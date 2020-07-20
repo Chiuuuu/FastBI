@@ -1,0 +1,13 @@
+/build/
+/config/
+/dist/
+/*.js
+
+/src/*.js
+/src/router/*
+/src/store/*
+/src/views/userManage/authorityConfig/*
+/src/api/*
+/src/static/*
+/node_modules/
+/src

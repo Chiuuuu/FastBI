@@ -1,0 +1,50 @@
+// 导航菜单
+.ant-menu {
+    .ant-menu-submenu-title {
+        span {
+            position: relative;
+            padding-left: 13px;
+            img {
+                position: absolute;
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+        }
+    }
+}
+
+.ant-table {
+    border: 1px solid #F0F0F0 !important;
+    border-bottom: 0 !important;
+}
+
+// 弹窗
+.ant-modal-header {
+    border-bottom: 0 !important;
+    background: #F5F5F5 !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+}
+
+.ant-modal-body {
+    padding-top: 15px !important;
+}
+
+.ant-modal-footer {
+    border-top: 0 !important;
+}
+
+button.ant-modal-close {
+    height: 42px !important;
+    .ant-modal-close-x {
+        height: 42px !important;
+        position: relative;
+        i {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+    }
+}
