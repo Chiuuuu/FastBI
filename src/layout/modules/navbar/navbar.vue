@@ -32,7 +32,7 @@ export default {
     // 退出登录按钮
     quitBtn() {
       this.$router.push({
-        path: '/login',
+        path: "/login"
       });
       sessionStorage.clear();
     },
@@ -40,14 +40,14 @@ export default {
     // 点击收起展开侧边栏
     sidebarUnfoldBtn() {
       if (this.sidebarUnfold == true) {
-        this.$store.commit('common/set_sidebarUnfold', false);
+        this.$store.commit("common/set_sidebarUnfold", false);
       } else {
-        this.$store.commit('common/set_sidebarUnfold', true);
+        this.$store.commit("common/set_sidebarUnfold", true);
       }
-    },
-  },
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>
-@import './navbar.scss';
+@import "./navbar.scss";
 </style>

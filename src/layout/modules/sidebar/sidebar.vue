@@ -11,16 +11,25 @@
       mode="inline"
       theme="dark"
     >
-      <a-sub-menu v-for="item in sidebarArr" v-if="item.children.length > 0" :key="item.id">
-        <span slot="title">
+      <a-sub-menu v-for="(item, index) in sidebarArr" :key="index + '_'">
+        <template v-if="item.children.length > 0">
+          <span slot="title">
+            <a-icon :type="item.icon" />
+            <span v-show="sidebarUnfold == false">{{ item.name }}</span>
+          </span>
+          <a-menu-item
+            v-for="i in item.children"
+            :key="i.id"
+            @click="selectMenu(i, i.id)"
+            >{{ i.name }}</a-menu-item
+          >
+        </template>
+      </a-sub-menu>
+      <a-menu-item v-for="item in sidebarArr" :key="item.id">
+        <template v-if="item.children.length == 0">
           <a-icon :type="item.icon" />
           <span v-show="sidebarUnfold == false">{{ item.name }}</span>
-        </span>
-        <a-menu-item v-for="i in item.children" :key="i.id" @click="selectMenu(i, i.id)">{{ i.name }}</a-menu-item>
-      </a-sub-menu>
-      <a-menu-item v-for="item in sidebarArr" v-if="item.children.length == 0" :key="item.id">
-        <a-icon :type="item.icon" />
-        <span v-show="sidebarUnfold == false">{{ item.name }}</span>
+        </template>
       </a-menu-item>
     </a-menu>
   </div>
@@ -30,57 +39,68 @@ export default {
   data() {
     return {
       sidebarStyle: {
-        width: '',
+        width: ""
       },
       logoStyle: {
-        left: '',
-        transform: '',
+        left: "",
+        transform: ""
       },
       sidebarArr: [
         {
-          name: '大屏管理',
-          id: '1',
-          icon: 'desktop',
-          path: '',
+          name: "大屏管理",
+          id: "1",
+          icon: "desktop",
+          path: "",
           children: [
-            { name: '大屏目录', id: '1-1', path: '/userManage/accountManage' }
-          ],
+            { name: "大屏目录", id: "1-1", path: "/userManage/accountManage" }
+          ]
         },
         {
-          name: '数据源',
-          id: '2',
-          icon: 'apartment',
-          path: '',
+          name: "数据源",
+          id: "2",
+          icon: "apartment",
+          path: "",
           children: [
-            { name: '审批列表', id: '2-1', path: '/approvalManage/multiApproval' },
-          ],
+            {
+              name: "数据接入",
+              id: "2-1",
+              path: "/approvalManage/multiApproval"
+            },
+            {
+              name: "数据模型",
+              id: "2-2",
+              path: "/approvalManage/multiApproval"
+            }
+          ]
         },
         {
-          name: '系统管理',
-          id: '3',
-          icon: 'tool',
-          path: '',
-          children: [{ name: '栏目配置', id: '3-1', path: '/columnManage/columnConfig' }],
+          name: "系统管理",
+          id: "3",
+          icon: "tool",
+          path: "",
+          children: [
+            { name: "栏目配置", id: "3-1", path: "/columnManage/columnConfig" }
+          ]
         }
-      ],
+      ]
     };
   },
   created() {
     if (this.sidebarUnfold == true) {
       this.sidebarStyle = {
-        width: '80px',
+        width: "80px"
       };
       this.logoStyle = {
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
+        left: "50%",
+        transform: "translate(-50%, -50%)"
       };
     } else {
       this.sidebarStyle = {
-        width: '220px',
+        width: "220px"
       };
       this.logoStyle = {
-        left: '20px',
-        transform: 'translateY(-50%)',
+        left: "20px",
+        transform: "translateY(-50%)"
       };
     }
   },
@@ -88,22 +108,22 @@ export default {
     sidebarUnfold() {
       if (this.sidebarUnfold == true) {
         this.sidebarStyle = {
-          width: '80px',
+          width: "80px"
         };
         this.logoStyle = {
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
+          left: "50%",
+          transform: "translate(-50%, -50%)"
         };
       } else {
         this.sidebarStyle = {
-          width: '220px',
+          width: "220px"
         };
         this.logoStyle = {
-          left: '20px',
-          transform: 'translateY(-50%)',
+          left: "20px",
+          transform: "translateY(-50%)"
         };
       }
-    },
+    }
   },
   computed: {
     // 侧边栏展开收起
@@ -120,14 +140,14 @@ export default {
     selectMenu(item, id) {
       console.log(item);
       console.log(id);
-      this.$store.commit('common/set_navMenuActive', item.id);
+      this.$store.commit("common/set_navMenuActive", item.id);
       this.$router.push({
-        path: item.path,
+        path: item.path
       });
-    },
-  },
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>
-@import './sidebar.scss';
+@import "./sidebar.scss";
 </style>

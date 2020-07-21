@@ -7,26 +7,26 @@
   </div>
 </template>
 <script>
-import Navbar from '../navbar/navbar';
+import Navbar from "../navbar/navbar";
 export default {
   components: {
-    Navbar,
+    Navbar
   },
   data() {
     return {
       appMainStyle: {
-        paddingLeft: '',
-      },
+        paddingLeft: ""
+      }
     };
   },
   created() {
     if (this.sidebarUnfold == true) {
       this.appMainStyle = {
-        paddingLeft: '80px',
+        paddingLeft: "80px"
       };
     } else {
       this.appMainStyle = {
-        paddingLeft: '220px',
+        paddingLeft: "220px"
       };
     }
   },
@@ -34,23 +34,23 @@ export default {
     sidebarUnfold() {
       if (this.sidebarUnfold == true) {
         this.appMainStyle = {
-          paddingLeft: '80px',
+          paddingLeft: "80px"
         };
       } else {
         this.appMainStyle = {
-          paddingLeft: '220px',
+          paddingLeft: "220px"
         };
       }
-    },
+    }
   },
   computed: {
     // 侧边栏展开收起
     sidebarUnfold() {
       return this.$store.state.common.sidebarUnfold;
-    },
-  },
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>
-@import './appMain.scss';
+@import "./appMain.scss";
 </style>

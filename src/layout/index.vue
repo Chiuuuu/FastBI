@@ -5,13 +5,13 @@
   </div>
 </template>
 <script>
-import AppMain from './modules/appMain/appMain';
-import Sidebar from './modules/sidebar/sidebar';
+import AppMain from "./modules/appMain/appMain";
+import Sidebar from "./modules/sidebar/sidebar";
 export default {
   components: {
     Sidebar,
-    AppMain,
-  },
+    AppMain
+  }
 };
 </script>
 <style lang="scss" scoped>
