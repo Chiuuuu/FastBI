@@ -64,12 +64,12 @@ export default {
             {
               name: "数据接入",
               id: "2-1",
-              path: "/approvalManage/multiApproval"
+              path: "/dataSource/dataAccess"
             },
             {
               name: "数据模型",
               id: "2-2",
-              path: "/approvalManage/multiApproval"
+              path: "/dataSource/dataModel"
             }
           ]
         },
