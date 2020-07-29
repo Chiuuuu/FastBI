@@ -1,0 +1,65 @@
+<template>
+  <div class="board-header" flex>
+    <div class="header-title">
+      <span v-if="config.title">{{ config.title.text }}</span>
+    </div>
+    <div class="control" flex-box="1">
+      <slot>control box</slot>
+    </div>
+    <div class="right-box">
+      <b-tooltip content="预览" placement="bottom">
+        <b-icon name="ios-eye" @click.native="openScreen"></b-icon>
+      </b-tooltip>
+      <b-tooltip content="发布" placement="bottom">
+        <b-icon name="ios-paper-plane"></b-icon>
+      </b-tooltip>
+      <b-tooltip content="个人中心" placement="bottom">
+        <b-icon name="ios-contact"></b-icon>
+      </b-tooltip>
+      <b-tooltip content="主题" placement="bottom">
+        <b-icon name="ios-shirt"></b-icon>
+      </b-tooltip>
+    </div>
+  </div>
+</template>
+
+<script>
+
+  export default {
+    name: 'BoardHeader',
+    props: {
+      config: {
+        type: Object,
+        required: true
+      }
+    },
+    data () {
+      return {
+        userId: ''
+      }
+    },
+    created () {
+      this.userId = 'dv1e443967LZP2Dj'
+    },
+    methods: {
+      // 计算缩放比例
+      resize_window() {
+          let wheight = Number(document.documentElement.clientHeight / 1080)
+          this.scalseNum = wheight
+      },
+      openScreen () {
+        this.$router.push({ name: 'screen', params: { id: this.userId } })
+        // var docElm = document.querySelector('.canvas-panel')
+        // if (docElm.requestFullscreen) { // W3C
+        //     docElm.requestFullscreen()
+        // } else if (docElm.mozRequestFullScreen) { // FireFox
+        //     docElm.mozRequestFullScreen()
+        // } else if (docElm.webkitRequestFullScreen) { // Chrome等
+        //     docElm.webkitRequestFullScreen()
+        // } else if (docElm.msRequestFullscreen) { // IE11
+        //     docElm.msRequestFullscreen()
+        // }
+      }
+    }
+  }
+</script>
