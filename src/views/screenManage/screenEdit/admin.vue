@@ -48,7 +48,8 @@
                             :type-name="transform.packageJson.name"
                             :config="transform.packageJson.config"
                             :api-data="transform.packageJson.api_data"
-                            :apis="transform.packageJson.apis"></charts-factory>
+                            :apis="transform.packageJson.apis"
+                            :background="transform.packageJson.background"></charts-factory>
           </drag-item>
         </template>
       </template>

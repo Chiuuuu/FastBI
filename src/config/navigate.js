@@ -26,6 +26,14 @@ const list = [
         apis: {
           labelMap: { 'x': '类目', 'y': '值', 's': '系列1' }
         },
+        background: {
+          backgroundType: '1',
+          backgroundColor: '',
+          borderColor: '',
+          borderWidth: 0,
+          borderStyle: '',
+          borderRadius: 0
+        },
         config: {
           title: {
             show: true,
@@ -137,6 +145,14 @@ const list = [
             's': '系列1'
           }
         },
+        background: {
+          backgroundType: '1',
+          backgroundColor: '',
+          borderColor: '',
+          borderWidth: 0,
+          borderStyle: '',
+          borderRadius: 0
+        },
         config: {
           title: {
             show: true,
@@ -240,6 +256,14 @@ const list = [
             's': '系列1'
           }
         },
+        background: {
+          backgroundType: '1',
+          backgroundColor: '',
+          borderColor: '',
+          borderWidth: 0,
+          borderStyle: '',
+          borderRadius: 0
+        },
         config: {
           title: {
             show: true,
@@ -336,6 +360,14 @@ const list = [
             'y': '值',
             's': '系列1'
           }
+        },
+        background: {
+          backgroundType: '1',
+          backgroundColor: '',
+          borderColor: '',
+          borderWidth: 0,
+          borderStyle: '',
+          borderRadius: 0
         },
         config: {
           title: {
@@ -453,6 +485,14 @@ const list = [
             's': '系列1'
           }
         },
+        background: {
+          backgroundType: '1',
+          backgroundColor: '',
+          borderColor: '',
+          borderWidth: 0,
+          borderStyle: '',
+          borderRadius: 0
+        },
         config: {
           title: {
             show: true,
@@ -561,6 +601,14 @@ const list = [
             'y': '人口',
             's': '系列1'
           }
+        },
+        background: {
+          backgroundType: '1',
+          backgroundColor: '',
+          borderColor: '',
+          borderWidth: 0,
+          borderStyle: '',
+          borderRadius: 0
         },
         config: {
           title: {
@@ -709,6 +757,14 @@ const list = [
         name: 've-text',
         apiData: {},
         apis: {},
+        background: {
+          backgroundType: '1',
+          backgroundColor: '',
+          borderColor: '',
+          borderWidth: 0,
+          borderStyle: '',
+          borderRadius: 0
+        },
         config: {
           title: {
             content: '文本',
@@ -807,6 +863,14 @@ const list = [
           ]
         },
         apis: {},
+        background: {
+          backgroundType: '1',
+          backgroundColor: '',
+          borderColor: '',
+          borderWidth: 0,
+          borderStyle: '',
+          borderRadius: 0
+        },
         config: {
           index: {
             show: false

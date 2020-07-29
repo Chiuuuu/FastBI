@@ -41,6 +41,14 @@ const database = {
             's': '系列1'
           }
         },
+        background: {
+          backgroundType: '1',
+          backgroundColor: '',
+          borderColor: '',
+          borderWidth: 0,
+          borderStyle: '',
+          borderRadius: 0
+        },
         config: {
           title: {
             show: true,
@@ -136,6 +144,14 @@ const database = {
         },
         apis: {
           labelMap: { 'x': '类目', 'y': '值', 's': '系列1' }
+        },
+        background: {
+          backgroundType: 1,
+          backgroundColor: '',
+          borderColor: '',
+          borderWidth: '',
+          borderStyle: '',
+          borderRadius: 0
         },
         config: {
           title: {
@@ -251,6 +267,14 @@ const database = {
             's': '系列1'
           }
         },
+        background: {
+          backgroundType: '1',
+          backgroundColor: '',
+          borderColor: '',
+          borderWidth: 0,
+          borderStyle: '',
+          borderRadius: 0
+        },
         config: {
           title: {
             show: true,
@@ -350,6 +374,14 @@ const database = {
             'y': '值',
             's': '系列1'
           }
+        },
+        background: {
+          backgroundType: '1',
+          backgroundColor: '',
+          borderColor: '',
+          borderWidth: 0,
+          borderStyle: '',
+          borderRadius: 0
         },
         config: {
           title: {
@@ -460,6 +492,14 @@ const database = {
             'y': '人口',
             's': '系列1'
           }
+        },
+        background: {
+          backgroundType: '1',
+          backgroundColor: '',
+          borderColor: '',
+          borderWidth: 0,
+          borderStyle: '',
+          borderRadius: 0
         },
         config: {
           title: {
@@ -633,6 +673,14 @@ const database = {
             's': '系列1'
           }
         },
+        background: {
+          backgroundType: '1',
+          backgroundColor: '',
+          borderColor: '',
+          borderWidth: 0,
+          borderStyle: '',
+          borderRadius: 0
+        },
         config: {
           title: {
             show: true,
@@ -724,6 +772,14 @@ const database = {
         name: 've-text',
         apiData: {},
         apis: {},
+        background: {
+          backgroundType: '1',
+          backgroundColor: '',
+          borderColor: '',
+          borderWidth: 0,
+          borderStyle: '',
+          borderRadius: 0
+        },
         config: {
           title: {
             content: '文本',
@@ -819,6 +875,14 @@ const database = {
           ]
         },
         apis: {},
+        background: {
+          backgroundType: '1',
+          backgroundColor: '',
+          borderColor: '',
+          borderWidth: 0,
+          borderStyle: '',
+          borderRadius: 0
+        },
         config: {
           index: {
             show: false

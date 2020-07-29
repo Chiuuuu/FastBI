@@ -1,5 +1,5 @@
 <template>
-  <div class="dv-tables" style="width: 100%;height:100%;" ref="wrap">
+  <div class="dv-tables" style="width: 100%;height:100%;" :style="backgroundStyle" ref="wrap">
     <div class="titles" ref="titles" v-if="config.title && config.title.show" :style="titleStyle">
       <span>{{ config.title.content }}</span>
     </div>
@@ -31,6 +31,10 @@
         required: true
       },
       apiData: {
+        type: Object,
+        required: true
+      },
+      background: {
         type: Object,
         required: true
       }
@@ -81,6 +85,22 @@
             this.columns = val.column
             this.tableData = val.source
           }
+        },
+        deep: true,
+        immediate: true
+      },
+      background: {
+        handler (val) {
+          if (val) {
+           this.backgroundStyle = {
+             backgroundColor: val.backgroundColor,
+             borderColor: val.borderColor,
+             borderWidth: val.borderWidth + 'px',
+             borderStyle: val.borderStyle,
+             borderRadius: val.borderRadius + 'px'
+            }
+          }
+          console.log(this.backgroundStyle)
         },
         deep: true,
         immediate: true
