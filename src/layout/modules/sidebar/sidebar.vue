@@ -52,7 +52,7 @@ export default {
           icon: 'desktop',
           path: '',
           children: [
-            { name: '大屏目录', id: '1-1', path: '/userManage/accountManage' }
+            { name: '大屏目录', id: '1-1', path: '/screenManage/screenCatalog' }
           ]
         },
         {

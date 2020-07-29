@@ -1,11 +1,22 @@
 <template>
-  <div class="data-access"></div>
+  <div class="data-access">
+    <Menu></Menu>
+    <Main></Main>
+  </div>
 </template>
-
 <script>
-export default {}
+import Menu from './components/data-main/data-menu/menu'
+import Main from './components/data-main/main'
+export default {
+  components: {
+    Menu,
+    Main
+  }
+}
 </script>
-
-<style lang="stylus" scoped>
-@import "./dataAccess.styl";
+<style lang="styl" scoped>
+.data-access {
+  display: flex;
+  justify-content: space-between;
+}
 </style>

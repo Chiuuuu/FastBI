@@ -29,9 +29,9 @@
 </template>
 
 <script>
-export default {};
+export default {}
 </script>
 
-<style lang="scss" scoped>
-@import "./screenEdit.scss";
+<style lang="styl" scoped>
+@import "./screenEdit.styl";
 </style>
