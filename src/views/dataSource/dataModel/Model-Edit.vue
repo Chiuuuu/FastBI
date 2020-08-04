@@ -12,6 +12,24 @@
         </a-select>
       </div>
       <a-divider />
+      <div class="menu_database">
+        <span class="database_span">数据库</span>
+        <a-select default-value="databaseA" style="width: 300px">
+          <a-select-option value="databaseA">
+            databaseA
+          </a-select-option>
+          <a-select-option value="databaseB">
+            databaseB
+          </a-select-option>
+          <a-select-option value="databaseC">
+            databaseC
+          </a-select-option>
+          <a-select-option value="databaseD">
+            databaseD
+          </a-select-option>
+        </a-select>
+      </div>
+      <a-divider />
       <div class="menu_search">
         <span class="search_span">表</span>
         <a-input placeholder="请输入关键词搜索" class="search_input">
@@ -19,7 +37,55 @@
         </a-input>
       </div>
       <div class="sheet_list">
-        <span>银行账户</span>
+        <span>银行账户</span><p/>
+        <span>sheet 1</span><p/>
+        <span>sheet 2</span><p/>
+      </div>
+      <a-divider />
+      <div class="SQL-View">
+        <!-- <div class="view-head">
+          <span>自定义SQL视图</span>
+        </div> -->
+        <div>
+          <a-menu
+            :default-selected-keys="['1']"
+            :open-keys.sync="openKeys"
+            mode="inline"
+          >
+            <a-sub-menu>
+              <span slot="title">
+                <span class="view-title">自定义SQL视图</span>
+              </span>
+              <a-menu-item>
+                <a-dropdown :trigger="['contextmenu']">
+              <div>
+                银行账户
+                </div>
+              <a-menu slot="overlay">
+                <a-menu-item v-on:click="check">
+                  查看表
+                </a-menu-item>
+                <a-menu-item>
+                  编辑
+                </a-menu-item>
+                <a-menu-item>
+                  删除
+                </a-menu-item>
+              </a-menu>
+            </a-dropdown>
+              </a-menu-item>
+              <!-- <a-menu-item>
+                Option 10
+              </a-menu-item>
+              <a-menu-item>
+                Option 11
+              </a-menu-item>
+              <a-menu-item>
+                Option 12
+              </a-menu-item> -->
+            </a-sub-menu>
+          </a-menu>
+        </div>
       </div>
     </div>
     <div class="right">
@@ -27,7 +93,7 @@
         <span class="data_con">数据模型1</span>
       </div>
       <div class="description">
-        <span>描述：<a-icon type="edit" v-on:click="open"/></span>
+        <span class="d-s">描述： <a-icon type="edit" v-on:click="open"/></span>
         <a-modal v-model="visible1" title="编辑描述" v-on:ok="close">
           <a-textarea
             placeholder="请输入描述内容"
@@ -35,7 +101,135 @@
           />
         </a-modal>
       </div>
-      <div class="draw_board"></div>
+      <div class="draw_board">
+        <div class="outer">
+          <div class="First">
+            <div class="bank-account">
+              <span class="f-b-s">银行账户</span>
+            </div>
+          </div>
+          <div class="Second">
+            <div class="need">
+              <span class="s-n-s">统计需求</span>
+            </div>
+            <div class="need-01">
+              <span class="s-n01-s">统计需求1</span>
+            </div>
+          </div>
+          <div class="Third">
+            <div class="account">
+              <span class="t-a-s">基本账户</span>
+            </div>
+            <div class="account-01">
+              <span class="t-a01-s">基本账户1</span>
+            </div>
+            <div class="account-02">
+              <span class="t-a02-s">基本账户2</span>
+            </div>
+            <div class="account-03">
+              <span class="t-a03-s">基本账户3</span>
+            </div>
+          </div>
+          <div class="Forth">
+            <div class="deal">
+              <span class="f-d-s">统结算交易</span>
+            </div>
+          </div>
+          <div class="conneted1" @click="showModal">
+            <a-icon type="plus-circle" />
+          </div>
+          <div class="conneted2" @click="showModal">
+            <a-icon type="plus-circle" />
+          </div>
+          <div class="conneted3" @click="showModal">
+            <a-icon type="plus-circle" />
+          </div>
+          <div class="conneted4" @click="showModal">
+            <a-icon type="plus-circle" />
+          </div>
+          <div class="conneted5" @click="showModal">
+            <a-icon type="plus-circle" />
+          </div>
+          <div class="conneted6" @click="showModal">
+            <a-icon type="plus-circle" />
+          </div>
+          <div class="conneted7" @click="showModal">
+            <a-icon type="plus-circle" />
+          </div>
+          <a-modal v-model="visible5" title="关联关系" :width="734">
+            <a-form-model
+              ref="ruleForm"
+              :model="form"
+              :rules="rules"
+              :label-col="labelCol"
+              :wrapper-col="wrapperCol"
+            >
+              <a-form-model-item label="关联方式" prop="Function">
+                <div class="function_select">
+                  <a-select
+                    placeholder="请选择关联关系"
+                    default-value="交集"
+                    style="width:560px"
+                  >
+                    <a-select-option value="交集">
+                      交集
+                    </a-select-option>
+                    <a-select-option value="并集">
+                      并集
+                    </a-select-option>
+                    <a-select-option value="左连接">
+                      左连接
+                    </a-select-option>
+                    <a-select-option value="右连接">
+                      右连接
+                    </a-select-option>
+                  </a-select>
+                </div>
+              </a-form-model-item>
+              <div class="function_table">
+                <div
+                  class="table_head"
+                  style=" background: rgba(248,248,248,1); "
+                >
+                  <div class="head_span">
+                    <span>表名1 </span>
+                    <a-icon type="link" /><span> 表名2</span>
+                  </div>
+                  <div class="head_add">
+                    <a-icon
+                      type="plus-square"
+                      style="margin-right:9px;"
+                      @click="handleAdd"
+                    />
+                  </div>
+                </div>
+                <div class="table_main">
+                  <a-table :data-source="dataSource" :columns="c">
+                    <span slot="table1">
+                      <a-input style="width:220px" />
+                    </span>
+                    <span slot="link">
+                      <a-icon type="link" />
+                    </span>
+                    <span slot="table2">
+                      <a-input style="width:220px" />
+                    </span>
+                    <span slot="operation" slot-scope="text, record">
+                      <a-popconfirm
+                        v-if="dataSource.length"
+                        title="确认删除?"
+                        @confirm="() => onDelete(record.key)"
+                      >
+                        <a href="javascript:;"> <a-icon type="delete"/></a>
+                      </a-popconfirm>
+                    </span>
+                  </a-table>
+                </div>
+              </div>
+            </a-form-model>
+          </a-modal>
+        </div>
+      </div>
       <div class="detail">
         <div class="detail_header">
           <span>数据模型详情</span>
@@ -58,7 +252,95 @@
                 </a-table>
               </div>
             </a-modal>
-            <a-button>批量编辑字段</a-button>
+            <a-button v-on:click="showDrawer">批量编辑字段</a-button>
+            <a-drawer
+              title="字段重命名"
+              :width="1150"
+              :visible="visible3"
+              :body-style="{ paddingBottom: '80px' }"
+              @close="onClose"
+            >
+              <div class="drawer-btn">
+                <a-button style="width:110px">设置字段类型</a-button>
+                <a-button style="width:110px">设置字段属性</a-button>
+                <a-button style="width:110px">设置是否可见</a-button>
+              </div>
+              <div class="drawer-menu">
+                <a-collapse style="width:1110px">
+                  <a-collapse-panel key="1" header="订单">
+                    <a-table
+                      :row-selection="rowSelection"
+                      :columns="column"
+                      :data-source="setting"
+                      bordered
+                    >
+                      <span slot="other_name">
+                        <a-input style="width:186px;height:32px" />
+                      </span>
+                      <span slot="type">
+                        <a-select default-value="数字" style="width:100px;">
+                          <a-select-option value="int">
+                            整数
+                          </a-select-option>
+                          <a-select-option value="date">
+                            日期时间
+                          </a-select-option>
+                          <a-select-option value="string">
+                            字符串
+                          </a-select-option>
+                          <a-select-option value="double">
+                            小数
+                          </a-select-option>
+                        </a-select>
+                      </span>
+                      <span slot="property">
+                        <a-select default-value="维度">
+                          <a-select-option value="dim">
+                            维度
+                          </a-select-option>
+                          <a-select-option value="mea">
+                            度量
+                          </a-select-option>
+                        </a-select>
+                      </span>
+                      <span slot="description">
+                        <a-input style="width:186px;height:32px" />
+                      </span>
+                      <span slot="isShow">
+                        <a-select default-value="是">
+                          <a-select-option value="yes">
+                            是
+                          </a-select-option>
+                          <a-select-option value="no">
+                            否
+                          </a-select-option>
+                        </a-select>
+                      </span>
+                    </a-table>
+                  </a-collapse-panel>
+                </a-collapse>
+              </div>
+              <div
+                :style="{
+                  position: 'absolute',
+                  right: 0,
+                  bottom: 0,
+                  width: '100%',
+                  borderTop: '1px solid #e9e9e9',
+                  padding: '10px 16px',
+                  background: '#fff',
+                  textAlign: 'right',
+                  zIndex: 1
+                }"
+              >
+                <a-button :style="{ marginRight: '8px' }">
+                  取消
+                </a-button>
+                <a-button type="primary" @click="onClose">
+                  保存
+                </a-button>
+              </div>
+            </a-drawer>
           </div>
         </div>
         <div class="detail_main">
@@ -154,6 +436,7 @@
                         :show-arrow="false"
                         :filter-option="false"
                         :not-found-content="null"
+                        @change="change"
                       >
                         <a-select-option
                           v-for="express in expression"
@@ -163,18 +446,90 @@
                         </a-select-option>
                       </a-select>
                     </div>
-                    <div
-                      class="text"
-                      v-for="express in expression"
-                      :key="express.key"
-                    >
-                      {{ expression.text }}
+                    <div class="text">
+                      {{ expression[activeIndex].text }}
                     </div>
                   </div>
                 </div>
               </a-modal>
               <a-divider type="vertical" />
-              <a>设置地理位置</a>
+              <a v-on:click="geography">设置地理位置</a>
+              <a-modal
+                v-model="visible4"
+                title="创建地理字段"
+                okText="确定"
+                width="750px"
+              >
+                <div class="cacsader">
+                  <span>国家： </span>
+                  <a-select
+                    :default-value="countryData[0]"
+                    style="width: 100px"
+                    @change="handlecountryChange"
+                  >
+                    <a-select-option
+                      v-for="country in countryData"
+                      :key="country"
+                    >
+                      {{ country }}
+                    </a-select-option>
+                  </a-select>
+                  <span>省市： </span>
+                  <a-select
+                    v-model="province"
+                    style="width: 100px"
+                    @change="handleprovinceChange"
+                  >
+                    <a-select-option v-for="pro in provinces" :key="pro">
+                      {{ pro }}
+                    </a-select-option>
+                  </a-select>
+                  <span>城市： </span>
+                  <a-select
+                    v-model="city"
+                    style="width: 100px"
+                    @change="handlecityChange"
+                  >
+                    <a-select-option v-for="city in cities" :key="city">
+                      {{ city }}
+                    </a-select-option>
+                  </a-select>
+                  <span>区县： </span>
+                  <a-select v-model="area" style="width: 100px">
+                    <a-select-option v-for="area in areas" :key="area">
+                      {{ area }}
+                    </a-select-option>
+                  </a-select>
+                </div>
+                <div class="geo-contain">
+                  <div class="geo-map"></div>
+                  <div class="geo-set">
+                    <div class="set-head">
+                      <span class="g-s-s">地区匹配</span>
+                      <span class="g-s-r">(6个未匹配项)</span>
+                    </div>
+                    <div class="set-select">
+                      <div>
+                        <span class="s-s-s">请选择匹配字段: </span>
+                      </div>
+                      <div>
+                        <a-select default-value="分公司" style="width: 390px">
+                          <a-select-option value="分公司">
+                            分公司
+                          </a-select-option>
+                        </a-select>
+                      </div>
+                    </div>
+                    <div class="set-table">
+                      <a-table :columns="colu" :data-source="datas">
+                        <span slot="config">
+                          <a>请选择配置项</a>
+                        </span>
+                      </a-table>
+                    </div>
+                  </div>
+                </div>
+              </a-modal>
             </div>
             <div class="dim_menu">
               <a-menu mode="inline">
@@ -271,6 +626,22 @@
 </template>
 
 <script>
+const countryData = ['中国']
+const proData = {
+  中国: ['广东省', '浙江省']
+}
+const cityData = {
+  广东省: ['广州市', '肇庆市', '深圳市'],
+  浙江省: ['宁波市', '温州市', '杭州市']
+}
+const areaData = {
+  广州市: ['海珠区', '越秀区', '荔湾区'],
+  深圳市: ['罗湖区', '福田区', '南山区'],
+  肇庆市: ['怀集县', '四会市', '封开县'],
+  宁波市: ['镇海区', '宁海区', '象山区'],
+  温州市: ['文成区', '苍南区', '平阳区'],
+  杭州市: ['上城区', '下城区', '富阳区']
+}
 const columns = [
   {
     title: '序号',
@@ -278,11 +649,36 @@ const columns = [
     dataIndex: 'number',
     key: 'number'
   },
-  { title: '产品ID', width: 25, dataIndex: 'id', key: 'id' },
-  { title: '产品名称', dataIndex: 'name', key: 'name', width: 40 },
-  { title: '发货日期', dataIndex: 'date', key: 'date', width: 40 },
-  { title: '国家', dataIndex: 'country', key: 'country', width: 20 },
-  { title: '地区', dataIndex: 'address', key: 'address', width: 20 }
+  {
+    title: '产品ID',
+    width: 25,
+    dataIndex: 'id',
+    key: 'id'
+  },
+  {
+    title: '产品名称',
+    dataIndex: 'name',
+    key: 'name',
+    width: 40
+  },
+  {
+    title: '发货日期',
+    dataIndex: 'date',
+    key: 'date',
+    width: 40
+  },
+  {
+    title: '国家',
+    dataIndex: 'country',
+    key: 'country',
+    width: 20
+  },
+  {
+    title: '地区',
+    dataIndex: 'address',
+    key: 'address',
+    width: 20
+  }
 ]
 
 const data = []
@@ -296,6 +692,62 @@ for (let i = 0; i < 100; i++) {
     address: '广东'
   })
 }
+
+const column = [
+  {
+    title: '原名',
+    dataIndex: 'last_name'
+  },
+  {
+    title: '别名',
+    dataIndex: 'other_name',
+    scopedSlots: {
+      customRender: 'other_name'
+    }
+  },
+  {
+    title: '字段类型',
+    dataIndex: 'type',
+    scopedSlots: {
+      customRender: 'type'
+    }
+  },
+  {
+    title: '字段属性',
+    dataIndex: 'property',
+    scopedSlots: {
+      customRender: 'property'
+    }
+  },
+  {
+    title: '字段说明',
+    dataIndex: 'description',
+    scopedSlots: {
+      customRender: 'description'
+    }
+  },
+  {
+    title: '注释',
+    dataIndex: 'annotation',
+    scopedSlots: {
+      customRender: 'annotation'
+    }
+  },
+  {
+    title: '是否可见',
+    dataIndex: 'isShow',
+    scopedSlots: {
+      customRender: 'isShow'
+    }
+  }
+]
+
+const setting = [
+  {
+    key: '1',
+    last_name: 'authorityEntityType'
+  }
+]
 
 const expression = [
   {
@@ -339,25 +791,136 @@ const expression = [
       'MAX(表达式) 返回表达式在所有记录中的最大值。MAX只能用于数字、日期、日期时间字段。 示例: MAX([访问量])s'
   }
 ]
+const colu = [
+  {
+    title: '您的数据',
+    dataIndex: 'data'
+  },
+  {
+    title: '匹配到',
+    dataIndex: 'config',
+    scopedSlots: {
+      customRender: 'config'
+    }
+  }
+]
+
+const datas = [
+  {
+    data: '天河'
+  },
+  {
+    data: '海珠'
+  }
+]
 
 export default {
   data() {
     return {
       data,
       columns,
+      column,
+      setting,
       expression,
+      countryData,
+      proData,
+      cityData,
+      areaData,
+      colu,
+      datas,
+      activeIndex: 0,
+      provinces: proData[countryData[0]],
+      province: proData[countryData[0]][0],
+      cities: cityData[proData[countryData[0]][0]],
+      city: cityData[proData[countryData[0]][0]][0],
+      areas: areaData[cityData[proData[countryData[0]][0]][0]],
+      area: areaData[cityData[proData[countryData[0]][0]][0]][0],
       current: ['mail'],
       openKeys: ['sub1'],
       visible: false,
       visible1: false,
       visible2: false,
-      labelCol: { span: 4 },
-      wrapperCol: { span: 14 },
+      visible3: false,
+      visible4: false,
+      visible5: false,
+      rules: {
+        Function: [
+          {
+            required: true,
+            message: '请选择关联方式'
+          }
+        ]
+      },
+      labelCol: {
+        span: 4
+      },
+      wrapperCol: {
+        span: 14
+      },
       formLayout: ' horizontal ',
-      form: this.$form.createForm(this, { name: 'coordinated' })
+      form: this.$form.createForm(this, {
+        name: 'coordinated'
+      }),
+      dataSource: [
+        {
+          key: '0',
+          name: 'Edward King 0',
+          age: '32',
+          address: 'London, Park Lane no. 0'
+        },
+        {
+          key: '1',
+          name: 'Edward King 1',
+          age: '32',
+          address: 'London, Park Lane no. 1'
+        }
+      ],
+      count: 2,
+      c: [
+        {
+          title: '表1',
+          dataIndex: 'table1',
+          width: '30%',
+          scopedSlots: {
+            customRender: 'table1'
+          }
+        },
+        {
+          title: '连接',
+          dataIndex: 'link',
+          scopedSlots: {
+            customRender: 'link'
+          }
+        },
+        {
+          title: '表2',
+          dataIndex: 'table2',
+          scopedSlots: {
+            customRender: 'table2'
+          }
+        },
+        {
+          title: '操作',
+          dataIndex: 'operation',
+          scopedSlots: {
+            customRender: 'operation'
+          }
+        }
+      ]
+    }
+  },
+  computed: {
+    rowSelection() {
+      return {}
     }
   },
   methods: {
+    showModal() {
+      this.visible5 = true
+    },
+    geography() {
+      this.visible4 = true
+    },
     open() {
       this.visible1 = true
     },
@@ -372,6 +935,50 @@ export default {
     },
     exit() {
       this.$router.go(-1)
+    },
+    showDrawer() {
+      this.visible3 = true
+    },
+    onClose() {
+      this.visible3 = false
+    },
+    handlecountryChange(value) {
+      this.provinces = proData[value]
+      this.province = proData[value][0]
+    },
+    handleprovinceChange(value) {
+      this.cities = cityData[value]
+      this.city = cityData[value][0]
+    },
+    handlecityChange(value) {
+      this.areas = areaData[value]
+      this.area = areaData[value][0]
+    },
+    change(index) {
+      this.activeIndex = index - 1
+    },
+    onCellChange(key, dataIndex, value) {
+      const dataSource = [...this.dataSource]
+      const target = dataSource.find(item => item.key === key)
+      if (target) {
+        target[dataIndex] = value
+        this.dataSource = dataSource
+      }
+    },
+    onDelete(key) {
+      const dataSource = [...this.dataSource]
+      this.dataSource = dataSource.filter(item => item.key !== key)
+    },
+    handleAdd() {
+      const { count, dataSource } = this
+      const newData = {
+        key: count,
+        name: `Edward King ${count}`,
+        age: 32,
+        address: `London, Park Lane no. ${count}`
+      }
+      this.dataSource = [...dataSource, newData]
+      this.count = count + 1
     }
   }
 }
