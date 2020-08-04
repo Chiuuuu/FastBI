@@ -102,41 +102,125 @@
       <a-sub-menu>
         <span slot="title"><a-icon type="folder" /><span>珠江测试</span></span>
         <a-menu-item>
+          <a-dropdown :trigger="['contextmenu']">
+            <div>
           <img src="@/assets/images/icon_my_sql.png" style="width:15px;height:15px" />
           数据连接1
+            </div>
+            <a-menu slot="overlay">
+                <a-menu-item>
+                  重命名
+                </a-menu-item>
+                <a-menu-item>
+                  删除
+                </a-menu-item>
+              </a-menu>
+            </a-dropdown>
         </a-menu-item>
         <a-menu-item>
+          <a-dropdown :trigger="['contextmenu']">
+            <div>
           <img src="@/assets/images/icon_csv.png" style="width:15px;height:15px" />
           数据连接2
+            </div>
+            <a-menu slot="overlay">
+                <a-menu-item>
+                  重命名
+                </a-menu-item>
+                <a-menu-item>
+                  删除
+                </a-menu-item>
+              </a-menu>
+            </a-dropdown>
         </a-menu-item>
         <a-menu-item>
+          <a-dropdown :trigger="['contextmenu']">
+            <div>
           <img
             src="@/assets/images/icon_log_file.png"
             style="width:15px;height:15px"
           />
           数据连接3
+            </div>
+            <a-menu slot="overlay">
+                <a-menu-item>
+                  重命名
+                </a-menu-item>
+                <a-menu-item>
+                  删除
+                </a-menu-item>
+              </a-menu>
+            </a-dropdown>
         </a-menu-item>
         <a-menu-item>
+          <a-dropdown :trigger="['contextmenu']">
+            <div>
           <img src="@/assets/images/icon_hive.png" style="width:15px;height:15px" />
           数据连接4
+            </div>
+            <a-menu slot="overlay">
+                <a-menu-item>
+                  重命名
+                </a-menu-item>
+                <a-menu-item>
+                  删除
+                </a-menu-item>
+              </a-menu>
+            </a-dropdown>
         </a-menu-item>
       </a-sub-menu>
       <a-sub-menu>
         <span slot="title"><a-icon type="folder" /><span>用户流程</span></span>
         <a-menu-item>
+          <a-dropdown :trigger="['contextmenu']">
+            <div>
           <img src="@/assets/images/icon_hbase.png" style="width:15px;height:15px" />
           数据连接1
+            </div>
+            <a-menu slot="overlay">
+                <a-menu-item>
+                  重命名
+                </a-menu-item>
+                <a-menu-item>
+                  删除
+                </a-menu-item>
+              </a-menu>
+            </a-dropdown>
         </a-menu-item>
         <a-menu-item>
+          <a-dropdown :trigger="['contextmenu']">
+            <div>
           <img
             src="@/assets/images/icon_sql_server.png"
             style="width:15px;height:15px"
           />
           数据连接2
+            </div>
+            <a-menu slot="overlay">
+                <a-menu-item>
+                  重命名
+                </a-menu-item>
+                <a-menu-item>
+                  删除
+                </a-menu-item>
+              </a-menu>
+            </a-dropdown>
         </a-menu-item>
         <a-menu-item>
+          <a-dropdown :trigger="['contextmenu']">
+            <div>
           <img src="@/assets/images/icon_excel.png" style="width:15px;height:15px" />
           数据连接3
+            </div>
+            <a-menu slot="overlay">
+                <a-menu-item>
+                  重命名
+                </a-menu-item>
+                <a-menu-item>
+                  删除
+                </a-menu-item>
+              </a-menu>
+            </a-dropdown>
         </a-menu-item>
       </a-sub-menu>
     </a-menu>

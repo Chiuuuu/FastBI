@@ -11,75 +11,30 @@
             <a-menu-item v-on:click="showModal">
               添加连接
             </a-menu-item>
-            <a-modal v-model="visible" title="添加连接" @ok="handleOk">
-              <a-row type="flex" justify="space-around">
-                <a-col>
-                  <img src="@/assets/images/icon_excel.png" />
-                </a-col>
-                <a-col>
-                  <img src="@/assets/images/icon_csv.png" />
-                </a-col>
-                <a-col>
-                  <img src="@/assets/images/icon_sql_server.png" />
-                </a-col>
-              </a-row>
-              <a-row type="flex" justify="space-around">
-                <a-col>
-                  Excel
-                </a-col>
-                <a-col>
-                  CSV
-                </a-col>
-                <a-col>
-                  SQL Server
-                </a-col>
-              </a-row>
-              <a-row type="flex" justify="space-around">
-                <a-col>
-                  <img src="@/assets/images/icon_my_sql.png" />
-                </a-col>
-                <a-col>
-                  <img src="@/assets/images/icon_db2.png" />
-                </a-col>
-                <a-col>
-                  <img src="@/assets/images/icon_hive.png" />
-                </a-col>
-              </a-row>
-              <a-row type="flex" justify="space-around">
-                <a-col>
-                  My SQL
-                </a-col>
-                <a-col>
-                  Db2
-                </a-col>
-                <a-col>
-                  Hadoop Hive
-                </a-col>
-              </a-row>
-              <a-row type="flex" justify="space-around">
-                <a-col>
-                  <img src="@/assets/images/icon_hbase.png" />
-                </a-col>
-                <a-col>
-                  <img src="@/assets/images/icon_oracle.png" />
-                </a-col>
-                <a-col>
-                  <img src="@/assets/images/icon_log_file.png" />
-                </a-col>
-              </a-row>
-              <a-row type="flex" justify="space-around">
-                <a-col>
-                  Hbase
-                </a-col>
-                <a-col>
-                  Oracle
-                </a-col>
-                <a-col>
-                  日志文件
-                </a-col>
-              </a-row>
-            </a-modal>
-            <a-menu-item key="1">
+              <a-modal v-model="visible" title="选择数据链接" @ok="handleOk">
+                <div><a-input placeholder="搜索数据链接名称" style="width:60%; margin-left:100px"></a-input></div>
+                <a style="margin-left:100px;margin-top:100px">新建数据链接</a>
+                <a-menu
+                :default-selected-keys="['1']"
+                :default-open-keys="['sub1']"
+                mode="inline"
+                style="width:60%; margin-left:78px"
+                >
+                  <a-sub-menu>
+                    <span slot="title"><a-icon type="folder" /><span>零售数据</span></span>
+                    <a-menu-item>
+                      <a-icon type="project" />数据模型1
+                    </a-menu-item>
+                    <a-menu-item>
+                      <a-icon type="project" />数据模型2
+                    </a-menu-item>
+                    <a-menu-item>
+                      <a-icon type="project" />数据模型3
+                    </a-menu-item>
+                  </a-sub-menu>
+                </a-menu>
+              </a-modal>
+            <a-menu-item>
               新建文件夹
             </a-menu-item>
           </a-menu>
@@ -270,9 +225,44 @@
         </div>
       </div>
       <div class="description">
-        <span>描述：</span>
+        <span class="d-s">描述：-</span>
       </div>
-      <div class="draw_board"></div>
+      <div class="draw_board">
+        <div class="outer">
+          <div class="First">
+            <div class="bank-account">
+              <span class="f-b-s">银行账户</span>
+            </div>
+          </div>
+          <div class="Second">
+            <div class="need">
+              <span class="s-n-s">统计需求</span>
+            </div>
+            <div class="need-01">
+              <span class="s-n01-s">统计需求1</span>
+            </div>
+          </div>
+          <div class="Third">
+            <div class="account">
+              <span class="t-a-s">基本账户</span>
+            </div>
+            <div class="account-01">
+              <span class="t-a01-s">基本账户1</span>
+            </div>
+            <div class="account-02">
+              <span class="t-a02-s">基本账户2</span>
+            </div>
+            <div class="account-03">
+              <span class="t-a03-s">基本账户3</span>
+            </div>
+          </div>
+          <div class="Forth">
+            <div class="deal">
+              <span class="f-d-s">统结算交易</span>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="detail">
         <div class="detail_header">
           <span>数据模型详情</span>

@@ -26,7 +26,7 @@ Vue.prototype.$EventBus = new Vue()
 Vue.prototype.$base = process.env.NODE_ENV === 'production' ? '/bin-data-site' : ''
 
 new Vue({
-  router,
-  store,
-  render: h => h(App)
+    router,
+    store,
+    render: h => h(App)
 }).$mount('#app')
