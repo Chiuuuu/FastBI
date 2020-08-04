@@ -1,5 +1,5 @@
 <template>
-  <div class="dv-charts" style="width: 100%;height:100%;" ref="wrap">
+  <div class="dv-charts" style="width: 100%;height:100%;" :style="backgroundStyle" ref="wrap">
     <div class="titles" ref="titles" v-if="config.title && config.title.show" :style="titleStyle">
       <span>{{ config.title.content }}</span>
     </div>
@@ -39,6 +39,10 @@
       config: {
         type: Object,
         required: true
+      },
+      background: {
+        type: Object,
+        required: true
       }
     },
     data () {
@@ -63,6 +67,7 @@
         chartExtend: {},
         chartOptions: {},
         chartSettings: {},
+        backgroundStyle: {},
         colors: []
       }
     },
@@ -103,6 +108,22 @@
             // this.$log.primary('========>chartSettings')
             // this.$print(this.chartSettings)
           }
+        },
+        deep: true,
+        immediate: true
+      },
+      background: {
+        handler (val) {
+          if (val) {
+           this.backgroundStyle = {
+             backgroundColor: val.backgroundColor,
+             borderColor: val.borderColor,
+             borderWidth: val.borderWidth + 'px',
+             borderStyle: val.borderStyle,
+             borderRadius: val.borderRadius + 'px'
+            }
+          }
+          console.log(this.backgroundStyle)
         },
         deep: true,
         immediate: true

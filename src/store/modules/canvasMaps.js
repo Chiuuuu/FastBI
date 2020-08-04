@@ -132,6 +132,11 @@ const canvasMaps = {
       if (state.singleSelected) {
         commit('SET_CURRENT_SELF', { data: source, property: 'api_data' })
       }
+    },
+    SetBackGround ({ commit, state }, background) {
+      if (state.singleSelected) {
+        commit('SET_CURRENT_SELF', { data: background, property: 'background' })
+      }
     }
   }
 }

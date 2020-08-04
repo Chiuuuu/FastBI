@@ -24,69 +24,41 @@
     <div class="options-body">
       <b-scrollbar style="height: 100%;">
         <div class="page-config" v-if="!currentSelected">
-          <a-collapse :bordered="false">
-            <a-collapse-panel header="页面尺寸">
-              <div class="gui-field">
-                <div class="gui-field-container">
-                  <div class="gui-inline">
-                    <a-input-number v-model="globalSettings.width" size="small"
-                                    :formatter="value => `宽 ${value}`"
-                                    @on-change="setPageSetting"></a-input-number>
-                  </div>
-                  <div class="gui-inline">
-                    <a-input-number v-model="globalSettings.height" size="small"
-                                    :formatter="value => `高 ${value}`"
-                                    @on-change="setPageSetting"></a-input-number>
-                  </div>
-                </div>
-              </div>
-            </a-collapse-panel>
-            <a-collapse-panel header="页面背景">
-              <gui-group groupName="背景设置">
-                <a-radio-group v-model="globalSettings.backgroundType" name="radioGroup">
-                  <a-radio :style="radioStyle" value="1" @click="onBgChange">
-                    <gui-field label="背景颜色">
-                      <el-color-picker v-model="globalSettings.backgroundColor" show-alpha
-                                      @change="setPageSetting"></el-color-picker>
-                    </gui-field>
-                  </a-radio>
-                  <a-radio :style="radioStyle" value="2" @click="onBgChange">
-                    <gui-field label="背景图片">
-                    </gui-field>
-                  </a-radio>
-                </a-radio-group>
-              </gui-group>
-            </a-collapse-panel>
-            <a-collapse-panel header="栅格间距">
-              <div class="gui-field">
-                <div class="gui-field-container">
-                  <div class="gui-inline">
-                    <a-input-number v-model="globalSettings.gridStep" size="small" :min="2" :max="20"
-                            @on-change="setPageSetting"></a-input-number>
-                  </div>
-                </div>
-              </div>
-            </a-collapse-panel>
-          </a-collapse>
           <gui-field label="页面尺寸">
             <div class="gui-inline">
               <a-input-number v-model="globalSettings.width" size="small"
                               :formatter="value => `宽 ${value}`"
-                              @on-change="setPageSetting"></a-input-number>
+                              @change="setPageSetting"></a-input-number>
             </div>
             <div class="gui-inline">
               <a-input-number v-model="globalSettings.height" size="small"
                               :formatter="value => `高 ${value}`"
-                              @on-change="setPageSetting"></a-input-number>
+                              @change="setPageSetting"></a-input-number>
             </div>
           </gui-field>
-          <gui-field label="背景颜色">
+          <!-- <gui-field label="背景颜色">
             <el-color-picker v-model="globalSettings.backgroundColor" show-alpha
                              @change="setPageSetting"></el-color-picker>
+          </gui-field> -->
+          <gui-field label="背景设置">
+            <a-radio-group v-model="globalSettings.backgroundType" name="radioGroup">
+            <a-radio :style="radioStyle" value="1" @click.native.stop="onBgChange($event, globalSettings, 'globalSettings.backgroundType')">
+              <gui-field label="背景颜色">
+                <el-color-picker v-model="globalSettings.backgroundColor" show-alpha
+                                @change="setPageSetting"></el-color-picker>
+              </gui-field>
+            </a-radio>
+            <a-radio :style="radioStyle" value="2" @click.native.stop="onBgChange($event, globalSettings, 'globalSettings.backgroundType')">
+              <gui-field label="背景图片">
+                <a-button type="primary">上传</a-button>
+              </gui-field>
+            </a-radio>
+          </a-radio-group>
           </gui-field>
+
           <gui-field label="栅格间距">
             <a-input-number v-model="globalSettings.gridStep" size="small" :min="2" :max="20"
-                            @on-change="setPageSetting"></a-input-number>
+                            @change="setPageSetting"></a-input-number>
           </gui-field>
           <gui-field label="重置">
             <a-button type="primary" size="small" v-waves @click="resetSetting">恢复默认配置</a-button>
@@ -100,13 +72,13 @@
                   <a-input-number v-model="baseProperty.x" size="small"
                                   :formatter="value => `X ${value}`"
                                   :parser="value => value.replace(/\X\s?|(,*)/g, '')"
-                                  @on-change="setBaseProperty"></a-input-number>
+                                  @change="setBaseProperty"></a-input-number>
                 </gui-inline>
                 <gui-inline>
                   <a-input-number v-model="baseProperty.y" size="small"
                                   :formatter="value => `Y ${value}`"
                                   :parser="value => value.replace(/\Y\s?|(,*)/g, '')"
-                                  @on-change="setBaseProperty"></a-input-number>
+                                  @change="setBaseProperty"></a-input-number>
                 </gui-inline>
               </gui-field>
               <gui-field label="尺寸">
@@ -114,13 +86,13 @@
                   <a-input-number v-model="baseProperty.width" size="small"
                                   :formatter="value => `W ${value}`"
                                   :parser="value => value.replace(/\W\s?|(,*)/g, '')"
-                                  @on-change="setBaseProperty"></a-input-number>
+                                  @change="setBaseProperty"></a-input-number>
                 </gui-inline>
                 <gui-inline>
                   <a-input-number v-model="baseProperty.height" size="small"
                                   :formatter="value => `H ${value}`"
                                   :parser="value => value.replace(/\H\s?|(,*)/g, '')"
-                                  @on-change="setBaseProperty"></a-input-number>
+                                  @change="setBaseProperty"></a-input-number>
                 </gui-inline>
               </gui-field>
 
@@ -164,7 +136,7 @@
                       <a-input-number v-model="selfConfig.grid.top" size="small"
                                       :formatter="value => `上 ${value}`"
                                       :parser="value => value.replace(/\上\s?|(,*)/g, '')"
-                                      :min="0" :max="60" @on-change="setSelfProperty"></a-input-number>
+                                      :min="0" :max="60" @change="setSelfProperty"></a-input-number>
                     </gui-inline>
                     <gui-inline>
                       <a-input-number v-model="selfConfig.grid.bottom" size="small"
@@ -281,11 +253,11 @@
                   <gui-field label="中心坐标">
                     <gui-inline label="offsetX">
                       <a-input v-model="selfConfig.radar.center[0]" size="small"
-                               placeholder="支持百分比或像素" @on-change="setSelfProperty"></a-input>
+                               placeholder="支持百分比或像素" @change="setSelfProperty"></a-input>
                     </gui-inline>
                     <gui-inline label="offsetY">
                       <a-input v-model="selfConfig.radar.center[1]" size="small"
-                               placeholder="支持百分比或像素" @on-change="setSelfProperty"></a-input>
+                               placeholder="支持百分比或像素" @change="setSelfProperty"></a-input>
                     </gui-inline>
                   </gui-field>
                   <gui-field label="雷达图半径">
@@ -307,7 +279,7 @@
                   <gui-field label="文本">
                     <gui-inline label="字号">
                       <a-input-number v-model="selfConfig.xAxis.axisLabel.fontSize" size="small"
-                                      :min="12" :max="40" @on-change="setSelfProperty"></a-input-number>
+                                      :min="12" :max="40" @change="setSelfProperty"></a-input-number>
                     </gui-inline>
                     <gui-inline label="颜色">
                       <el-color-picker v-model="selfConfig.xAxis.axisLabel.color"
@@ -348,18 +320,17 @@
                                        @change="setSelfProperty"></el-color-picker>
                     </gui-inline>
                   </gui-field>
-                  <gui-wrap label="轴线" v-model="selfConfig.yAxis.axisLine.show" @on-change="setSelfProperty">
-                    <gui-field label="轴线颜色">
-                      <el-color-picker v-model="selfConfig.yAxis.axisLine.lineStyle.color"
-                                       show-alpha @change="setSelfProperty"></el-color-picker>
-                    </gui-field>
-                  </gui-wrap>
-                  <gui-wrap label="网格线" v-model="selfConfig.yAxis.splitLine.show" @on-change="setSelfProperty">
-                    <gui-field label="网格线颜色">
-                      <el-color-picker v-model="selfConfig.yAxis.splitLine.lineStyle.color"
-                                       show-alpha @change="setSelfProperty"></el-color-picker>
-                    </gui-field>
-                  </gui-wrap>
+                  <gui-field label="轴线颜色">
+                    <el-color-picker v-model="selfConfig.yAxis.axisLine.lineStyle.color"
+                                      show-alpha @change="setSelfProperty"></el-color-picker>
+                  </gui-field>
+                  <gui-field label="是否网格线">
+                    <a-switch v-model="selfConfig.yAxis.splitLine.show" default-checked @change="switchChange" size="small" />
+                  </gui-field>
+                  <gui-field label="网格线颜色" v-if="selfConfig.yAxis.splitLine.show">
+                    <el-color-picker v-model="selfConfig.yAxis.splitLine.lineStyle.color"
+                                      show-alpha @change="setSelfProperty"></el-color-picker>
+                  </gui-field>
                 </a-collapse-panel>
               </template>
               <!--地图独有-->
@@ -575,7 +546,7 @@
               </template>
               <!--颜色数组-->
               <template v-if="selfConfig.color">
-                <a-collapse-panel key="colors" header="颜色数组">
+                <a-collapse-panel key="colors" header="颜色设置">
                   <div style="padding: 5px 13px;">
                     <gui-colors v-for="(c,index) of selfConfig.color" :key="index+c">
                       <el-color-picker v-model="selfConfig.color[index]" :predefine="predefineColors"
@@ -693,6 +664,49 @@
                   </gui-field>
                 </a-collapse-panel>
               </template>
+              <a-collapse-panel key="background" header="背景设置">
+                <a-radio-group v-model="backgroundApi.backgroundType" name="radioGroup">
+                  <a-radio :style="radioStyle" value="1" @click="onBgChange">
+                    <gui-field label="背景颜色">
+                      <el-color-picker v-model="backgroundApi.backgroundColor" show-alpha
+                                      @change="setBackGround"></el-color-picker>
+                    </gui-field>
+                  </a-radio>
+                  <a-radio :style="radioStyle" value="2" @click="onBgChange">
+                    <gui-field label="背景图片">
+                    </gui-field>
+                  </a-radio>
+                </a-radio-group>
+                <gui-field label="边框颜色">
+                  <el-color-picker v-model="backgroundApi.borderColor" show-alpha
+                                  @change="setBackGround"></el-color-picker>
+                </gui-field>
+                <gui-field label="边框大小">
+                  <a-input-number v-model="backgroundApi.borderWidth" size="small"
+                                  :formatter="value => `${value}px`"
+                                  :parser="value => value.replace('px', '')"
+                                  @change="setBackGround"></a-input-number>
+                </gui-field>
+                <gui-field label="边框线型">
+                  <a-select style="width: 90px" v-model="backgroundApi.borderStyle" @change="setBackGround" placeholder="无" size="small">
+                    <a-select-option value="solid">
+                      实线
+                    </a-select-option>
+                    <a-select-option value="dot">
+                      点状
+                    </a-select-option>
+                    <a-select-option value="dashed">
+                      虚线
+                    </a-select-option>
+                  </a-select>
+                </gui-field>
+                <gui-field label="圆角大小">
+                  <a-input-number v-model="backgroundApi.borderRadius" size="small"
+                                  :formatter="value => `${value}px`"
+                                  :parser="value => value.replace('px', '')"
+                                  @change="setBackGround"></a-input-number>
+                </gui-field>
+              </a-collapse-panel>
             </a-collapse>
           </div>
           <div v-else-if="tabsType===1">
@@ -763,6 +777,7 @@
         selfConfig: {},
         apiData: {},
         apis: {},
+        backgroundApi: {},
         predefineColors: DEFAULT_COLORS,
         dataSource: '',
 
@@ -798,6 +813,11 @@
       // 设置数据映射
       setApiLabelMap () {
         this.$store.dispatch('SetApis', this.apis)
+        // 发送请求来保存数据
+        setBaseProperty(this.currentSelected)
+      },
+      setBackGround (val) {
+        this.$store.dispatch('SetBackGround', this.backgroundApi)
         // 发送请求来保存数据
         setBaseProperty(this.currentSelected)
       },
@@ -838,8 +858,8 @@
       },
 
       // 点击选择背景
-      onBgChange(e) {
-        this.$set(this.globalSettings, 'backgroundType', e.target.value)
+      onBgChange(e, data, key) {
+        this.$set(data, key, e.target.value)
         this.setPageSetting()
       },
 
@@ -881,6 +901,9 @@
             }
             if (this.apiData.source) {
               this.dataSource = JSON.stringify(this.apiData.source)
+            }
+            if (val.packageJson.background) {
+              this.backgroundApi = deepClone(val.packageJson.background)
             }
           }
         },
