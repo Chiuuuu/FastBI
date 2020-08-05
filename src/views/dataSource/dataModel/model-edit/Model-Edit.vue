@@ -12,7 +12,7 @@
         </a-select>
       </div>
       <a-divider />
-      <div class="menu_database">
+      <!-- <div class="menu_database">
         <span class="database_span">数据库</span>
         <a-select default-value="databaseA" style="width: 300px">
           <a-select-option value="databaseA">
@@ -29,18 +29,14 @@
           </a-select-option>
         </a-select>
       </div>
-      <a-divider />
+      <a-divider /> -->
       <div class="menu_search">
         <span class="search_span">表</span>
         <a-input placeholder="请输入关键词搜索" class="search_input">
           <a-icon slot="prefix" type="search" />
         </a-input>
       </div>
-      <div class="sheet_list">
-        <span>银行账户</span><p/>
-        <span>sheet 1</span><p/>
-        <span>sheet 2</span><p/>
-      </div>
+      <edit-left @on-left-drag-leave="handleLeftDragLeave"></edit-left>
       <a-divider />
       <div class="SQL-View">
         <!-- <div class="view-head">
@@ -102,133 +98,7 @@
         </a-modal>
       </div>
       <div class="draw_board">
-        <div class="outer">
-          <div class="First">
-            <div class="bank-account">
-              <span class="f-b-s">银行账户</span>
-            </div>
-          </div>
-          <div class="Second">
-            <div class="need">
-              <span class="s-n-s">统计需求</span>
-            </div>
-            <div class="need-01">
-              <span class="s-n01-s">统计需求1</span>
-            </div>
-          </div>
-          <div class="Third">
-            <div class="account">
-              <span class="t-a-s">基本账户</span>
-            </div>
-            <div class="account-01">
-              <span class="t-a01-s">基本账户1</span>
-            </div>
-            <div class="account-02">
-              <span class="t-a02-s">基本账户2</span>
-            </div>
-            <div class="account-03">
-              <span class="t-a03-s">基本账户3</span>
-            </div>
-          </div>
-          <div class="Forth">
-            <div class="deal">
-              <span class="f-d-s">统结算交易</span>
-            </div>
-          </div>
-          <div class="conneted1" @click="showModal">
-            <a-icon type="plus-circle" />
-          </div>
-          <div class="conneted2" @click="showModal">
-            <a-icon type="plus-circle" />
-          </div>
-          <div class="conneted3" @click="showModal">
-            <a-icon type="plus-circle" />
-          </div>
-          <div class="conneted4" @click="showModal">
-            <a-icon type="plus-circle" />
-          </div>
-          <div class="conneted5" @click="showModal">
-            <a-icon type="plus-circle" />
-          </div>
-          <div class="conneted6" @click="showModal">
-            <a-icon type="plus-circle" />
-          </div>
-          <div class="conneted7" @click="showModal">
-            <a-icon type="plus-circle" />
-          </div>
-          <a-modal v-model="visible5" title="关联关系" :width="734">
-            <a-form-model
-              ref="ruleForm"
-              :model="form"
-              :rules="rules"
-              :label-col="labelCol"
-              :wrapper-col="wrapperCol"
-            >
-              <a-form-model-item label="关联方式" prop="Function">
-                <div class="function_select">
-                  <a-select
-                    placeholder="请选择关联关系"
-                    default-value="交集"
-                    style="width:560px"
-                  >
-                    <a-select-option value="交集">
-                      交集
-                    </a-select-option>
-                    <a-select-option value="并集">
-                      并集
-                    </a-select-option>
-                    <a-select-option value="左连接">
-                      左连接
-                    </a-select-option>
-                    <a-select-option value="右连接">
-                      右连接
-                    </a-select-option>
-                  </a-select>
-                </div>
-              </a-form-model-item>
-              <div class="function_table">
-                <div
-                  class="table_head"
-                  style=" background: rgba(248,248,248,1); "
-                >
-                  <div class="head_span">
-                    <span>表名1 </span>
-                    <a-icon type="link" /><span> 表名2</span>
-                  </div>
-                  <div class="head_add">
-                    <a-icon
-                      type="plus-square"
-                      style="margin-right:9px;"
-                      @click="handleAdd"
-                    />
-                  </div>
-                </div>
-                <div class="table_main">
-                  <a-table :data-source="dataSource" :columns="c">
-                    <span slot="table1">
-                      <a-input style="width:220px" />
-                    </span>
-                    <span slot="link">
-                      <a-icon type="link" />
-                    </span>
-                    <span slot="table2">
-                      <a-input style="width:220px" />
-                    </span>
-                    <span slot="operation" slot-scope="text, record">
-                      <a-popconfirm
-                        v-if="dataSource.length"
-                        title="确认删除?"
-                        @confirm="() => onDelete(record.key)"
-                      >
-                        <a href="javascript:;"> <a-icon type="delete"/></a>
-                      </a-popconfirm>
-                    </span>
-                  </a-table>
-                </div>
-              </div>
-            </a-form-model>
-          </a-modal>
-        </div>
+        <edit-right-top ref='rightTopRef'></edit-right-top>
       </div>
       <div class="detail">
         <div class="detail_header">
@@ -814,9 +684,44 @@ const datas = [
   }
 ]
 
+import EditLeft from './edit-left';
+import EditRightTop from './edit-right-top'
 export default {
+  components:{
+    EditLeft,
+    EditRightTop
+  },
+  provide(){
+    return {
+      nodeStatus: this.globalStatus,
+    } 
+  },
   data() {
     return {
+      globalStatus:{
+        dragType: '',
+        dragNode:{},
+        dropNode:{},
+        event: null
+      },
+      leftListData:[
+        {
+          id: 4,
+          title: '三大框架',
+        },
+        {
+          id: 1,
+          title: 'react',
+        },
+        {
+          id: 2,
+          title: 'vue'
+        },
+        {
+          id: 3,
+          title: 'angular'
+        }
+      ],
       data,
       columns,
       column,
@@ -915,6 +820,9 @@ export default {
     }
   },
   methods: {
+    handleLeftDragLeave(){
+      this.$refs.rightTopRef.handleMapRemoveClass();
+    },
     showModal() {
       this.visible5 = true
     },

@@ -71,7 +71,7 @@ let routes = [{
                         path: 'Model-Edit',
                         name: '编辑模型',
                         component: () =>
-                            import ('@/views/dataSource/dataModel/Model-Edit')
+                            import ('@/views/dataSource/dataModel/model-edit/Model-Edit')
                     }
                 ]
             }
