@@ -5,7 +5,7 @@
   </div>
 </template>
 <script>
-import Menu from './components/data-main/data-menu/menu'
+import Menu from './components/data-menu/menu'
 import Main from './components/data-main/main'
 export default {
   components: {
