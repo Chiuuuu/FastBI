@@ -14,17 +14,16 @@
             v-model="visible"
             title="添加连接"
             @ok="handleOk"
-            :footer="null"
           >
             <a-row type="flex" justify="space-around">
               <a-col>
-                <img src="@/assets/images/icon_excel.png" />
+                <img src="@/assets/images/icon_excel.png" @click="changeList(1)"/>
               </a-col>
               <a-col>
-                <img src="@/assets/images/icon_csv.png" />
+                <img src="@/assets/images/icon_csv.png" @click="changeList(1)"/>
               </a-col>
               <a-col>
-                <img src="@/assets/images/icon_sql_server.png" />
+                <img src="@/assets/images/icon_sql_server.png" @click="changeList(3)"/>
               </a-col>
             </a-row>
             <a-row type="flex" justify="space-around">
@@ -40,13 +39,13 @@
             </a-row>
             <a-row type="flex" justify="space-around">
               <a-col>
-                <img src="@/assets/images/icon_my_sql.png" />
+                <img src="@/assets/images/icon_my_sql.png" @click="changeList(3)"/>
               </a-col>
               <a-col>
-                <img src="@/assets/images/icon_db2.png" />
+                <img src="@/assets/images/icon_db2.png" @click="changeList(3)"/>
               </a-col>
               <a-col>
-                <img src="@/assets/images/icon_hive.png" />
+                <img src="@/assets/images/icon_hive.png" @click="changeList(3)"/>
               </a-col>
             </a-row>
             <a-row type="flex" justify="space-around">
@@ -62,13 +61,13 @@
             </a-row>
             <a-row type="flex" justify="space-around">
               <a-col>
-                <img src="@/assets/images/icon_hbase.png" />
+                <img src="@/assets/images/icon_hbase.png" @click="changeList(3)"/>
               </a-col>
               <a-col>
-                <img src="@/assets/images/icon_oracle.png" />
+                <img src="@/assets/images/icon_oracle.png" @click="changeList(3)"/>
               </a-col>
               <a-col>
-                <img src="@/assets/images/icon_log_file.png" />
+                <img src="@/assets/images/icon_log_file.png" @click="changeList(1)"/>
               </a-col>
             </a-row>
             <a-row type="flex" justify="space-around">
@@ -103,9 +102,9 @@
         <span slot="title"><a-icon type="folder" /><span>珠江测试</span></span>
         <a-menu-item>
           <a-dropdown :trigger="['contextmenu']">
-            <div>
+            <div @mouseenter="mouseenter" @mouseleave="mouseleave">
           <img src="@/assets/images/icon_my_sql.png" style="width:15px;height:15px" />
-          数据连接1
+          数据连接1<a-icon type="more" style="margin-left:170px" v-if="icon"/>
             </div>
             <a-menu slot="overlay">
                 <a-menu-item>
@@ -119,9 +118,9 @@
         </a-menu-item>
         <a-menu-item>
           <a-dropdown :trigger="['contextmenu']">
-            <div>
+            <div @mouseenter="mouseenter" @mouseleave="mouseleave">
           <img src="@/assets/images/icon_csv.png" style="width:15px;height:15px" />
-          数据连接2
+          数据连接2<a-icon type="more" style="margin-left:170px" v-if="icon"/>
             </div>
             <a-menu slot="overlay">
                 <a-menu-item>
@@ -135,12 +134,12 @@
         </a-menu-item>
         <a-menu-item>
           <a-dropdown :trigger="['contextmenu']">
-            <div>
+            <div @mouseenter="mouseenter" @mouseleave="mouseleave">
           <img
             src="@/assets/images/icon_log_file.png"
             style="width:15px;height:15px"
           />
-          数据连接3
+          数据连接3<a-icon type="more" style="margin-left:170px" v-if="icon"/>
             </div>
             <a-menu slot="overlay">
                 <a-menu-item>
@@ -154,9 +153,9 @@
         </a-menu-item>
         <a-menu-item>
           <a-dropdown :trigger="['contextmenu']">
-            <div>
+            <div @mouseenter="mouseenter" @mouseleave="mouseleave">
           <img src="@/assets/images/icon_hive.png" style="width:15px;height:15px" />
-          数据连接4
+          数据连接4<a-icon type="more" style="margin-left:170px" v-if="icon"/>
             </div>
             <a-menu slot="overlay">
                 <a-menu-item>
@@ -173,9 +172,9 @@
         <span slot="title"><a-icon type="folder" /><span>用户流程</span></span>
         <a-menu-item>
           <a-dropdown :trigger="['contextmenu']">
-            <div>
+            <div @mouseenter="mouseenter" @mouseleave="mouseleave">
           <img src="@/assets/images/icon_hbase.png" style="width:15px;height:15px" />
-          数据连接1
+          数据连接1<a-icon type="more" style="margin-left:170px" v-if="icon"/>
             </div>
             <a-menu slot="overlay">
                 <a-menu-item>
@@ -189,12 +188,12 @@
         </a-menu-item>
         <a-menu-item>
           <a-dropdown :trigger="['contextmenu']">
-            <div>
+            <div @mouseenter="mouseenter" @mouseleave="mouseleave">
           <img
             src="@/assets/images/icon_sql_server.png"
             style="width:15px;height:15px"
           />
-          数据连接2
+          数据连接2<a-icon type="more" style="margin-left:170px" v-if="icon"/>
             </div>
             <a-menu slot="overlay">
                 <a-menu-item>
@@ -208,9 +207,9 @@
         </a-menu-item>
         <a-menu-item>
           <a-dropdown :trigger="['contextmenu']">
-            <div>
+            <div @mouseenter="mouseenter" @mouseleave="mouseleave">
           <img src="@/assets/images/icon_excel.png" style="width:15px;height:15px" />
-          数据连接3
+          数据连接3<a-icon type="more" style="margin-left:170px" v-if="icon"/>
             </div>
             <a-menu slot="overlay">
                 <a-menu-item>
@@ -229,8 +228,15 @@
 
 <script>
 export default {
+  props: {
+    menuData: {
+      type: String,
+      default: ''
+    }
+  },
   data() {
     return {
+      icon: false,
       current: ['mail'],
       openKeys: ['sub1'],
       visible: false,
@@ -238,12 +244,25 @@ export default {
       wrapperCol: { span: 14 }
     }
   },
+  mounted() {
+    console.log(this.menuData)
+  },
   methods: {
     showModal() {
       this.visible = true
     },
     handleOk(e) {
       this.visible = false
+    },
+    changeList(i) {
+      // console.log('触发了')
+      this.$store.commit('dataAccess/set_selectAccess', i)
+    },
+    mouseenter(icon) {
+      this.icon = true
+    },
+    mouseleave() {
+      this.icon = false
     }
   }
 }
