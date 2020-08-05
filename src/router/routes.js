@@ -59,7 +59,7 @@ let routes = [{
                         path: 'dataAccess-setting',
                         name: '设置',
                         component: () =>
-                            import ('@/views/dataSource/dataAccess/dataAccess-setting')
+                            import ('@/views/dataSource/dataAccess/setting/dataAccess-setting')
                     },
                     {
                         path: 'dataModel',
@@ -71,7 +71,7 @@ let routes = [{
                         path: 'Model-Edit',
                         name: '编辑模型',
                         component: () =>
-                            import ('@/views/dataSource/dataModel/Model-Edit')
+                            import ('@/views/dataSource/dataModel/edit/Model-Edit')
                     }
                 ]
             }

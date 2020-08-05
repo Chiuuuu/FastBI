@@ -3,8 +3,12 @@
     <div class="right">
       <div class="header">
         <span class="data_con">数据连接A</span>
-        <span class="data_category" v-if="selectAccess == 3">（类型：MySQL）</span>
-        <span class="data_category" v-if="selectAccess == 1"> （ 类型：Excel ）</span>
+        <span class="data_category" v-if="selectAccess == 3"
+          >（类型：MySQL）</span
+        >
+        <span class="data_category" v-if="selectAccess == 1">
+          （ 类型：Excel ）</span
+        >
       </div>
       <div class="tab">
         <a-tabs default-active-key="1" :wrapper-col="wrapperCol">
@@ -21,7 +25,10 @@
                     <a-input style="width:528px;" />
                   </a-form-model-item>
                   <a-form-model-item label="Execl文件" prop="File">
-                    <a-button style="border-color:rgba(97, 123, 255, 1);" @click="select">
+                    <a-button
+                      style="border-color:rgba(97, 123, 255, 1);"
+                      @click="select"
+                    >
                       选择文件
                     </a-button>
                     <div class="excel-list" v-if="excel">
@@ -108,15 +115,23 @@
           </a-tab-pane>
           <a-tab-pane key="2" tab="库表结构" force-render>
             <div class="search_bar">
-              <a-input placeholder="请输入关键词" class="search_input">
-                <a-icon slot="prefix" type="search" />
-              </a-input>
-              <a-select default-value="全部" class="search_select">
-                <a-select-option value="aaa">
-                  aaa
-                </a-select-option>
-              </a-select>
-                <a-button type="primary" style="margin-left:670px">全部抽取</a-button>
+              <a-row type="flex" justify="space-between">
+                <a-col>
+                  <a-input placeholder="请输入关键词" class="search_input">
+                    <a-icon slot="prefix" type="search" />
+                  </a-input>
+                  <a-select default-value="全部" class="search_select">
+                    <a-select-option value="aaa">
+                      aaa
+                    </a-select-option>
+                  </a-select>
+                </a-col>
+                <a-col>
+                  <a-button type="primary" class="search_button"
+                    >全部抽取</a-button
+                  >
+                </a-col>
+              </a-row>
             </div>
             <div class="table">
               <a-table :columns="columns" :data-source="data">

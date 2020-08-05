@@ -77,7 +77,7 @@
 </template>
 
 <script>
-import Menu from '../dataAccess/components/data-main/data-menu/menu'
+import Menu from '../components/data-menu/menu'
 const columns = [
   {
     title: '原名',
