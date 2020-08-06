@@ -437,7 +437,8 @@ const list = [
               show: true,
               color: '',
               fontSize: 12,
-              position: 'outside' // 可选inside
+              position: 'outside', // 可选inside
+              formatter: '{b}: {@2012} ({d}%)'
             },
             roseType: false, // 饼图可选玫瑰图
             center: ['50%', '50%'], // 饼图可选
@@ -775,7 +776,7 @@ const list = [
             }
           }
         },
-        view: { width: 400, height: 400, x: 136, y: 34 }
+        view: { width: 500, height: 400, x: 710, y: 340 }
       },
       {
         title: '图片',
@@ -903,7 +904,8 @@ const list = [
             },
             oddBackgroundColor: '',
             evenBackgroundColor: '',
-            pageSize: 10
+            pageSize: 10,
+            ellipsis: true
           }
         },
         view: { width: 500, height: 400, x: 710, y: 340 } // 计算中间值(1920-500)*0.5,(1080-400)*0.5

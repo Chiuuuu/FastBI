@@ -19,59 +19,59 @@ let routes = [{
         path: '/screen/:id',
         name: 'screen',
         component: () =>
-            import ('../views/screen')
+            import('../views/screen')
     },
     {
         path: '/admin/:id',
         name: 'admin',
         component: () =>
-            import ('@/views/screenManage/screenEdit/admin')
+            import('@/views/screenManage/screenEdit/admin')
     },
     {
         path: '/layout',
         name: '布局容器',
         component: () =>
-            import ('@/layout/index'),
+            import('@/layout/index'),
         children: [{
                 path: '/screenManage',
                 name: '大屏管理',
                 component: () =>
-                    import ('@/views/screenManage/index'),
+                    import('@/views/screenManage/index'),
                 children: [{
                     path: 'screenCatalog',
                     name: '大屏目录',
                     component: () =>
-                        import ('@/views/screenManage/screenCatalog/screenCatalog')
+                        import('@/views/screenManage/screenCatalog/screenCatalog')
                 }]
             },
             {
                 path: '/dataSource',
                 name: '数据源',
                 component: () =>
-                    import ('@/views/dataSource/index'),
+                    import('@/views/dataSource/index'),
                 children: [{
                         path: 'dataAccess',
                         name: '数据接入',
                         component: () =>
-                            import ('@/views/dataSource/dataAccess/dataAccess')
+                            import('@/views/dataSource/dataAccess/dataAccess')
                     },
                     {
                         path: 'dataAccess-setting',
                         name: '设置',
                         component: () =>
-                            import ('@/views/dataSource/dataAccess/dataAccess-setting')
+                            import('@/views/dataSource/dataAccess/dataAccess-setting')
                     },
                     {
                         path: 'dataModel',
                         name: '数据模型',
                         component: () =>
-                            import ('@/views/dataSource/dataModel/dataModel')
+                            import('@/views/dataSource/dataModel/dataModel')
                     },
                     {
                         path: 'Model-Edit',
                         name: '编辑模型',
                         component: () =>
-                            import ('@/views/dataSource/dataModel/Model-Edit')
+                            import('@/views/dataSource/dataModel/Model-Edit')
                     }
                 ]
             }

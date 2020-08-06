@@ -55,6 +55,12 @@
           if (val) {
             this.showHeader = val.header.show
           }
+          console.log(val)
+          console.log(this.columns)
+          for (let item of this.columns) {
+            // 是否自动换行
+            item.ellipsis = val.table.ellipsis
+          }
           // let obj = {
           //   title: '序号',
           //   dataIndex: 'index',
@@ -79,7 +85,15 @@
           if (val) {
             if (val.column) {
               for (let item of val.column) {
+                // 表格样式
                 item.customHeaderCell = this.customHeaderRow
+
+                // 是否自动换行
+                if (!this.config.ellipsis) {
+                  item.ellipsis = true
+                } else {
+                  item.ellipsis = false
+                }
               }
             }
             this.columns = val.column

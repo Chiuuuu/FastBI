@@ -451,7 +451,8 @@ const database = {
               show: true,
               color: '',
               fontSize: 12,
-              position: 'outside' // 可选inside
+              position: 'outside', // 可选inside
+              formatter: '{b}: {@2012} ({d}%)'
             },
             roseType: false, // 饼图可选玫瑰图
             center: ['50%', '50%'], // 饼图可选
@@ -790,7 +791,7 @@ const database = {
             }
           }
         },
-        view: { width: 500, height: 400, x: 710, y: 580 }
+        view: { width: 500, height: 400, x: 710, y: 580 } // 计算中间值(1920-500)*0.5,(1080-400)*0.5
       }
     },
     {
@@ -915,7 +916,8 @@ const database = {
             },
             oddBackgroundColor: '',
             evenBackgroundColor: '',
-            pageSize: 10
+            pageSize: 10,
+            ellipsis: true
           }
         },
         view: { width: 500, height: 400, x: 710, y: 580 }

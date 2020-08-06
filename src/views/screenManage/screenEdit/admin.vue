@@ -33,7 +33,8 @@
                      @mouseleave.native="handleNoHover()">
             <!-- 文本 -->
             <chart-text v-if="transform.packageJson.name === 've-text'"
-                        :config="transform.packageJson.config"></chart-text>
+                        :config="transform.packageJson.config"
+                        :background="transform.packageJson.background"></chart-text>
 
             <!-- 图片 -->
             <chart-image v-else-if="transform.packageJson.name === 've-image'"
@@ -42,7 +43,8 @@
             <!-- 表格 -->
             <chart-tables v-else-if="transform.packageJson.name === 've-tables'"
                           :config="transform.packageJson.config"
-                          :api-data="transform.packageJson.api_data"></chart-tables>
+                          :api-data="transform.packageJson.api_data"
+                          :background="transform.packageJson.background"></chart-tables>
 
             <charts-factory v-else
                             :type-name="transform.packageJson.name"

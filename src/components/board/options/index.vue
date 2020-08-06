@@ -186,6 +186,67 @@
                 </a-collapse-panel>
               </template>
 
+              <template v-if="isPie">
+                <a-collapse-panel key="properties" header="图形属性">
+                  <gui-field label="中心坐标">
+                    <gui-inline>
+                      <a-input v-model="selfConfig.series.center[0]" size="small"
+                                placeholder="默认50%"
+                                @change="setSelfProperty"
+                                ><span slot="prefix">x</span></a-input>
+                    </gui-inline>
+                    <gui-inline>
+                      <a-input v-model="selfConfig.series.center[1]" size="small"
+                                placeholder="默认50%"
+                                @change="setSelfProperty"
+                                ><span slot="prefix">y</span></a-input>
+                    </gui-inline>
+                  </gui-field>
+                  <gui-field label="内环大小">
+                    <a-input v-model="selfConfig.series.radius[0]" size="small"
+                              placeholder="默认0"
+                              style="width:100px"
+                              @change="setSelfProperty"></a-input>
+                  </gui-field>
+                  <gui-field label="外径大小">
+                    <a-input v-model="selfConfig.series.radius[1]" size="small"
+                              placeholder="默认50%"
+                              style="width:100px"
+                              @change="setSelfProperty"></a-input>
+                  </gui-field>
+                  <gui-field label="是否启用玫瑰图">
+                    <a-switch v-model="selfConfig.series.roseType" size="small"
+                              @change="switchChange"></a-switch>
+                  </gui-field>
+                </a-collapse-panel>
+                <a-collapse-panel key="indicator" header="指标设置">
+                  <a-switch slot="extra"
+                            v-if="collapseActive.indexOf('indicator') > -1"
+                            v-model="selfConfig.series.label.show"
+                            default-checked @change="switchChange" size="small" />
+                  <gui-field label="文本">
+                    <gui-inline label="字号">
+                      <a-input-number v-model="selfConfig.series.label.fontSize" size="small"
+                                      :min="12" :max="40" @change="setSelfProperty"></a-input-number>
+                    </gui-inline>
+                    <gui-inline label="颜色">
+                      <el-color-picker v-model="selfConfig.series.label.color"
+                                        @change="setSelfProperty"></el-color-picker>
+                    </gui-inline>
+                  </gui-field>
+                  <gui-field label="显示位置">
+                    <a-radio-group :value="selfConfig.series.label.position" size="small" >
+                      <a-radio-button value="inside" @click.native.stop="onRadioChange($event, selfConfig.series.label, 'position')">
+                        内部
+                      </a-radio-button>
+                      <a-radio-button value="outside" @click.native.stop="onRadioChange($event, selfConfig.series.label, 'position')">
+                        外部
+                      </a-radio-button>
+                    </a-radio-group>
+                  </gui-field>
+                </a-collapse-panel>
+              </template>
+
               <!--图例-->
               <template v-if="selfConfig.legend">
                 <a-collapse-panel key="legend" header="图例设置">
@@ -249,26 +310,57 @@
               </template>
               <!--雷达图独有-->
               <template v-if="isRadar">
-                <a-collapse-panel key="radar" header="极轴">
+                <a-collapse-panel key="radar" header="图形属性">
                   <gui-field label="中心坐标">
-                    <gui-inline label="offsetX">
+                    <gui-inline>
                       <a-input v-model="selfConfig.radar.center[0]" size="small"
-                               placeholder="支持百分比或像素" @change="setSelfProperty"></a-input>
+                                placeholder="支持百分比或像素"
+                                @change="setSelfProperty"
+                                ><span slot="prefix">x</span></a-input>
                     </gui-inline>
-                    <gui-inline label="offsetY">
+                    <gui-inline>
                       <a-input v-model="selfConfig.radar.center[1]" size="small"
-                               placeholder="支持百分比或像素" @change="setSelfProperty"></a-input>
+                                placeholder="支持百分比或像素"
+                                @change="setSelfProperty"
+                                ><span slot="prefix">y</span></a-input>
                     </gui-inline>
                   </gui-field>
                   <gui-field label="雷达图半径">
-                    <a-input v-model="selfConfig.radar.radius" size="small" @change="setSelfProperty"></a-input>
+                    <a-input v-model="selfConfig.radar.radius" size="small" style="width:100px;" @change="setSelfProperty"></a-input>
                   </gui-field>
                   <gui-field label="雷达图类型">
-                    <el-select v-model="selfConfig.radar.shape" size="mini"
-                               @change="setSelfProperty" :value="selfConfig.radar.shape">
-                      <el-option label="circle" value="circle"></el-option>
-                      <el-option label="polygon" value="polygon"></el-option>
-                    </el-select>
+                    <a-radio-group :value="selfConfig.radar.shape" size="small" >
+                      <a-radio-button value="circle" @click.native.stop="onRadioChange($event, selfConfig.radar, 'shape')">
+                        圆形
+                      </a-radio-button>
+                      <a-radio-button value="polygon" @click.native.stop="onRadioChange($event, selfConfig.radar, 'shape')">
+                        三角形
+                      </a-radio-button>
+                    </a-radio-group>
+                  </gui-field>
+                  <gui-field label="指标">
+                    <a-switch v-model="selfConfig.series.label.show" size="small"
+                              @change="switchChange"></a-switch>
+                  </gui-field>
+                  <gui-field label="指标文本" v-if="selfConfig.series.label.show">
+                    <gui-inline label="字号">
+                      <a-input-number v-model="selfConfig.series.label.fontSize" size="small"
+                                      :min="12" :max="40" @change="setSelfProperty"></a-input-number>
+                    </gui-inline>
+                    <gui-inline label="颜色">
+                      <el-color-picker v-model="selfConfig.series.label.color"
+                                        @change="setSelfProperty"></el-color-picker>
+                    </gui-inline>
+                  </gui-field>
+                  <gui-field label="指标位置" v-if="selfConfig.series.label.show">
+                    <a-radio-group :value="selfConfig.series.label.position" size="small" >
+                      <a-radio-button value="inside" @click.native.stop="onRadioChange($event, selfConfig.series.label, 'position')">
+                        内部
+                      </a-radio-button>
+                      <a-radio-button value="top" @click.native.stop="onRadioChange($event, selfConfig.series.label, 'position')">
+                        顶部
+                      </a-radio-button>
+                    </a-radio-group>
                   </gui-field>
                 </a-collapse-panel>
               </template>
@@ -336,15 +428,16 @@
               <!--地图独有-->
               <template v-if="isMap">
                 <a-collapse-panel key="map" header="视觉映射">
-                  <gui-field label="是否显示">
-                    <b-switch v-model="selfConfig.visualMap.show" size="small" @on-change="setSelfProperty"></b-switch>
-                  </gui-field>
+                  <a-switch slot="extra" v-if="collapseActive.indexOf('map') > -1" v-model="selfConfig.visualMap.show" default-checked size="small" @change="switchChange" />
                   <gui-field label="类型">
-                    <el-select v-model="selfConfig.visualMap.type" size="mini"
-                               @change="setSelfProperty" :value="selfConfig.visualMap.type">
-                      <el-option label="分段型" value="piecewise"></el-option>
-                      <el-option label="连续型" value="continuous"></el-option>
-                    </el-select>
+                    <a-radio-group :value="selfConfig.visualMap.type" size="small" >
+                      <a-radio-button value="piecewise" @click.native.stop="onRadioChange($event, selfConfig.visualMap, 'type')">
+                        分段型
+                      </a-radio-button>
+                      <a-radio-button value="continuous" @click.native.stop="onRadioChange($event, selfConfig.visualMap, 'type')">
+                        连续型
+                      </a-radio-button>
+                    </a-radio-group>
                   </gui-field>
                   <gui-field label="极值">
                     <gui-inline label="最小值">
@@ -390,30 +483,34 @@
                     <a-input-number v-model="selfConfig.geo.zoom" size="small" :min="0" :step="0.1"
                                     @change="setSelfProperty"></a-input-number>
                   </gui-field>
-                  <gui-wrap label="文本" v-model="selfConfig.geo.label.normal.show" @on-change="setSelfProperty">
-                    <gui-field label="文本">
-                      <gui-inline label="字号">
-                        <a-input-number v-model="selfConfig.geo.label.normal.fontSize" size="small"
-                                        :min="12" :max="40" @change="setSelfProperty"></a-input-number>
-                      </gui-inline>
-                      <gui-inline label="颜色">
-                        <el-color-picker v-model="selfConfig.geo.label.normal.color"
-                                         @change="setSelfProperty"></el-color-picker>
-                      </gui-inline>
-                    </gui-field>
-                  </gui-wrap>
-                  <gui-wrap label="文本悬停" v-model="selfConfig.geo.label.emphasis.show" @on-change="setSelfProperty">
-                    <gui-field label="文本">
-                      <gui-inline label="字号">
-                        <a-input-number v-model="selfConfig.geo.label.emphasis.fontSize" size="small"
-                                        :min="12" :max="40" @change="setSelfProperty"></a-input-number>
-                      </gui-inline>
-                      <gui-inline label="颜色">
-                        <el-color-picker v-model="selfConfig.geo.label.emphasis.color"
-                                         @change="setSelfProperty"></el-color-picker>
-                      </gui-inline>
-                    </gui-field>
-                  </gui-wrap>
+                  <gui-field label="文本">
+                    <a-switch v-model="selfConfig.geo.label.normal.show" size="small"
+                              @change="switchChange"></a-switch>
+                  </gui-field>
+                  <gui-field label="文本样式" v-if="selfConfig.geo.label.normal.show">
+                    <gui-inline label="字号">
+                      <a-input-number v-model="selfConfig.geo.label.normal.fontSize" size="small"
+                                      :min="12" :max="40" @change="setSelfProperty"></a-input-number>
+                    </gui-inline>
+                    <gui-inline label="颜色">
+                      <el-color-picker v-model="selfConfig.geo.label.normal.color"
+                                        @change="setSelfProperty"></el-color-picker>
+                    </gui-inline>
+                  </gui-field>
+                  <gui-field label="文本悬停">
+                    <a-switch v-model="selfConfig.geo.label.emphasis.show" size="small"
+                              @change="switchChange"></a-switch>
+                  </gui-field>
+                  <gui-field label="文本悬停样式" v-if="selfConfig.geo.label.emphasis.show">
+                    <gui-inline label="字号">
+                      <a-input-number v-model="selfConfig.geo.label.emphasis.fontSize" size="small"
+                                      :min="12" :max="40" @change="setSelfProperty"></a-input-number>
+                    </gui-inline>
+                    <gui-inline label="颜色">
+                      <el-color-picker v-model="selfConfig.geo.label.emphasis.color"
+                                        @change="setSelfProperty"></el-color-picker>
+                    </gui-inline>
+                  </gui-field>
                   <gui-field label="多边形">
                     <gui-inline label="区域" style="width:auto;">
                       <el-color-picker v-model="selfConfig.geo.itemStyle.normal.areaColor"
@@ -432,6 +529,49 @@
                     <gui-inline label="边框" style="width:auto;">
                       <el-color-picker v-model="selfConfig.geo.itemStyle.emphasis.borderColor"
                                        @change="setSelfProperty"></el-color-picker>
+                    </gui-inline>
+                  </gui-field>
+                </a-collapse-panel>
+                <a-collapse-panel key="mapIndicator" header="指标设置">
+                  <a-switch slot="extra" v-if="collapseActive.indexOf('mapIndicator') > -1" v-model="selfConfig.series.label.show" default-checked size="small" @change="switchChange" />
+                  <gui-field label="指标文本">
+                    <gui-inline label="字号">
+                      <a-input-number v-model="selfConfig.series.label.fontSize" size="small"
+                                      :min="12" :max="40" @change="setSelfProperty"></a-input-number>
+                    </gui-inline>
+                    <gui-inline label="颜色">
+                      <el-color-picker v-model="selfConfig.series.label.color"
+                                        @change="setSelfProperty"></el-color-picker>
+                    </gui-inline>
+                  </gui-field>
+                  <gui-field label="类型">
+                    <el-select v-model="selfConfig.series.type" size="mini"
+                                @change="setSelfProperty" :value="selfConfig.series.type">
+                      <el-option label="散点/气泡" value="scatter"></el-option>
+                      <el-option label="动画气泡" value="effectScatter"></el-option>
+                    </el-select>
+                  </gui-field>
+                  <gui-field label="涟漪动画" v-if="selfConfig.series.type==='effectScatter'">
+                    <gui-inline label="最大缩放比">
+                      <a-input-number v-model="selfConfig.series.rippleEffect.scale" size="small"
+                                      :step="0.5" @change="setSelfProperty"></a-input-number>
+                    </gui-inline>
+                    <gui-inline label="波纹方式">
+                      <el-select v-model="selfConfig.series.rippleEffect.brushType" size="mini"
+                                  @change="setSelfProperty" :value="selfConfig.series.rippleEffect.brushType">
+                        <el-option label="stroke" value="stroke"></el-option>
+                        <el-option label="fill" value="fill"></el-option>
+                      </el-select>
+                    </gui-inline>
+                  </gui-field>
+                  <gui-field label="气泡悬停">
+                    <gui-inline label="边框宽度">
+                      <a-input-number v-model="selfConfig.series.itemStyle.emphasis.borderWidth" size="small"
+                                      :min="0" :max="2" @change="setSelfProperty"></a-input-number>
+                    </gui-inline>
+                    <gui-inline label="边框颜色" style="width:auto;">
+                      <el-color-picker v-model="selfConfig.series.itemStyle.emphasis.borderColor"
+                                        @change="setSelfProperty"></el-color-picker>
                     </gui-inline>
                   </gui-field>
                 </a-collapse-panel>
@@ -645,6 +785,10 @@
                   <gui-field label="偶行">
                     <el-color-picker v-model="selfConfig.table.evenBackgroundColor"
                                       @change="setSelfProperty"></el-color-picker>
+                  </gui-field>
+                  <gui-field label="自动换行">
+                    <a-switch v-model="selfConfig.table.ellipsis" size="small"
+                              @change="switchChange"></a-switch>
                   </gui-field>
                 </a-collapse-panel>
                 <a-collapse-panel key="page" header="翻页器">
