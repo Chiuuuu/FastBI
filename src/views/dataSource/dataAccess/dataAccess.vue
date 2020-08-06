@@ -1,8 +1,12 @@
 <template>
-  <div class="data-access">
-    <Menu></Menu>
-    <Main></Main>
-  </div>
+  <a-row :gutter="16">
+    <a-col class="gutter-row" :span="5">
+      <Menu></Menu>
+    </a-col>
+    <a-col class="gutter-row" :span="19">
+      <Main></Main>
+    </a-col>
+  </a-row>
 </template>
 <script>
 import Menu from './components/data-main/data-menu/menu'
@@ -14,9 +18,3 @@ export default {
   }
 }
 </script>
-<style lang="styl" scoped>
-.data-access {
-  display: flex;
-  justify-content: space-between;
-}
-</style>
