@@ -3,80 +3,154 @@
     <div class="right">
       <div class="header">
         <span class="data_con">数据连接A</span>
-        <span class="data_category">（类型：MySQL）</span>
+        <span class="data_category" v-if="selectAccess == 3"
+          >（类型：MySQL）</span
+        >
+        <span class="data_category" v-if="selectAccess == 1">
+          （ 类型：Excel ）</span
+        >
       </div>
       <div class="tab">
         <a-tabs default-active-key="1" :wrapper-col="wrapperCol">
+          <!-- <a-tab-pane key="1" tab="基本信息">
+            Content of Tab Pane 1
+          </a-tab-pane> -->
           <a-tab-pane key="1" tab="连接信息">
-            <div class="sub_form">
-              <a-form-model
-                ref="ruleForm"
-                :model="form"
-                :rules="rules"
-                :label-col="labelCol"
-              >
-                <a-form-model-item label="数据源名称" prop="DataSource">
-                  <a-input style="width:528px;" />
-                </a-form-model-item>
-                <a-form-model-item label="服务器" prop="Server">
-                  <a-input style="width:528px;" />
-                </a-form-model-item>
-                <a-form-model-item label="端口" prop="Port">
-                  <a-input style="width:528px;" />
-                </a-form-model-item>
-                <a-form-model-item label="用户名" prop="UserName">
-                  <a-input style="width:528px;" />
-                </a-form-model-item>
-                <a-form-model-item label="密码" prop="Password">
-                  <a-input-password style="width:528px;" />
-                </a-form-model-item>
-                <a-form-model-item :wrapper-col="{ span: 14, offset: 4 }">
-                  <a-button disabled style="width:88px;height:30px">
-                    连接
-                  </a-button>
-                </a-form-model-item>
-                <a-form-model-item label="默认连接库" prop="DataBase">
-                  <a-select default-value="请选择数据库" style="width: 528px">
-                    <a-select-option value="SQL Server">
-                      SQL Server
-                    </a-select-option>
-                    <a-select-option value="Oracle">
-                      Oracle
-                    </a-select-option>
-                    <a-select-option value="MySQL">
-                      MySQL
-                    </a-select-option>
-                  </a-select>
-                </a-form-model-item>
-              </a-form-model>
+            <div v-if="selectAccess == 1">
+              <div class="tab-excel">
+                <a-form-model
+                  ref="ruleForm"
+                  :model="form"
+                  :rules="rule"
+                  :label-col="labelCol"
+                >
+                  <a-form-model-item label="数据源名称" prop="Data">
+                    <a-input style="width:528px;" />
+                  </a-form-model-item>
+                  <a-form-model-item label="Execl文件" prop="File">
+                    <a-button
+                      style="border-color:rgba(97, 123, 255, 1);"
+                      @click="select"
+                    >
+                      选择文件
+                    </a-button>
+                    <div class="excel-list" v-if="excel">
+                      <a-list item-layout="horizontal" :data-source="d">
+                        <a-list-item slot="renderItem" style="margin-left:10px">
+                          <a-list-item-meta description="XXX.xlsx">
+                          </a-list-item-meta>
+                        </a-list-item>
+                      </a-list>
+                    </div>
+                  </a-form-model-item>
+                  <a-form-model-item label="保存目录" prop="Catalog">
+                    <a-select default-value="数据连接目录" style="width: 535px">
+                      <a-select-option value="电视统计">
+                        电视统计
+                      </a-select-option>
+                      <a-select-option value="用户统计">
+                        用户统计
+                      </a-select-option>
+                      <a-select-option value="流失统计">
+                        流失统计
+                      </a-select-option>
+                      <a-select-option value="收入统计">
+                        收入统计
+                      </a-select-option>
+                    </a-select>
+                  </a-form-model-item>
+                </a-form-model>
+              </div>
             </div>
-            <a-button type="primary" class="btn_sub">
-              保存
-            </a-button>
+            <div v-if="selectAccess == 2">
+              <div class="tab-empty">
+                <img src="@/assets/images/icon_empty_state.png" />
+                <span class="empty-span">请在左侧新建或选择数据连接</span>
+              </div>
+            </div>
+            <div v-if="selectAccess == 3">
+              <div class="tab-datasource">
+                <a-form-model
+                  ref="ruleForm"
+                  :model="form"
+                  :rules="rules"
+                  :label-col="labelCol"
+                >
+                  <a-form-model-item label="数据源名称" prop="DataSource">
+                    <a-input style="width:528px;" />
+                  </a-form-model-item>
+                  <a-form-model-item label="服务器" prop="Server">
+                    <a-input style="width:528px;" />
+                  </a-form-model-item>
+                  <a-form-model-item label="端口" prop="Port">
+                    <a-input style="width:528px;" />
+                  </a-form-model-item>
+                  <a-form-model-item label="用户名" prop="UserName">
+                    <a-input style="width:528px;" />
+                  </a-form-model-item>
+                  <a-form-model-item label="密码" prop="Password">
+                    <a-input-password style="width:528px;" />
+                  </a-form-model-item>
+                  <a-form-model-item :wrapper-col="{ span: 14, offset: 4 }">
+                    <a-button disabled style="width:88px;height:30px">
+                      连接
+                    </a-button>
+                  </a-form-model-item>
+                  <a-form-model-item label="默认连接库" prop="DataBase">
+                    <a-select default-value="请选择数据库" style="width: 528px">
+                      <a-select-option value="SQL Server">
+                        SQL Server
+                      </a-select-option>
+                      <a-select-option value="Oracle">
+                        Oracle
+                      </a-select-option>
+                      <a-select-option value="MySQL">
+                        MySQL
+                      </a-select-option>
+                    </a-select>
+                  </a-form-model-item>
+                </a-form-model>
+              </div>
+              <a-button type="primary" class="btn_sub">
+                保存
+              </a-button>
+            </div>
           </a-tab-pane>
           <a-tab-pane key="2" tab="库表结构" force-render>
             <div class="search_bar">
-              <a-input placeholder="请输入关键词" class="search_input">
-                <a-icon slot="prefix" type="search" />
-              </a-input>
-              <a-select default-value="全部" class="search_select">
-                <a-select-option value="aaa">
-                  aaa
-                </a-select-option>
-              </a-select>
+              <a-row type="flex" justify="space-between">
+                <a-col>
+                  <a-input placeholder="请输入关键词" class="search_input">
+                    <a-icon slot="prefix" type="search" />
+                  </a-input>
+                  <a-select default-value="全部" class="search_select">
+                    <a-select-option value="aaa">
+                      aaa
+                    </a-select-option>
+                  </a-select>
+                </a-col>
+                <a-col>
+                  <a-button type="primary" class="search_button"
+                    >全部抽取</a-button
+                  >
+                </a-col>
+              </a-row>
             </div>
             <div class="table">
               <a-table :columns="columns" :data-source="data">
+                <span slot="field">
+                  <a-switch default-checked />
+                </span>
+                <span slot="extract">
+                  <a-switch default-checked />
+                </span>
                 <span slot="config">
                   <a v-on:click="setting">设置</a>
                 </span>
               </a-table>
             </div>
           </a-tab-pane>
-          <a-tab-pane key="3" tab="维度分类">
-            Content of Tab Pane 3
-          </a-tab-pane>
-          <a-tab-pane key="4" tab="操作记录">
+          <a-tab-pane key="3" tab="操作记录">
             <div class="search_bar">
               <a-input placeholder="请输入关键词" class="search_input">
                 <a-icon slot="prefix" type="search" />
@@ -138,12 +212,16 @@ const columns = [
   {
     title: '是否设置字段',
     dataIndex: 'field',
-    key: 'field'
+    key: 'field',
+    slots: { title: 'field' },
+    scopedSlots: { customRender: 'field' }
   },
   {
     title: '是否抽取',
     dataIndex: 'extract',
-    key: 'extract'
+    key: 'extract',
+    slots: { title: 'extract' },
+    scopedSlots: { customRender: 'extract' }
   },
   {
     title: '修改时间',
@@ -157,18 +235,33 @@ const columns = [
   }
 ]
 
+const d = [
+  {
+    title: 'Ant Design Title 1'
+  },
+  {
+    title: 'Ant Design Title 2'
+  },
+  {
+    title: 'Ant Design Title 3'
+  },
+  {
+    title: 'Ant Design Title 4'
+  }
+]
+
 const data = [
   {
     key: '1',
     file_name: 'fine_authority',
-    field: '否',
-    extract: '否',
-    time: ' '
+    time: '2020-10-12  12:23:00'
   }
 ]
 export default {
   data() {
     return {
+      excel: false,
+      d,
       data,
       columns,
       datas,
@@ -186,6 +279,26 @@ export default {
         type: [],
         resource: '',
         desc: ''
+      },
+      rule: {
+        Data: [
+          {
+            required: true,
+            message: '请输入数据源名称'
+          }
+        ],
+        File: [
+          {
+            required: true,
+            message: '请选择文件'
+          }
+        ],
+        Catalog: [
+          {
+            required: true,
+            message: '请选择保存目录'
+          }
+        ]
       },
       rules: {
         DataSource: [
@@ -222,6 +335,19 @@ export default {
       }
     }
   },
+  props: {
+    i: {
+      type: String,
+      value: ''
+    }
+  },
+  computed: {
+    // 选择的数据库
+    selectAccess() {
+      // console.log(this.$store.state.dataAccess.selectAccess)
+      return this.$store.state.dataAccess.selectAccess
+    }
+  },
   methods: {
     showModal() {
       this.visible = true
@@ -231,6 +357,9 @@ export default {
     },
     setting() {
       this.$router.push('/dataSource/dataAccess-setting')
+    },
+    select(excel) {
+      this.excel = !this.excel
     }
   }
 }

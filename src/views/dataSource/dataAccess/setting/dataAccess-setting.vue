@@ -19,14 +19,11 @@
             :data-source="data"
             bordered
           >
-            <template v-for="col in ['other_name', 'description']" :slot="col">
-              <div :key="col">
-                <a-input style="width:206px;height:32px" />
-              </div>
-            </template>
-            <template v-for="cols in ['type']" :slot="cols">
-              <div :key="cols">
-                <a-select default-value="数字" style="width:150px;">
+          <span slot="other_name">
+            <a-input style="width:186px;height:32px" />
+          </span>
+          <span slot="type">
+            <a-select default-value="数字" style="width:100px;">
                   <a-select-option value="int">
                     整数
                   </a-select-option>
@@ -40,8 +37,30 @@
                     小数
                   </a-select-option>
                 </a-select>
-              </div>
-            </template>
+          </span>
+          <span slot="property">
+            <a-select default-value="维度">
+                  <a-select-option value="dim">
+                    维度
+                  </a-select-option>
+                  <a-select-option value="mea">
+                    度量
+                  </a-select-option>
+            </a-select>
+          </span>
+          <span slot="description">
+            <a-input style="width:186px;height:32px" />
+          </span>
+          <span slot="isShow">
+              <a-select default-value="是">
+                  <a-select-option value="yes">
+                    是
+                  </a-select-option>
+                  <a-select-option value="no">
+                    否
+                  </a-select-option>
+                </a-select>
+          </span>
           </a-table>
         </div>
       </div>
@@ -58,7 +77,7 @@
 </template>
 
 <script>
-import Menu from '../dataAccess/components/data-main/data-menu/menu'
+import Menu from '../components/data-menu/menu'
 const columns = [
   {
     title: '原名',
@@ -75,9 +94,24 @@ const columns = [
     scopedSlots: { customRender: 'type' }
   },
   {
+    title: '字段属性',
+    dataIndex: 'property',
+    scopedSlots: { customRender: 'property' }
+  },
+  {
     title: '字段说明',
     dataIndex: 'description',
     scopedSlots: { customRender: 'description' }
+  },
+  {
+    title: '注释',
+    dataIndex: 'annotation',
+    scopedSlots: { customRender: 'annotation' }
+  },
+  {
+    title: '是否可见',
+    dataIndex: 'isShow',
+    scopedSlots: { customRender: 'isShow' }
   }
 ]
 
