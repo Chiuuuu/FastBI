@@ -42,17 +42,28 @@
           </gui-field> -->
           <gui-field label="背景设置">
             <a-radio-group v-model="globalSettings.backgroundType" name="radioGroup">
-            <a-radio :style="radioStyle" value="1" @click.native.stop="onBgChange($event, globalSettings, 'globalSettings.backgroundType')">
+            <a-radio :style="radioStyle" value="1" @click.native.stop="globalBgChange($event, globalSettings, 'backgroundType')">
               <gui-field label="背景颜色">
                 <el-color-picker v-model="globalSettings.backgroundColor" show-alpha
                                 @change="setPageSetting"></el-color-picker>
               </gui-field>
             </a-radio>
-            <a-radio :style="radioStyle" value="2" @click.native.stop="onBgChange($event, globalSettings, 'globalSettings.backgroundType')">
+            <!-- <a-radio :style="radioStyle" value="2" @click.native.stop="globalBgChange($event, globalSettings, 'backgroundType')">
               <gui-field label="背景图片">
-                <a-button type="primary">上传</a-button>
+                <a-upload
+                    name="avatar"
+                    list-type="picture-card"
+                    class="avatar-uploader"
+                    :show-upload-list="false"
+                    action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                    @change="ImageChange"
+                  >
+                    <div>
+                      <a-icon :type="loading ? 'loading' : 'plus'" />
+                    </div>
+                  </a-upload>
               </gui-field>
-            </a-radio>
+            </a-radio> -->
           </a-radio-group>
           </gui-field>
 
@@ -810,16 +821,16 @@
               </template>
               <a-collapse-panel key="background" header="背景设置">
                 <a-radio-group v-model="backgroundApi.backgroundType" name="radioGroup">
-                  <a-radio :style="radioStyle" value="1" @click="onBgChange">
+                  <a-radio :style="radioStyle" value="1" @click="onBgChange($event, backgroundApi, 'backgroundType')">
                     <gui-field label="背景颜色">
                       <el-color-picker v-model="backgroundApi.backgroundColor" show-alpha
                                       @change="setBackGround"></el-color-picker>
                     </gui-field>
                   </a-radio>
-                  <a-radio :style="radioStyle" value="2" @click="onBgChange">
+                  <!-- <a-radio :style="radioStyle" value="2" @click="onBgChange($event, backgroundApi, 'backgroundType')">
                     <gui-field label="背景图片">
                     </gui-field>
-                  </a-radio>
+                  </a-radio> -->
                 </a-radio-group>
                 <gui-field label="边框颜色">
                   <el-color-picker v-model="backgroundApi.borderColor" show-alpha
@@ -985,6 +996,21 @@
           console.warn('source is not a json string')
         }
       },
+      // 上传背景图片
+      ImageChange(info) {
+        if (info.file.status === 'uploading') {
+          this.loading = true
+          return
+        }
+        if (info.file.status === 'done') {
+          getBase64(info.file.originFileObj, imageUrl => {
+            this.imageUrl = imageUrl
+            this.selfConfig.backgroundSrc = imageUrl
+            this.loading = false
+            this.setPageSetting()
+          })
+        }
+      },
       // 上传图片
       handleChange(info) {
         if (info.file.status === 'uploading') {
@@ -994,17 +1020,23 @@
         if (info.file.status === 'done') {
           getBase64(info.file.originFileObj, imageUrl => {
             this.imageUrl = imageUrl
-            this.selfConfig.imageUrl = imageUrl
+            this.globalSettings.imageUrl = imageUrl
             this.loading = false
             this.setSelfProperty()
           })
         }
       },
 
-      // 点击选择背景
-      onBgChange(e, data, key) {
+      // 全局设置，选择背景设置
+      globalBgChange(e, data, key) {
         this.$set(data, key, e.target.value)
         this.setPageSetting()
+      },
+
+      // 图表 点击选择背景
+      onBgChange(e, data, key) {
+        this.$set(data, key, e.target.value)
+        // this.setPageSetting()
       },
 
       // 点击选择对齐方式

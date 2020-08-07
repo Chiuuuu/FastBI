@@ -12,7 +12,7 @@ const list = [
       {
         title: '折线图',
         name: 've-line',
-        icon: 'ios-trending-up',
+        icon: 'line-chart',
         api_data: {
           source: [
             { x: '1/1', y: 375 },
@@ -121,7 +121,7 @@ const list = [
       {
         title: '柱状图',
         name: 've-histogram',
-        icon: 'ios-podium',
+        icon: 'bar-chart',
         api_data: {
           source: [
             { x: '1/1', y: 375, s: '系列1' },
@@ -232,7 +232,7 @@ const list = [
       {
         title: '条形图',
         name: 've-bar',
-        icon: 'md-list',
+        icon: 'menu',
         api_data: {
           source: [
             { x: '1/1', y: 375, s: '系列1' },
@@ -343,7 +343,7 @@ const list = [
       {
         title: '饼图',
         name: 've-pie',
-        icon: 'ios-pie',
+        icon: 'pie-chart',
         api_data: {
           source: [
             { x: '1/1', y: 1393, s: '系列1' },
@@ -454,7 +454,7 @@ const list = [
       {
         title: '雷达图',
         name: 've-radar',
-        icon: 'ios-cellular',
+        icon: 'radar-chart',
         api_data: {
           source: [
             { x: '1/1', y: 1393, s: '指标1' },
@@ -580,7 +580,7 @@ const list = [
       {
         title: '地图',
         name: 've-map',
-        icon: 'ios-map',
+        icon: 'global',
         api_data: {
           source: [
             { x: '吉林', y: 178 },
@@ -756,6 +756,7 @@ const list = [
       {
         title: '文本',
         name: 've-text',
+        icon: 'edit',
         apiData: {},
         apis: {},
         background: {
@@ -781,6 +782,7 @@ const list = [
       {
         title: '图片',
         name: 've-image',
+        icon: 'picture',
         apiData: {},
         apis: {},
         config: {
@@ -789,11 +791,12 @@ const list = [
             content: '图片'
           }
         },
-        view: { width: 400, height: 400, x: 136, y: 34 }
+        view: { width: 400, height: 400, x: 760, y: 340 }
       },
       {
         title: '表格',
         name: 've-tables',
+        icon: 'table',
         api_data: {
           source: [
             {

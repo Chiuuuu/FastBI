@@ -17,7 +17,7 @@ const database = {
       packageJson: {
         title: '柱状图',
         name: 've-histogram',
-        icon: 'ios-podium',
+        icon: 'bar-chart',
         api_data: {
           source: [
             { x: '1/1', y: 375, s: '系列1' },
@@ -131,7 +131,7 @@ const database = {
       packageJson: {
         title: '折线图',
         name: 've-line',
-        icon: 'ios-trending-up',
+        icon: 'line-chart',
         api_data: {
           source: [
             { x: '1/1', y: 375 },
@@ -799,6 +799,7 @@ const database = {
       packageJson: {
         title: '图片',
         name: 've-image',
+        icon: 'md-images',
         // apiData: {},
         // apis: {},
         config: {
@@ -812,6 +813,7 @@ const database = {
       packageJson: {
         title: '表格',
         name: 've-tables',
+        icon: 'table',
         api_data: {
           source: [
             {
