@@ -7,9 +7,26 @@ export function fetchMenuList(options) {
     return requestGetNoData(options.url)
 }
 
-// export function fetchDeleteMenu(options){
-//     return req
-// }
+/**
+ * 根据id获取对应表单信息
+ */
+export function fetchTableInfo(options) {
+    return requestGetNoData(options.url)
+}
+
+/**
+ * 写入数据库
+ */
+export function fetchWriteTable(options) {
+    return requestGetNoData(options.url)
+}
+
+/**
+ * 获取表结构
+*/
+export function fetchDatabaseInfo(opions) {
+    return requestGet(opions.url, opions.data)
+}
 
 /**
  * 连接操作
