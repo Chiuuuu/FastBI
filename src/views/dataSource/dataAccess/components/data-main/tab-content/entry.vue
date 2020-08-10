@@ -252,17 +252,22 @@ export default {
     })
   },
   created() {
-    this.form = Object.assign(this.form, this.modelInfo)
+    this.$EventBus.$on('setFormData', this.handleSetFormData)
     this.$EventBus.$on('resetForm', this.handleResetForm)
     // this.$EventBus.$on('fetchFormData', th)
   },
   beforeDestroy() {
-    this.$EventBus.$off('resetForm')
+    this.$EventBus.$off('resetForm', this.handleResetForm)
+    this.$EventBus.$off('setFormData', this.handleSetFormData)
   },
   mounted() {
     console.log('main-table', this.tableList)
   },
   methods: {
+    handleSetFormData() {
+      this.form = Object.assign(this.form, this.modelInfo)
+      this.connectStatus = false
+    },
     /**
      * 任一表单项被校验后触发
      * prop 字段名称
@@ -294,13 +299,15 @@ export default {
       })
       const obj = item.pop()
       this.form.dbid = obj.id
-      this.form.databaseName = obj.name
+      this.form.databaseName = obj.databaseName
+      this.$store.dispatch('dataAccess/setModelInfo', this.form)
     },
     /**
      * 重置表单
      */
     handleResetForm() {
       this.$refs['dbForm'] && this.$refs.dbForm.resetFields()
+      this.connectStatus = false
     },
     /**
      * 连接数据库
@@ -322,7 +329,7 @@ export default {
             this.connectBtn = false
           })
 
-          if (result.data.code === '200') {
+          if (result.data.code === 200) {
             console.log(result.data)
             this.databaseList = [].concat(result.data.rows)
             // 设置默认选中第一个
@@ -356,12 +363,14 @@ export default {
           this.saveBtn = true
           const result = await fetchSave({
             url: '/admin/dev-api/system/mysql/save',
-            data: this.form
+            data: Object.assign(this.form, {
+              id: this.$store.state.dataAccess.modelId
+            })
           }).finally(() => {
             this.saveBtn = false
           })
 
-          if (result.data.code === '200') {
+          if (result.data.code === 200) {
             this.$store.dispatch('dataAccess/getMenuList')
             this.$store.dispatch('dataAccess/setFirstFinished', true)
             this.$store.dispatch('dataAccess/setModelInfo', this.form)

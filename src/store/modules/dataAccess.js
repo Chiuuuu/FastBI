@@ -4,8 +4,9 @@ const state = {
     modelType: '', // 数据类型
     firstFinished: false, // 数据连接信息是否填写完成
     modelInfo: {}, // 数据表信息
-    modelId: '', // 选中的菜单id
-    menuList: [] // 左边菜单列表
+    modelId: -1, // 选中的菜单id
+    menuList: [], // 左边菜单列表
+    databaseid: -1 // 选择的默认表id
 }
 
 const mutations = {
@@ -23,6 +24,9 @@ const mutations = {
     },
     SET_MENULIST(state, list) {
         state.menuList = [].concat(list)
+    },
+    SET_DATABASEID(state, id) {
+        state.databaseid = id
     }
 }
 
@@ -39,6 +43,9 @@ const actions = {
     },
     setModelInfo({ commit }, info) {
         commit('SET_MODELINFO', info)
+    },
+    setDateBaseId({ commit }, id) {
+        commit('SET_DATABASEID', id)
     },
     setModelId({ commit }, id) {
         commit('SET_MODELID', id)

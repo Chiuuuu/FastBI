@@ -1,7 +1,7 @@
 <template>
   <div class="menu">
     <div class="menu_title">
-      <span>数据连接{{ tableList.length }}</span>
+      <span>数据连接</span>
       <a-dropdown :trigger="['click']" placement="bottomLeft">
         <a class="ant-dropdown-link">
           <a-icon type="plus-square" class="menu_icon" />
@@ -161,6 +161,7 @@
 <script>
 import ResetNameModal from '../data-main/data-menu/resetName'
 import { mapState } from 'vuex'
+import { fetchTableInfo } from '../../../../../api/dataAccess/api'
 export default {
   props: {
     menuData: {
@@ -202,7 +203,7 @@ export default {
     }),
     menuKey: {
       get () {
-        return [this.$store.state.dataAccess.modelId]
+        return this.$store.state.dataAccess.modelId ? [this.$store.state.dataAccess.modelId] : []
       },
       set (value) {
         this.$store.commit('dataAccess/SET_MODELID', value.pop())
@@ -260,6 +261,9 @@ export default {
       console.log('model-type', item.type)
       this.visible = false
       this.$store.dispatch('dataAccess/setModelType', item.type)
+      this.$store.dispatch('dataAccess/setFirstFinished', false)
+      this.$store.dispatch('dataAccess/setModelId', -1)
+      this.$store.dispatch('dataAccess/setModelInfo', {})
       this.$EventBus.$emit('resetForm')
     },
     /**
@@ -339,7 +343,7 @@ export default {
     /**
      * 选中哪个表
     */
-    handleSelect({ item, key, selectedKeys }) {
+    async handleSelect({ item, key, selectedKeys }) {
       console.log('select', selectedKeys)
       const itemObj = this.tableList.filter(item => {
         return item.id === key
@@ -347,9 +351,27 @@ export default {
       console.log('obj', itemObj)
       if (itemObj.typeCore === 1) {
         this.$store.dispatch('dataAccess/setModelType', 'mysql')
+
+        const result = await fetchTableInfo({
+          url: '/admin/dev-api/system/mysql/' + itemObj.id
+        })
+        console.log('result', result)
+        if (result.data.code === 200) {
+          this.$store.dispatch('dataAccess/setModelInfo', {
+            ip: result.data.data.ip,
+            name: result.data.data.name,
+            password: '',
+            port: Number(result.data.data.port),
+            username: result.data.data.username
+          })
+          this.$EventBus.$emit('setFormData')
+        } else {
+          this.$message.error(result.data.msg)
+        }
       } else if (itemObj.typeCode === 2) {
         this.$store.dispatch('dataAccess/setModelType', 'oracle')
       }
+      this.$store.dispatch('dataAccess/setFirstFinished', false)
       this.$store.dispatch('dataAccess/setModelId', itemObj.id)
     },
     mouseenter(icon) {

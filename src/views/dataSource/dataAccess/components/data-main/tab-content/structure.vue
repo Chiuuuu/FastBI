@@ -1,5 +1,6 @@
 <template>
   <div>
+    <a-spin tip="加载中..." :spinning="spinning">
     <div class="search_bar">
       <a-input placeholder="请输入关键词" class="search_input">
         <a-icon slot="prefix" type="search" />
@@ -12,76 +13,96 @@
       <a-button type="primary" class="select_button">全部抽取</a-button>
     </div>
     <div class="table">
-      <a-table :columns="columns" :data-source="data">
-        <span slot="field">
-          <a-switch default-checked />
+      <a-table :columns="columns" :data-source="data"  rowKey='id'>
+        <span slot="setBy" slot-scope="setBy">
+          {{ handleChangeType(setBy) ? '是' : '否' }}
         </span>
-        <span slot="extract">
-          <a-switch default-checked />
+        <span slot="extactBy" slot-scope="extactBy">
+          {{ handleChangeType(extactBy) ? '是' : '否' }}
         </span>
         <span slot="config">
           <a v-on:click="setting">设置</a>
         </span>
       </a-table>
     </div>
+    </a-spin>
   </div>
 </template>
 <script>
+import { fetchDatabaseInfo } from '../../../../../../api/dataAccess/api'
+import { mapState } from 'vuex'
 const columns = [
   {
-    title: "表名",
-    dataIndex: "file_name",
-    key: "file_name"
+    title: '表名',
+    dataIndex: 'name',
+    key: 'name'
   },
   {
-    title: "是否设置字段",
-    dataIndex: "field",
-    key: "field",
-    slots: { title: "field" },
-    scopedSlots: { customRender: "field" }
+    title: '是否设置过字段',
+    dataIndex: 'setBy',
+    key: 'setBy',
+    slots: { title: 'setBy' },
+    scopedSlots: { customRender: 'setBy' }
   },
   {
-    title: "是否抽取",
-    dataIndex: "extract",
-    key: "extract",
-    slots: { title: "extract" },
-    scopedSlots: { customRender: "extract" }
+    title: '是否抽取',
+    dataIndex: 'extactBy',
+    key: 'extactBy',
+    slots: { title: 'extactBy' },
+    scopedSlots: { customRender: 'extactBy' }
   },
   {
-    title: "修改时间",
-    key: "time",
-    dataIndex: "time"
+    title: '修改时间',
+    key: 'updateTime',
+    dataIndex: 'updateTime'
   },
   {
-    title: "字段配置",
-    key: "config",
-    scopedSlots: { customRender: "config" }
+    title: '字段配置',
+    key: 'config',
+    scopedSlots: { customRender: 'config' }
   }
-];
+]
 
-const data = [
-  {
-    key: "1",
-    file_name: "fine_authority",
-    time: "2020-10-12  12:23:00"
-  }
-];
 export default {
-  name: "tabContentStructure",
+  name: 'tabContentStructure',
   data() {
     return {
       columns,
-      data
-    };
+      data: [],
+      spinning: true
+    }
+  },
+  computed: {
+    ...mapState({
+      databaseid: state => state.dataAccess.databaseid
+    })
   },
   methods: {
-    handleGetData(){
-        console.log('获取数据')
+    handleChangeType(stringBoolean) {
+      return stringBoolean === 1
+    },
+    async handleGetData(databaseid) {
+      this.spinning = true
+      const dabaseInfoResult = await fetchDatabaseInfo({
+        url: '/admin/dev-api/system/sourceTbale/list/bydatabaseid',
+        data: {
+          databaseId: this.databaseid
+        }
+      }).finally(() => {
+        this.spinning = false
+      })
+
+      if (dabaseInfoResult.data.code === 200) {
+        this.data = [].concat(dabaseInfoResult.data.rows)
+      } else {
+        this.$message.error(dabaseInfoResult.data.msg)
+      }
+      console.log('获取数据', dabaseInfoResult.data)
     },
     setting() {
     //   this.$router.push("/dataSource/dataAccess-setting");
       this.$emit('on-change-componet', 'Setting')
     }
   }
-};
+}
 </script>
