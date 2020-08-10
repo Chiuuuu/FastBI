@@ -684,8 +684,8 @@ const datas = [
   }
 ]
 
-import EditLeft from './edit-left';
-import EditRightTop from './edit-right-top'
+import EditLeft from '../model-edit/edit-left';
+import EditRightTop from '../model-edit/edit-right-top'
 export default {
   components:{
     EditLeft,

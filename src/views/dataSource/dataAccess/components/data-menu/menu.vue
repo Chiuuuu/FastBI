@@ -159,7 +159,7 @@
 </template>
 
 <script>
-import ResetNameModal from "./resetName";
+import ResetNameModal from "../data-main/data-menu/resetName";
 import { mapState } from "vuex";
 export default {
   props: {

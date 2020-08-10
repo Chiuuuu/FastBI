@@ -11,7 +11,7 @@
 <script>
 import Menu from './components/data-menu/menu'
 import Main from './components/data-main/main'
-import Setting from './dataAccess-setting'
+import Setting from './setting/dataAccess-setting'
 import { fetchLogin } from '../../../api/dataAccess/api'
 export default {
   components: {
