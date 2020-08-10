@@ -159,13 +159,13 @@
 </template>
 
 <script>
-import ResetNameModal from "../data-main/data-menu/resetName";
-import { mapState } from "vuex";
+import ResetNameModal from '../data-main/data-menu/resetName'
+import { mapState } from 'vuex'
 export default {
   props: {
     menuData: {
       type: String,
-      default: ""
+      default: ''
     }
   },
   components: {
@@ -175,16 +175,16 @@ export default {
     return {
       // menuKey: [],
       // tableList: [], // 表列表
-      modelList: ["mysql", "oracle", "csv"].map(function(item) {
+      modelList: ['mysql', 'oracle', 'csv'].map(function(item) {
         // 弹窗选项列表
         return {
           imgurl: require(`@/assets/images/icon_${item}.png`),
           name: item,
           type: item
-        };
+        }
       }),
       resetNameVisible: false, // 重命名弹窗显示
-      resetNameType: "", // 重命名类型
+      resetNameType: '', // 重命名类型
       menuNode: {
         // 存储节点
         targetNode: {}, // 目标节点
@@ -194,172 +194,172 @@ export default {
       visible: false,
       labelCol: { span: 4 },
       wrapperCol: { span: 14 }
-    };
+    }
   },
   computed: {
     ...mapState({
-      tableList: state => state.dataAccess.menuList,
+      tableList: state => state.dataAccess.menuList
     }),
     menuKey: {
       get () {
-        return [this.$store.state.dataAccess.modelId] 
+        return [this.$store.state.dataAccess.modelId]
       },
       set (value) {
         this.$store.commit('dataAccess/SET_MODELID', value.pop())
       }
-    },
+    }
   },
   mounted() {
-    this.handleGetMenuList();
+    this.handleGetMenuList()
   },
   methods: {
-    handleGetMenuList(){
-      this.$store.dispatch('dataAccess/getMenuList', this);
+    handleGetMenuList() {
+      this.$store.dispatch('dataAccess/getMenuList', this)
     },
     /**
      * 添加数据连接
      */
     showModal() {
-      this.visible = true;
+      this.visible = true
     },
     /**
      * 添加新文件夹
      */
     handleAddNewFolder() {
-      this.resetNameVisible = true;
-      this.resetNameType = "new";
+      this.resetNameVisible = true
+      this.resetNameType = 'new'
     },
     /**
      * 是否为文件夹
      */
     handleIsFolder(item) {
-      return item.hasOwnProperty("items");
+      return item.hasOwnProperty('items')
     },
     /**
      * 文件夹重命名
      */
     handleResetFolderShow(event, item) {
-      this.resetNameType = "folder";
+      this.resetNameType = 'folder'
       this.menuNode = Object.assign(this.menuNode, {
         targetNode: item,
         parentNode: {}
-      });
-      this.handleResetNameModalShow();
+      })
+      this.handleResetNameModalShow()
     },
     /**
      * 文件夹删除
      */
     handleResetFolderDelete(event, index) {
-      this.tableList.splice(index, 1);
+      this.tableList.splice(index, 1)
     },
     /**
      * 选择哪个类型的数据连接
      */
     handleSelectModelType(event, item) {
-      event.stopPropagation();
-      console.log("model-type", item.type);
-      this.visible = false;
-      this.$store.dispatch("dataAccess/setModelType", item.type);
+      event.stopPropagation()
+      console.log('model-type', item.type)
+      this.visible = false
+      this.$store.dispatch('dataAccess/setModelType', item.type)
       this.$EventBus.$emit('resetForm')
     },
     /**
      * 重命名弹窗显示
      */
     handleResetNameModalShow(event, options) {
-      this.resetNameVisible = true;
+      this.resetNameVisible = true
     },
     /**
      * 重命名弹窗隐藏
      */
     handleResetNameCancel() {
-      this.resetNameVisible = false;
+      this.resetNameVisible = false
     },
     /**
      * 重命名弹窗确定
      */
     handleResetNameCreate() {
-      const form = this.$refs.resetNameForm.form;
+      const form = this.$refs.resetNameForm.form
       form.validateFields((err, values) => {
         if (err) {
-          return;
+          return
         }
-        console.log("Received values of form: ", values);
+        console.log('Received values of form: ', values)
 
-        if (this.resetNameType === "new") {
-          this.handleAddItem(values);
-        } else if (this.resetNameType === "folder") {
-          this.handleResetFolderName(values);
+        if (this.resetNameType === 'new') {
+          this.handleAddItem(values)
+        } else if (this.resetNameType === 'folder') {
+          this.handleResetFolderName(values)
         }
-        form.resetFields();
-        this.resetNameVisible = false;
-      });
+        form.resetFields()
+        this.resetNameVisible = false
+      })
     },
     /**
      * 新增文件夹
      */
     handleAddItem(values) {
-      const isHas = this.handleHasName(this.tableList, values);
-      if (isHas) return this.$message.warning("已存在");
+      const isHas = this.handleHasName(this.tableList, values)
+      if (isHas) return this.$message.warning('已存在')
       const item = {
         id: this.tableList.length + 1,
         name: values.name,
         items: []
-      };
-      this.tableList.push(item);
+      }
+      this.tableList.push(item)
     },
     /**
      * 修改文件夹名称
      */
     handleResetFolderName(values) {
-      const target = this.menuNode.targetNode;
+      const target = this.menuNode.targetNode
       if (values.name === target.name) {
-        return this.$message.warning("名称重复");
+        return this.$message.warning('名称重复')
       }
 
-      const isHas = this.handleHasName(this.tableList, values);
-      if (isHas) return this.$message.warning("已存在");
+      const isHas = this.handleHasName(this.tableList, values)
+      if (isHas) return this.$message.warning('已存在')
 
       this.menuNode.targetNode = Object.assign(target, {
         name: values.name
-      });
+      })
     },
     /**
      * 判断是否有相同名称
      */
     handleHasName(list, values) {
       const isHas = list.filter(item => {
-        return item.name === values.name;
-      });
-      console.log(isHas);
-      return isHas && isHas.length > 0 ? true : false;
+        return item.name === values.name
+      })
+      console.log(isHas)
+      return !!(isHas && isHas.length > 0)
     },
     handleOk(e) {
-      this.visible = false;
+      this.visible = false
     },
-    /** 
+    /**
      * 选中哪个表
     */
     handleSelect({ item, key, selectedKeys }) {
-      console.log("select", selectedKeys);
-      const itemObj = this.tableList.filter( item => {
+      console.log('select', selectedKeys)
+      const itemObj = this.tableList.filter(item => {
         return item.id === key
-      }).pop();
+      }).pop()
       console.log('obj', itemObj)
-      if(itemObj.typeCore===1) {
-        this.$store.dispatch('dataAccess/setModelType', 'mysql');
-      } else if (itemObj.typeCode===2) {
-        this.$store.dispatch('dataAccess/setModelType', 'oracle');
+      if (itemObj.typeCore === 1) {
+        this.$store.dispatch('dataAccess/setModelType', 'mysql')
+      } else if (itemObj.typeCode === 2) {
+        this.$store.dispatch('dataAccess/setModelType', 'oracle')
       }
       this.$store.dispatch('dataAccess/setModelId', itemObj.id)
     },
     mouseenter(icon) {
-      this.icon = true;
+      this.icon = true
     },
     mouseleave() {
-      this.icon = false;
+      this.icon = false
     }
   }
-};
+}
 </script>
 
 <style lang="styl" scope>

@@ -130,78 +130,78 @@
   </div>
 </template>
 <script>
-import { mapState } from "vuex";
-import emptry from "../../../../../../assets/images/icon_empty_state.png";
+import { mapState } from 'vuex'
+import emptry from '../../../../../../assets/images/icon_empty_state.png'
 import {
   fetchConnect,
   fetchGetDBList,
   fetchSave
-} from "../../../../../../api/dataAccess/api";
+} from '../../../../../../api/dataAccess/api'
 export default {
-  name: "tabContentEntry",
+  name: 'tabContentEntry',
   data() {
     let validateIP = (rule, value, callback) => {
-      if (value === "") {
-        callback(new Error("请输入服务器ip地址"));
+      if (value === '') {
+        callback(new Error('请输入服务器ip地址'))
       } else {
-        var re = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
-        var bl = re.test(value);
+        var re = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
+        var bl = re.test(value)
         if (!bl) {
-          callback(new Error("ip地址格式错误"));
+          callback(new Error('ip地址格式错误'))
         }
-        callback();
+        callback()
       }
-    };
+    }
     return {
       emptyImgUrl: emptry, // 空状态
       labelCol: { span: 4 },
       form: {
         // 连接信息表单
-        name: "", // 数据库名
-        ip: "", // 服务器ip
-        port: "", // 端口号
-        username: "", // 用户名
-        password: "", // 密码
-        dbid: "", // 默认数据库id
-        databaseName: "" // 默认数据库名称
+        name: '', // 数据库名
+        ip: '', // 服务器ip
+        port: '', // 端口号
+        username: '', // 用户名
+        password: '', // 密码
+        dbid: '', // 默认数据库id
+        databaseName: '' // 默认数据库名称
       },
       rules: {
         name: [
           {
             required: true,
-            message: "请输入数据源名称"
+            message: '请输入数据源名称'
           },
           {
-            type: "string",
+            type: 'string',
             max: 20,
             min: 1,
-            message: "五个"
+            message: '五个'
           }
         ],
         ip: [
           {
             required: true,
-            message: "请输入服务器ip地址"
+            message: '请输入服务器ip地址'
           },
           {
             validator: validateIP,
-            trigger: "blur"
+            trigger: 'blur'
           }
         ],
         port: [
-          { required: true, message: "请输入端口号" },
-          { type: "integer", message: "请输入数字", min: 0 }
+          { required: true, message: '请输入端口号' },
+          { type: 'integer', message: '请输入数字', min: 0 }
         ],
         username: [
           {
             required: true,
-            message: "请输入用户名"
+            message: '请输入用户名'
           }
         ],
         password: [
           {
             required: true,
-            message: "请输入密码"
+            message: '请输入密码'
           }
         ],
         dbid: [
@@ -219,23 +219,23 @@ export default {
         Data: [
           {
             required: true,
-            message: "请输入数据源名称"
+            message: '请输入数据源名称'
           }
         ],
         File: [
           {
             required: true,
-            message: "请选择文件"
+            message: '请选择文件'
           }
         ],
         Catalog: [
           {
             required: true,
-            message: "请选择保存目录"
+            message: '请选择保存目录'
           }
         ]
       }
-    };
+    }
   },
   computed: {
     ...mapState({
@@ -244,23 +244,23 @@ export default {
       modelType: state => state.dataAccess.modelType, // 数据类型
       isFileType(state) {
         // 数据类型是否是文件格式
-        return ["execl", "csv"].some(function(item) {
-          return item === state.dataAccess.modelType;
-        });
+        return ['execl', 'csv'].some(function(item) {
+          return item === state.dataAccess.modelType
+        })
       },
       tabChangeAble: state => state.dataAccess.firstFinished // 是否完成第一部分
     })
   },
   created() {
-    this.form = Object.assign(this.form, this.modelInfo);
-    this.$EventBus.$on("resetForm", this.handleResetForm);
+    this.form = Object.assign(this.form, this.modelInfo)
+    this.$EventBus.$on('resetForm', this.handleResetForm)
     // this.$EventBus.$on('fetchFormData', th)
   },
   beforeDestroy() {
-    this.$EventBus.$off("resetForm");
+    this.$EventBus.$off('resetForm')
   },
   mounted() {
-    console.log("main-table", this.tableList);
+    console.log('main-table', this.tableList)
   },
   methods: {
     /**
@@ -271,36 +271,36 @@ export default {
      */
     handleValidateFiled(prop, result, err) {
       if (!result) {
-        this.connectStatus = false;
-        this.$emit("on-set-tab", "1");
-        this.$store.dispatch("dataAccess/setFirstFinished", false);
+        this.connectStatus = false
+        this.$emit('on-set-tab', '1')
+        this.$store.dispatch('dataAccess/setFirstFinished', false)
       }
     },
     /**
      * 设置表单名称
      */
     handleSetTableName() {
-      console.log("emit");
-      this.$emit("on-set-table-name", this.form.name);
+      console.log('emit')
+      this.$emit('on-set-table-name', this.form.name)
     },
     /**
      * 默认选择数据库操作
      * value 选中的id值
      */
     handleDefaultDbSelect(value) {
-      console.log("defaultmodel", value);
+      console.log('defaultmodel', value)
       const item = this.databaseList.filter(item => {
-        return item.id === value && item;
-      });
-      const obj = item.pop();
-      this.form.dbid = obj.id;
-      this.form.databaseName = obj.name;
+        return item.id === value && item
+      })
+      const obj = item.pop()
+      this.form.dbid = obj.id
+      this.form.databaseName = obj.name
     },
     /**
      * 重置表单
      */
     handleResetForm() {
-      this.$refs["dbForm"] && this.$refs.dbForm.resetFields();
+      this.$refs['dbForm'] && this.$refs.dbForm.resetFields()
     },
     /**
      * 连接数据库
@@ -308,9 +308,9 @@ export default {
     handleConnect() {
       this.$refs.dbForm.validate(async valid => {
         if (valid) {
-          this.connectBtn = true;
+          this.connectBtn = true
           const result = await fetchConnect({
-            url: "/admin/dev-api/system/mysql/connect",
+            url: '/admin/dev-api/system/mysql/connect',
             data: {
               ip: this.form.ip,
               name: this.form.name,
@@ -319,25 +319,25 @@ export default {
               username: this.form.username
             }
           }).finally(() => {
-            this.connectBtn = false;
-          });
+            this.connectBtn = false
+          })
 
-          if (result.data.code == "200") {
-            console.log(result.data);
-            this.databaseList = [].concat(result.data.rows);
+          if (result.data.code === '200') {
+            console.log(result.data)
+            this.databaseList = [].concat(result.data.rows)
             // 设置默认选中第一个
-            console.log("请求获取数据库列表");
-            this.form.dbid = this.databaseList[0].id;
-            this.form.databaseName = this.databaseList[0].name;
-            this.connectStatus = true;
+            console.log('请求获取数据库列表')
+            this.form.dbid = this.databaseList[0].id
+            this.form.databaseName = this.databaseList[0].name
+            this.connectStatus = true
           } else {
-            this.$message.warning(result.data.msg);
+            this.$message.warning(result.data.msg)
           }
         } else {
-          this.connectStatus = false;
-          return false;
+          this.connectStatus = false
+          return false
         }
-      });
+      })
     },
     /**
      * 保存数据表
@@ -347,41 +347,41 @@ export default {
         if (valid) {
           const datadbitem = this.databaseList
             .filter(item => item.id === this.form.dbid)
-            .pop();
+            .pop()
           this.form = Object.assign(this.form, {
             databaseName: datadbitem.databaseName
-          });
-          console.log(this.form);
+          })
+          console.log(this.form)
 
-          this.saveBtn = true;
+          this.saveBtn = true
           const result = await fetchSave({
-            url: "/admin/dev-api/system/mysql/save",
+            url: '/admin/dev-api/system/mysql/save',
             data: this.form
           }).finally(() => {
-            this.saveBtn = false;
-          });
+            this.saveBtn = false
+          })
 
-          if (result.data.code == "200") {
-            this.$store.dispatch("dataAccess/getMenuList");
-            this.$store.dispatch("dataAccess/setFirstFinished", true);
-            this.$store.dispatch("dataAccess/setModelInfo", this.form);
-            this.$store.dispatch("dataAccess/setModelId", result.data.data);
+          if (result.data.code === '200') {
+            this.$store.dispatch('dataAccess/getMenuList')
+            this.$store.dispatch('dataAccess/setFirstFinished', true)
+            this.$store.dispatch('dataAccess/setModelInfo', this.form)
+            this.$store.dispatch('dataAccess/setModelId', result.data.data)
             // this.tableList.push({
             //   id: this.tableList.length + 1,
             //   name: this.form.name
             // })
           } else {
-            this.$message.error(result.data.msg);
+            this.$message.error(result.data.msg)
           }
-          console.log(result);
+          console.log(result)
         } else {
-          return false;
+          return false
         }
-      });
+      })
     },
     select(excel) {
-      this.excel = !this.excel;
+      this.excel = !this.excel
     }
   }
-};
+}
 </script>

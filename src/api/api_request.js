@@ -14,23 +14,22 @@ const service = httpRequest.create({
   timeout: 60000 // 请求超时时间
 })
 
-
 // 添加请求拦截器
 service.interceptors.request.use(
   function (config) {
-    const token = window.localStorage.getItem('token');
+    const token = window.localStorage.getItem('token')
     if (token) {
       // 判断token是否存在，如果存在则每个请求都带上token
       // Bearer是JWT的认证头部信息
-      config.headers.common['Authorization'] = `Bearer ${token}`;
+      config.headers.common['Authorization'] = `Bearer ${token}`
     }
 
-    return config;
+    return config
   },
   function (error) {
-    return Promise.reject(error);
-  },
-);
+    return Promise.reject(error)
+  }
+)
 
 /**
  * respone拦截器

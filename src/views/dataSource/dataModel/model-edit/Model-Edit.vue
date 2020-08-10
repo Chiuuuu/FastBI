@@ -496,6 +496,9 @@
 </template>
 
 <script>
+import EditLeft from './edit-left'
+import EditRightTop from './edit-right-top'
+
 const countryData = ['中国']
 const proData = {
   中国: ['广东省', '浙江省']
@@ -683,35 +686,32 @@ const datas = [
     data: '海珠'
   }
 ]
-
-import EditLeft from './edit-left';
-import EditRightTop from './edit-right-top'
 export default {
-  components:{
+  components: {
     EditLeft,
     EditRightTop
   },
-  provide(){
+  provide() {
     return {
-      nodeStatus: this.globalStatus,
-    } 
+      nodeStatus: this.globalStatus
+    }
   },
   data() {
     return {
-      globalStatus:{
+      globalStatus: {
         dragType: '',
-        dragNode:{},
-        dropNode:{},
+        dragNode: {},
+        dropNode: {},
         event: null
       },
-      leftListData:[
+      leftListData: [
         {
           id: 4,
-          title: '三大框架',
+          title: '三大框架'
         },
         {
           id: 1,
-          title: 'react',
+          title: 'react'
         },
         {
           id: 2,
@@ -820,8 +820,8 @@ export default {
     }
   },
   methods: {
-    handleLeftDragLeave(){
-      this.$refs.rightTopRef.handleMapRemoveClass();
+    handleLeftDragLeave() {
+      this.$refs.rightTopRef.handleMapRemoveClass()
     },
     showModal() {
       this.visible5 = true

@@ -30,74 +30,74 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState } from 'vuex'
 import TabContentEntry from './tab-content/entry'
 import TabContentStructure from './tab-content/structure'
 import TabContentRecord from './tab-content/record'
 export default {
   name: 'dataAccessMain',
-  components:{
+  components: {
     TabContentEntry,
     TabContentStructure,
     TabContentRecord
   },
-  props:['tabindex'],
+  props: ['tabindex'],
   data() {
     return {
       excel: false,
       visible: false,
       wrapperCol: { span: 14 },
       defaultTab: this.tabindex,
-      formName: '',
-    };
+      formName: ''
+    }
   },
   computed: {
     ...mapState({
       modelType: state => state.dataAccess.modelType, // 数据类型
       isFileType(state) { // 数据类型是否是文件格式
-        return ["execl", "csv"].some(function(item) {
-          return item === state.dataAccess.modelType;
-        });
+        return ['execl', 'csv'].some(function(item) {
+          return item === state.dataAccess.modelType
+        })
       },
       tabChangeAble: state => state.dataAccess.firstFinished // 是否完成第一部分
-    }),
+    })
   },
   methods: {
-    /** 
+    /**
      * 设置表名称
     */
     handleSetTableName(name) {
-      this.formName = name;
+      this.formName = name
     },
-    handleSetTab(key){
-      this.defaultTab = key;
+    handleSetTab(key) {
+      this.defaultTab = key
     },
-    handleTT(){
-      if(this.defaultTab !='1'){
+    handleTT() {
+      if (this.defaultTab !== '1') {
         console.log('去刷新')
-        this.$refs.structure.handleGetData();
+        this.$refs.structure.handleGetData()
       }
     },
-    /** 
+    /**
      * 选项卡
     */
-    handleChangeTab(activeKey){
-      console.log('tab',activeKey)
+    handleChangeTab(activeKey) {
+      console.log('tab', activeKey)
       // this.$emit('on-change-componet')
-      if(activeKey==='2'){
+      if (activeKey === '2') {
         console.log('数据结构请求')
-      }else if(activeKey==='3'){
+      } else if (activeKey === '3') {
         console.log('操作记录请求')
       }
     },
-    /** 
+    /**
      * 展示弹出
     */
     showModal() {
-      this.visible = true;
+      this.visible = true
     }
   }
-};
+}
 </script>
 
 <style lang="styl" scope>
