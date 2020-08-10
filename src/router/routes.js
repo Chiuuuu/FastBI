@@ -2,13 +2,13 @@ import Home from '../views/home'
 
 let routes = [{
         path: '/',
-        redirect: '/home',
-        component: Home,
-        children: [{
-            path: 'home',
-            name: 'home',
-            component: Home
-        }]
+        redirect: '/screenManage/screenCatalog'
+        // component: Home,
+        // children: [{
+        //     path: 'home',
+        //     name: 'home',
+        //     component: Home
+        // }]
     },
     // {
     //   path: '/admin/:id',
@@ -16,13 +16,13 @@ let routes = [{
     //   component: () => import('../views/admin')
     // },
     {
-        path: '/screen/:id',
+        path: '/screen',
         name: 'screen',
         component: () =>
             import('../views/screen')
     },
     {
-        path: '/admin/:id',
+        path: '/admin',
         name: 'admin',
         component: () =>
             import('@/views/screenManage/screenEdit/admin')

@@ -88,13 +88,15 @@
         let obj = {
           width: `${this.pageSettings.width}px`,
           height: `${this.pageSettings.height}px`,
-          transform: `scale(${this.canvasRange}) translate3d(0px, 0px, 0)`
+          transform: `scale(${this.canvasRange}) translate3d(0px, 0px, 0)`,
+          backgroundColor: this.pageSettings.backgroundColor
         }
-        if (this.pageSettings.backgroundType === '1') {
-          obj.background = this.pageSettings.backgroundColor
-        } else {
-          obj.background = this.pageSettings.backgroundSrc
-        }
+        this._calcStyle()
+        // if (this.pageSettings.backgroundType === '1') {
+        //   obj.backgroundColor = this.pageSettings.backgroundColor
+        // } else {
+        //   obj.background = this.pageSettings.backgroundSrc
+        // }
          return obj
       }
     },

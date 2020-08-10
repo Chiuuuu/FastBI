@@ -104,7 +104,7 @@
       <a-button class="btn_n2">
         刷新数据
       </a-button>
-      <a-button type="primary" class="btn_pr">
+      <a-button type="primary" class="btn_pr" @click="editScreen">
         编辑大屏
       </a-button>
       <div class="contain">
@@ -140,6 +140,10 @@ export default {
     },
     handleOk(e) {
       this.visible = false
+    },
+    // 编辑大屏
+    editScreen() {
+      this.$router.push({ name: 'admin' })
     }
   }
 }

@@ -1,7 +1,7 @@
 <template>
   <div class="dv-admin"
        @click.stop.prevent="hideContextMenu">
-    <board>
+    <board v-if="!isScreen">
       <!--头部嵌套可拖拽物品-->
       <template v-slot:headerBox>
         <drag-list :drag-list="navigate"></drag-list>
@@ -16,7 +16,7 @@
              <a-icon v-if="transform.packageJson.icon" :type="transform.packageJson.icon" />
           <!-- <b-icon v-if="transform.packageJson.icon" :name="transform.packageJson.icon"></b-icon> -->
           <!---->
-          <span v-if="transform.packageJson.config&&transform.packageJson.config.title.content">
+          <span v-if="transform.packageJson.config&&transform.packageJson.config.title">
             {{ transform.packageJson.config.title.content}}
           </span>
           <span v-else> {{ transform.packageJson.title }}</span>
@@ -57,6 +57,8 @@
         </template>
       </template>
     </board>
+
+    <screen v-show="isScreen"></screen>
     <b-modal v-model="deleteDialog" :styles="{top: '300px',width:'350px'}"
              class-name="delete-dialog" @on-ok="deleteOne">
       <div class="delete-dialog-inner">
@@ -83,6 +85,8 @@
   import ChartImage from '@/components/tools/Image'
   import ChartTables from '@/components/tools/Tables'
 
+  import Screen from '@/views/screen' // 全屏
+
   export default {
     name: 'Admin',
     data () {
@@ -95,7 +99,7 @@
       }
     },
     computed: {
-      ...mapGetters(['canvasMap', 'currentSelected']),
+      ...mapGetters(['canvasMap', 'currentSelected', 'isScreen']),
       coverageMaps () {
         let maps = [...this.canvasMap]
         return maps.reverse()
@@ -117,6 +121,14 @@
     mounted () {
       on(document, 'keyup', this.handleKeyup)
       this.$EventBus.$on('context/menu/delete', this.deleteDialogShow)
+
+      window.onresize = () => {
+        // 全屏下监控是否按键了ESC
+        if (!this.checkFull()) {
+          // 全屏下按键esc后要执行的动作
+          this.$store.dispatch('SetIsScreen', false)
+        }
+      }
     },
     methods: {
       // 悬停事件
@@ -156,9 +168,21 @@
       },
       deleteOne () {
         this.$store.dispatch('ContextMenuCommand', 'remove')
+      },
+      /**
+     * 是否全屏并按键ESC键的方法
+     */
+      checkFull () {
+        // document.fullscreenEnabled 谷歌浏览器一直返回true
+        // let isFull = document.fullscreenEnabled || window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled
+        let isFull = window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled
+        if (isFull === undefined) {
+          isFull = false
+        }
+        return isFull
       }
     },
-    components: { ChartsFactory, DragItem, DragList, Board, ChartText, ChartImage, ChartTables },
+    components: { ChartsFactory, DragItem, DragList, Board, ChartText, ChartImage, ChartTables, Screen },
     beforeDestroy () {
       off(document, 'keyup', this.handleKeyup)
       this.$EventBus.$off('context/menu/delete', this.deleteDialogShow)
