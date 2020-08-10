@@ -4,10 +4,26 @@
       <div class="canvas-panel" :style="canvasPanelStyle">
         <template v-for="transform in canvasMap">
           <preview-box :key="transform.id" :item="transform">
-            <charts-factory :type-name="transform.packageJson.name"
+             <!-- 文本 -->
+            <chart-text v-if="transform.packageJson.name === 've-text'"
+                        :config="transform.packageJson.config"
+                        :background="transform.packageJson.background"></chart-text>
+
+            <!-- 图片 -->
+            <chart-image v-else-if="transform.packageJson.name === 've-image'"
+                         :config="transform.packageJson.config"></chart-image>
+
+            <!-- 表格 -->
+            <chart-tables v-else-if="transform.packageJson.name === 've-tables'"
+                          :config="transform.packageJson.config"
+                          :api-data="transform.packageJson.api_data"
+                          :background="transform.packageJson.background"></chart-tables>
+            <charts-factory v-else
+                    :type-name="transform.packageJson.name"
                     :config="transform.packageJson.config"
                     :api-data="transform.packageJson.api_data"
                     :apis="transform.packageJson.apis"
+                    :background="transform.packageJson.background"
                     ></charts-factory>
           </preview-box>
         </template>
@@ -22,10 +38,13 @@
   import { getCanvasMaps } from '../api/canvasMaps/canvas-maps-request'
   import ChartsFactory from '../components/charts/charts-factory'
   import PreviewBox from '../components/preview/preview-box'
+  import ChartText from '@/components/tools/Text'
+  import ChartImage from '@/components/tools/Image'
+  import ChartTables from '@/components/tools/Tables'
 
   export default {
     name: 'screen',
-    components: { ChartsFactory, PreviewBox },
+    components: { ChartsFactory, PreviewBox, ChartText, ChartImage, ChartTables },
     data () {
       return {}
     },

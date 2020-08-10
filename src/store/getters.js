@@ -9,7 +9,9 @@ const getters = {
   // 当前选中的
   currentSelected: state => state.canvasMaps.singleSelected,
   // 右键菜单信息
-  contextMenuInfo: state => state.canvasMaps.contextMenuInfo
+  contextMenuInfo: state => state.canvasMaps.contextMenuInfo,
+  // 是否全屏
+  isScreen: state => state.app.isScreen
 }
 
 export default getters

@@ -1,7 +1,8 @@
 <template>
   <div class="board-header" flex>
-    <div class="header-title">
-      <span v-if="config.title">{{ config.title.text }}</span>
+    <div class="header-title" @click="goBack">
+      <i class="el-icon-arrow-left" style="margin-left:20px;font-size:22px;cursor: pointer;margin-top:8px"></i>
+      <!-- <span v-if="config.title">{{ config.title.text }}</span> -->
     </div>
     <div class="control" flex-box="1">
       <slot>control box</slot>
@@ -24,7 +25,7 @@
 </template>
 
 <script>
-
+  import { mapGetters } from 'vuex'
   export default {
     name: 'BoardHeader',
     props: {
@@ -38,6 +39,9 @@
         userId: ''
       }
     },
+    computed: {
+      ...mapGetters(['isScreen'])
+    },
     created () {
       this.userId = 'dv1e443967LZP2Dj'
     },
@@ -47,18 +51,22 @@
           let wheight = Number(document.documentElement.clientHeight / 1080)
           this.scalseNum = wheight
       },
+      goBack() {
+        this.$router.go(-1)
+      },
       openScreen () {
-        this.$router.push({ name: 'screen', params: { id: this.userId } })
-        // var docElm = document.querySelector('.canvas-panel')
-        // if (docElm.requestFullscreen) { // W3C
-        //     docElm.requestFullscreen()
-        // } else if (docElm.mozRequestFullScreen) { // FireFox
-        //     docElm.mozRequestFullScreen()
-        // } else if (docElm.webkitRequestFullScreen) { // Chrome等
-        //     docElm.webkitRequestFullScreen()
-        // } else if (docElm.msRequestFullscreen) { // IE11
-        //     docElm.msRequestFullscreen()
-        // }
+        this.$store.dispatch('SetIsScreen', true)
+        // this.$router.push({ name: 'screen', params: { id: this.userId } })
+        var docElm = document.querySelector('.dv-screen')
+        if (docElm.requestFullscreen) { // W3C
+            docElm.requestFullscreen()
+        } else if (docElm.mozRequestFullScreen) { // FireFox
+            docElm.mozRequestFullScreen()
+        } else if (docElm.webkitRequestFullScreen) { // Chrome等
+            docElm.webkitRequestFullScreen()
+        } else if (docElm.msRequestFullscreen) { // IE11
+            docElm.msRequestFullscreen()
+        }
       }
     }
   }

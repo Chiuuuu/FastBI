@@ -17,7 +17,7 @@ const database = {
       packageJson: {
         title: '柱状图',
         name: 've-histogram',
-        icon: 'ios-podium',
+        icon: 'bar-chart',
         api_data: {
           source: [
             { x: '1/1', y: 375, s: '系列1' },
@@ -131,7 +131,7 @@ const database = {
       packageJson: {
         title: '折线图',
         name: 've-line',
-        icon: 'ios-trending-up',
+        icon: 'line-chart',
         api_data: {
           source: [
             { x: '1/1', y: 375 },
@@ -451,7 +451,8 @@ const database = {
               show: true,
               color: '',
               fontSize: 12,
-              position: 'outside' // 可选inside
+              position: 'outside', // 可选inside
+              formatter: '{b}: {@2012} ({d}%)'
             },
             roseType: false, // 饼图可选玫瑰图
             center: ['50%', '50%'], // 饼图可选
@@ -790,7 +791,7 @@ const database = {
             }
           }
         },
-        view: { width: 500, height: 400, x: 710, y: 580 }
+        view: { width: 500, height: 400, x: 710, y: 580 } // 计算中间值(1920-500)*0.5,(1080-400)*0.5
       }
     },
     {
@@ -798,6 +799,7 @@ const database = {
       packageJson: {
         title: '图片',
         name: 've-image',
+        icon: 'md-images',
         // apiData: {},
         // apis: {},
         config: {
@@ -811,6 +813,7 @@ const database = {
       packageJson: {
         title: '表格',
         name: 've-tables',
+        icon: 'table',
         api_data: {
           source: [
             {
@@ -915,7 +918,8 @@ const database = {
             },
             oddBackgroundColor: '',
             evenBackgroundColor: '',
-            pageSize: 10
+            pageSize: 10,
+            ellipsis: true
           }
         },
         view: { width: 500, height: 400, x: 710, y: 580 }

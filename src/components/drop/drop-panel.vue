@@ -2,8 +2,7 @@
   <!--这里默认组织画布的右键点击事件 后期加在拖拽区块上-->
   <div class="drop-panel"
        @drop.stop.prevent="handleDropOnCanvas($event)"
-       @dragover.stop.prevent
-       style="background: linear-gradient(-90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px) 0% 0% / 20px 20px, linear-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px) 0% 0% / 20px 20px;">
+       @dragover.stop.prevent>
     <slot>
     </slot>
   </div>

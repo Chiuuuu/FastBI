@@ -85,12 +85,19 @@
       ...mapGetters(['pageSettings', 'canvasRange', 'contextMenuInfo']),
       // 画布面板的样式
       canvasPanelStyle () {
-        return {
+        let obj = {
           width: `${this.pageSettings.width}px`,
           height: `${this.pageSettings.height}px`,
           transform: `scale(${this.canvasRange}) translate3d(0px, 0px, 0)`,
           backgroundColor: this.pageSettings.backgroundColor
         }
+        this._calcStyle()
+        // if (this.pageSettings.backgroundType === '1') {
+        //   obj.backgroundColor = this.pageSettings.backgroundColor
+        // } else {
+        //   obj.background = this.pageSettings.backgroundSrc
+        // }
+         return obj
       }
     },
     components: { DropPanel, EditSlider }

@@ -160,10 +160,11 @@
     computed: {
       titleStyle () {
         return {
-          padding: '0 10px',
+          padding: '20px 10px',
           color: this.config.title.textStyle.color,
           fontSize: this.config.title.textStyle.fontSize + 'px',
-          textAlign: this.config.title.textAlign
+          textAlign: this.config.title.textAlign,
+          height: 'auto'
         }
       }
     }
