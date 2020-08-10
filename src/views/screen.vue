@@ -45,6 +45,9 @@
   export default {
     name: 'screen',
     components: { ChartsFactory, PreviewBox, ChartText, ChartImage, ChartTables },
+    props: {
+
+    },
     data () {
       return {}
     },
@@ -58,6 +61,8 @@
           backgroundColor: this.pageSettings.backgroundColor
         }
       }
+    },
+    watch: {
     },
     created () {
       // 拉取页面配置信息

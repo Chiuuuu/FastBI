@@ -46,7 +46,8 @@
         tableData: [],
         columns: [],
         colors: [],
-        showHeader: true
+        showHeader: true,
+        backgroundStyle: {}
       }
     },
     watch: {

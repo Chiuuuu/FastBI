@@ -4,6 +4,7 @@ const app = {
     // 状态数据
     canvasRange: 0, // 画布缩放
     optionsExpand: true, // 参数面板打开关闭
+    modelExpand: true, // 数据模型面板打开关闭
     isScreen: false // 是否全屏
   },
   mutations: {
@@ -12,6 +13,9 @@ const app = {
     },
     SET_OPTIONS_EXPAND: (state) => {
       state.optionsExpand = !state.optionsExpand
+    },
+    SET_MODEL_EXPAND: (state) => {
+      state.modelExpand = !state.modelExpand
     },
     SET_PAGE_SETTING: (state, setting) => {
       state.pageSettings = { ...setting }
@@ -26,6 +30,9 @@ const app = {
     },
     ToggleOptionsExpand: ({ commit }) => {
       commit('SET_OPTIONS_EXPAND')
+    },
+    ToggleModelExpand: ({ commit }) => {
+      commit('SET_MODEL_EXPAND')
     },
     SetPageSettings: ({ commit }, setting) => {
       commit('SET_PAGE_SETTING', setting)

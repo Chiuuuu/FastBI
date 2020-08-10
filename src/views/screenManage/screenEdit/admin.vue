@@ -58,7 +58,7 @@
       </template>
     </board>
 
-    <screen v-show="isScreen"></screen>
+    <screen v-if="isScreen" :canvasMap="canvasMap"></screen>
     <b-modal v-model="deleteDialog" :styles="{top: '300px',width:'350px'}"
              class-name="delete-dialog" @on-ok="deleteOne">
       <div class="delete-dialog-inner">

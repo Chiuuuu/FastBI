@@ -5,19 +5,22 @@
       <span v-if="!currentSelected">{{ config.title.text }}</span>
       <div class="tabs" v-else>
         <div class="tab-item" :class="{'active':tabsType===0}" @click="tabsType=0">
-          <b-tooltip content="配置">
+          <!-- <b-tooltip content="配置">
             <b-icon name="ios-options"></b-icon>
-          </b-tooltip>
+          </b-tooltip> -->
+          样式
         </div>
         <div class="tab-item" :class="{'active':tabsType===1}" @click="tabsType=1">
-          <b-tooltip content="数据">
+          <!-- <b-tooltip content="数据">
             <b-icon name="ios-code-working"></b-icon>
-          </b-tooltip>
+          </b-tooltip> -->
+          数据
         </div>
         <div class="tab-item" :class="{'active':tabsType===2}" @click="tabsType=2">
-          <b-tooltip content="交互">
+          <!-- <b-tooltip content="交互">
             <b-icon name="ios-crop"></b-icon>
-          </b-tooltip>
+          </b-tooltip> -->
+          交互
         </div>
       </div>
     </div>
@@ -96,7 +99,7 @@
                 <gui-inline>
                   <a-input-number v-model="baseProperty.width" size="small"
                                   :formatter="value => `W ${value}`"
-                                  :parser="value => value.replace(/\W\s?|(,*)/g, '')"
+                                  :parser="value => value.replace('W', '')"
                                   @change="setBaseProperty"></a-input-number>
                 </gui-inline>
                 <gui-inline>
@@ -878,7 +881,7 @@
             </gui-group>
             <gui-group group-name="数据源">
               <div style="padding: 6px;">
-                <a-input v-model="dataSource" type="textarea" @on-keyup.delete.stop autosize
+                <a-input v-model="dataSource" type="textarea" @on-keyup.delete.stop autoSize
                          placeholder="enter json data..." @change="dataSourceChange"></a-input>
               </div>
             </gui-group>

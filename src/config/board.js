@@ -34,7 +34,13 @@ export default {
       text: '页面配置'
     },
     style: {
-      width: '300px'
+      width: '260px'
+    }
+  },
+  // 数据模型
+  data: {
+    style: {
+      width: '220px'
     }
   }
 }

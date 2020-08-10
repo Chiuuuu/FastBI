@@ -57,16 +57,20 @@
       openScreen () {
         this.$store.dispatch('SetIsScreen', true)
         // this.$router.push({ name: 'screen', params: { id: this.userId } })
-        var docElm = document.querySelector('.dv-screen')
-        if (docElm.requestFullscreen) { // W3C
-            docElm.requestFullscreen()
-        } else if (docElm.mozRequestFullScreen) { // FireFox
-            docElm.mozRequestFullScreen()
-        } else if (docElm.webkitRequestFullScreen) { // Chrome等
-            docElm.webkitRequestFullScreen()
-        } else if (docElm.msRequestFullscreen) { // IE11
-            docElm.msRequestFullscreen()
-        }
+        this.$nextTick(() => {
+          var docElm = document.querySelector('.dv-screen')
+          if (docElm) {
+            if (docElm.requestFullscreen) { // W3C
+              docElm.requestFullscreen()
+            } else if (docElm.mozRequestFullScreen) { // FireFox
+                docElm.mozRequestFullScreen()
+            } else if (docElm.webkitRequestFullScreen) { // Chrome等
+                docElm.webkitRequestFullScreen()
+            } else if (docElm.msRequestFullscreen) { // IE11
+                docElm.msRequestFullscreen()
+            }
+          }
+        })
       }
     }
   }

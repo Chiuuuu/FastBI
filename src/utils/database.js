@@ -854,26 +854,22 @@ const database = {
             {
               title: 'Address',
               dataIndex: 'address',
-              key: 'address 1',
-              ellipsis: true
+              key: 'address 1'
             },
             {
               title: 'Long Column Long Column Long Column',
               dataIndex: 'address',
-              key: 'address 2',
-              ellipsis: true
+              key: 'address 2'
             },
             {
               title: 'Long Column Long Column',
               dataIndex: 'address',
-              key: 'address 3',
-              ellipsis: true
+              key: 'address 3'
             },
             {
               title: 'Long Column',
               dataIndex: 'address',
-              key: 'address 4',
-              ellipsis: true
+              key: 'address 4'
             }
           ]
         },

@@ -17,10 +17,13 @@
         </canvas-main>
       </div>
       <!--右侧的参数配置页面-->
-      <board-options v-if="config.options"
-                     :config="config.options"
-                     @on-toggle="ToggleOptionsExpand"
-      ></board-options>
+      <div class="border-right">
+        <board-options v-if="config.options"
+                      :config="config.options"
+                      @on-toggle="ToggleOptionsExpand"
+        ></board-options>
+        <board-data-model :config="config.data"></board-data-model>
+      </div>
     </div>
     <!--右键菜单-->
     <context-menu></context-menu>
@@ -33,6 +36,7 @@
   import BoardHeader from './header/index'
   import BoardCoverage from './coverage/index'
   import BoardOptions from './options/index'
+  import BoardDataModel from './data-model/index'
   import CanvasMain from './canvas'
   import ContextMenu from './context-menu/index'
   import { mapGetters, mapActions } from 'vuex'
@@ -66,6 +70,6 @@
         }
       }
     },
-    components: { ContextMenu, CanvasMain, BoardCoverage, BoardHeader, BoardOptions }
+    components: { ContextMenu, CanvasMain, BoardCoverage, BoardHeader, BoardOptions, BoardDataModel }
   }
 </script>
