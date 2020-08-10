@@ -18,7 +18,7 @@
               ></tab-content-entry>
           </a-tab-pane>
           <a-tab-pane key="2" tab="库表结构" force-render :disabled="!tabChangeAble">
-            <tab-content-structure></tab-content-structure>
+            <tab-content-structure v-on="$listeners" ref="structure" @hook:mounted="handleTT"></tab-content-structure>
           </a-tab-pane>
           <a-tab-pane key="3" tab="操作记录" :disabled="!tabChangeAble">
             <tab-content-record></tab-content-record>
@@ -41,12 +41,13 @@ export default {
     TabContentStructure,
     TabContentRecord
   },
+  props:['tabindex'],
   data() {
     return {
       excel: false,
       visible: false,
       wrapperCol: { span: 14 },
-      defaultTab: '1',
+      defaultTab: this.tabindex,
       formName: '',
     };
   },
@@ -71,11 +72,18 @@ export default {
     handleSetTab(key){
       this.defaultTab = key;
     },
+    handleTT(){
+      if(this.defaultTab !='1'){
+        console.log('去刷新')
+        this.$refs.structure.handleGetData();
+      }
+    },
     /** 
      * 选项卡
     */
     handleChangeTab(activeKey){
       console.log('tab',activeKey)
+      // this.$emit('on-change-componet')
       if(activeKey==='2'){
         console.log('数据结构请求')
       }else if(activeKey==='3'){

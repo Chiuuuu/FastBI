@@ -75,8 +75,12 @@ export default {
     };
   },
   methods: {
+    handleGetData(){
+        console.log('获取数据')
+    },
     setting() {
-      this.$router.push("/dataSource/dataAccess-setting");
+    //   this.$router.push("/dataSource/dataAccess-setting");
+      this.$emit('on-change-componet', 'Setting')
     }
   }
 };

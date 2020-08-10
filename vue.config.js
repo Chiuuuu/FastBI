@@ -12,11 +12,17 @@ module.exports = {
     : '/',
   outputDir: 'preview',
   // dev跨域问题
-  // devServer: {
-  //   proxy: {
-  //     '/admin': { target: 'http://localhost:8088/cms' }
-  //   }
-  // },
+  devServer: {
+    proxy: {
+      '/admin': { 
+        target: 'http://192.168.0.69:81',
+        changeOrigin: true,  //是否跨域
+        pathRewrite:{
+            '^/admin':''
+        } 
+      }
+    }
+  },
   productionSourceMap: false,
   lintOnSave: process.env.NODE_ENV !== 'production',
   assetsDir: 'static',

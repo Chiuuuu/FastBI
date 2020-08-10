@@ -1,6 +1,5 @@
 <template>
   <div class="data-access-setting">
-    <Menu></Menu>
     <div class="set-main">
       <div class="header">
         <span class="data_con">fine_authority</span>
@@ -77,7 +76,6 @@
 </template>
 
 <script>
-import Menu from '../dataAccess/components/data-main/data-menu/menu'
 const columns = [
   {
     title: '原名',
@@ -123,9 +121,6 @@ const data = [
 ]
 
 export default {
-  components: {
-    Menu
-  },
   data() {
     return {
       data,
@@ -150,7 +145,8 @@ export default {
       this.visible = false
     },
     back() {
-      this.$router.go(-1)
+      // this.$router.go(-1)
+      this.$emit('on-change-componet', 'Main')
     }
   }
 }

@@ -67,7 +67,11 @@
             @validate="handleValidateFiled"
           >
             <a-form-model-item label="数据源名称" prop="name">
-              <a-input style="width:528px;" v-model="form.name" @change="handleSetTableName" />
+              <a-input
+                style="width:528px;"
+                v-model="form.name"
+                @change="handleSetTableName"
+              />
             </a-form-model-item>
             <a-form-model-item label="服务器" prop="ip">
               <a-input style="width:528px;" v-model="form.ip" />
@@ -83,6 +87,7 @@
             </a-form-model-item>
             <a-form-model-item :wrapper-col="{ span: 14, offset: 4 }">
               <a-button
+                :loading="connectBtn"
                 type="primary"
                 style="width:88px;height:30px"
                 @click="handleConnect"
@@ -92,12 +97,12 @@
             </a-form-model-item>
             <a-form-model-item
               label="默认连接库"
-              prop="database_id"
+              prop="dbid"
               v-if="connectStatus"
             >
               <a-select
                 style="width: 528px"
-                v-model="form.database_id"
+                v-model="form.dbid"
                 @change="handleDefaultDbSelect"
               >
                 <a-select-option
@@ -105,7 +110,7 @@
                   :value="item.id"
                   :key="item.id"
                 >
-                  {{ item.name }}
+                  {{ item.databaseName }}
                 </a-select-option>
               </a-select>
             </a-form-model-item>
@@ -116,6 +121,7 @@
           class="btn_sub"
           @click="handleSaveForm"
           :disabled="!connectStatus"
+          :loading="saveBtn"
         >
           保存
         </a-button>
@@ -126,6 +132,11 @@
 <script>
 import { mapState } from "vuex";
 import emptry from "../../../../../../assets/images/icon_empty_state.png";
+import {
+  fetchConnect,
+  fetchGetDBList,
+  fetchSave
+} from "../../../../../../api/dataAccess/api";
 export default {
   name: "tabContentEntry",
   data() {
@@ -151,8 +162,8 @@ export default {
         port: "", // 端口号
         username: "", // 用户名
         password: "", // 密码
-        database_id: "", // 默认数据库id
-        database_name: "" // 默认数据库名称
+        dbid: "", // 默认数据库id
+        databaseName: "" // 默认数据库名称
       },
       rules: {
         name: [
@@ -193,27 +204,16 @@ export default {
             message: "请输入密码"
           }
         ],
-        database_id: [
+        dbid: [
           {
             required: true
           }
         ]
       },
+      connectBtn: false,
       connectStatus: false, // 是否连接
-      databaseList: [
-        {
-          id: 1,
-          name: "SQL Server"
-        },
-        {
-          id: 2,
-          name: "Oracle"
-        },
-        {
-          id: 3,
-          name: "MySQL"
-        }
-      ],
+      saveBtn: false,
+      databaseList: [],
       excel: false,
       rule: {
         Data: [
@@ -234,11 +234,13 @@ export default {
             message: "请选择保存目录"
           }
         ]
-      },
+      }
     };
   },
   computed: {
     ...mapState({
+      modelInfo: state => state.dataAccess.modelInfo,
+      tableList: state => state.dataAccess.menuList,
       modelType: state => state.dataAccess.modelType, // 数据类型
       isFileType(state) {
         // 数据类型是否是文件格式
@@ -248,6 +250,17 @@ export default {
       },
       tabChangeAble: state => state.dataAccess.firstFinished // 是否完成第一部分
     })
+  },
+  created() {
+    this.form = Object.assign(this.form, this.modelInfo);
+    this.$EventBus.$on("resetForm", this.handleResetForm);
+    // this.$EventBus.$on('fetchFormData', th)
+  },
+  beforeDestroy() {
+    this.$EventBus.$off("resetForm");
+  },
+  mounted() {
+    console.log("main-table", this.tableList);
   },
   methods: {
     /**
@@ -259,16 +272,16 @@ export default {
     handleValidateFiled(prop, result, err) {
       if (!result) {
         this.connectStatus = false;
-        this.$emit('on-set-tab', '1');
+        this.$emit("on-set-tab", "1");
         this.$store.dispatch("dataAccess/setFirstFinished", false);
       }
     },
-    /** 
+    /**
      * 设置表单名称
-    */
-    handleSetTableName(){
-        console.log('emit')
-        this.$emit('on-set-table-name', this.form.name)
+     */
+    handleSetTableName() {
+      console.log("emit");
+      this.$emit("on-set-table-name", this.form.name);
     },
     /**
      * 默认选择数据库操作
@@ -280,27 +293,46 @@ export default {
         return item.id === value && item;
       });
       const obj = item.pop();
-      this.form.database_id = obj.id;
-      this.form.database_name = obj.name;
+      this.form.dbid = obj.id;
+      this.form.databaseName = obj.name;
     },
     /**
      * 重置表单
      */
     handleResetForm() {
-      this.$refs.dbForm.resetFields();
+      this.$refs["dbForm"] && this.$refs.dbForm.resetFields();
     },
     /**
      * 连接数据库
      */
     handleConnect() {
-      this.$refs.dbForm.validate(valid => {
+      this.$refs.dbForm.validate(async valid => {
         if (valid) {
-          this.connectStatus = true;
+          this.connectBtn = true;
+          const result = await fetchConnect({
+            url: "/admin/dev-api/system/mysql/connect",
+            data: {
+              ip: this.form.ip,
+              name: this.form.name,
+              password: this.form.password,
+              port: this.form.port,
+              username: this.form.username
+            }
+          }).finally(() => {
+            this.connectBtn = false;
+          });
 
-          // 设置默认选中第一个
-          console.log("请求获取数据库列表");
-          this.form.database_id = this.databaseList[0].id;
-          this.form.database_name = this.databaseList[0].name;
+          if (result.data.code == "200") {
+            console.log(result.data);
+            this.databaseList = [].concat(result.data.rows);
+            // 设置默认选中第一个
+            console.log("请求获取数据库列表");
+            this.form.dbid = this.databaseList[0].id;
+            this.form.databaseName = this.databaseList[0].name;
+            this.connectStatus = true;
+          } else {
+            this.$message.warning(result.data.msg);
+          }
         } else {
           this.connectStatus = false;
           return false;
@@ -311,10 +343,37 @@ export default {
      * 保存数据表
      */
     handleSaveForm() {
-      this.$refs.dbForm.validate(valid => {
+      this.$refs.dbForm.validate(async valid => {
         if (valid) {
+          const datadbitem = this.databaseList
+            .filter(item => item.id === this.form.dbid)
+            .pop();
+          this.form = Object.assign(this.form, {
+            databaseName: datadbitem.databaseName
+          });
           console.log(this.form);
-          this.$store.dispatch("dataAccess/setFirstFinished", true);
+
+          this.saveBtn = true;
+          const result = await fetchSave({
+            url: "/admin/dev-api/system/mysql/save",
+            data: this.form
+          }).finally(() => {
+            this.saveBtn = false;
+          });
+
+          if (result.data.code == "200") {
+            this.$store.dispatch("dataAccess/getMenuList");
+            this.$store.dispatch("dataAccess/setFirstFinished", true);
+            this.$store.dispatch("dataAccess/setModelInfo", this.form);
+            this.$store.dispatch("dataAccess/setModelId", result.data.data);
+            // this.tableList.push({
+            //   id: this.tableList.length + 1,
+            //   name: this.form.name
+            // })
+          } else {
+            this.$message.error(result.data.msg);
+          }
+          console.log(result);
         } else {
           return false;
         }
