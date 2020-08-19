@@ -33,6 +33,27 @@ export function fetchReadeTable(options) {
 }
 
 /**
+ * 获取具体表字段
+*/
+export function fetchGetTableField(opions) {
+  return requestPost2(opions.url, opions.data)
+}
+
+/**
+ * 保存数据表
+*/
+export function fetchWriteTable(options) {
+  return requestPost2(options.url, options.data)
+}
+
+/**
+ * 保存修改具体表字段
+*/
+export function fetchSaveTableField(options) {
+  return requestPost2(options.url, options.data)
+}
+
+/**
  * 连接操作
  */
 export function fetchConnect(opions) {
