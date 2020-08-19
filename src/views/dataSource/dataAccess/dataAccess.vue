@@ -1,10 +1,10 @@
 <template>
   <a-row :gutter="16">
     <a-col class="gutter-row" :span="5">
-      <Menu></Menu>
+      <Menu @on-change-tabindex='handleChangeTabindex'></Menu>
     </a-col>
     <a-col class="gutter-row" :span="19">
-      <component :is="showWhat" @on-change-componet="handleChangeComponet" :tabindex="tabindex"></component>
+      <component :is="showWhat" @on-change-componet="handleChangeComponet" :tabindex="tabindex" @on-change-tabindex='handleChangeTabindex'></component>
     </a-col>
   </a-row>
 </template>
@@ -31,6 +31,9 @@ export default {
       if (componentName === 'Main') {
         this.tabindex = '2'
       }
+    },
+    handleChangeTabindex(index) {
+      this.tabindex = index
     }
   },
   beforeDestroy() {

@@ -3,7 +3,7 @@
     <div class="right">
       <div class="header">
         <span class="data_con">{{
-          modelType ? (formName ? formName : '未命名连接') : "请连接数据"
+          modelType ? (formInfo.name ? formInfo.name : '未命名连接') : "请连接数据"
         }}</span>
         <span class="data_category" v-if="modelType"
           >（类型：{{ modelType }}）</span
@@ -36,7 +36,7 @@ import { mapState } from 'vuex'
 import TabContentEntry from './tab-content/entry'
 import TabContentStructure from './tab-content/structure'
 import TabContentRecord from './tab-content/record'
-import { fetchWriteTable } from '../../../../../api/dataAccess/api'
+import { fetchReadeTable } from '../../../../../api/dataAccess/api'
 export default {
   name: 'dataAccessMain',
   components: {
@@ -71,7 +71,9 @@ export default {
      * 设置表名称
     */
     handleSetTableName(name) {
-      this.formName = name
+      this.$store.dispatch('dataAccess/setModelInfo', Object.assign(this.formInfo, {
+        name
+      }))
     },
     handleSetTab(key) {
       this.defaultTab = key
@@ -93,7 +95,9 @@ export default {
       // this.$emit('on-change-componet')
       if (activeKey === '2') {
         console.log('数据结构请求')
-        this.handleWriteTable()
+        this.$nextTick(() => {
+          this.$refs.structure.handleGetData()
+        })
       } else if (activeKey === '3') {
         console.log('操作记录请求')
       } else if (activeKey === '1') {
@@ -102,22 +106,26 @@ export default {
           this.$refs.entry.handleSetFormData()
         }
       }
+      // this.$emit('on-change-tabindex', activeKey)
     },
-    async handleWriteTable() {
-      const writeResult = await fetchWriteTable({
-        url: '/admin/dev-api/system/mysql/write/teble/' + this.formInfo.name
-      })
+    // async handleWriteTable() {
+    //   const writeResult = await fetchReadeTable({
+    //     url: '/admin/dev-api/system/mysql/read/table',
+    //     data: {
+    //       databaseName: this.formInfo.databaseName,
+    //       mysqlSourceName: this.formInfo.name
+    //     }
+    //   })
 
-      if (writeResult.data.code === 200) {
-        console.log('获取数据writeResult', writeResult)
-        this.$store.dispatch('dataAccess/setDateBaseId', writeResult.data.data)
-        this.$nextTick(() => {
-          this.$refs.structure.handleGetData()
-        })
-      } else {
-        this.$message.error(writeResult.data.msg)
-      }
-    },
+    //   if (writeResult.data.code === 200) {
+    //     console.log('获取数据writeResult', writeResult)
+    //     this.$nextTick(() => {
+    //       this.$refs.structure.handleGetData(writeResult)
+    //     })
+    //   } else {
+    //     this.$message.error(writeResult.data.msg)
+    //   }
+    // },
     /**
      * 展示弹出
     */

@@ -29,7 +29,7 @@
   </div>
 </template>
 <script>
-import { fetchDatabaseInfo } from '../../../../../../api/dataAccess/api'
+import { fetchReadeTable } from '../../../../../../api/dataAccess/api'
 import { mapState } from 'vuex'
 const columns = [
   {
@@ -74,6 +74,7 @@ export default {
   },
   computed: {
     ...mapState({
+      formInfo: state => state.dataAccess.modelInfo,
       databaseid: state => state.dataAccess.databaseid
     })
   },
@@ -81,12 +82,13 @@ export default {
     handleChangeType(stringBoolean) {
       return stringBoolean === 1
     },
-    async handleGetData(databaseid) {
+    async handleGetData() {
       this.spinning = true
-      const dabaseInfoResult = await fetchDatabaseInfo({
-        url: '/admin/dev-api/system/sourceTbale/list/bydatabaseid',
+      const dabaseInfoResult = await fetchReadeTable({
+        url: '/admin/dev-api/system/mysql/read/table',
         data: {
-          databaseId: this.databaseid
+          databaseName: this.formInfo.databaseName,
+          mysqlSourceName: this.formInfo.name
         }
       }).finally(() => {
         this.spinning = false

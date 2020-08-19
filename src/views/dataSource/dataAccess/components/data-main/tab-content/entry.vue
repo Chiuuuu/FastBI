@@ -242,6 +242,7 @@ export default {
       modelInfo: state => state.dataAccess.modelInfo,
       tableList: state => state.dataAccess.menuList,
       modelType: state => state.dataAccess.modelType, // 数据类型
+      modelSelectType: state => state.dataAccess.modelSelectType,
       isFileType(state) {
         // 数据类型是否是文件格式
         return ['execl', 'csv'].some(function(item) {
@@ -363,7 +364,10 @@ export default {
           this.saveBtn = true
           const result = await fetchSave({
             url: '/admin/dev-api/system/mysql/save',
-            data: Object.assign(this.form, {
+            data: this.modelSelectType === 'new' ? Object.assign(this.form, {
+              parentId: -1,
+              id: this.$store.state.dataAccess.modelId
+            }) : Object.assign(this.form, {
               id: this.$store.state.dataAccess.modelId
             })
           }).finally(() => {

@@ -6,7 +6,8 @@ const state = {
     modelInfo: {}, // 数据表信息
     modelId: -1, // 选中的菜单id
     menuList: [], // 左边菜单列表
-    databaseid: -1 // 选择的默认表id
+    databaseid: -1, // 选择的默认表id
+    modelSelectType: '' // new: 新添加 add: 右键添加
 }
 
 const mutations = {
@@ -16,6 +17,9 @@ const mutations = {
     SET_MODELID(state, id) {
         state.modelId = id
     },
+    SET_MODELSELECTTYPE(state, type) {
+        state.modelSelectType = type
+    },
     SET_MODELTYPE(state, type) {
         state.modelType = type
     },
@@ -24,9 +28,6 @@ const mutations = {
     },
     SET_MENULIST(state, list) {
         state.menuList = [].concat(list)
-    },
-    SET_DATABASEID(state, id) {
-        state.databaseid = id
     }
 }
 
@@ -44,9 +45,6 @@ const actions = {
     setModelInfo({ commit }, info) {
         commit('SET_MODELINFO', info)
     },
-    setDateBaseId({ commit }, id) {
-        commit('SET_DATABASEID', id)
-    },
     setModelId({ commit }, id) {
         commit('SET_MODELID', id)
     },
@@ -55,6 +53,9 @@ const actions = {
     },
     setFirstFinished({ commit }, status) {
         commit('SET_FIRSTFINISHED', status)
+    },
+    setModelSelectType({ commit }, type) {
+        commit('SET_MODELSELECTTYPE', type)
     }
 }
 
