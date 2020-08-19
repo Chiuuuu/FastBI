@@ -16,53 +16,53 @@
 </template>
 <script>
 export default {
-  name: "model-edit-left",
-  inject: ["nodeStatus"],
+  name: 'model-edit-left',
+  inject: ['nodeStatus'],
   data() {
     return {
       isDrag: false,
       list: [
         {
           id: 4,
-          title: "三大框架"
+          title: '三大框架'
         },
         {
           id: 1,
-          title: "react"
+          title: 'react'
         },
         {
           id: 2,
-          title: "vue"
+          title: 'vue'
         },
         {
           id: 3,
-          title: "angular"
+          title: 'angular'
         }
       ]
-    };
+    }
   },
   methods: {
     handleMouseDown() {
-      this.isDrag = true;
+      this.isDrag = true
     },
     handleMouseLeave() {
-      this.isDrag = false;
+      this.isDrag = false
     },
     handleLeftDragStart(event, data) {
-      const copyData = JSON.parse(JSON.stringify(data));
-      console.log("left-drag-start", copyData);
+      const copyData = JSON.parse(JSON.stringify(data))
+      console.log('left-drag-start', copyData)
       this.nodeStatus = Object.assign(this.nodeStatus, {
-        dragType: "left",
+        dragType: 'left',
         dragNode: {
           nodeData: copyData,
           parentNode: null
         },
         event
-      });
+      })
     },
-    handleLeftDragEnd(){
+    handleLeftDragEnd() {
         this.$emit('on-left-drag-leave')
     }
   }
-};
+}
 </script>

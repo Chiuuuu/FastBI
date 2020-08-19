@@ -53,43 +53,101 @@
         </a-input>
       </div>
       <p class="menu_tips">右键文件夹或选项有添加，重命名等操作</p>
-      <div class="menu-wrap">
-        <div
-          class="group"
-          :class="handleIsFolder(folder, 'items') ? 'is-folder' : ''"
-          v-for="(folder, index) in tableList"
-          :key="folder.id"
-        >
-          <template v-if="handleIsFolder(folder, 'items')">
-            <menu-folder
-              :folder="folder"
-              :index="index"
-              :contextmenus="folderContenxtMenu"
-              @folderFileSelect="handleFileSelect"
+      <a-menu
+        mode="inline"
+        v-model="menuKey"
+        @select="handleSelect"
+      >
+        <template v-for="(item, index) in tableList">
+          <template v-if="handleIsFolder(item)">
+            <a-menu-item
+              v-if="item.items && item.items.length === 0"
+              :key="item.id"
             >
-              <template v-slot:file="slotProps">
-                <menu-file
-                  :file="slotProps.file"
-                  :index="slotProps.index"
-                  :parent="folder"
-                  :isSelect='fileSelectId === slotProps.file.id'
-                  :contextmenus="fileContenxtMenu"
-                ></menu-file>
-              </template>
-            </menu-folder>
+              <a-dropdown :trigger="['contextmenu']">
+                <div>
+                  <a-icon type="file" />
+                  {{ item.name }}
+                  <!-- <a-icon type="more" style="margin-left:170px" /> -->
+                </div>
+                <a-menu slot="overlay">
+                  <a-menu-item @click="handleResetFolderShow($event, item)">
+                    重命名
+                  </a-menu-item>
+                  <a-menu-item @click="handleResetFolderDelete($event, index)">
+                    删除
+                  </a-menu-item>
+                </a-menu>
+              </a-dropdown>
+            </a-menu-item>
+            <a-sub-menu v-else :key="index">
+              <span slot="title">
+                <a-dropdown :trigger="['contextmenu']">
+                  <div>
+                    <a-icon type="folder" /><span>{{ item.name }}</span>
+                  </div>
+                  <a-menu slot="overlay">
+                    <a-menu-item @click="handleResetFolderShow($event, item)">
+                      重命名
+                    </a-menu-item>
+                    <a-menu-item
+                      @click="handleResetFolderDelete($event, index)"
+                    >
+                      删除
+                    </a-menu-item>
+                  </a-menu>
+                </a-dropdown>
+              </span>
+              <a-menu-item v-for="subitem in item.items" :key="subitem.id">
+                <a-dropdown :trigger="['contextmenu']">
+                  <div @mouseenter="mouseenter" @mouseleave="mouseleave">
+                    <div>
+                      <a-icon type="file" />
+                      {{ subitem.name }}
+                      <!-- <a-icon type="more" style="margin-left:130px" /> -->
+                    </div>
+                  </div>
+                  <a-menu slot="overlay">
+                    <a-menu-item
+                      @click="
+                        handleResetNameModalShow($event, {
+                          type: 'sub',
+                          parentNode: item,
+                          item
+                        })
+                      "
+                    >
+                      重命名
+                    </a-menu-item>
+                    <a-menu-item>
+                      删除
+                    </a-menu-item>
+                  </a-menu>
+                </a-dropdown>
+              </a-menu-item>
+            </a-sub-menu>
           </template>
           <template v-else>
-            <ul class="items">
-              <menu-file
-                :file="folder"
-                :index="index"
-                :isSelect='fileSelectId === folder.id'
-                :contextmenus="fileContenxtMenu"
-              ></menu-file>
-            </ul>
+            <a-menu-item :key="item.id">
+              <a-dropdown :trigger="['contextmenu']">
+                <div @mouseenter="mouseenter" @mouseleave="mouseleave">
+                  <a-icon type="file" />{{ item.name
+                  }}
+                  <!-- <a-icon type="more" style="margin-left:170px" /> -->
+                </div>
+                <a-menu slot="overlay">
+                  <a-menu-item>
+                    重命名
+                  </a-menu-item>
+                  <a-menu-item>
+                    删除
+                  </a-menu-item>
+                </a-menu>
+              </a-dropdown>
+            </a-menu-item>
           </template>
-        </div>
-      </div>
+        </template>
+      </a-menu>
     </template>
     <reset-name-modal
       ref="resetNameForm"
@@ -103,9 +161,7 @@
 <script>
 import ResetNameModal from '../data-main/data-menu/resetName'
 import { mapState } from 'vuex'
-import { fetchTableInfo, fetchDeleteMenuById } from '../../../../../api/dataAccess/api'
-import MenuFile from '@/components/dataSource/menu-group/file'
-import MenuFolder from '@/components/dataSource/menu-group/folder'
+import { fetchTableInfo } from '../../../../../api/dataAccess/api'
 export default {
   props: {
     menuData: {
@@ -114,12 +170,12 @@ export default {
     }
   },
   components: {
-    ResetNameModal,
-    MenuFile,
-    MenuFolder
+    ResetNameModal
   },
   data() {
     return {
+      // menuKey: [],
+      // tableList: [], // 表列表
       modelList: ['mysql', 'oracle', 'csv'].map(function(item) {
         // 弹窗选项列表
         return {
@@ -128,7 +184,6 @@ export default {
           type: item
         }
       }),
-      // fileSelectId: '', // 选中左侧菜单
       resetNameVisible: false, // 重命名弹窗显示
       resetNameType: '', // 重命名类型
       menuNode: {
@@ -136,30 +191,6 @@ export default {
         targetNode: {}, // 目标节点
         parentNode: {} // 父级节点
       },
-      folderContenxtMenu: [
-        {
-          name: '添加链接',
-          onClick: this.showModal
-        },
-        {
-          name: '重命名',
-          onClick: this.handleFolderResetName
-        },
-        {
-          name: '删除',
-          onClick: this.handleFolderDelete
-        }
-      ],
-      fileContenxtMenu: [
-        {
-          name: '移动到',
-          onClick: this.handleFileMoveFolder
-        },
-        {
-          name: '删除',
-          onClick: this.handleFileDelete
-        }
-      ],
       icon: false,
       visible: false,
       labelCol: { span: 4 },
@@ -170,96 +201,27 @@ export default {
     ...mapState({
       tableList: state => state.dataAccess.menuList
     }),
-    fileSelectId: {
+    menuKey: {
       get () {
-        return this.$store.state.dataAccess.modelId
+        return this.$store.state.dataAccess.modelId ? [this.$store.state.dataAccess.modelId] : []
       },
       set (value) {
-        this.$store.commit('dataAccess/SET_MODELID', value)
+        this.$store.commit('dataAccess/SET_MODELID', value.pop())
       }
     }
   },
   mounted() {
     this.handleGetMenuList()
-    this.$on('fileSelect', this.handleFileSelect)
   },
   methods: {
-    /**
-    * 获取左侧菜单数据
-    */
     handleGetMenuList() {
-     this.$store.dispatch('dataAccess/getMenuList', this)
+      this.$store.dispatch('dataAccess/getMenuList', this)
     },
     /**
-    * 选择左侧菜单
-    */
-    async handleFileSelect(file) {
-      if (this.fileSelectId === file.id) return
-      this.fileSelectId = file.id
-      if (file.typeCore === 1) {
-        this.$store.dispatch('dataAccess/setModelType', 'mysql')
-
-        const result = await fetchTableInfo({
-          url: '/admin/dev-api/system/mysql/' + file.id
-        })
-        console.log('result', result)
-        if (result.data.code === 200) {
-          this.$store.dispatch('dataAccess/setModelInfo', {
-            ip: result.data.data.ip,
-            name: result.data.data.name,
-            password: '',
-            port: Number(result.data.data.port),
-            username: result.data.data.username
-          })
-          this.$EventBus.$emit('setFormData')
-        } else {
-          this.$message.error(result.data.msg)
-        }
-      } else if (file.typeCode === 2) {
-        this.$store.dispatch('dataAccess/setModelType', 'oracle')
-      }
-      this.$store.dispatch('dataAccess/setFirstFinished', false)
-      this.$store.dispatch('dataAccess/setModelId', file.id)
-      this.$EventBus.$emit('set-tab-index', '1')
-      this.$emit('on-menuChange-componet', 'Main')
-    },
-    /**
-    * 删除菜单
-    */
-    async handleFileDelete(event, item, { parent, file, index }) {
-      const result = await fetchDeleteMenuById({
-        url: `/admin/dev-api/system/catalog/delete/${file.id}`
-      })
-      if (result.data.code === 200) {
-        if (parent) {
-          parent.splice(index, 1)
-        } else {
-          this.tableList.splice(index, 1)
-        }
-      } else {
-        this.$message.error(result.data.msg)
-      }
-    },
-    /**
-     * 打开数据类型弹窗
+     * 添加数据连接
      */
     showModal() {
       this.visible = true
-      this.$store.dispatch('dataAccess/setModelSelectType', 'new')
-    },
-    /**
-     * 打开数据类型弹窗
-     */
-    showResetNameModal() {
-      this.resetNameVisible = true
-    },
-    /**
-    * 修改文件夹名称
-    */
-    handleFolderResetName(event, item, { folder }) {
-      this.resetNameVisible = true
-      // this.resetNameType = 'new'
-      folder.name = 'new'
     },
     /**
      * 添加新文件夹
@@ -374,6 +336,9 @@ export default {
       })
       console.log(isHas)
       return !!(isHas && isHas.length > 0)
+    },
+    handleOk(e) {
+      this.visible = false
     },
     /**
      * 选中哪个表

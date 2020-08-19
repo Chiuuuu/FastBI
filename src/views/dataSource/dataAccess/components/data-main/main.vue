@@ -66,6 +66,12 @@ export default {
       tabChangeAble: state => state.dataAccess.firstFinished // 是否完成第一部分
     })
   },
+  created() {
+    this.$EventBus.$on('set-tab-index', this.handleSetTab)
+  },
+  beforeDestroy() {
+    this.$EventBus.$off('set-tab-index', this.handleSetTab)
+  },
   methods: {
     /**
      * 设置表名称
@@ -106,7 +112,6 @@ export default {
           this.$refs.entry.handleSetFormData()
         }
       }
-      // this.$emit('on-change-tabindex', activeKey)
     },
     // async handleWriteTable() {
     //   const writeResult = await fetchReadeTable({
