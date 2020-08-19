@@ -1,13 +1,13 @@
 <template>
   <div class="canvas-main" ref="canvasMain"
-       @contextmenu.stop.prevent="hideContextMenu">
+      @contextmenu.stop.prevent="hideContextMenu">
     <div class="canvas-panel-wrap" :style="wrapStyle"
-         @click.stop.prevent="cancelSelected">
+        @click.stop.prevent="cancelSelected">
       <b-scrollbar style="height:100%;">
         <div class="screen-shot" :style="screenStyle" ref="screenInner">
           <div class="canvas-panel" :style="canvasPanelStyle"
-               @click.stop.prevent="cancelSelected"
-               :data-spm-anchor-id="$route.params.id">
+              @click.stop.prevent="cancelSelected"
+              :data-spm-anchor-id="$route.params.id">
             <drop-panel>
               <slot></slot>
             </drop-panel>

@@ -29,53 +29,53 @@
 <script>
 const columns = [
   {
-    title: "表名",
-    dataIndex: "file_name",
-    key: "file_name"
+    title: '表名',
+    dataIndex: 'file_name',
+    key: 'file_name'
   },
   {
-    title: "是否设置字段",
-    dataIndex: "field",
-    key: "field",
-    slots: { title: "field" },
-    scopedSlots: { customRender: "field" }
+    title: '是否设置字段',
+    dataIndex: 'field',
+    key: 'field',
+    slots: { title: 'field' },
+    scopedSlots: { customRender: 'field' }
   },
   {
-    title: "是否抽取",
-    dataIndex: "extract",
-    key: "extract",
-    slots: { title: "extract" },
-    scopedSlots: { customRender: "extract" }
+    title: '是否抽取',
+    dataIndex: 'extract',
+    key: 'extract',
+    slots: { title: 'extract' },
+    scopedSlots: { customRender: 'extract' }
   },
   {
-    title: "修改时间",
-    key: "time",
-    dataIndex: "time"
+    title: '修改时间',
+    key: 'time',
+    dataIndex: 'time'
   },
   {
-    title: "字段配置",
-    key: "config",
-    scopedSlots: { customRender: "config" }
+    title: '字段配置',
+    key: 'config',
+    scopedSlots: { customRender: 'config' }
   }
-];
+]
 
 const data = [
   {
-    key: "1",
-    file_name: "fine_authority",
-    time: "2020-10-12  12:23:00"
+    key: '1',
+    file_name: 'fine_authority',
+    time: '2020-10-12  12:23:00'
   }
-];
+]
 export default {
-  name: "tabContentStructure",
+  name: 'tabContentStructure',
   data() {
     return {
       columns,
       data
-    };
+    }
   },
   methods: {
-    handleGetData(){
+    handleGetData() {
         console.log('获取数据')
     },
     setting() {
@@ -83,5 +83,5 @@ export default {
       this.$emit('on-change-componet', 'Setting')
     }
   }
-};
+}
 </script>

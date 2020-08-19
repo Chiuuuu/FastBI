@@ -15,18 +15,18 @@
   </div>
 </template>
 <script>
-import { Utils } from "./utils";
-import TreeNode from "./tree-node";
+import { Utils } from './utils'
+import TreeNode from './tree-node'
 export default {
-  name: "edit-right-top",
-  inject: ["nodeStatus"],
+  name: 'edit-right-top',
+  inject: ['nodeStatus'],
   components: {
     TreeNode
   },
   data() {
     return {
       isTree: true,
-      treeData:[],
+      treeData: []
     //   treeData: [
     //     {
     //       id: 1,
@@ -57,40 +57,40 @@ export default {
     //       ]
     //     }
     //   ]
-    };
+    }
   },
   methods: {
-    //是否有拖拽节点
+    // 是否有拖拽节点
     hasDragNode() {
-      return this.nodeStatus.dragNode;
+      return this.nodeStatus.dragNode
       // return this.dragOverStatus.dragNode;
     },
     handleMapAddClass() {
-      Utils.addClass(this.$refs.mapRef, "m-map-hover");
+      Utils.addClass(this.$refs.mapRef, 'm-map-hover')
     },
     handleMapRemoveClass() {
-      Utils.removeClass(this.$refs.mapRef, "m-map-hover");
+      Utils.removeClass(this.$refs.mapRef, 'm-map-hover')
     },
     // 开始拖拽时候记录节点
     handleRightDragStart(event, treeNode, index) {
       this.nodeStatus = Object.assign(this.nodeStatus, {
         event,
-        dragType: "right",
+        dragType: 'right',
         dragNode: {
           nodeData: treeNode.nodeData,
           parentNode: treeNode.parentNodeData,
           index
         }
-      });
-      console.log("start-nodestatr", this.nodeStatus);
+      })
+      console.log('start-nodestatr', this.nodeStatus)
     },
     handleMapDragover(event) {
-      event.preventDefault();
+      event.preventDefault()
       //   console.log('right-wrap-drop', this.$refs.mapRef.className)
-      this.handleMapAddClass();
+      this.handleMapAddClass()
     },
     handleMapDragLeave(event) {
-      event.stopPropagation();
+      event.stopPropagation()
       //   console.log('right-wrap-leaveeee', event.target.className)
     },
     handleNodeDrop(event, treeNode, index) {
@@ -101,76 +101,76 @@ export default {
           parentNode: treeNode.parentNodeData
         },
         event
-      });
-      this.handleChangeData();
+      })
+      this.handleChangeData()
     },
     handleChangeData() {
-      console.log(this.nodeStatus);
-      const type = this.nodeStatus.dragType;
-      console.log("type", type);
-      var dragData = this.nodeStatus.dragNode.nodeData;
-      var dragParent = this.nodeStatus.dragNode.parentNode;
-      var dropData = this.nodeStatus.dropNode.nodeData;
-      var dropParent = this.nodeStatus.dropNode.parentNode;
+      console.log(this.nodeStatus)
+      const type = this.nodeStatus.dragType
+      console.log('type', type)
+      var dragData = this.nodeStatus.dragNode.nodeData
+      var dragParent = this.nodeStatus.dragNode.parentNode
+      var dropData = this.nodeStatus.dropNode.nodeData
+      var dropParent = this.nodeStatus.dropNode.parentNode
 
       if (dragParent === dropData) {
-        console.log("相同父节点");
-        return;
+        console.log('相同父节点')
+        return
       }
-    this.handleAddItem();
+    this.handleAddItem()
     },
-    handleAddItem(){
-      var dragData = this.nodeStatus.dragNode.nodeData;
-      var dragParent = this.nodeStatus.dragNode.parentNode;
-      var dropData = this.nodeStatus.dropNode.nodeData;
+    handleAddItem() {
+      var dragData = this.nodeStatus.dragNode.nodeData
+      var dragParent = this.nodeStatus.dragNode.parentNode
+      var dropData = this.nodeStatus.dropNode.nodeData
       // var copyDragData = JSON.parse(JSON.stringify(dragData))
-      var dropParent = this.nodeStatus.dropNode.parentNode;
-      var dropPosition = this.nodeStatus.dropPosition; 
+      var dropParent = this.nodeStatus.dropNode.parentNode
+      var dropPosition = this.nodeStatus.dropPosition
       if (Utils.isType(dropData, 'Object')) {
-        if (this.nodeStatus.dragType === "right") {
-          dragParent.children.splice(this.nodeStatus.dragNode.index, 1);
+        if (this.nodeStatus.dragType === 'right') {
+          dragParent.children.splice(this.nodeStatus.dragNode.index, 1)
         }
-        if (dropData.hasOwnProperty("children")) {
-          console.log("12131");
-          dropData.children.push(dragData);
+        if (dropData.hasOwnProperty('children')) {
+          console.log('12131')
+          dropData.children.push(dragData)
         } else {
-          this.$set(dropData, "children", [dragData]);
-          if(dropParent && dropParent.children){
-            this.$set(dropParent.children, this.nodeStatus.dropNode.index, dropData);
+          this.$set(dropData, 'children', [dragData])
+          if (dropParent && dropParent.children) {
+            this.$set(dropParent.children, this.nodeStatus.dropNode.index, dropData)
           }
-          console.log(dropParent);
+          console.log(dropParent)
         }
       }
     },
     handleMapDrop(event, type, treeNode) {
-      event.preventDefault();
-      event.stopPropagation();
-      console.log("right-wrap-drop", event.target.className);
-      if(this.nodeStatus.dragType === 'left'){
-          if(this.treeData.length === 0){
+      event.preventDefault()
+      event.stopPropagation()
+      console.log('right-wrap-drop', event.target.className)
+      if (this.nodeStatus.dragType === 'left') {
+          if (this.treeData.length === 0) {
               this.treeData.push(this.nodeStatus.dragNode.nodeData)
-          }else{
-              this.loopObject(this.treeData, this.nodeStatus.dragNode.nodeData);
+          } else {
+              this.loopObject(this.treeData, this.nodeStatus.dragNode.nodeData)
           }
       }
     },
     loopObject(arry, data) {
-      let item = arry[0];
-      if (!Utils.isType(item, "Object")) {
-        return;
+      let item = arry[0]
+      if (!Utils.isType(item, 'Object')) {
+        return
       }
-      if (item.hasOwnProperty("children")) {
+      if (item.hasOwnProperty('children')) {
         if (item.children.length === 0) {
-          item.children.push(data);
+          item.children.push(data)
         } else {
-          this.loopObject(item.children, data);
+          this.loopObject(item.children, data)
         }
       } else {
-        this.$set(item, "children", [data]);
+        this.$set(item, 'children', [data])
       }
     }
   }
-};
+}
 </script>
 <style lang="stylus" scoped>
 .m-dml-map {

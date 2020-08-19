@@ -17,7 +17,7 @@
               @on-set-tab="handleSetTab"
               ></tab-content-entry>
           </a-tab-pane>
-          <a-tab-pane key="2" tab="库表结构" force-render :disabled="!tabChangeAble">
+          <a-tab-pane key="2" tab="库表结构" force-render >
             <tab-content-structure v-on="$listeners" ref="structure" @hook:mounted="handleTT"></tab-content-structure>
           </a-tab-pane>
           <a-tab-pane key="3" tab="操作记录" :disabled="!tabChangeAble">
@@ -63,7 +63,7 @@ export default {
     }),
   },
   methods: {
-    /** 
+    /**
      * 设置表名称
     */
     handleSetTableName(name) {
@@ -78,7 +78,7 @@ export default {
         this.$refs.structure.handleGetData();
       }
     },
-    /** 
+    /**
      * 选项卡
     */
     handleChangeTab(activeKey){
@@ -90,7 +90,7 @@ export default {
         console.log('操作记录请求')
       }
     },
-    /** 
+    /**
      * 展示弹出
     */
     showModal() {

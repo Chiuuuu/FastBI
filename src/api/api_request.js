@@ -7,46 +7,45 @@ import { messages } from 'bin-ui'
 
 let baseUrl = process.env.NODE_ENV !== 'production' ? '/' : '/admin'
 const service = httpRequest.create({
-  baseURL: baseUrl,
-  headers: {
-    'X-Requested-With': 'XMLHttpRequest'
-  },
-  timeout: 60000 // 请求超时时间
+    baseURL: baseUrl,
+    headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+    },
+    timeout: 60000 // 请求超时时间
 })
-
 
 // 添加请求拦截器
 service.interceptors.request.use(
-  function (config) {
-    const token = window.localStorage.getItem('token');
-    if (token) {
-      // 判断token是否存在，如果存在则每个请求都带上token
-      // Bearer是JWT的认证头部信息
-      config.headers.common['Authorization'] = `Bearer ${token}`;
-    }
+    function(config) {
+        const token = window.localStorage.getItem('token')
+        if (token) {
+            // 判断token是否存在，如果存在则每个请求都带上token
+            // Bearer是JWT的认证头部信息
+            config.headers.common['Authorization'] = `Bearer ${token}`
+        }
 
-    return config;
-  },
-  function (error) {
-    return Promise.reject(error);
-  },
-);
+        return config
+    },
+    function(error) {
+        return Promise.reject(error)
+    }
+)
 
 /**
  * respone拦截器
  */
 service.interceptors.response.use(
-  response => {
-    return response
-  },
-  error => {
-    if (error.response) {
-      messages({ content: error.response.data, type: 'danger', duration: 5 })
-    } else {
-      messages({ content: error.message, type: 'danger', duration: 5 })
+    response => {
+        return response
+    },
+    error => {
+        if (error.response) {
+            messages({ content: error.response.data, type: 'danger', duration: 5 })
+        } else {
+            messages({ content: error.message, type: 'danger', duration: 5 })
+        }
+        return Promise.reject(error)
     }
-    return Promise.reject(error)
-  }
 )
 
 export default service
@@ -56,37 +55,19 @@ export default service
  * @param url
  * @param data
  */
-export function requestGetNoData (url) {
-  return service({
-    url: url,
-    method: 'get'
-  })
+export function requestGetNoData(url) {
+    return service({
+        url: url,
+        method: 'get'
+    })
 }
 
-export function requestGet (url, data) {
-  return service({
-    url: url,
-    method: 'get',
-    params: data
-  })
-}
-
-/**
- * post请求
- * @param url
- * @param data
- */
-export function requestPost (url, data) {
-  return service({
-    url: url,
-    method: 'post',
-    transformRequest: [function (data) {
-      data = Qs.stringify(data)
-      return data
-    }],
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    data: data
-  })
+export function requestGet(url, data) {
+    return service({
+        url: url,
+        method: 'get',
+        params: data
+    })
 }
 
 /**
@@ -94,12 +75,30 @@ export function requestPost (url, data) {
  * @param url
  * @param data
  */
-export function requestPost2 (url, data) {
-  return service({
-    url: url,
-    method: 'post',
-    data: data
-  })
+export function requestPost(url, data) {
+    return service({
+        url: url,
+        method: 'post',
+        transformRequest: [function(data) {
+            data = Qs.stringify(data)
+            return data
+        }],
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        data: data
+    })
+}
+
+/**
+ * post请求
+ * @param url
+ * @param data
+ */
+export function requestPost2(url, data) {
+    return service({
+        url: url,
+        method: 'post',
+        data: data
+    })
 }
 
 /**
@@ -107,13 +106,13 @@ export function requestPost2 (url, data) {
  * @param url
  * @param formData
  */
-export function requestPostFormData (url, data) {
-  return service({
-    url: url,
-    method: 'post',
-    headers: { 'Content-Type': 'multipart/form-data' },
-    data: data
-  })
+export function requestPostFormData(url, data) {
+    return service({
+        url: url,
+        method: 'post',
+        headers: { 'Content-Type': 'multipart/form-data' },
+        data: data
+    })
 }
 
 /**
@@ -122,24 +121,24 @@ export function requestPostFormData (url, data) {
  * @param name 参数名
  * @param value 参数值
  */
-export function appendFormData (formData, name, value) {
-  if (value != null) {
-    formData.append(name, value)
-  }
+export function appendFormData(formData, name, value) {
+    if (value != null) {
+        formData.append(name, value)
+    }
 }
 
-export function getBaseUrl () {
-  return baseUrl
+export function getBaseUrl() {
+    return baseUrl
 }
 
-export function requestGet2 (url, data, downloadProcess) {
-  return service({
-    timeout: 10000 * 60, // 请求超时时间
-    url: url,
-    method: 'get',
-    params: data,
-    headers: { 'Content-Type': 'application/octet-stream;charset=utf-8' },
-    responseType: 'arraybuffer',
-    onDownloadProgress: downloadProcess
-  })
+export function requestGet2(url, data, downloadProcess) {
+    return service({
+        timeout: 10000 * 60, // 请求超时时间
+        url: url,
+        method: 'get',
+        params: data,
+        headers: { 'Content-Type': 'application/octet-stream;charset=utf-8' },
+        responseType: 'arraybuffer',
+        onDownloadProgress: downloadProcess
+    })
 }

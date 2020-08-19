@@ -1,13 +1,16 @@
+<!-- 左侧栏 -->
 <template>
   <div class="board-coverage" :style="config.style">
     <div flex="dir:top" style="height: 100%;">
       <div class="header-title" v-show="config.title.enable">
-        <span v-if="collapsed">{{ config.title.text }}</span> <a-icon type="menu-fold" class="pointer" @click="toggleCollapsed" />
+        <span v-if="collapsed">{{ config.title.text }}</span>
+        <a-icon type="menu-fold" class="pointer" @click="toggleCollapsed" />
       </div>
       <div class="control" :class="{'selected':currentSelected}" v-show="collapsed">
+        <!-- 控制器（4个按钮） -->
         <div class="context-menu-item"
-             v-for="item in menuList" :key="item.order"
-             @click="handleCommand(item)">
+            v-for="item in menuList" :key="item.order"
+            @click="handleCommand(item)">
           <b-icon :name="item.icon" :title="item.text"></b-icon>
         </div>
       </div>
@@ -58,7 +61,7 @@
       handleCommand (item) {
         if (this.currentSelected) {
           this.$message(item.text)
-          this.$store.dispatch('ContextMenuCommand', item.order)
+          this.$store.dispatch('ContextMenuCommand', item.order) // canvasMaos中的actions里的ContextMenuCommand方法
         }
       },
       // 点击展开收起

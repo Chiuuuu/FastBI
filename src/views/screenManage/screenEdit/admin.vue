@@ -1,21 +1,20 @@
 <template>
   <div class="dv-admin"
-       @click.stop.prevent="hideContextMenu">
+      @click.stop.prevent="hideContextMenu">
     <board v-if="!isScreen">
       <!--头部嵌套可拖拽物品-->
       <template v-slot:headerBox>
         <drag-list :drag-list="navigate"></drag-list>
       </template>
+      <!-- 左边侧栏 -->
       <template v-slot:coverage>
         <div class="list-item" :key="transform.id" v-for="transform in coverageMaps"
-             :class="[{'hovered':hoverItem===transform.id},{'selected':currentSelected&&currentSelected.id===transform.id},]"
-             :selected="currentSelected&&currentSelected.id===transform.id"
-             @click.stop.prevent="handleSelected(transform)"
-             @mouseenter="handleHover(transform)"
-             @mouseleave="handleNoHover()">
-             <a-icon v-if="transform.packageJson.icon" :type="transform.packageJson.icon" />
-          <!-- <b-icon v-if="transform.packageJson.icon" :name="transform.packageJson.icon"></b-icon> -->
-          <!---->
+            :class="[{'hovered':hoverItem===transform.id},{'selected':currentSelected&&currentSelected.id===transform.id},]"
+            :selected="currentSelected&&currentSelected.id===transform.id"
+            @click.stop.prevent="handleSelected(transform)"
+            @mouseenter="handleHover(transform)"
+            @mouseleave="handleNoHover()">
+            <a-icon v-if="transform.packageJson.icon" :type="transform.packageJson.icon" />
           <span v-if="transform.packageJson.config&&transform.packageJson.config.title">
             {{ transform.packageJson.config.title.content}}
           </span>
@@ -26,12 +25,12 @@
         <!--动态组件-->
         <template v-for="transform in canvasMap">
           <drag-item :key="transform.id" :item="transform"
-                     :com-hover="hoverItem===transform.id"
-                     :selected="currentSelected&&currentSelected.id===transform.id"
-                     @click.native.stop.prevent="handleSelected(transform)"
-                     @contextmenu.native.stop.prevent="handleRightClickOnCanvas(transform,$event)"
-                     @mouseenter.native="handleHover(transform)"
-                     @mouseleave.native="handleNoHover()">
+                    :com-hover="hoverItem===transform.id"
+                    :selected="currentSelected&&currentSelected.id===transform.id"
+                    @click.native.stop.prevent="handleSelected(transform)"
+                    @contextmenu.native.stop.prevent="handleRightClickOnCanvas(transform,$event)"
+                    @mouseenter.native="handleHover(transform)"
+                    @mouseleave.native="handleNoHover()">
             <!-- 文本 -->
             <chart-text v-if="transform.packageJson.name === 've-text'"
                         :config="transform.packageJson.config"
@@ -39,7 +38,7 @@
 
             <!-- 图片 -->
             <chart-image v-else-if="transform.packageJson.name === 've-image'"
-                         :config="transform.packageJson.config"></chart-image>
+                        :config="transform.packageJson.config"></chart-image>
 
             <!-- 表格 -->
             <chart-tables v-else-if="transform.packageJson.name === 've-tables'"
@@ -60,7 +59,7 @@
 
     <screen v-show="isScreen"></screen>
     <b-modal v-model="deleteDialog" :styles="{top: '300px',width:'350px'}"
-             class-name="delete-dialog" @on-ok="deleteOne">
+            class-name="delete-dialog" @on-ok="deleteOne">
       <div class="delete-dialog-inner">
         <div>
           <b-icon name="ios-warning" size="40"></b-icon>
@@ -72,18 +71,18 @@
 </template>
 
 <script>
-  import Board from '@/components/board/index'
-  import navigateList from '@/config/navigate'
-  import DragList from '@/components/drag/DragList'
-  import DragItem from '@/components/drag/DragItem'
-  import { mapGetters } from 'vuex'
-  import { on, off } from 'bin-ui/src/utils/dom'
-  import { getCanvasMaps } from '@/api/canvasMaps/canvas-maps-request'
-  import { getPageSettings } from '@/api/app/app-request'
+  import Board from '@/components/board/index' // 右键下拉菜单
+  import navigateList from '@/config/navigate' // 导航条菜单
+  import DragList from '@/components/drag/DragList' // 导航条拖动模块
+  import DragItem from '@/components/drag/DragItem' // 板块设置（长宽高比例悬停）
+  import { mapGetters } from 'vuex' // 导入vuex
+  import { on, off } from 'bin-ui/src/utils/dom' //
+  import { getCanvasMaps } from '@/api/canvasMaps/canvas-maps-request' // 图层的方法
+  import { getPageSettings } from '@/api/app/app-request' // axious请求，拦截器
   import ChartsFactory from '@/components/charts/charts-factory'
-  import ChartText from '@/components/tools/Text'
-  import ChartImage from '@/components/tools/Image'
-  import ChartTables from '@/components/tools/Tables'
+  import ChartText from '@/components/tools/Text' // 文本模块
+  import ChartImage from '@/components/tools/Image' // 图片模块
+  import ChartTables from '@/components/tools/Tables' // 表格模块
 
   import Screen from '@/views/screen' // 全屏
 
