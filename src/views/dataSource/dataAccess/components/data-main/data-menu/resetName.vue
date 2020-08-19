@@ -43,20 +43,20 @@
 </template>
 <script>
 export default {
-  name: "resetName",
-  props: ["visible"],
+  name: 'resetName',
+  props: ['visible'],
   data() {
-    return {};
+    return {}
   },
   beforeCreate() {
-    this.form = this.$form.createForm(this, { name: "form_in_modal" });
+    this.form = this.$form.createForm(this, { name: 'form_in_modal' })
   },
-  methods:{
-    handleAfterClose(){
-      this.form.resetFields();
+  methods: {
+    handleAfterClose() {
+      this.form.resetFields()
     }
   }
-};
+}
 </script>
 <style lang="less" scoped>
 /deep/ .resetNameForm .ant-form-explain {

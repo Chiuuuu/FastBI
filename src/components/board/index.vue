@@ -15,15 +15,15 @@
         <canvas-main>
           <slot name="canvas"></slot>
         </canvas-main>
-      </div>
-      <!--右侧的参数配置页面-->
-      <div class="border-right">
         <board-options v-if="config.options"
-                      :config="config.options"
-                      @on-toggle="ToggleOptionsExpand"
-        ></board-options>
-        <board-data-model :config="config.data"></board-data-model>
+                    :config="config.options"
+                    @on-toggle="ToggleOptionsExpand"
+      ></board-options>
       </div>
+      <!-- 右侧数据模型列表 -->
+        <board-model :config="config.model" v-if="config.model" @on-toggle="toCollapse">
+          <slot name="model"></slot>
+        </board-model>
     </div>
     <!--右键菜单-->
     <context-menu></context-menu>
@@ -33,12 +33,12 @@
 <script>
   // 默认配置信息
   import config from '../../config/board'
-  import BoardHeader from './header/index'
-  import BoardCoverage from './coverage/index'
-  import BoardOptions from './options/index'
-  import BoardDataModel from './data-model/index'
-  import CanvasMain from './canvas'
-  import ContextMenu from './context-menu/index'
+  import BoardHeader from './header/index' // 头部
+  import BoardCoverage from './coverage/index' // 左侧栏(图层)
+  import BoardOptions from './options/index' // 右侧栏(页面配置)
+  import CanvasMain from './canvas' // 中间画板
+  import ContextMenu from './context-menu/index' // 右键菜单
+  import BoardModel from './model/index' // 8-14 新增数据模型
   import { mapGetters, mapActions } from 'vuex'
 
   const prefixCls = 'board'
@@ -51,25 +51,37 @@
       }
     },
     computed: {
-      ...mapGetters(['optionsExpand']),
+      ...mapGetters(['optionsExpand', 'modelExpand']),
       centerStyle () {
         return {
           left: this.config.coverage.style.width,
-          right: this.optionsExpand ? this.config.options.style.width : '0'
+          // right: this.optionsExpand ? this.config.options.style.width : '0'
+          right: this.modelExpand ? this.config.model.style.width : '50px'
         }
       }
     },
     methods: {
-      ...mapActions(['ToggleOptionsExpand']),
+      ...mapActions(['ToggleOptionsExpand', 'ToggleModelExpand']),
       // 点击图层侧边展开收起
       toggleCollapsed (val) {
         if (!val) {
           this.config.coverage.style.width = '50px'
         } else {
-           this.config.coverage.style.width = '180px'
+          this.config.coverage.style.width = '180px'
+        }
+      },
+      toCollapse(val) {
+        console.log(val)
+
+        if (!val) {
+          this.config.model.style.width = '50px'
+        } else {
+          this.config.model.style.width = '300px'
         }
       }
     },
-    components: { ContextMenu, CanvasMain, BoardCoverage, BoardHeader, BoardOptions, BoardDataModel }
+    // 8-14 添加配置侧栏
+    components: { ContextMenu, CanvasMain, BoardCoverage, BoardHeader, BoardModel, BoardOptions }
+
   }
 </script>

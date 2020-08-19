@@ -51,15 +51,15 @@
   </div>
 </template>
 <script>
-import { Utils } from "./utils";
+import { Utils } from './utils'
 export default {
-  name: "tree-node",
-  inject: ["nodeStatus"],
+  name: 'tree-node',
+  inject: ['nodeStatus'],
   props: {
     nodeData: {
       type: Object,
       default: function() {
-        return {};
+        return {}
       }
     },
     dataIndex: {
@@ -71,61 +71,61 @@ export default {
     return {
       isDrag: false,
       root: true
-    };
+    }
   },
   created() {
-    const parent = this.$parent;
+    const parent = this.$parent
     if (parent.isTree) {
-      this.root = parent;
+      this.root = parent
     } else {
-      this.root = parent.root;
+      this.root = parent.root
     }
   },
   methods: {
     handleMouseDown() {
-      this.isDrag = true;
+      this.isDrag = true
     },
     handleMouseLeave() {
-      this.isDrag = false;
+      this.isDrag = false
     },
     handleDragStart(event, index) {
-      console.log("node--drag-start");
-      event.stopPropagation();
-      const parent = this.$parent;
-      this.parentNodeData = parent.nodeData;
-      this.root.handleRightDragStart(event, this, index);
+      console.log('node--drag-start')
+      event.stopPropagation()
+      const parent = this.$parent
+      this.parentNodeData = parent.nodeData
+      this.root.handleRightDragStart(event, this, index)
     },
     handleDragEnter(event) {
-      if (Utils.hasClass(event.target, "draggable", false)) {
-        console.log("node-over", event.target.className);
-        this.handleItemHigtLight();
+      if (Utils.hasClass(event.target, 'draggable', false)) {
+        console.log('node-over', event.target.className)
+        this.handleItemHigtLight()
       }
-      this.root.handleMapDragover(event, this);
+      this.root.handleMapDragover(event, this)
     },
     handleDragLeave(event) {
-      console.log("node-leave", event.target.className);
-      this.handleRemoveItemHigtLight();
+      console.log('node-leave', event.target.className)
+      this.handleRemoveItemHigtLight()
     },
     handleItemHigtLight() {
-      Utils.addClass(this.$refs.itemRef, "z-on");
+      Utils.addClass(this.$refs.itemRef, 'z-on')
     },
     handleRemoveItemHigtLight() {
-      Utils.removeClass(this.$refs.itemRef, "z-on");
+      Utils.removeClass(this.$refs.itemRef, 'z-on')
     },
     handleDragEnd() {
-      console.log("node-end");
-      this.root.handleMapRemoveClass();
+      console.log('node-end')
+      this.root.handleMapRemoveClass()
     },
     handleDragOver(event) {
-      event.preventDefault();
+      event.preventDefault()
     },
-    handleDrop(event,index) {
-      console.log("node-drop");
-      this.handleRemoveItemHigtLight();
-      this.root.handleNodeDrop(event,this, index);
+    handleDrop(event, index) {
+      console.log('node-drop')
+      this.handleRemoveItemHigtLight()
+      this.root.handleNodeDrop(event, this, index)
     }
   }
-};
+}
 </script>
 <style lang="stylus" scoped>
 .m-map {

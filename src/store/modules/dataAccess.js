@@ -4,10 +4,8 @@ const state = {
     modelType: '', // 数据类型
     firstFinished: false, // 数据连接信息是否填写完成
     modelInfo: {}, // 数据表信息
-    modelId: -1, // 选中的菜单id
-    menuList: [], // 左边菜单列表
-    databaseid: -1, // 选择的默认表id
-    modelSelectType: '' // new: 新添加 add: 右键添加
+    modelId: '', // 选中的菜单id
+    menuList: [] // 左边菜单列表
 }
 
 const mutations = {
@@ -16,9 +14,6 @@ const mutations = {
     },
     SET_MODELID(state, id) {
         state.modelId = id
-    },
-    SET_MODELSELECTTYPE(state, type) {
-        state.modelSelectType = type
     },
     SET_MODELTYPE(state, type) {
         state.modelType = type

@@ -1,13 +1,13 @@
 <template>
   <transition name="fade-in">
     <div class="dv-context-menu"
-         v-if="contextMenuInfo.isShow"
-         @mousedown.stop.prevent
-         :style="contextMenuStyle"
-         @click.stop.prevent>
+        v-if="contextMenuInfo.isShow"
+        @mousedown.stop.prevent
+        :style="contextMenuStyle"
+        @click.stop.prevent>
       <div class="context-menu-item"
-           v-for="item in menuList" :key="item.order"
-           @click="handleCommand(item.order)">
+          v-for="item in menuList" :key="item.order"
+          @click="handleCommand(item.order)">
         <b-icon :name="item.icon"></b-icon>
         {{ item.text }}
       </div>

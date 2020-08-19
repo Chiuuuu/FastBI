@@ -19,7 +19,7 @@
               @on-set-tab="handleSetTab"
               ></tab-content-entry>
           </a-tab-pane>
-          <a-tab-pane key="2" tab="库表结构" force-render :disabled="!tabChangeAble">
+          <a-tab-pane key="2" tab="库表结构" force-render >
             <tab-content-structure v-on="$listeners" ref="structure" @hook:mounted="handleTT"></tab-content-structure>
           </a-tab-pane>
           <a-tab-pane key="3" tab="操作记录" :disabled="!tabChangeAble">
