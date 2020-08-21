@@ -12,7 +12,7 @@
         <a-icon type="folder" class='folder-icon'/>
         <span class="title-span">{{ folder.name }}</span>
       </h4>
-      <span class="menu">
+      <span class="menu" v-if="hasContextmenus">
         <span class="caret-down" @click="handleCreateMenu"></span>
       </span>
     </div>
@@ -48,7 +48,6 @@ export default {
       default: 0
     },
     contextmenus: {
-      required: true,
       type: Array,
       default: function() {
         return []
@@ -58,6 +57,11 @@ export default {
   components: {
     MenuFile
   },
+  computed: {
+    hasContextmenus() {
+      return this.contextmenus.length !== 0
+    }
+  },
   data() {
     return {
       contenxtmenu: '',
@@ -65,15 +69,25 @@ export default {
     }
   },
   mounted() {
-    this.$refs.folder.addEventListener('contextmenu', (e) => {
-      e.preventDefault()
-      this.handleCreateMenu(e)
-    })
-    this.$on('fileSelect', this.handleFileSelect)
+    if (this.hasContextmenus) {
+      this.initContextMenu()
+    }
+  },
+  beforeDestroy() {
+    if (this.hasContextmenus) {
+      this.destoryContextMenu()
+    }
   },
   methods: {
-    handleFileSelect(file) {
-      this.$emit('folderFileSelect', file)
+    initContextMenu() {
+      this.$refs.folder && this.$refs.folder.addEventListener('contextmenu', this.handleConextMenu)
+    },
+    destoryContextMenu() {
+      this.$refs.folder && this.$refs.folder.removeEventListener('contextmenu', this.handleConextMenu)
+    },
+    handleConextMenu(e) {
+      e.preventDefault()
+      this.handleCreateMenu(e)
     },
     handleDragOver(event) {
       event.preventDefault()
