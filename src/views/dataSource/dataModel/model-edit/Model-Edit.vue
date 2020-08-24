@@ -693,6 +693,7 @@ export default {
   },
   provide() {
     return {
+      tables: [],
       nodeStatus: this.globalStatus
     }
   },
