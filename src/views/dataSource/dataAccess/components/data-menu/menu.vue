@@ -65,7 +65,6 @@
               :folder="folder"
               :index="index"
               :contextmenus="folderContenxtMenu"
-              @folderFileSelect="handleFileSelect"
             >
               <template v-slot:file="slotProps">
                 <menu-file
@@ -74,6 +73,7 @@
                   :parent="folder"
                   :isSelect='fileSelectId === slotProps.file.id'
                   :contextmenus="fileContenxtMenu"
+                  @fileSelect="handleFileSelect"
                 ></menu-file>
               </template>
             </menu-folder>
@@ -85,6 +85,7 @@
                 :index="index"
                 :isSelect='fileSelectId === folder.id'
                 :contextmenus="fileContenxtMenu"
+                @fileSelect="handleFileSelect"
               ></menu-file>
             </ul>
           </template>
@@ -107,6 +108,7 @@ import { fetchTableInfo, fetchDeleteMenuById } from '../../../../../api/dataAcce
 import MenuFile from '@/components/dataSource/menu-group/file'
 import MenuFolder from '@/components/dataSource/menu-group/folder'
 export default {
+  name: 'data-menu',
   props: {
     menuData: {
       type: String,
