@@ -26,29 +26,26 @@
           </span>
           <span slot="fieldType" slot-scope="text, record, index">
             <a-select :value="text" style="width:100px;" @change="(value) => handleSelectChangeValue(value, record, index, 'fieldType')">
-              <a-select-option value="BIGINT">
+              <a-select-option value="INT">
                 整数
               </a-select-option>
               <a-select-option value="TIMESTAMP">
                 日期时间
               </a-select-option>
-              <a-select-option value="LONGBLOB">
-                长整
-              </a-select-option>
               <a-select-option value="VARCHAR">
                 字符串
               </a-select-option>
-              <a-select-option value="TINYINT">
+              <a-select-option value="DOUBLE">
                 小数
               </a-select-option>
             </a-select>
           </span>
           <span slot="fieldNature" slot-scope="text, record, index">
-            <a-select default-value="dim" :value='text' @change="(value) => handleSelectChangeValue(value, record, index, 'fieldNature')">
-              <a-select-option value="dim">
+            <a-select default-value="true" :value='`${text}`' @change="(value) => handleSelectChangeValue(value, record, index, 'fieldNature')">
+              <a-select-option value="true">
                 维度
               </a-select-option>
-              <a-select-option value="mea">
+              <a-select-option value="false">
                 度量
               </a-select-option>
             </a-select>
@@ -59,12 +56,12 @@
           <span slot="fieldDesc" slot-scope="fieldDesc">
             {{ fieldDesc }}
           </span>
-          <span slot="isVisible" slot-scope="text, record, index">
-              <a-select default-value="yes" :value='text' @change="(value) => handleSelectChangeValue(value, record, index, 'isVisible')">
-                <a-select-option value="yes">
+          <span slot="visible" slot-scope="text, record, index">
+              <a-select default-value="true" :value='`${text}`' @change="(value) => handleSelectChangeValue(value, record, index, 'visible')">
+                <a-select-option value="true">
                   是
                 </a-select-option>
-                <a-select-option value="no">
+                <a-select-option value="false">
                   否
                 </a-select-option>
               </a-select>
@@ -119,8 +116,8 @@ const columns = [
   },
   {
     title: '是否可见',
-    dataIndex: 'isVisible',
-    scopedSlots: { customRender: 'isVisible' }
+    dataIndex: 'visible',
+    scopedSlots: { customRender: 'visible' }
   }
 ]
 
@@ -148,7 +145,8 @@ export default {
   computed: {
     ...mapState({
       formInfo: state => state.dataAccess.modelInfo,
-      modelId: state => state.dataAccess.modelId
+      modelId: state => state.dataAccess.modelId,
+      readRows: state => state.dataAccess.readRows
     }),
     rowSelection() {
       return {}
@@ -195,11 +193,14 @@ export default {
       this.handleSaveWriteTable()
     },
     async handleSaveWriteTable() {
+      console.log(this.fieldInfo)
       const writeResult = await fetchWriteTable({
-        url: '/admin/dev-api/system/mysql/write/table',
+        url: '/admin/dev-api/system/sourceTbale/save/table',
         data: {
-          databaseName: this.formInfo.databaseName,
-          mysqlSourceName: this.formInfo.name
+          rows: this.readRows,
+          tableId: this.fieldInfo.id
+          // databaseName: this.formInfo.databaseName,
+          // sourceMysqName: this.formInfo.name
         }
       })
 
