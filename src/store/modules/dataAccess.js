@@ -7,7 +7,8 @@ const state = {
     modelId: -1, // 选中的菜单id
     menuList: [], // 左边菜单列表
     databaseid: -1, // 选择的默认表id
-    modelSelectType: '' // new: 新添加 add: 右键添加
+    modelSelectType: '', // new: 新添加 add: 右键添加
+    readRows: [] // 读表数据
 }
 
 const mutations = {
@@ -28,6 +29,9 @@ const mutations = {
     },
     SET_MENULIST(state, list) {
         state.menuList = [].concat(list)
+    },
+    SET_READROWS(state, list) {
+        state.readRows = [].concat(list)
     }
 }
 
@@ -56,6 +60,9 @@ const actions = {
     },
     setModelSelectType({ commit }, type) {
         commit('SET_MODELSELECTTYPE', type)
+    },
+    setReadRows({ commit }, list) {
+        commit('SET_READROWS', list)
     }
 }
 
