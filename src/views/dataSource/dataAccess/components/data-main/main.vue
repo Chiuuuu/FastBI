@@ -113,24 +113,6 @@ export default {
         }
       }
     },
-    // async handleWriteTable() {
-    //   const writeResult = await fetchReadeTable({
-    //     url: '/admin/dev-api/system/mysql/read/table',
-    //     data: {
-    //       databaseName: this.formInfo.databaseName,
-    //       mysqlSourceName: this.formInfo.name
-    //     }
-    //   })
-
-    //   if (writeResult.data.code === 200) {
-    //     console.log('获取数据writeResult', writeResult)
-    //     this.$nextTick(() => {
-    //       this.$refs.structure.handleGetData(writeResult)
-    //     })
-    //   } else {
-    //     this.$message.error(writeResult.data.msg)
-    //   }
-    // },
     /**
      * 展示弹出
     */

@@ -13,7 +13,7 @@
       <a-button type="primary" class="select_button">全部抽取</a-button>
     </div>
     <div class="table">
-      <a-table :columns="columns" :data-source="data"  rowKey='id' :loading='spinning'>
+      <a-table :columns="columns" :data-source="data"  rowKey='id' :loading='spinning' :pagination='false'>
         <span slot="setBy" slot-scope="setBy">
           {{ handleChangeType(setBy) ? '是' : '否' }}
         </span>
@@ -88,7 +88,7 @@ export default {
         url: '/admin/dev-api/system/mysql/read/table',
         data: {
           databaseName: this.formInfo.databaseName,
-          mysqlSourceName: this.formInfo.name
+          sourceMysqName: this.formInfo.name
         }
       }).finally(() => {
         this.spinning = false
@@ -96,6 +96,7 @@ export default {
 
       if (dabaseInfoResult.data.code === 200) {
         this.data = [].concat(dabaseInfoResult.data.rows)
+        this.$store.dispatch('dataAccess/setReadRows', this.data)
       } else {
         this.$message.error(dabaseInfoResult.data.msg)
       }
