@@ -17,27 +17,21 @@
                   <a-input class="mod_input" placeholder="请输入大屏名称" />
                 </a-form-item>
                 <a-form-item label="保存目录">
-                  <a-dropdown :trigger="['click']">
-                    <a-menu slot="overlay">
-                      <a-menu-item key="1">
-                        <a-icon type="user" />1st menu item
-                      </a-menu-item>
-                      <a-menu-item key="2">
-                        <a-icon type="user" />2nd menu item
-                      </a-menu-item>
-                      <a-menu-item key="3">
-                        <a-icon type="user" />3rd item
-                      </a-menu-item>
-                    </a-menu>
-                    <a-button class="mod_btn" @click="e => e.preventDefault()"
-                      ><span class="mod_span"> 请选择目录 </span
-                      ><a-icon type="down" class="mod_icon" />
-                    </a-button>
-                  </a-dropdown>
+                  <a-select placeholder="选择大屏目录" style="width:310px">
+                    <a-select-option value="1">
+                      Option 1
+                    </a-select-option>
+                    <a-select-option value="2">
+                      Option 2
+                    </a-select-option>
+                    <a-select-option value="3">
+                      Option 3
+                    </a-select-option>
+                  </a-select>
                 </a-form-item>
               </a-form>
             </a-modal>
-            <a-menu-item key="1">
+            <a-menu-item key="1" @click="creatFolder">
               新建文件夹
             </a-menu-item>
           </a-menu>
@@ -114,16 +108,23 @@
         </div>
       </div>
     </div>
+
+    <new-folder :visible="folderVisible" @cancel="hideFolder"></new-folder>
   </div>
 </template>
 
 <script>
+import NewFolder from '@/components/newFolder/newFolder'
 export default {
+  components: {
+    NewFolder
+  },
   data() {
     return {
       current: ['mail'],
       openKeys: ['sub1'],
-      visible: false
+      visible: false,
+      folderVisible: false // 新建文件夹弹窗
     }
   },
   watch: {
@@ -144,6 +145,14 @@ export default {
     // 编辑大屏
     editScreen() {
       this.$router.push({ name: 'admin' })
+    },
+    // 新建文件夹
+    creatFolder() {
+      this.folderVisible = true
+    },
+    // 关闭新建文件夹弹窗
+    hideFolder() {
+      this.folderVisible = false
     }
   }
 }

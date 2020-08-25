@@ -123,7 +123,6 @@
              borderRadius: val.borderRadius + 'px'
             }
           }
-          console.log(this.backgroundStyle)
         },
         deep: true,
         immediate: true

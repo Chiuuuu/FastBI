@@ -9,21 +9,21 @@
       <slot>control box</slot>
     </div>
     <div class="right-box">
-        <div flex="dir:top" style="margin-top:10px">
+        <div class="item" flex="dir:top">
         <a-icon
           type="mobile"
           style="font-size:20px"
         />
         <span> 手机端</span>
         </div>
-        <div flex="dir:top" style="margin-top:10px">
+        <div class="item" flex="dir:top">
         <a-icon
           type="sync"
           style="font-size:20px"
         />
         <span> 刷新</span>
         </div>
-        <div flex="dir:top" style="margin-top:10px">
+        <div class="item" flex="dir:top">
         <a-icon
           type="block"
           @click.native="openScreen"
@@ -31,10 +31,9 @@
         />
         <span> 预览</span>
         </div>
-        <div flex="dir:top" style="margin-top:10px">
+        <div class="item" flex="dir:top" @click="goBack">
         <a-icon
           type="close"
-          @click="goBack"
           style="font-size:20px"
         />
         <span> 关闭</span>
@@ -65,15 +64,6 @@ export default {
     this.userId = 'dv1e443967LZP2Dj'
   },
   methods: {
-    // 计算缩放比例
-    resize_window() {
-      let wheight = Number(document.documentElement.clientHeight / 1080)
-      this.scalseNum = wheight
-    },
-    goBack() {
-      this.$router.go(-1)
-    },
-    methods: {
       // 计算缩放比例
       resize_window() {
           let wheight = Number(document.documentElement.clientHeight / 1080)
@@ -101,6 +91,5 @@ export default {
         })
       }
     }
-  }
 }
 </script>

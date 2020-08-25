@@ -22,8 +22,8 @@ export default {
         },
         // 样式
         style: {
-            width: '180px',
-            flex: '0 0 180px'
+            width: '50px',
+            flex: '0 0 50px'
         }
     },
     // 表单元素配置组件
@@ -34,7 +34,7 @@ export default {
             text: '页面配置'
         },
         style: {
-            width: '300px'
+            width: '260px'
         }
     },
     // 8-14 数据模型侧栏
@@ -48,7 +48,7 @@ export default {
         },
         // 样式
         style: {
-            width: '300px'
+            width: '220px'
                 // flex: '0 0 180px'
         }
     }

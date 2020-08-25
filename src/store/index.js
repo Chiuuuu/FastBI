@@ -5,6 +5,7 @@ import canvasMaps from './modules/canvasMaps'
 import common from './modules/common'
 import getters from './getters'
 import dataAccess from './modules/dataAccess'
+import options from './modules/options'
 
 Vue.use(Vuex)
 
@@ -13,7 +14,8 @@ export default new Vuex.Store({
         app,
         canvasMaps,
         common,
-        dataAccess
+        dataAccess,
+        options
     },
     getters
 })

@@ -7,7 +7,7 @@
     <!--中间工作区-->
     <div class="center-box" flex>
       <!--左侧图层列表-->
-      <board-coverage :config="config.coverage" v-if="config.coverage" @toggleCollapsed="toggleCollapsed">
+      <board-coverage :config="config.coverage" v-if="config.coverage" @toggleCollapsed="ToggleCoverageExpand">
         <slot name="coverage"></slot>
       </board-coverage>
       <!--中间画板区域-->
@@ -21,7 +21,7 @@
       ></board-options>
       </div>
       <!-- 右侧数据模型列表 -->
-        <board-model :config="config.model" v-if="config.model" @on-toggle="toCollapse">
+        <board-model :config="config.model" v-if="config.model" @on-toggle="ToggleModelExpand">
           <slot name="model"></slot>
         </board-model>
     </div>
@@ -51,34 +51,29 @@
       }
     },
     computed: {
-      ...mapGetters(['optionsExpand', 'modelExpand']),
+      ...mapGetters(['optionsExpand', 'coverageExpand', 'modelExpand']),
       centerStyle () {
         return {
-          left: this.config.coverage.style.width,
+          left: this.coverageExpand ? this.config.coverage.style.width : '50px',
           // right: this.optionsExpand ? this.config.options.style.width : '0'
           right: this.modelExpand ? this.config.model.style.width : '50px'
         }
       }
     },
-    methods: {
-      ...mapActions(['ToggleOptionsExpand', 'ToggleModelExpand']),
-      // 点击图层侧边展开收起
-      toggleCollapsed (val) {
-        if (!val) {
-          this.config.coverage.style.width = '50px'
-        } else {
+    watch: {
+      // 检测图层面板是否打开
+      coverageExpand(val) {
+        if (val) {
           this.config.coverage.style.width = '180px'
-        }
-      },
-      toCollapse(val) {
-        console.log(val)
-
-        if (!val) {
-          this.config.model.style.width = '50px'
+          this.config.coverage.style.flex = '0 0 180px'
         } else {
-          this.config.model.style.width = '300px'
+          this.config.coverage.style.width = '50px'
+          this.config.coverage.style.flex = '0 0 50px'
         }
       }
+    },
+    methods: {
+      ...mapActions(['ToggleOptionsExpand', 'ToggleCoverageExpand', 'ToggleModelExpand'])
     },
     // 8-14 添加配置侧栏
     components: { ContextMenu, CanvasMain, BoardCoverage, BoardHeader, BoardModel, BoardOptions }

@@ -2,17 +2,22 @@
 // 左侧图层列表
 .board-coverage {
   background: $color-admin-ctrl;
-  transition: all 2 sease-out;
+  transition: all .5s;
   .header-title {
+    position: relative;
     height: 30px;
     line-height: 30px;
     padding: 0 10px;
     background: $color-admin-ctrl;
-    font-size: 12px;
+    font-size: 16px;
     color: $color-text-info;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    .coverage-icon{
+      position: absolute;
+      right: 15px;
+      top: 10px;
+      color: #040E2E;
+      opacity: 0.3;
+    }
   }
   .control {
     display: flex;

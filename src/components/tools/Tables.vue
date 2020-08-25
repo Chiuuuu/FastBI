@@ -56,8 +56,6 @@
           if (val) {
             this.showHeader = val.header.show
           }
-          console.log(val)
-          console.log(this.columns)
           for (let item of this.columns) {
             // 是否自动换行
             item.ellipsis = val.table.ellipsis

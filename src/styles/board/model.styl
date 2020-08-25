@@ -26,7 +26,7 @@
 
     .model-icon {
       opacity: 0.3;
-      color: rgba(3, 13, 45, 1);
+      color: #040E2E;
       position: absolute;
       right: 15px;
       top: 15px;
@@ -66,27 +66,41 @@
     .operation_main {
       overflow-y: scroll;
       height:730px;
-      .operation_dim {
-      .dim_header {
-        display flex;
-        justify-content space-between;
-        width: 90%;
-        .d_h_s {
-          font-size:14px;
-          font-family:Microsoft YaHei;
-          font-weight:400;
-          color:rgba(1,4,15,1);
-          line-height:48px;
-          margin-left: 20px;
+      .operation {
+        height:232px;
+        border-bottom: 1px solid #EFEFEF;
+        .header {
+          display flex;
+          justify-content space-between;
+          width: 90%;
+          .d_h_s {
+            font-size:14px;
+            font-family:Microsoft YaHei;
+            font-weight:400;
+            color:rgba(1,4,15,1);
+            margin-top: 15px;
+            margin-left: 20px;
+            }
+          .dicon {
+            color:rgba(191,191,191,1);
+            margin-top: 15px;
+            font-size: 16px;
+            }
+        }
+        .filewrap{
+          padding: 0 15px;
+          margin-bottom: 0;
+          .filelist{
+            line-height: 25px;
+            color: #01040F;
+            font-size: 14px;
+            img{
+              margin-right: 10px;
+            }
           }
-        .dicon {
-          color:rgba(191,191,191,1);
-          margin-top: 15px;
-          font-size: 16px;
-          }
+        }
       }
-      }
-      }
+    }
     .operation_mea {
       .mea_header {
         display flex;
@@ -108,4 +122,8 @@
         }
       }
   }
+}
+
+.operation .bin-scrollbar__wrap {
+    overflow-x: hidden;
 }

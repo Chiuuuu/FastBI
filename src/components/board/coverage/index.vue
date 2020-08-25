@@ -2,19 +2,20 @@
 <template>
   <div class="board-coverage" :style="config.style">
     <div flex="dir:top" style="height: 100%;">
-      <div class="header-title" v-show="config.title.enable">
-        <span v-if="collapsed">{{ config.title.text }}</span>
-        <a-icon type="menu-fold" class="pointer" @click="toggleCollapsed" />
+      <div class="header-title" v-show="config.title.enable" flex="main:center">
+        <span v-if="coverageExpand">{{ config.title.text }}</span>
+        <a-icon :type="coverageExpand ? 'menu-fold' : 'menu-unfold'"
+                class="coverage-icon" @click="toggleCollapsed" />
       </div>
-      <div class="control" :class="{'selected':currentSelected}" v-show="collapsed">
+      <div class="control" :class="{'selected':currentSelected}" v-if="coverageExpand">
         <!-- 控制器（4个按钮） -->
         <div class="context-menu-item"
             v-for="item in menuList" :key="item.order"
             @click="handleCommand(item)">
-          <b-icon :name="item.icon" :title="item.text"></b-icon>
+          <b-icon v-if="coverageExpand" :name="item.icon" :title="item.text"></b-icon>
         </div>
       </div>
-      <div class="control-body" flex-box="1" v-show="collapsed">
+      <div class="control-body" flex-box="1" >
         <div class="body-wrap" @click="cancelSelected">
           <b-scrollbar style="height: 100%;">
             <slot></slot>
@@ -31,7 +32,6 @@
 
   export default {
     name: 'BoardCoverage',
-
     props: {
       config: {
         type: Object,
@@ -46,11 +46,11 @@
           { icon: 'ios-share', text: '置顶', order: 'top' },
           { icon: 'ios-download', text: '置底', order: 'bottom' }
         ],
-        collapsed: true
+        coverageConfig: {}
       }
     },
     computed: {
-      ...mapGetters(['currentSelected'])
+      ...mapGetters(['currentSelected', 'coverageExpand'])
     },
     methods: {
       // transform点击事件
@@ -66,7 +66,6 @@
       },
       // 点击展开收起
       toggleCollapsed () {
-        this.collapsed = !this.collapsed
         this.$emit('toggleCollapsed', this.collapsed)
       }
     }

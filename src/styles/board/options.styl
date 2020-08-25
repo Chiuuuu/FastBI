@@ -21,6 +21,7 @@
   box-sizing: border-box;
   z-index: 200;
   background: #ffffff;
+  border-right: 1px solid #EFEFEF;
   box-shadow: -2px 0 2px 0 rgba(0, 0, 0, 0.1);
   transition: all .3s;
   transform: translate3d(100%, 0, 0)
@@ -221,6 +222,46 @@
   }
   .group-title {
     padding: 0 10px;
+  }
+}
+
+// 数据样式
+.data-source{
+  .empty{
+    width:230px;
+    height:32px;
+    border:1px solid rgba(229,229,229,1);
+    border-radius:4px;
+    color: #020510;
+    text-align: center;
+    line-height: 32px;
+  }
+  .field{
+    position: relative;
+    width:230px;
+    height:32px;
+    background:rgba(98,124,255,0.1);
+    border:1px solid #627CFF;
+    border-radius:4px;
+    color: #627CFF;
+    text-align: center;
+    line-height: 32px;
+    margin-bottom: 8px;
+    &:hover{
+      .icon-more{
+        display: block;
+      }
+    }
+  }
+  .dragable-vaild{
+    background-color: #e9ebee;
+  }
+  .icon-more{
+    display: none;
+    position: absolute;
+    right: 10px;
+    top: 8px;
+    cursor: pointer;
   }
 }
 

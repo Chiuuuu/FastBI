@@ -8,17 +8,23 @@
       </template>
       <!-- 左边侧栏 -->
       <template v-slot:coverage>
-        <div class="list-item" :key="transform.id" v-for="transform in coverageMaps"
+        <div class="list-item"
+            :key="transform.id" v-for="transform in coverageMaps"
             :class="[{'hovered':hoverItem===transform.id},{'selected':currentSelected&&currentSelected.id===transform.id},]"
             :selected="currentSelected&&currentSelected.id===transform.id"
             @click.stop.prevent="handleSelected(transform)"
             @mouseenter="handleHover(transform)"
             @mouseleave="handleNoHover()">
-            <a-icon v-if="transform.packageJson.icon" :type="transform.packageJson.icon" />
-          <span v-if="transform.packageJson.config&&transform.packageJson.config.title">
-            {{ transform.packageJson.config.title.content}}
-          </span>
-          <span v-else> {{ transform.packageJson.title }}</span>
+            <div v-if="coverageExpand">
+              <a-icon v-if="transform.packageJson.icon" :type="transform.packageJson.icon" />
+              <span v-if="transform.packageJson.config&&transform.packageJson.config.title">
+                {{ transform.packageJson.config.title.content}}
+              </span>
+              <span v-else> {{ transform.packageJson.title }}</span>
+            </div>
+            <div v-else flex="main:center" style="padding:5px 0;">
+              <a-icon :type="transform.packageJson.icon" />
+            </div>
         </div>
       </template>
       <template v-slot:canvas>
@@ -98,7 +104,7 @@
       }
     },
     computed: {
-      ...mapGetters(['canvasMap', 'currentSelected', 'isScreen']),
+      ...mapGetters(['canvasMap', 'currentSelected', 'isScreen', 'coverageExpand']),
       coverageMaps () {
         let maps = [...this.canvasMap]
         return maps.reverse()
