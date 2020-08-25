@@ -16,7 +16,7 @@ export default new Vuex.Store({
         canvasMaps,
         common,
         dataAccess,
-        options
+        options,
         dataModel
     },
     getters
