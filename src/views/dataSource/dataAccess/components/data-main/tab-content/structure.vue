@@ -10,18 +10,18 @@
           aaa
         </a-select-option>
       </a-select>
-      <a-button type="primary" class="select_button">全部抽取</a-button>
+      <a-button type="primary" class="select_button" @click="handleExtract">全部抽取</a-button>
     </div>
     <div class="table">
-      <a-table :columns="columns" :data-source="data"  rowKey='id' :loading='spinning' :pagination='false'>
+      <a-table :row-selection="rowSelection" :columns="columns" :data-source="data"  rowKey='id' :loading='spinning' :pagination='false'>
         <span slot="setBy" slot-scope="setBy">
-          {{ handleChangeType(setBy) ? '是' : '否' }}
+          {{ setBy ? '是' : '否' }}
         </span>
         <span slot="extactBy" slot-scope="extactBy">
           {{ handleChangeType(extactBy) ? '是' : '否' }}
         </span>
         <span slot="config" slot-scope="row">
-          <a v-on:click="setting(row)">设置</a>
+          <a v-on:click="setting(row)">{{row.setBy ? '编辑' : '设置' }}</a>
         </span>
       </a-table>
     </div>
@@ -45,7 +45,7 @@ const columns = [
     scopedSlots: { customRender: 'setBy' }
   },
   {
-    title: '是否抽取',
+    title: '是否抽取过',
     dataIndex: 'extactBy',
     key: 'extactBy',
     slots: { title: 'extactBy' },
@@ -53,8 +53,8 @@ const columns = [
   },
   {
     title: '修改时间',
-    key: 'updateTime',
-    dataIndex: 'updateTime'
+    key: 'modifiedTime',
+    dataIndex: 'modifiedTime'
   },
   {
     title: '字段配置',
@@ -69,7 +69,18 @@ export default {
     return {
       columns,
       data: [],
-      spinning: true
+      spinning: true,
+      selectedRows: [],
+      rowSelection: {
+        onSelect: (record, selected, selectedRows) => {
+          console.log(record, selected, selectedRows)
+          this.selectedRows = selectedRows
+        },
+        onSelectAll: (selected, selectedRows, changeRows) => {
+          console.log(selected, selectedRows, changeRows)
+          this.selectedRows = selectedRows
+        }
+      }
     }
   },
   computed: {
@@ -101,6 +112,11 @@ export default {
         this.$message.error(dabaseInfoResult.data.msg)
       }
       console.log('获取数据', dabaseInfoResult.data)
+    },
+    handleExtract() {
+      if (this.selectedRows.length === 0) {
+        return this.$message.error('请选择至少一项')
+      }
     },
     setting(row) {
     //   this.$router.push("/dataSource/dataAccess-setting");
