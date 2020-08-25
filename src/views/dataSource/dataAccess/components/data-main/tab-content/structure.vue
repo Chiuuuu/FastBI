@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-spin tip="加载中..." :spinning="spinning">
+    <!-- <a-spin tip="加载中..." :spinning="spinning"> -->
     <div class="search_bar">
       <a-input placeholder="请输入关键词" class="search_input">
         <a-icon slot="prefix" type="search" />
@@ -13,19 +13,19 @@
       <a-button type="primary" class="select_button">全部抽取</a-button>
     </div>
     <div class="table">
-      <a-table :columns="columns" :data-source="data"  rowKey='id'>
+      <a-table :columns="columns" :data-source="data"  rowKey='id' :loading='spinning' :pagination='false'>
         <span slot="setBy" slot-scope="setBy">
           {{ handleChangeType(setBy) ? '是' : '否' }}
         </span>
         <span slot="extactBy" slot-scope="extactBy">
           {{ handleChangeType(extactBy) ? '是' : '否' }}
         </span>
-        <span slot="config">
-          <a v-on:click="setting">设置</a>
+        <span slot="config" slot-scope="row">
+          <a v-on:click="setting(row)">设置</a>
         </span>
       </a-table>
     </div>
-    </a-spin>
+    <!-- </a-spin> -->
   </div>
 </template>
 <script>
@@ -88,7 +88,7 @@ export default {
         url: '/admin/dev-api/system/mysql/read/table',
         data: {
           databaseName: this.formInfo.databaseName,
-          mysqlSourceName: this.formInfo.name
+          sourceMysqName: this.formInfo.name
         }
       }).finally(() => {
         this.spinning = false
@@ -96,14 +96,15 @@ export default {
 
       if (dabaseInfoResult.data.code === 200) {
         this.data = [].concat(dabaseInfoResult.data.rows)
+        this.$store.dispatch('dataAccess/setReadRows', this.data)
       } else {
         this.$message.error(dabaseInfoResult.data.msg)
       }
       console.log('获取数据', dabaseInfoResult.data)
     },
-    setting() {
+    setting(row) {
     //   this.$router.push("/dataSource/dataAccess-setting");
-      this.$emit('on-change-componet', 'Setting')
+      this.$emit('on-change-componet', 'Setting', row)
     }
   }
 }

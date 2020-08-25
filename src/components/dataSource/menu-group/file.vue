@@ -10,10 +10,11 @@
     @click="handleFileSelect"
   >
     <h4 class="title" :title="file.name">
-      <img :src="icon" class='file-icon'/>
+      <a-icon type="file" v-if="icon === 'default'" style="margin-right: 2px;"/>
+      <img :src="fileIcon" class='file-icon' v-else/>
       <span>{{ file.name }}</span>
     </h4>
-    <span class="menu">
+    <span class="menu" v-if="hasContextmenus">
       <span class="caret-down" @click="handleCreateMenu"></span>
     </span>
   </li>
@@ -41,12 +42,15 @@ export default {
       type: Number,
       default: 0
     },
+    icon: {
+      type: String,
+      default: 'default'
+    },
     isSelect: {
       type: Boolean,
       default: false
     },
     contextmenus: {
-      required: true,
       type: Array,
       default: function() {
         return []
@@ -56,18 +60,37 @@ export default {
   data() {
     return {
       contenxtmenu: '',
-      icon: require(`@/assets/images/icon_mysql.png`)
+      fileIcon: this.icon === 'default' ? '' : require(`@/assets/images/icon_${this.icon}.png`)
     }
   },
   mounted() {
-    this.$refs.file.addEventListener('contextmenu', (e) => {
-      e.preventDefault()
-      this.handleCreateMenu(e)
-    })
+    if (this.hasContextmenus) {
+      this.initContextMenu()
+    }
+  },
+  beforeDestroy() {
+    if (this.hasContextmenus) {
+      this.destoryContextMenu()
+    }
+  },
+  computed: {
+    hasContextmenus() {
+      return this.contextmenus.length !== 0
+    }
   },
   methods: {
+    initContextMenu() {
+      this.$refs.file && this.$refs.file.addEventListener('contextmenu', this.handleConextMenu)
+    },
+    destoryContextMenu() {
+      this.$refs.file && this.$refs.file.removeEventListener('contextmenu', this.handleConextMenu)
+    },
+    handleConextMenu(e) {
+      e.preventDefault()
+      this.handleCreateMenu(e)
+    },
     handleFileSelect() {
-      this.$parent.$emit('fileSelect', this.file)
+      this.$emit('fileSelect', this.file)
     },
     handleFileDragStart(e) {
       e.stopPropagation()

@@ -2,19 +2,20 @@
   <div class="sheet_list">
     <div
       class="sheet_list_item"
-      v-for="(item, index) in list"
-      :key="index"
+      v-for="item in list"
+      :key="item.id"
       :draggable="isDrag"
       @mouseleave.stop="handleMouseLeave"
       @mousedown.stop="handleMouseDown"
       @dragstart.stop="handleLeftDragStart($event, item)"
       @dragend.stop="handleLeftDragEnd"
     >
-      <span>{{ item.title }}</span>
+      <span>{{ item.tableName }}</span>
     </div>
   </div>
 </template>
 <script>
+import { Node } from '../util'
 export default {
   name: 'model-edit-left',
   inject: ['nodeStatus'],
@@ -23,20 +24,25 @@ export default {
       isDrag: false,
       list: [
         {
-          id: 4,
-          title: '三大框架'
-        },
-        {
           id: 1,
-          title: 'react'
+          tableName: '类别',
+          hasFilter: false,
+          status: 'direct',
+          dataConnectionId: 700468972
         },
         {
           id: 2,
-          title: 'vue'
+          tableName: '细分',
+          hasFilter: false,
+          status: 'direct',
+          dataConnectionId: 700468972
         },
         {
           id: 3,
-          title: 'angular'
+          tableName: '订单',
+          hasFilter: false,
+          status: 'direct',
+          dataConnectionId: 700468972
         }
       ]
     }
@@ -49,19 +55,15 @@ export default {
       this.isDrag = false
     },
     handleLeftDragStart(event, data) {
-      const copyData = JSON.parse(JSON.stringify(data))
-      console.log('left-drag-start', copyData)
+      console.log('left-drag-start', data)
       this.nodeStatus = Object.assign(this.nodeStatus, {
-        dragType: 'left',
-        dragNode: {
-          nodeData: copyData,
-          parentNode: null
-        },
+        dragType: 'menu',
+        dragNode: new Node(data),
         event
       })
     },
     handleLeftDragEnd() {
-        this.$emit('on-left-drag-leave')
+      this.$emit('on-left-drag-leave')
     }
   }
 }

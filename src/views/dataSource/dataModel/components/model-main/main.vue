@@ -10,41 +10,15 @@
     <div class="description">
         <span class="d-s">描述：-</span>
     </div>
-    <div class="draw_board">
-      <div class="outer">
-        <div class="First">
-          <div class="bank-account">
-            <span class="f-b-s">银行账户</span>
-          </div>
-        </div>
-        <div class="Second">
-          <div class="need">
-            <span class="s-n-s">统计需求</span>
-          </div>
-          <div class="need-01">
-            <span class="s-n01-s">统计需求1</span>
-          </div>
-        </div>
-        <div class="Third">
-          <div class="account">
-            <span class="t-a-s">基本账户</span>
-          </div>
-          <div class="account-01">
-            <span class="t-a01-s">基本账户1</span>
-          </div>
-          <div class="account-02">
-            <span class="t-a02-s">基本账户2</span>
-          </div>
-          <div class="account-03">
-            <span class="t-a03-s">基本账户3</span>
-          </div>
-        </div>
-        <div class="Forth">
-          <div class="deal">
-            <span class="f-d-s">统结算交易</span>
-          </div>
-        </div>
-      </div>
+    <div
+      class="m-dml-map m-map"
+    >
+      <tree-node
+        v-for="(item, index) in renderTables"
+        :key="index"
+        :node-data="item"
+        title='tableName'
+      ></tree-node>
     </div>
     <div class="detail">
       <div class="detail_header">
@@ -139,10 +113,136 @@
 </template>
 
 <script>
+import TreeNode from './show-tree-node'
+import { Node, conversionTree } from '../../util'
 export default {
+  name: 'model-main',
+  components: {
+    TreeNode
+  },
+  data() {
+    return {
+      tables: [
+        {
+          tableId: 1,
+          tableAlias: '总编',
+          produced: 'Original',
+          dataConnectionId: 700460682,
+          tableName: '总编'
+        },
+        {
+          tableId: 2,
+          join: {
+            conditions: [
+              {
+                left: '国家及地区',
+                right: '国家及地区',
+                leftTableId: 1,
+                op: '='
+              },
+              {
+                left: '平均年薪（美元）',
+                right: '平均年薪（美元）',
+                leftTableId: 1,
+                op: '='
+              }
+            ],
+            method: 'inner'
+          },
+          tableAlias: '工作表1',
+          produced: 'Original',
+          dataConnectionId: 700460682,
+          tableName: '工作表1'
+        },
+        {
+          tableId: 3,
+          join: {
+            conditions: [
+              {
+                left: '国家及地区',
+                right: '国家及地区',
+                leftTableId: 1,
+                op: '='
+              },
+              {
+                left: '平均年薪（美元）',
+                right: '平均年薪（美元）',
+                leftTableId: 1,
+                op: '='
+              }
+            ],
+            method: 'inner'
+          },
+          tableAlias: '工作表2',
+          produced: 'Original',
+          dataConnectionId: 700460682,
+          tableName: '工作表2'
+        },
+        {
+          tableId: 4,
+          join: {
+            conditions: [
+              {
+                left: '国家及地区',
+                right: '国家及地区',
+                leftTableId: 2,
+                op: '='
+              },
+              {
+                left: '平均年薪（美元）',
+                right: '平均年薪（美元）',
+                leftTableId: 2,
+                op: '='
+              }
+            ],
+            method: 'inner'
+          },
+          tableAlias: '工作表3',
+          produced: 'Original',
+          dataConnectionId: 700460682,
+          tableName: '工作表3'
+        },
+        {
+          tableId: 5,
+          join: {
+            conditions: [
+              {
+                left: '国家及地区',
+                right: '国家及地区',
+                leftTableId: 3,
+                op: '='
+              },
+              {
+                left: '平均年薪（美元）',
+                right: '平均年薪（美元）',
+                leftTableId: 3,
+                op: '='
+              }
+            ],
+            method: 'inner'
+          },
+          tableAlias: '工作表1',
+          produced: 'Original',
+          dataConnectionId: 700460682,
+          tableName: '工作表1'
+        }
+      ],
+      renderTables: []
+    }
+  },
+  created() {
+    const first = this.tables[0]
+    const root = new Node(first)
+    const node = this.handleConversionTree(root)
+    this.renderTables.push(node)
+  },
   methods: {
-      edit() {
+    edit() {
       this.$router.push('/dataSource/Model-Edit')
+    },
+    handleConversionTree(node) {
+      conversionTree(node, this.tables.slice(1), 'tableId')
+      return node
     }
   }
 }

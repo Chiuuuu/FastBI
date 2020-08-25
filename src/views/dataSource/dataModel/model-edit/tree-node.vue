@@ -6,19 +6,21 @@
         :draggable="isDrag"
         @mouseleave.stop="handleMouseLeave"
         @mousedown.stop="handleMouseDown"
-        @dragstart.stop="handleDragStart($event, dataIndex)"
+        @dragstart.stop="handleDragStart($event, nodeData, dataIndex)"
         @dragenter.stop="handleDragEnter"
-        @dragend.stop="handleDragEnd"
         @dragleave.stop="handleDragLeave"
-        @dragover.stop="handleDragOver"
-        @drop.stop="handleDrop($event, dataIndex)"
+        @dragend.stop="handleDragEnd"
+        @dragover.prevent.stop
+        @drop.stop="handleDrop($event, nodeData, dataIndex)"
         style="border-color: rgb(8, 140, 237);"
       >
-        {{ nodeData.title }}
+        {{ nodeData.props.tableName }}
       </h6>
-      <span class="opt">
-        <b class="num">0</b>
-      </span>
+      <a-popover v-model="visible" title="Title" trigger="click">
+        <span class="opt">
+          <b class="num">0</b>
+        </span>
+      </a-popover>
     </div>
     <div class="wrap">
       <tree-node
@@ -27,34 +29,14 @@
         :node-data="item"
         :data-index="subindex"
       ></tree-node>
-      <!-- <div class="box">
-        <div class="item table-item">
-          <h6 class="dragable" style="border-color: rgb(8, 140, 237);">
-            工作表1
-          </h6>
-          <span class="opt">
-            <b class="num">2</b>
-          </span>
-        </div>
-      </div>
-      <div class="box">
-        <div class="item table-item">
-          <h6 class="dragable" style="border-color: rgb(8, 140, 237);">
-            工作表1
-          </h6>
-          <span class="opt">
-            <b class="num">2</b>
-          </span>
-        </div>
-      </div> -->
     </div>
   </div>
 </template>
 <script>
-import { Utils } from './utils'
+import { Utils, Node } from '../util'
 export default {
   name: 'tree-node',
-  inject: ['nodeStatus'],
+  inject: ['tables', 'nodeStatus'],
   props: {
     nodeData: {
       type: Object,
@@ -70,7 +52,8 @@ export default {
   data() {
     return {
       isDrag: false,
-      root: true
+      root: true,
+      visible: false
     }
   },
   created() {
@@ -88,19 +71,17 @@ export default {
     handleMouseLeave() {
       this.isDrag = false
     },
-    handleDragStart(event, index) {
+    handleDragStart(event, item, index) {
       console.log('node--drag-start')
-      event.stopPropagation()
-      const parent = this.$parent
-      this.parentNodeData = parent.nodeData
-      this.root.handleRightDragStart(event, this, index)
+      this.nodeStatus.dragNode = item
+      this.nodeStatus.dragType = 'node'
     },
     handleDragEnter(event) {
       if (Utils.hasClass(event.target, 'draggable', false)) {
         console.log('node-over', event.target.className)
         this.handleItemHigtLight()
       }
-      this.root.handleMapDragover(event, this)
+      this.root.handleMapDragEnter(event, this)
     },
     handleDragLeave(event) {
       console.log('node-leave', event.target.className)
@@ -116,13 +97,48 @@ export default {
       console.log('node-end')
       this.root.handleMapRemoveClass()
     },
-    handleDragOver(event) {
-      event.preventDefault()
-    },
-    handleDrop(event, index) {
+    handleDrop(event, current, index) {
       console.log('node-drop')
       this.handleRemoveItemHigtLight()
-      this.root.handleNodeDrop(event, this, index)
+      let dragNode = this.nodeStatus.dragNode
+      if (this.nodeStatus.dragType === 'menu') {
+        dragNode.setTableId(this.tables.length + 1)
+        this.tables.push(dragNode.getProps())
+        current.add(dragNode)
+      }
+
+      if (this.nodeStatus.dragType === 'node') {
+        if (current.props.tableId === dragNode.props.tableId) {
+          console.log('同一个元素')
+          return
+        }
+
+        const dragNodeId = dragNode.props.tableId
+
+        if (dragNode.parent && dragNode.parent.props.tableId === current.props.tableId) {
+          console.log('相同父节点')
+          return
+        }
+
+        if (this.lootBeforeParent(dragNodeId, current)) return
+
+        let node = new Node(dragNode.getProps())
+        node.setParent(current)
+        node.setChildren(dragNode.children)
+        current.add(node)
+        this.parentDeleteNode(event, dragNode)
+      }
+    },
+    lootBeforeParent(parentId, node) {
+      console.log(node)
+      if (!node.parent) return false
+      if (node.parent.props.tableId === parentId) return true
+      return this.lootBeforeParent(parentId, node.parent)
+    },
+    parentDeleteNode(event, node) {
+      const children = node.parent.children
+      const index = children.indexOf(node)
+      children.splice(index, 1)
     }
   }
 }

@@ -2,9 +2,9 @@
   <div
     class="m-dml-map m-map edit"
     ref="mapRef"
-    @dragover.stop="handleMapDragover"
-    @dragleave.stop="handleMapDragLeave"
-    @drop.stop="handleMapDrop($event, 'wrap')"
+    @dragenter.prevent.stop="handleMapDragEnter"
+    @dragover.prevent.stop
+    @drop.stop="handleMapDrop"
   >
     <tree-node
       v-for="(item, index) in treeData"
@@ -19,7 +19,7 @@ import { Utils } from './utils'
 import TreeNode from './tree-node'
 export default {
   name: 'edit-right-top',
-  inject: ['nodeStatus'],
+  inject: ['tables', 'nodeStatus'],
   components: {
     TreeNode
   },
@@ -60,122 +60,57 @@ export default {
     }
   },
   methods: {
-    // 是否有拖拽节点
-    hasDragNode() {
-      return this.nodeStatus.dragNode
-      // return this.dragOverStatus.dragNode;
-    },
     handleMapAddClass() {
       Utils.addClass(this.$refs.mapRef, 'm-map-hover')
     },
     handleMapRemoveClass() {
       Utils.removeClass(this.$refs.mapRef, 'm-map-hover')
     },
-    // 开始拖拽时候记录节点
-    handleRightDragStart(event, treeNode, index) {
-      this.nodeStatus = Object.assign(this.nodeStatus, {
-        event,
-        dragType: 'right',
-        dragNode: {
-          nodeData: treeNode.nodeData,
-          parentNode: treeNode.parentNodeData,
-          index
-        }
-      })
-      console.log('start-nodestatr', this.nodeStatus)
-    },
-    handleMapDragover(event) {
+    handleMapDragEnter(event) {
       event.preventDefault()
-      //   console.log('right-wrap-drop', this.$refs.mapRef.className)
       this.handleMapAddClass()
     },
-    handleMapDragLeave(event) {
-      event.stopPropagation()
-      //   console.log('right-wrap-leaveeee', event.target.className)
-    },
-    handleNodeDrop(event, treeNode, index) {
-      this.nodeStatus = Object.assign(this.nodeStatus, {
-        dropNode: {
-          index,
-          nodeData: treeNode.nodeData,
-          parentNode: treeNode.parentNodeData
-        },
-        event
-      })
-      this.handleChangeData()
-    },
-    handleChangeData() {
-      console.log(this.nodeStatus)
-      const type = this.nodeStatus.dragType
-      console.log('type', type)
-      var dragData = this.nodeStatus.dragNode.nodeData
-      var dragParent = this.nodeStatus.dragNode.parentNode
-      var dropData = this.nodeStatus.dropNode.nodeData
-      var dropParent = this.nodeStatus.dropNode.parentNode
-
-      if (dragParent === dropData) {
-        console.log('相同父节点')
-        return
-      }
-    this.handleAddItem()
-    },
-    handleAddItem() {
-      var dragData = this.nodeStatus.dragNode.nodeData
-      var dragParent = this.nodeStatus.dragNode.parentNode
-      var dropData = this.nodeStatus.dropNode.nodeData
-      // var copyDragData = JSON.parse(JSON.stringify(dragData))
-      var dropParent = this.nodeStatus.dropNode.parentNode
-      var dropPosition = this.nodeStatus.dropPosition
-      if (Utils.isType(dropData, 'Object')) {
-        if (this.nodeStatus.dragType === 'right') {
-          dragParent.children.splice(this.nodeStatus.dragNode.index, 1)
-        }
-        if (dropData.hasOwnProperty('children')) {
-          console.log('12131')
-          dropData.children.push(dragData)
-        } else {
-          this.$set(dropData, 'children', [dragData])
-          if (dropParent && dropParent.children) {
-            this.$set(dropParent.children, this.nodeStatus.dropNode.index, dropData)
-          }
-          console.log(dropParent)
-        }
-      }
-    },
-    handleMapDrop(event, type, treeNode) {
-      event.preventDefault()
-      event.stopPropagation()
+    handleMapDrop(event) {
       console.log('right-wrap-drop', event.target.className)
-      if (this.nodeStatus.dragType === 'left') {
-          if (this.treeData.length === 0) {
-              this.treeData.push(this.nodeStatus.dragNode.nodeData)
-          } else {
-              this.loopObject(this.treeData, this.nodeStatus.dragNode.nodeData)
-          }
-      }
+      if (this.nodeStatus.dragType === 'node') return
+      Utils.removeClass(this.$refs.mapRef, 'map-hover')
+      this.handleDealWithNode()
     },
-    loopObject(arry, data) {
-      let item = arry[0]
-      if (!Utils.isType(item, 'Object')) {
+    handleDealWithNode(key = 'children') {
+      let len = this.tables.length
+      let node = this.nodeStatus.dragNode
+      node.setTableId(this.tables.length + 1)
+      if (len === 0) {
+        this.generateRoot(node)
+      } else {
+        this.loopCurrentAddNode(this.treeData, node, key)
+      }
+      this.tables.push(node.getProps())
+      console.log(this.tables)
+    },
+    generateRoot(node) {
+      this.treeData.push(node)
+    },
+    loopCurrentAddNode(arry, node, key) {
+      let current = arry[0]
+      if (!Utils.isType(current, 'Object')) {
         return
       }
-      if (item.hasOwnProperty('children')) {
-        if (item.children.length === 0) {
-          item.children.push(data)
+
+      if (current.hasOwnProperty(key)) {
+        if (current[key].length === 0) {
+          current.add(node)
         } else {
-          this.loopObject(item.children, data)
+          this.loopCurrentAddNode(current[key], node, key)
         }
-      } else {
-        this.$set(item, 'children', [data])
       }
     }
   }
 }
 </script>
 <style lang="stylus" scoped>
-.m-dml-map {
-    margin: 10px;
-    background: #fff;
+.m-dml-map.edit {
+    height: calc(50vh - 162px);
 }
 .m-map {
     position: relative;
@@ -187,9 +122,9 @@ export default {
     -ms-user-select: none;
     -o-user-select: none;
     user-select: none;
-    border: 2px solid transparent;
+    border: 1px solid transparent;
 }
 .m-map-hover {
-    border: 2px solid #90b9e8;
+    border-color: #90b9e8;
 }
 </style>

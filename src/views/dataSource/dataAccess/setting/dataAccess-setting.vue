@@ -2,7 +2,7 @@
   <div class="data-access-setting">
     <div class="set-main">
       <div class="header">
-        <span class="data_con">fine_authority</span>
+        <span class="data_con">{{fieldInfo.name}}</span>
         <a-button class="data_btn" v-on:click="back">返回</a-button>
       </div>
       <div class="setting">
@@ -13,52 +13,58 @@
         </div>
         <div class="table">
           <a-table
+            rowKey='id'
             :row-selection="rowSelection"
             :columns="columns"
             :data-source="data"
+            :loading='sping'
+            :pagination='false'
             bordered
           >
-          <span slot="other_name">
-            <a-input style="width:186px;height:32px" />
+          <span slot="fieldNickname" slot-scope="text, record, index">
+            <a-input style="width:186px;height:32px" :value="text" @change.stop.prevent="handleChangeValue($event, record, index, 'fieldNickname')"/>
           </span>
-          <span slot="type">
-            <a-select default-value="数字" style="width:100px;">
-                  <a-select-option value="int">
-                    整数
-                  </a-select-option>
-                  <a-select-option value="date">
-                    日期时间
-                  </a-select-option>
-                  <a-select-option value="string">
-                    字符串
-                  </a-select-option>
-                  <a-select-option value="double">
-                    小数
-                  </a-select-option>
-                </a-select>
-          </span>
-          <span slot="property">
-            <a-select default-value="维度">
-                  <a-select-option value="dim">
-                    维度
-                  </a-select-option>
-                  <a-select-option value="mea">
-                    度量
-                  </a-select-option>
+          <span slot="fieldType" slot-scope="text, record, index">
+            <a-select :value="text" style="width:100px;" @change="(value) => handleSelectChangeValue(value, record, index, 'fieldType')">
+              <a-select-option value="INT">
+                整数
+              </a-select-option>
+              <a-select-option value="TIMESTAMP">
+                日期时间
+              </a-select-option>
+              <a-select-option value="VARCHAR">
+                字符串
+              </a-select-option>
+              <a-select-option value="DOUBLE">
+                小数
+              </a-select-option>
             </a-select>
           </span>
-          <span slot="description">
-            <a-input style="width:186px;height:32px" />
+          <span slot="fieldNature" slot-scope="text, record, index">
+            <a-select default-value="true" :value='`${text}`' @change="(value) => handleSelectChangeValue(value, record, index, 'fieldNature')">
+              <a-select-option value="true">
+                维度
+              </a-select-option>
+              <a-select-option value="false">
+                度量
+              </a-select-option>
+            </a-select>
           </span>
-          <span slot="isShow">
-              <a-select default-value="是">
-                  <a-select-option value="yes">
-                    是
-                  </a-select-option>
-                  <a-select-option value="no">
-                    否
-                  </a-select-option>
-                </a-select>
+          <span slot="fieldComment" slot-scope="text, record, index">
+            <a-input style="width:186px;height:32px" :value="text" @change.stop.prevent="handleChangeValue($event, record, index, 'fieldComment')"/>
+          </span>
+          <span slot="fieldDesc" slot-scope="fieldDesc">
+            {{ fieldDesc }}
+          </span>
+          <span slot="visible" slot-scope="text, record, index">
+              <a-select default-value="true" :value='`${text}`' @change="(value) => handleSelectChangeValue(value, record, index, 'visible')">
+                <a-select-option value="true">
+                  是
+                </a-select-option>
+                <a-select-option value="false">
+                  否
+                </a-select-option>
+              </a-select>
           </span>
           </a-table>
         </div>
@@ -67,7 +73,7 @@
         <a-button style="width:88px;height:30px;">
           取消
         </a-button>
-        <a-button type="primary" style="width:88px;height:30px;">
+        <a-button type="primary" style="width:88px;height:30px;" @click="handleSave">
           保存
         </a-button>
       </div>
@@ -76,54 +82,58 @@
 </template>
 
 <script>
+import { fetchGetTableField, fetchWriteTable, fetchSaveTableField } from '@/api/dataAccess/api'
+import { mapState } from 'vuex'
 const columns = [
   {
     title: '原名',
-    dataIndex: 'last_name'
+    dataIndex: 'fieldName'
   },
   {
     title: '别名',
-    dataIndex: 'other_name',
-    scopedSlots: { customRender: 'other_name' }
+    dataIndex: 'fieldNickname',
+    scopedSlots: { customRender: 'fieldNickname' }
   },
   {
     title: '字段类型',
-    dataIndex: 'type',
-    scopedSlots: { customRender: 'type' }
+    dataIndex: 'fieldType',
+    scopedSlots: { customRender: 'fieldType' }
   },
   {
     title: '字段属性',
-    dataIndex: 'property',
-    scopedSlots: { customRender: 'property' }
+    dataIndex: 'fieldNature',
+    scopedSlots: { customRender: 'fieldNature' }
   },
   {
     title: '字段说明',
-    dataIndex: 'description',
-    scopedSlots: { customRender: 'description' }
+    dataIndex: 'fieldComment',
+    scopedSlots: { customRender: 'fieldComment' }
   },
   {
     title: '注释',
-    dataIndex: 'annotation',
-    scopedSlots: { customRender: 'annotation' }
+    dataIndex: 'fieldDesc',
+    scopedSlots: { customRender: 'fieldDesc' }
   },
   {
     title: '是否可见',
-    dataIndex: 'isShow',
-    scopedSlots: { customRender: 'isShow' }
-  }
-]
-
-const data = [
-  {
-    key: '1',
-    last_name: 'authorityEntityType'
+    dataIndex: 'visible',
+    scopedSlots: { customRender: 'visible' }
   }
 ]
 
 export default {
+  props: {
+    fieldInfo: {
+      type: Object,
+      default: function() {
+        return {}
+      }
+    }
+  },
   data() {
     return {
-      data,
+      data: [],
+      sping: true,
       columns,
       current: ['mail'],
       openKeys: ['sub1'],
@@ -133,20 +143,91 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      formInfo: state => state.dataAccess.modelInfo,
+      modelId: state => state.dataAccess.modelId,
+      readRows: state => state.dataAccess.readRows
+    }),
     rowSelection() {
       return {}
     }
   },
+  mounted() {
+    this.handleGetData()
+  },
   methods: {
+    handleChangeValue(event, record, index, key) {
+      const newValue = event.target.value
+      record[key] = newValue
+    },
+    handleSelectChangeValue(value, record, index, key) {
+      record[key] = value
+    },
+    async handleGetData() {
+      this.sping = true
+      const result = await fetchGetTableField({
+        url: '/admin/dev-api/system/mysql/get/field',
+        data: {
+          sourceMysqlId: this.modelId,
+          databasesName: this.formInfo.databaseName,
+          sourceMysqName: this.formInfo.name,
+          tableId: this.fieldInfo.id,
+          tableName: this.fieldInfo.name
+        }
+      }).finally(() => {
+        this.sping = false
+      })
+      if (result.data.code === 200) {
+        this.data = [].concat(result.data.rows)
+      } else {
+        this.$message.error(result.data.msg)
+      }
+    },
     showModal() {
       this.visible = true
     },
-    handleOk(e) {
-      this.visible = false
-    },
     back() {
-      // this.$router.go(-1)
       this.$emit('on-change-componet', 'Main')
+    },
+    handleSave() {
+      this.handleSaveWriteTable()
+    },
+    async handleSaveWriteTable() {
+      console.log(this.fieldInfo)
+      const writeResult = await fetchWriteTable({
+        url: '/admin/dev-api/system/sourceTbale/save/table',
+        data: {
+          rows: this.readRows,
+          tableId: this.fieldInfo.id
+          // databaseName: this.formInfo.databaseName,
+          // sourceMysqName: this.formInfo.name
+        }
+      })
+
+      if (writeResult.data.code === 200) {
+        this.handleSaveTableField()
+      } else {
+        this.$message.error(writeResult.data.msg)
+      }
+    },
+    async handleSaveTableField() {
+      const result = await fetchSaveTableField({
+        url: '/admin/dev-api/system/field/save/field',
+        data: {
+          rows: this.data
+        }
+      })
+
+      if (result.data.code === 200) {
+        this.$message.success({
+          content: '保存成功',
+          duration: 0.5
+        }).then(() => {
+          this.back()
+        })
+      } else {
+        this.$message.error(result.data.msg)
+      }
     }
   }
 }

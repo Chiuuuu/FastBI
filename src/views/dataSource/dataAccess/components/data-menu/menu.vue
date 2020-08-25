@@ -65,7 +65,6 @@
               :folder="folder"
               :index="index"
               :contextmenus="folderContenxtMenu"
-              @folderFileSelect="handleFileSelect"
             >
               <template v-slot:file="slotProps">
                 <menu-file
@@ -74,6 +73,7 @@
                   :parent="folder"
                   :isSelect='fileSelectId === slotProps.file.id'
                   :contextmenus="fileContenxtMenu"
+                  @fileSelect="handleFileSelect"
                 ></menu-file>
               </template>
             </menu-folder>
@@ -85,6 +85,7 @@
                 :index="index"
                 :isSelect='fileSelectId === folder.id'
                 :contextmenus="fileContenxtMenu"
+                @fileSelect="handleFileSelect"
               ></menu-file>
             </ul>
           </template>
@@ -107,6 +108,7 @@ import { fetchTableInfo, fetchDeleteMenuById } from '../../../../../api/dataAcce
 import MenuFile from '@/components/dataSource/menu-group/file'
 import MenuFolder from '@/components/dataSource/menu-group/folder'
 export default {
+  name: 'data-menu',
   props: {
     menuData: {
       type: String,
@@ -220,8 +222,8 @@ export default {
       }
       this.$store.dispatch('dataAccess/setFirstFinished', false)
       this.$store.dispatch('dataAccess/setModelId', file.id)
-      console.log('emit')
-      this.$emit('on-change-tabindex', '1')
+      this.$EventBus.$emit('set-tab-index', '1')
+      this.$emit('on-menuChange-componet', 'Main')
     },
     /**
     * 删除菜单
@@ -374,9 +376,6 @@ export default {
       })
       console.log(isHas)
       return !!(isHas && isHas.length > 0)
-    },
-    handleOk(e) {
-      this.visible = false
     },
     /**
      * 选中哪个表

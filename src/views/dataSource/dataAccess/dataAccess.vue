@@ -1,10 +1,10 @@
 <template>
   <a-row :gutter="16">
     <a-col class="gutter-row" :span="5">
-      <Menu @on-change-tabindex='handleChangeTabindex'></Menu>
+      <Menu @on-menuChange-componet="handleMenuChangeComponet"></Menu>
     </a-col>
     <a-col class="gutter-row" :span="19">
-      <component :is="showWhat" @on-change-componet="handleChangeComponet" :tabindex="tabindex" @on-change-tabindex='handleChangeTabindex'></component>
+      <component :is="showWhat" @on-change-componet="handleChangeComponet" :tabindex="tabindex" :fieldInfo="fieldInfo"></component>
     </a-col>
   </a-row>
 </template>
@@ -22,22 +22,26 @@ export default {
   data() {
     return {
       showWhat: 'Main',
-      tabindex: '1'
+      tabindex: '1',
+      fieldInfo: {}
     }
   },
   methods: {
-    handleChangeComponet(componentName) {
+    handleChangeComponet(componentName, row) {
       this.showWhat = componentName
       if (componentName === 'Main') {
         this.tabindex = '2'
+      } else if (componentName === 'Setting') {
+        this.fieldInfo = Object.assign(this.fieldInfo, row)
       }
     },
-    handleChangeTabindex(index) {
-      this.tabindex = index
+    handleMenuChangeComponet(componentName) {
+      this.showWhat = componentName
     }
   },
   beforeDestroy() {
     this.$store.dispatch('dataAccess/setModelType', '')
+    this.$store.dispatch('dataAccess/setModelId', '')
   }
 }
 </script>

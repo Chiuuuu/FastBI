@@ -66,6 +66,12 @@ export default {
       tabChangeAble: state => state.dataAccess.firstFinished // 是否完成第一部分
     })
   },
+  created() {
+    this.$EventBus.$on('set-tab-index', this.handleSetTab)
+  },
+  beforeDestroy() {
+    this.$EventBus.$off('set-tab-index', this.handleSetTab)
+  },
   methods: {
     /**
      * 设置表名称
@@ -106,26 +112,7 @@ export default {
           this.$refs.entry.handleSetFormData()
         }
       }
-      // this.$emit('on-change-tabindex', activeKey)
     },
-    // async handleWriteTable() {
-    //   const writeResult = await fetchReadeTable({
-    //     url: '/admin/dev-api/system/mysql/read/table',
-    //     data: {
-    //       databaseName: this.formInfo.databaseName,
-    //       mysqlSourceName: this.formInfo.name
-    //     }
-    //   })
-
-    //   if (writeResult.data.code === 200) {
-    //     console.log('获取数据writeResult', writeResult)
-    //     this.$nextTick(() => {
-    //       this.$refs.structure.handleGetData(writeResult)
-    //     })
-    //   } else {
-    //     this.$message.error(writeResult.data.msg)
-    //   }
-    // },
     /**
      * 展示弹出
     */
