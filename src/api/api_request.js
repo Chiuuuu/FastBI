@@ -116,6 +116,19 @@ export function requestPostFormData(url, data) {
 }
 
 /**
+ * put请求
+ * @param {*} url
+ * @param {*} data
+ */
+export function requestPut(url, data) {
+  return service({
+    url: url,
+    method: 'put',
+    data: data
+})
+}
+
+/**
  * 向formData中添加新的项，如果值为null则跳过
  * @param formData FormData
  * @param name 参数名
