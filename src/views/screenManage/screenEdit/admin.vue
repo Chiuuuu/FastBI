@@ -175,6 +175,12 @@
         this.$store.dispatch('ContextMenuCommand', 'remove')
       },
       /**
+       * 保存大屏
+       */
+      screenSave() {
+        console.log(123)
+      },
+      /**
      * 是否全屏并按键ESC键的方法
      */
       checkFull () {

@@ -62,7 +62,7 @@ export function requestGetNoData(url) {
     })
 }
 
-export function requestGet(url, data) {
+export function requestGet(url, data = {}) {
     return service({
         url: url,
         method: 'get',

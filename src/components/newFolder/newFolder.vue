@@ -43,15 +43,15 @@
 </template>
 <script>
 export default {
-  name: 'resetName',
+  name: 'newFolder',
   props: ['visible'],
-  data() {
-    return {}
-  },
   beforeCreate() {
     this.form = this.$form.createForm(this, { name: 'form_in_modal' })
   },
   methods: {
+    /**
+     * 弹出框完成关闭后
+    */
     handleAfterClose() {
       this.form.resetFields()
     }

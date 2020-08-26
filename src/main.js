@@ -11,6 +11,8 @@ import 'ant-design-vue/dist/antd.less'
 
 import './styles/index.styl'
 
+import server from '@/api/index'
+
 // element-ui 局部引用
 Vue.use(Button)
 Vue.use(ColorPicker)
@@ -22,6 +24,7 @@ Vue.use(BinUI)
 Vue.use(VCharts)
 Vue.use(Antd)
 
+Vue.prototype.$server = server
 Vue.prototype.$EventBus = new Vue()
 Vue.prototype.$base = process.env.NODE_ENV === 'production' ? '/bin-data-site' : ''
 

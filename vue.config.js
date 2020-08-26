@@ -14,12 +14,13 @@ module.exports = {
   // dev跨域问题
   devServer: {
     proxy: {
-      '/admin': { 
-        target: 'http://192.168.0.69:81',
-        changeOrigin: true,  //是否跨域
-        pathRewrite:{
-            '^/admin':''
-        } 
+      '/admin': {
+        // target: 'http://192.168.0.69:81',
+        target: 'http://192.168.2.39:80',
+        changeOrigin: true, // 是否跨域
+        pathRewrite: {
+            '^/admin': ''
+        }
       }
     }
   },

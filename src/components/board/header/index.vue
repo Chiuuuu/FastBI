@@ -10,33 +10,37 @@
     </div>
     <div class="right-box">
         <div class="item" flex="dir:top">
-        <a-icon
-          type="mobile"
-          style="font-size:20px"
-        />
-        <span> 手机端</span>
+          <a-icon
+            type="mobile"
+            style="font-size:18px"
+          />
+          <span> 手机端</span>
         </div>
         <div class="item" flex="dir:top">
-        <a-icon
-          type="sync"
-          style="font-size:20px"
-        />
-        <span> 刷新</span>
+          <a-icon
+            type="sync"
+            style="font-size:18px"
+          />
+          <span> 刷新</span>
         </div>
         <div class="item" flex="dir:top">
-        <a-icon
-          type="block"
-          @click.native="openScreen"
-          style="font-size:20px"
-        />
-        <span> 预览</span>
+          <a-icon
+            type="block"
+            @click.native="openScreen"
+            style="font-size:18px"
+          />
+          <span> 预览</span>
+        </div>
+        <div class="item" flex="dir:top" @click="screenSave">
+          <a-icon type="save" style="font-size:18px" />
+          <span> 保存</span>
         </div>
         <div class="item" flex="dir:top" @click="goBack">
-        <a-icon
-          type="close"
-          style="font-size:20px"
-        />
-        <span> 关闭</span>
+          <a-icon
+            type="close"
+            style="font-size:18px"
+          />
+          <span> 关闭</span>
         </div>
     </div>
   </div>
@@ -58,7 +62,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['isScreen'])
+    ...mapGetters(['isScreen', 'pageSettings', 'canvasMap'])
   },
   created() {
     this.userId = 'dv1e443967LZP2Dj'
@@ -72,6 +76,7 @@ export default {
       goBack() {
         this.$router.go(-1)
       },
+      // 打开全屏
       openScreen () {
         this.$store.dispatch('SetIsScreen', true)
         // this.$router.push({ name: 'screen', params: { id: this.userId } })
@@ -88,6 +93,23 @@ export default {
                 docElm.msRequestFullscreen()
             }
           }
+        })
+      },
+      // 保存大屏
+      screenSave() {
+        console.log(123)
+        const screenObj = {
+          setting: this.pageSettings,
+          components: this.canvasMap
+        }
+        const params = {
+          id: -1,
+          json: JSON.stringify(screenObj),
+          name: this.$route.query.name,
+          parentId: this.$route.query.parentId
+        }
+        this.$server.screenManage.screenSave(params).then(res => {
+
         })
       }
     }
