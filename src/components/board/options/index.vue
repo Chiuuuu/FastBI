@@ -755,14 +755,14 @@
                     </gui-inline>
                   </gui-field>
                   <gui-field label="对齐方式">
-                    <a-radio-group :value="selfConfig.header.textAlign" size="small" >
-                      <a-radio-button value="left" @click.native.stop="onAlignChange(selfConfig.header, $event)">
+                    <a-radio-group :value="selfConfig.header.textStyle.textAlign" size="small" >
+                      <a-radio-button value="left" @click.native.stop="onRadioChange($event, selfConfig.header.textStyle, 'textAlign')">
                         <a-icon type="align-left" value="left" />
                       </a-radio-button>
-                      <a-radio-button value="center" @click.native.stop="onAlignChange(selfConfig.header, $event)">
+                      <a-radio-button value="center" @click.native.stop="onRadioChange($event, selfConfig.header.textStyle, 'textAlign')">
                         <a-icon type="align-center" value="center" />
                       </a-radio-button>
-                      <a-radio-button value="right" @click.native.stop="onAlignChange(selfConfig.header, $event)">
+                      <a-radio-button value="right" @click.native.stop="onRadioChange($event, selfConfig.header.textStyle, 'textAlign')">
                         <a-icon type="align-right" value="right" />
                       </a-radio-button>
                     </a-radio-group>
@@ -780,14 +780,14 @@
                     </gui-inline>
                   </gui-field>
                   <gui-field label="对齐方式">
-                    <a-radio-group :value="selfConfig.table.textAlign" size="small" >
-                      <a-radio-button value="left" @click.native.stop="onAlignChange(selfConfig.table, $event)">
+                    <a-radio-group :value="selfConfig.table.textStyle.textAlign" size="small" >
+                      <a-radio-button value="left" @click.native.stop="onRadioChange($event, selfConfig.table.textStyle, 'textAlign')">
                         <a-icon type="align-left" value="left" />
                       </a-radio-button>
-                      <a-radio-button value="center" @click.native.stop="onAlignChange(selfConfig.table, $event)">
+                      <a-radio-button value="center" @click.native.stop="onRadioChange($event, selfConfig.table.textStyle, 'textAlign')">
                         <a-icon type="align-center" value="center" />
                       </a-radio-button>
-                      <a-radio-button value="right" @click.native.stop="onAlignChange(selfConfig.table, $event)">
+                      <a-radio-button value="right" @click.native.stop="onRadioChange($event, selfConfig.table.textStyle, 'textAlign')">
                         <a-icon type="align-right" value="right" />
                       </a-radio-button>
                     </a-radio-group>
@@ -1047,6 +1047,7 @@
       // 点击选择对齐方式
       onAlignChange(data, event) {
         this.$set(data, 'textAlign', event.target.value)
+        console.log(data, event)
         this.setSelfProperty()
       },
 
@@ -1059,6 +1060,7 @@
 
       onRadioChange(e, data, key) {
         this.$set(data, key, e.target.value)
+        console.log(e, data, key)
         this.setSelfProperty()
       },
 

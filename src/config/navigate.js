@@ -801,21 +801,21 @@ const list = [{
                             key: '1',
                             name: 'John Brown',
                             age: 32,
-                            address: 'New York No. 1 Lake Park, New York No. 1 Lake Park',
+                            address: 'New York',
                             tags: ['nice', 'developer']
                         },
                         {
                             key: '2',
                             name: 'Jim Green',
                             age: 42,
-                            address: 'London No. 2 Lake Park, London No. 2 Lake Park',
+                            address: 'London',
                             tags: ['loser']
                         },
                         {
                             key: '3',
                             name: 'Joe Black',
                             age: 32,
-                            address: 'Sidney No. 1 Lake Park, Sidney No. 1 Lake Park',
+                            address: 'Sidney',
                             tags: ['cool', 'teacher']
                         }
                     ],
@@ -841,21 +841,21 @@ const list = [{
                             customHeaderCell: function() {}
                         },
                         {
-                            title: 'Long Column Long Column Long Column',
+                            title: '02',
                             dataIndex: 'address',
                             key: 'address 2',
                             ellipsis: true,
                             customHeaderCell: function() {}
                         },
                         {
-                            title: 'Long Column Long Column',
+                            title: '03',
                             dataIndex: 'address',
                             key: 'address 3',
                             ellipsis: true,
                             customHeaderCell: function() {}
                         },
                         {
-                            title: 'Long Column',
+                            title: '04',
                             dataIndex: 'address',
                             key: 'address 4',
                             ellipsis: true,
@@ -887,20 +887,20 @@ const list = [{
                     },
                     header: {
                         show: true,
-                        textAlign: 'left',
                         textStyle: {
                             color: '#000',
                             fontSize: 20,
-                            fontWeight: 'bold'
+                            fontWeight: 'bold',
+                            textAlign: 'left'
                         },
                         backgroundColor: ''
                     },
                     table: {
-                        textAlign: 'left',
                         textStyle: {
                             color: '#ffffff',
                             fontSize: 20,
-                            fontWeight: 'bold'
+                            fontWeight: 'bold',
+                            textAlign: 'left'
                         },
                         oddBackgroundColor: '',
                         evenBackgroundColor: '',
