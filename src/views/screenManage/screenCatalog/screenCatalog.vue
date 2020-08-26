@@ -8,7 +8,7 @@
             <a-icon type="plus-square" class="menu_icon" />
           </a>
           <a-menu slot="overlay" class="drow_menu">
-            <a-menu-item v-on:click="showModal">
+            <a-menu-item v-on:click="addScreen">
               新建大屏
             </a-menu-item>
             <a-menu-item key="1" @click="addFolder">
@@ -60,44 +60,6 @@
           </template>
         </div>
       </div>
-      <!-- <a-collapse class="menu_collapse" default-active-key="1" :bordered="false">
-        <template #expandIcon>
-          <a-icon class="folder_icon" type="folder" style="font-size:16px;color:rgba(1,4,15, 0.8)" />
-        </template>
-        <a-collapse-panel v-for="(item, index) in folderList"
-                          :key="index + 1"
-                          :header="item.name"
-                          :style="customStyle"
-                          @contextmenu.prevent="rightClick(item)">
-          <p class="menu_folder"
-             :class="{active: item2.active}"
-             v-for="(item2, index) in item.childen" :key="index + '_'"
-             @click.stop="handleScreenClick(item2)"
-             @contextmenu.prevent="rightClick(item2)">{{item2.name}}</p>
-        </a-collapse-panel>
-      </a-collapse> -->
-      <!-- <a-menu
-        :default-selected-keys="['1']"
-        :open-keys.sync="openKeys"
-        mode="inline"
-      >
-        <a-sub-menu v-for="(item, index) in folderList" :key="index" @contextmenu.prevent="rightClick()">
-          <div slot="title"
-            ><a-icon type="folder" /><span>{{item.name}}</span></div
-          >
-          <a-menu-item v-for="(item2, index) in item.childen" :key="index + '_'" @contextmenu.prevent="showMore(item2)">
-            {{item2.name}}
-          </a-menu-item>
-        </a-sub-menu>
-        <a-sub-menu>
-          <span slot="title"
-            ><a-icon type="folder"/><input
-              class="add_input"
-              value="新建文件夹"
-              onfocus="this.select();"
-          /></span>
-        </a-sub-menu>
-      </a-menu> -->
     </div>
     <div class="right">
       <span class="nav_title">电视统计大屏</span>
@@ -118,14 +80,14 @@
       </div>
     </div>
 
-    <a-modal v-model="visible" title="新建大屏" @ok="handleOk">
-      <a-form :form="folderForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
+    <a-modal v-model="screenVisible" title="新建大屏" @ok="handleOk">
+      <a-form :form="screenForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
         <a-form-item label="大屏名称">
           <a-input class="mod_input"
            v-decorator="['name', { rules: [{ required: true, message: '请输入大屏名称' }] }]"
            placeholder="请输入大屏名称" />
         </a-form-item>
-        <a-form-item label="保存目录">
+        <a-form-item label="保存目录" v-if="isAdd !== 2">
           <a-select
             v-decorator="['parentId', { rules: [{ required: true, message: '请选择大屏目录' }] }]"
             placeholder="选择大屏目录"
@@ -157,18 +119,30 @@ export default {
       current: ['mail'],
       openKeys: ['sub1'],
       folderList: [], // 文件夹列表
-      visible: false,
+      screenVisible: false, // 新建大屏弹窗
       isAdd: 1, // 1新增 2编辑 3删除
       folderVisible: false, // 新建文件夹弹窗
-      folderForm: this.$form.createForm(this), // 新建大屏弹窗
+      screenForm: this.$form.createForm(this), // 新建大屏弹窗
       customStyle: 'background: #ffffff;border: 0;overflow: hidden;color:#3B3C43;',
       folderContenxtMenu: [
+        {
+          name: '新建大屏',
+          onClick: this.handleScreen
+        },
+        {
+          name: '重命名',
+          onClick: this.handleResetFolder
+        },
         {
           name: '删除',
           onClick: this.handleFolderDelete
         }
       ],
       fileContenxtMenu: [
+        {
+          name: '重命名',
+          onClick: this.handleResetFile
+        },
         {
           name: '删除',
           onClick: this.handleFileDelete
@@ -207,18 +181,13 @@ export default {
           })
           // 后端不会返 所以前端要判断parentId与id对应的数据
           for (let item of list) {
-            item.showMore = false
-            // item.active = false
-            this.$set(item, 'active', false)
             item.items = []
             for (let item2 of rows) {
-              item2.showMore = false
               if (item2.parentId === item.id) {
                 item.items.push(item2)
               }
             }
           }
-          console.log(list)
           this.folderList = list
         }
       })
@@ -231,48 +200,94 @@ export default {
     },
     // 右键删除文件夹
     handleFolderDelete(event, item, { folder }) {
-
+      this.handleDelete(folder.id)
     },
     // 右键删除文件
     handleFileDelete(event, item, { parent, file, index }) {
-
+      this.handleDelete(file.id)
     },
-    // 选中文件
+    // 删除
+    handleDelete(id) {
+      let params = {
+        id: id
+      }
+      this.$server.screenManage.folderDel(params).then(res => {
+        if (res.data.code === 200) {
+          this.getList()
+        }
+      })
+    },
+    // 重命名文件夹
+    handleResetFolder(event, item, { folder }) {
+      this.isAdd = 2
+      this.id = folder.id
+      this.folderVisible = true
+      this.$nextTick(() => {
+        this.$refs.newFolderForm.form.setFieldsValue({
+          name: folder.name
+        })
+      })
+    },
+    // 重命名大屏
+    handleResetFile(event, item, { parent, file, index }) {
+      this.isAdd = 2
+      this.id = file.id
+      this.screenVisible = true
+      // dom渲染以后才能给form赋值
+      this.$nextTick(() => {
+        this.screenForm.setFieldsValue({
+          name: file.name
+        })
+      })
+    },
+    // 在文件夹底下新建大屏
+    handleScreen(event, item, { folder }) {
+      this.isAdd = 1
+      this.screenVisible = true
+      // dom渲染以后才能给form赋值
+      this.$nextTick(() => {
+        this.screenForm.setFieldsValue({
+          parentId: folder.id
+        })
+      })
+    },
+    // 选择左侧菜单
     handleFileSelect(file) {
 
     },
-    // 右键点击文件夹
-    showMore(item) {
-      console.log(item)
-
-      item.showMore = true
+    // 点击新建大屏
+    addScreen() {
+      this.isAdd = 1
+      this.screenForm.resetFields()
+      this.screenVisible = true
     },
-    // 点击大屏菜单
-    handleScreenClick(obj) {
-      for (let item of this.folderList) {
-        if (item.childen) {
-          for (let item2 of item.childen) {
-            item2.active = false
-          }
-        }
-      }
-      obj.active = true
-      console.log(obj)
-    },
-    showModal() {
-      this.visible = true
-    },
+    // 确认新建大屏
     handleOk(e) {
-      this.folderForm.validateFields((err, values) => {
-        if (!err) {
-          this.visible = false
+      this.screenForm.validateFields((err, values) => {
+        if (err) {
+          return
+        }
+        if (this.isAdd === 1) { // 新增
           this.$router.push({
             path: '/admin',
             query: {
               ...values
             }
           })
+        } else { // 编辑
+          let params = {
+            isFolder: 0,
+            id: this.id,
+            ...values
+          }
+          this.$server.screenManage.folderput(params).then(res => {
+            if (res.data.code === 200) {
+              this.$message.success(res.data.msg)
+              this.getList()
+            }
+          })
         }
+        this.screenVisible = false
       })
     },
     // 编辑大屏
@@ -292,17 +307,31 @@ export default {
           return
         }
         console.log('Received values of form: ', values)
-
-        if (this.isAdd === 1) {
+        if (this.isAdd === 1) { // 新增
           let params = {
             isFolder: 1,
             ...values
           }
           this.$server.screenManage.folderAdd(params).then(res => {
-            console.log(res.data)
-            this.$message.success(res.data.msg)
             if (res.data.code === 200) {
+              this.$message.success(res.data.msg)
               this.getList()
+            } else {
+              this.$message.error(res.data.msg)
+            }
+          })
+        } else { // 修改
+          let params = {
+            isFolder: 1,
+            id: this.id,
+            ...values
+          }
+          this.$server.screenManage.folderput(params).then(res => {
+            if (res.data.code === 200) {
+              this.$message.success(res.data.msg)
+              this.getList()
+            } else {
+              this.$message.error(res.data.msg)
             }
           })
         }

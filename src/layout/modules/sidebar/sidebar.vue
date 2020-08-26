@@ -25,12 +25,12 @@
           >
         </template>
       </a-sub-menu>
-      <a-menu-item v-for="item in sidebarArr" :key="item.id">
+      <!-- <a-menu-item v-for="item in sidebarArr" :key="item.id">
         <template v-if="item.children.length == 0">
           <a-icon :type="item.icon" />
           <span v-show="sidebarUnfold == false">{{ item.name }}</span>
         </template>
-      </a-menu-item>
+      </a-menu-item> -->
     </a-menu>
   </div>
 </template>

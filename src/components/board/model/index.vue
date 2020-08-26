@@ -183,7 +183,7 @@ export default {
       customStyle:
         'background: #ffffff;border-radius: 4px;border: 0;overflow: hidden',
       activeKey: ['1', '2', '3'],
-      model: false
+      model: true
     }
   },
   computed: {

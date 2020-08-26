@@ -911,47 +911,47 @@ const list = [{
                 view: { width: 500, height: 400, x: 710, y: 340 } // 计算中间值(1920-500)*0.5,(1080-400)*0.5
             }
         ]
-    },
-    {
-        type: 'Base',
-        title: '素材库',
-        hovered: false,
-        icon: 'database',
-        children: []
-    },
-    {
-        type: 'Sort',
-        title: '排序',
-        hovered: false,
-        icon: 'unordered-list',
-        children: [{
-                title: '上移一层'
-            },
-            {
-                title: '下移一层'
-            },
-            {
-                title: '置于顶层'
-            },
-            {
-                title: '置于底层'
-            }
-        ]
-    },
-    {
-        type: 'Theme',
-        title: '主题风格',
-        hovered: false,
-        icon: 'bg-colors',
-        children: []
-    },
-    {
-        type: 'Recommend',
-        title: '智能推荐',
-        hovered: false,
-        icon: 'compass',
-        children: []
     }
+    // {
+    //     type: 'Base',
+    //     title: '素材库',
+    //     hovered: false,
+    //     icon: 'database',
+    //     children: []
+    // }
+    // {
+    //     type: 'Sort',
+    //     title: '排序',
+    //     hovered: false,
+    //     icon: 'unordered-list',
+    //     children: [{
+    //             title: '上移一层'
+    //         },
+    //         {
+    //             title: '下移一层'
+    //         },
+    //         {
+    //             title: '置于顶层'
+    //         },
+    //         {
+    //             title: '置于底层'
+    //         }
+    //     ]
+    // },
+    // {
+    //     type: 'Theme',
+    //     title: '主题风格',
+    //     hovered: false,
+    //     icon: 'bg-colors',
+    //     children: []
+    // },
+    // {
+    //     type: 'Recommend',
+    //     title: '智能推荐',
+    //     hovered: false,
+    //     icon: 'compass',
+    //     children: []
+    // }
 ]
 
 export default list
