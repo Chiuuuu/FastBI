@@ -7,7 +7,7 @@
       <div class="list-group-header" flex="dir:top"
           @mouseenter="category.hovered=true" @mouseleave="category.hovered=false">
         <!-- <b-icon v-if="category.icon" :name="category.icon" size="18"></b-icon> -->
-        <a-icon  v-if="category.icon" :type="category.icon" style="font-size:20px;" />
+        <a-icon  v-if="category.icon" :type="category.icon" style="font-size:18px;" />
         <span>{{ category.title }}</span>
       </div>
       <div class="list-group-body" flex v-show="category.hovered" @mouseenter="category.hovered=true" @mouseleave="category.hovered=false">
