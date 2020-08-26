@@ -104,7 +104,7 @@ export default {
         }
         const params = {
           id: -1,
-          json: JSON.stringify(screenObj),
+          json: screenObj,
           name: this.$route.query.name,
           parentId: this.$route.query.parentId
         }

@@ -1,0 +1,46 @@
+@import "var.styl"
+.menu-wrap{
+  .folder{
+    .title{
+      margin-bottom: 0;
+      line-height: 36px;
+      color: $color-primary;
+      cursor: pointer;
+      .folder-icon{
+        font-size: 16px;
+        margin-right: 5px;
+      }
+      &:hover{
+        margin: 0 -14px;
+        padding: 0 14px;
+        background-color: $color-main;
+        color: #fff;
+      }
+    }
+  }
+  .items{
+    margin-bottom: 0;
+    .item {
+      height: 36px;
+      line-height: 36px;
+      padding: 0;
+      padding-left: 20px;
+      position: relative;
+      cursor: pointer;
+      &.file-active,
+      &:hover {
+        margin: 0 -14px;
+        padding-left: 34px;
+        background: #617BFF;
+        color: #fff;
+        z-index: 3;
+        .menu {
+          display: inline-block;
+        }
+        .title {
+            color: #ffffff
+        }
+      }
+    }
+  }
+}
