@@ -30,6 +30,13 @@ const screenManage = {
    */
   screenSave(params) {
     return requestPost2('/admin/dev-api/screen/data/save', params)
+  },
+  /**
+   * 大屏详细信息
+   * @param {*} id
+   */
+  screenData(id) {
+    return requestGet(`/admin/dev-api/screen/data/${id}`)
   }
 }
 

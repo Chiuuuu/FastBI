@@ -91,13 +91,7 @@
           transform: `scale(${this.canvasRange}) translate3d(0px, 0px, 0)`,
           backgroundColor: this.pageSettings.backgroundColor
         }
-        this._calcStyle()
-        // if (this.pageSettings.backgroundType === '1') {
-        //   obj.backgroundColor = this.pageSettings.backgroundColor
-        // } else {
-        //   obj.background = this.pageSettings.backgroundSrc
-        // }
-         return obj
+        return obj
       }
     },
     components: { DropPanel, EditSlider }
