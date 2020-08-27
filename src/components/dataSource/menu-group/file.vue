@@ -2,17 +2,17 @@
   <li
     class="item dragable"
     :class="isSelect ? 'file-active':''"
-    :title="file.name"
+    :title="file[fileName]"
     :index="index"
     ref="file"
     draggable
     @dragstart="handleFileDragStart"
     @click="handleFileSelect"
   >
-    <h4 class="title" :title="file.name">
+    <h4 class="title" :title="file[fileName]">
       <a-icon type="file" v-if="icon === 'default'" style="margin-right: 2px;"/>
       <img :src="fileIcon" class='file-icon' v-else/>
-      <span>{{ file.name }}</span>
+      <span>{{ file[fileName] }}</span>
     </h4>
     <span class="menu" v-if="hasContextmenus">
       <span class="caret-down" @click="handleCreateMenu"></span>
@@ -55,6 +55,10 @@ export default {
       default: function() {
         return []
       }
+    },
+    fileName: {
+      type: String,
+      default: 'name'
     }
   },
   data() {
