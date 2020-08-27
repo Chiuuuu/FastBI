@@ -10,7 +10,7 @@
           aaa
         </a-select-option>
       </a-select>
-      <a-button type="primary" class="select_button" @click="handleExtract">全部抽取</a-button>
+      <a-button type="primary" class="select_button" @click="handleExtract" :loading="extractSping">全部抽取</a-button>
     </div>
     <div class="table">
       <a-table :row-selection="rowSelection" :columns="columns" :data-source="data"  rowKey='id' :loading='spinning' :pagination='false'>
@@ -29,7 +29,7 @@
   </div>
 </template>
 <script>
-import { fetchReadeTable } from '../../../../../../api/dataAccess/api'
+import { fetchReadeTable, fetchSaveExtract } from '../../../../../../api/dataAccess/api'
 import { mapState } from 'vuex'
 const columns = [
   {
@@ -71,6 +71,7 @@ export default {
       data: [],
       spinning: true,
       selectedRows: [],
+      extractSping: false,
       rowSelection: {
         onSelect: (record, selected, selectedRows) => {
           console.log(record, selected, selectedRows)
@@ -86,7 +87,8 @@ export default {
   computed: {
     ...mapState({
       formInfo: state => state.dataAccess.modelInfo,
-      databaseid: state => state.dataAccess.databaseid
+      databaseid: state => state.dataAccess.databaseid,
+      modelInfo: state => state.dataAccess.modelInfo
     })
   },
   methods: {
@@ -113,9 +115,34 @@ export default {
       }
       console.log('获取数据', dabaseInfoResult.data)
     },
-    handleExtract() {
+    async handleExtract() {
       if (this.selectedRows.length === 0) {
         return this.$message.error('请选择至少一项')
+      }
+      const rows = this.selectedRows.map(item => {
+        const _item = {
+          databasesName: this.modelInfo.databaseName,
+          sourceMysqName: this.formInfo.name,
+          tableId: item.id,
+          tableName: item.name,
+          sourceMysqlId: this.formInfo.id
+        }
+        return _item
+      })
+      this.extractSping = true
+      const result = await fetchSaveExtract({
+        url: '/admin/dev-api/system/mysql/datax/extract',
+        data: {
+          rows: rows
+        }
+      }).finally(() => {
+        this.extractSping = false
+      })
+
+      if (result.data.code === 200) {
+        this.$message.success('抽取成功')
+      } else {
+        this.$message.error(result.data.msg)
       }
     },
     setting(row) {
