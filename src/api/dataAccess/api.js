@@ -73,3 +73,10 @@ export function fetchGetDBList(options) {
 export function fetchSave(options) {
   return requestPost2(options.url, options.data)
 }
+
+/**
+ * 全部抽取
+*/
+export function fetchSaveExtract(options) {
+  return requestPost2(options.url, options.data)
+}
