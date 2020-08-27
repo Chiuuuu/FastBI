@@ -117,11 +117,14 @@
       })
       console.log(this.canvasMap)
       // 拉取页面canvasMaps
-      getCanvasMaps().then(res => {
-        this.$store.dispatch('InitCanvasMaps', res.data)
-        this.$log.danger('========>canvasMaps')
-        this.$print(res.data)
-      })
+      // getCanvasMaps().then(res => {
+      //   this.$store.dispatch('InitCanvasMaps', res.data)
+      //   this.$log.danger('========>canvasMaps')
+      //   this.$print(res.data)
+      // })
+      if (this.$route.query.id) {
+        this.getScreenData()
+      }
     },
     mounted () {
       on(document, 'keyup', this.handleKeyup)
@@ -136,6 +139,12 @@
       }
     },
     methods: {
+      // 获取大屏数据
+      getScreenData() {
+        this.$server.screenManage.screenData(this.$route.query.id).then(res => {
+
+        })
+      },
       // 悬停事件
       handleHover (item) {
         this.hoverItem = item.id

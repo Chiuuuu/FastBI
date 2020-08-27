@@ -17,7 +17,9 @@ const getters = {
 
     isScreen: state => state.app.isScreen, // 是否全屏
 
-    dragFile: state => state.options.dragFile // 拖拽的字段类型
+    dragFile: state => state.options.dragFile, // 拖拽的字段类型
+
+    dataModel: state => state.options.dataModel // 选中的数据模型
 
 }
 

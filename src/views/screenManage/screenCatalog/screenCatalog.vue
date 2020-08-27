@@ -253,7 +253,12 @@ export default {
     },
     // 选择左侧菜单
     handleFileSelect(file) {
-
+      this.$router.push({
+        path: '/admin',
+        query: {
+          id: file.id
+        }
+      })
     },
     // 点击新建大屏
     addScreen() {

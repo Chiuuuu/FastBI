@@ -16,7 +16,7 @@
           />
           <span> 手机端</span>
         </div>
-        <div class="item" flex="dir:top">
+        <div class="item" flex="dir:top" @click.stop="refreshData">
           <a-icon
             type="sync"
             style="font-size:18px"
@@ -97,18 +97,35 @@ export default {
       },
       // 保存大屏
       screenSave() {
-        console.log(123)
         const screenObj = {
           setting: this.pageSettings,
           components: this.canvasMap
         }
-        const params = {
-          id: -1,
-          json: screenObj,
-          name: this.$route.query.name,
-          parentId: this.$route.query.parentId
+        let params = {}
+        if (this.$route.query.parentId) { // 新增大屏保存
+          params = {
+            id: -1,
+            json: JSON.stringify(screenObj),
+            name: this.$route.query.name,
+            parentId: this.$route.query.parentId
+          }
+        } else { // 编辑大屏保存
+          params = {
+            id: this.$route.query.id,
+            json: JSON.stringify(screenObj)
+          }
         }
         this.$server.screenManage.screenSave(params).then(res => {
+
+        })
+      },
+      // 刷新大屏
+      refreshData() {
+        console.log(111)
+        let params = {
+          id: this.$route.query.id
+        }
+        this.$server.screenManage.screenRefresh(params).then(res => {
 
         })
       }

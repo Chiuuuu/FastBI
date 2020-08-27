@@ -10,13 +10,13 @@
       <div v-if="modelExpand">
         <div class="model-operation" v-if="model">
           <div class="operation_select">
-            <a-select default-value="电视收拾" style="width:90%">
-              <a-select-option value="电视收拾">
-                电视收拾
+            <a-select :default-value="dataModel.id" style="width:90%">
+              <a-select-option :value="dataModel.id">
+                {{dataModel.name}}
               </a-select-option>
               <a-select-option value="添加数据模型">
-                <span @click="modelHandle">添加数据模型</span>
-                <a-icon type="rollback" style="margin-left:130px" @click="modelHandle" />
+                <span @click="modelAdd">添加数据模型</span>
+                <a-icon type="rollback" style="margin-left:130px" @click="modelAdd" />
               </a-select-option>
             </a-select>
           </div>
@@ -32,25 +32,17 @@
               <b-scrollbar style="height: 100%;">
                 <div class="dim_main">
                   <a-collapse v-model="activeKey" :bordered="false">
-                    <a-collapse-panel key="1" header="Sheet 1" :style="customStyle">
+                    <a-collapse-panel v-for="(item, index) in dimensions" :key="index"
+                      :header="item[0].tableName" :style="customStyle">{{typeof(index)}}
                       <ul class="filewrap">
-                        <li v-for="(item, index) in dimesion"
+                        <li v-for="(item2, index2) in item"
                             class="filelist"
-                            :key="index"
+                            :key="index2 + '_'"
                             draggable="true"
-                            @dragstart="dragstart(item, 'dimension', $event)"
-                            @dragend="dragsend(item, $event)">
+                            @dragstart="dragstart(item2, 'dimension', $event)"
+                            @dragend="dragsend(item2, $event)">
                           <img src="@/assets/images/icon_dimension.png" />
-                          {{ item.title }}
-                        </li>
-                      </ul>
-                    </a-collapse-panel>
-                    <a-collapse-panel key="2" header="Sheet 2" :style="customStyle">
-                      <ul class="filewrap">
-                        <li v-for="(item, index) in dimesion" class="filelist"
-                            :key="index" draggable="true" @dragstart="dragstart(item, 'dimension', $event)">
-                          <img src="@/assets/images/icon_dimension.png" />
-                          {{ item.title }}
+                          {{ item2.field }}
                         </li>
                       </ul>
                     </a-collapse-panel>
@@ -66,15 +58,16 @@
               <b-scrollbar style="height: 100%;">
                 <div class="mea_main">
                   <a-collapse v-model="activeKey">
-                    <a-collapse-panel key="3" header="Sheet 1">
+                    <a-collapse-panel v-for="(item, index) in measures" :key="index"
+                      :header="item[0].tableName" :style="customStyle">
                       <ul class="filewrap">
-                          <li v-for="(item, index) in measure"
+                          <li v-for="(item2, index2) in item"
                               class="filelist"
-                              :key="index" draggable="true"
-                              @dragstart="dragstart(item, 'measure', $event)"
-                              @dragend="dragsend(item, $event)">
+                              :key="index2 + '_'" draggable="true"
+                              @dragstart="dragstart(item2, 'measure', $event)"
+                              @dragend="dragsend(item2, $event)">
                             <img src="@/assets/images/icon_measure.png" />
-                            {{ item.title }}
+                            {{ item2.field }}
                           </li>
                         </ul>
                     </a-collapse-panel>
@@ -101,23 +94,9 @@
                   style="font-size:16px"
                 />
               </template>
-              <a-collapse-panel key="1" header="数据看板" :style="customStyle">
+              <a-collapse-panel v-for="(item, index) in modelList" :key="index" :header="item.name" :style="customStyle">
                 <div style="margin-left:25px">
-                  <!-- 暂时写死一个点击事件 -->
-                  <p @click="modelHandle">电视统计</p>
-                  <p>用户统计</p>
-                </div>
-              </a-collapse-panel>
-              <a-collapse-panel key="2" header="管理驾驶舱" :style="customStyle">
-                <div style="margin-left:25px">
-                  <p>流失统计</p>
-                  <p>收入统计</p>
-                </div>
-              </a-collapse-panel>
-              <a-collapse-panel key="3" header="收视分析" :style="customStyle">
-                <div style="margin-left:25px">
-                  <p>月度统计</p>
-                  <p>年度统计</p>
+                  <p @click="modelHandle(item2)" v-for="item2 in item.items" :key="item2.id">{{item2.name}}</p>
                 </div>
               </a-collapse-panel>
             </a-collapse>
@@ -181,21 +160,34 @@ export default {
       dimesion,
       measure,
       customStyle:
-        'background: #ffffff;border-radius: 4px;border: 0;overflow: hidden',
-      activeKey: ['1', '2', '3'],
-      model: true
+        'background: #ffffff;border-radius: 4px;border: 0;overflow: hidden;',
+      activeKey: [0, 1, 2, 3],
+      model: false,
+      modelList: [], // 数据模型列表
+      dimensions: [], // 维度列表
+      measures: [] // 度量列表
     }
   },
   computed: {
-    ...mapGetters(['modelExpand'])
+    ...mapGetters(['modelExpand', 'dataModel'])
+  },
+  mounted() {
+    this.getModelList()
   },
   methods: {
     // 点击展开收起
     toCollapse() {
       this.$emit('on-toggle', this.modelExpand)
     },
-    modelHandle() {
+    // 添加数据模型
+    modelAdd() {
       this.model = !this.model
+    },
+    // 点击选中模型
+    modelHandle(item) {
+      this.model = !this.model
+      this.$store.dispatch('SetDataModel', item)
+      this.getPivoSchemaList()
     },
     // 拖动开始 type 拖拽的字段类型维度或者度量
     dragstart(item, type, event) {
@@ -211,6 +203,41 @@ export default {
     // 拖动结束
     dragsend() {
       this.$store.dispatch('SetDragFile', '')
+    },
+    // 数据模型列表
+    getModelList() {
+      this.$server.screenManage.catalogList().then(res => {
+        if (res.data.code === 200) {
+          this.modelList = res.data.data.folders
+        }
+      })
+    },
+    // 维度、度量列表
+    getPivoSchemaList() {
+      this.$server.screenManage.getPivoSchemaList(this.dataModel.id).then(res => {
+        if (res.data.code === 200) {
+          let dimensions = res.data.data.dimensions
+          let measures = res.data.data.measures
+          this.dimensions = this.transData(dimensions)
+          this.measures = this.transData(measures)
+        }
+      })
+    },
+    transData(data) {
+      // const data = [{ name: 'xiaoming', round: 1 }, { name: 'xiaowang', round: 1 }, { name: 'xiaoli', round: 2 }, { name: 'xiaowang', round: 3 }]
+      const result = Object.values(
+          data.reduce((obj, cur) => {
+            console.log(obj)
+              if (obj[cur.tableNo]) {
+                  Object.prototype.toString.call(obj[cur.tableNo]) === '[object Array]' ? obj[cur.tableNo].push(cur) : (obj[cur.tableNo] = [obj[cur.tableNo], cur])
+              } else {
+                  obj[cur.tableNo] = [cur]
+              }
+              return obj
+          }, {})
+      )
+      console.log(result)
+      return result
     }
   }
 }

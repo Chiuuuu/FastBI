@@ -16,7 +16,8 @@ module.exports = {
     proxy: {
       '/admin': {
         // target: 'http://192.168.0.69:81',
-        target: 'http://192.168.2.39:80',
+        // target: 'http://192.168.2.39:80',
+        target: 'http://192.168.0.30:80',
         changeOrigin: true, // 是否跨域
         pathRewrite: {
             '^/admin': ''
