@@ -44,6 +44,25 @@ const screenManage = {
    */
   screenData(id) {
     return requestGet(`/admin/dev-api/screen/data/${id}`)
+  },
+  /**
+   * 刷新大屏
+   * @param {*} params
+   */
+  screenRefresh(params) {
+    return requestGet(`/admin/screen/data/refresh`, params)
+  },
+  /**
+   * 数据模型目录
+   */
+  catalogList() {
+    return requestPost2(`/admin/dev-api/datamodel/catalog/list/10`)
+  },
+  /**
+   * 数据模型--维度、度量列表
+   */
+  getPivoSchemaList(id) {
+    return requestGet(`/admin/dev-api/datamodel/pivotschema/getPivoSchemaList/${id}`)
   }
 }
 
