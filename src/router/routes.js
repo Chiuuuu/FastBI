@@ -68,8 +68,8 @@ let routes = [{
                             import('@/views/dataSource/dataModel/dataModel')
                     },
                     {
-                        path: 'Model-Edit',
-                        name: '编辑模型',
+                        path: 'Model-Edit/:id',
+                        name: 'modelEdit',
                         component: () =>
                             import('@/views/dataSource/dataModel/model-edit/Model-Edit')
                     }
