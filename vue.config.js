@@ -14,15 +14,17 @@ module.exports = {
   // dev跨域问题
   devServer: {
     proxy: {
-      '/admin': {
-        // target: 'http://192.168.0.69:81',
+      '/admin/dev-api': {
+        // target: 'http://192.168.0.69:8080',
         // target: 'http://192.168.2.39:80',
-        target: 'http://192.168.0.30:80',
+        // target: 'http://192.168.0.30:80',
+        target: 'http://192.168.45.95:8080', // 测试服
         changeOrigin: true, // 是否跨域
         pathRewrite: {
-            '^/admin': ''
+            '^/admin/dev-api': ''
         }
       }
+
     }
   },
   productionSourceMap: false,

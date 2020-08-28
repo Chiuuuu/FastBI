@@ -6,6 +6,9 @@ import {
   topCanvasMap, upCanvasMap
 } from '../../api/canvasMaps/canvas-maps-request'
 
+import { screenSave } from '@/api/screenManage/api'
+import { mapPairs } from 'core-js/fn/dict'
+
 const canvasMaps = {
   state: {
     canvasMap: [], // 画布中的组件，默认插入一个用于调试可动态添加，暂时写死，后期用lowdb缓存
@@ -50,6 +53,10 @@ const canvasMaps = {
       if (current) {
         current.packageJson[property] = { ...data }
       }
+    },
+    // 保存大屏
+    SAVE_CANVAS_MAP(state, maps) {
+      state.canvasMap = [...maps]
     }
   },
   actions: {
@@ -137,6 +144,12 @@ const canvasMaps = {
       if (state.singleSelected) {
         commit('SET_CURRENT_SELF', { data: background, property: 'background' })
       }
+    },
+
+    SaveCanvasMap ({ commit }, nodeInfo) {
+      screenSave(nodeInfo).then(res => {
+        commit('SAVE_CANVAS_MAP', nodeInfo)
+      })
     }
   }
 }

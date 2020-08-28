@@ -105,18 +105,18 @@ export default {
         if (this.$route.query.parentId) { // 新增大屏保存
           params = {
             id: -1,
-            json: JSON.stringify(screenObj),
+            json: screenObj,
             name: this.$route.query.name,
             parentId: this.$route.query.parentId
           }
         } else { // 编辑大屏保存
           params = {
             id: this.$route.query.id,
-            json: JSON.stringify(screenObj)
+            json: screenObj
           }
         }
         this.$server.screenManage.screenSave(params).then(res => {
-
+          console.log('保存成功')
         })
       },
       // 刷新大屏

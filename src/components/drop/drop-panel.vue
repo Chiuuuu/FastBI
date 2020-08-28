@@ -10,9 +10,13 @@
 
 <script>
   import { addCanvasMap } from '../../api/canvasMaps/canvas-maps-request'
+  import { mapGetters } from 'vuex' // 导入vuex
 
   export default {
     name: 'DropPanel',
+    computed: {
+      ...mapGetters(['canvasMap'])
+    },
     methods: {
       // 元素drop
       handleDropOnCanvas: function (event) {
@@ -31,7 +35,14 @@
         //   left: offsetX + 'px',
         //   top: offsetY + 'px'
         // }
-        this.$store.dispatch('AddCanvasMap', nodeInfo)
+
+        // this.$store.dispatch('AddCanvasMap', nodeInfo)
+        this.canvasMap.push(nodeInfo)
+        let params = {
+          id: this.$route.query.id,
+          json: this.canvasMap
+        }
+        this.$server.screenManage.screenSave(params).then(res => {})
       }
     }
   }

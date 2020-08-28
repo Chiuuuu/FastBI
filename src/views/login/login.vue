@@ -15,10 +15,9 @@
           >
             <a-form-item>
               <a-input
-              style="width:390px;"
-              size="large"
+                size="large"
                 v-decorator="[
-                  'userName',
+                  'username',
                   { rules: [{ required: true, message: '请输入用户名！' }] }
                 ]"
                 placeholder="请输入用户名"
@@ -32,7 +31,6 @@
             </a-form-item>
             <a-form-item>
               <a-input
-                style="width:390px;"
                 size="large"
                 v-decorator="[
                   'password',
@@ -50,7 +48,7 @@
             </a-form-item>
             <a-form-item>
               <a-checkbox
-                style="width:390px;height:50px"
+                style="width:100%;height:50px"
                 v-decorator="[
                   'remember',
                   {
@@ -64,7 +62,7 @@
             </a-form-item>
             <a-form-item>
               <a-button
-                style="width:390px;height: 50px;"
+                style="width:100%;height: 50px;"
                 size="large"
                 type="primary"
                 html-type="submit"
@@ -83,15 +81,29 @@
 <script>
 export default {
   beforeCreate() {
-    this.form = this.$form.createForm(this, { name: 'normal_login' })
+    this.form = this.$form.createForm(this)
   },
   methods: {
     handleSubmit(e) {
       e.preventDefault()
       this.form.validateFields((err, values) => {
-        if (!err) {
-          console.log('Received values of form: ', values)
+        if (err) {
+          return
         }
+        console.log('Received values of form: ', values)
+        let params = {
+          ...values
+        }
+        this.$server.login.login(params).then(res => {
+          if (res.data.code === 200) {
+            // this.$store.commit('common/set_token', res.data.token)
+            this.$router.push({
+              path: '/screenManage/screenCatalog'
+            })
+          } else {
+            this.$message.error(res.data.msg)
+          }
+        })
       })
     }
   }
