@@ -15,10 +15,17 @@ module.exports = {
   devServer: {
     proxy: {
       '/admin': { 
-        target: 'http://192.168.0.69:81',
+        target: 'http://192.168.0.30:80',   //钟军：'http://192.168.0.69:81',
         changeOrigin: true,  //是否跨域
         pathRewrite:{
             '^/admin':''
+        } 
+      },
+      '/zj': { 
+        target: 'http://192.168.0.69:81',   //钟军：'http://192.168.0.69:81',
+        changeOrigin: true,  //是否跨域
+        pathRewrite:{
+            '^/zj':''
         } 
       }
     }

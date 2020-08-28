@@ -38,7 +38,7 @@ const mutations = {
 const actions = {
     async getMenuList({ commit }, vm) {
         const result = await fetchMenuList({
-            url: '/admin/dev-api/system/catalog/cataloglist'
+            url: '/zj/dev-api/system/catalog/cataloglist'
         })
         if (result.data.code === 200) {
             commit('SET_MENULIST', result.data.data)
