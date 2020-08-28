@@ -57,7 +57,8 @@
         // 拖拽的节点数据
         let nodeInfo = {
           // 唯一标识
-          id: 'node-' + ((new Date()).getTime()),
+          // id: 'node-' + ((new Date()).getTime()),
+          id: (new Date()).getTime(),
           packageJson: { ...component }
         }
         event.dataTransfer.setData('node', JSON.stringify(nodeInfo))

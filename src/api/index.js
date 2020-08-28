@@ -1,7 +1,9 @@
 import screenManage from './screenManage/api'
+import login from './login/api'
 
 const server = {
-  screenManage
+  screenManage,
+  login
 }
 
 export default server

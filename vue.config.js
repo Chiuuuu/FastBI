@@ -14,20 +14,30 @@ module.exports = {
   // dev跨域问题
   devServer: {
     proxy: {
-      '/admin': { 
+      '/admin': {
         target: 'http://192.168.0.30:80',   //钟军：'http://192.168.0.69:81',
         changeOrigin: true,  //是否跨域
         pathRewrite:{
             '^/admin':''
-        } 
+        }
       },
-      '/zj': { 
+      '/zj': {
         target: 'http://192.168.0.69:81',   //钟军：'http://192.168.0.69:81',
         changeOrigin: true,  //是否跨域
         pathRewrite:{
             '^/zj':''
-        } 
+        },
+      '/admin/dev-api': {
+        // target: 'http://192.168.0.69:8080',
+        // target: 'http://192.168.2.39:80',
+        // target: 'http://192.168.0.30:80',
+        target: 'http://192.168.45.95:8080', // 测试服
+        changeOrigin: true, // 是否跨域
+        pathRewrite: {
+            '^/admin/dev-api': ''
+        }
       }
+
     }
   },
   productionSourceMap: false,

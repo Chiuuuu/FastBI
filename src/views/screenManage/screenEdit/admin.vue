@@ -112,9 +112,9 @@
     },
     created () {
       // 拉取页面配置信息
-      getPageSettings().then(res => {
-        this.$store.dispatch('SetPageSettings', res.data)
-      })
+      // getPageSettings().then(res => {
+      //   this.$store.dispatch('SetPageSettings', res.data)
+      // })
       console.log(this.canvasMap)
       // 拉取页面canvasMaps
       // getCanvasMaps().then(res => {
@@ -142,7 +142,11 @@
       // 获取大屏数据
       getScreenData() {
         this.$server.screenManage.screenData(this.$route.query.id).then(res => {
-
+          if (res.data.code === 200) {
+            let json = res.data ? res.data.data.json : {}
+            this.$store.dispatch('SetPageSettings', json.setting)
+            this.$store.dispatch('InitCanvasMaps', json.components)
+          }
         })
       },
       // 悬停事件
@@ -154,7 +158,6 @@
       },
       // transform点击事件
       handleSelected (item) {
-        console.log(item)
         this.$store.dispatch('SingleSelected', item)
         this.$store.dispatch('ToggleContextMenu')
       },
@@ -173,7 +176,8 @@
         let k = e.keyCode || e.which
         if (k === 46) {
           if (this.currentSelected) {
-            this.deleteDialogShow()
+            this.deleteOne()
+            // this.deleteDialogShow()
           }
         }
       },
@@ -181,7 +185,16 @@
         this.deleteDialog = true
       },
       deleteOne () {
-        this.$store.dispatch('ContextMenuCommand', 'remove')
+        let index = this.canvasMap.indexOf(this.currentSelected)
+        if (index > -1) {
+          this.canvasMap.splice(index, 1)
+        }
+        let params = {
+          id: this.$route.query.id,
+          json: this.canvasMap
+        }
+        this.$server.screenManage.screenSave(params).then(res => {})
+        // this.$store.dispatch('ContextMenuCommand', 'remove')
       },
       /**
        * 保存大屏

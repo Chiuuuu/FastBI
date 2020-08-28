@@ -63,6 +63,12 @@ const screenManage = {
    */
   getPivoSchemaList(id) {
     return requestGet(`/admin/dev-api/datamodel/pivotschema/getPivoSchemaList/${id}`)
+  },
+  /**
+   * 根据维度度量获取数据
+   */
+  getData(params) {
+    return requestPost2('/admin/dev-api/screen/graph/getData', params)
   }
 }
 

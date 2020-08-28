@@ -13,20 +13,13 @@
           @contextmenu.prevent="showMore(item)">
           <a-dropdown :trigger="['click', 'contextmenu']" v-model="item.showMore">
             <a-icon class="icon-more" type="caret-down" />
-            <a-menu slot="overlay">
-              <a-menu-item key="0">
-                <a href="http://www.alipay.com/">1st menu item</a>
-              </a-menu-item>
-              <a-menu-item key="1">
-                <a href="http://www.taobao.com/">2nd menu item</a>
-              </a-menu-item>
-              <a-menu-divider />
+            <a-menu slot="overlay" @click="deleteFile(item, index)">
               <a-menu-item key="3">
                 移除
               </a-menu-item>
             </a-menu>
           </a-dropdown>
-          {{item.title}}
+          {{item.field}}
       </div>
     </div>
     <div class="empty"
@@ -57,20 +50,22 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['dragFile'])
+    ...mapGetters(['dragFile', 'currentSelected'])
   },
   methods: {
     // 将拖动的维度到所选择的放置目标节点中
     handleDropOnFilesWD(event) {
       // h5 api
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
+      dataFile.showMore = false // 是否点击显示更多
       if (dataFile.file === this.type) {
-        this.fileList.push(dataFile)
-        for (let item of this.fileList) {
-          // 是否点击显示更多
-          this.$set(item, 'showMore', false)
+        if (this.fileList.length < 2) {
+          this.fileList.push(dataFile)
+        } else {
+          this.fileList[1] = dataFile
         }
       }
+      this.getData()
       this.isdrag = false
     },
     // 当可拖动的元素进入可放置的目标时
@@ -83,8 +78,31 @@ export default {
       event.preventDefault()
       this.isdrag = false
     },
+    // 点击右键显示更多
     showMore(item) {
       item.showMore = true
+    },
+    // 删除当前维度或者度量
+    deleteFile(item, index) {
+      this.fileList.splice(index, 1)
+    },
+    // 根据维度度量获取数据
+    getData() {
+      console.log(this.currentSelected)
+      if (this.type === 'dimension') {
+        this.currentSelected.packageJson.api_data.dimensions = this.fileList
+      } else {
+        this.currentSelected.packageJson.api_data.measures = this.fileList
+      }
+      let params = {
+        id: this.$route.query.id ? this.$route.query.id : -1,
+        json: {
+          components: this.currentSelected
+        }
+      }
+      this.$server.screenManage.getData(params).then(res => {
+
+      })
     }
   }
 }

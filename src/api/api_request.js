@@ -2,6 +2,7 @@
  *创建axios服务实例
  */
 import httpRequest from 'axios'
+import store from '@/store'
 import Qs from 'qs'
 import { messages } from 'bin-ui'
 
@@ -17,7 +18,7 @@ const service = httpRequest.create({
 // 添加请求拦截器
 service.interceptors.request.use(
   function (config) {
-    const token = window.localStorage.getItem('token')
+    const token = store.state.common.adminToken
     if (token) {
       // 判断token是否存在，如果存在则每个请求都带上token
       // Bearer是JWT的认证头部信息
