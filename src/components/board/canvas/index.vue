@@ -1,13 +1,13 @@
 <template>
   <div class="canvas-main" ref="canvasMain"
-       @contextmenu.stop.prevent="hideContextMenu">
+      @contextmenu.stop.prevent="hideContextMenu">
     <div class="canvas-panel-wrap" :style="wrapStyle"
-         @click.stop.prevent="cancelSelected">
+        @click.stop.prevent="cancelSelected">
       <b-scrollbar style="height:100%;">
         <div class="screen-shot" :style="screenStyle" ref="screenInner">
           <div class="canvas-panel" :style="canvasPanelStyle"
-               @click.stop.prevent="cancelSelected"
-               :data-spm-anchor-id="$route.params.id">
+              @click.stop.prevent="cancelSelected"
+              :data-spm-anchor-id="$route.params.id">
             <drop-panel>
               <slot></slot>
             </drop-panel>
@@ -91,13 +91,7 @@
           transform: `scale(${this.canvasRange}) translate3d(0px, 0px, 0)`,
           backgroundColor: this.pageSettings.backgroundColor
         }
-        this._calcStyle()
-        // if (this.pageSettings.backgroundType === '1') {
-        //   obj.backgroundColor = this.pageSettings.backgroundColor
-        // } else {
-        //   obj.background = this.pageSettings.backgroundSrc
-        // }
-         return obj
+        return obj
       }
     },
     components: { DropPanel, EditSlider }

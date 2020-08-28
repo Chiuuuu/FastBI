@@ -36,7 +36,7 @@
           <a-icon slot="prefix" type="search" />
         </a-input>
       </div>
-      <edit-left @on-left-drag-leave="handleLeftDragLeave"></edit-left>
+      <edit-left ref="editLeftRef" @on-left-drag-leave="handleLeftDragLeave"></edit-left>
       <a-divider />
       <div class="SQL-View">
         <!-- <div class="view-head">
@@ -86,10 +86,10 @@
     </div>
     <div class="right">
       <div class="header">
-        <span class="data_con">数据模型1</span>
+        <span class="data_con">{{detailInfo.name}}</span>
       </div>
       <div class="description">
-        <span class="d-s">描述： <a-icon type="edit" v-on:click="open"/></span>
+        <span class="d-s">描述： {{detailInfo.description}}<a-icon type="edit" v-on:click="open"/></span>
         <a-modal v-model="visible1" title="编辑描述" v-on:ok="close">
           <a-textarea
             placeholder="请输入描述内容"
@@ -98,7 +98,7 @@
         </a-modal>
       </div>
       <div class="draw_board">
-        <edit-right-top ref='rightTopRef'></edit-right-top>
+        <edit-right-top ref='rightTopRef' :detailInfo="detailInfo"></edit-right-top>
       </div>
       <div class="detail">
         <div class="detail_header">
@@ -402,39 +402,15 @@
               </a-modal>
             </div>
             <div class="dim_menu">
-              <a-menu mode="inline">
-                <a-sub-menu>
-                  <span slot="title"><span>银行账户</span></span>
-                  <a-menu-item>
+              <a-menu mode="inline" v-for="(value, name) in dimensions" :key="name" :default-open-keys="[name]" :inline-collapsed="false">
+                <a-sub-menu :key="name">
+                  <span slot="title"><span>{{name}}</span></span>
+                  <a-menu-item v-for="item in value" :key="item.id">
                     <img
                       src="@/assets/images/icon_dimension.png"
                       style="width:15px;height:15px"
                     />
-                    aaa
-                  </a-menu-item>
-                  <a-menu-item>
-                    <img
-                      src="@/assets/images/icon_dimension.png"
-                      style="width:15px;height:15px"
-                    />
-                    bbb
-                  </a-menu-item>
-                </a-sub-menu>
-                <a-sub-menu>
-                  <span slot="title"><span>统计需求</span></span>
-                  <a-menu-item>
-                    <img
-                      src="@/assets/images/icon_dimension.png"
-                      style="width:15px;height:15px"
-                    />
-                    ccc
-                  </a-menu-item>
-                  <a-menu-item>
-                    <img
-                      src="@/assets/images/icon_dimension.png"
-                      style="width:15px;height:15px"
-                    />
-                    ddd
+                    {{item.field}}
                   </a-menu-item>
                 </a-sub-menu>
               </a-menu>
@@ -446,39 +422,15 @@
               <a v-on:click="dim_mea" style="line-height:38px">新建计算度量</a>
             </div>
             <div class="mea_menu">
-              <a-menu mode="inline">
-                <a-sub-menu>
-                  <span slot="title"><span>银行账户</span></span>
-                  <a-menu-item>
+              <a-menu mode="inline" v-for="(value, name) in measures" :key="name" :default-open-keys="[name]" :inline-collapsed="false">
+                <a-sub-menu :key="name">
+                  <span slot="title"><span>{{name}}</span></span>
+                  <a-menu-item v-for="item in value" :key="item.id">
                     <img
-                      src="@/assets/images/icon_measure.png"
+                      src="@/assets/images/icon_dimension.png"
                       style="width:15px;height:15px"
                     />
-                    aaa
-                  </a-menu-item>
-                  <a-menu-item>
-                    <img
-                      src="@/assets/images/icon_measure.png"
-                      style="width:15px;height:15px"
-                    />
-                    bbb
-                  </a-menu-item>
-                </a-sub-menu>
-                <a-sub-menu>
-                  <span slot="title"><span>统计需求</span></span>
-                  <a-menu-item>
-                    <img
-                      src="@/assets/images/icon_measure.png"
-                      style="width:15px;height:15px"
-                    />
-                    ccc
-                  </a-menu-item>
-                  <a-menu-item>
-                    <img
-                      src="@/assets/images/icon_measure.png"
-                      style="width:15px;height:15px"
-                    />
-                    ddd
+                    {{item.field}}
                   </a-menu-item>
                 </a-sub-menu>
               </a-menu>
@@ -498,6 +450,11 @@
 <script>
 import EditLeft from './edit-left'
 import EditRightTop from './edit-right-top'
+import {
+  fetchModelInfoById,
+  fetchCreateModel
+} from '@/api/dataModel/api'
+import groupBy from 'lodash/groupBy'
 
 const countryData = ['中国']
 const proData = {
@@ -693,36 +650,21 @@ export default {
   },
   provide() {
     return {
-      tables: [],
       nodeStatus: this.globalStatus
     }
   },
   data() {
     return {
+      spinning: false,
+      detailInfo: '',
       globalStatus: {
         dragType: '',
         dragNode: {},
         dropNode: {},
         event: null
       },
-      leftListData: [
-        {
-          id: 4,
-          title: '三大框架'
-        },
-        {
-          id: 1,
-          title: 'react'
-        },
-        {
-          id: 2,
-          title: 'vue'
-        },
-        {
-          id: 3,
-          title: 'angular'
-        }
-      ],
+      measures: '',
+      dimensions: '',
       data,
       columns,
       column,
@@ -820,7 +762,65 @@ export default {
       return {}
     }
   },
+  created() {
+    if (this.$route.params.id) {
+      this.handleGetData(this.$route.params.id)
+    } else {
+      console.log(this.$route.query)
+      this.handleAddNew()
+    }
+  },
   methods: {
+    async handleAddNew() {
+      const result = await fetchCreateModel({
+        url: '/admin/dev-api/datamodel/datamodelInfo/createDataModelInfo/{dataConnectionId}/{dataModelName}/{folderId}'
+      })
+
+      if (result.data.code === 200) {
+        this.$message.success('获取数据成功')
+        this.detailInfo = result.data.data
+        this.$refs.editLeftRef.handleGetMenuList(this.detailInfo)
+        this.handleDimensions()
+        this.handleMeasures()
+      } else {
+        this.$message.error(result.data.msg)
+      }
+    },
+    /**
+     * 获取数据
+    */
+    async handleGetData(id) {
+      this.spinning = true
+      const result = await fetchModelInfoById({
+        url: '/admin/dev-api/datamodel/datamodelInfo/getDataModelInfo/' + id
+      }).finally(() => {
+        this.spinning = false
+      })
+
+      if (result.data.code === 200) {
+        this.$message.success('获取数据成功')
+        this.detailInfo = result.data.data
+        this.$refs.editLeftRef.handleGetMenuList(this.detailInfo)
+        this.handleDimensions()
+        this.handleMeasures()
+      } else {
+        this.$message.error(result.data.msg)
+      }
+    },
+    /**
+     * 维度数据处理
+    */
+    handleDimensions() {
+      console.log(groupBy(this.detailInfo.pivotSchema.dimensions, 'tableName'))
+      this.dimensions = groupBy(this.detailInfo.pivotSchema.dimensions, 'tableName')
+    },
+    /**
+     * 度量数据处理
+    */
+    handleMeasures() {
+      console.log(groupBy(this.detailInfo.pivotSchema.measures, 'tableName'))
+      this.measures = groupBy(this.detailInfo.pivotSchema.measures, 'tableName')
+    },
     handleLeftDragLeave() {
       this.$refs.rightTopRef.handleMapRemoveClass()
     },

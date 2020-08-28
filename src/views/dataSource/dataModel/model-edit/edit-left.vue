@@ -16,38 +16,61 @@
 </template>
 <script>
 import { Node } from '../util'
+import { mapState } from 'vuex'
+import {
+  fetchGetTableList
+} from '@/api/dataModel/api'
+
 export default {
   name: 'model-edit-left',
   inject: ['nodeStatus'],
+  props: ['detailInfo'],
   data() {
     return {
       isDrag: false,
-      list: [
-        {
-          id: 1,
-          tableName: '类别',
-          hasFilter: false,
-          status: 'direct',
-          dataConnectionId: 700468972
-        },
-        {
-          id: 2,
-          tableName: '细分',
-          hasFilter: false,
-          status: 'direct',
-          dataConnectionId: 700468972
-        },
-        {
-          id: 3,
-          tableName: '订单',
-          hasFilter: false,
-          status: 'direct',
-          dataConnectionId: 700468972
-        }
-      ]
+      list: ''
+      // list: [
+      //   {
+      //     id: 1,
+      //     tableName: '类别',
+      //     hasFilter: false,
+      //     status: 'direct',
+      //     dataConnectionId: 700468972
+      //   },
+      //   {
+      //     id: 2,
+      //     tableName: '细分',
+      //     hasFilter: false,
+      //     status: 'direct',
+      //     dataConnectionId: 700468972
+      //   },
+      //   {
+      //     id: 3,
+      //     tableName: '订单',
+      //     hasFilter: false,
+      //     status: 'direct',
+      //     dataConnectionId: 700468972
+      //   }
+      // ]
     }
   },
+  computed: {
+    ...mapState({
+      fileSelectId: state => state.dataModel.modelId
+    })
+  },
   methods: {
+    async handleGetMenuList(detailInfo) {
+      const result = await fetchGetTableList({
+        url: '/admin/dev-api/datamodel/datamodelInfo/getDataSourceTableInfo/' + detailInfo.dataConnectionId // '111112222233333444' // detailInfo.dataConnectionId
+      })
+
+      if (result.data.code === 200) {
+        this.list = result.data.data
+      } else {
+        this.$message(result.data.msg)
+      }
+    },
     handleMouseDown() {
       this.isDrag = true
     },

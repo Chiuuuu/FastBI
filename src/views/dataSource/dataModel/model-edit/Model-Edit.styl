@@ -178,11 +178,11 @@
             }
         }
         .detail_main {
+            overflow: hidden;
             display: flex;
             justify-content: space-around;
             .dimensionality {
                 margin-left: 21px;
-                height: 32px;
                 width: 50%;
                 background: rgba(248, 248, 248, 1);
                 .dim_span {
@@ -203,7 +203,6 @@
             }
             .measurement {
                 margin-right: 21px;
-                height: 32px;
                 width: 50%;
                 background: rgba(248, 248, 248, 1);
                 .mea_span {
@@ -225,7 +224,6 @@
         .submit_btn {
             float: right;
             margin-right: 44px;
-            margin-top: 300px;
             display: flex;
             justify-content: space-between;
             width: 280px;
@@ -369,4 +367,14 @@
     .ant-form-item-label {
         text-align: left;
     }
+}
+
+.main-empty{
+    position: absolute;
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(0, 0, 0, 0.65);
 }

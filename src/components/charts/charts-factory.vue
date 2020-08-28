@@ -4,13 +4,13 @@
       <span>{{ config.title.content }}</span>
     </div>
     <component
-               v-bind:is="typeName"
-               v-if="apiData.source.length > 0"
-               :events="chartEvents"
-               :data="chartData" :width="width" :height="height" ref="chart"
-               :legend-visible="legendVisible"
-               :after-config="afterConfig"
-               :extend="chartExtend" :options="chartOptions" :settings="chartSettings"></component>
+              v-bind:is="typeName"
+              v-if="apiData.source.length > 0"
+              :events="chartEvents"
+              :data="chartData" :width="width" :height="height" ref="chart"
+              :legend-visible="legendVisible"
+              :after-config="afterConfig"
+              :extend="chartExtend" :options="chartOptions" :settings="chartSettings"></component>
     <div v-else class="dv-charts-null">
       <a-icon  type="pie-chart" style="font-size:50px;" />
     </div>
@@ -123,7 +123,6 @@
              borderRadius: val.borderRadius + 'px'
             }
           }
-          console.log(this.backgroundStyle)
         },
         deep: true,
         immediate: true

@@ -16,10 +16,96 @@
       >
         {{ nodeData.props.tableName }}
       </h6>
-      <a-popover v-model="visible" title="Title" trigger="click">
+      <a-popover v-model="visible" trigger="click" overlayClassName='model-popover-box' @visibleChange="(v)=> handleVisibleChange(v, nodeData)">
+        <div slot="content" class='popover-content'>
+          <div class="popover-header">
+            <div class="popover-header-title">
+              <div class="mtx">关联</div>
+              <span class="closeBtn" @click="handleClosePopover">X</span>
+            </div>
+          </div>
+          <div class="popover-type">
+            <ul>
+              <li v-for='item in popoverType' :key="item">
+                <div class="wap" @click="handlePopoverType(item, nodeData)">
+                  <div class="inner" :class="popoverTypeActive === item ? 'active':''">
+                    <div class="img img-05"></div>
+                    <div class="txt">{{item}}</div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="popover-body">
+            <div class="sprt">
+              <div class="item">订单</div>
+              <div class="item">类别</div>
+            </div>
+            <div class="popover-form">
+              <a-form>
+                <a-row>
+                  <a-col :span="10">
+                    <a-form-item>
+                      <a-select
+                        show-search
+                        placeholder="Select a person"
+                        style="width: 100%"
+                      >
+                        <a-select-option value="jack">
+                          Jack
+                        </a-select-option>
+                        <a-select-option value="lucy">
+                          Lucy
+                        </a-select-option>
+                        <a-select-option value="tom">
+                          Tom
+                        </a-select-option>
+                      </a-select>
+                    </a-form-item>
+                  </a-col>
+                  <a-col :span="2">
+                    <span>=</span>
+                  </a-col>
+                  <a-col :span="10">
+                    <a-form-item>
+                      <a-select
+                        show-search
+                        placeholder="Select a person"
+                        style="width: 100%"
+                      >
+                        <a-select-option value="jack">
+                          Jack
+                        </a-select-option>
+                        <a-select-option value="lucy">
+                          Lucy
+                        </a-select-option>
+                        <a-select-option value="tom">
+                          Tom
+                        </a-select-option>
+                      </a-select>
+                    </a-form-item>
+                  </a-col>
+                  <a-col :span='2'>
+                    <a-button type='link'><a-icon type="delete" /></a-button>
+                  </a-col>
+                </a-row>
+              </a-form>
+              <a-button type="link">
+                <a-icon type="plus" />添加
+              </a-button>
+              <a-button type="link">全部删除</a-button>
+            </div>
+          </div>
+        </div>
         <span class="opt">
-          <b class="num">0</b>
+          <b class="num">{{joinLength}}</b>
         </span>
+      </a-popover>
+      <a-popover v-model="nodeVisible" trigger="click"  overlayClassName='btn-box'>
+        <ul slot="content" class="btn-box-ul">
+          <li class="btn-box-li" @click="handleBtnDelete(nodeData)">删除</li>
+        </ul>
+        <div class="caret-down"></div>
       </a-popover>
     </div>
     <div class="wrap">
@@ -28,15 +114,20 @@
         :key="subindex"
         :node-data="item"
         :data-index="subindex"
+        :detailInfo="detailInfo"
       ></tree-node>
     </div>
   </div>
 </template>
 <script>
 import { Utils, Node } from '../util'
+import findIndex from 'lodash/findIndex'
+import {
+  fetchGetJoin
+} from '@/api/dataModel/api'
 export default {
   name: 'tree-node',
-  inject: ['tables', 'nodeStatus'],
+  inject: ['nodeStatus'],
   props: {
     nodeData: {
       type: Object,
@@ -47,13 +138,25 @@ export default {
     dataIndex: {
       type: Number,
       default: 0
+    },
+    detailInfo: {
+      type: [String, Object]
     }
   },
   data() {
     return {
       isDrag: false,
       root: true,
-      visible: false
+      visible: false,
+      nodeVisible: false,
+      mark: '',
+      popoverTypeActive: '内部',
+      popoverType: ['内部', '左侧', '右侧', '完全外部']
+    }
+  },
+  computed: {
+    joinLength() {
+      return this.nodeData.props.join && this.nodeData.props.join.conditions.length
     }
   },
   created() {
@@ -65,6 +168,28 @@ export default {
     }
   },
   methods: {
+    async handleBtnDelete(node) {
+      // let deleteList = []
+      this.loopDelete(node, this.detailInfo.config.tables)
+      if (node.parent) {
+        const index = node.parent.children.indexOf(node)
+        node.parent.children.splice(index, 1)
+      } else {
+        this.root.handleClearRenderTables()
+      }
+      await this.root.handleUpdate()
+      this.nodeVisible = false
+    },
+    loopDelete(node, list) {
+      const ownProps = node.getProps()
+      const index = findIndex(list, ownProps)
+      list.splice(index, 1)
+      if (node.children && node.children.length > 0) {
+        node.children.forEach(item => {
+          this.loopDelete(item, list)
+        })
+      }
+    },
     handleMouseDown() {
       this.isDrag = true
     },
@@ -97,25 +222,31 @@ export default {
       console.log('node-end')
       this.root.handleMapRemoveClass()
     },
-    handleDrop(event, current, index) {
+    async handleDrop(event, current, index) {
       console.log('node-drop')
       this.handleRemoveItemHigtLight()
       let dragNode = this.nodeStatus.dragNode
+      const tables = this.detailInfo.config.tables
       if (this.nodeStatus.dragType === 'menu') {
-        dragNode.setTableId(this.tables.length + 1)
-        this.tables.push(dragNode.getProps())
+        await this.root.getJoin(current, dragNode)
+        // await this.getJoin(current, dragNode)
+        // dragNode.setJoin(conditions)
+        dragNode.setTableId(tables.length + 1)
+        tables.push(dragNode.getProps())
         current.add(dragNode)
+        await this.root.handleUpdate()
+        console.log(tables)
       }
 
       if (this.nodeStatus.dragType === 'node') {
-        if (current.props.tableId === dragNode.props.tableId) {
+        if (current.props.tableNo === dragNode.props.tableNo) {
           console.log('同一个元素')
           return
         }
 
-        const dragNodeId = dragNode.props.tableId
+        const dragNodeId = dragNode.props.tableNo
 
-        if (dragNode.parent && dragNode.parent.props.tableId === current.props.tableId) {
+        if (dragNode.parent && dragNode.parent.props.tableNo === current.props.tableNo) {
           console.log('相同父节点')
           return
         }
@@ -129,16 +260,48 @@ export default {
         this.parentDeleteNode(event, dragNode)
       }
     },
+    async getJoin(left, right) {
+      console.log('11', this.detailInfo)
+      console.log('left', left.getProps())
+      console.log('right', right.getProps())
+      const result = await fetchGetJoin({
+        url: '/admin/dev-api/datamodel/datamodelInfo/getTableConfigInfo',
+        data: {
+          dataConnectionId: this.detailInfo.dataConnectionId,
+          dataModelId: this.detailInfo.dataConnectionId,
+          left: left.getProps(),
+          right: Object.assign(right.getProps(), {
+            leftTableId: left.getProps().tableId
+          })
+        }
+      })
+      if (result.data.code === 200) {
+        right.setJoin(result.data.data)
+      } else {
+        this.$message.error(result.data.msg)
+      }
+    },
     lootBeforeParent(parentId, node) {
       console.log(node)
       if (!node.parent) return false
-      if (node.parent.props.tableId === parentId) return true
+      if (node.parent.props.tableNo === parentId) return true
       return this.lootBeforeParent(parentId, node.parent)
     },
     parentDeleteNode(event, node) {
       const children = node.parent.children
       const index = children.indexOf(node)
       children.splice(index, 1)
+    },
+    handleClosePopover() {
+      this.visible = false
+    },
+    handlePopoverType(type) {
+      this.popoverTypeActive = type
+    },
+    handleVisibleChange(v, node) {
+      if (!v) return
+      console.log('left', node.parent.getProps().tableName)
+      console.log('right', node.getProps().tableName)
     }
   }
 }
@@ -165,6 +328,23 @@ export default {
         color: #666;
         border-radius: 2px;
         background: #f1f1f1;
+        &:hover {
+          .caret-down {
+            display: block;
+          }
+        }
+        .caret-down {
+          display: none;
+          width: 0;
+          height: 0;
+          border: 4px solid #333;
+          border-color: rgba(0, 0, 0, 0.85) transparent transparent transparent;
+          position: absolute;
+          top: 55%;
+          transform: translateY(-50%);
+          right: 6px;
+          cursor: pointer;
+        }
         &.z-on {
             border-color: #4a91e3;
             box-shadow: 0 0 6px #4a91e3;
@@ -259,5 +439,144 @@ export default {
             }
         }
     }
+}
+</style>
+<style lang="less">
+.model-popover-box{
+  .ant-popover-inner-content {
+    padding: 0;
+  }
+  .popover{
+    &-header{
+      background: #fff;
+      z-index: 10;
+      position: relative;
+      height: 44px;
+      line-height: 44px;
+      .mtx {
+        font-size: 14px;
+        color: #666;
+        padding-left: 20px;
+        letter-spacing: 1px;
+      }
+      .closeBtn {
+        display: block;
+        position: absolute;
+        right: 10px;
+        top: 0;
+        font-size: 12px;
+        cursor: pointer;
+      }
+    }
+    &-type{
+      border-top: 1px solid #ededed;
+      border-bottom: 1px solid #ededed;
+      position: relative;
+      z-index: 10;
+      background: #fff;
+      overflow: hidden;
+      ul > li {
+        float: left;
+        width: 25%;
+        cursor: pointer;
+        .wap {
+          border-right: 1px solid #ededed;
+          .inner {
+            border: 3px solid #fff;
+            &.active {
+              border-color: #ededed;
+            }
+              .img{
+                width: 48px;
+                height: 30px;
+                margin: 10px auto 8px;
+                background: #fff url("../../../../assets/images/tableRelat.png") no-repeat;
+                &-01{
+                  background-position: 0 0
+                }
+                &-02{
+                  background-position: 0 -38px
+                }
+                &-03{
+                  background-position: 0 -77px
+                }
+                &-04{
+                  background-position: 0 -116px
+                }
+                &-05{
+                  background-position: -52px -116px
+                }
+                &-06{
+                  background-position: -52px -77px
+                }
+              }
+              .txt {
+                text-align: center;
+                margin-bottom: 8px;
+              }
+          }
+        }
+      }
+    }
+    &-body{
+      .sprt {
+        border-bottom: 1px solid #ededed;
+        background: #fafafa;
+        height: 36px;
+        line-height: 36px;
+        position: relative;
+        z-index: 10;
+        overflow: hidden;
+        .item {
+          float: left;
+          width: 50%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
+      .popover-form {
+        padding: 20px 0;
+        max-height: 300px;
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+    }
+  }
+}
+.popover-content {
+  box-shadow: 0 2px 0 0 #ddd;
+  border: 1px solid #e6e6e6;
+  width: 546px;
+  z-index: 100;
+  color: #666;
+}
+.btn-box {
+  .ant-popover-inner-content {
+    padding: 0;
+  }
+  .btn-box-ul {
+    margin: 0;
+  }
+  .btn-box-li {
+    cursor: default;
+    position: relative;
+    font-size: 12px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+    padding-left: 24px;
+    padding-right: 18px;
+    height: 32px;
+    line-height: 32px;
+    min-width: 180px;
+    background-color: #fff;
+    white-space: nowrap;
+    &:hover {
+      background-color: #e0e0e0;
+    }
+  }
 }
 </style>

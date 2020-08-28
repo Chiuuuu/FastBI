@@ -18,7 +18,14 @@ export class Node {
     this.children = item
   }
   setTableId(id) {
-    this.props['tableId'] = id
+    this.props['tableId'] = `${id}`
+    this.props['tableNo'] = id
+  }
+  setDataModelId(id, key = 'dataModelId') {
+    this.props[key] = id
+  }
+  setJoin(data, key = 'join') {
+    this.props[key] = data
   }
   getProps() {
     return this.props

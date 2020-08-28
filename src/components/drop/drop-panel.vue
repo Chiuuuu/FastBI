@@ -1,8 +1,8 @@
 <template>
   <!--这里默认组织画布的右键点击事件 后期加在拖拽区块上-->
   <div class="drop-panel"
-       @drop.stop.prevent="handleDropOnCanvas($event)"
-       @dragover.stop.prevent>
+      @drop.stop.prevent="handleDropOnCanvas($event)"
+      @dragover.stop.prevent>
     <slot>
     </slot>
   </div>

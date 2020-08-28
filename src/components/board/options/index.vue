@@ -755,14 +755,14 @@
                     </gui-inline>
                   </gui-field>
                   <gui-field label="对齐方式">
-                    <a-radio-group :value="selfConfig.header.textAlign" size="small" >
-                      <a-radio-button value="left" @click.native.stop="onAlignChange(selfConfig.header, $event)">
+                    <a-radio-group :value="selfConfig.header.textStyle.textAlign" size="small" >
+                      <a-radio-button value="left" @click.native.stop="onRadioChange($event, selfConfig.header.textStyle, 'textAlign')">
                         <a-icon type="align-left" value="left" />
                       </a-radio-button>
-                      <a-radio-button value="center" @click.native.stop="onAlignChange(selfConfig.header, $event)">
+                      <a-radio-button value="center" @click.native.stop="onRadioChange($event, selfConfig.header.textStyle, 'textAlign')">
                         <a-icon type="align-center" value="center" />
                       </a-radio-button>
-                      <a-radio-button value="right" @click.native.stop="onAlignChange(selfConfig.header, $event)">
+                      <a-radio-button value="right" @click.native.stop="onRadioChange($event, selfConfig.header.textStyle, 'textAlign')">
                         <a-icon type="align-right" value="right" />
                       </a-radio-button>
                     </a-radio-group>
@@ -780,14 +780,14 @@
                     </gui-inline>
                   </gui-field>
                   <gui-field label="对齐方式">
-                    <a-radio-group :value="selfConfig.table.textAlign" size="small" >
-                      <a-radio-button value="left" @click.native.stop="onAlignChange(selfConfig.table, $event)">
+                    <a-radio-group :value="selfConfig.table.textStyle.textAlign" size="small" >
+                      <a-radio-button value="left" @click.native.stop="onRadioChange($event, selfConfig.table.textStyle, 'textAlign')">
                         <a-icon type="align-left" value="left" />
                       </a-radio-button>
-                      <a-radio-button value="center" @click.native.stop="onAlignChange(selfConfig.table, $event)">
+                      <a-radio-button value="center" @click.native.stop="onRadioChange($event, selfConfig.table.textStyle, 'textAlign')">
                         <a-icon type="align-center" value="center" />
                       </a-radio-button>
-                      <a-radio-button value="right" @click.native.stop="onAlignChange(selfConfig.table, $event)">
+                      <a-radio-button value="right" @click.native.stop="onRadioChange($event, selfConfig.table.textStyle, 'textAlign')">
                         <a-icon type="align-right" value="right" />
                       </a-radio-button>
                     </a-radio-group>
@@ -868,7 +868,8 @@
             </a-collapse>
           </div>
           <div v-else-if="tabsType===1">
-            <gui-group group-name="数据映射">
+            <data-source></data-source>
+            <!-- <gui-group group-name="数据映射">
               <gui-field label="x">
                 <a-input v-model="apis.labelMap.x" size="small" @change="setApiLabelMap"></a-input>
               </gui-field>
@@ -884,7 +885,7 @@
                 <a-input v-model="dataSource" type="textarea" @on-keyup.delete.stop autoSize
                          placeholder="enter json data..." @change="dataSourceChange"></a-input>
               </div>
-            </gui-group>
+            </gui-group> -->
           </div>
           <div v-else>
             <div flex="main:center">暂无交互事件</div>
@@ -909,6 +910,7 @@
   import GuiField from './gui-field'
   import GuiInline from './gui-inline'
   import GuiColors from './gui-colors'
+  import DataSource from '../data-source/data-source'
   import { DEFAULT_COLORS } from '../../../utils/defaultColors'
   import { deepClone } from '../../../utils/deepClone'
 
@@ -1045,6 +1047,7 @@
       // 点击选择对齐方式
       onAlignChange(data, event) {
         this.$set(data, 'textAlign', event.target.value)
+        console.log(data, event)
         this.setSelfProperty()
       },
 
@@ -1057,6 +1060,7 @@
 
       onRadioChange(e, data, key) {
         this.$set(data, key, e.target.value)
+        console.log(e, data, key)
         this.setSelfProperty()
       },
 
@@ -1138,6 +1142,6 @@
         return this.selfConfig.yAxis && (this.isLine || this.isHistogram)
       }
     },
-    components: { GuiGroup, GuiField, GuiInline, GuiColors, GuiWrap }
+    components: { GuiField, GuiInline, GuiColors, GuiWrap, DataSource }
   }
 </script>

@@ -1,6 +1,6 @@
 <template>
   <div class="dv-transform" :class="{'selected':selected}" :style="contentStyles" ref="dvTransform"
-       @mousedown="handleMoveStart">
+      @mousedown="handleMoveStart">
     <div class="navigator-line" v-show="selected">
       <div class="navigator-line-left" :style="lineLeft"></div>
       <div class="navigator-line-top" :style="lineTop"></div>

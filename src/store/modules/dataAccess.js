@@ -18,9 +18,6 @@ const mutations = {
     SET_MODELID(state, id) {
         state.modelId = id
     },
-    SET_MODELSELECTTYPE(state, type) {
-        state.modelSelectType = type
-    },
     SET_MODELTYPE(state, type) {
         state.modelType = type
     },

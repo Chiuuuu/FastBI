@@ -56,8 +56,6 @@
           if (val) {
             this.showHeader = val.header.show
           }
-          console.log(val)
-          console.log(this.columns)
           for (let item of this.columns) {
             // 是否自动换行
             item.ellipsis = val.table.ellipsis
@@ -157,12 +155,20 @@
         if (index % 2 === 1) { // 奇行
           return {
             style: {
+              color: this.config.table.textStyle.color + '!important',
+              textAlign: this.config.table.textStyle.textAlign,
+              'font-size': this.config.table.textStyle.fontSize + 'px',
+              'font-weight': this.config.table.textStyle.fontWeight,
               backgroundColor: this.config.table.oddBackgroundColor
             }
           }
         } else {
           return {
             style: {
+              color: this.config.table.textStyle.color + '!important',
+              textAlign: this.config.table.textStyle.textAlign,
+              'font-size': this.config.table.textStyle.fontSize + 'px',
+              'font-weight': this.config.table.textStyle.fontWeight,
               backgroundColor: this.config.table.evenBackgroundColor
             }
           }
@@ -183,6 +189,7 @@
           // 这个style就是我自定义的属性，也就是官方文档中的props
           style: {
             color: this.config.header.textStyle.color + '!important',
+            textAlign: this.config.header.textStyle.textAlign,
             'background-color': this.config.header.backgroundColor,
             'font-size': this.config.header.textStyle.fontSize + 'px',
             'font-weight': this.config.header.textStyle.fontWeight
