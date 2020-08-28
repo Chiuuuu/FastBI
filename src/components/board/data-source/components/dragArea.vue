@@ -49,6 +49,25 @@ export default {
       isVaild: false //
     }
   },
+  watch: {
+    currentSelected: {
+      handler (val) {
+        if (val) {
+          // 当前选中的图表显示维度度量的数据
+          if (val.packageJson.api_data.dimensions && val.packageJson.api_data.measures) {
+            if (this.type === 'dimension') {
+              this.fileList = val.packageJson.api_data.dimensions
+            } else {
+              this.fileList = val.packageJson.api_data.measures
+            }
+          } else {
+            this.fileList = []
+          }
+        }
+      },
+      deep: true
+    }
+  },
   computed: {
     ...mapGetters(['dragFile', 'currentSelected'])
   },
@@ -89,15 +108,18 @@ export default {
     // 根据维度度量获取数据
     getData() {
       console.log(this.currentSelected)
+      for (let item of this.fileList) {
+        item.defaultAggregator = 'SUM'
+      }
       if (this.type === 'dimension') {
         this.currentSelected.packageJson.api_data.dimensions = this.fileList
       } else {
         this.currentSelected.packageJson.api_data.measures = this.fileList
       }
       let params = {
-        id: this.$route.query.id ? this.$route.query.id : -1,
-        json: {
-          components: this.currentSelected
+        // id: this.$route.query.id ? this.$route.query.id : -1,
+        setting: {
+          ...this.currentSelected
         }
       }
       this.$server.screenManage.getData(params).then(res => {

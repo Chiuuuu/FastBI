@@ -31,13 +31,8 @@ export default {
   },
   data() {
     return {
-      activeKey: ['dimension', 'measure', 'filter', 'sort', 'tips', 'refresh'], // 所有面板默认打开
-      isdrag: false, // 是否拖拽中
-      dimensionFileList: [] // 维度字段数组
+      activeKey: ['dimension', 'measure', 'filter', 'sort', 'tips', 'refresh'] // 所有面板默认打开
     }
-  },
-  computed: {
-    ...mapGetters(['dragFile'])
   },
   methods: {
 
