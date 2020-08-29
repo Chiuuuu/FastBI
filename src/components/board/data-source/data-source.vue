@@ -6,8 +6,6 @@
       </a-collapse-panel>
       <a-collapse-panel key="measure" header="度量">
         <drag-area type="measure"></drag-area>
-        <!-- <div class=""></div>
-        <div class="empty">拖入度量</div> -->
       </a-collapse-panel>
       <a-collapse-panel key="filter" header="数据筛选">
         <div class="empty">拖入字段</div>
@@ -31,13 +29,8 @@ export default {
   },
   data() {
     return {
-      activeKey: ['dimension', 'measure', 'filter', 'sort', 'tips', 'refresh'], // 所有面板默认打开
-      isdrag: false, // 是否拖拽中
-      dimensionFileList: [] // 维度字段数组
+      activeKey: ['dimension', 'measure', 'filter', 'sort', 'tips', 'refresh'] // 所有面板默认打开
     }
-  },
-  computed: {
-    ...mapGetters(['dragFile'])
   },
   methods: {
 

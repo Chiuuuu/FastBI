@@ -19,7 +19,9 @@ const getters = {
 
     dragFile: state => state.options.dragFile, // 拖拽的字段类型
 
-    dataModel: state => state.options.dataModel // 选中的数据模型
+    dataModel: state => state.options.dataModel, // 选中的数据模型
+
+    optionsTabsType: state => state.options.optionsTabsType // 选中的项 样式/数据/交互
 
 }
 

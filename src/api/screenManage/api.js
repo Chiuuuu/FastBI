@@ -56,13 +56,19 @@ const screenManage = {
    * 数据模型目录
    */
   catalogList() {
-    return requestPost2(`/admin/dev-api/datamodel/catalog/list/10`)
+    return requestGet(`/admin/dev-api/datamodel/catalog/list`)
   },
   /**
    * 数据模型--维度、度量列表
    */
   getPivoSchemaList(id) {
     return requestGet(`/admin/dev-api/datamodel/pivotschema/getPivoSchemaList/${id}`)
+  },
+  /**
+   * 根据维度度量获取数据
+   */
+  getData(params) {
+    return requestPost2('/admin/dev-api/screen/graph/getData', params)
   }
 }
 

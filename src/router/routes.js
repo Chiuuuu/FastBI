@@ -2,13 +2,19 @@ import Home from '../views/home'
 
 let routes = [{
         path: '/',
-        redirect: '/screenManage/screenCatalog'
+        redirect: '/login'
             // component: Home,
             // children: [{
             //     path: 'home',
             //     name: 'home',
             //     component: Home
             // }]
+    },
+    {
+      path: '/login',
+      name: '登录页',
+      component: () =>
+          import('@/views/login/login')
     },
     // {
     //   path: '/admin/:id',
@@ -26,12 +32,6 @@ let routes = [{
         name: 'admin',
         component: () =>
             import('@/views/screenManage/screenEdit/admin')
-    },
-    {
-        path: '/login',
-        name: '登录页',
-        component: () =>
-            import('@/views/login/login')
     },
     {
         path: '/layout',

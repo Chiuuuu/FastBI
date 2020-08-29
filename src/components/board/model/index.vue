@@ -31,9 +31,9 @@
               </div>
               <b-scrollbar style="height: 100%;">
                 <div class="dim_main">
-                  <a-collapse v-model="activeKey" :bordered="false">
-                    <a-collapse-panel v-for="(item, index) in dimensions" :key="index"
-                      :header="item[0].tableName" :style="customStyle">{{typeof(index)}}
+                  <a-collapse v-model="dimensionsKey" :bordered="false">
+                    <a-collapse-panel v-for="(item, index) in dimensions" :key="String(index)"
+                      :header="item[0].tableName" :style="customStyle">
                       <ul class="filewrap">
                         <li v-for="(item2, index2) in item"
                             class="filelist"
@@ -57,8 +57,8 @@
               </div>
               <b-scrollbar style="height: 100%;">
                 <div class="mea_main">
-                  <a-collapse v-model="activeKey">
-                    <a-collapse-panel v-for="(item, index) in measures" :key="index"
+                  <a-collapse v-model="measuresKey">
+                    <a-collapse-panel v-for="(item, index) in measures" :key="String(index)"
                       :header="item[0].tableName" :style="customStyle">
                       <ul class="filewrap">
                           <li v-for="(item2, index2) in item"
@@ -86,7 +86,7 @@
             />
           </div>
           <div class="model-main" flex-box="1">
-            <a-collapse v-model="activeKey" :bordered="false">
+            <a-collapse v-model="modelKey" :bordered="false">
               <template #expandIcon="props">
                 <a-icon
                   type="folder"
@@ -94,7 +94,7 @@
                   style="font-size:16px"
                 />
               </template>
-              <a-collapse-panel v-for="(item, index) in modelList" :key="index" :header="item.name" :style="customStyle">
+              <a-collapse-panel v-for="(item, index) in modelList" :key="String(index)" :header="item.name" :style="customStyle">
                 <div style="margin-left:25px">
                   <p @click="modelHandle(item2)" v-for="item2 in item.items" :key="item2.id">{{item2.name}}</p>
                 </div>
@@ -161,7 +161,9 @@ export default {
       measure,
       customStyle:
         'background: #ffffff;border-radius: 4px;border: 0;overflow: hidden;',
-      activeKey: [0, 1, 2, 3],
+      modelKey: ['0', '1', '2', '3'],
+      dimensionsKey: ['0', '1', '2', '3'], // 默认展开
+      measuresKey: ['0', '1', '2', '3'],
       model: false,
       modelList: [], // 数据模型列表
       dimensions: [], // 维度列表
@@ -227,7 +229,6 @@ export default {
       // const data = [{ name: 'xiaoming', round: 1 }, { name: 'xiaowang', round: 1 }, { name: 'xiaoli', round: 2 }, { name: 'xiaowang', round: 3 }]
       const result = Object.values(
           data.reduce((obj, cur) => {
-            console.log(obj)
               if (obj[cur.tableNo]) {
                   Object.prototype.toString.call(obj[cur.tableNo]) === '[object Array]' ? obj[cur.tableNo].push(cur) : (obj[cur.tableNo] = [obj[cur.tableNo], cur])
               } else {
@@ -236,7 +237,6 @@ export default {
               return obj
           }, {})
       )
-      console.log(result)
       return result
     }
   }

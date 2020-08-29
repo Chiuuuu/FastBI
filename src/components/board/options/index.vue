@@ -4,19 +4,19 @@
     <div class="header-title" v-if="config.title&&config.title.enable">
       <span v-if="!currentSelected">{{ config.title.text }}</span>
       <div class="tabs" v-else>
-        <div class="tab-item" :class="{'active':tabsType===0}" @click="tabsType=0">
+        <div class="tab-item" :class="{'active':tabsType===0}" @click="tabsTypeChange(0)">
           <!-- <b-tooltip content="配置">
             <b-icon name="ios-options"></b-icon>
           </b-tooltip> -->
           样式
         </div>
-        <div class="tab-item" :class="{'active':tabsType===1}" @click="tabsType=1">
+        <div class="tab-item" :class="{'active':tabsType===1}" @click="tabsTypeChange(1)">
           <!-- <b-tooltip content="数据">
             <b-icon name="ios-code-working"></b-icon>
           </b-tooltip> -->
           数据
         </div>
-        <div class="tab-item" :class="{'active':tabsType===2}" @click="tabsType=2">
+        <div class="tab-item" :class="{'active':tabsType===2}" @click="tabsTypeChange(2)">
           <!-- <b-tooltip content="交互">
             <b-icon name="ios-crop"></b-icon>
           </b-tooltip> -->
@@ -952,6 +952,10 @@
       }
     },
     methods: {
+      tabsTypeChange(num) {
+        this.tabsType = num
+        this.$store.dispatch('SetTabsType', num)
+      },
       // 设置全局配置
       setPageSetting () {
         setPageSettings(this.globalSettings).then(res => {
@@ -1102,9 +1106,18 @@
         deep: true,
         immediate: true
       }
+      // optionsTabsType: {
+      //   handler (val) {
+      //     if (val) {
+      //       console.log(val)
+      //       this.tabsType = val
+      //     }
+      //   },
+      //   deep: true
+      // }
     },
     computed: {
-      ...mapGetters(['pageSettings', 'canvasRange', 'optionsExpand', 'currentSelected']),
+      ...mapGetters(['pageSettings', 'canvasRange', 'optionsExpand', 'currentSelected', 'optionsTabsType']),
       chartType () {
         return this.currentSelected ? this.currentSelected.packageJson.name : ''
       },

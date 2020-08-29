@@ -1,5 +1,6 @@
 @import "var.styl"
 .menu-wrap{
+  padding: 14px;
   .folder{
     .title{
       margin-bottom: 0;
@@ -40,6 +41,20 @@
         .title {
             color: #ffffff
         }
+      }
+    }
+  }
+}
+
+.screen-menu{
+  .folder .title:hover{
+    margin: 0 -14px;
+    }
+  .items {
+    .item{
+      &.file-active,
+      &:hover{
+        margin: 0 -14px;
       }
     }
   }
