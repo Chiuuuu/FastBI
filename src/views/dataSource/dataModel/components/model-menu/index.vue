@@ -349,7 +349,7 @@ export default {
         name: 'modelEdit',
         query: {
           type: 'add',
-          dataConnectionId: '111112222233333444' // this.modalFileSelectId
+          dataConnectionId: this.modalFileSelectId
         }
       })
     },
