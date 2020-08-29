@@ -18,7 +18,7 @@
           {{ setBy ? '是' : '否' }}
         </span>
         <span slot="extactBy" slot-scope="extactBy">
-          {{ handleChangeType(extactBy) ? '是' : '否' }}
+          {{ extactBy ? '是' : '否' }}
         </span>
         <span slot="config" slot-scope="row">
           <a v-on:click="setting(row)">{{row.setBy ? '编辑' : '设置' }}</a>
