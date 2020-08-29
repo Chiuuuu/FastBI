@@ -6,7 +6,7 @@ import store from '@/store'
 import Qs from 'qs'
 import { messages } from 'bin-ui'
 
-let baseUrl = process.env.NODE_ENV !== 'production' ? '/' : '/admin'
+let baseUrl = process.env.NODE_ENV !== 'production' ? '/' : '/'
 const service = httpRequest.create({
     baseURL: baseUrl,
     headers: {
