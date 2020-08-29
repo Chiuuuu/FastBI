@@ -918,9 +918,7 @@ export default {
           }
         })
       }
-      
       if (!formAllRight) return
-      
       if (formAllRight && this.detailInfo.config.tables.length === 0) {
         this.$message.error('请关联左侧表')
         return
