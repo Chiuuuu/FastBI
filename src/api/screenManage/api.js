@@ -56,7 +56,7 @@ const screenManage = {
    * 数据模型目录
    */
   catalogList() {
-    return requestPost2(`/admin/dev-api/datamodel/catalog/list/10`)
+    return requestGet(`/admin/dev-api/datamodel/catalog/list`)
   },
   /**
    * 数据模型--维度、度量列表

@@ -229,7 +229,6 @@ export default {
       // const data = [{ name: 'xiaoming', round: 1 }, { name: 'xiaowang', round: 1 }, { name: 'xiaoli', round: 2 }, { name: 'xiaowang', round: 3 }]
       const result = Object.values(
           data.reduce((obj, cur) => {
-            console.log(obj)
               if (obj[cur.tableNo]) {
                   Object.prototype.toString.call(obj[cur.tableNo]) === '[object Array]' ? obj[cur.tableNo].push(cur) : (obj[cur.tableNo] = [obj[cur.tableNo], cur])
               } else {
@@ -238,7 +237,6 @@ export default {
               return obj
           }, {})
       )
-      console.log(result)
       return result
     }
   }

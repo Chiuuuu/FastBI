@@ -65,7 +65,7 @@
     watch: {
     },
     created () {
-      this.getScreenData()
+      // this.getScreenData()
     },
     methods: {
       // 获取大屏数据

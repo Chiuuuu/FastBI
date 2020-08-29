@@ -22,7 +22,7 @@
           <a-icon slot="prefix" type="search" />
         </a-input>
       </div>
-      <div class="menu-wrap ">
+      <div class="menu-wrap screen-menu">
         <div
           class="group"
           :class="handleIsFolder(folder, 'items') ? 'is-folder' : ''"
@@ -73,8 +73,8 @@
         编辑大屏
       </a-button>
       <div class="contain">
-        <screen></screen>
-        <div class="empty">
+        <screen v-if="folderList.length > 0"></screen>
+        <div class="empty" v-else>
           <img src="@/assets/images/icon_empty_state.png" class="empty_img" />
           <span class="empty_word"> 暂无内容 ， 请先添加大屏目录数据 ~</span>
         </div>

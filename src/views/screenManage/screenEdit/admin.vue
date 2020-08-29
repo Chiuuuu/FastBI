@@ -124,6 +124,8 @@
       // })
       if (this.$route.query.id) {
         this.getScreenData()
+      } else {
+        // this.$store.dispatch('InitCanvasMaps', {})
       }
     },
     mounted () {

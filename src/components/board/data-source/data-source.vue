@@ -6,8 +6,6 @@
       </a-collapse-panel>
       <a-collapse-panel key="measure" header="度量">
         <drag-area type="measure"></drag-area>
-        <!-- <div class=""></div>
-        <div class="empty">拖入度量</div> -->
       </a-collapse-panel>
       <a-collapse-panel key="filter" header="数据筛选">
         <div class="empty">拖入字段</div>
