@@ -4,7 +4,7 @@ import { requestPost2, requestGetNoData } from '../api_request'
  * 获取菜单
 */
 export function fetchMenuList(options) {
-    return requestPost2(options.url)
+    return requestGetNoData(options.url)
 }
 
 /**
@@ -70,6 +70,16 @@ export function fetchUpdate(options) {
     return requestPost2(options.url, options.data)
 }
 
+/**
+ * 新增数据模型的时候
+*/
 export function fetchCreateModel(options) {
     return requestGetNoData(options.url)
+}
+
+/**
+ * 保存
+*/
+export function fetchSaveData(options) {
+    return requestPost2(options.url, options.data)
 }
