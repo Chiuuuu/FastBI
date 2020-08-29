@@ -18,7 +18,7 @@ export class Node {
     this.children = item
   }
   setTableId(id) {
-    this.props['tableId'] = `${id}`
+    // this.props['tableId'] = `${id}`
     this.props['tableNo'] = id
   }
   setDataModelId(id, key = 'dataModelId') {
@@ -36,7 +36,7 @@ export function conversionTree(node, list, key, lineKey = 'conditions[0].leftTab
     let tableId = node.props[key]
     list.forEach(function(item) {
       let leftTableId = get(item.join, lineKey)
-      if (leftTableId === tableId) {
+      if (parseInt(leftTableId) === tableId) {
         let _node = new Node(item)
         node.add(_node)
         conversionTree(_node, list, key, lineKey)

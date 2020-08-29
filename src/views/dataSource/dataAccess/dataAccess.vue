@@ -42,6 +42,7 @@ export default {
   beforeDestroy() {
     this.$store.dispatch('dataAccess/setModelType', '')
     this.$store.dispatch('dataAccess/setModelId', '')
+    this.$store.dispatch('dataAccess/setFirstFinished', false)
   }
 }
 </script>

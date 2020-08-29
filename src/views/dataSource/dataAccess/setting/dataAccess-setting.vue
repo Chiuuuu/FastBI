@@ -70,7 +70,7 @@
         </div>
       </div>
       <div class="set_btn">
-        <a-button style="width:88px;height:30px;">
+        <a-button style="width:88px;height:30px;" @click="back">
           取消
         </a-button>
         <a-button type="primary" style="width:88px;height:30px;" @click="handleSave">

@@ -62,13 +62,13 @@ export default {
   methods: {
     async handleGetMenuList(detailInfo) {
       const result = await fetchGetTableList({
-        url: '/admin/dev-api/datamodel/datamodelInfo/getDataSourceTableInfo/' + detailInfo.dataConnectionId // '111112222233333444' // detailInfo.dataConnectionId
+        url: '/admin/dev-api/datamodel/datamodelInfo/getDataSourceTableInfo/' + detailInfo.dataConnectionId // '111112222233333444'
       })
 
       if (result.data.code === 200) {
         this.list = result.data.data
       } else {
-        this.$message(result.data.msg)
+        this.$message.error(result.data.msg)
       }
     },
     handleMouseDown() {

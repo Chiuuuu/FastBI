@@ -98,6 +98,7 @@ export default {
      * 处理树形组件
     */
     handleDetailWithRoot() {
+      if (this.info.config.tables.length === 0) return
       this.renderTables = []
       const first = this.info.config.tables[0]
       const root = new Node(first)
@@ -108,7 +109,7 @@ export default {
      * 转换数据
     */
     handleConversionTree(node) {
-      conversionTree(node, this.info.config.tables.slice(1), 'tableId')
+      conversionTree(node, this.info.config.tables.slice(1), 'tableNo')
       return node
     },
     handleMapAddClass() {
@@ -138,7 +139,9 @@ export default {
         this.loopCurrentAddNode(this.renderTables, node, key)
       }
     },
-    generateRoot(node) {
+    async generateRoot(node) {
+      this.detailInfo.config.tables.push(node.getProps())
+      await this.handleUpdate()
       this.renderTables.push(node)
     },
     async loopCurrentAddNode(arry, node, key) {
@@ -160,9 +163,6 @@ export default {
       }
     },
     async getJoin(left, right) {
-      console.log('11', this.detailInfo)
-      console.log('left', left.getProps())
-      console.log('right', right.getProps())
       const result = await fetchGetJoin({
         url: '/admin/dev-api/datamodel/datamodelInfo/getTableConfigInfo',
         data: {
@@ -170,7 +170,7 @@ export default {
           dataModelId: this.detailInfo.datamodelId,
           left: left.getProps(),
           right: Object.assign(right.getProps(), {
-            leftTableId: left.getProps().tableId
+            leftTableId: left.getProps().tableNo
           })
         }
       })

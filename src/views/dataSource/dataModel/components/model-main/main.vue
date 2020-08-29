@@ -239,8 +239,9 @@ export default {
       // this.$router.push({ path: `/dataSource/Model-Edit/${this.fileSelectId}` })
       this.$router.push({
         name: 'modelEdit',
-        params: {
-          id: this.fileSelectId
+        query: {
+          type: 'edit',
+          dataConnectionId: this.fileSelectId
         }
       })
     },
@@ -262,7 +263,7 @@ export default {
      * 转换数据
     */
     handleConversionTree(node) {
-      conversionTree(node, this.detailInfo.config.tables.slice(1), 'tableId')
+      conversionTree(node, this.detailInfo.config.tables.slice(1), 'tableNo')
       return node
     },
     /**

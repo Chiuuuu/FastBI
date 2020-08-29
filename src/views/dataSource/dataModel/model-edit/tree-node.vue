@@ -229,13 +229,10 @@ export default {
       const tables = this.detailInfo.config.tables
       if (this.nodeStatus.dragType === 'menu') {
         await this.root.getJoin(current, dragNode)
-        // await this.getJoin(current, dragNode)
-        // dragNode.setJoin(conditions)
         dragNode.setTableId(tables.length + 1)
         tables.push(dragNode.getProps())
         current.add(dragNode)
         await this.root.handleUpdate()
-        console.log(tables)
       }
 
       if (this.nodeStatus.dragType === 'node') {
@@ -256,33 +253,18 @@ export default {
         let node = new Node(dragNode.getProps())
         node.setParent(current)
         node.setChildren(dragNode.children)
+        await this.root.getJoin(current, node)
         current.add(node)
+        const index = findIndex(tables, function(item) {
+          return node.getProps().tableNo === item.tableNo
+        })
+        tables.splice(index, 1, node.getProps())
+        console.log(tables)
         this.parentDeleteNode(event, dragNode)
-      }
-    },
-    async getJoin(left, right) {
-      console.log('11', this.detailInfo)
-      console.log('left', left.getProps())
-      console.log('right', right.getProps())
-      const result = await fetchGetJoin({
-        url: '/admin/dev-api/datamodel/datamodelInfo/getTableConfigInfo',
-        data: {
-          dataConnectionId: this.detailInfo.dataConnectionId,
-          dataModelId: this.detailInfo.dataConnectionId,
-          left: left.getProps(),
-          right: Object.assign(right.getProps(), {
-            leftTableId: left.getProps().tableId
-          })
-        }
-      })
-      if (result.data.code === 200) {
-        right.setJoin(result.data.data)
-      } else {
-        this.$message.error(result.data.msg)
+        await this.root.handleUpdate()
       }
     },
     lootBeforeParent(parentId, node) {
-      console.log(node)
       if (!node.parent) return false
       if (node.parent.props.tableNo === parentId) return true
       return this.lootBeforeParent(parentId, node.parent)

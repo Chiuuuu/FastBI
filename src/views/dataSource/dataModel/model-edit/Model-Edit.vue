@@ -1,7 +1,7 @@
 <template>
   <div class="Model-Edit">
     <div class="left">
-      <div class="menu_title">
+      <!-- <div class="menu_title">
         <span>数据链接</span>
       </div>
       <div class="selector">
@@ -11,7 +11,7 @@
           </a-select-option>
         </a-select>
       </div>
-      <a-divider />
+      <a-divider /> -->
       <!-- <div class="menu_database">
         <span class="database_span">数据库</span>
         <a-select default-value="databaseA" style="width: 300px">
@@ -85,9 +85,16 @@
       </div>
     </div>
     <div class="right">
-      <div class="header">
+      <div class="header" v-if="model==='edit'">
         <span class="data_con">{{detailInfo.name}}</span>
       </div>
+      <a-form :form="modelForm" :label-col="{ span: 3 }" :wrapper-col="{ span: 12 }" v-else-if="model==='add'">
+        <a-form-item label="数据模型名称">
+          <a-input
+            v-decorator="['name', { rules: [{ required: true, message: '请输入名称!' }] }]"
+          />
+        </a-form-item>
+      </a-form>
       <div class="description">
         <span class="d-s">描述： {{detailInfo.description}}<a-icon type="edit" v-on:click="open"/></span>
         <a-modal v-model="visible1" title="编辑描述" v-on:ok="close">
@@ -439,7 +446,7 @@
         </div>
         <div class="submit_btn">
           <a-button>保存并新建报告</a-button>
-          <a-button type="primary">保 存</a-button>
+          <a-button type="primary" @click="handleSave">保 存</a-button>
           <a-button v-on:click="exit">退 出</a-button>
         </div>
       </div>
@@ -452,7 +459,8 @@ import EditLeft from './edit-left'
 import EditRightTop from './edit-right-top'
 import {
   fetchModelInfoById,
-  fetchCreateModel
+  fetchCreateModel,
+  fetchSaveData
 } from '@/api/dataModel/api'
 import groupBy from 'lodash/groupBy'
 
@@ -655,6 +663,7 @@ export default {
   },
   data() {
     return {
+      modelForm: this.$form.createForm(this, { name: 'modelForm' }),
       spinning: false,
       detailInfo: '',
       globalStatus: {
@@ -760,26 +769,34 @@ export default {
   computed: {
     rowSelection() {
       return {}
+    },
+    model() {
+      return this.$route.query.type
     }
   },
   created() {
-    if (this.$route.params.id) {
-      this.handleGetData(this.$route.params.id)
-    } else {
-      console.log(this.$route.query)
+    if (this.model === 'edit') {
+      this.handleGetData(this.$route.query.dataConnectionId)
+    }
+  },
+  mounted() {
+    if (this.model === 'add') {
+      this.$refs.editLeftRef.handleGetMenuList(this.$route.query)
       this.handleAddNew()
     }
   },
   methods: {
+    /**
+     * 新增方法
+    */
     async handleAddNew() {
       const result = await fetchCreateModel({
-        url: '/admin/dev-api/datamodel/datamodelInfo/createDataModelInfo/{dataConnectionId}/{dataModelName}/{folderId}'
+        url: `/admin/dev-api/datamodel/datamodelInfo/createDataModelInfo/${this.$route.query.dataConnectionId}`
       })
 
       if (result.data.code === 200) {
         this.$message.success('获取数据成功')
         this.detailInfo = result.data.data
-        this.$refs.editLeftRef.handleGetMenuList(this.detailInfo)
         this.handleDimensions()
         this.handleMeasures()
       } else {
@@ -888,6 +905,44 @@ export default {
       }
       this.dataSource = [...dataSource, newData]
       this.count = count + 1
+    },
+    async handleSave() {
+      let formAllRight = true
+      if (this.model === 'add') {
+        this.modelForm.validateFields((err, values) => {
+          if (!err) {
+            this.detailInfo.name = values.name
+            formAllRight = true
+          } else {
+            formAllRight = false
+          }
+        })
+      }
+      
+      if (!formAllRight) return
+      
+      if (formAllRight && this.detailInfo.config.tables.length === 0) {
+        this.$message.error('请关联左侧表')
+        return
+      }
+
+      const result = await fetchSaveData({
+        url: '/admin/dev-api/datamodel/datamodelInfo/updataDataModelInfo',
+        data: {
+          ...this.detailInfo
+        }
+      })
+
+      if (result.data.code === 200) {
+        this.$message.success({
+          content: this.model === 'add' ? '保存成功' : '编辑成功',
+          duration: 0.5
+        }).then(() => {
+          this.exit()
+        })
+      } else {
+        this.$message.error(result.data.msg)
+      }
     }
   }
 }
