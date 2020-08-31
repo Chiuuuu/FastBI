@@ -1,6 +1,9 @@
 <template>
-  <div>
-    <a-empty
+  <div style="position: relative;min-height:500px;">
+    <a-empty v-if="!modelType" class="tab-empty">
+      <span slot="description">请在左侧新建或选择数据连接</span>
+    </a-empty>
+    <!-- <a-empty
       v-if="!modelType"
       class="tab-empty"
       :image="emptyImgUrl"
@@ -9,7 +12,7 @@
       }"
     >
       <span slot="description"> 请在左侧新建或选择数据连接</span>
-    </a-empty>
+    </a-empty> -->
     <template v-else>
       <div v-if="isFileType">
         <div class="tab-excel">

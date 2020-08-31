@@ -209,7 +209,7 @@ export default {
           this.$store.dispatch('dataAccess/setModelInfo', {
             ip: result.data.data.ip,
             name: result.data.data.name,
-            password: '',
+            password: result.data.data.password,
             port: Number(result.data.data.port),
             username: result.data.data.username
           })
@@ -224,6 +224,7 @@ export default {
       this.$store.dispatch('dataAccess/setModelId', file.id)
       this.$EventBus.$emit('set-tab-index', '1')
       this.$emit('on-menuChange-componet', 'Main')
+      this.$store.dispatch('dataAccess/setModelSelectType', '')
     },
     /**
     * 删除菜单
@@ -305,6 +306,7 @@ export default {
       this.$store.dispatch('dataAccess/setModelId', -1)
       this.$store.dispatch('dataAccess/setModelInfo', {})
       this.$EventBus.$emit('resetForm')
+      this.$EventBus.$emit('set-tab-index', '1')
     },
     /**
      * 重命名弹窗显示

@@ -16,7 +16,10 @@
       >
         {{ nodeData.props.tableName }}
       </h6>
-      <a-popover v-model="visible" trigger="click" overlayClassName='model-popover-box' @visibleChange="(v)=> handleVisibleChange(v, nodeData)">
+      <span class="opt">
+         <b class="num">{{joinLength}}</b>
+      </span>
+      <!-- <a-popover v-model="visible" trigger="click" overlayClassName='model-popover-box' @visibleChange="(v)=> handleVisibleChange(v, nodeData)">
         <div slot="content" class='popover-content'>
           <div class="popover-header">
             <div class="popover-header-title">
@@ -100,7 +103,7 @@
         <span class="opt">
           <b class="num">{{joinLength}}</b>
         </span>
-      </a-popover>
+      </a-popover> -->
       <a-popover v-model="nodeVisible" trigger="click"  overlayClassName='btn-box'>
         <ul slot="content" class="btn-box-ul">
           <li class="btn-box-li" @click="handleBtnDelete(nodeData)">删除</li>
