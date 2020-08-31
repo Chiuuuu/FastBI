@@ -1,7 +1,7 @@
 <template>
   <a-modal
     :visible="visible"
-    title="名称"
+    title="新建文件夹"
     cancelText="取消"
     okText="确定"
     :afterClose="handleAfterClose"
