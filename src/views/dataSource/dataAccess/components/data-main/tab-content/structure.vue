@@ -133,7 +133,8 @@ export default {
       const result = await fetchSaveExtract({
         url: '/admin/dev-api/system/mysql/datax/extract',
         data: {
-          rows: rows
+          rows: rows,
+          tableList: this.data
         }
       }).finally(() => {
         this.extractSping = false
