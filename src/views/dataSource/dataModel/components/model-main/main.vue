@@ -40,7 +40,7 @@
                 <div class="dim_menu">
                   <a-menu mode="inline" v-for="(value, name) in dimensions" :key="name" :default-open-keys="[name]" :inline-collapsed="false">
                     <a-sub-menu :key="name">
-                      <span slot="title"><span>{{name}}</span></span>
+                      <span slot="title"><span>{{value[0].tableName}}</span></span>
                       <a-menu-item v-for="item in value" :key="item.id">
                         <img
                           src="@/assets/images/icon_dimension.png"
@@ -57,7 +57,7 @@
                 <div class="mea_menu">
                   <a-menu mode="inline" v-for="(value, name) in measures" :key="name" :default-open-keys="[name]" :inline-collapsed="false">
                     <a-sub-menu :key="name">
-                      <span slot="title"><span>{{name}}</span></span>
+                      <span slot="title"><span>{{value[0].tableName}}</span></span>
                       <a-menu-item v-for="item in value" :key="item.id">
                         <img
                           src="@/assets/images/icon_dimension.png"
@@ -270,15 +270,15 @@ export default {
      * 维度数据处理
     */
     handleDimensions() {
-      console.log(groupBy(this.detailInfo.pivotSchema.dimensions, 'tableName'))
-      this.dimensions = groupBy(this.detailInfo.pivotSchema.dimensions, 'tableName')
+      console.log(groupBy(this.detailInfo.pivotSchema.dimensions, 'tableNo'))
+      this.dimensions = groupBy(this.detailInfo.pivotSchema.dimensions, 'tableNo')
     },
     /**
      * 度量数据处理
     */
     handleMeasures() {
-      console.log(groupBy(this.detailInfo.pivotSchema.measures, 'tableName'))
-      this.measures = groupBy(this.detailInfo.pivotSchema.measures, 'tableName')
+      console.log(groupBy(this.detailInfo.pivotSchema.measures, 'tableNo'))
+      this.measures = groupBy(this.detailInfo.pivotSchema.measures, 'tableNo')
     }
   }
 }
