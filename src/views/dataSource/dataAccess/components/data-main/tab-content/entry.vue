@@ -175,7 +175,7 @@ export default {
             type: 'string',
             max: 20,
             min: 1,
-            message: '五个'
+            message: '长度为1~20'
           }
         ],
         ip: [
@@ -266,8 +266,9 @@ export default {
   },
   methods: {
     handleSetFormData() {
+      this.handleResetForm()
       this.form = Object.assign(this.form, this.modelInfo)
-      this.connectStatus = false
+      // this.connectStatus = false
     },
     /**
      * 任一表单项被校验后触发
