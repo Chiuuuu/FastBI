@@ -801,8 +801,8 @@ const database = {
                 title: '图片',
                 name: 've-image',
                 icon: 'md-images',
-                // apiData: {},
-                // apis: {},
+                apiData: {},
+                apis: {},
                 config: {
                     imageUrl: ''
                 },

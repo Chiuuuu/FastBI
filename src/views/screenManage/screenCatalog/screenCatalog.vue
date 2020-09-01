@@ -73,7 +73,7 @@
         编辑大屏
       </a-button>
       <div class="contain" ref="contain" :style="wrapStyle">
-        <screen v-if="folderList.length > 0" :style="canvasPanelStyle"></screen>
+        <screen v-if="folderList.length > 0 && flag" :style="canvasPanelStyle"></screen>
         <div class="empty" v-else>
           <img src="@/assets/images/icon_empty_state.png" class="empty_img" />
           <span class="empty_word"> 暂无内容 ， 请先添加大屏目录数据 ~</span>
@@ -156,7 +156,8 @@ export default {
         }
       ],
       wrapStyle: {},
-      range: 0
+      range: 0,
+      flag: true
     }
   },
   watch: {
@@ -280,11 +281,12 @@ export default {
     },
     // 选择左侧菜单
     handleFileSelect(file) {
-      this.$router.push({
-        path: '/admin',
-        query: {
-          id: file.id
-        }
+      if (this.fileSelectId === file.id) return
+      this.flag = false
+      this.fileSelectId = file.id
+      this.$store.dispatch('SetScreenId', file.id)
+      setTimeout(() => {
+        this.flag = true
       })
     },
     // 点击新建大屏
@@ -325,7 +327,11 @@ export default {
     },
     // 编辑大屏
     editScreen() {
-      this.$router.push({ name: 'admin' })
+      console.log(this.screenId)
+      this.$router.push({ path: '/admin',
+      query: {
+        id: this.fileSelectId
+      } })
     },
     // 点击新建文件夹
     addFolder() {
@@ -390,7 +396,6 @@ export default {
         width: `${this.pageSettings.width * range + 120}px`,
         height: `${this.pageSettings.height * range + 120}px`
       }
-      console.log(range)
       this.range = range
     }
   }

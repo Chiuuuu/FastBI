@@ -54,15 +54,17 @@ export default {
     currentSelected: {
       handler (val) {
         if (val) {
-          // 当前选中的图表显示维度度量的数据
-          if (val.packageJson.api_data.dimensions || val.packageJson.api_data.measures) {
-            if (this.type === 'dimension') {
-              this.fileList = val.packageJson.api_data.dimensions
+          if (val.name !== 've-image') {
+            // 当前选中的图表显示维度度量的数据
+            if (val.packageJson.api_data.dimensions || val.packageJson.api_data.measures) {
+              if (this.type === 'dimension') {
+                this.fileList = val.packageJson.api_data.dimensions
+              } else {
+                this.fileList = val.packageJson.api_data.measures
+              }
             } else {
-              this.fileList = val.packageJson.api_data.measures
+              this.fileList = []
             }
-          } else {
-            this.fileList = []
           }
         }
       },
@@ -83,12 +85,10 @@ export default {
         // 维度暂时只能拉入一个字段
         this.fileList[0] = dataFile
       } else {
-        if (this.fileList.length < 2) {
-          this.fileList.push(dataFile)
-        }
-        // else {
-        //   this.fileList[1] = dataFile
+        // if (this.fileList.length < 2) {
+
         // }
+        this.fileList.push(dataFile)
       }
       this.fileList = this.uniqueFun(this.fileList, 'field')
       // let apiData = {

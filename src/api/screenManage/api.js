@@ -75,8 +75,8 @@ const screenManage = {
    * 上传图片
    * @param {*} params
    */
-  saveImage(params) {
-    return requestPost2('/dev-api/screen/data/avatar', params)
+  uploadImage(params) {
+    return requestPost2('/admin/dev-api/screen/data/avatar', params)
   }
 }
 

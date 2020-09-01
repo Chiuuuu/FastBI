@@ -73,7 +73,6 @@
     watch: {
       config: {
         handler (val) {
-          console.log(val)
           if (val) {
             // 图例
             this.legendVisible = val.legend.show
@@ -88,12 +87,10 @@
       },
       apiData: {
         handler (val) {
-          console.log(val)
           if (val) {
             if (val.dimensions && val.measures) {
               this.chartData = val.source
               this.chartData.rows = val.source.rows
-              console.log(this.chartData)
               return
             }
             if (val.source) {

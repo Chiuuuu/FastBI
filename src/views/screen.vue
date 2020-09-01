@@ -52,7 +52,7 @@
       return {}
     },
     computed: {
-      ...mapGetters(['canvasMap', 'pageSettings']),
+      ...mapGetters(['canvasMap', 'pageSettings', 'screenId']),
       // 画布面板的样式
       canvasPanelStyle () {
         return {
@@ -65,21 +65,21 @@
     watch: {
     },
     created () {
-      // this.getScreenData()
+      this.getScreenData()
     },
     methods: {
       // 获取大屏数据
-      // getScreenData() {
-      //   this.$server.screenManage.screenData(this.$route.query.id).then(res => {
-      //     if (res.data.code === 200) {
-      //       let json = res.data ? res.data.data.json : {}
-      //       // 页面配置信息
-      //       this.$store.dispatch('SetPageSettings', json.setting)
-      //       // 页面canvasMaps
-      //       this.$store.dispatch('InitCanvasMaps', json.components)
-      //     }
-      //   })
-      // }
+      getScreenData() {
+        this.$server.screenManage.screenData(this.screenId).then(res => {
+          if (res.data.code === 200) {
+            let json = res.data.data ? res.data.data.json : {}
+            // 页面配置信息
+            this.$store.dispatch('SetPageSettings', json.setting)
+            // 页面canvasMaps
+            this.$store.dispatch('InitCanvasMaps', json.components)
+          }
+        })
+      }
     }
   }
 </script>

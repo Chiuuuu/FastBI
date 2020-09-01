@@ -102,7 +102,7 @@
       }
     },
     computed: {
-      ...mapGetters(['canvasRange', 'pageSettings', 'contextMenuInfo', 'currentSelected']),
+      ...mapGetters(['canvasRange', 'pageSettings', 'contextMenuInfo', 'currentSelected', 'canvasMap', 'screenId']),
       // 鼠标移动根据栅格间距的值
       mouseMoveStep () {
         return this.canvasRange * this.pageSettings.gridStep
@@ -325,7 +325,26 @@
         this.$store.dispatch('SetBaseProperty', this.transformData)
       },
       setBaseProperty () {
+        this.screenSave()
         setBaseProperty(this.currentSelected)
+      },
+      // 保存大屏
+      screenSave() {
+        const json = {
+          setting: this.pageSettings,
+          components: this.canvasMap
+        }
+        let params = {
+          id: this.screenId,
+          json
+        }
+        this.$server.screenManage.screenSave(params).then(res => {
+          if (res.data.code === 200) {
+            this.$store.dispatch('SetScreenId', res.data.id)
+          } else {
+            this.$message.error(res.data.msg)
+          }
+        })
       }
     }
   }
