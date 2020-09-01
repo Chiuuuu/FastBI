@@ -721,7 +721,7 @@
                         list-type="picture-card"
                         class="avatar-uploader"
                         :show-upload-list="false"
-                        action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                        action=""
                         @change="handleChange"
                       >
                         <div>
@@ -959,7 +959,9 @@
       // 设置全局配置
       setPageSetting () {
         setPageSettings(this.globalSettings).then(res => {
+          console.log(res)
           this.$store.dispatch('SetPageSettings', res.data)
+          this.screenSave()
         })
       },
       // 设置基本属性
@@ -967,6 +969,7 @@
         this.$store.dispatch('SetBaseProperty', this.baseProperty)
         // 发送请求来保存数据
         setBaseProperty(this.currentSelected)
+        this.screenSave()
       },
       // 设置自有属性
       setSelfProperty () {
@@ -1027,12 +1030,12 @@
           return
         }
         if (info.file.status === 'done') {
-          getBase64(info.file.originFileObj, imageUrl => {
-            this.imageUrl = imageUrl
-            this.globalSettings.imageUrl = imageUrl
-            this.loading = false
-            this.setSelfProperty()
-          })
+          // getBase64(info.file.originFileObj, imageUrl => {
+          //   this.imageUrl = imageUrl
+          //   this.globalSettings.imageUrl = imageUrl
+          //   this.loading = false
+          //   this.setSelfProperty()
+          // })
         }
       },
 
@@ -1068,8 +1071,23 @@
         this.setSelfProperty()
       },
 
-      onChange(key) {
-        console.log(key)
+      // 保存大屏
+      screenSave() {
+        const json = {
+          setting: this.pageSettings,
+          components: this.canvasMap
+        }
+        let params = {
+          id: this.screenId,
+          json
+        }
+        this.$server.screenManage.screenSave(params).then(res => {
+          if (res.data.code === 200) {
+            this.$store.dispatch('SetScreenId', res.data.id)
+          } else {
+            this.$message.error(res.data.msg)
+          }
+        })
       }
     },
     watch: {
@@ -1106,18 +1124,9 @@
         deep: true,
         immediate: true
       }
-      // optionsTabsType: {
-      //   handler (val) {
-      //     if (val) {
-      //       console.log(val)
-      //       this.tabsType = val
-      //     }
-      //   },
-      //   deep: true
-      // }
     },
     computed: {
-      ...mapGetters(['pageSettings', 'canvasRange', 'optionsExpand', 'currentSelected', 'optionsTabsType']),
+      ...mapGetters(['pageSettings', 'canvasRange', 'optionsExpand', 'currentSelected', 'screenId']),
       chartType () {
         return this.currentSelected ? this.currentSelected.packageJson.name : ''
       },

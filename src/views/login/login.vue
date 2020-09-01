@@ -34,10 +34,10 @@
                 size="large"
                 v-decorator="[
                   'password',
-                  { rules: [{ required: true, message: '请输入登陆密码！' }] }
+                  { rules: [{ required: true, message: '请输入登录密码！' }] }
                 ]"
                 type="password"
-                placeholder="请输入登陆密码"
+                placeholder="请输入登录密码"
               >
                 <a-icon
                   slot="prefix"
