@@ -30,6 +30,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
+import { DEFAULT_COLORS } from '../../../../utils/defaultColors'
 export default {
   props: {
     type: {
@@ -122,14 +123,10 @@ export default {
     },
     // 根据维度度量获取数据
     getData() {
-      console.log(this.currentSelected)
       for (let item of this.fileList) {
         item.defaultAggregator = 'SUM'
       }
       if (this.type === 'dimension') {
-        // for (let item of this.fileList) {
-        //   dimensionKeys.push(item.field)
-        // }
         this.currentSelected.packageJson.api_data.dimensions = this.fileList
       } else {
         this.currentSelected.packageJson.api_data.measures = this.fileList
@@ -141,26 +138,29 @@ export default {
       }
       this.$server.screenManage.getData(params).then(res => {
         if (res.data.code === 200) {
-          // let columns = []
+          let columns = []
           let apiData = this.currentSelected.packageJson.api_data
           let dimensionKeys = apiData.dimensions[0].field // 维度key
+          columns[0] = dimensionKeys // 默认columns第一项为维度
           let measureKeys = [] // 度量key
           for (let m of apiData.measures) {
             measureKeys.push(m.field)
+            columns.push(m.field) // 默认columns第二项起为指标
           }
+          console.log(columns)
           let rows = []
-          console.log(measureKeys)
           res.data.rows.map((item, index) => {
             let obj = {}
             obj[dimensionKeys] = item[dimensionKeys]
-            obj[measureKeys[index]] = item[measureKeys[index]]
+            for (let item2 of measureKeys) {
+              obj[item2] = item[item2]
+            }
             rows.push(obj)
-              // rows.push(
-              //   { [dimensionKeys]: item[dimensionKeys], [measureKeys[index]]: item[measureKeys[index]] }
-              // )
           })
-
-          console.log(rows)
+           this.currentSelected.packageJson.api_data.source = {
+             columns,
+             rows
+           }
         }
       })
     }

@@ -122,10 +122,11 @@
       //   this.$log.danger('========>canvasMaps')
       //   this.$print(res.data)
       // })
+      // 先清空数据
+      this.$store.dispatch('InitCanvasMaps', [])
       if (this.$route.query.id) {
+        this.$store.dispatch('SetScreenId', this.$route.query.id)
         this.getScreenData()
-      } else {
-        // this.$store.dispatch('InitCanvasMaps', {})
       }
     },
     mounted () {
@@ -145,7 +146,7 @@
       getScreenData() {
         this.$server.screenManage.screenData(this.$route.query.id).then(res => {
           if (res.data.code === 200) {
-            let json = res.data ? res.data.data.json : {}
+            let json = res.data.data ? res.data.data.json : {}
             this.$store.dispatch('SetPageSettings', json.setting)
             this.$store.dispatch('InitCanvasMaps', json.components)
           }

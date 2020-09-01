@@ -72,8 +72,8 @@
       <a-button type="primary" class="btn_pr" @click="editScreen">
         编辑大屏
       </a-button>
-      <div class="contain">
-        <screen v-if="folderList.length > 0"></screen>
+      <div class="contain" ref="contain" :style="wrapStyle">
+        <screen v-if="folderList.length > 0" :style="canvasPanelStyle"></screen>
         <div class="empty" v-else>
           <img src="@/assets/images/icon_empty_state.png" class="empty_img" />
           <span class="empty_word"> 暂无内容 ， 请先添加大屏目录数据 ~</span>
@@ -110,7 +110,10 @@ import NewFolder from '@/components/newFolder/newFolder'
 import MenuFile from '@/components/dataSource/menu-group/file'
 import MenuFolder from '@/components/dataSource/menu-group/folder'
 
-  import Screen from '@/views/screen' // 大屏
+import { mapGetters } from 'vuex' // 导入vuex
+import Screen from '@/views/screen' // 大屏
+import { addResizeListener, removeResizeListener } from 'bin-ui/src/utils/resize-event'
+
 export default {
   components: {
     NewFolder,
@@ -151,7 +154,9 @@ export default {
           name: '删除',
           onClick: this.handleFileDelete
         }
-      ]
+      ],
+      wrapStyle: {},
+      range: 0
     }
   },
   watch: {
@@ -160,6 +165,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['pageSettings', 'canvasRange']),
     fileSelectId: {
       get () {
         return this.$store.state.dataAccess.modelId
@@ -167,11 +173,28 @@ export default {
       set (value) {
         this.$store.commit('dataAccess/SET_MODELID', value)
       }
+    },
+    // 画布面板的样式
+    canvasPanelStyle () {
+      let obj = {
+        width: `${this.pageSettings.width}px`,
+        height: `${this.pageSettings.height}px`,
+        transform: `scale(0.47) translate3d(0px, 0px, 0)`,
+        transformOrigin: '0 0',
+        backgroundColor: this.pageSettings.backgroundColor
+      }
+      return obj
     }
   },
   mounted() {
     this.getList()
     this.$on('fileSelect', this.handleFileSelect)
+
+    this.$nextTick(this._calcStyle)
+    addResizeListener(this.$refs.contain, this._calcStyle)
+  },
+  beforeDestroy () {
+    removeResizeListener(this.$refs.contain, this._calcStyle)
   },
   methods: {
     // 获取文件夹列表
@@ -267,7 +290,6 @@ export default {
     // 点击新建大屏
     addScreen() {
       this.isAdd = 1
-      this.screenForm.resetFields()
       this.screenVisible = true
     },
     // 确认新建大屏
@@ -296,6 +318,8 @@ export default {
             }
           })
         }
+        this.screenForm.resetFields()
+        this.$store.dispatch('SetScreenId', '')
         this.screenVisible = false
       })
     },
@@ -352,9 +376,22 @@ export default {
     hideFolder() {
       this.folderVisible = false
     },
-    // 点击右键
-    rightClick() {
-      console.log(12)
+    _calcStyle () {
+      const wrap = this.$refs.contain
+      if (!wrap) return
+      // 计算wrap样式
+      // 计算缩放比例
+      let range = ((wrap.clientWidth - 120) / this.pageSettings.width)
+      range = Math.round(range * 100) / 100
+      if (range < 0.3) {
+        range = 0.3
+      }
+      this.wrapStyle = {
+        width: `${this.pageSettings.width * range + 120}px`,
+        height: `${this.pageSettings.height * range + 120}px`
+      }
+      console.log(range)
+      this.range = range
     }
   }
 }

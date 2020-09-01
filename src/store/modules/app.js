@@ -6,7 +6,8 @@ const app = {
         optionsExpand: true, // 参数面板打开关闭
         modelExpand: true, // 8-14数据模型面板
         coverageExpand: false, // 图层面板打开关闭
-        isScreen: false // 是否全屏
+        isScreen: false, // 是否全屏
+        screenId: '' // 大屏id
     },
     mutations: {
         SET_CANVAS_RANGE: (state, val) => {
@@ -26,6 +27,9 @@ const app = {
         },
         SET_IS_SCREEN: (state, val) => {
             state.isScreen = val
+        },
+        SET_SCREEN_ID: (state, val) => {
+          state.screenId = val
         }
     },
     actions: {
@@ -46,8 +50,10 @@ const app = {
         },
         SetIsScreen: ({ commit }, val) => {
             commit('SET_IS_SCREEN', val)
+        },
+        SetScreenId: ({ commit }, val) => {
+          commit('SET_SCREEN_ID', val)
         }
-
     }
 }
 
