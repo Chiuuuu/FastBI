@@ -5,23 +5,16 @@
       <span v-if="!currentSelected">{{ config.title.text }}</span>
       <div class="tabs" v-else>
         <div class="tab-item" :class="{'active':tabsType===0}" @click="tabsTypeChange(0)">
-          <!-- <b-tooltip content="配置">
-            <b-icon name="ios-options"></b-icon>
-          </b-tooltip> -->
           样式
         </div>
-        <div class="tab-item" :class="{'active':tabsType===1}" @click="tabsTypeChange(1)">
-          <!-- <b-tooltip content="数据">
-            <b-icon name="ios-code-working"></b-icon>
-          </b-tooltip> -->
+        <div class="tab-item" v-if="currentSelected.packageJson.name!=='ve-image'"
+          :class="{'active':tabsType===1}" @click="tabsTypeChange(1)">
           数据
         </div>
-        <div class="tab-item" :class="{'active':tabsType===2}" @click="tabsTypeChange(2)">
-          <!-- <b-tooltip content="交互">
-            <b-icon name="ios-crop"></b-icon>
-          </b-tooltip> -->
+        <!-- <div class="tab-item" v-if="currentSelected.packageJson.name!=='ve-image'"
+          :class="{'active':tabsType===2}" @click="tabsTypeChange(2)">
           交互
-        </div>
+        </div> -->
       </div>
     </div>
     <div class="options-body">
@@ -712,24 +705,38 @@
               <!-- 图片 -->
               <template v-if="isImage">
                 <a-collapse-panel key="images" header="图片">
-                  <a-row>
+                  <gui-field label="上传">
+                    <div class="photo" @click.stop="addPhote">
+                      <a-icon type="plus" />
+                      <input
+                        id="upload_photo"
+                        ref="img_input1"
+                        type="file"
+                        name
+                        accept="image/png, image/jpeg"
+                        style="display:none;"
+                        @change="selectPhoto($event)"
+                      />
+                    </div>
+                  </gui-field>
+                  <!-- <a-row>
                     <a-col :span="4">上传</a-col>
                     <a-col :span="8"></a-col>
                     <a-col :span="4">
-                      <a-upload
-                        name="avatar"
-                        list-type="picture-card"
-                        class="avatar-uploader"
-                        :show-upload-list="false"
-                        action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                        @change="handleChange"
-                      >
-                        <div>
-                          <a-icon :type="loading ? 'loading' : 'plus'" />
-                        </div>
-                      </a-upload>
+                      <div class="photo" @click.native="addPhote">
+                        <a-icon type="plus" />
+                        <input
+                          id="upload_photo"
+                          ref="img_input1"
+                          type="file"
+                          name
+                          accept="image/png, image/jpeg"
+                          style="display:none;"
+                          @change="selectPhoto($event)"
+                        />
+                      </div>
                     </a-col>
-                  </a-row>
+                  </a-row> -->
                 </a-collapse-panel>
               </template>
               <!-- 表格 -->
@@ -823,18 +830,19 @@
                 </a-collapse-panel>
               </template>
               <a-collapse-panel key="background" header="背景设置">
-                <a-radio-group v-model="backgroundApi.backgroundType" name="radioGroup">
+                <gui-field label="背景颜色">
+                  <el-color-picker v-model="backgroundApi.backgroundColor" show-alpha
+                                  @change="setBackGround"></el-color-picker>
+                </gui-field>
+                <!-- <a-radio-group v-model="backgroundApi.backgroundType" name="radioGroup">
                   <a-radio :style="radioStyle" value="1" @click="onBgChange($event, backgroundApi, 'backgroundType')">
-                    <gui-field label="背景颜色">
-                      <el-color-picker v-model="backgroundApi.backgroundColor" show-alpha
-                                      @change="setBackGround"></el-color-picker>
-                    </gui-field>
+
                   </a-radio>
-                  <!-- <a-radio :style="radioStyle" value="2" @click="onBgChange($event, backgroundApi, 'backgroundType')">
+                  <a-radio :style="radioStyle" value="2" @click="onBgChange($event, backgroundApi, 'backgroundType')">
                     <gui-field label="背景图片">
                     </gui-field>
-                  </a-radio> -->
-                </a-radio-group>
+                  </a-radio>
+                </a-radio-group> -->
                 <gui-field label="边框颜色">
                   <el-color-picker v-model="backgroundApi.borderColor" show-alpha
                                   @change="setBackGround"></el-color-picker>
@@ -960,6 +968,7 @@
       setPageSetting () {
         setPageSettings(this.globalSettings).then(res => {
           this.$store.dispatch('SetPageSettings', res.data)
+          this.screenSave()
         })
       },
       // 设置基本属性
@@ -967,23 +976,27 @@
         this.$store.dispatch('SetBaseProperty', this.baseProperty)
         // 发送请求来保存数据
         setBaseProperty(this.currentSelected)
+        this.screenSave()
       },
       // 设置自有属性
       setSelfProperty () {
         this.$store.dispatch('SetSelfProperty', this.selfConfig)
         // 发送请求来保存数据
         setBaseProperty(this.currentSelected)
+        this.screenSave()
       },
       // 设置数据映射
       setApiLabelMap () {
         this.$store.dispatch('SetApis', this.apis)
         // 发送请求来保存数据
         setBaseProperty(this.currentSelected)
+        this.screenSave()
       },
       setBackGround (val) {
         this.$store.dispatch('SetBackGround', this.backgroundApi)
         // 发送请求来保存数据
         setBaseProperty(this.currentSelected)
+        this.screenSave()
       },
       // 重置全局配置
       resetSetting () {
@@ -991,6 +1004,7 @@
         resetPageSettings().then(res => {
           this.$store.dispatch('SetPageSettings', res.data)
           this.$loading.done()
+          this.screenSave()
         })
       },
       // 数据源改变事件
@@ -1016,24 +1030,36 @@
             this.imageUrl = imageUrl
             this.selfConfig.backgroundSrc = imageUrl
             this.loading = false
-            this.setPageSetting()
+            this.setSelfProperty()
           })
         }
       },
       // 上传图片
-      handleChange(info) {
-        if (info.file.status === 'uploading') {
-          this.loading = true
-          return
-        }
-        if (info.file.status === 'done') {
-          getBase64(info.file.originFileObj, imageUrl => {
-            this.imageUrl = imageUrl
-            this.globalSettings.imageUrl = imageUrl
-            this.loading = false
-            this.setSelfProperty()
+      beforeUpload(file) {
+        console.log(file)
+      },
+
+      // 点击添加图片
+      addPhote() {
+        document.getElementById('upload_photo').click()
+      },
+
+      // 选择上传图片
+      selectPhoto(e) {
+        var form = new FormData()
+        form.append('avatarfile', e.target.files[0])
+        this.$server.screenManage.uploadImage(form).then(res => {
+            if (res.data.code === 200) {
+              let imageUrl = process.env.VUE_APP_SERVICE_URL + res.data.imgUrl
+              this.selfConfig.imageUrl = imageUrl
+              this.setSelfProperty()
+            } else {
+              this.$message.error(res.data.msg)
+            }
           })
-        }
+          .catch(err => {
+            console.log(err)
+          })
       },
 
       // 全局设置，选择背景设置
@@ -1068,8 +1094,23 @@
         this.setSelfProperty()
       },
 
-      onChange(key) {
-        console.log(key)
+      // 保存大屏
+      screenSave() {
+        const json = {
+          setting: this.pageSettings,
+          components: this.canvasMap
+        }
+        let params = {
+          id: this.screenId,
+          json
+        }
+        this.$server.screenManage.screenSave(params).then(res => {
+          if (res.data.code === 200) {
+            this.$store.dispatch('SetScreenId', res.data.id)
+          } else {
+            this.$message.error(res.data.msg)
+          }
+        })
       }
     },
     watch: {
@@ -1106,18 +1147,9 @@
         deep: true,
         immediate: true
       }
-      // optionsTabsType: {
-      //   handler (val) {
-      //     if (val) {
-      //       console.log(val)
-      //       this.tabsType = val
-      //     }
-      //   },
-      //   deep: true
-      // }
     },
     computed: {
-      ...mapGetters(['pageSettings', 'canvasRange', 'optionsExpand', 'currentSelected', 'optionsTabsType']),
+      ...mapGetters(['pageSettings', 'canvasRange', 'optionsExpand', 'currentSelected', 'screenId', 'canvasMap']),
       chartType () {
         return this.currentSelected ? this.currentSelected.packageJson.name : ''
       },

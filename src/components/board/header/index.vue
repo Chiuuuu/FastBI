@@ -9,13 +9,13 @@
       <slot>control box</slot>
     </div>
     <div class="right-box">
-        <div class="item" flex="dir:top">
+        <!-- <div class="item" flex="dir:top">
           <a-icon
             type="mobile"
             style="font-size:18px"
           />
           <span> 手机端</span>
-        </div>
+        </div> -->
         <div class="item" flex="dir:top" @click.stop="refreshData">
           <a-icon
             type="sync"
@@ -62,7 +62,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['isScreen', 'pageSettings', 'canvasMap'])
+    ...mapGetters(['isScreen', 'pageSettings', 'canvasMap', 'screenId'])
   },
   created() {
     this.userId = 'dv1e443967LZP2Dj'
@@ -97,36 +97,45 @@ export default {
       },
       // 保存大屏
       screenSave() {
-        const screenObj = {
+        const json = {
           setting: this.pageSettings,
           components: this.canvasMap
         }
-        let params = {}
-        if (this.$route.query.parentId) { // 新增大屏保存
-          params = {
-            id: -1,
-            json: screenObj,
-            name: this.$route.query.name,
-            parentId: this.$route.query.parentId
-          }
-        } else { // 编辑大屏保存
-          params = {
-            id: this.$route.query.id,
-            json: screenObj
-          }
+        let params = {
+          json
+        }
+        if (!this.screenId) {
+          params.id = -1
+          params.name = this.$route.query.name
+          params.parentId = this.$route.query.parentId
+        } else {
+          params.id = this.screenId
         }
         this.$server.screenManage.screenSave(params).then(res => {
-          console.log('保存成功')
+          if (res.data.code === 200) {
+            this.$store.dispatch('SetScreenId', res.data.id)
+          } else {
+            this.$message.error(res.data.msg)
+          }
         })
       },
       // 刷新大屏
       refreshData() {
-        console.log(111)
         let params = {
           id: this.$route.query.id
         }
         this.$server.screenManage.screenRefresh(params).then(res => {
-
+          if (res.data.code === 200) {
+            let screenDataList = res.data.data.screenDataList
+            for (let item of screenDataList) {
+              for (let item2 of this.canvasMap) {
+                if (item2.id === item.id) {
+                  item2.packageJson.api_data.source.rows = item2.value
+                }
+              }
+            }
+            this.screenSave()
+          }
         })
       }
     }

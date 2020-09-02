@@ -1,5 +1,5 @@
 <template>
-  <div class="dv-images" style="width: 100%;height:100%;" ref="wrap">
+  <div class="dv-images" style="width: 100%;height:100%;" :style="backgroundStyle" ref="wrap">
     <img v-if="config.imageUrl" :src="config.imageUrl" alt="">
     <a-icon v-else type="file-image" style="font-size:40px;" />
   </div>
@@ -13,6 +13,10 @@
     name: 'ChartsImage',
     props: {
       config: {
+        type: Object,
+        required: true
+      },
+      background: {
         type: Object,
         required: true
       }
@@ -31,7 +35,34 @@
         chartExtend: {},
         chartOptions: {},
         chartSettings: {},
-        colors: []
+        colors: [],
+        backgroundStyle: {}
+      }
+    },
+    watch: {
+      config: {
+        handler (val) {
+          if (val) {
+          }
+        },
+        deep: true,
+        immediate: true
+      },
+      background: {
+        handler (val) {
+          console.log(val)
+          if (val) {
+           this.backgroundStyle = {
+             backgroundColor: val.backgroundColor,
+             borderColor: val.borderColor,
+             borderWidth: val.borderWidth + 'px',
+             borderStyle: val.borderStyle,
+             borderRadius: val.borderRadius + 'px'
+            }
+          }
+        },
+        deep: true,
+        immediate: true
       }
     },
     mounted () {

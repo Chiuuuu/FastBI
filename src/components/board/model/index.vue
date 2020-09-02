@@ -94,11 +94,17 @@
                   style="font-size:16px"
                 />
               </template>
-              <a-collapse-panel v-for="(item, index) in modelList" :key="String(index)" :header="item.name" :style="customStyle">
-                <div style="margin-left:25px">
-                  <p @click="modelHandle(item2)" v-for="item2 in item.items" :key="item2.id">{{item2.name}}</p>
-                </div>
-              </a-collapse-panel>
+              <template v-for="(item, index) in modelList">
+                <a-collapse-panel :showArrow="Boolean(item.isFolder)"
+                :key="String(index)"
+                :header="item.name"
+                :style="customStyle"
+                @click.native="modelHandle(item)">
+                  <div style="margin-left:25px">
+                    <p @click="modelHandle(item2)" v-for="item2 in item.items" :key="item2.id">{{item2.name}}</p>
+                  </div>
+                </a-collapse-panel>
+              </template>
             </a-collapse>
           </div>
         </div>
@@ -109,43 +115,6 @@
 
 <script>
   import { mapGetters, mapActions } from 'vuex'
-const dimesion = [
-  {
-    title: '国家'
-  },
-  {
-    title: '外部账号性质'
-  },
-  {
-    title: '对公对私'
-  },
-  {
-    title: '开户地市'
-  },
-  {
-    title: '开户日期'
-  },
-  {
-    title: '开户省'
-  }
-]
-const measure = [
-  {
-    title: '余额1'
-  },
-  {
-    title: '余额2'
-  },
-  {
-    title: '余额3'
-  },
-  {
-    title: '余额4'
-  },
-  {
-    title: '余额5'
-  }
-]
 
 export default {
   name: 'BoardModel',
@@ -157,8 +126,6 @@ export default {
   },
   data() {
     return {
-      dimesion,
-      measure,
       customStyle:
         'background: #ffffff;border-radius: 4px;border: 0;overflow: hidden;',
       modelKey: ['0', '1', '2', '3'],
@@ -187,17 +154,14 @@ export default {
     },
     // 点击选中模型
     modelHandle(item) {
-      this.model = !this.model
-      this.$store.dispatch('SetDataModel', item)
-      this.getPivoSchemaList()
+      if (!item.isFolder) {
+        this.model = !this.model
+        this.$store.dispatch('SetDataModel', item)
+        this.getPivoSchemaList()
+      }
     },
     // 拖动开始 type 拖拽的字段类型维度或者度量
     dragstart(item, type, event) {
-      // if (file === 'dimension') {
-      //   event.dataTransfer.setData('dimensionFile', JSON.stringify(item))
-      // } else {
-      //   event.dataTransfer.setData('measureFile', JSON.stringify(item))
-      // }
       item.file = type
       event.dataTransfer.setData('dataFile', JSON.stringify(item))
       this.$store.dispatch('SetDragFile', type)
@@ -211,6 +175,7 @@ export default {
       this.$server.screenManage.catalogList().then(res => {
         if (res.data.code === 200) {
           this.modelList = res.data.data.folders
+          this.modelList = this.modelList.concat(res.data.data.items)
         }
       })
     },

@@ -21,7 +21,9 @@ const getters = {
 
     dataModel: state => state.options.dataModel, // 选中的数据模型
 
-    optionsTabsType: state => state.options.optionsTabsType // 选中的项 样式/数据/交互
+    optionsTabsType: state => state.options.optionsTabsType, // 选中的项 样式/数据/交互
+
+    screenId: state => state.app.screenId // 大屏id
 
 }
 

@@ -30,6 +30,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
+import { DEFAULT_COLORS } from '../../../../utils/defaultColors'
 export default {
   props: {
     type: {
@@ -53,15 +54,17 @@ export default {
     currentSelected: {
       handler (val) {
         if (val) {
-          // 当前选中的图表显示维度度量的数据
-          if (val.packageJson.api_data.dimensions || val.packageJson.api_data.measures) {
-            if (this.type === 'dimension') {
-              this.fileList = val.packageJson.api_data.dimensions
+          if (val.name !== 've-image') {
+            // 当前选中的图表显示维度度量的数据
+            if (val.packageJson.api_data.dimensions || val.packageJson.api_data.measures) {
+              if (this.type === 'dimension') {
+                this.fileList = val.packageJson.api_data.dimensions
+              } else {
+                this.fileList = val.packageJson.api_data.measures
+              }
             } else {
-              this.fileList = val.packageJson.api_data.measures
+              this.fileList = []
             }
-          } else {
-            this.fileList = []
           }
         }
       },
@@ -78,22 +81,14 @@ export default {
       // h5 api
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
       dataFile.showMore = false // 是否点击显示更多
-      if (this.type === 'dimension') {
+      if (this.type === 'dimension' && this.dragFile === this.type) {
         // 维度暂时只能拉入一个字段
         this.fileList[0] = dataFile
-      } else {
-        if (this.fileList.length < 2) {
-          this.fileList.push(dataFile)
-        }
-        // else {
-        //   this.fileList[1] = dataFile
-        // }
+      }
+      if (this.type === 'measure') {
+        this.fileList.push(dataFile)
       }
       this.fileList = this.uniqueFun(this.fileList, 'field')
-      // let apiData = {
-      //   [this.type]: this.fileList
-      // }
-      // this.$store.dispatch('SetSelfDataSource', apiData)
       this.getData()
       this.isdrag = false
     },
@@ -119,17 +114,14 @@ export default {
     // 删除当前维度或者度量
     deleteFile(item, index) {
       this.fileList.splice(index, 1)
+      this.getData()
     },
     // 根据维度度量获取数据
     getData() {
-      console.log(this.currentSelected)
       for (let item of this.fileList) {
         item.defaultAggregator = 'SUM'
       }
       if (this.type === 'dimension') {
-        // for (let item of this.fileList) {
-        //   dimensionKeys.push(item.field)
-        // }
         this.currentSelected.packageJson.api_data.dimensions = this.fileList
       } else {
         this.currentSelected.packageJson.api_data.measures = this.fileList
@@ -141,26 +133,28 @@ export default {
       }
       this.$server.screenManage.getData(params).then(res => {
         if (res.data.code === 200) {
-          // let columns = []
+          let columns = []
           let apiData = this.currentSelected.packageJson.api_data
           let dimensionKeys = apiData.dimensions[0].field // 维度key
+          columns[0] = dimensionKeys // 默认columns第一项为维度
           let measureKeys = [] // 度量key
           for (let m of apiData.measures) {
             measureKeys.push(m.field)
+            columns.push(m.field) // 默认columns第二项起为指标
           }
           let rows = []
-          console.log(measureKeys)
           res.data.rows.map((item, index) => {
             let obj = {}
             obj[dimensionKeys] = item[dimensionKeys]
-            obj[measureKeys[index]] = item[measureKeys[index]]
+            for (let item2 of measureKeys) {
+              obj[item2] = item[item2]
+            }
             rows.push(obj)
-              // rows.push(
-              //   { [dimensionKeys]: item[dimensionKeys], [measureKeys[index]]: item[measureKeys[index]] }
-              // )
           })
-
-          console.log(rows)
+           this.currentSelected.packageJson.api_data.source = {
+             columns,
+             rows
+           }
         }
       })
     }

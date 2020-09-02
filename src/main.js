@@ -28,6 +28,17 @@ Vue.prototype.$server = server
 Vue.prototype.$EventBus = new Vue()
 Vue.prototype.$base = process.env.NODE_ENV === 'production' ? '/bin-data-site' : ''
 
+if (sessionStorage.getItem('store')) {
+  store.replaceState(
+    Object.assign({}, store.state, JSON.parse(sessionStorage.getItem('store')))
+  )
+}
+
+// 在页面刷新时将vuex里的信息保存到sessionStorage里
+window.addEventListener('beforeunload', () => {
+  sessionStorage.setItem('store', JSON.stringify(store.state))
+})
+
 new Vue({
     router,
     store,

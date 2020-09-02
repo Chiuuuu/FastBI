@@ -801,10 +801,18 @@ const database = {
                 title: '图片',
                 name: 've-image',
                 icon: 'md-images',
-                // apiData: {},
-                // apis: {},
+                apiData: {},
+                apis: {},
                 config: {
                     imageUrl: ''
+                },
+                background: {
+                  backgroundType: '1',
+                  backgroundColor: '',
+                  borderColor: '',
+                  borderWidth: 0,
+                  borderStyle: '',
+                  borderRadius: 0
                 },
                 view: { width: 500, height: 400, x: 710, y: 580 }
             }

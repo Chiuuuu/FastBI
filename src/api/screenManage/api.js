@@ -16,8 +16,8 @@ const screenManage = {
    * 文件夹列表
    *
    */
-  folderList() {
-    return requestGet('/admin/dev-api/screen/folder/list')
+  folderList(params) {
+    return requestGet('/admin/dev-api/screen/folder/list', params)
   },
   /**
    * 删除文件夹
@@ -50,7 +50,7 @@ const screenManage = {
    * @param {*} params
    */
   screenRefresh(params) {
-    return requestGet(`/admin/screen/data/refresh`, params)
+    return requestGet(`/admin/dev-api/screen/data/refresh`, params)
   },
   /**
    * 数据模型目录
@@ -69,6 +69,14 @@ const screenManage = {
    */
   getData(params) {
     return requestPost2('/admin/dev-api/screen/graph/getData', params)
+  },
+
+  /**
+   * 上传图片
+   * @param {*} params
+   */
+  uploadImage(params) {
+    return requestPost2('/admin/dev-api/screen/data/avatar', params)
   }
 }
 

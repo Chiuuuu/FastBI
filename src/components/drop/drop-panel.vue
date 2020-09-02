@@ -15,7 +15,7 @@
   export default {
     name: 'DropPanel',
     computed: {
-      ...mapGetters(['canvasMap'])
+      ...mapGetters(['canvasMap', 'pageSettings', 'screenId'])
     },
     methods: {
       // 元素drop
@@ -39,10 +39,25 @@
         // this.$store.dispatch('AddCanvasMap', nodeInfo)
         this.canvasMap.push(nodeInfo)
         let params = {
-          id: this.$route.query.id,
-          json: this.canvasMap
+          json: {
+            setting: this.pageSettings,
+            components: this.canvasMap
+          }
         }
-        this.$server.screenManage.screenSave(params).then(res => {})
+        if (!this.screenId) {
+          params.id = -1
+          params.name = this.$route.query.name
+          params.parentId = this.$route.query.parentId
+        } else {
+          params.id = this.screenId
+        }
+        this.$server.screenManage.screenSave(params).then(res => {
+          if (res.data.code === 200) {
+            this.$store.dispatch('SetScreenId', res.data.id)
+          } else {
+            this.$message.error(res.data.msg)
+          }
+        })
       }
     }
   }

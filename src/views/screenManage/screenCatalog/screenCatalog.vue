@@ -18,7 +18,7 @@
         </a-dropdown>
       </div>
       <div class="menu_search">
-        <a-input placeholder="搜索大屏目录">
+        <a-input placeholder="搜索大屏目录" v-model="searchName" @change="menuSearch">
           <a-icon slot="prefix" type="search" />
         </a-input>
       </div>
@@ -63,7 +63,7 @@
     </div>
     <div class="right">
       <span class="nav_title">电视统计大屏</span>
-      <a-button class="btn_n1">
+      <a-button class="btn_n1" @click="openScreen">
         全屏
       </a-button>
       <a-button class="btn_n2">
@@ -72,11 +72,11 @@
       <a-button type="primary" class="btn_pr" @click="editScreen">
         编辑大屏
       </a-button>
-      <div class="contain">
-        <screen v-if="folderList.length > 0"></screen>
+      <div class="contain" ref="contain" :style="wrapStyle">
+        <screen v-if="folderList.length > 0 && flag" :style="canvasPanelStyle"></screen>
         <div class="empty" v-else>
           <img src="@/assets/images/icon_empty_state.png" class="empty_img" />
-          <span class="empty_word"> 暂无内容 ， 请先添加大屏目录数据 ~</span>
+          <span class="empty_word"> 暂无内容 ， 请先添加大屏目录数据或者选择一个大屏目录 ~</span>
         </div>
       </div>
     </div>
@@ -85,8 +85,9 @@
       <a-form :form="screenForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
         <a-form-item label="大屏名称">
           <a-input class="mod_input"
-           v-decorator="['name', { rules: [{ required: true, message: '请输入大屏名称' }] }]"
-           placeholder="请输入大屏名称" />
+           v-decorator="['name', { rules: [{ required: true, message: '请输入大屏名称'}] }]"
+           placeholder="请输入大屏名称"
+           maxLength="20" />
         </a-form-item>
         <a-form-item label="保存目录" v-if="isAdd !== 2">
           <a-select
@@ -110,7 +111,10 @@ import NewFolder from '@/components/newFolder/newFolder'
 import MenuFile from '@/components/dataSource/menu-group/file'
 import MenuFolder from '@/components/dataSource/menu-group/folder'
 
-  import Screen from '@/views/screen' // 大屏
+import { mapGetters } from 'vuex' // 导入vuex
+import Screen from '@/views/screen' // 大屏
+import { addResizeListener, removeResizeListener } from 'bin-ui/src/utils/resize-event'
+
 export default {
   components: {
     NewFolder,
@@ -151,7 +155,11 @@ export default {
           name: '删除',
           onClick: this.handleFileDelete
         }
-      ]
+      ],
+      wrapStyle: {},
+      range: 0,
+      flag: true, // 用于刷新大屏数据
+      searchName: '' // 搜索名称
     }
   },
   watch: {
@@ -160,23 +168,49 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['pageSettings', 'canvasRange', 'screenId']),
     fileSelectId: {
       get () {
-        return this.$store.state.dataAccess.modelId
+        console.log(this.screenId)
+        return this.screenId
       },
       set (value) {
-        this.$store.commit('dataAccess/SET_MODELID', value)
+        this.$store.dispatch('SetScreenId', value)
+        // this.$store.commit('dataAccess/SET_MODELID', value)
       }
+    },
+    // 画布面板的样式
+    canvasPanelStyle () {
+      let obj = {
+        width: `${this.pageSettings.width}px`,
+        height: `${this.pageSettings.height}px`,
+        transform: `scale(0.47) translate3d(0px, 0px, 0)`,
+        transformOrigin: '0 0',
+        backgroundColor: this.pageSettings.backgroundColor
+      }
+      return obj
     }
   },
   mounted() {
+    if (!this.fileSelectId) {
+      this.flag = false
+    }
     this.getList()
     this.$on('fileSelect', this.handleFileSelect)
+
+    this.$nextTick(this._calcStyle)
+    addResizeListener(this.$refs.contain, this._calcStyle)
+  },
+  beforeDestroy () {
+    removeResizeListener(this.$refs.contain, this._calcStyle)
   },
   methods: {
     // 获取文件夹列表
     getList() {
-      this.$server.screenManage.folderList().then(res => {
+      let params = {
+        name: this.searchName
+      }
+      this.$server.screenManage.folderList(params).then(res => {
         if (res.data.code === 200) {
           let rows = res.data.rows
           const list = rows.filter(item => {
@@ -195,6 +229,9 @@ export default {
           this.folderList = list
         }
       })
+    },
+    menuSearch() {
+      this.getList()
     },
     /**
      * 是否为文件夹
@@ -218,6 +255,8 @@ export default {
       this.$server.screenManage.folderDel(params).then(res => {
         if (res.data.code === 200) {
           this.getList()
+          this.$store.dispatch('SetScreenId', '')
+          this.flag = false
         }
       })
     },
@@ -257,17 +296,17 @@ export default {
     },
     // 选择左侧菜单
     handleFileSelect(file) {
-      this.$router.push({
-        path: '/admin',
-        query: {
-          id: file.id
-        }
+      if (this.fileSelectId === file.id) return
+      this.flag = false
+      this.fileSelectId = file.id
+      this.$store.dispatch('SetScreenId', file.id)
+      setTimeout(() => {
+        this.flag = true
       })
     },
     // 点击新建大屏
     addScreen() {
       this.isAdd = 1
-      this.screenForm.resetFields()
       this.screenVisible = true
     },
     // 确认新建大屏
@@ -296,12 +335,18 @@ export default {
             }
           })
         }
+        this.screenForm.resetFields()
+        this.$store.dispatch('SetScreenId', '')
         this.screenVisible = false
       })
     },
     // 编辑大屏
     editScreen() {
-      this.$router.push({ name: 'admin' })
+      console.log(this.screenId)
+      this.$router.push({ path: '/admin',
+      query: {
+        id: this.fileSelectId
+      } })
     },
     // 点击新建文件夹
     addFolder() {
@@ -352,9 +397,40 @@ export default {
     hideFolder() {
       this.folderVisible = false
     },
-    // 点击右键
-    rightClick() {
-      console.log(12)
+    // 打开全屏
+    openScreen () {
+      this.$store.dispatch('SetIsScreen', true)
+      // this.$router.push({ name: 'screen', params: { id: this.userId } })
+      this.$nextTick(() => {
+        var docElm = document.querySelector('.dv-screen')
+        if (docElm) {
+          if (docElm.requestFullscreen) { // W3C
+            docElm.requestFullscreen()
+          } else if (docElm.mozRequestFullScreen) { // FireFox
+              docElm.mozRequestFullScreen()
+          } else if (docElm.webkitRequestFullScreen) { // Chrome等
+              docElm.webkitRequestFullScreen()
+          } else if (docElm.msRequestFullscreen) { // IE11
+              docElm.msRequestFullscreen()
+          }
+        }
+      })
+    },
+    _calcStyle () {
+      const wrap = this.$refs.contain
+      if (!wrap) return
+      // 计算wrap样式
+      // 计算缩放比例
+      let range = ((wrap.clientWidth - 120) / this.pageSettings.width)
+      range = Math.round(range * 100) / 100
+      if (range < 0.3) {
+        range = 0.3
+      }
+      this.wrapStyle = {
+        width: `${this.pageSettings.width * range + 120}px`,
+        height: `${this.pageSettings.height * range + 120}px`
+      }
+      this.range = range
     }
   }
 }

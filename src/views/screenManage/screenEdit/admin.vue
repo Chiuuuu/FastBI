@@ -44,7 +44,8 @@
 
             <!-- 图片 -->
             <chart-image v-else-if="transform.packageJson.name === 've-image'"
-                        :config="transform.packageJson.config"></chart-image>
+                        :config="transform.packageJson.config"
+                        :background="transform.packageJson.background"></chart-image>
 
             <!-- 表格 -->
             <chart-tables v-else-if="transform.packageJson.name === 've-tables'"
@@ -104,7 +105,7 @@
       }
     },
     computed: {
-      ...mapGetters(['canvasMap', 'currentSelected', 'isScreen', 'coverageExpand']),
+      ...mapGetters(['canvasMap', 'currentSelected', 'isScreen', 'coverageExpand', 'pageSettings']),
       coverageMaps () {
         let maps = [...this.canvasMap]
         return maps.reverse()
@@ -122,10 +123,11 @@
       //   this.$log.danger('========>canvasMaps')
       //   this.$print(res.data)
       // })
+      // 先清空数据
+      this.$store.dispatch('InitCanvasMaps', [])
       if (this.$route.query.id) {
+        this.$store.dispatch('SetScreenId', this.$route.query.id)
         this.getScreenData()
-      } else {
-        // this.$store.dispatch('InitCanvasMaps', {})
       }
     },
     mounted () {
@@ -145,7 +147,7 @@
       getScreenData() {
         this.$server.screenManage.screenData(this.$route.query.id).then(res => {
           if (res.data.code === 200) {
-            let json = res.data ? res.data.data.json : {}
+            let json = res.data.data ? res.data.data.json : {}
             this.$store.dispatch('SetPageSettings', json.setting)
             this.$store.dispatch('InitCanvasMaps', json.components)
           }
@@ -193,7 +195,10 @@
         }
         let params = {
           id: this.$route.query.id,
-          json: this.canvasMap
+          json: {
+            components: this.canvasMap,
+            setting: this.pageSettings
+          }
         }
         this.$server.screenManage.screenSave(params).then(res => {})
         // this.$store.dispatch('ContextMenuCommand', 'remove')
