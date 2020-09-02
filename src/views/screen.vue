@@ -11,7 +11,8 @@
 
             <!-- 图片 -->
             <chart-image v-else-if="transform.packageJson.name === 've-image'"
-                         :config="transform.packageJson.config"></chart-image>
+                         :config="transform.packageJson.config"
+                         :background="transform.packageJson.background"></chart-image>
 
             <!-- 表格 -->
             <chart-tables v-else-if="transform.packageJson.name === 've-tables'"

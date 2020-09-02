@@ -16,8 +16,8 @@ const screenManage = {
    * 文件夹列表
    *
    */
-  folderList() {
-    return requestGet('/admin/dev-api/screen/folder/list')
+  folderList(params) {
+    return requestGet('/admin/dev-api/screen/folder/list', params)
   },
   /**
    * 删除文件夹

@@ -806,6 +806,14 @@ const database = {
                 config: {
                     imageUrl: ''
                 },
+                background: {
+                  backgroundType: '1',
+                  backgroundColor: '',
+                  borderColor: '',
+                  borderWidth: 0,
+                  borderStyle: '',
+                  borderRadius: 0
+                },
                 view: { width: 500, height: 400, x: 710, y: 580 }
             }
         },

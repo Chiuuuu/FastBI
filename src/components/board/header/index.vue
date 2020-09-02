@@ -9,13 +9,13 @@
       <slot>control box</slot>
     </div>
     <div class="right-box">
-        <div class="item" flex="dir:top">
+        <!-- <div class="item" flex="dir:top">
           <a-icon
             type="mobile"
             style="font-size:18px"
           />
           <span> 手机端</span>
-        </div>
+        </div> -->
         <div class="item" flex="dir:top" @click.stop="refreshData">
           <a-icon
             type="sync"

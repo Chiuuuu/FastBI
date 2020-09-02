@@ -81,20 +81,14 @@ export default {
       // h5 api
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
       dataFile.showMore = false // 是否点击显示更多
-      if (this.type === 'dimension') {
+      if (this.type === 'dimension' && this.dragFile === this.type) {
         // 维度暂时只能拉入一个字段
         this.fileList[0] = dataFile
-      } else {
-        // if (this.fileList.length < 2) {
-
-        // }
+      }
+      if (this.type === 'measure') {
         this.fileList.push(dataFile)
       }
       this.fileList = this.uniqueFun(this.fileList, 'field')
-      // let apiData = {
-      //   [this.type]: this.fileList
-      // }
-      // this.$store.dispatch('SetSelfDataSource', apiData)
       this.getData()
       this.isdrag = false
     },
@@ -120,6 +114,7 @@ export default {
     // 删除当前维度或者度量
     deleteFile(item, index) {
       this.fileList.splice(index, 1)
+      this.getData()
     },
     // 根据维度度量获取数据
     getData() {
@@ -147,7 +142,6 @@ export default {
             measureKeys.push(m.field)
             columns.push(m.field) // 默认columns第二项起为指标
           }
-          console.log(columns)
           let rows = []
           res.data.rows.map((item, index) => {
             let obj = {}
