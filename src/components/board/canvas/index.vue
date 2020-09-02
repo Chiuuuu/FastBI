@@ -80,18 +80,25 @@
         }
         this.SetCanvasRange(this.range)
       }
+      // pageSettings: {
+      //   handler(val) {
+      //     console.log(val)
+      //   },
+      //   deep: true,
+      //   immediate: true
+      // }
     },
     computed: {
       ...mapGetters(['pageSettings', 'canvasRange', 'contextMenuInfo']),
       // 画布面板的样式
       canvasPanelStyle () {
-        let obj = {
+        return {
           width: `${this.pageSettings.width}px`,
           height: `${this.pageSettings.height}px`,
           transform: `scale(${this.canvasRange}) translate3d(0px, 0px, 0)`,
-          backgroundColor: this.pageSettings.backgroundColor
+          background: this.pageSettings.backgroundType === '1' ? this.pageSettings.backgroundColor : `url(${this.pageSettings.backgroundSrc})`
+          // backgroundColor: this.pageSettings.backgroundColor
         }
-        return obj
       }
     },
     components: { DropPanel, EditSlider }

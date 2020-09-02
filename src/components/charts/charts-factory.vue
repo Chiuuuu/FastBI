@@ -120,7 +120,8 @@
         handler (val) {
           if (val) {
            this.backgroundStyle = {
-             backgroundColor: val.backgroundColor,
+             background: val.backgroundType === '1' ? val.backgroundColor : `url(${val.backgroundSrc})`,
+            //  backgroundColor: val.backgroundColor,
              borderColor: val.borderColor,
              borderWidth: val.borderWidth + 'px',
              borderStyle: val.borderStyle,

@@ -43,7 +43,8 @@ export default {
       emptyText: {
         'dimension': '拖入维度',
         'measure': '拖入度量',
-        'filter': '拖入字段'
+        'filter': '拖入字段',
+        'table': '拖入字段'
       },
       isdrag: false, // 是否拖拽中
       fileList: [], // 维度字段数组
@@ -57,10 +58,14 @@ export default {
           if (val.name !== 've-image') {
             // 当前选中的图表显示维度度量的数据
             if (val.packageJson.api_data.dimensions || val.packageJson.api_data.measures) {
-              if (this.type === 'dimension') {
+              if (this.type === 'dimension') { // 维度
                 this.fileList = val.packageJson.api_data.dimensions
-              } else {
+              }
+              if (this.type === 'measures') { // 度量
                 this.fileList = val.packageJson.api_data.measures
+              }
+              if (this.type === 'table') { // 表格不区分维度度量
+                this.fileList = val.packageJson.api_data.tableList
               }
             } else {
               this.fileList = []
@@ -85,7 +90,7 @@ export default {
         // 维度暂时只能拉入一个字段
         this.fileList[0] = dataFile
       }
-      if (this.type === 'measure') {
+      if (this.type === 'measure' || this.type === 'table') {
         this.fileList.push(dataFile)
       }
       this.fileList = this.uniqueFun(this.fileList, 'field')
@@ -123,8 +128,12 @@ export default {
       }
       if (this.type === 'dimension') {
         this.currentSelected.packageJson.api_data.dimensions = this.fileList
-      } else {
+      }
+      if (this.type === 'measures') {
         this.currentSelected.packageJson.api_data.measures = this.fileList
+      }
+      if (this.type === 'table') {
+        this.currentSelected.packageJson.api_data.tableList = this.fileList
       }
       let params = {
         setting: {
@@ -133,28 +142,49 @@ export default {
       }
       this.$server.screenManage.getData(params).then(res => {
         if (res.data.code === 200) {
-          let columns = []
-          let apiData = this.currentSelected.packageJson.api_data
-          let dimensionKeys = apiData.dimensions[0].field // 维度key
-          columns[0] = dimensionKeys // 默认columns第一项为维度
-          let measureKeys = [] // 度量key
-          for (let m of apiData.measures) {
-            measureKeys.push(m.field)
-            columns.push(m.field) // 默认columns第二项起为指标
-          }
-          let rows = []
-          res.data.rows.map((item, index) => {
-            let obj = {}
-            obj[dimensionKeys] = item[dimensionKeys]
-            for (let item2 of measureKeys) {
-              obj[item2] = item[item2]
+          if (this.type === 'table') {
+            let columns = []
+            let apiData = this.currentSelected.packageJson.api_data
+            for (let item of apiData.tableList) {
+              columns.push({
+                title: item.field,
+                dataIndex: item.field,
+                key: item.field
+              })
             }
-            rows.push(obj)
-          })
-           this.currentSelected.packageJson.api_data.source = {
-             columns,
-             rows
-           }
+            let rows = res.data.rows
+            if (rows.length > 10) {
+              rows.length = 10
+            }
+            this.currentSelected.packageJson.api_data.source = {
+              columns,
+              rows
+            }
+            console.log(this.currentSelected.packageJson.api_data.source)
+          } else {
+            let columns = []
+            let apiData = this.currentSelected.packageJson.api_data
+            let dimensionKeys = apiData.dimensions[0].field // 维度key
+            columns[0] = dimensionKeys // 默认columns第一项为维度
+            let measureKeys = [] // 度量key
+            for (let m of apiData.measures) {
+              measureKeys.push(m.field)
+              columns.push(m.field) // 默认columns第二项起为指标
+            }
+            let rows = []
+            res.data.rows.map((item, index) => {
+              let obj = {}
+              obj[dimensionKeys] = item[dimensionKeys]
+              for (let item2 of measureKeys) {
+                obj[item2] = item[item2]
+              }
+              rows.push(obj)
+            })
+            this.currentSelected.packageJson.api_data.source = {
+              columns,
+              rows
+            }
+          }
         }
       })
     }
