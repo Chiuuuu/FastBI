@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- <a-spin tip="加载中..." :spinning="spinning"> -->
     <div class="search_bar">
       <a-input placeholder="请输入关键词" class="search_input">
         <a-icon slot="prefix" type="search" />
@@ -10,7 +9,8 @@
           aaa
         </a-select-option>
       </a-select>
-      <a-button type="primary" class="select_button" @click="handleExtract" :loading="extractSping">全部抽取</a-button>
+      <a-button type="primary" style="margin-right:10px;" class="select_button" @click="handleExtract" :loading="extractSping">全部抽取</a-button>
+      <a-button type="primary" class="select_button" @click="handleGetData" :loading="spinning">刷新数据</a-button>
     </div>
     <div class="table">
       <a-table :row-selection="rowSelection" :columns="columns" :data-source="data"  rowKey='id' :loading='spinning' :pagination='false'>
@@ -25,7 +25,6 @@
         </span>
       </a-table>
     </div>
-    <!-- </a-spin> -->
   </div>
 </template>
 <script>
