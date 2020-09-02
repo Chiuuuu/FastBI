@@ -140,7 +140,7 @@ export default {
       },
       folderContenxtMenu: [
         {
-          name: '添加链接',
+          name: '添加连接',
           onClick: this.showModal
         },
         {
