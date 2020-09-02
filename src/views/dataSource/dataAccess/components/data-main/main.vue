@@ -14,9 +14,7 @@
           <a-tab-pane key="1" tab="连接信息">
             <tab-content-entry
               ref="entry"
-              @hook:mounted="handleTT"
               @on-set-table-name="handleSetTableName"
-              @on-set-tab="handleSetTab"
               ></tab-content-entry>
           </a-tab-pane>
           <a-tab-pane key="2" tab="库表结构" force-render :disabled="!tabChangeAble">
@@ -77,6 +75,7 @@ export default {
      * 设置表名称
     */
     handleSetTableName(name) {
+      this.$set(this.formInfo, 'name', name)
       this.$store.dispatch('dataAccess/setModelInfo', Object.assign(this.formInfo, {
         name
       }))
@@ -88,9 +87,6 @@ export default {
       if (this.defaultTab === '2') {
         console.log('去刷新')
         this.$refs.structure.handleGetData()
-      } else {
-        console.log('去刷新2')
-        this.$refs.entry.handleSetFormData()
       }
     },
     /**
@@ -106,11 +102,6 @@ export default {
         })
       } else if (activeKey === '3') {
         console.log('操作记录请求')
-      } else if (activeKey === '1') {
-        if (this.$refs.entry) {
-          console.log('操作form')
-          this.$refs.entry.handleSetFormData()
-        }
       }
     },
     /**

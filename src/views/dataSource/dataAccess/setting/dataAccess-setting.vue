@@ -146,7 +146,8 @@ export default {
     ...mapState({
       formInfo: state => state.dataAccess.modelInfo,
       modelId: state => state.dataAccess.modelId,
-      readRows: state => state.dataAccess.readRows
+      readRows: state => state.dataAccess.readRows,
+      modelType: state => state.dataAccess.modelType
     }),
     rowSelection() {
       return {}
@@ -165,18 +166,36 @@ export default {
     },
     async handleGetData() {
       this.sping = true
-      const result = await fetchGetTableField({
-        url: '/admin/dev-api/system/mysql/get/field',
-        data: {
-          sourceMysqlId: this.modelId,
-          databasesName: this.formInfo.databaseName,
-          sourceMysqName: this.formInfo.name,
-          tableId: this.fieldInfo.id,
-          tableName: this.fieldInfo.name
-        }
-      }).finally(() => {
-        this.sping = false
-      })
+      let result
+
+      if (this.modelType === 'mysql') {
+        result = await fetchGetTableField({
+          url: '/admin/dev-api/system/mysql/get/field',
+          data: {
+            sourceMysqlId: this.modelId,
+            databasesName: this.formInfo.databaseName,
+            sourceMysqName: this.formInfo.name,
+            tableId: this.fieldInfo.id,
+            tableName: this.fieldInfo.name
+          }
+        }).finally(() => {
+          this.sping = false
+        })
+      } else if (this.modelType === 'oracle') {
+        result = await fetchGetTableField({
+          url: '/admin/dev-api/system/oracle/get/field',
+          data: {
+            sourceOracleId: this.modelId,
+            databasesName: this.formInfo.databaseName,
+            sourceOracleName: this.formInfo.name,
+            tableId: this.fieldInfo.id,
+            tableName: this.fieldInfo.name
+          }
+        }).finally(() => {
+          this.sping = false
+        })
+      }
+
       if (result.data.code === 200) {
         this.data = [].concat(result.data.rows)
       } else {

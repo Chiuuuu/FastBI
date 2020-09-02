@@ -29,6 +29,9 @@ const mutations = {
     },
     SET_READROWS(state, list) {
         state.readRows = [].concat(list)
+    },
+    SET_MODELSELECTTYPE(state, type) {
+        state.modelSelectType = type
     }
 }
 

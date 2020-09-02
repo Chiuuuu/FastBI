@@ -88,7 +88,8 @@ export default {
     ...mapState({
       formInfo: state => state.dataAccess.modelInfo,
       databaseid: state => state.dataAccess.databaseid,
-      modelInfo: state => state.dataAccess.modelInfo
+      modelInfo: state => state.dataAccess.modelInfo,
+      modelType: state => state.dataAccess.modelType
     })
   },
   methods: {
@@ -97,15 +98,29 @@ export default {
     },
     async handleGetData() {
       this.spinning = true
-      const dabaseInfoResult = await fetchReadeTable({
-        url: '/admin/dev-api/system/mysql/read/table',
-        data: {
-          databaseName: this.formInfo.databaseName,
-          sourceMysqName: this.formInfo.name
-        }
-      }).finally(() => {
-        this.spinning = false
-      })
+      let dabaseInfoResult
+
+      if (this.modelType === 'mysql') {
+        dabaseInfoResult = await fetchReadeTable({
+          url: '/admin/dev-api/system/mysql/read/table',
+          data: {
+            databaseName: this.formInfo.databaseName,
+            sourceMysqName: this.formInfo.name
+          }
+        }).finally(() => {
+          this.spinning = false
+        })
+      } else if (this.modelType === 'oracle') {
+        dabaseInfoResult = await fetchReadeTable({
+          url: '/admin/dev-api/system/oracle/read/table',
+          data: {
+            databaseName: this.formInfo.databaseName,
+            sourceOracleName: this.formInfo.name
+          }
+        }).finally(() => {
+          this.spinning = false
+        })
+      }
 
       if (dabaseInfoResult.data.code === 200) {
         this.data = [].concat(dabaseInfoResult.data.rows)
@@ -113,7 +128,6 @@ export default {
       } else {
         this.$message.error(dabaseInfoResult.data.msg)
       }
-      console.log('获取数据', dabaseInfoResult.data)
     },
     async handleExtract() {
       if (this.selectedRows.length === 0) {
@@ -130,15 +144,28 @@ export default {
         return _item
       })
       this.extractSping = true
-      const result = await fetchSaveExtract({
-        url: '/admin/dev-api/system/mysql/datax/extract',
-        data: {
-          rows: rows,
-          tableList: this.data
-        }
-      }).finally(() => {
-        this.extractSping = false
-      })
+
+      let result
+      if (this.modelType === 'mysql') {
+        result = await fetchSaveExtract({
+          url: '/admin/dev-api/system/mysql/datax/extract',
+          data: {
+            rows: rows,
+            tableList: this.data
+          }
+        }).finally(() => {
+          this.extractSping = false
+        })
+      } else if (this.modelType === 'oracle') {
+        result = await fetchSaveExtract({
+          url: '/admin/dev-api/system/oracle/datax',
+          data: {
+            rows: rows
+          }
+        }).finally(() => {
+          this.extractSping = false
+        })
+      }
 
       if (result.data.code === 200) {
         this.$message.success('抽取成功')
