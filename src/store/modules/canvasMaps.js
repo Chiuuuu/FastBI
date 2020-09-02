@@ -5,7 +5,6 @@ import {
   removeCanvasMap,
   topCanvasMap, upCanvasMap
 } from '../../api/canvasMaps/canvas-maps-request'
-import getters from '../getters'
 
 const canvasMaps = {
   state: {

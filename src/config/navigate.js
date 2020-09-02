@@ -790,6 +790,14 @@ const list = [{
                         content: '图片'
                     }
                 },
+                background: {
+                    backgroundType: '1',
+                    backgroundColor: '',
+                    borderColor: '',
+                    borderWidth: 0,
+                    borderStyle: '',
+                    borderRadius: 0
+                },
                 view: { width: 400, height: 400, x: 760, y: 340 }
             },
             {

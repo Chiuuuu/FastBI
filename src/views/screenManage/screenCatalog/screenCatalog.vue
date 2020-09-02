@@ -18,7 +18,7 @@
         </a-dropdown>
       </div>
       <div class="menu_search">
-        <a-input placeholder="搜索大屏目录">
+        <a-input placeholder="搜索大屏目录" v-model="searchName" @change="menuSearch">
           <a-icon slot="prefix" type="search" />
         </a-input>
       </div>
@@ -63,7 +63,7 @@
     </div>
     <div class="right">
       <span class="nav_title">电视统计大屏</span>
-      <a-button class="btn_n1">
+      <a-button class="btn_n1" @click="openScreen">
         全屏
       </a-button>
       <a-button class="btn_n2">
@@ -76,7 +76,7 @@
         <screen v-if="folderList.length > 0 && flag" :style="canvasPanelStyle"></screen>
         <div class="empty" v-else>
           <img src="@/assets/images/icon_empty_state.png" class="empty_img" />
-          <span class="empty_word"> 暂无内容 ， 请先添加大屏目录数据 ~</span>
+          <span class="empty_word"> 暂无内容 ， 请先添加大屏目录数据或者选择一个大屏目录 ~</span>
         </div>
       </div>
     </div>
@@ -85,8 +85,9 @@
       <a-form :form="screenForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
         <a-form-item label="大屏名称">
           <a-input class="mod_input"
-           v-decorator="['name', { rules: [{ required: true, message: '请输入大屏名称' }] }]"
-           placeholder="请输入大屏名称" />
+           v-decorator="['name', { rules: [{ required: true, message: '请输入大屏名称'}] }]"
+           placeholder="请输入大屏名称"
+           maxLength="20" />
         </a-form-item>
         <a-form-item label="保存目录" v-if="isAdd !== 2">
           <a-select
@@ -157,7 +158,8 @@ export default {
       ],
       wrapStyle: {},
       range: 0,
-      flag: true
+      flag: true, // 用于刷新大屏数据
+      searchName: '' // 搜索名称
     }
   },
   watch: {
@@ -166,13 +168,15 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['pageSettings', 'canvasRange']),
+    ...mapGetters(['pageSettings', 'canvasRange', 'screenId']),
     fileSelectId: {
       get () {
-        return this.$store.state.dataAccess.modelId
+        console.log(this.screenId)
+        return this.screenId
       },
       set (value) {
-        this.$store.commit('dataAccess/SET_MODELID', value)
+        this.$store.dispatch('SetScreenId', value)
+        // this.$store.commit('dataAccess/SET_MODELID', value)
       }
     },
     // 画布面板的样式
@@ -188,6 +192,9 @@ export default {
     }
   },
   mounted() {
+    if (!this.fileSelectId) {
+      this.flag = false
+    }
     this.getList()
     this.$on('fileSelect', this.handleFileSelect)
 
@@ -200,7 +207,10 @@ export default {
   methods: {
     // 获取文件夹列表
     getList() {
-      this.$server.screenManage.folderList().then(res => {
+      let params = {
+        name: this.searchName
+      }
+      this.$server.screenManage.folderList(params).then(res => {
         if (res.data.code === 200) {
           let rows = res.data.rows
           const list = rows.filter(item => {
@@ -219,6 +229,9 @@ export default {
           this.folderList = list
         }
       })
+    },
+    menuSearch() {
+      this.getList()
     },
     /**
      * 是否为文件夹
@@ -242,6 +255,8 @@ export default {
       this.$server.screenManage.folderDel(params).then(res => {
         if (res.data.code === 200) {
           this.getList()
+          this.$store.dispatch('SetScreenId', '')
+          this.flag = false
         }
       })
     },
@@ -381,6 +396,25 @@ export default {
     // 关闭新建文件夹弹窗
     hideFolder() {
       this.folderVisible = false
+    },
+    // 打开全屏
+    openScreen () {
+      this.$store.dispatch('SetIsScreen', true)
+      // this.$router.push({ name: 'screen', params: { id: this.userId } })
+      this.$nextTick(() => {
+        var docElm = document.querySelector('.dv-screen')
+        if (docElm) {
+          if (docElm.requestFullscreen) { // W3C
+            docElm.requestFullscreen()
+          } else if (docElm.mozRequestFullScreen) { // FireFox
+              docElm.mozRequestFullScreen()
+          } else if (docElm.webkitRequestFullScreen) { // Chrome等
+              docElm.webkitRequestFullScreen()
+          } else if (docElm.msRequestFullscreen) { // IE11
+              docElm.msRequestFullscreen()
+          }
+        }
+      })
     },
     _calcStyle () {
       const wrap = this.$refs.contain

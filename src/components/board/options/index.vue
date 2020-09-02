@@ -967,7 +967,6 @@
       // 设置全局配置
       setPageSetting () {
         setPageSettings(this.globalSettings).then(res => {
-          console.log(res)
           this.$store.dispatch('SetPageSettings', res.data)
           this.screenSave()
         })
@@ -1031,7 +1030,7 @@
             this.imageUrl = imageUrl
             this.selfConfig.backgroundSrc = imageUrl
             this.loading = false
-            this.setPageSetting()
+            this.setSelfProperty()
           })
         }
       },
@@ -1049,9 +1048,11 @@
       selectPhoto(e) {
         var form = new FormData()
         form.append('avatarfile', e.target.files[0])
-        console.log(this.$server.screenManage)
         this.$server.screenManage.uploadImage(form).then(res => {
             if (res.data.code === 200) {
+              let imageUrl = process.env.VUE_APP_SERVICE_URL + res.data.imgUrl
+              this.selfConfig.imageUrl = imageUrl
+              this.setSelfProperty()
             } else {
               this.$message.error(res.data.msg)
             }
