@@ -51,7 +51,7 @@
         </div>
       </div>
       <div v-else>
-        <component :is="modelType" @on-set-table-name="handleSetName"></component>
+        <component :is="modelType" @on-set-table-name="handleSetName" @hook:mounted="handleMounted" ref="entryRef"></component>
       </div>
     </template>
   </div>
@@ -105,6 +105,9 @@ export default {
   methods: {
     handleSetName(name) {
       this.$emit('on-set-table-name', name)
+    },
+    handleMounted() {
+      this.$refs.entryRef.handleSetFormData()
     }
   }
 }

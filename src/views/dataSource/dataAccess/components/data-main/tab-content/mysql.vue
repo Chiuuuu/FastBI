@@ -25,7 +25,7 @@
       <a-input style="width:528px;" v-model="form.username" />
     </a-form-model-item>
     <a-form-model-item label="密码" prop="password">
-      <a-input-password style="width:528px;" v-model="form.password" />
+      <a-input-password style="width:528px;" v-model="form.password" autocomplete />
     </a-form-model-item>
     <a-form-model-item :wrapper-col="{ span: 14, offset: 4 }">
       <a-button
