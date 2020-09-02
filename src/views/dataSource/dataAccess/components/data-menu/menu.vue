@@ -122,7 +122,7 @@ export default {
   },
   data() {
     return {
-      modelList: ['mysql', 'oracle', 'csv'].map(function(item) {
+      modelList: ['mysql', 'oracle'].map(function(item) {
         // 弹窗选项列表
         return {
           imgurl: require(`@/assets/images/icon_${item}.png`),
@@ -204,7 +204,6 @@ export default {
         const result = await fetchTableInfo({
           url: '/admin/dev-api/system/mysql/' + file.id
         })
-        console.log('result', result)
         if (result.data.code === 200) {
           this.$store.dispatch('dataAccess/setModelInfo', {
             ip: result.data.data.ip,
@@ -217,8 +216,20 @@ export default {
         } else {
           this.$message.error(result.data.msg)
         }
-      } else if (file.typeCode === 2) {
+      } else if (file.typeCore === 2) {
         this.$store.dispatch('dataAccess/setModelType', 'oracle')
+        const result = await fetchTableInfo({
+          url: '/admin/dev-api/system/oracle/' + file.id
+        })
+        if (result.data.code === 200) {
+          this.$store.dispatch('dataAccess/setModelInfo', {
+            ...result.data.data,
+            port: Number(result.data.data.port)
+          })
+          this.$EventBus.$emit('setFormData')
+        } else {
+          this.$message.error(result.data.msg)
+        }
       }
       this.$store.dispatch('dataAccess/setFirstFinished', false)
       this.$store.dispatch('dataAccess/setModelId', file.id)
