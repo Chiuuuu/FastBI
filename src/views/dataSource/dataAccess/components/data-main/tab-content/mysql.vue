@@ -77,6 +77,7 @@ export default {
   data() {
     return {
       labelCol: { span: 4 },
+      wrapperCol: { span: 10 },
       form: {
         // 连接信息表单
         name: '', // 数据库名
