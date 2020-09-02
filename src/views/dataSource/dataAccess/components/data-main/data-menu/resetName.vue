@@ -17,7 +17,7 @@
     "
   >
     <a-form layout="vertical" :form="form" class="resetNameForm">
-      <a-form-item label="名称">
+      <a-form-item label="文件夹名称">
         <a-input
           v-decorator="[
             'name',
