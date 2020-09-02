@@ -17,45 +17,45 @@
 <script>
 const column = [
   {
-    title: "操作时间",
-    dataIndex: "work_time",
-    key: "work_time"
+    title: '操作时间',
+    dataIndex: 'work_time',
+    key: 'work_time'
   },
   {
-    title: "操作者",
-    dataIndex: "operator",
-    key: "operator"
+    title: '操作者',
+    dataIndex: 'operator',
+    key: 'operator'
   },
   {
-    title: "账号",
-    dataIndex: "account",
-    key: "account"
+    title: '账号',
+    dataIndex: 'account',
+    key: 'account'
   },
   {
-    title: "操作类型",
-    key: "type",
-    dataIndex: "type"
+    title: '操作类型',
+    key: 'type',
+    dataIndex: 'type'
   }
-];
+]
 
 const datas = [
   {
-    key: "1",
-    work_time: "2020-07-12  12:00:00",
-    operator: "钟大勇",
-    account: "vfg123456"
+    key: '1',
+    work_time: '2020-07-12  12:00:00',
+    operator: '钟大勇',
+    account: 'vfg123456'
   }
-];
+]
 export default {
-  name: "tabContentRecord",
+  name: 'tabContentRecord',
   data() {
     return {
         column,
         datas
-    };
+    }
   },
   mounted() {
-    console.log("tab-mounted");
+    console.log('tab-mounted')
   }
-};
+}
 </script>
