@@ -376,6 +376,7 @@ export default {
 
       if (result.data.code === 200) {
         this.$message.success('添加成功')
+        this.handleGetMenuList()
       } else {
         this.$message.error(result.data.msg)
       }
