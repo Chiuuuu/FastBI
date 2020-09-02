@@ -9,6 +9,8 @@
               :data-source="tableData"
               :showHeader="showHeader"
               :customRow="customRow"
+              :pagination="false"
+              :scroll="{ y: 240 }"
               size="middle"
               >
         <span slot="index" slot-scope="text, record, index" v-if="config.index.show">
@@ -60,21 +62,6 @@
             // 是否自动换行
             item.ellipsis = val.table.ellipsis
           }
-          // let obj = {
-          //   title: '序号',
-          //   dataIndex: 'index',
-          //   key: 'index',
-          //   scopedSlots: { customRender: 'index' }
-          // }
-          // if (this.columns.length > 0) {
-          //   let i = this.columns.indexOf(obj)
-          //   console.log(val.index.show)
-          //   if (val.index.show && i < 0) {
-          //     this.columns.unshift(obj)
-          //   } else {
-          //     this.columns.shift()
-          //   }
-          // }
         },
         deep: true,
         immediate: true
@@ -82,8 +69,8 @@
       apiData: {
         handler (val) {
           if (val) {
-            if (val.column) {
-              for (let item of val.column) {
+            if (val.source) {
+              for (let item of val.source.columns) {
                 // 表格样式
                 item.customHeaderCell = this.customHeaderRow
 
@@ -95,8 +82,8 @@
                 }
               }
             }
-            this.columns = val.column
-            this.tableData = val.source
+            this.columns = val.source.columns
+            this.tableData = val.source.rows
           }
         },
         deep: true,

@@ -28,17 +28,6 @@ module.exports = {
       //       '^/zj': ''
       //   }
       // },
-      // '/admin/dev-api': {
-      //   // target: 'http://192.168.0.69:81',
-      //   // target: 'http://192.168.2.39:80',
-      //   // target: 'http://10.16.41.69:80',
-      //   // target: 'http://192.168.0.30:80',
-      //   target: 'http://192.168.45.95:8080', // 测试服
-      //   changeOrigin: true, // 是否跨域
-      //   pathRewrite: {
-      //       '^/admin/dev-api': ''
-      //   }
-      // }
       [process.env.VUE_APP_BASE_API]: {
         // target: 'http://192.168.0.69:81',
         // target: 'http://192.168.2.39:80',

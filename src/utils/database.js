@@ -17,6 +17,7 @@ const database = {
                 title: '柱状图',
                 name: 've-histogram',
                 icon: 'bar-chart',
+                type: '1',
                 api_data: {
                     source: [
                         { x: '1/1', y: 375, s: '系列1' },
@@ -131,6 +132,7 @@ const database = {
                 title: '折线图',
                 name: 've-line',
                 icon: 'line-chart',
+                type: '1',
                 api_data: {
                     source: [
                         { x: '1/1', y: 375 },
@@ -245,6 +247,7 @@ const database = {
                 title: '条形图',
                 name: 've-bar',
                 icon: 'md-list',
+                type: '1',
                 api_data: {
                     source: [
                         { x: '1/1', y: 375, s: '系列1' },
@@ -359,6 +362,7 @@ const database = {
                 title: '饼图',
                 name: 've-pie',
                 icon: 'ios-pie',
+                type: '1',
                 api_data: {
                     source: [
                         { x: '1/1', y: 1393, s: '系列1' },
@@ -473,6 +477,7 @@ const database = {
                 title: '地图',
                 name: 've-map',
                 icon: 'ios-map',
+                type: '1',
                 api_data: {
                     source: [
                         { x: '吉林', y: 178 },
@@ -644,6 +649,7 @@ const database = {
                 title: '雷达图',
                 name: 've-radar',
                 icon: 'ios-cellular',
+                type: '1',
                 api_data: {
                     source: [
                         { x: '1/1', y: 1393, s: '指标1' },
@@ -823,66 +829,72 @@ const database = {
                 title: '表格',
                 name: 've-tables',
                 icon: 'table',
+                type: '3',
                 api_data: {
-                    source: [{
-                            key: '1',
-                            name: 'John Brown',
-                            age: 32,
-                            address: 'New York',
-                            tags: ['nice', 'developer']
-                        },
-                        {
-                            key: '2',
-                            name: 'Jim Green',
-                            age: 42,
-                            address: 'London ',
-                            tags: ['loser']
-                        },
-                        {
-                            key: '3',
-                            name: 'Joe Black',
-                            age: 32,
-                            address: 'Sidney ',
-                            tags: ['cool', 'teacher']
-                        }
-                    ],
-                    column: [{
-                            title: 'Name',
-                            dataIndex: 'name',
-                            key: 'name',
-                            scopedSlots: { customRender: 'name' }
-                        },
-                        {
-                            title: 'Age',
-                            dataIndex: 'age',
-                            key: 'age',
-                            width: 80
-                        },
-                        {
-                            title: 'Address',
-                            dataIndex: 'address',
-                            key: 'address 1',
-                            ellipsis: true
-                        },
-                        {
-                            title: '02',
-                            dataIndex: 'address',
-                            key: 'address 2',
-                            ellipsis: true
-                        },
-                        {
-                            title: '03',
-                            dataIndex: 'address',
-                            key: 'address 3',
-                            ellipsis: true
-                        },
-                        {
-                            title: '04',
-                            dataIndex: 'address',
-                            key: 'address 4',
-                            ellipsis: true
-                        }
-                    ]
+                    source: {
+                      columns: [{
+                                  title: 'Name',
+                                  dataIndex: 'name',
+                                  key: 'name',
+                                  scopedSlots: { customRender: 'name' },
+                                  customHeaderCell: function() {}
+                              },
+                              {
+                                  title: 'Age',
+                                  dataIndex: 'age',
+                                  key: 'age',
+                                  width: 80,
+                                  customHeaderCell: function() {}
+                              },
+                              {
+                                  title: 'Address',
+                                  dataIndex: 'address',
+                                  key: 'address 1',
+                                  ellipsis: true,
+                                  customHeaderCell: function() {}
+                              },
+                              {
+                                  title: '02',
+                                  dataIndex: 'address',
+                                  key: 'address 2',
+                                  ellipsis: true,
+                                  customHeaderCell: function() {}
+                              },
+                              {
+                                  title: '03',
+                                  dataIndex: 'address',
+                                  key: 'address 3',
+                                  ellipsis: true,
+                                  customHeaderCell: function() {}
+                              },
+                              {
+                                  title: '04',
+                                  dataIndex: 'address',
+                                  key: 'address 4',
+                                  ellipsis: true,
+                                  customHeaderCell: function() {}
+                              }
+                            ],
+                    rows: [{
+                                key: '1',
+                                name: 'John Brown',
+                                age: 32,
+                                address: 'New York'
+                            },
+                            {
+                                key: '2',
+                                name: 'Jim Green',
+                                age: 42,
+                                address: 'London'
+                            },
+                            {
+                                key: '3',
+                                name: 'Joe Black',
+                                age: 32,
+                                address: 'Sidney'
+                            }
+                        ]
+                    }
                 },
                 apis: {},
                 background: {

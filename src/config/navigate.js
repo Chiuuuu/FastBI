@@ -12,6 +12,7 @@ const list = [{
                 title: '折线图',
                 name: 've-line',
                 icon: 'line-chart',
+                type: '1',
                 api_data: {
                     source: [
                         { x: '1/1', y: 375 },
@@ -122,6 +123,7 @@ const list = [{
                 title: '柱状图',
                 name: 've-histogram',
                 icon: 'bar-chart',
+                type: '1',
                 api_data: {
                     source: [
                         { x: '1/1', y: 375, s: '系列1' },
@@ -233,6 +235,7 @@ const list = [{
                 title: '条形图',
                 name: 've-bar',
                 icon: 'menu',
+                type: '1',
                 api_data: {
                     source: [
                         { x: '1/1', y: 375, s: '系列1' },
@@ -344,6 +347,7 @@ const list = [{
                 title: '饼图',
                 name: 've-pie',
                 icon: 'pie-chart',
+                type: '1',
                 api_data: {
                     source: [
                         { x: '1/1', y: 1393, s: '系列1' },
@@ -455,6 +459,7 @@ const list = [{
                 title: '雷达图',
                 name: 've-radar',
                 icon: 'radar-chart',
+                type: '1',
                 api_data: {
                     source: [
                         { x: '1/1', y: 1393, s: '指标1' },
@@ -576,175 +581,175 @@ const list = [{
                     color: DEFAULT_COLORS
                 },
                 view: { width: 400, height: 400, x: 760, y: 340 }
-            },
-            {
-                title: '地图',
-                name: 've-map',
-                icon: 'global',
-                api_data: {
-                    source: [
-                        { x: '吉林', y: 178 },
-                        { x: '北京', y: 23 },
-                        { x: '上海', y: 122 },
-                        { x: '徐州', y: 98 },
-                        { x: '南京', y: 188 },
-                        { x: '兰州', y: 31 },
-                        { x: '乌鲁木齐', y: 122 },
-                        { x: '马鞍山', y: 32 },
-                        { x: '张家界', y: 55 },
-                        { x: '三门峡', y: 100 }
-                    ]
-                },
-                apis: {
-                    position: 'china',
-                    labelMap: {
-                        'x': '位置',
-                        'y': '人口',
-                        's': '系列1'
-                    }
-                },
-                background: {
-                    backgroundType: '1',
-                    backgroundColor: '',
-                    borderColor: '',
-                    borderWidth: 0,
-                    borderStyle: '',
-                    borderRadius: 0
-                },
-                config: {
-                    title: {
-                        show: true,
-                        content: '地图',
-                        textAlign: 'left',
-                        textStyle: {
-                            color: '#ffffff',
-                            fontSize: 20
-                        }
-                    },
-                    grid: { left: 20, top: 60, right: 20, bottom: 30 },
-                    legend: {
-                        show: true,
-                        textStyle: {
-                            color: '#ffffff',
-                            fontSize: 12
-                        },
-                        itemGap: 12,
-                        icon: '',
-                        left: 'center',
-                        top: 'auto',
-                        right: 'auto',
-                        bottom: 'auto'
-                    },
-                    visualMap: {
-                        show: false,
-                        type: 'piecewise',
-                        min: 0,
-                        max: 200,
-                        inRange: {
-                            color: ['#50a3ba', '#eac736', '#d94e5d'],
-                            symbolSize: [10, 16]
-                        },
-                        textStyle: {
-                            color: '#fff',
-                            fontSize: 12
-                        }
-                    },
-                    xAxis: {
-                        show: false,
-                        axisLabel: {
-                            color: '#ffffff',
-                            fontSize: 12,
-                            rotate: 0
-                        },
-                        axisLine: {
-                            show: false,
-                            lineStyle: {
-                                color: '#cccccc'
-                            }
-                        },
-                        splitLine: {
-                            show: false,
-                            lineStyle: {
-                                color: '#cccccc'
-                            }
-                        }
-                    },
-                    yAxis: {
-                        show: false,
-                        axisLabel: {
-                            color: '#ffffff',
-                            fontSize: 12
-                        },
-                        axisLine: {
-                            show: false,
-                            lineStyle: {
-                                color: '#cccccc'
-                            }
-                        },
-                        splitLine: {
-                            show: false,
-                            lineStyle: {
-                                color: '#cccccc'
-                            }
-                        }
-                    },
-                    // 地图独有的
-                    geo: {
-                        map: 'china',
-                        zoom: 1.2,
-                        label: {
-                            normal: {
-                                show: false,
-                                color: '#fff',
-                                fontSize: 12
-                            },
-                            emphasis: {
-                                show: false,
-                                color: '#fff',
-                                fontSize: 12
-                            }
-                        },
-                        itemStyle: {
-                            normal: {
-                                areaColor: '#282c3c',
-                                borderColor: '#1f9bff'
-                            },
-                            emphasis: {
-                                areaColor: '#1d2131',
-                                borderColor: '#1f9bff'
-                            }
-                        }
-                    },
-                    series: {
-                        type: 'scatter', // scatter,effectScatter
-                        coordinateSystem: 'geo',
-                        symbolSize: 10,
-                        aspectScale: 0.75,
-                        hoverAnimation: true,
-                        showEffectOn: 'render',
-                        rippleEffect: {
-                            brushType: 'stroke',
-                            scale: 3
-                        },
-                        label: {
-                            show: false,
-                            formatter: '{b}',
-                            color: '',
-                            fontSize: 12,
-                            position: 'inside' // 可选inside
-                        },
-                        itemStyle: {
-                            emphasis: {
-                                borderColor: '#fff',
-                                borderWidth: 1
-                            }
-                        },
-                        zlevel: 1
-                    },
-                    color: DEFAULT_COLORS
-                },
-                view: { width: 500, height: 500, x: 710, y: 290 }
             }
+            // {
+            //     title: '地图',
+            //     name: 've-map',
+            //     icon: 'global',
+            //     api_data: {
+            //         source: [
+            //             { x: '吉林', y: 178 },
+            //             { x: '北京', y: 23 },
+            //             { x: '上海', y: 122 },
+            //             { x: '徐州', y: 98 },
+            //             { x: '南京', y: 188 },
+            //             { x: '兰州', y: 31 },
+            //             { x: '乌鲁木齐', y: 122 },
+            //             { x: '马鞍山', y: 32 },
+            //             { x: '张家界', y: 55 },
+            //             { x: '三门峡', y: 100 }
+            //         ]
+            //     },
+            //     apis: {
+            //         position: 'china',
+            //         labelMap: {
+            //             'x': '位置',
+            //             'y': '人口',
+            //             's': '系列1'
+            //         }
+            //     },
+            //     background: {
+            //         backgroundType: '1',
+            //         backgroundColor: '',
+            //         borderColor: '',
+            //         borderWidth: 0,
+            //         borderStyle: '',
+            //         borderRadius: 0
+            //     },
+            //     config: {
+            //         title: {
+            //             show: true,
+            //             content: '地图',
+            //             textAlign: 'left',
+            //             textStyle: {
+            //                 color: '#ffffff',
+            //                 fontSize: 20
+            //             }
+            //         },
+            //         grid: { left: 20, top: 60, right: 20, bottom: 30 },
+            //         legend: {
+            //             show: true,
+            //             textStyle: {
+            //                 color: '#ffffff',
+            //                 fontSize: 12
+            //             },
+            //             itemGap: 12,
+            //             icon: '',
+            //             left: 'center',
+            //             top: 'auto',
+            //             right: 'auto',
+            //             bottom: 'auto'
+            //         },
+            //         visualMap: {
+            //             show: false,
+            //             type: 'piecewise',
+            //             min: 0,
+            //             max: 200,
+            //             inRange: {
+            //                 color: ['#50a3ba', '#eac736', '#d94e5d'],
+            //                 symbolSize: [10, 16]
+            //             },
+            //             textStyle: {
+            //                 color: '#fff',
+            //                 fontSize: 12
+            //             }
+            //         },
+            //         xAxis: {
+            //             show: false,
+            //             axisLabel: {
+            //                 color: '#ffffff',
+            //                 fontSize: 12,
+            //                 rotate: 0
+            //             },
+            //             axisLine: {
+            //                 show: false,
+            //                 lineStyle: {
+            //                     color: '#cccccc'
+            //                 }
+            //             },
+            //             splitLine: {
+            //                 show: false,
+            //                 lineStyle: {
+            //                     color: '#cccccc'
+            //                 }
+            //             }
+            //         },
+            //         yAxis: {
+            //             show: false,
+            //             axisLabel: {
+            //                 color: '#ffffff',
+            //                 fontSize: 12
+            //             },
+            //             axisLine: {
+            //                 show: false,
+            //                 lineStyle: {
+            //                     color: '#cccccc'
+            //                 }
+            //             },
+            //             splitLine: {
+            //                 show: false,
+            //                 lineStyle: {
+            //                     color: '#cccccc'
+            //                 }
+            //             }
+            //         },
+            //         // 地图独有的
+            //         geo: {
+            //             map: 'china',
+            //             zoom: 1.2,
+            //             label: {
+            //                 normal: {
+            //                     show: false,
+            //                     color: '#fff',
+            //                     fontSize: 12
+            //                 },
+            //                 emphasis: {
+            //                     show: false,
+            //                     color: '#fff',
+            //                     fontSize: 12
+            //                 }
+            //             },
+            //             itemStyle: {
+            //                 normal: {
+            //                     areaColor: '#282c3c',
+            //                     borderColor: '#1f9bff'
+            //                 },
+            //                 emphasis: {
+            //                     areaColor: '#1d2131',
+            //                     borderColor: '#1f9bff'
+            //                 }
+            //             }
+            //         },
+            //         series: {
+            //             type: 'scatter', // scatter,effectScatter
+            //             coordinateSystem: 'geo',
+            //             symbolSize: 10,
+            //             aspectScale: 0.75,
+            //             hoverAnimation: true,
+            //             showEffectOn: 'render',
+            //             rippleEffect: {
+            //                 brushType: 'stroke',
+            //                 scale: 3
+            //             },
+            //             label: {
+            //                 show: false,
+            //                 formatter: '{b}',
+            //                 color: '',
+            //                 fontSize: 12,
+            //                 position: 'inside' // 可选inside
+            //             },
+            //             itemStyle: {
+            //                 emphasis: {
+            //                     borderColor: '#fff',
+            //                     borderWidth: 1
+            //                 }
+            //             },
+            //             zlevel: 1
+            //         },
+            //         color: DEFAULT_COLORS
+            //     },
+            //     view: { width: 500, height: 500, x: 710, y: 290 }
+            // }
         ]
     },
     {
@@ -804,72 +809,72 @@ const list = [{
                 title: '表格',
                 name: 've-tables',
                 icon: 'table',
+                type: '3',
                 api_data: {
-                    source: [{
-                            key: '1',
-                            name: 'John Brown',
-                            age: 32,
-                            address: 'New York',
-                            tags: ['nice', 'developer']
-                        },
-                        {
-                            key: '2',
-                            name: 'Jim Green',
-                            age: 42,
-                            address: 'London',
-                            tags: ['loser']
-                        },
-                        {
-                            key: '3',
-                            name: 'Joe Black',
-                            age: 32,
-                            address: 'Sidney',
-                            tags: ['cool', 'teacher']
-                        }
-                    ],
-                    column: [{
-                            title: 'Name',
-                            dataIndex: 'name',
-                            key: 'name',
-                            scopedSlots: { customRender: 'name' },
-                            customHeaderCell: function() {}
-                        },
-                        {
-                            title: 'Age',
-                            dataIndex: 'age',
-                            key: 'age',
-                            width: 80,
-                            customHeaderCell: function() {}
-                        },
-                        {
-                            title: 'Address',
-                            dataIndex: 'address',
-                            key: 'address 1',
-                            ellipsis: true,
-                            customHeaderCell: function() {}
-                        },
-                        {
-                            title: '02',
-                            dataIndex: 'address',
-                            key: 'address 2',
-                            ellipsis: true,
-                            customHeaderCell: function() {}
-                        },
-                        {
-                            title: '03',
-                            dataIndex: 'address',
-                            key: 'address 3',
-                            ellipsis: true,
-                            customHeaderCell: function() {}
-                        },
-                        {
-                            title: '04',
-                            dataIndex: 'address',
-                            key: 'address 4',
-                            ellipsis: true,
-                            customHeaderCell: function() {}
-                        }
-                    ]
+                    source: {
+                      columns: [{
+                                  title: 'Name',
+                                  dataIndex: 'name',
+                                  key: 'name',
+                                  scopedSlots: { customRender: 'name' },
+                                  customHeaderCell: function() {}
+                              },
+                              {
+                                  title: 'Age',
+                                  dataIndex: 'age',
+                                  key: 'age',
+                                  width: 80,
+                                  customHeaderCell: function() {}
+                              },
+                              {
+                                  title: 'Address',
+                                  dataIndex: 'address',
+                                  key: 'address 1',
+                                  ellipsis: true,
+                                  customHeaderCell: function() {}
+                              },
+                              {
+                                  title: '02',
+                                  dataIndex: 'address',
+                                  key: 'address 2',
+                                  ellipsis: true,
+                                  customHeaderCell: function() {}
+                              },
+                              {
+                                  title: '03',
+                                  dataIndex: 'address',
+                                  key: 'address 3',
+                                  ellipsis: true,
+                                  customHeaderCell: function() {}
+                              },
+                              {
+                                  title: '04',
+                                  dataIndex: 'address',
+                                  key: 'address 4',
+                                  ellipsis: true,
+                                  customHeaderCell: function() {}
+                              }
+                            ],
+                    rows: [{
+                                key: '1',
+                                name: 'John Brown',
+                                age: 32,
+                                address: 'New York'
+                            },
+                            {
+                                key: '2',
+                                name: 'Jim Green',
+                                age: 42,
+                                address: 'London'
+                            },
+                            {
+                                key: '3',
+                                name: 'Joe Black',
+                                age: 32,
+                                address: 'Sidney'
+                            }
+                        ]
+                    }
                 },
                 apis: {},
                 background: {

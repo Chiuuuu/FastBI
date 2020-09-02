@@ -44,22 +44,22 @@
                                 @change="setPageSetting"></el-color-picker>
               </gui-field>
             </a-radio>
-            <!-- <a-radio :style="radioStyle" value="2" @click.native.stop="globalBgChange($event, globalSettings, 'backgroundType')">
+            <a-radio :style="radioStyle" value="2" @click.native.stop="globalBgChange($event, globalSettings, 'backgroundType')">
               <gui-field label="背景图片">
-                <a-upload
-                    name="avatar"
-                    list-type="picture-card"
-                    class="avatar-uploader"
-                    :show-upload-list="false"
-                    action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                    @change="ImageChange"
-                  >
-                    <div>
-                      <a-icon :type="loading ? 'loading' : 'plus'" />
-                    </div>
-                  </a-upload>
+                <div>
+                  <a-button size="small" @click.native.stop="addGlobalPhoto" :disabled="globalSettings.backgroundType!=='2'">上传</a-button>
+                  <input
+                      id="globalPhoto"
+                      ref="img_input1"
+                      type="file"
+                      name
+                      accept="image/png, image/jpeg"
+                      style="display:none"
+                      @change="selectPhoto($event, globalSettings, 'globalSettings')"
+                    />
+                </div>
               </gui-field>
-            </a-radio> -->
+            </a-radio>
           </a-radio-group>
           </gui-field>
 
@@ -190,6 +190,10 @@
                                         @change="setSelfProperty"></el-color-picker>
                     </gui-inline>
                   </gui-field>
+                  <gui-field label="柱条宽度" v-if="isHistogram">
+                    <a-input size="small" @change="setSelfProperty"
+                             v-model="selfConfig.series.barWidth" clearable></a-input>
+                  </gui-field>
                 </a-collapse-panel>
               </template>
 
@@ -275,11 +279,11 @@
                     </gui-inline>
                     <gui-inline label="图标">
                       <a-select v-model="selfConfig.legend.icon" style="width: 100px" size="small" @change="setSelfProperty">
-                        <a-select-option value="">normal</a-select-option>
-                        <a-select-option value="circle">circle</a-select-option>
-                        <a-select-option value="rect">rect</a-select-option>
-                        <a-select-option value="roundRect">roundRect</a-select-option>
-                        <a-select-option value="diamond">diamond</a-select-option>
+                        <a-select-option value="">正常</a-select-option>
+                        <a-select-option value="circle">圆形</a-select-option>
+                        <a-select-option value="rect">矩形</a-select-option>
+                        <a-select-option value="roundRect">圆矩形</a-select-option>
+                        <a-select-option value="diamond">菱形</a-select-option>
                       </a-select>
                     </gui-inline>
                   </gui-field>
@@ -715,28 +719,10 @@
                         name
                         accept="image/png, image/jpeg"
                         style="display:none;"
-                        @change="selectPhoto($event)"
+                        @change="selectPhoto($event, selfConfig, 'selfConfig')"
                       />
                     </div>
                   </gui-field>
-                  <!-- <a-row>
-                    <a-col :span="4">上传</a-col>
-                    <a-col :span="8"></a-col>
-                    <a-col :span="4">
-                      <div class="photo" @click.native="addPhote">
-                        <a-icon type="plus" />
-                        <input
-                          id="upload_photo"
-                          ref="img_input1"
-                          type="file"
-                          name
-                          accept="image/png, image/jpeg"
-                          style="display:none;"
-                          @change="selectPhoto($event)"
-                        />
-                      </div>
-                    </a-col>
-                  </a-row> -->
                 </a-collapse-panel>
               </template>
               <!-- 表格 -->
@@ -812,7 +798,7 @@
                               @change="switchChange"></a-switch>
                   </gui-field>
                 </a-collapse-panel>
-                <a-collapse-panel key="page" header="翻页器">
+                <!-- <a-collapse-panel key="page" header="翻页器">
                   <a-switch slot="extra"
                             v-if="collapseActive.indexOf('page')>-1"
                             v-model="selfConfig.header.show"
@@ -827,22 +813,31 @@
                       <a-select-option :value="100">100</a-select-option>
                     </a-select>
                   </gui-field>
-                </a-collapse-panel>
+                </a-collapse-panel> -->
               </template>
               <a-collapse-panel key="background" header="背景设置">
-                <gui-field label="背景颜色">
-                  <el-color-picker v-model="backgroundApi.backgroundColor" show-alpha
-                                  @change="setBackGround"></el-color-picker>
-                </gui-field>
-                <!-- <a-radio-group v-model="backgroundApi.backgroundType" name="radioGroup">
-                  <a-radio :style="radioStyle" value="1" @click="onBgChange($event, backgroundApi, 'backgroundType')">
-
-                  </a-radio>
-                  <a-radio :style="radioStyle" value="2" @click="onBgChange($event, backgroundApi, 'backgroundType')">
-                    <gui-field label="背景图片">
+                <a-radio-group v-model="backgroundApi.backgroundType" name="radioGroup">
+                  <a-radio :style="radioStyle" value="1" @click.native.stop="onBgChange($event, backgroundApi, 'backgroundType')">
+                    <gui-field label="背景颜色">
+                      <el-color-picker v-model="backgroundApi.backgroundColor" show-alpha
+                                      @change="setBackGround"></el-color-picker>
                     </gui-field>
                   </a-radio>
-                </a-radio-group> -->
+                  <a-radio :style="radioStyle" value="2" @click.native.stop="onBgChange($event, backgroundApi, 'backgroundType')">
+                    <gui-field label="背景图片">
+                      <a-button size="small" @click.native.stop="addbgPhoto" :disabled="backgroundApi.backgroundType!=='2'">上传</a-button>
+                      <input
+                          id="bgPhoto"
+                          ref="img_input1"
+                          type="file"
+                          name
+                          accept="image/png, image/jpeg"
+                          style="display:none"
+                          @change="selectPhoto($event, backgroundApi, 'backgroundApi')"
+                        />
+                    </gui-field>
+                  </a-radio>
+                </a-radio-group>
                 <gui-field label="边框颜色">
                   <el-color-picker v-model="backgroundApi.borderColor" show-alpha
                                   @change="setBackGround"></el-color-picker>
@@ -966,10 +961,10 @@
       },
       // 设置全局配置
       setPageSetting () {
-        setPageSettings(this.globalSettings).then(res => {
-          this.$store.dispatch('SetPageSettings', res.data)
-          this.screenSave()
-        })
+        // setPageSettings(this.globalSettings).then(res => {
+        // })
+        this.$store.dispatch('SetPageSettings', this.globalSettings)
+        this.screenSave()
       },
       // 设置基本属性
       setBaseProperty () {
@@ -1019,40 +1014,41 @@
           console.warn('source is not a json string')
         }
       },
-      // 上传背景图片
-      ImageChange(info) {
-        if (info.file.status === 'uploading') {
-          this.loading = true
-          return
-        }
-        if (info.file.status === 'done') {
-          getBase64(info.file.originFileObj, imageUrl => {
-            this.imageUrl = imageUrl
-            this.selfConfig.backgroundSrc = imageUrl
-            this.loading = false
-            this.setSelfProperty()
-          })
-        }
-      },
-      // 上传图片
-      beforeUpload(file) {
-        console.log(file)
-      },
 
       // 点击添加图片
       addPhote() {
         document.getElementById('upload_photo').click()
       },
 
+      // 点击上传全局背景图片
+      addGlobalPhoto(e) {
+        document.getElementById('globalPhoto').click()
+      },
+
+      // 点击上传图形背景图
+      addbgPhoto() {
+        document.getElementById('bgPhoto').click()
+      },
+
       // 选择上传图片
-      selectPhoto(e) {
+      selectPhoto(e, data, key) {
         var form = new FormData()
         form.append('avatarfile', e.target.files[0])
         this.$server.screenManage.uploadImage(form).then(res => {
             if (res.data.code === 200) {
               let imageUrl = process.env.VUE_APP_SERVICE_URL + res.data.imgUrl
-              this.selfConfig.imageUrl = imageUrl
-              this.setSelfProperty()
+              if (key === 'globalSettings') {
+                data['backgroundSrc'] = imageUrl
+                this.setPageSetting()
+              }
+              if (key === 'selfConfig') {
+                data['imageUrl'] = imageUrl
+                this.setSelfProperty()
+              }
+              if (key === 'backgroundApi') {
+                data['backgroundSrc'] = imageUrl
+                this.setBackGround()
+              }
             } else {
               this.$message.error(res.data.msg)
             }
@@ -1064,14 +1060,18 @@
 
       // 全局设置，选择背景设置
       globalBgChange(e, data, key) {
-        this.$set(data, key, e.target.value)
-        this.setPageSetting()
+        if (e.target.value) {
+          this.$set(data, key, e.target.value)
+          this.setPageSetting()
+        }
       },
 
       // 图表 点击选择背景
       onBgChange(e, data, key) {
-        this.$set(data, key, e.target.value)
-        // this.setPageSetting()
+        if (e.target.value) {
+          this.$set(data, key, e.target.value)
+          this.setBackGround()
+        }
       },
 
       // 点击选择对齐方式
@@ -1090,7 +1090,6 @@
 
       onRadioChange(e, data, key) {
         this.$set(data, key, e.target.value)
-        console.log(e, data, key)
         this.setSelfProperty()
       },
 
@@ -1140,7 +1139,6 @@
       pageSettings: {
         handler (val) {
           if (val) {
-            val.backgroundType = '1'
             this.globalSettings = { ...val }
           }
         },

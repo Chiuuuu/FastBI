@@ -59,7 +59,7 @@
         return {
           width: `${this.pageSettings.width}px`,
           height: `${this.pageSettings.height}px`,
-          backgroundColor: this.pageSettings.backgroundColor
+          background: this.pageSettings.backgroundType === '1' ? this.pageSettings.backgroundColor : `url(${this.pageSettings.backgroundSrc})`
         }
       }
     },

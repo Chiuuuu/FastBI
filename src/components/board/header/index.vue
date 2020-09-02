@@ -113,6 +113,7 @@ export default {
         }
         this.$server.screenManage.screenSave(params).then(res => {
           if (res.data.code === 200) {
+            this.$message.success('保存成功')
             this.$store.dispatch('SetScreenId', res.data.id)
           } else {
             this.$message.error(res.data.msg)
