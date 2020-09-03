@@ -1,7 +1,7 @@
 <template>
   <div class="model-menu">
     <div class="menu_title">
-      <span>数据模型</span>
+      <span class="m-t-s">数据模型</span>
       <a-dropdown :trigger="['click']" placement="bottomLeft">
         <a class="ant-dropdown-link">
           <a-icon type="plus-square" class="menu_icon" />
@@ -66,7 +66,7 @@
     <template v-else>
       <div class="menu_search">
         <a-input placeholder="搜索数据模型名称">
-          <a-icon slot="prefix" type="search" />
+          <a-icon class="icon_search" slot="suffix" type="search" />
         </a-input>
       </div>
       <p class="menu_tips">右键文件夹或选项有添加，重命名等操作</p>
@@ -409,6 +409,6 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
-@import "./menu.less";
+<style lang="styl" scoped>
+@import "./menu.styl";
 </style>
