@@ -24,7 +24,7 @@
         <a-icon slot="prefix" type="search" />
       </a-input>
       <router-link to="/dataSource/dataAccess" class="modal-item hover">新建数据链接</router-link>
-      <div class="modal-wrap">
+      <div class="menu-wrap modal-wrap">
         <div
           class="group"
           :class="handleIsFolder(folder, 'items') ? 'is-folder' : ''"
