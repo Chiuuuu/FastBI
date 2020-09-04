@@ -1,16 +1,24 @@
 <template>
   <div>
     <div class="search_bar">
-      <a-input placeholder="请输入关键词" class="search_input">
-        <a-icon slot="prefix" type="search" />
-      </a-input>
-      <a-select default-value="全部" class="search_select">
-        <a-select-option value="aaa">
-          aaa
-        </a-select-option>
-      </a-select>
-      <a-button type="primary" style="margin-right:10px;" class="select_button" @click="handleExtract" :loading="extractSping">全部抽取</a-button>
-      <a-button type="primary" class="select_button" @click="handleGetData" :loading="spinning">刷新数据</a-button>
+      <a-row type="flex" justify="space-between" align="middle">
+        <a-col>
+          <a-input placeholder="请输入关键词" class="search_input">
+            <a-icon slot="prefix" type="search" />
+          </a-input>
+        </a-col>
+        <a-col>
+          <a-select default-value="全部" class="search_select">
+            <a-select-option value="aaa">
+              aaa
+            </a-select-option>
+          </a-select>
+        </a-col>
+        <a-col>
+          <a-button type="primary" style="margin-right:10px;" class="select_button" @click="handleExtract" :loading="extractSping">全部抽取</a-button>
+          <a-button type="primary" class="select_button" @click="handleGetData" :loading="spinning">刷新数据</a-button>
+        </a-col>
+      </a-row>
     </div>
     <div class="table">
       <a-table :row-selection="rowSelection" :columns="columns" :data-source="data"  rowKey='id' :loading='spinning' :pagination='false'>
@@ -131,6 +139,8 @@ export default {
     async handleExtract() {
       if (this.selectedRows.length === 0) {
         return this.$message.error('请选择至少一项')
+      } else if (this.selectedRows.length > 3) {
+        return this.$message.error('最多选取三个')
       }
       const rows = this.selectedRows.map(item => {
         const _item = {
@@ -167,7 +177,7 @@ export default {
       }
 
       if (result.data.code === 200) {
-        this.$message.success('抽取成功')
+        this.$message.success('请刷新数据查看状态')
       } else {
         this.$message.error(result.data.msg)
       }

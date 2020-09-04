@@ -15,6 +15,7 @@
         <div class="description">
             <span class="d-s">描述：{{detailInfo.description}}</span>
         </div>
+        <a-divider />
         <div
           class="m-dml-map m-map"
         >
@@ -30,6 +31,7 @@
             ></tree-node>
           </template>
         </div>
+        <a-divider />
         <div class="detail">
           <div class="detail_header">
             <span>数据模型详情</span>
@@ -60,7 +62,7 @@
                       <span slot="title"><span>{{value[0].tableName}}</span></span>
                       <a-menu-item v-for="item in value" :key="item.id">
                         <img
-                          src="@/assets/images/icon_dimension.png"
+                          src="@/assets/images/icon_measure.png"
                           style="width:15px;height:15px"
                         />
                         {{item.field}}
