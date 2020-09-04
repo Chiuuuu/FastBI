@@ -87,7 +87,7 @@
           <a-input class="mod_input"
            v-decorator="['name', { rules: [{ required: true, message: '请输入大屏名称'}] }]"
            placeholder="请输入大屏名称"
-           maxLength="20" />
+           :maxLength="20" />
         </a-form-item>
         <a-form-item label="保存目录" v-if="isAdd !== 2">
           <a-select

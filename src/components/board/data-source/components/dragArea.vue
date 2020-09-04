@@ -30,7 +30,6 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
-import { DEFAULT_COLORS } from '../../../../utils/defaultColors'
 export default {
   props: {
     type: {
@@ -61,7 +60,7 @@ export default {
               if (this.type === 'dimension') { // 维度
                 this.fileList = val.packageJson.api_data.dimensions
               }
-              if (this.type === 'measures') { // 度量
+              if (this.type === 'measure') { // 度量
                 this.fileList = val.packageJson.api_data.measures
               }
               if (this.type === 'table') { // 表格不区分维度度量
@@ -86,14 +85,16 @@ export default {
       // h5 api
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
       dataFile.showMore = false // 是否点击显示更多
+      console.log(this.type)
       if (this.type === 'dimension' && this.dragFile === this.type) {
         // 维度暂时只能拉入一个字段
         this.fileList[0] = dataFile
       }
-      if (this.type === 'measure' || this.type === 'table') {
+      if ((this.type === 'measure' || this.type === 'table') && this.dragFile === this.type) {
         this.fileList.push(dataFile)
       }
       this.fileList = this.uniqueFun(this.fileList, 'field')
+      console.log(this.fileList)
       this.getData()
       this.isdrag = false
     },
@@ -129,7 +130,7 @@ export default {
       if (this.type === 'dimension') {
         this.currentSelected.packageJson.api_data.dimensions = this.fileList
       }
-      if (this.type === 'measures') {
+      if (this.type === 'measure') {
         this.currentSelected.packageJson.api_data.measures = this.fileList
       }
       if (this.type === 'table') {
@@ -143,24 +144,24 @@ export default {
       this.$server.screenManage.getData(params).then(res => {
         if (res.data.code === 200) {
           if (this.type === 'table') {
-            let columns = []
-            let apiData = this.currentSelected.packageJson.api_data
-            for (let item of apiData.tableList) {
-              columns.push({
-                title: item.field,
-                dataIndex: item.field,
-                key: item.field
-              })
-            }
-            let rows = res.data.rows
-            if (rows.length > 10) {
-              rows.length = 10
-            }
-            this.currentSelected.packageJson.api_data.source = {
-              columns,
-              rows
-            }
-            console.log(this.currentSelected.packageJson.api_data.source)
+            // let columns = []
+            // let apiData = this.currentSelected.packageJson.api_data
+            // for (let item of this.fileList) {
+            //   columns.push({
+            //     title: item.field,
+            //     dataIndex: item.field,
+            //     key: item.field
+            //   })
+            // }
+            // let rows = res.data.rows
+            // if (rows.length > 10) {
+            //   rows.length = 10
+            // }
+            // this.currentSelected.packageJson.api_data.source = {
+            //   columns,
+            //   rows
+            // }
+            // console.log(this.currentSelected.packageJson.api_data)
           } else {
             let columns = []
             let apiData = this.currentSelected.packageJson.api_data

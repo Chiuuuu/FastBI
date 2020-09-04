@@ -113,7 +113,10 @@ export default {
         }
         this.$server.screenManage.screenSave(params).then(res => {
           if (res.data.code === 200) {
-            this.$message.success('保存成功')
+            // 刷新操作的时候不提示
+            if (!this.refresh) {
+              this.$message.success('保存成功')
+            }
             this.$store.dispatch('SetScreenId', res.data.id)
           } else {
             this.$message.error(res.data.msg)
@@ -123,7 +126,7 @@ export default {
       // 刷新大屏
       refreshData() {
         let params = {
-          id: this.$route.query.id
+          id: this.screenId
         }
         this.$server.screenManage.screenRefresh(params).then(res => {
           if (res.data.code === 200) {
@@ -135,7 +138,9 @@ export default {
                 }
               }
             }
+            this.refresh = true // 刷新按钮
             this.screenSave()
+            this.$message.success('刷新成功')
           }
         })
       }
