@@ -36,50 +36,6 @@
           color: #627CFF;
         }
     }
-    .menu_tips{
-      font-size: 12px;
-      color: #999999;
-      text-align: left;
-      width: 70%;
-      margin-left: 50px;
-      margin-top: 10px;
-    }
-    .menu-wrap {
-      overflow-y: scroll;
-      height: 670px;
-    }
-    .menu-wrap::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-  
-    .menu-wrap::-webkit-scrollbar-thumb {
-      background-color: rgba(0, 0, 0, 0.05);
-      border-radius: 5px;
-      -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
-    }
-  
-    .menu-wrap:hover::-webkit-scrollbar-thumb {
-      background-color: rgba(0, 0, 0, 0.2);
-      border-radius: 5px;
-      -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
-    }
-  
-    .menu-wrap::-webkit-scrollbar-thumb:hover {
-      background-color: rgba(0, 0, 0, 0.4);
-      -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
-    }
-  
-    .menu-wrap::-webkit-scrollbar-track {
-      border-radius: 5px;
-      -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0);
-      background-color: white;
-    }
-  
-    .menu-wrap::-webkit-scrollbar-track:hover {
-      -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.4);
-      background-color: rgba(0, 0, 0, 0.01);
-    }
     .table_list-_empty{
         color: rgba(0, 0, 0, 0.65);
     }
@@ -91,121 +47,6 @@
     color: #333;
     text-align: center;
     text-transform: capitalize;
-}
-.group {
-    /deep/ul {
-        margin: 0;
-    }
-    /deep/&.is-folder {
-      // margin: 0 -14px;
-      position: relative;
-      font-size: 14px;
-      font-family: Microsoft YaHei;
-      font-weight: 400;
-      color: #FFFFFF;
-      line-height: 48px;
-    .items {
-      .item {
-        // padding-left: 34px;
-        position: relative;
-        font-size: 14px;
-        font-family: Microsoft YaHei;
-        font-weight: 400;
-        color: #FFFFFF;
-        line-height: 48px;
-      }
-    }
-  }
-  /deep/.file-icon {
-      margin-right: 5px;
-      margin-bottom: 2px;
-      height: 16px;
-      width: 16px;
-  }
-  /deep/.folder {
-    // height: 30px;
-    // line-height: 30px;
-    position: relative;
-    font-size: 14px;
-    font-family: Microsoft YaHei;
-    font-weight: 400;
-    color: #FFFFFF;
-    line-height: 48px;
-    &.dragable-current {
-      border: 1px solid #627CFF;
-    }
-    &.folder-active,
-    &:hover {
-      cursor: pointer;
-      z-index: 3;
-      background: #627CFF;
-      color: #fff;
-      .menu {
-        display: inline-block;
-      }
-      .title-span,
-      .folder-icon {
-          color: #ffffff;
-      }
-    }
-  }
-  /deep/.title {
-    padding: 0 28px 0 22px;
-    height: 30px;
-    line-height: 30px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    // font-size: 12px;
-    .folder-icon {
-        // font-size: 14px;
-        margin-right: 5px;
-    }
-  }
-  /deep/.menu {
-    display: none;
-    position: absolute;
-    right: 24px;
-    top: 3px;
-    height: 28px;
-    line-height: 28px;
-    min-height: auto;
-    .caret-down {
-      width: 0;
-      height: 0;
-      border: 6px solid white;
-      border-color: white transparent transparent transparent;
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-    }
-  }
-  /deep/.items {
-    .item {
-      // height: 30px;
-      // line-height: 30px;
-      // padding: 0;
-      position: relative;
-      font-size: 14px;
-      font-family: Microsoft YaHei;
-      font-weight: 400;
-      color: #FFFFFF;
-      line-height: 48px;
-      &.file-active,
-      &:hover {
-        cursor: pointer;
-        z-index: 3;
-        background: #627CFF;
-        color: #fff;
-        .menu {
-          display: inline-block;
-        }
-        .title {
-            color: #ffffff
-        }
-      }
-    }
-  }
 }
 a.modal-item {
     display: block;
@@ -223,10 +64,10 @@ a.modal-item {
     }
 }
 .modal-wrap{
+    height: auto;
+    overflow: hidden;
     .group {
-        /deep/.folder {
-            // height: 32px;
-            // line-height: 32px;
+        .folder {
             position: relative;
             font-size: 14px;
             font-family: Microsoft YaHei;
@@ -241,7 +82,7 @@ a.modal-item {
               }
             }
           }
-        /deep/.items {
+        .items {
             .item {
                 &:hover {
                     background: @hoverColor;
