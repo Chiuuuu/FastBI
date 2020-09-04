@@ -323,6 +323,8 @@ export default {
         } else {
           this.modelFileList.splice(index, 1)
         }
+        const isSame = file.id === this.fileSelectId
+        if (isSame) this.$store.dispatch('dataModel/setModelId', -1)
       } else {
         this.$message.error(result.data.msg)
       }
