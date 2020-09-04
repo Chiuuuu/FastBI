@@ -32,10 +32,10 @@ export class Node {
   }
 }
 
-export function conversionTree(node, list, key, lineKey = 'conditions[0].leftTableId') {
+export function conversionTree(node, list, key, lineKey = 'leftTableId') {
     let tableId = node.props[key]
     list.forEach(function(item) {
-      let leftTableId = get(item.join, lineKey)
+      let leftTableId = get(item, lineKey)
       if (parseInt(leftTableId) === tableId) {
         let _node = new Node(item)
         node.add(_node)
