@@ -53,27 +53,19 @@
           }
         .sheet_list {
             margin-top: 15px;
-            padding: 2px 14px 0 14px;
             font-size: 16px;
             font-family: Microsoft YaHei;
             font-weight: 400;
-            color: rgba(1, 4, 15, 1);
+            color: #01040f;
             line-height: 1.5;
-            overflow-y: scroll;
+            overflow-y: auto;
             height: 400px;
             .sheet_list_item {
-                 // padding: 0 5px;
-                // height: 30px;
-                // line-height: 30px;
-                margin-left: 10px;
-                font-size: 14px;
                 font-family: Microsoft YaHei;
                 font-weight: 400;
                 color: #020510;
-                line-height: 48px;
                 cursor: move;
                 cursor: -webkit-grab;
-                cursor: -moz-grab;
                 cursor: -ms-grab;
                 cursor: -o-grab;
                 overflow: hidden;
@@ -81,6 +73,10 @@
                 white-space: nowrap;
                 text-overflow: ellipsis;
                 border-left: 2px solid transparent;
+                padding: 0 28px 0 22px;
+                height: 30px;
+                line-height: 30px;
+                font-size: 12px;
                 &:hover {
                     background: #627CFF;
                     color: #fff;
