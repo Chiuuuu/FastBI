@@ -1,7 +1,7 @@
 <template>
   <div class="menu">
     <div class="menu_title">
-      <span>数据连接</span>
+      <span class="m-t-s">数据连接</span>
       <a-dropdown :trigger="['click']" placement="bottomLeft">
         <a class="ant-dropdown-link">
           <a-icon type="plus-square" class="menu_icon" />
@@ -49,7 +49,7 @@
     <template v-else>
       <div class="menu_search">
         <a-input placeholder="搜索数据连接名称">
-          <a-icon slot="prefix" type="search" />
+          <a-icon class="icon_search" slot="suffix" type="search" />
         </a-input>
       </div>
       <p class="menu_tips">右键文件夹或选项有添加，重命名等操作</p>

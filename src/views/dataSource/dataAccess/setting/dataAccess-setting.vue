@@ -19,13 +19,14 @@
             :data-source="data"
             :loading='sping'
             :pagination='false'
+            :scroll="{ x: 1200, y: 570 }"
             bordered
           >
           <span slot="fieldNickname" slot-scope="text, record, index">
-            <a-input style="width:186px;height:32px" :value="text" @change.stop.prevent="handleChangeValue($event, record, index, 'fieldNickname')"/>
+            <a-input style="width:100%;height:32px" :value="text" @change.stop.prevent="handleChangeValue($event, record, index, 'fieldNickname')"/>
           </span>
           <span slot="fieldType" slot-scope="text, record, index">
-            <a-select :value="text" style="width:100px;" @change="(value) => handleSelectChangeValue(value, record, index, 'fieldType')">
+            <a-select :value="text" style="width:100%;" @change="(value) => handleSelectChangeValue(value, record, index, 'fieldType')">
               <a-select-option value="INT">
                 整数
               </a-select-option>
@@ -51,13 +52,13 @@
             </a-select>
           </span>
           <span slot="fieldComment" slot-scope="text, record, index">
-            <a-input style="width:186px;height:32px" :value="text" @change.stop.prevent="handleChangeValue($event, record, index, 'fieldComment')"/>
+            <a-input style="width:100%;height:32px" :value="text" @change.stop.prevent="handleChangeValue($event, record, index, 'fieldComment')"/>
           </span>
           <span slot="fieldDesc" slot-scope="fieldDesc">
             {{ fieldDesc }}
           </span>
           <span slot="visible" slot-scope="text, record, index">
-              <a-select default-value="true" :value='`${text}`' @change="(value) => handleSelectChangeValue(value, record, index, 'visible')">
+              <a-select style="width:60px" default-value="true" :value='`${text}`' @change="(value) => handleSelectChangeValue(value, record, index, 'visible')">
                 <a-select-option value="true">
                   是
                 </a-select-option>
@@ -70,12 +71,18 @@
         </div>
       </div>
       <div class="set_btn">
-        <a-button style="width:88px;height:30px;" @click="back">
-          取消
-        </a-button>
-        <a-button type="primary" style="width:88px;height:30px;" @click="handleSave">
-          保存
-        </a-button>
+        <a-row type="flex" justify="space-around" align="middle">
+          <a-col>
+            <a-button style="width:88px;height:30px;" @click="back">
+              取消
+            </a-button>
+          </a-col>
+          <a-col>
+            <a-button type="primary" style="width:88px;height:30px;" @click="handleSave">
+            保存
+          </a-button>
+          </a-col>
+        </a-row>
       </div>
     </div>
   </div>
@@ -166,35 +173,18 @@ export default {
     },
     async handleGetData() {
       this.sping = true
-      let result
-
-      if (this.modelType === 'mysql') {
-        result = await fetchGetTableField({
-          url: '/admin/dev-api/system/mysql/get/field',
-          data: {
-            sourceMysqlId: this.modelId,
-            databasesName: this.formInfo.databaseName,
-            sourceMysqName: this.formInfo.name,
-            tableId: this.fieldInfo.id,
-            tableName: this.fieldInfo.name
-          }
-        }).finally(() => {
-          this.sping = false
-        })
-      } else if (this.modelType === 'oracle') {
-        result = await fetchGetTableField({
-          url: '/admin/dev-api/system/oracle/get/field',
-          data: {
-            sourceOracleId: this.modelId,
-            databasesName: this.formInfo.databaseName,
-            sourceOracleName: this.formInfo.name,
-            tableId: this.fieldInfo.id,
-            tableName: this.fieldInfo.name
-          }
-        }).finally(() => {
-          this.sping = false
-        })
-      }
+      const result = await fetchGetTableField({
+        url: `/admin/dev-api/system/${this.modelType}/get/field`,
+        data: {
+          sourceMysqlId: this.modelId,
+          databasesName: this.formInfo.databaseName,
+          sourceMysqName: this.formInfo.name,
+          tableId: this.fieldInfo.id,
+          tableName: this.fieldInfo.name
+        }
+      }).finally(() => {
+        this.sping = false
+      })
 
       if (result.data.code === 200) {
         this.data = [].concat(result.data.rows)

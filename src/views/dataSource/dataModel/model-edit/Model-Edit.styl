@@ -52,16 +52,25 @@
                 }
           }
         .sheet_list {
+            margin-top: 15px;
             padding: 2px 14px 0 14px;
             font-size: 16px;
             font-family: Microsoft YaHei;
             font-weight: 400;
             color: rgba(1, 4, 15, 1);
             line-height: 1.5;
+            overflow-y: scroll;
+            height: 400px;
             .sheet_list_item {
-                padding: 0 5px;
-                height: 30px;
-                line-height: 30px;
+                 // padding: 0 5px;
+                // height: 30px;
+                // line-height: 30px;
+                margin-left: 10px;
+                font-size: 14px;
+                font-family: Microsoft YaHei;
+                font-weight: 400;
+                color: #020510;
+                line-height: 48px;
                 cursor: move;
                 cursor: -webkit-grab;
                 cursor: -moz-grab;
@@ -73,10 +82,42 @@
                 text-overflow: ellipsis;
                 border-left: 2px solid transparent;
                 &:hover {
-                    background: #103ffa;
+                    background: #627CFF;
                     color: #fff;
                 }
             }
+        }
+        .sheet_list::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .sheet_list::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.05);
+            border-radius: 5px;
+            -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .sheet_list:hover::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .sheet_list::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(0, 0, 0, 0.4);
+            -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .sheet_list::-webkit-scrollbar-track {
+            border-radius: 5px;
+            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0);
+            background-color: white;
+        }
+
+        .sheet_list::-webkit-scrollbar-track:hover {
+            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.4);
+            background-color: rgba(0, 0, 0, 0.01);
         }
         .view-title{
           font-size:16px;
@@ -93,8 +134,11 @@
             display: flex;
             justify-content: space-between;
             .data_con {
-                width: 201px;
-                height: 19px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                width: 350px;
+                height: 40px;
                 font-size: 16px;
                 font-family: Microsoft YaHei;
                 font-weight: bold;
@@ -102,6 +146,10 @@
                 line-height: 48px;
                 margin-left: 21px;
             }
+        }
+        .data_con_add {
+            width: 1100px;
+            margin-top: 20px;
         }
         .description {
             margin-left: 20px;
@@ -168,12 +216,12 @@
             font-family: Microsoft YaHei;
             font-weight: 400;
             color: rgba(1, 4, 15, 1);
-            line-height: 48px;
+            // line-height: 48px;
             .detail_btn {
                 display: flex;
                 justify-content: space-between;
                 width: 215px;
-                margin-top: 9px;
+                // margin-top: 9px;
                 margin-right: 20px;
             }
         }
@@ -196,6 +244,40 @@
                 }
                 .dim_menu {
                     margin-top: 10px;
+                    overflow-y: scroll;
+                    height: 140px;
+                }
+                .dim_menu::-webkit-scrollbar {
+                    width: 8px;
+                    height: 8px;
+                }
+
+                .dim_menu::-webkit-scrollbar-thumb {
+                    background-color: rgba(0, 0, 0, 0.05);
+                    border-radius: 5px;
+                    -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
+                }
+
+                .dim_menu:hover::-webkit-scrollbar-thumb {
+                    background-color: rgba(0, 0, 0, 0.2);
+                    border-radius: 5px;
+                    -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
+                }
+
+                .dim_menu::-webkit-scrollbar-thumb:hover {
+                    background-color: rgba(0, 0, 0, 0.4);
+                    -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
+                }
+
+                .dim_menu::-webkit-scrollbar-track {
+                    border-radius: 5px;
+                    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0);
+                    background-color: white;
+                }
+
+                .dim_menu::-webkit-scrollbar-track:hover {
+                    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.4);
+                    background-color: rgba(0, 0, 0, 0.01);
                 }
                 .dim_operation {
                     float: right;
@@ -215,6 +297,40 @@
                 }
                 .mea_menu {
                     margin-top: 10px;
+                    overflow-y: scroll;
+                    height: 140px;
+                }
+                .mea_menu::-webkit-scrollbar {
+                    width: 8px;
+                    height: 8px;
+                }
+
+                .mea_menu::-webkit-scrollbar-thumb {
+                    background-color: rgba(0, 0, 0, 0.05);
+                    border-radius: 5px;
+                    -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
+                }
+
+                .mea_menu:hover::-webkit-scrollbar-thumb {
+                    background-color: rgba(0, 0, 0, 0.2);
+                    border-radius: 5px;
+                    -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
+                }
+
+                .mea_menu::-webkit-scrollbar-thumb:hover {
+                    background-color: rgba(0, 0, 0, 0.4);
+                    -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
+                }
+
+                .mea_menu::-webkit-scrollbar-track {
+                    border-radius: 5px;
+                    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0);
+                    background-color: white;
+                }
+
+                .mea_menu::-webkit-scrollbar-track:hover {
+                    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.4);
+                    background-color: rgba(0, 0, 0, 0.01);
                 }
                 .mea_operation {
                     float: right;
@@ -223,7 +339,8 @@
         }
         .submit_btn {
             float: right;
-            margin-right: 44px;
+            margin-top: 10px;
+            margin-right: 20px;
             display: flex;
             justify-content: space-between;
             width: 280px;

@@ -12,7 +12,11 @@
     <h4 class="title" :title="file[fileName]">
       <a-icon type="file" v-if="icon === 'default'" style="margin-right: 2px;"/>
       <img :src="fileIcon" class='file-icon' v-else/>
-      <span>{{ file[fileName] }}</span>
+      <span style="font-size: 14px;
+                  font-family: Microsoft YaHei;
+                  font-weight: 400;
+                  color: #020510;
+                  line-height: 46px;">&nbsp;{{ file[fileName] }}</span>
     </h4>
     <span class="menu" v-if="hasContextmenus">
       <span class="caret-down" @click="handleCreateMenu"></span>
