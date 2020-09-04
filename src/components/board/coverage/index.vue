@@ -50,7 +50,7 @@
       }
     },
     computed: {
-      ...mapGetters(['currentSelected', 'coverageExpand'])
+      ...mapGetters(['currentSelected', 'coverageExpand', 'pageSettings', 'canvasMap', 'screenId'])
     },
     methods: {
       // transform点击事件
@@ -60,13 +60,33 @@
       //  执行菜单命令
       handleCommand (item) {
         if (this.currentSelected) {
-          this.$message(item.text)
+          this.$message.info(item.text)
           this.$store.dispatch('ContextMenuCommand', item.order) // canvasMaos中的actions里的ContextMenuCommand方法
+          this.screenSave()
         }
       },
       // 点击展开收起
       toggleCollapsed () {
         this.$emit('toggleCollapsed', this.collapsed)
+      },
+
+      // 保存大屏
+      screenSave() {
+        const json = {
+          setting: this.pageSettings,
+          components: this.canvasMap
+        }
+        let params = {
+          id: this.screenId,
+          json
+        }
+        this.$server.screenManage.screenSave(params).then(res => {
+          if (res.data.code === 200) {
+            this.$store.dispatch('SetScreenId', res.data.id)
+          } else {
+            this.$message.error(res.data.msg)
+          }
+        })
       }
     }
   }

@@ -53,7 +53,7 @@
                       ref="img_input1"
                       type="file"
                       name
-                      accept="image/png, image/jpeg"
+                      accept="image/png, image/jpeg, image/gif"
                       style="display:none"
                       @change="selectPhoto($event, globalSettings, 'globalSettings')"
                     />
@@ -717,7 +717,7 @@
                         ref="img_input1"
                         type="file"
                         name
-                        accept="image/png, image/jpeg"
+                        accept="image/png, image/jpeg, image/gif"
                         style="display:none;"
                         @change="selectPhoto($event, selfConfig, 'selfConfig')"
                       />
@@ -831,7 +831,7 @@
                           ref="img_input1"
                           type="file"
                           name
-                          accept="image/png, image/jpeg"
+                          accept="image/png, image/jpeg, image/gif"
                           style="display:none"
                           @change="selectPhoto($event, backgroundApi, 'backgroundApi')"
                         />
