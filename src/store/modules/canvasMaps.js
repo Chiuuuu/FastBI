@@ -8,6 +8,7 @@ import {
 import getters from '../getters'
 import { screenData } from '../../api/screenManage/api'
 import { toFirst, toLast, upGo, downGo } from '../../utils/arr-utils'
+import { deepClone } from '../../utils/deepClone'
 
 const canvasMaps = {
   state: {
@@ -79,49 +80,79 @@ const canvasMaps = {
       switch (order) {
         case 'top':
           // 如果是置顶
-          let arr = state.canvasMap
-          let index = arr.findIndex(item => {
+          let topArr = state.canvasMap
+          let topIndex = topArr.findIndex(item => {
             return item.id === state.singleSelected.id
           })
-          if (index !== arr.length - 1) {
-            let newArr = toLast(arr, index)
-            arr = newArr
+          if (topIndex !== topArr.length - 1) {
+            let newArr = toLast(topArr, topIndex)
+            topArr = newArr
           }
-          commit('SET_CANVAS_MAPS', arr)
-          // topCanvasMap(state.singleSelected).then(res => {
-          //   commit('SET_CANVAS_MAPS', res.data)
-          // })
+          commit('SET_CANVAS_MAPS', topArr)
           break
         case 'bottom':
-          // 如果是置顶
-          bottomCanvasMap(state.singleSelected).then(res => {
-            commit('SET_CANVAS_MAPS', res.data)
+          // 置底一个数据 即将数组元素排至开头位置
+          let bottomArr = state.canvasMap
+          let bottomIndex = bottomArr.findIndex(item => {
+            return item.id === state.singleSelected.id
           })
+          if (bottomIndex !== bottomArr.length - 1) {
+            let newArr = toFirst(bottomArr, bottomIndex)
+            bottomArr = newArr
+          }
+          commit('SET_CANVAS_MAPS', bottomArr)
           break
         case 'up':
-          upCanvasMap(state.singleSelected).then(res => {
-            commit('SET_CANVAS_MAPS', res.data)
+          let upArr = state.canvasMap
+          let upIndex = upArr.findIndex(item => {
+            return item.id === state.singleSelected.id
           })
+          if (upIndex !== upArr.length - 1) {
+            let newArr = downGo(upArr, upIndex)
+            upArr = newArr
+          }
+          commit('SET_CANVAS_MAPS', upArr)
           break
         case 'down':
-          downCanvasMap(state.singleSelected).then(res => {
-            commit('SET_CANVAS_MAPS', res.data)
+          let downArr = state.canvasMap
+          let downIndex = downArr.findIndex(item => {
+            return item.id === state.singleSelected.id
           })
+          if (downIndex !== downArr.length - 1) {
+            let newArr = upGo(downArr, downIndex)
+            downArr = newArr
+          }
+          commit('SET_CANVAS_MAPS', downArr)
           break
         case 'copy':
           // 如果是复制操作，则传入当前选中的值
-          copyCanvasMap(state.singleSelected).then(res => {
-            let last = res.data[res.data.length - 1]
-            commit('SET_CANVAS_MAPS', res.data)
-            commit('SINGLE_SELECT', last)
-          })
+          // copyCanvasMap(state.singleSelected).then(res => {
+          //   let last = res.data[res.data.length - 1]
+          //   commit('SET_CANVAS_MAPS', res.data)
+          //   commit('SINGLE_SELECT', last)
+          // })
+          let newMap = deepClone(state.singleSelected) // 深拷贝一个对象并修改默认信息，
+          newMap.id = 'node-' + ((new Date()).getTime()) // 修改生成的id
+          // 修改复制出来的位置信息
+          newMap.packageJson.view.x += 20
+          newMap.packageJson.view.y += 20
+          state.canvasMap.push(newMap)
+          let last = state.canvasMap[state.canvasMap.length - 1]
+          commit('SET_CANVAS_MAPS', state.canvasMap)
+          commit('SINGLE_SELECT', last)
           break
         case 'remove':
           // 如果是删除操作，则需要删除并更新当前的canvasMaps，并默认设置当前选中为空
-          removeCanvasMap(state.singleSelected).then(res => {
-            commit('SET_CANVAS_MAPS', res.data)
-            commit('SINGLE_SELECT', null)
-          })
+          let index = state.canvasMap.indexOf(this.currentSelected)
+          if (index > -1) {
+            state.canvasMap.splice(index, 1)
+          }
+          commit('SET_CANVAS_MAPS', state.canvasMap)
+          commit('SINGLE_SELECT', null)
+          // removeCanvasMap(state.singleSelected).then(res => {
+          //   commit('SET_CANVAS_MAPS', res.data)
+          //   commit('SINGLE_SELECT', null)
+          // })
           break
       }
     },

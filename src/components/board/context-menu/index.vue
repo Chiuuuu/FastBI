@@ -33,7 +33,7 @@
       }
     },
     computed: {
-      ...mapGetters(['contextMenuInfo']),
+      ...mapGetters(['contextMenuInfo', 'pageSettings', 'canvasMap', 'screenId']),
       contextMenuStyle () {
         let x = this.contextMenuInfo.x !== undefined ? (parseInt(this.contextMenuInfo.x) > 0 ? parseInt(this.contextMenuInfo.x) : 0) : 0
         let y = this.contextMenuInfo.y !== undefined ? (parseInt(this.contextMenuInfo.y) > 0 ? parseInt(this.contextMenuInfo.y) : 0) : 0
@@ -61,10 +61,29 @@
       handleCommand (order) {
         if (order === 'remove') { // 如果是删除操作则弹出一个对话框来确认
           this.$store.dispatch('HideContextMenu')
-          this.$EventBus.$emit('context/menu/delete')
+          // this.$EventBus.$emit('context/menu/delete')
         } else {
           this.$store.dispatch('ContextMenuCommand', order)
         }
+        this.screenSave()
+      },
+      // 保存大屏
+      screenSave() {
+        const json = {
+          setting: this.pageSettings,
+          components: this.canvasMap
+        }
+        let params = {
+          id: this.screenId,
+          json
+        }
+        this.$server.screenManage.screenSave(params).then(res => {
+          if (res.data.code === 200) {
+            this.$store.dispatch('SetScreenId', res.data.id)
+          } else {
+            this.$message.error(res.data.msg)
+          }
+        })
       }
     }
   }

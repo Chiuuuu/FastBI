@@ -64,6 +64,13 @@
       }
     },
     watch: {
+      screenId: {
+        handler(val) {
+          this.getScreenData()
+        },
+        deep: true,
+        immediate: true
+      }
     },
     created () {
       this.getScreenData()

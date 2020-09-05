@@ -73,10 +73,10 @@
         编辑大屏
       </a-button>
       <div class="contain" ref="contain" :style="wrapStyle">
-        <screen v-if="folderList.length > 0 && flag" :style="canvasPanelStyle"></screen>
+        <screen v-if="folderList.length > 0" :style="canvasPanelStyle"></screen>
         <div class="empty" v-else>
           <img src="@/assets/images/icon_empty_state.png" class="empty_img" />
-          <span class="empty_word"> 暂无内容 ， 请先添加大屏目录数据或者选择一个大屏目录 ~</span>
+          <p class="empty_word"> 暂无内容 ， 请先添加大屏目录数据或者选择一个大屏目录 ~</p>
         </div>
       </div>
     </div>
@@ -158,7 +158,6 @@ export default {
       ],
       wrapStyle: {},
       range: 0,
-      flag: true, // 用于刷新大屏数据
       searchName: '', // 搜索名称
       fileName: '' // 大屏名称
     }
@@ -193,9 +192,6 @@ export default {
     }
   },
   mounted() {
-    if (!this.fileSelectId) {
-      this.flag = false
-    }
     this.getList()
     this.$on('fileSelect', this.handleFileSelect)
 
@@ -258,7 +254,6 @@ export default {
           this.$message.error('删除成功')
           this.getList()
           this.$store.dispatch('SetScreenId', '')
-          this.flag = false
         }
       })
     },
@@ -299,13 +294,9 @@ export default {
     // 选择左侧菜单
     handleFileSelect(file) {
       if (this.fileSelectId === file.id) return
-      this.flag = false
       this.fileSelectId = file.id
       this.$store.dispatch('SetScreenId', file.id)
       this.fileName = file.name
-      setTimeout(() => {
-        this.flag = true
-      })
     },
     // 点击新建大屏
     addScreen() {
