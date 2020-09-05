@@ -81,7 +81,7 @@
       </div>
     </div>
 
-    <a-modal v-model="screenVisible" title="新建大屏" @ok="handleOk">
+    <a-modal v-model="screenVisible" :title="isAdd===1?'新建大屏':'重命名大屏'" @ok="handleOk">
       <a-form :form="screenForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
         <a-form-item label="大屏名称">
           <a-input class="mod_input"
@@ -342,7 +342,10 @@ export default {
     },
     // 编辑大屏
     editScreen() {
-      console.log(this.screenId)
+      if (!this.screenId) {
+        this.$message.error(' 请先添加大屏目录数据或者选择一个大屏目录')
+        return
+      }
       this.$router.push({ path: '/admin',
       query: {
         id: this.fileSelectId
