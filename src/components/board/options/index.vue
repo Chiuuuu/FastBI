@@ -587,114 +587,6 @@
                   </gui-field>
                 </a-collapse-panel>
               </template>
-              <!--数据系列-->
-              <template v-if="selfConfig.series">
-                <a-collapse-panel key="series" header="数据系列">
-                  <gui-wrap label="指标"
-                            v-model="selfConfig.series.label.show" @on-change="setSelfProperty">
-                    <gui-field label="指标文本">
-                      <gui-inline label="字号">
-                        <a-input-number v-model="selfConfig.series.label.fontSize" size="small"
-                                        :min="12" :max="40" @change="setSelfProperty"></a-input-number>
-                      </gui-inline>
-                      <gui-inline label="颜色">
-                        <el-color-picker v-model="selfConfig.series.label.color"
-                                         @change="setSelfProperty"></el-color-picker>
-                      </gui-inline>
-                    </gui-field>
-                    <gui-field label="指标位置">
-                      <el-select v-model="selfConfig.series.label.position" size="mini"
-                                 @change="setSelfProperty" :value="selfConfig.series.label.position">
-                        <el-option label="inside" value="inside"></el-option>
-                        <!--饼图-->
-                        <template v-if="isPie">
-                          <el-option label="outside" value="outside"></el-option>
-                        </template>
-                        <template v-else>
-                          <el-option label="top" value="top"></el-option>
-                        </template>
-                      </el-select>
-                    </gui-field>
-                  </gui-wrap>
-                  <gui-wrap label="区域渐变" :value="true" simple v-if="isLine">
-                    <gui-field label="区域透明度">
-                      <a-input-number v-model="selfConfig.series.areaStyle.opacity" size="small"
-                                      :max="1" :step="0.1" @change="setSelfProperty"></a-input-number>
-                    </gui-field>
-                  </gui-wrap>
-                  <gui-field label="近似曲线" v-if="isLine">
-                    <b-switch v-model="selfConfig.series.smooth" size="small" @on-change="setSelfProperty"></b-switch>
-                  </gui-field>
-                  <gui-field label="柱条宽度" v-if="isHistogram">
-                    <a-input size="small" @change="setSelfProperty"
-                             v-model="selfConfig.series.barWidth" clearable></a-input>
-                  </gui-field>
-                  <!--饼图独有-->
-                  <template v-if="isPie">
-                    <gui-field label="玫瑰图">
-                      <b-switch v-model="selfConfig.series.roseType" size="small"
-                                @on-change="setSelfProperty"></b-switch>
-                    </gui-field>
-                    <gui-field label="中心坐标">
-                      <gui-inline label="offsetX">
-                        <a-input v-model="selfConfig.series.center[0]" size="small"
-                                 placeholder="默认50%"
-                                 @change="setSelfProperty"></a-input>
-                      </gui-inline>
-                      <gui-inline label="offsetY">
-                        <a-input v-model="selfConfig.series.center[1]" size="small"
-                                 placeholder="默认50%"
-                                 @change="setSelfProperty"></a-input>
-                      </gui-inline>
-                    </gui-field>
-                    <gui-field label="饼图半径">
-                      <gui-inline label="内半径">
-                        <a-input v-model="selfConfig.series.radius[0]" size="small"
-                                 placeholder="默认0"
-                                 @change="setSelfProperty"></a-input>
-                      </gui-inline>
-                      <gui-inline label="外半径">
-                        <a-input v-model="selfConfig.series.radius[1]" size="small"
-                                 placeholder="默认50%"
-                                 @change="setSelfProperty"></a-input>
-                      </gui-inline>
-                    </gui-field>
-                  </template>
-                  <!--地图独有-->
-                  <template v-if="isMap">
-                    <gui-field label="类型">
-                      <el-select v-model="selfConfig.series.type" size="mini"
-                                 @change="setSelfProperty" :value="selfConfig.series.type">
-                        <el-option label="散点/气泡" value="scatter"></el-option>
-                        <el-option label="动画气泡" value="effectScatter"></el-option>
-                      </el-select>
-                    </gui-field>
-                    <gui-field label="涟漪动画" v-if="selfConfig.series.type==='effectScatter'">
-                      <gui-inline label="最大缩放比">
-                        <a-input-number v-model="selfConfig.series.rippleEffect.scale" size="small"
-                                        :step="0.5" @change="setSelfProperty"></a-input-number>
-                      </gui-inline>
-                      <gui-inline label="波纹方式">
-                        <el-select v-model="selfConfig.series.rippleEffect.brushType" size="mini"
-                                   @change="setSelfProperty" :value="selfConfig.series.rippleEffect.brushType">
-                          <el-option label="stroke" value="stroke"></el-option>
-                          <el-option label="fill" value="fill"></el-option>
-                        </el-select>
-                      </gui-inline>
-                    </gui-field>
-                    <gui-field label="气泡悬停">
-                      <gui-inline label="边框宽度">
-                        <a-input-number v-model="selfConfig.series.itemStyle.emphasis.borderWidth" size="small"
-                                        :min="0" :max="2" @change="setSelfProperty"></a-input-number>
-                      </gui-inline>
-                      <gui-inline label="边框颜色" style="width:auto;">
-                        <el-color-picker v-model="selfConfig.series.itemStyle.emphasis.borderColor"
-                                         @change="setSelfProperty"></el-color-picker>
-                      </gui-inline>
-                    </gui-field>
-                  </template>
-                </a-collapse-panel>
-              </template>
               <!--颜色数组-->
               <template v-if="selfConfig.color">
                 <a-collapse-panel key="colors" header="颜色设置">
@@ -1194,6 +1086,6 @@
         return this.selfConfig.yAxis && (this.isLine || this.isHistogram)
       }
     },
-    components: { GuiField, GuiInline, GuiColors, GuiWrap, DataSource }
+    components: { GuiField, GuiInline, GuiColors, DataSource }
   }
 </script>
