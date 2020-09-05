@@ -16,14 +16,14 @@
         </a-menu>
       </a-dropdown>
     </div>
-    <a-modal v-model="visible" title="选择数据链接" :bodyStyle="{
+    <a-modal v-model="visible" title="选择数据连接" :bodyStyle="{
       height: `300px`,
       overflowY: 'auto'
     }" @ok="handleOk">
       <a-input ref="userNameInput" v-model="search" placeholder="搜索数据连接" @pressEnter='handleSearch'>
         <a-icon slot="prefix" type="search" />
       </a-input>
-      <router-link to="/dataSource/dataAccess" class="modal-item hover">新建数据链接</router-link>
+      <router-link to="/dataSource/dataAccess" class="modal-item hover">新建数据连接</router-link>
       <div class="menu-wrap modal-wrap">
         <div
           class="group"
