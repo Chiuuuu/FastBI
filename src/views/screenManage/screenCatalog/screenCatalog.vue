@@ -62,7 +62,7 @@
       </div>
     </div>
     <div class="right">
-      <span class="nav_title">电视统计大屏</span>
+      <span class="nav_title">{{fileName}}</span>
       <a-button class="btn_n1" @click="openScreen">
         全屏
       </a-button>
@@ -87,7 +87,7 @@
           <a-input class="mod_input"
            v-decorator="['name', { rules: [{ required: true, message: '请输入大屏名称'}] }]"
            placeholder="请输入大屏名称"
-           maxLength="20" />
+           :maxLength="20" />
         </a-form-item>
         <a-form-item label="保存目录" v-if="isAdd !== 2">
           <a-select
@@ -159,7 +159,8 @@ export default {
       wrapStyle: {},
       range: 0,
       flag: true, // 用于刷新大屏数据
-      searchName: '' // 搜索名称
+      searchName: '', // 搜索名称
+      fileName: '' // 大屏名称
     }
   },
   watch: {
@@ -254,6 +255,7 @@ export default {
       }
       this.$server.screenManage.folderDel(params).then(res => {
         if (res.data.code === 200) {
+          this.$message.error('删除成功')
           this.getList()
           this.$store.dispatch('SetScreenId', '')
           this.flag = false
@@ -300,6 +302,7 @@ export default {
       this.flag = false
       this.fileSelectId = file.id
       this.$store.dispatch('SetScreenId', file.id)
+      this.fileName = file.name
       setTimeout(() => {
         this.flag = true
       })

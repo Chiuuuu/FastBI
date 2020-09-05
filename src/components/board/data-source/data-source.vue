@@ -7,7 +7,7 @@
       <a-collapse-panel key="measure" header="度量" v-if="currentSelected.packageJson.name!=='ve-tables'">
         <drag-area type="measure"></drag-area>
       </a-collapse-panel>
-      <a-collapse-panel key="measure" header="列" v-if="currentSelected.packageJson.name==='ve-tables'">
+      <a-collapse-panel key="table" header="列" v-if="currentSelected.packageJson.name==='ve-tables'">
         <drag-area type="table"></drag-area>
       </a-collapse-panel>
       <!-- <a-collapse-panel key="filter" header="数据筛选">
@@ -38,7 +38,6 @@ export default {
   watch: {
     currentSelected: {
       handler (val) {
-        console.log(val)
       },
       deep: true,
       immediate: true

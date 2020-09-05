@@ -939,7 +939,7 @@ const database = {
                     header: {
                         show: true,
                         textStyle: {
-                            color: '#ffffff',
+                            color: '#000',
                             fontSize: 20,
                             fontWeight: 'bold',
                             textAlign: 'left'
@@ -948,7 +948,7 @@ const database = {
                     },
                     table: {
                         textStyle: {
-                            color: '#ffffff',
+                            color: '#000',
                             fontSize: 20,
                             fontWeight: 'bold',
                             textAlign: 'left'

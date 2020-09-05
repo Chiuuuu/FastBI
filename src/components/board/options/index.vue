@@ -53,7 +53,7 @@
                       ref="img_input1"
                       type="file"
                       name
-                      accept="image/png, image/jpeg"
+                      accept="image/png, image/jpeg, image/gif"
                       style="display:none"
                       @change="selectPhoto($event, globalSettings, 'globalSettings')"
                     />
@@ -68,7 +68,7 @@
                             @change="setPageSetting"></a-input-number>
           </gui-field>
           <gui-field label="重置">
-            <a-button type="primary" size="small" v-waves @click="resetSetting">恢复默认配置</a-button>
+            <a-button type="primary" size="small" @click="resetSetting">恢复默认配置</a-button>
           </gui-field>
         </div>
         <div class="block-config" v-else>
@@ -108,7 +108,7 @@
                 <a-collapse-panel key="title" header="标题">
                   <a-switch slot="extra" v-if="collapseActive.indexOf('title') > -1" v-model="selfConfig.title.show" default-checked @change="switchChange" size="small" />
                   <gui-field label="标题名">
-                    <a-input v-model="selfConfig.title.content" size="small" @change="setSelfProperty"></a-input>
+                    <a-input v-model="selfConfig.title.content" size="small" :maxLength="20" @change="setSelfProperty"></a-input>
                   </gui-field>
                   <gui-field label="文本">
                     <gui-inline label="字号">
@@ -717,7 +717,7 @@
                         ref="img_input1"
                         type="file"
                         name
-                        accept="image/png, image/jpeg"
+                        accept="image/png, image/jpeg, image/gif"
                         style="display:none;"
                         @change="selectPhoto($event, selfConfig, 'selfConfig')"
                       />
@@ -831,7 +831,7 @@
                           ref="img_input1"
                           type="file"
                           name
-                          accept="image/png, image/jpeg"
+                          accept="image/png, image/jpeg, image/gif"
                           style="display:none"
                           @change="selectPhoto($event, backgroundApi, 'backgroundApi')"
                         />
@@ -1032,6 +1032,9 @@
 
       // 选择上传图片
       selectPhoto(e, data, key) {
+        if (!e.target.files[0]) {
+          return
+        }
         var form = new FormData()
         form.append('avatarfile', e.target.files[0])
         this.$server.screenManage.uploadImage(form).then(res => {

@@ -5,6 +5,9 @@ import {
   removeCanvasMap,
   topCanvasMap, upCanvasMap
 } from '../../api/canvasMaps/canvas-maps-request'
+import getters from '../getters'
+import { screenData } from '../../api/screenManage/api'
+import { toFirst, toLast, upGo, downGo } from '../../utils/arr-utils'
 
 const canvasMaps = {
   state: {
@@ -76,9 +79,18 @@ const canvasMaps = {
       switch (order) {
         case 'top':
           // 如果是置顶
-          topCanvasMap(state.singleSelected).then(res => {
-            commit('SET_CANVAS_MAPS', res.data)
+          let arr = state.canvasMap
+          let index = arr.findIndex(item => {
+            return item.id === state.singleSelected.id
           })
+          if (index !== arr.length - 1) {
+            let newArr = toLast(arr, index)
+            arr = newArr
+          }
+          commit('SET_CANVAS_MAPS', arr)
+          // topCanvasMap(state.singleSelected).then(res => {
+          //   commit('SET_CANVAS_MAPS', res.data)
+          // })
           break
         case 'bottom':
           // 如果是置顶
