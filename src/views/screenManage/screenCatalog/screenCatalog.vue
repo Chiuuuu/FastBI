@@ -351,7 +351,8 @@ export default {
       }
       this.$router.push({ path: '/admin',
       query: {
-        id: this.fileSelectId
+        id: this.fileSelectId,
+        name: this.fileName
       } })
     },
     // 点击新建文件夹

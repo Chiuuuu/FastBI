@@ -19,6 +19,7 @@
     <a-form layout="vertical" :form="form" class="resetNameForm">
       <a-form-item label="名称">
         <a-input
+          :maxLength="20"
           v-decorator="[
             'name',
             {

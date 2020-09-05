@@ -1,7 +1,7 @@
 <template>
   <div class="board-header" flex>
     <div class="header-title">
-      <span style="font-size:18px;margin-top:10px">电视统计大屏</span>
+      <span style="font-size:18px;margin-top:10px">{{fileName}}</span>
       <!-- <i class="el-icon-arrow-left" style="margin-left:20px;font-size:22px;cursor: pointer;margin-top:8px"></i> -->
       <!-- <span v-if="config.title">{{ config.title.text }}</span> -->
     </div>
@@ -58,6 +58,7 @@ export default {
   },
   data() {
     return {
+      fileName: '', // 大屏名称
       userId: ''
     }
   },
@@ -65,6 +66,9 @@ export default {
     ...mapGetters(['isScreen', 'pageSettings', 'canvasMap', 'screenId'])
   },
   created() {
+    if (this.$route.query.name) {
+      this.fileName = this.$route.query.name
+    }
     this.userId = 'dv1e443967LZP2Dj'
   },
   methods: {
