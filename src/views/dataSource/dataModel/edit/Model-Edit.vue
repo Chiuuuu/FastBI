@@ -2,7 +2,7 @@
   <div class="Model-Edit">
     <div class="left">
       <div class="menu_title">
-        <span>数据链接</span>
+        <span>数据连接</span>
       </div>
       <div class="selector">
         <a-select default-value="银行账户" style="width: 94%;">
