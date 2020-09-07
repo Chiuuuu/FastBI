@@ -10,9 +10,9 @@
           <a-menu-item v-on:click="showModal">
             新建模型
           </a-menu-item>
-          <a-menu-item @click="handleAddNewFolder">
+          <!-- <a-menu-item @click="handleAddNewFolder">
             新建文件夹
-          </a-menu-item>
+          </a-menu-item> -->
         </a-menu>
       </a-dropdown>
     </div>
@@ -64,11 +64,11 @@
       <span slot="description">暂无数据源</span>
     </a-empty>
     <template v-else>
-      <div class="menu_search">
+      <!-- <div class="menu_search">
         <a-input placeholder="搜索数据模型名称">
           <a-icon class="icon_search" slot="suffix" type="search" />
         </a-input>
-      </div>
+      </div> -->
       <p class="menu_tips">右键文件夹或选项有添加，重命名等操作</p>
       <div class="menu-wrap">
         <div

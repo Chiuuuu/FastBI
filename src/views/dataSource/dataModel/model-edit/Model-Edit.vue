@@ -32,17 +32,17 @@
       <a-divider /> -->
       <div class="menu_search">
         <span class="search_span">表</span>
-        <a-input placeholder="请输入关键词搜索" class="search_input">
+        <!-- <a-input placeholder="请输入关键词搜索" class="search_input">
           <a-icon slot="prefix" type="search" />
-        </a-input>
+        </a-input> -->
       </div>
       <edit-left ref="editLeftRef" @on-left-drag-leave="handleLeftDragLeave"></edit-left>
-      <a-divider />
-      <div class="SQL-View">
+      <!-- <a-divider /> -->
+      <!-- <div class="SQL-View"> -->
         <!-- <div class="view-head">
           <span>自定义SQL视图</span>
         </div> -->
-        <div>
+        <!-- <div>
           <a-menu
             :default-selected-keys="['1']"
             :open-keys.sync="openKeys"
@@ -54,35 +54,26 @@
               </span>
               <a-menu-item>
                 <a-dropdown :trigger="['contextmenu']">
-              <div>
-                银行账户
-                </div>
-              <a-menu slot="overlay">
-                <a-menu-item v-on:click="check">
-                  查看表
-                </a-menu-item>
-                <a-menu-item>
-                  编辑
-                </a-menu-item>
-                <a-menu-item>
-                  删除
-                </a-menu-item>
-              </a-menu>
-            </a-dropdown>
+                  <div>
+                    银行账户
+                    </div>
+                  <a-menu slot="overlay">
+                    <a-menu-item v-on:click="check">
+                      查看表
+                    </a-menu-item>
+                    <a-menu-item>
+                      编辑
+                    </a-menu-item>
+                    <a-menu-item>
+                      删除
+                    </a-menu-item>
+                  </a-menu>
+                </a-dropdown>
               </a-menu-item>
-              <!-- <a-menu-item>
-                Option 10
-              </a-menu-item>
-              <a-menu-item>
-                Option 11
-              </a-menu-item>
-              <a-menu-item>
-                Option 12
-              </a-menu-item> -->
             </a-sub-menu>
           </a-menu>
-        </div>
-      </div>
+        </div> -->
+      <!-- </div> -->
     </div>
     <div class="right">
       <div class="header" v-if="model==='edit'">
@@ -97,7 +88,7 @@
           </a-form-item>
         </a-form>
       </div>
-      <div class="description">
+      <!-- <div class="description">
         <span class="d-s">描述： {{detailInfo.description}}<a-icon type="edit" v-on:click="open"/></span>
         <a-modal v-model="visible1" title="编辑描述" v-on:ok="close">
           <a-textarea
@@ -105,7 +96,7 @@
             :auto-size="{ minRows: 7, maxRows: 10 }"
           />
         </a-modal>
-      </div>
+      </div> -->
       <a-divider />
       <div class="draw_board">
         <edit-right-top ref='rightTopRef' :detailInfo="detailInfo"></edit-right-top>
@@ -115,7 +106,7 @@
         <div class="detail_header">
           <span>数据模型详情</span>
           <div class="detail_btn">
-            <a-button v-on:click="check">查看表宽</a-button>
+            <!-- <a-button v-on:click="check">查看表宽</a-button> -->
             <a-modal
               v-model="visible"
               title="查看宽表"
@@ -133,7 +124,7 @@
                 </a-table>
               </div>
             </a-modal>
-            <a-button v-on:click="showDrawer">批量编辑字段</a-button>
+            <!-- <a-button v-on:click="showDrawer">批量编辑字段</a-button> -->
             <a-drawer
               title="字段重命名"
               :width="1150"
@@ -228,7 +219,7 @@
           <div class="dimensionality">
             <span class="dim_span">维度</span>
             <div class="dim_operation">
-              <a v-on:click="dim_mea" style="color:#627CFF;line-height:38px">新建计算维度</a>
+              <!-- <a v-on:click="dim_mea" style="color:#627CFF;line-height:38px">新建计算维度</a> -->
               <a-modal
                 v-model="visible2"
                 title="新建计算字段（维度）"
@@ -334,7 +325,7 @@
                 </div>
               </a-modal>
               <a-divider type="vertical" />
-              <a v-on:click="geography" style="color:#627CFF;">设置地理位置</a>
+              <!-- <a v-on:click="geography" style="color:#627CFF;">设置地理位置</a> -->
               <a-modal
                 v-model="visible4"
                 title="创建地理字段"
@@ -430,7 +421,7 @@
           <div class="measurement">
             <span class="mea_span">度量</span>
             <div class="mea_operation">
-              <a v-on:click="dim_mea" style="color:#627CFF;margin-right:20px;line-height:38px">新建计算度量</a>
+              <!-- <a v-on:click="dim_mea" style="color:#627CFF;margin-right:20px;line-height:38px">新建计算度量</a> -->
             </div>
             <div class="mea_menu">
               <a-menu mode="inline" v-for="(value, name) in measures" :key="name" :default-open-keys="[name]" :inline-collapsed="false">
