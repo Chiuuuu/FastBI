@@ -809,12 +809,6 @@
   import { DEFAULT_COLORS } from '../../../utils/defaultColors'
   import { deepClone } from '../../../utils/deepClone'
 
-  function getBase64(img, callback) {
-    const reader = new FileReader()
-    reader.addEventListener('load', () => callback(reader.result))
-    reader.readAsDataURL(img)
-  }
-
   export default {
     name: 'BoardOptions',
     props: {

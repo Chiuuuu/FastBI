@@ -129,6 +129,10 @@ export default {
       },
       // 刷新大屏
       refreshData() {
+        if (!this.screenId) {
+          this.$message.error('暂无数据可刷新，请先添加数据')
+          return
+        }
         let params = {
           id: this.screenId
         }
