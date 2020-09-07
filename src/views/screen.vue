@@ -59,7 +59,8 @@
         return {
           width: `${this.pageSettings.width}px`,
           height: `${this.pageSettings.height}px`,
-          background: this.pageSettings.backgroundType === '1' ? this.pageSettings.backgroundColor : `url(${this.pageSettings.backgroundSrc})`
+          background: this.pageSettings.backgroundType === '1' ? this.pageSettings.backgroundColor : `url(${this.pageSettings.backgroundSrc}) no-repeat`,
+          backgroundSize: '100% 100%'
         }
       }
     },

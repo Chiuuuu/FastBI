@@ -7,7 +7,8 @@ const app = {
         modelExpand: true, // 8-14数据模型面板
         coverageExpand: false, // 图层面板打开关闭
         isScreen: false, // 是否全屏
-        screenId: '' // 大屏id
+        screenId: '', // 大屏id
+        fileName: ''
     },
     mutations: {
         SET_CANVAS_RANGE: (state, val) => {
@@ -30,6 +31,9 @@ const app = {
         },
         SET_SCREEN_ID: (state, val) => {
           state.screenId = val
+        },
+        SET_FILE_NAME(state, val) {
+          state.fileName = val
         }
     },
     actions: {
@@ -53,6 +57,9 @@ const app = {
         },
         SetScreenId: ({ commit }, val) => {
           commit('SET_SCREEN_ID', val)
+        },
+        SetFileName({ commit }, val) {
+          commit('SET_FILE_NAME', val)
         }
     }
 }

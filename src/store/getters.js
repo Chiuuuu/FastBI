@@ -23,8 +23,9 @@ const getters = {
 
     optionsTabsType: state => state.options.optionsTabsType, // 选中的项 样式/数据/交互
 
-    screenId: state => state.app.screenId // 大屏id
+    screenId: state => state.app.screenId, // 大屏id
 
+    fileName: state => state.app.fileName
 }
 
 export default getters

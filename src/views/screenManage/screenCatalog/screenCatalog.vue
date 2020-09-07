@@ -158,8 +158,7 @@ export default {
       ],
       wrapStyle: {},
       range: 0,
-      searchName: '', // 搜索名称
-      fileName: '' // 大屏名称
+      searchName: '' // 搜索名称
     }
   },
   watch: {
@@ -168,7 +167,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['pageSettings', 'canvasRange', 'screenId']),
+    ...mapGetters(['pageSettings', 'canvasRange', 'screenId', 'fileName']),
     fileSelectId: {
       get () {
         console.log(this.screenId)
@@ -184,7 +183,7 @@ export default {
       let obj = {
         width: `${this.pageSettings.width}px`,
         height: `${this.pageSettings.height}px`,
-        transform: `scale(0.47) translate3d(0px, 0px, 0)`,
+        transform: `scale(${this.range}) translate3d(0px, 0px, 0)`,
         transformOrigin: '0 0',
         backgroundColor: this.pageSettings.backgroundColor
       }
@@ -296,7 +295,8 @@ export default {
       if (this.fileSelectId === file.id) return
       this.fileSelectId = file.id
       this.$store.dispatch('SetScreenId', file.id)
-      this.fileName = file.name
+      this.$store.dispatch('SetFileName', file.name)
+      console.log(this.fileName)
     },
     // 点击新建大屏
     addScreen() {
@@ -421,11 +421,12 @@ export default {
       // 计算缩放比例
       let range = ((wrap.clientWidth - 120) / this.pageSettings.width)
       range = Math.round(range * 100) / 100
-      if (range < 0.3) {
-        range = 0.3
+      console.log(this.range)
+      if (range < 0.4) {
+        range = 0.4
       }
       this.wrapStyle = {
-        width: `${this.pageSettings.width * range + 120}px`,
+        width: `${wrap.clientWidth * range + 120}px`,
         height: `${this.pageSettings.height * range + 120}px`
       }
       this.range = range

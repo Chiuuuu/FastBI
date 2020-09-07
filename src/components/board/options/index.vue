@@ -840,6 +840,11 @@
         loading: false // 是否上传图片中
       }
     },
+    mounted() {
+      if (!this.screenId) {
+        this.resetSetting()
+      }
+    },
     methods: {
       tabsTypeChange(num) {
         this.tabsType = num
@@ -883,6 +888,7 @@
       resetSetting () {
         this.$loading.start()
         resetPageSettings().then(res => {
+          this.globalSettings = res.data
           this.$store.dispatch('SetPageSettings', res.data)
           this.$loading.done()
           this.screenSave()
@@ -921,8 +927,16 @@
         if (!e.target.files[0]) {
           return
         }
+        const isLt2M = e.target.files[0].size / 1024 / 1024 < 2
+        console.log(isLt2M)
+        if (!isLt2M) {
+          this.$message.error('图片大小不能超过2M!')
+          return
+        }
+        console.log(e.target.files[0])
         var form = new FormData()
         form.append('avatarfile', e.target.files[0])
+        console.log(form)
         this.$server.screenManage.uploadImage(form).then(res => {
             if (res.data.code === 200) {
               let imageUrl = process.env.VUE_APP_SERVICE_URL + res.data.imgUrl
@@ -1034,6 +1048,7 @@
       pageSettings: {
         handler (val) {
           if (val) {
+            console.log(val)
             this.globalSettings = { ...val }
           }
         },

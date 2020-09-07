@@ -13,6 +13,7 @@ const list = [{
                 name: 've-line',
                 icon: 'line-chart',
                 type: '1',
+                modelId: '',
                 api_data: {
                     source: [
                         { x: '1/1', y: 375 },
@@ -124,6 +125,7 @@ const list = [{
                 name: 've-histogram',
                 icon: 'bar-chart',
                 type: '1',
+                modelId: '',
                 api_data: {
                     source: [
                         { x: '1/1', y: 375, s: '系列1' },
@@ -236,6 +238,7 @@ const list = [{
                 name: 've-bar',
                 icon: 'menu',
                 type: '1',
+                modelId: '',
                 api_data: {
                     source: [
                         { x: '1/1', y: 375, s: '系列1' },
@@ -348,6 +351,7 @@ const list = [{
                 name: 've-pie',
                 icon: 'pie-chart',
                 type: '1',
+                modelId: '',
                 api_data: {
                     source: [
                         { x: '1/1', y: 1393, s: '系列1' },
@@ -460,6 +464,7 @@ const list = [{
                 name: 've-radar',
                 icon: 'radar-chart',
                 type: '1',
+                modelId: '',
                 api_data: {
                     source: [
                         { x: '1/1', y: 1393, s: '指标1' },
@@ -586,6 +591,7 @@ const list = [{
                 title: '地图',
                 name: 've-map',
                 icon: 'global',
+                modelId: '',
                 api_data: {
                     source: [
                         { x: '吉林', y: 178 },
@@ -763,6 +769,7 @@ const list = [{
                 icon: 'edit',
                 apiData: {},
                 apis: {},
+                modelId: '',
                 background: {
                     backgroundType: '1',
                     backgroundColor: '',
@@ -787,6 +794,7 @@ const list = [{
                 title: '图片',
                 name: 've-image',
                 icon: 'picture',
+                modelId: '',
                 apiData: {},
                 apis: {},
                 config: {
@@ -810,6 +818,7 @@ const list = [{
                 name: 've-tables',
                 icon: 'table',
                 type: '3',
+                modelId: '',
                 api_data: {
                     source: {
                       columns: [{

@@ -23,15 +23,14 @@
           />
           <span> 刷新</span>
         </div>
-        <div class="item" flex="dir:top">
+        <div class="item" flex="dir:top" @click.native="openScreen">
           <a-icon
             type="block"
-            @click.native="openScreen"
             style="font-size:18px"
           />
           <span> 预览</span>
         </div>
-        <div class="item" flex="dir:top" @click="screenSave">
+        <div class="item" flex="dir:top" @click.native="screenSave">
           <a-icon type="save" style="font-size:18px" />
           <span> 保存</span>
         </div>

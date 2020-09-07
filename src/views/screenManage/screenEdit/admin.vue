@@ -123,12 +123,6 @@
       if (this.$route.query.id) {
         this.$store.dispatch('SetScreenId', this.$route.query.id)
         this.getScreenData()
-      } else {
-        resetPageSettings().then(res => {
-          this.$store.dispatch('SetPageSettings', res.data)
-          this.$loading.done()
-          this.screenSave()
-        })
       }
     },
     mounted () {

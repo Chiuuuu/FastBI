@@ -96,7 +96,9 @@
           width: `${this.pageSettings.width}px`,
           height: `${this.pageSettings.height}px`,
           transform: `scale(${this.canvasRange}) translate3d(0px, 0px, 0)`,
-          background: this.pageSettings.backgroundType === '1' ? this.pageSettings.backgroundColor : `url(${this.pageSettings.backgroundSrc})`
+          background: this.pageSettings.backgroundType === '1' ? this.pageSettings.backgroundColor : `url(${this.pageSettings.backgroundSrc}) no-repeat`,
+          backgroundSize: '100% 100%'
+
           // backgroundColor: this.pageSettings.backgroundColor
         }
       }

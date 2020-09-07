@@ -1,6 +1,6 @@
 <template>
   <div class="dragArea"
-       :class="{'dragable-vaild':type===dragFile}"
+       :class="{'dragable-vaild':type===dragFile || isdrag && type==='table'}"
        @drop.stop.prevent="handleDropOnFilesWD($event)"
        @dragover.stop.prevent
        @dragenter="dragenter"
@@ -54,21 +54,17 @@ export default {
     currentSelected: {
       handler (val) {
         if (val) {
-          if (val.name !== 've-image') {
-            // 当前选中的图表显示维度度量的数据
-            if (val.packageJson.api_data.dimensions || val.packageJson.api_data.measures) {
-              if (this.type === 'dimension') { // 维度
-                this.fileList = val.packageJson.api_data.dimensions
-              }
-              if (this.type === 'measure') { // 度量
-                this.fileList = val.packageJson.api_data.measures
-              }
-              if (this.type === 'table') { // 表格不区分维度度量
-                this.fileList = val.packageJson.api_data.tableList
-              }
-            } else {
-              this.fileList = []
-            }
+          console.log(val)
+          // 当前选中的图表显示维度度量的数据
+          this.fileList = []
+          if (this.type === 'dimension' && val.packageJson.api_data.dimensions) { // 维度
+            this.fileList = val.packageJson.api_data.dimensions
+          }
+          if (this.type === 'measure' && val.packageJson.api_data.measures) { // 度量
+            this.fileList = val.packageJson.api_data.measures
+          }
+          if (this.type === 'table' && val.packageJson.api_data.tableList) { // 表格不区分维度度量
+            this.fileList = val.packageJson.api_data.tableList
           }
         }
       },
@@ -85,16 +81,17 @@ export default {
       // h5 api
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
       dataFile.showMore = false // 是否点击显示更多
-      console.log(this.type)
       if (this.type === 'dimension' && this.dragFile === this.type) {
         // 维度暂时只能拉入一个字段
         this.fileList[0] = dataFile
       }
-      if ((this.type === 'measure' || this.type === 'table') && this.dragFile === this.type) {
+      if (this.type === 'measure' && this.dragFile === this.type) {
+        this.fileList.push(dataFile)
+      }
+      if (this.type === 'table') {
         this.fileList.push(dataFile)
       }
       this.fileList = this.uniqueFun(this.fileList, 'field')
-      console.log(this.fileList)
       this.getData()
       this.isdrag = false
     },
@@ -127,6 +124,7 @@ export default {
       for (let item of this.fileList) {
         item.defaultAggregator = 'SUM'
       }
+      console.log(this.fileList)
       if (this.type === 'dimension') {
         this.currentSelected.packageJson.api_data.dimensions = this.fileList
       }
@@ -144,24 +142,23 @@ export default {
       this.$server.screenManage.getData(params).then(res => {
         if (res.data.code === 200) {
           if (this.type === 'table') {
-            // let columns = []
+            let columns = []
             // let apiData = this.currentSelected.packageJson.api_data
-            // for (let item of this.fileList) {
-            //   columns.push({
-            //     title: item.field,
-            //     dataIndex: item.field,
-            //     key: item.field
-            //   })
-            // }
-            // let rows = res.data.rows
-            // if (rows.length > 10) {
-            //   rows.length = 10
-            // }
-            // this.currentSelected.packageJson.api_data.source = {
-            //   columns,
-            //   rows
-            // }
-            // console.log(this.currentSelected.packageJson.api_data)
+            for (let item of this.fileList) {
+              columns.push({
+                title: item.field,
+                dataIndex: item.field,
+                key: item.field
+              })
+            }
+            let rows = res.data.rows
+            if (rows.length > 10) {
+              rows.length = 10
+            }
+            this.currentSelected.packageJson.api_data.source = {
+              columns,
+              rows
+            }
           } else {
             let columns = []
             let apiData = this.currentSelected.packageJson.api_data

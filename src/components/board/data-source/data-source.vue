@@ -32,7 +32,7 @@ export default {
   },
   data() {
     return {
-      activeKey: ['dimension', 'measure', 'filter', 'sort', 'tips', 'refresh'] // 所有面板默认打开
+      activeKey: ['dimension', 'measure', 'filter', 'sort', 'tips', 'refresh', 'table'] // 所有面板默认打开
     }
   },
   watch: {

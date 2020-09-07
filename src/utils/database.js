@@ -10,7 +10,7 @@ const database = {
         height: 1080, // 全局面包的宽高
         backgroundColor: '#0d2a42', // 背景颜色
         gridStep: 8, // 栅格间距
-        backgroundType: 1,
+        backgroundType: '1',
         backgroundSrc: ''
     },
     canvasMaps: [{
@@ -20,6 +20,7 @@ const database = {
                 name: 've-histogram',
                 icon: 'bar-chart',
                 type: '1',
+                modelId: '',
                 api_data: {
                     source: [
                         { x: '1/1', y: 375, s: '系列1' },
@@ -135,6 +136,7 @@ const database = {
                 name: 've-line',
                 icon: 'line-chart',
                 type: '1',
+                modelId: '',
                 api_data: {
                     source: [
                         { x: '1/1', y: 375 },
@@ -250,6 +252,7 @@ const database = {
                 name: 've-bar',
                 icon: 'md-list',
                 type: '1',
+                modelId: '',
                 api_data: {
                     source: [
                         { x: '1/1', y: 375, s: '系列1' },
@@ -365,6 +368,7 @@ const database = {
                 name: 've-pie',
                 icon: 'ios-pie',
                 type: '1',
+                modelId: '',
                 api_data: {
                     source: [
                         { x: '1/1', y: 1393, s: '系列1' },
@@ -480,6 +484,7 @@ const database = {
                 name: 've-map',
                 icon: 'ios-map',
                 type: '1',
+                modelId: '',
                 api_data: {
                     source: [
                         { x: '吉林', y: 178 },
@@ -652,6 +657,7 @@ const database = {
                 name: 've-radar',
                 icon: 'ios-cellular',
                 type: '1',
+                modelId: '',
                 api_data: {
                     source: [
                         { x: '1/1', y: 1393, s: '指标1' },
@@ -780,6 +786,7 @@ const database = {
             packageJson: {
                 title: '文本',
                 name: 've-text',
+                modelId: '',
                 apiData: {},
                 apis: {},
                 background: {
@@ -809,6 +816,7 @@ const database = {
                 title: '图片',
                 name: 've-image',
                 icon: 'md-images',
+                modelId: '',
                 apiData: {},
                 apis: {},
                 config: {
@@ -832,6 +840,7 @@ const database = {
                 name: 've-tables',
                 icon: 'table',
                 type: '3',
+                modelId: '',
                 api_data: {
                     source: {
                       columns: [{
