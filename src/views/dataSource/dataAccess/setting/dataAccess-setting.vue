@@ -6,11 +6,11 @@
         <a-button class="data_btn" v-on:click="back">返回</a-button>
       </div>
       <div class="setting">
-        <div class="search_bar">
+        <!-- <div class="search_bar">
           <a-input placeholder="请输入关键词" class="search_input">
             <a-icon slot="prefix" type="search" />
           </a-input>
-        </div>
+        </div> -->
         <div class="table">
           <a-table
             rowKey='id'

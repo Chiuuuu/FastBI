@@ -2,20 +2,20 @@
   <div>
     <div class="search_bar">
       <a-row type="flex" justify="space-between" align="middle">
-        <a-col>
+        <!-- <a-col>
           <a-input placeholder="请输入关键词" class="search_input">
             <a-icon slot="prefix" type="search" />
           </a-input>
-        </a-col>
-        <a-col>
+        </a-col> -->
+        <!-- <a-col>
           <a-select default-value="全部" class="search_select">
             <a-select-option value="aaa">
               aaa
             </a-select-option>
           </a-select>
-        </a-col>
+        </a-col> -->
         <a-col>
-          <a-button type="primary" style="margin-right:10px;" class="select_button" @click="handleExtract" :loading="extractSping">全部抽取</a-button>
+          <a-button type="primary" style="margin:0 10px;" class="select_button" @click="handleExtract" :loading="extractSping">全部抽取</a-button>
           <a-button type="primary" class="select_button" @click="handleGetData" :loading="spinning">刷新数据</a-button>
         </a-col>
       </a-row>

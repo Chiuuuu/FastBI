@@ -37,9 +37,9 @@
               </a-col>
             </a-row>
           </a-modal>
-          <a-menu-item key="1" @click="handleAddNewFolder">
+          <!-- <a-menu-item key="1" @click="handleAddNewFolder">
             新建文件夹
-          </a-menu-item>
+          </a-menu-item> -->
         </a-menu>
       </a-dropdown>
     </div>
@@ -47,11 +47,11 @@
       <span slot="description">暂无数据库连接</span>
     </a-empty>
     <template v-else>
-      <div class="menu_search">
+      <!-- <div class="menu_search">
         <a-input placeholder="搜索数据连接名称">
           <a-icon class="icon_search" slot="suffix" type="search" />
         </a-input>
-      </div>
+      </div> -->
       <p class="menu_tips">右键文件夹或选项有添加，重命名等操作</p>
       <div class="menu-wrap">
         <div
@@ -153,10 +153,10 @@ export default {
         }
       ],
       fileContenxtMenu: [
-        {
-          name: '移动到',
-          onClick: this.handleFileMoveFolder
-        },
+        // {
+        //   name: '移动到',
+        //   onClick: this.handleFileMoveFolder
+        // },
         {
           name: '删除',
           onClick: this.handleFileDelete
