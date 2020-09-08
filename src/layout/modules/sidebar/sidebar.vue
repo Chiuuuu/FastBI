@@ -72,16 +72,16 @@ export default {
               path: '/dataSource/dataModel'
             }
           ]
-        },
-        {
-          name: '系统管理',
-          id: '3',
-          icon: 'tool',
-          path: '',
-          children: [
-            { name: '栏目配置', id: '3-1', path: '/columnManage/columnConfig' }
-          ]
         }
+        // {
+        //   name: '系统管理',
+        //   id: '3',
+        //   icon: 'tool',
+        //   path: '',
+        //   children: [
+        //     { name: '栏目配置', id: '3-1', path: '/columnManage/columnConfig' }
+        //   ]
+        // }
       ]
     }
   },
