@@ -73,7 +73,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['dragFile', 'currentSelected', 'optionsTabsType'])
+    ...mapGetters(['dragFile', 'currentSelected', 'optionsTabsType', 'pageSettings', 'canvasMap', 'screenId'])
   },
   methods: {
     // 将拖动的维度到所选择的放置目标节点中
@@ -183,9 +183,34 @@ export default {
               rows
             }
           }
+          this.screenSave()
         }
       })
-    }
+    },
+    // 保存大屏
+      screenSave() {
+        const json = {
+          setting: this.pageSettings,
+          components: this.canvasMap
+        }
+        let params = {
+          json
+        }
+        if (!this.screenId) {
+          params.id = -1
+          params.name = this.$route.query.name
+          params.parentId = this.$route.query.parentId
+        } else {
+          params.id = this.screenId
+        }
+        this.$server.screenManage.screenSave(params).then(res => {
+          if (res.data.code === 200) {
+            this.$store.dispatch('SetScreenId', res.data.id)
+          } else {
+            this.$message.error(res.data.msg)
+          }
+        })
+      }
   }
 }
 </script>

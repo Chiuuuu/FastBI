@@ -808,6 +808,7 @@
   import DataSource from '../data-source/data-source'
   import { DEFAULT_COLORS } from '../../../utils/defaultColors'
   import { deepClone } from '../../../utils/deepClone'
+  import baseUrl from '@/api/baseUrl'
 
   export default {
     name: 'BoardOptions',
@@ -933,13 +934,13 @@
           this.$message.error('图片大小不能超过2M!')
           return
         }
-        console.log(e.target.files[0])
         var form = new FormData()
         form.append('avatarfile', e.target.files[0])
         console.log(form)
         this.$server.screenManage.uploadImage(form).then(res => {
             if (res.data.code === 200) {
-              let imageUrl = process.env.VUE_APP_SERVICE_URL + res.data.imgUrl
+              let imageUrl = baseUrl.requestURL + res.data.imgUrl
+              console.log(imageUrl)
               if (key === 'globalSettings') {
                 data['backgroundSrc'] = imageUrl
                 this.setPageSetting()

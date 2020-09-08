@@ -296,7 +296,6 @@ export default {
       this.fileSelectId = file.id
       this.$store.dispatch('SetScreenId', file.id)
       this.$store.dispatch('SetFileName', file.name)
-      console.log(this.fileName)
     },
     // 点击新建大屏
     addScreen() {
