@@ -452,11 +452,6 @@
 <script>
 import EditLeft from './edit-left'
 import EditRightTop from './edit-right-top'
-import {
-  fetchModelInfoById,
-  fetchCreateModel,
-  fetchSaveData
-} from '@/api/dataModel/api'
 import groupBy from 'lodash/groupBy'
 
 const countryData = ['中国']
@@ -785,17 +780,15 @@ export default {
      * 新增方法
     */
     async handleAddNew() {
-      const result = await fetchCreateModel({
-        url: `/admin/dev-api/datamodel/datamodelInfo/createDataModelInfo/${this.$route.query.dataConnectionId}`
-      })
+      const result = await this.$server.dataModel.addModel(this.$route.query.dataConnectionId)
 
-      if (result.data.code === 200) {
+      if (result.code === 200) {
         this.$message.success('获取数据成功')
-        this.detailInfo = result.data.data
+        this.detailInfo = result.data
         this.handleDimensions()
         this.handleMeasures()
       } else {
-        this.$message.error(result.data.msg)
+        this.$message.error(result.msg)
       }
     },
     /**
@@ -803,20 +796,19 @@ export default {
     */
     async handleGetData(id) {
       this.spinning = true
-      const result = await fetchModelInfoById({
-        url: '/admin/dev-api/datamodel/datamodelInfo/getDataModelInfo/' + id
-      }).finally(() => {
-        this.spinning = false
-      })
+      const result = await this.$server.common.getDetailByMenuId(`/datamodel/datamodelInfo/getDataModelInfo/${id}`)
+        .finally(() => {
+          this.spinning = false
+        })
 
-      if (result.data.code === 200) {
+      if (result.code === 200) {
         this.$message.success('获取数据成功')
-        this.detailInfo = result.data.data
+        this.detailInfo = result.data
         this.$refs.editLeftRef.handleGetMenuList(this.detailInfo)
         this.handleDimensions()
         this.handleMeasures()
       } else {
-        this.$message.error(result.data.msg)
+        this.$message.error(result.msg)
       }
     },
     /**
@@ -919,23 +911,20 @@ export default {
         return
       }
 
-      const result = await fetchSaveData({
-        url: '/admin/dev-api/datamodel/datamodelInfo/updataDataModelInfo',
-        data: {
-          ...this.detailInfo
-        }
+      const result = await this.$server.dataModel.saveModel({
+        ...this.detailInfo
       })
 
-      if (result.data.code === 200) {
+      if (result.code === 200) {
         this.$message.success({
           content: this.model === 'add' ? '保存成功' : '编辑成功',
           duration: 0.5
         }).then(() => {
-          this.$store.commit('dataModel/SET_MODELID', result.data.data.id)
+          this.$store.commit('dataModel/SET_MODELID', result.data.id)
           this.exit()
         })
       } else {
-        this.$message.error(result.data.msg)
+        this.$message.error(result.msg)
       }
     }
   }

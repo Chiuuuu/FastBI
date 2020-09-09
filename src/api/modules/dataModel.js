@@ -28,11 +28,10 @@ export default {
     /**
      * @description 新增数据模型
      * @param {string | number} id 表id
-     * @param {Object} params 请求参数
      * @returns
      */
-    addModel(id, params) {
-        return $axios.post(`/datamodel/datamodelInfo/createDataModelInfo/${id}`, params)
+    addModel(id) {
+        return $axios.get(`/datamodel/datamodelInfo/createDataModelInfo/${id}`)
     },
     /**
      * @description 保存数据模型
