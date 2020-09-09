@@ -173,23 +173,20 @@ export default {
     },
     async handleGetData() {
       this.sping = true
-      const result = await fetchGetTableField({
-        url: `/admin/dev-api/system/${this.modelType}/get/field`,
-        data: {
-          sourceMysqlId: this.modelId,
-          databasesName: this.formInfo.databaseName,
-          sourceMysqName: this.formInfo.name,
-          tableId: this.fieldInfo.id,
-          tableName: this.fieldInfo.name
-        }
+      const result = await this.$server.dataAccess.getTableFieldDetail(this.modelType, {
+        sourceMysqlId: this.modelId,
+        databasesName: this.formInfo.databaseName,
+        sourceMysqName: this.formInfo.name,
+        tableId: this.fieldInfo.id,
+        tableName: this.fieldInfo.name
       }).finally(() => {
         this.sping = false
       })
 
-      if (result.data.code === 200) {
-        this.data = [].concat(result.data.rows)
+      if (result.code === 200) {
+        this.data = [].concat(result.rows)
       } else {
-        this.$message.error(result.data.msg)
+        this.$message.error(result.msg)
       }
     },
     showModal() {
@@ -202,32 +199,23 @@ export default {
       this.handleSaveWriteTable()
     },
     async handleSaveWriteTable() {
-      console.log(this.fieldInfo)
-      const writeResult = await fetchWriteTable({
-        url: '/admin/dev-api/system/sourceTbale/save/table',
-        data: {
-          rows: this.readRows,
-          tableId: this.fieldInfo.id
-          // databaseName: this.formInfo.databaseName,
-          // sourceMysqName: this.formInfo.name
-        }
+      const writeResult = await this.$server.dataAccess.saveDataTable({
+        rows: this.readRows,
+        tableId: this.fieldInfo.id
       })
 
-      if (writeResult.data.code === 200) {
+      if (writeResult.code === 200) {
         this.handleSaveTableField()
       } else {
-        this.$message.error(writeResult.data.msg)
+        this.$message.error(writeResult.msg)
       }
     },
     async handleSaveTableField() {
-      const result = await fetchSaveTableField({
-        url: '/admin/dev-api/system/field/save/field',
-        data: {
-          rows: this.data
-        }
+      const result = await this.$server.dataAccess.saveTableField({
+        rows: this.data
       })
 
-      if (result.data.code === 200) {
+      if (result.code === 200) {
         this.$message.success({
           content: '保存成功',
           duration: 0.5
@@ -235,7 +223,7 @@ export default {
           this.back()
         })
       } else {
-        this.$message.error(result.data.msg)
+        this.$message.error(result.msg)
       }
     }
   }

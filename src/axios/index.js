@@ -55,19 +55,20 @@ service.interceptors.request.use(
  */
 service.interceptors.response.use(
   response => {
-    const { code, message } = response.data
+    const { code, msg } = response.data
     if (code !== 200) {
       const errorHandleFun = errorHandle[code]
       if (errorHandleFun instanceof Function) {
-        errorHandleFun(message)
+        errorHandleFun(msg)
       } else {
-        return Promise.reject(message)
+        return Promise.reject(msg)
       }
     }
     return response.data
   },
   error => {
-    messages({ content: response ? response.data : message, type: 'danger', duration: 5 })
+    const { response } = error
+    messages({ content: response ? response.data : '请求错误', type: 'danger', duration: 5 })
     return Promise.reject(error)
   }
 )
