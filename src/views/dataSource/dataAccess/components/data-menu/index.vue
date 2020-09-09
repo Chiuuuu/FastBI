@@ -391,37 +391,24 @@ export default {
     /**
      * 选中哪个表
     */
-    async handleSelect({ item, key, selectedKeys }) {
-      console.log('select', selectedKeys)
-      const itemObj = this.tableList.filter(item => {
-        return item.id === key
-      }).pop()
-      console.log('obj', itemObj)
-      if (itemObj.typeCore === 1) {
-        this.$store.dispatch('dataAccess/setModelType', 'mysql')
-
-        const result = await fetchTableInfo({
-          url: '/admin/dev-api/system/mysql/' + itemObj.id
-        })
-        console.log('result', result)
-        if (result.data.code === 200) {
-          this.$store.dispatch('dataAccess/setModelInfo', {
-            ip: result.data.data.ip,
-            name: result.data.data.name,
-            password: '',
-            port: Number(result.data.data.port),
-            username: result.data.data.username
-          })
-          this.$EventBus.$emit('setFormData')
-        } else {
-          this.$message.error(result.data.msg)
-        }
-      } else if (itemObj.typeCode === 2) {
-        this.$store.dispatch('dataAccess/setModelType', 'oracle')
-      }
-      this.$store.dispatch('dataAccess/setFirstFinished', false)
-      this.$store.dispatch('dataAccess/setModelId', itemObj.id)
-    },
+    // async handleSelect({ item, key, selectedKeys }) {
+    //   const itemObj = this.tableList.filter(item => {
+    //     return item.id === key
+    //   }).pop()
+    //   if (itemObj.typeCore === 1) {
+    //     this.$store.dispatch('dataAccess/setModelType', 'mysql')
+    //     this.getTableInfo(`/system/mysql/${itemObj.id}`, result => {
+    //       this.$store.dispatch('dataAccess/setModelInfo', {
+    //         ...result.data,
+    //         port: Number(result.data.port)
+    //       })
+    //     })
+    //   } else if (itemObj.typeCode === 2) {
+    //     this.$store.dispatch('dataAccess/setModelType', 'oracle')
+    //   }
+    //   this.$store.dispatch('dataAccess/setFirstFinished', false)
+    //   this.$store.dispatch('dataAccess/setModelId', itemObj.id)
+    // },
     mouseenter(icon) {
       this.icon = true
     },

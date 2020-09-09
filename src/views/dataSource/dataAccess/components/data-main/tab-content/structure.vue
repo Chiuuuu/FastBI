@@ -36,7 +36,6 @@
   </div>
 </template>
 <script>
-import { fetchReadeTable, fetchSaveExtract } from '../../../../../../api/dataAccess/api'
 import { mapState } from 'vuex'
 const columns = [
   {

@@ -89,7 +89,6 @@
 </template>
 
 <script>
-import { fetchGetTableField, fetchWriteTable, fetchSaveTableField } from '@/api/dataAccess/api'
 import { mapState } from 'vuex'
 const columns = [
   {
