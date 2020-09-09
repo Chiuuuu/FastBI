@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import isFunction from 'lodash/isFunction'
-import tml from './menu.vue'
+import tml from './contextMenu.vue'
 
 var _ContextMenu = Vue.extend(tml)
 var instance = ''
