@@ -145,9 +145,9 @@
     methods: {
       // 获取大屏数据
       getScreenData() {
-        this.$server.screenManage.screenData(this.$route.query.id).then(res => {
-          if (res.data.code === 200) {
-            let json = res.data.data ? res.data.data.json : {}
+        this.$server.screenManage.getScreenDetailById(this.$route.query.id).then(res => {
+          if (res.code === 200) {
+            let json = res.data ? res.data.json : {}
             this.$store.dispatch('SetPageSettings', json.setting)
             this.$store.dispatch('InitCanvasMaps', json.components)
           }
@@ -200,7 +200,7 @@
             setting: this.pageSettings
           }
         }
-        this.$server.screenManage.screenSave(params).then(res => {})
+        this.$server.screenManage.saveScreen(params).then(res => {})
         // this.$store.dispatch('ContextMenuCommand', 'remove')
       },
       /**

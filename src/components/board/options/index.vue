@@ -929,9 +929,9 @@
         }
         var form = new FormData()
         form.append('avatarfile', e.target.files[0])
-        this.$server.screenManage.uploadImage(form).then(res => {
-            if (res.data.code === 200) {
-              let imageUrl = process.env.VUE_APP_SERVICE_URL + res.data.imgUrl
+        this.$server.screenManage.actionUploadImage(form).then(res => {
+            if (res.code === 200) {
+              let imageUrl = process.env.VUE_APP_SERVICE_URL + res.imgUrl
               if (key === 'globalSettings') {
                 data['backgroundSrc'] = imageUrl
                 this.setPageSetting()
@@ -945,7 +945,7 @@
                 this.setBackGround()
               }
             } else {
-              this.$message.error(res.data.msg)
+              this.$message.error(res.msg)
             }
           })
           .catch(err => {
@@ -1004,11 +1004,11 @@
         } else {
           params.id = this.screenId
         }
-        this.$server.screenManage.screenSave(params).then(res => {
-          if (res.data.code === 200) {
-            this.$store.dispatch('SetScreenId', res.data.id)
+        this.$server.screenManage.saveScreen(params).then(res => {
+          if (res.code === 200) {
+            this.$store.dispatch('SetScreenId', res.id)
           } else {
-            this.$message.error(res.data.msg)
+            this.$message.error(res.msg)
           }
         })
       }

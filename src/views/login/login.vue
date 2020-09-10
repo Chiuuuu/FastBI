@@ -94,14 +94,14 @@ export default {
         let params = {
           ...values
         }
-        this.$server.login.login(params).then(res => {
-          if (res.data.code === 200) {
+        this.$server.login.actionLogin(params).then(res => {
+          if (res.code === 200) {
             // this.$store.commit('common/set_token', res.data.token)
             this.$router.push({
               path: '/screenManage/screenCatalog'
             })
           } else {
-            this.$message.error(res.data.msg)
+            this.$message.error(res.msg)
           }
         })
       })

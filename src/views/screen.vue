@@ -78,9 +78,9 @@
     methods: {
       // 获取大屏数据
       getScreenData() {
-        this.$server.screenManage.screenData(this.screenId).then(res => {
-          if (res.data.code === 200) {
-            let json = res.data.data ? res.data.data.json : {}
+        this.$server.screenManage.getScreenDetailById(this.screenId).then(res => {
+          if (res.code === 200) {
+            let json = res.data ? res.data.json : {}
             // 页面配置信息
             this.$store.dispatch('SetPageSettings', json.setting)
             // 页面canvasMaps
