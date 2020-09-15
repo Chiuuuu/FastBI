@@ -340,7 +340,7 @@ export default {
         this.$message.error(' 请先添加大屏目录数据或者选择一个大屏目录')
         return
       }
-      this.$router.push({ path: '/admin',
+      this.$router.push({ name: 'screenEdit',
       query: {
         id: this.fileSelectId,
         name: this.fileName
