@@ -206,9 +206,9 @@ export default {
       let params = {
         name: this.searchName
       }
-      this.$server.screenManage.folderList(params).then(res => {
-        if (res.data.code === 200) {
-          let rows = res.data.rows
+      this.$server.screenManage.getFolderList(params).then(res => {
+        if (res.code === 200) {
+          let rows = res.rows
           const list = rows.filter(item => {
             // 是否是文件夹
             return item.isFolder === '1'
@@ -248,8 +248,8 @@ export default {
       let params = {
         id: id
       }
-      this.$server.screenManage.folderDel(params).then(res => {
-        if (res.data.code === 200) {
+      this.$server.screenManage.deleFolder(params).then(res => {
+        if (res.code === 200) {
           this.$message.error('删除成功')
           this.getList()
           this.$store.dispatch('SetScreenId', '')
@@ -321,9 +321,9 @@ export default {
             id: this.id,
             ...values
           }
-          this.$server.screenManage.folderput(params).then(res => {
-            if (res.data.code === 200) {
-              this.$message.success(res.data.msg)
+          this.$server.screenManage.putFolder(params).then(res => {
+            if (res.code === 200) {
+              this.$message.success(res.msg)
               this.getList()
             }
           })
@@ -339,7 +339,7 @@ export default {
         this.$message.error(' 请先添加大屏目录数据或者选择一个大屏目录')
         return
       }
-      this.$router.push({ path: '/admin',
+      this.$router.push({ name: 'screenEdit',
       query: {
         id: this.fileSelectId,
         name: this.fileName
@@ -363,12 +363,12 @@ export default {
             isFolder: 1,
             ...values
           }
-          this.$server.screenManage.folderAdd(params).then(res => {
-            if (res.data.code === 200) {
-              this.$message.success(res.data.msg)
+          this.$server.common.addMenuFolder('/screen/folder', params).then(res => {
+            if (res.code === 200) {
+              this.$message.success(res.msg)
               this.getList()
             } else {
-              this.$message.error(res.data.msg)
+              this.$message.error(res.msg)
             }
           })
         } else { // 修改
@@ -377,9 +377,9 @@ export default {
             id: this.id,
             ...values
           }
-          this.$server.screenManage.folderput(params).then(res => {
-            if (res.data.code === 200) {
-              this.$message.success(res.data.msg)
+          this.$server.screenManage.putFolder(params).then(res => {
+            if (res.code === 200) {
+              this.$message.success(res.msg)
               this.getList()
             } else {
               this.$message.error(res.data.msg)

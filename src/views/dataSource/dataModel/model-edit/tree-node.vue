@@ -125,9 +125,6 @@
 <script>
 import { Utils, Node } from '../util'
 import findIndex from 'lodash/findIndex'
-import {
-  fetchGetJoin
-} from '@/api/dataModel/api'
 export default {
   name: 'tree-node',
   inject: ['nodeStatus'],

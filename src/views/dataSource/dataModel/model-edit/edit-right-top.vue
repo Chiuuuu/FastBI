@@ -24,10 +24,6 @@
 import { Utils, Node, conversionTree } from '../util'
 import TreeNode from './tree-node'
 import groupBy from 'lodash/groupBy'
-import {
-  fetchGetJoin,
-  fetchUpdate
-} from '@/api/dataModel/api'
 export default {
   name: 'edit-right-top',
   inject: ['nodeStatus'],
@@ -163,41 +159,35 @@ export default {
       }
     },
     async getJoin(left, right) {
-      const result = await fetchGetJoin({
-        url: '/admin/dev-api/datamodel/datamodelInfo/getTableConfigInfo',
-        data: {
-          dataConnectionId: this.detailInfo.dataConnectionId,
-          dataModelId: this.detailInfo.datamodelId,
-          left: left.getProps(),
-          right: Object.assign(right.getProps(), {
-            leftTableId: left.getProps().tableNo
-          })
-        }
+      const result = await this.$server.dataModel.getBetweenJoin({
+        dataConnectionId: this.detailInfo.dataConnectionId,
+        dataModelId: this.detailInfo.datamodelId,
+        left: left.getProps(),
+        right: Object.assign(right.getProps(), {
+          leftTableId: left.getProps().tableNo
+        })
       })
-      if (result.data.code === 200) {
-        right.setJoin(result.data.data)
+      if (result.code === 200) {
+        right.setJoin(result.data)
         right.setDataModelId(this.detailInfo.datamodelId)
       } else {
-        this.$message.error(result.data.msg)
+        this.$message.error(result.msg)
       }
     },
     async handleUpdate() {
-      const result = await fetchUpdate({
-        url: '/admin/dev-api/datamodel/datamodelInfo/getDataSourceTableInfo',
-        data: {
-          dataConnectionId: this.detailInfo.dataConnectionId,
-          dataModelId: this.detailInfo.dataConnectionId,
-          config: this.detailInfo.config
-        }
+      const result = await this.$server.dataModel.putModelDetail({
+        dataConnectionId: this.detailInfo.dataConnectionId,
+        dataModelId: this.detailInfo.dataConnectionId,
+        config: this.detailInfo.config
       })
 
-      if (result.data.code === 200) {
-        this.detailInfo.config = result.data.data.config
-        this.detailInfo.pivotSchema = result.data.data.pivotSchema
+      if (result.code === 200) {
+        this.detailInfo.config = result.data.config
+        this.detailInfo.pivotSchema = result.data.pivotSchema
         this.$parent.handleDimensions()
         this.$parent.handleMeasures()
       } else {
-        this.$message.error(result.data.msg)
+        this.$message.error(result.msg)
       }
     }
   }

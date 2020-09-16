@@ -172,19 +172,19 @@ export default {
     },
     // 数据模型列表
     getModelList() {
-      this.$server.screenManage.catalogList().then(res => {
-        if (res.data.code === 200) {
-          this.modelList = res.data.data.folders
-          this.modelList = this.modelList.concat(res.data.data.items)
+      this.$server.screenManage.getCatalogList().then(res => {
+        if (res.code === 200) {
+          this.modelList = res.data.folders
+          this.modelList = this.modelList.concat(res.data.items)
         }
       })
     },
     // 维度、度量列表
     getPivoSchemaList() {
       this.$server.screenManage.getPivoSchemaList(this.dataModel.id).then(res => {
-        if (res.data.code === 200) {
-          let dimensions = res.data.data.dimensions
-          let measures = res.data.data.measures
+        if (res.code === 200) {
+          let dimensions = res.data.dimensions
+          let measures = res.data.measures
           this.dimensions = this.transData(dimensions)
           this.measures = this.transData(measures)
         }

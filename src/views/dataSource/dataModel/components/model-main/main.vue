@@ -83,9 +83,6 @@ import TreeNode from './show-tree-node'
 import { Node, conversionTree } from '../../util'
 import { mapState } from 'vuex'
 import groupBy from 'lodash/groupBy'
-import {
-  fetchModelInfoById
-} from '@/api/dataModel/api'
 export default {
   name: 'model-main',
   components: {
@@ -98,111 +95,6 @@ export default {
       tablesEmpty: false, // 是否表为空
       dimensions: '', // 维度
       measures: '', // 度量
-      // tables: [
-      //   {
-      //     tableId: 1,
-      //     tableAlias: '总编',
-      //     produced: 'Original',
-      //     dataConnectionId: 700460682,
-      //     tableName: '总编'
-      //   },
-      //   {
-      //     tableId: 2,
-      //     join: {
-      //       conditions: [
-      //         {
-      //           left: '国家及地区',
-      //           right: '国家及地区',
-      //           leftTableId: 1,
-      //           op: '='
-      //         },
-      //         {
-      //           left: '平均年薪（美元）',
-      //           right: '平均年薪（美元）',
-      //           leftTableId: 1,
-      //           op: '='
-      //         }
-      //       ],
-      //       method: 'inner'
-      //     },
-      //     tableAlias: '工作表1',
-      //     produced: 'Original',
-      //     dataConnectionId: 700460682,
-      //     tableName: '工作表1'
-      //   },
-      //   {
-      //     tableId: 3,
-      //     join: {
-      //       conditions: [
-      //         {
-      //           left: '国家及地区',
-      //           right: '国家及地区',
-      //           leftTableId: 1,
-      //           op: '='
-      //         },
-      //         {
-      //           left: '平均年薪（美元）',
-      //           right: '平均年薪（美元）',
-      //           leftTableId: 1,
-      //           op: '='
-      //         }
-      //       ],
-      //       method: 'inner'
-      //     },
-      //     tableAlias: '工作表2',
-      //     produced: 'Original',
-      //     dataConnectionId: 700460682,
-      //     tableName: '工作表2'
-      //   },
-      //   {
-      //     tableId: 4,
-      //     join: {
-      //       conditions: [
-      //         {
-      //           left: '国家及地区',
-      //           right: '国家及地区',
-      //           leftTableId: 2,
-      //           op: '='
-      //         },
-      //         {
-      //           left: '平均年薪（美元）',
-      //           right: '平均年薪（美元）',
-      //           leftTableId: 2,
-      //           op: '='
-      //         }
-      //       ],
-      //       method: 'inner'
-      //     },
-      //     tableAlias: '工作表3',
-      //     produced: 'Original',
-      //     dataConnectionId: 700460682,
-      //     tableName: '工作表3'
-      //   },
-      //   {
-      //     tableId: 5,
-      //     join: {
-      //       conditions: [
-      //         {
-      //           left: '国家及地区',
-      //           right: '国家及地区',
-      //           leftTableId: 3,
-      //           op: '='
-      //         },
-      //         {
-      //           left: '平均年薪（美元）',
-      //           right: '平均年薪（美元）',
-      //           leftTableId: 3,
-      //           op: '='
-      //         }
-      //       ],
-      //       method: 'inner'
-      //     },
-      //     tableAlias: '工作表1',
-      //     produced: 'Original',
-      //     dataConnectionId: 700460682,
-      //     tableName: '工作表1'
-      //   }
-      // ],
       renderTables: [] // 用来渲染树组件
     }
   },
@@ -218,20 +110,19 @@ export default {
     async handleGetData() {
       this.spinning = true
       this.renderTables = []
-      const result = await fetchModelInfoById({
-        url: '/admin/dev-api/datamodel/datamodelInfo/getDataModelInfo/' + this.fileSelectId
-      }).finally(() => {
-        this.spinning = false
-      })
+      const result = await this.$server.common.getDetailByMenuId(`/datamodel/datamodelInfo/getDataModelInfo/${this.fileSelectId}`)
+        .finally(() => {
+          this.spinning = false
+        })
 
-      if (result.data.code === 200) {
+      if (result.code === 200) {
         this.$message.success('获取数据成功')
-        this.detailInfo = result.data.data
+        this.detailInfo = result.data
         this.handleDetailWithRoot()
         this.handleDimensions()
         this.handleMeasures()
       } else {
-        this.$message.error(result.data.msg)
+        this.$message.error(result.msg)
       }
     },
     /**

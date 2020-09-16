@@ -1,5 +1,5 @@
 <template>
-  <div class="menu">
+  <div class="menu" id="menuRef">
     <div class="menu_title">
       <span class="m-t-s">数据连接</span>
       <a-dropdown :trigger="['click']" placement="bottomLeft">
@@ -108,7 +108,7 @@ import { fetchTableInfo, fetchDeleteMenuById } from '../../../../../api/dataAcce
 import MenuFile from '@/components/dataSource/menu-group/file'
 import MenuFolder from '@/components/dataSource/menu-group/folder'
 export default {
-  name: 'data-menu',
+  name: 'dataMenu',
   props: {
     menuData: {
       type: String,
@@ -193,43 +193,41 @@ export default {
      this.$store.dispatch('dataAccess/getMenuList', this)
     },
     /**
+     * @description 获取表详情信息
+    */
+    async getTableInfo(url, callback) {
+      const result = await this.$server.common.getDetailByMenuId(url)
+      if (result.code === 200) {
+        if (callback && (callback instanceof Function)) {
+          callback(result)
+        }
+        this.$EventBus.$emit('setFormData')
+      } else {
+        this.$message.error(result.msg)
+      }
+    },
+    /**
     * 选择左侧菜单
     */
-    async handleFileSelect(file) {
+    handleFileSelect(file) {
       if (this.fileSelectId === file.id) return
       this.fileSelectId = file.id
       if (file.typeCore === 1) {
         this.$store.dispatch('dataAccess/setModelType', 'mysql')
-
-        const result = await fetchTableInfo({
-          url: '/admin/dev-api/system/mysql/' + file.id
-        })
-        if (result.data.code === 200) {
+        this.getTableInfo(`/system/mysql/${file.id}`, result => {
           this.$store.dispatch('dataAccess/setModelInfo', {
-            ip: result.data.data.ip,
-            name: result.data.data.name,
-            password: result.data.data.password,
-            port: Number(result.data.data.port),
-            username: result.data.data.username
+            ...result.data,
+            port: Number(result.data.port)
           })
-          this.$EventBus.$emit('setFormData')
-        } else {
-          this.$message.error(result.data.msg)
-        }
+        })
       } else if (file.typeCore === 2) {
         this.$store.dispatch('dataAccess/setModelType', 'oracle')
-        const result = await fetchTableInfo({
-          url: '/admin/dev-api/system/oracle/' + file.id
-        })
-        if (result.data.code === 200) {
+        this.getTableInfo(`/system/oracle/${file.id}`, result => {
           this.$store.dispatch('dataAccess/setModelInfo', {
-            ...result.data.data,
-            port: Number(result.data.data.port)
+            ...result.data,
+            port: Number(result.data.port)
           })
-          this.$EventBus.$emit('setFormData')
-        } else {
-          this.$message.error(result.data.msg)
-        }
+        })
       }
       this.$store.dispatch('dataAccess/setFirstFinished', false)
       this.$store.dispatch('dataAccess/setModelId', file.id)
@@ -241,17 +239,17 @@ export default {
     * 删除菜单
     */
     async handleFileDelete(event, item, { parent, file, index }) {
-      const result = await fetchDeleteMenuById({
-        url: `/admin/dev-api/system/catalog/delete/${file.id}`
-      })
-      if (result.data.code === 200) {
+      const result = await this.$server.common.deleMenuById(`/system/catalog/delete/${file.id}`)
+      if (result.code === 200) {
         if (parent) {
           parent.splice(index, 1)
         } else {
           this.tableList.splice(index, 1)
         }
+        const isSame = file.id === this.fileSelectId
+        if (isSame) this.$store.dispatch('dataAccess/setModelType', '')
       } else {
-        this.$message.error(result.data.msg)
+        this.$message.error(result.msg)
       }
     },
     /**
@@ -393,37 +391,24 @@ export default {
     /**
      * 选中哪个表
     */
-    async handleSelect({ item, key, selectedKeys }) {
-      console.log('select', selectedKeys)
-      const itemObj = this.tableList.filter(item => {
-        return item.id === key
-      }).pop()
-      console.log('obj', itemObj)
-      if (itemObj.typeCore === 1) {
-        this.$store.dispatch('dataAccess/setModelType', 'mysql')
-
-        const result = await fetchTableInfo({
-          url: '/admin/dev-api/system/mysql/' + itemObj.id
-        })
-        console.log('result', result)
-        if (result.data.code === 200) {
-          this.$store.dispatch('dataAccess/setModelInfo', {
-            ip: result.data.data.ip,
-            name: result.data.data.name,
-            password: '',
-            port: Number(result.data.data.port),
-            username: result.data.data.username
-          })
-          this.$EventBus.$emit('setFormData')
-        } else {
-          this.$message.error(result.data.msg)
-        }
-      } else if (itemObj.typeCode === 2) {
-        this.$store.dispatch('dataAccess/setModelType', 'oracle')
-      }
-      this.$store.dispatch('dataAccess/setFirstFinished', false)
-      this.$store.dispatch('dataAccess/setModelId', itemObj.id)
-    },
+    // async handleSelect({ item, key, selectedKeys }) {
+    //   const itemObj = this.tableList.filter(item => {
+    //     return item.id === key
+    //   }).pop()
+    //   if (itemObj.typeCore === 1) {
+    //     this.$store.dispatch('dataAccess/setModelType', 'mysql')
+    //     this.getTableInfo(`/system/mysql/${itemObj.id}`, result => {
+    //       this.$store.dispatch('dataAccess/setModelInfo', {
+    //         ...result.data,
+    //         port: Number(result.data.port)
+    //       })
+    //     })
+    //   } else if (itemObj.typeCode === 2) {
+    //     this.$store.dispatch('dataAccess/setModelType', 'oracle')
+    //   }
+    //   this.$store.dispatch('dataAccess/setFirstFinished', false)
+    //   this.$store.dispatch('dataAccess/setModelId', itemObj.id)
+    // },
     mouseenter(icon) {
       this.icon = true
     },

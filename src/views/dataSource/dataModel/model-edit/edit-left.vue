@@ -17,10 +17,6 @@
 <script>
 import { Node } from '../util'
 import { mapState } from 'vuex'
-import {
-  fetchGetTableList
-} from '@/api/dataModel/api'
-
 export default {
   name: 'model-edit-left',
   inject: ['nodeStatus'],
@@ -61,14 +57,12 @@ export default {
   },
   methods: {
     async handleGetMenuList(detailInfo) {
-      const result = await fetchGetTableList({
-        url: '/admin/dev-api/datamodel/datamodelInfo/getDataSourceTableInfo/' + detailInfo.dataConnectionId // '111112222233333444'
-      })
+      const result = await this.$server.dataModel.getTableListById(detailInfo.dataConnectionId)
 
-      if (result.data.code === 200) {
-        this.list = result.data.data
+      if (result.code === 200) {
+        this.list = result.data
       } else {
-        this.$message.error(result.data.msg)
+        this.$message.error(result.msg)
       }
     },
     handleMouseDown() {

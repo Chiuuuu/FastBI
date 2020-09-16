@@ -114,15 +114,15 @@ export default {
         } else {
           params.id = this.screenId
         }
-        this.$server.screenManage.screenSave(params).then(res => {
-          if (res.data.code === 200) {
+        this.$server.screenManage.saveScreen(params).then(res => {
+          if (res.code === 200) {
             // 刷新操作的时候不提示
             if (!this.refresh) {
               this.$message.success('保存成功')
             }
-            this.$store.dispatch('SetScreenId', res.data.id)
+            this.$store.dispatch('SetScreenId', res.id)
           } else {
-            this.$message.error(res.data.msg)
+            this.$message.error(res.msg)
           }
         })
       },
@@ -135,9 +135,9 @@ export default {
         let params = {
           id: this.screenId
         }
-        this.$server.screenManage.screenRefresh(params).then(res => {
-          if (res.data.code === 200) {
-            let screenDataList = res.data.data.screenDataList
+        this.$server.screenManage.actionRefreshScreen(params).then(res => {
+          if (res.code === 200) {
+            let screenDataList = res.data.screenDataList
             for (let item of screenDataList) {
               for (let item2 of this.canvasMap) {
                 if (item2.id === item.id) {

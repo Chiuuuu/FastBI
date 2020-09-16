@@ -140,7 +140,7 @@ export default {
         }
       }
       this.$server.screenManage.getData(params).then(res => {
-        if (res.data.code === 200) {
+        if (res.code === 200) {
           if (this.type === 'table') {
             let columns = []
             // let apiData = this.currentSelected.packageJson.api_data
@@ -170,7 +170,7 @@ export default {
               columns.push(m.field) // 默认columns第二项起为指标
             }
             let rows = []
-            res.data.rows.map((item, index) => {
+            res.rows.map((item, index) => {
               let obj = {}
               obj[dimensionKeys] = item[dimensionKeys]
               for (let item2 of measureKeys) {
