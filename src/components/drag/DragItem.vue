@@ -55,7 +55,7 @@
 <script>
   // 引入两个注册和取消注册的事件
   import { on, off } from 'bin-ui/src/utils/dom'
-  import { mapGetters } from 'vuex'
+  import { mapGetters, mapActions } from 'vuex'
   import { setBaseProperty } from '../../api/canvasMaps/canvas-maps-request'
 
   export default {
@@ -181,6 +181,7 @@
       }
     },
     methods: {
+      ...mapActions(['saveScreenData']),
       // 悬停事件
       handleHover () {
         this.comHover = true
@@ -325,26 +326,8 @@
         this.$store.dispatch('SetBaseProperty', this.transformData)
       },
       setBaseProperty () {
-        this.screenSave()
+        this.saveScreenData()
         setBaseProperty(this.currentSelected)
-      },
-      // 保存大屏
-      screenSave() {
-        const json = {
-          setting: this.pageSettings,
-          components: this.canvasMap
-        }
-        let params = {
-          id: this.screenId,
-          json
-        }
-        this.$server.screenManage.saveScreen(params).then(res => {
-          if (res.code === 200) {
-            this.$store.dispatch('SetScreenId', res.id)
-          } else {
-            this.$message.error(res.msg)
-          }
-        })
       }
     }
   }

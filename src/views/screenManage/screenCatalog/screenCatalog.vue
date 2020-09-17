@@ -4,9 +4,7 @@
       <div class="menu_title">
         <span>大屏目录</span>
         <a-dropdown :trigger="['click']" placement="bottomLeft">
-          <a class="ant-dropdown-link">
-            <a-icon type="plus-square" class="menu_icon" />
-          </a>
+          <a-icon type="plus-square" class="menu_icon" />
           <a-menu slot="overlay" class="drow_menu">
             <a-menu-item v-on:click="addScreen">
               新建大屏
@@ -62,18 +60,20 @@
       </div>
     </div>
     <div class="right">
-      <span class="nav_title">{{fileName}}</span>
-      <a-button class="btn_n1" @click="openScreen">
-        全屏
-      </a-button>
-      <a-button class="btn_n2">
-        刷新数据
-      </a-button>
-      <a-button type="primary" class="btn_pr" @click="editScreen">
-        编辑大屏
-      </a-button>
-      <div class="contain" ref="contain" :style="wrapStyle">
-        <screen v-if="folderList.length > 0" :style="canvasPanelStyle"></screen>
+      <div class="right-header">
+        <span class="nav_title">{{fileName}}</span>
+        <a-button class="btn_n1" @click="openScreen">
+          全屏
+        </a-button>
+        <a-button class="btn_n2">
+          刷新数据
+        </a-button>
+        <a-button type="primary" class="btn_pr" @click="editScreen">
+          编辑大屏
+        </a-button>
+      </div>
+      <div class="contain" ref="contain">
+        <screen v-if="fileSelectId" :key="componentKey"></screen>
         <div class="empty" v-else>
           <img src="@/assets/images/icon_empty_state.png" class="empty_img" />
           <p class="empty_word"> 暂无内容 ， 请先添加大屏目录数据或者选择一个大屏目录 ~</p>
@@ -112,7 +112,7 @@ import MenuFile from '@/components/dataSource/menu-group/file'
 import MenuFolder from '@/components/dataSource/menu-group/folder'
 
 import { mapGetters } from 'vuex' // 导入vuex
-import Screen from '@/views/screen' // 大屏
+import Screen from '@/views/screen' // 预览
 import { addResizeListener, removeResizeListener } from 'bin-ui/src/utils/resize-event'
 
 export default {
@@ -156,9 +156,8 @@ export default {
           onClick: this.handleFileDelete
         }
       ],
-      wrapStyle: {},
-      range: 0,
-      searchName: '' // 搜索名称
+      searchName: '', // 搜索名称
+      componentKey: 0
     }
   },
   watch: {
@@ -167,38 +166,29 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['pageSettings', 'canvasRange', 'screenId', 'fileName']),
+    ...mapGetters(['pageSettings', 'canvasRange', 'screenId', 'fileName', 'isScreen']),
     fileSelectId: {
       get () {
-        console.log(this.screenId)
         return this.screenId
       },
       set (value) {
         this.$store.dispatch('SetScreenId', value)
         // this.$store.commit('dataAccess/SET_MODELID', value)
       }
-    },
-    // 画布面板的样式
-    canvasPanelStyle () {
-      let obj = {
-        width: `${this.pageSettings.width}px`,
-        height: `${this.pageSettings.height}px`,
-        transform: `scale(${this.range}) translate3d(0px, 0px, 0)`,
-        transformOrigin: '0 0',
-        backgroundColor: this.pageSettings.backgroundColor
-      }
-      return obj
     }
   },
   mounted() {
     this.getList()
     this.$on('fileSelect', this.handleFileSelect)
 
-    this.$nextTick(this._calcStyle)
-    addResizeListener(this.$refs.contain, this._calcStyle)
-  },
-  beforeDestroy () {
-    removeResizeListener(this.$refs.contain, this._calcStyle)
+    window.onresize = () => {
+      // 全屏下监控是否按键了ESC
+      if (!this.checkFull()) {
+        // 全屏下按键esc后要执行的动作
+        this.componentKey -= 1
+        this.$store.dispatch('SetIsScreen', false)
+      }
+    }
   },
   methods: {
     // 获取文件夹列表
@@ -246,13 +236,14 @@ export default {
     // 删除
     handleDelete(id) {
       let params = {
-        id: id
+        id
       }
-      this.$server.screenManage.deleFolder(params).then(res => {
+      this.$server.screenManage.deleFolder({ params }).then(res => {
         if (res.code === 200) {
           this.$message.error('删除成功')
           this.getList()
           this.$store.dispatch('SetScreenId', '')
+          this.$store.dispatch('SetFileName', '')
         }
       })
     },
@@ -310,7 +301,7 @@ export default {
         }
         if (this.isAdd === 1) { // 新增
           this.$router.push({
-            path: '/admin',
+            name: 'screenEdit',
             query: {
               ...values
             }
@@ -397,6 +388,7 @@ export default {
     // 打开全屏
     openScreen () {
       this.$store.dispatch('SetIsScreen', true)
+      this.componentKey += 1
       // this.$router.push({ name: 'screen', params: { id: this.userId } })
       this.$nextTick(() => {
         var docElm = document.querySelector('.dv-screen')
@@ -413,22 +405,17 @@ export default {
         }
       })
     },
-    _calcStyle () {
-      const wrap = this.$refs.contain
-      if (!wrap) return
-      // 计算wrap样式
-      // 计算缩放比例
-      let range = ((wrap.clientWidth - 120) / this.pageSettings.width)
-      range = Math.round(range * 100) / 100
-      console.log(this.range)
-      if (range < 0.4) {
-        range = 0.4
+     /**
+     * 是否全屏并按键ESC键的方法
+     */
+    checkFull () {
+      // document.fullscreenEnabled 谷歌浏览器一直返回true
+      // let isFull = document.fullscreenEnabled || window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled
+      let isFull = window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled
+      if (isFull === undefined) {
+        isFull = false
       }
-      this.wrapStyle = {
-        width: `${wrap.clientWidth * range + 120}px`,
-        height: `${this.pageSettings.height * range + 120}px`
-      }
-      this.range = range
+      return isFull
     }
   }
 }

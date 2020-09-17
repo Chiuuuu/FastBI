@@ -30,7 +30,7 @@
           />
           <span> 预览</span>
         </div>
-        <div class="item" flex="dir:top" @click.stop="screenSave">
+        <div class="item" flex="dir:top" @click.stop="saveScreenData('保存成功')">
           <a-icon type="save" style="font-size:18px" />
           <span> 保存</span>
         </div>
@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 export default {
   name: 'BoardHeader',
   props: {
@@ -71,11 +71,7 @@ export default {
     this.userId = 'dv1e443967LZP2Dj'
   },
   methods: {
-      // 计算缩放比例
-      resize_window() {
-          let wheight = Number(document.documentElement.clientHeight / 1080)
-          this.scalseNum = wheight
-      },
+      ...mapActions(['saveScreenData']),
       goBack() {
         this.$router.go(-1)
       },
@@ -98,34 +94,6 @@ export default {
           }
         })
       },
-      // 保存大屏
-      screenSave() {
-        const json = {
-          setting: this.pageSettings,
-          components: this.canvasMap
-        }
-        let params = {
-          json
-        }
-        if (!this.screenId) {
-          params.id = -1
-          params.name = this.$route.query.name
-          params.parentId = this.$route.query.parentId
-        } else {
-          params.id = this.screenId
-        }
-        this.$server.screenManage.saveScreen(params).then(res => {
-          if (res.code === 200) {
-            // 刷新操作的时候不提示
-            if (!this.refresh) {
-              this.$message.success('保存成功')
-            }
-            this.$store.dispatch('SetScreenId', res.id)
-          } else {
-            this.$message.error(res.msg)
-          }
-        })
-      },
       // 刷新大屏
       refreshData() {
         if (!this.screenId) {
@@ -135,7 +103,7 @@ export default {
         let params = {
           id: this.screenId
         }
-        this.$server.screenManage.actionRefreshScreen(params).then(res => {
+        this.$server.screenManage.actionRefreshScreen({ params }).then(res => {
           if (res.code === 200) {
             let screenDataList = res.data.screenDataList
             for (let item of screenDataList) {
@@ -146,7 +114,7 @@ export default {
               }
             }
             this.refresh = true // 刷新按钮
-            this.screenSave()
+            this.saveScreenData()
             this.$message.success('刷新成功')
           }
         })

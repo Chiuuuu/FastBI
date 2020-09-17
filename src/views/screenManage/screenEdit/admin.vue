@@ -15,12 +15,18 @@
             @click.stop.prevent="handleSelected(transform)"
             @mouseenter="handleHover(transform)"
             @mouseleave="handleNoHover()">
-            <div v-if="coverageExpand">
+            <div class="item" v-if="coverageExpand">
               <a-icon v-if="transform.packageJson.icon" :type="transform.packageJson.icon" />
-              <span v-if="transform.packageJson.config&&transform.packageJson.config.title">
+              <a-tooltip v-if="transform.packageJson.config.title.content.length > 7">
+                <template slot="title">
+                  {{transform.packageJson.config.title.content}}
+                </template>
+                {{transform.packageJson.config.title.content.substring(0, 7) + '...'}}
+              </a-tooltip>
+              <span v-else>
                 {{ transform.packageJson.config.title.content}}
               </span>
-              <span v-else> {{ transform.packageJson.title }}</span>
+              <!-- <span v-else> {{ transform.packageJson.title }}</span> -->
             </div>
             <div v-else flex="main:center" style="padding:5px 0;">
               <a-icon :type="transform.packageJson.icon" />
@@ -151,6 +157,10 @@
       // 悬停事件
       handleHover (item) {
         this.hoverItem = item.id
+        if (!this.currentSelected) {
+          this.$store.dispatch('SingleSelected', item)
+          this.$store.dispatch('ToggleContextMenu')
+        }
       },
       handleNoHover () {
         this.hoverItem = null
@@ -197,12 +207,6 @@
         }
         this.$server.screenManage.saveScreen(params).then(res => {})
         // this.$store.dispatch('ContextMenuCommand', 'remove')
-      },
-      /**
-       * 保存大屏
-       */
-      screenSave() {
-        console.log(123)
       },
       /**
      * 是否全屏并按键ESC键的方法

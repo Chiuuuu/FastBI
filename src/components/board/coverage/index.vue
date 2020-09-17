@@ -28,7 +28,7 @@
 
 <script>
 
-  import { mapGetters } from 'vuex'
+  import { mapGetters, mapActions } from 'vuex'
 
   export default {
     name: 'BoardCoverage',
@@ -53,6 +53,7 @@
       ...mapGetters(['currentSelected', 'coverageExpand', 'pageSettings', 'canvasMap', 'screenId'])
     },
     methods: {
+      ...mapActions(['saveScreenData']),
       // transform点击事件
       cancelSelected () {
         this.$store.dispatch('SingleSelected', null)
@@ -62,31 +63,12 @@
         if (this.currentSelected) {
           this.$message.info(item.text)
           this.$store.dispatch('ContextMenuCommand', item.order) // canvasMaos中的actions里的ContextMenuCommand方法
-          this.screenSave()
+          this.saveScreenData()
         }
       },
       // 点击展开收起
       toggleCollapsed () {
         this.$emit('toggleCollapsed', this.collapsed)
-      },
-
-      // 保存大屏
-      screenSave() {
-        const json = {
-          setting: this.pageSettings,
-          components: this.canvasMap
-        }
-        let params = {
-          id: this.screenId,
-          json
-        }
-        this.$server.screenManage.saveScreen(params).then(res => {
-          if (res.code === 200) {
-            this.$store.dispatch('SetScreenId', res.id)
-          } else {
-            this.$message.error(res.msg)
-          }
-        })
       }
     }
   }

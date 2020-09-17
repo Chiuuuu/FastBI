@@ -20,6 +20,7 @@
             :key="component.name"
             :name="component.name"
             draggable="true"
+            @click="handleAdd(component, $event)"
             @dragstart="handleDragStart(component, $event)"
           >
             <!-- <div class="img" :class="component.name"></div> -->
@@ -36,6 +37,7 @@
 </template>
 
 <script>
+  import { mapActions } from 'vuex' // 导入vuex
   export default {
     name: 'DragList',
     props: {
@@ -52,6 +54,8 @@
       }
     },
     methods: {
+      ...mapActions(['saveScreenData']),
+      // 拖拽图表添加到大屏
       handleDragStart (component, event) {
         this.$print('drag start:' + component.name, 'primary')
         // 拖拽的节点数据
@@ -64,6 +68,18 @@
         event.dataTransfer.setData('node', JSON.stringify(nodeInfo))
         this.$print('drag nodeInfo', 'success')
         this.$print(nodeInfo)
+      },
+      // 点击图表添加到大屏
+      handleAdd(component) {
+        // 拖拽的节点数据
+        let nodeInfo = {
+          // 唯一标识
+          // id: 'node-' + ((new Date()).getTime()),
+          id: (new Date()).getTime(),
+          packageJson: { ...component }
+        }
+        this.$store.dispatch('AddCanvasMap', nodeInfo)
+        this.saveScreenData()
       }
     }
   }

@@ -1,3 +1,7 @@
+import router from '../../router'
+import screenManage from '../../api/modules/screenManage'
+import { Message } from 'ant-design-vue'
+console.log(Message)
 const app = {
     state: {
         pageSettings: { width: 1920, height: 1080, backgroundColor: '#0d2a42', gridStep: 1, backgroundSrc: '', backgroundType: 1, opacity: 1 },
@@ -60,6 +64,34 @@ const app = {
         },
         SetFileName({ commit }, val) {
           commit('SET_FILE_NAME', val)
+        },
+        // 保存大屏
+        saveScreenData(store, mes) {
+          const { commit, state, rootGetters } = store
+          const json = {
+            setting: state.pageSettings,
+            components: rootGetters.canvasMap
+          }
+          let params = {
+            json
+          }
+          if (!state.screenId) {
+            params.id = -1
+            params.name = router.history.current.query.name
+            params.parentId = router.history.current.query.parentId
+          } else {
+            params.id = state.screenId
+          }
+          screenManage.saveScreen(params).then(res => {
+            if (res.code === 200) {
+              if (mes) {
+
+              }
+              commit('SET_SCREEN_ID', res.id)
+            } else {
+              this.$message.error(res.msg)
+            }
+          })
         }
     }
 }

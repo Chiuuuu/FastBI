@@ -797,7 +797,7 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+  import { mapGetters, mapActions } from 'vuex'
   import { setBaseProperty } from '../../../api/canvasMaps/canvas-maps-request'
   import { resetPageSettings, setPageSettings } from '../../../api/app/app-request'
   import GuiGroup from './gui-group'
@@ -847,6 +847,7 @@
       }
     },
     methods: {
+      ...mapActions(['saveScreenData']),
       tabsTypeChange(num) {
         this.tabsType = num
         this.$store.dispatch('SetTabsType', num)
@@ -856,34 +857,34 @@
         // setPageSettings(this.globalSettings).then(res => {
         // })
         this.$store.dispatch('SetPageSettings', this.globalSettings)
-        this.screenSave()
+        this.saveScreenData()
       },
       // 设置基本属性
       setBaseProperty () {
         this.$store.dispatch('SetBaseProperty', this.baseProperty)
         // 发送请求来保存数据
         setBaseProperty(this.currentSelected)
-        this.screenSave()
+        this.saveScreenData()
       },
       // 设置自有属性
       setSelfProperty () {
         this.$store.dispatch('SetSelfProperty', this.selfConfig)
         // 发送请求来保存数据
         setBaseProperty(this.currentSelected)
-        this.screenSave()
+        this.saveScreenData()
       },
       // 设置数据映射
       setApiLabelMap () {
         this.$store.dispatch('SetApis', this.apis)
         // 发送请求来保存数据
         setBaseProperty(this.currentSelected)
-        this.screenSave()
+        this.saveScreenData()
       },
       setBackGround (val) {
         this.$store.dispatch('SetBackGround', this.backgroundApi)
         // 发送请求来保存数据
         setBaseProperty(this.currentSelected)
-        this.screenSave()
+        this.saveScreenData()
       },
       // 重置全局配置
       resetSetting () {
@@ -892,7 +893,7 @@
           this.globalSettings = res.data
           this.$store.dispatch('SetPageSettings', res.data)
           this.$loading.done()
-          this.screenSave()
+          this.saveScreenData()
         })
       },
       // 数据源改变事件
@@ -993,37 +994,15 @@
       onRadioChange(e, data, key) {
         this.$set(data, key, e.target.value)
         this.setSelfProperty()
-      },
-
-      // 保存大屏
-      screenSave() {
-        const json = {
-          setting: this.pageSettings,
-          components: this.canvasMap
-        }
-        let params = {
-          json
-        }
-        if (!this.screenId) {
-          params.id = -1
-          params.name = this.$route.query.name
-          params.parentId = this.$route.query.parentId
-        } else {
-          params.id = this.screenId
-        }
-        this.$server.screenManage.saveScreen(params).then(res => {
-          if (res.code === 200) {
-            this.$store.dispatch('SetScreenId', res.id)
-          } else {
-            this.$message.error(res.msg)
-          }
-        })
       }
     },
     watch: {
       currentSelected: {
         handler (val) {
           if (val) {
+            if (val.packageJson.name === 've-image') {
+              this.tabsType = 0
+            }
             this.baseProperty = { ...val.packageJson.view }
             if (val.packageJson.config) {
               this.selfConfig = deepClone(val.packageJson.config)

@@ -5,8 +5,6 @@ import {
   removeCanvasMap,
   topCanvasMap, upCanvasMap
 } from '../../api/canvasMaps/canvas-maps-request'
-import getters from '../getters'
-import { screenData } from '../../api/screenManage/api'
 import { toFirst, toLast, upGo, downGo } from '../../utils/arr-utils'
 import { deepClone } from '../../utils/deepClone'
 
@@ -61,9 +59,10 @@ const canvasMaps = {
       commit('SET_CANVAS_MAPS', maps)
     },
     AddCanvasMap ({ commit }, nodeInfo) {
-      addCanvasMap(nodeInfo).then(() => {
-        commit('ADD_CANVAS_MAP', nodeInfo)
-      })
+      commit('ADD_CANVAS_MAP', nodeInfo)
+      // addCanvasMap(nodeInfo).then(() => {
+
+      // })
     },
     SingleSelected ({ commit }, selectItem) {
       commit('SINGLE_SELECT', selectItem)
@@ -96,7 +95,7 @@ const canvasMaps = {
           let bottomIndex = bottomArr.findIndex(item => {
             return item.id === state.singleSelected.id
           })
-          if (bottomIndex !== bottomArr.length - 1) {
+          if (bottomIndex !== 0) {
             let newArr = toFirst(bottomArr, bottomIndex)
             bottomArr = newArr
           }
@@ -118,7 +117,7 @@ const canvasMaps = {
           let downIndex = downArr.findIndex(item => {
             return item.id === state.singleSelected.id
           })
-          if (downIndex !== downArr.length - 1) {
+          if (downIndex !== 0) {
             let newArr = upGo(downArr, downIndex)
             downArr = newArr
           }
@@ -143,7 +142,7 @@ const canvasMaps = {
           break
         case 'remove':
           // 如果是删除操作，则需要删除并更新当前的canvasMaps，并默认设置当前选中为空
-          let index = state.canvasMap.indexOf(this.currentSelected)
+          let index = state.canvasMap.indexOf(state.singleSelected)
           if (index > -1) {
             state.canvasMap.splice(index, 1)
           }
