@@ -15,7 +15,8 @@ const screenManage = {
    * @returns
    */
   getFolderList(params) {
-    return $axios.get('/screen/folder/list', params)
+    return $axios.get('/screen/catalog/listScreenTree', params)
+    // return $axios.get('/screen/folder/list', params)
   },
   /**
    * @description 删除文件夹

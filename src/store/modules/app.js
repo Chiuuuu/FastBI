@@ -1,7 +1,7 @@
 import router from '../../router'
 import screenManage from '../../api/modules/screenManage'
-import { Message } from 'ant-design-vue'
-console.log(Message)
+import { message } from 'ant-design-vue'
+
 const app = {
     state: {
         pageSettings: { width: 1920, height: 1080, backgroundColor: '#0d2a42', gridStep: 1, backgroundSrc: '', backgroundType: 1, opacity: 1 },
@@ -85,7 +85,7 @@ const app = {
           screenManage.saveScreen(params).then(res => {
             if (res.code === 200) {
               if (mes) {
-
+                message.success(mes)
               }
               commit('SET_SCREEN_ID', res.id)
             } else {

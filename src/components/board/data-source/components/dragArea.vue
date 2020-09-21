@@ -74,7 +74,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['dragFile', 'currentSelected', 'optionsTabsType', 'pageSettings', 'canvasMap', 'screenId'])
+    ...mapGetters(['dragFile', 'currentSelected', 'optionsTabsType'])
   },
   methods: {
     ...mapActions(['saveScreenData']),

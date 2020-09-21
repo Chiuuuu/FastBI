@@ -789,6 +789,7 @@ const database = {
                 modelId: '',
                 apiData: {},
                 apis: {},
+                canEdit: false,
                 background: {
                     backgroundType: '1',
                     backgroundColor: '',

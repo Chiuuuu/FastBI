@@ -808,7 +808,6 @@
   import DataSource from '../data-source/data-source'
   import { DEFAULT_COLORS } from '../../../utils/defaultColors'
   import { deepClone } from '../../../utils/deepClone'
-  import baseUrl from '@/api/baseUrl'
 
   export default {
     name: 'BoardOptions',

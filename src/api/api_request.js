@@ -4,7 +4,8 @@
 import httpRequest from 'axios'
 import store from '@/store'
 import Qs from 'qs'
-import { messages } from 'bin-ui'
+// import { messages } from 'bin-ui'
+import { message } from 'ant-design-vue'
 
 let baseUrl = process.env.NODE_ENV !== 'production' ? '/' : '/'
 const service = httpRequest.create({
@@ -41,9 +42,11 @@ service.interceptors.response.use(
     },
     error => {
         if (error.response) {
-            messages({ content: error.response.data, type: 'danger', duration: 5 })
+          message.error(error.response.data)
+            // messages({ content: error.response.data, type: 'danger', duration: 5 })
         } else {
-            messages({ content: error.message, type: 'danger', duration: 5 })
+          message.error(error.message)
+            // messages({ content: error.message, type: 'danger', duration: 5 })
         }
         return Promise.reject(error)
     }

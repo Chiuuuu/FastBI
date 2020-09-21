@@ -770,9 +770,10 @@ const list = [{
                 apiData: {},
                 apis: {},
                 modelId: '',
+                canEdit: false,
                 background: {
                     backgroundType: '1',
-                    backgroundColor: '',
+                    backgroundColor: 'none',
                     borderColor: '',
                     borderWidth: 0,
                     borderStyle: '',

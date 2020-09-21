@@ -12,7 +12,9 @@
 import axios from 'axios'
 import baseURL from '@/api/base'
 import store from '@/store'
-import { messages } from 'bin-ui'
+// import { messages } from 'bin-ui'
+import { message } from 'ant-design-vue'
+
 const service = axios.create({
   baseURL,
   headers: {
@@ -68,7 +70,8 @@ service.interceptors.response.use(
   },
   error => {
     const { response } = error
-    messages({ content: response ? response.data : '请求错误', type: 'danger', duration: 5 })
+    // messages({ content: response ? response.data : '请求错误', type: 'danger', duration: 5 })
+    message.error(response ? response.data : '请求错误')
     return Promise.reject(error)
   }
 )

@@ -1,7 +1,7 @@
 <template>
-  <div class="dv-transform" :class="{'selected':selected}" :style="contentStyles" ref="dvTransform"
+  <div class="dv-transform" :class="{'selected':isSelected}" :style="contentStyles" ref="dvTransform"
       @mousedown="handleMoveStart">
-    <div class="navigator-line" v-show="selected">
+    <div class="navigator-line" v-show="isSelected">
       <div class="navigator-line-left" :style="lineLeft"></div>
       <div class="navigator-line-top" :style="lineTop"></div>
       <div class="navigator-line-account" :style="lineAccountStyle">
@@ -10,7 +10,7 @@
     </div>
     <div class="dv-scale" :style="dragScaleStyle">
       <div class="dv-com" :class="{'hovered':comHover}" style="transform: rotate(0deg);">
-        <div class="transform-handler" :class="{'hide':!comHover&&!selected}">
+        <div class="transform-handler" :class="{'hide':!comHover&&!isSelected}">
           <div class="dv-wrapper" :style="dvWrapperStyles">
             <slot>我是块的标题</slot>
           </div>
@@ -85,7 +85,8 @@
           dragging: false
         },
         dragScale: null,
-        resizeType: 'none'
+        resizeType: 'none',
+        isSelected: false
       }
     },
     created () {
@@ -99,10 +100,16 @@
           }
         },
         deep: true
+      },
+      selected: {
+        handler (val) {
+          this.isSelected = val
+        },
+        deep: true
       }
     },
     computed: {
-      ...mapGetters(['canvasRange', 'pageSettings', 'contextMenuInfo', 'currentSelected', 'canvasMap', 'screenId']),
+      ...mapGetters(['canvasRange', 'pageSettings', 'contextMenuInfo', 'currentSelected']),
       // 鼠标移动根据栅格间距的值
       mouseMoveStep () {
         return this.canvasRange * this.pageSettings.gridStep
@@ -191,7 +198,12 @@
       },
       // 鼠标拖动事件函数
       handleMoveStart (event) {
-        if (!this.selected || this.contextMenuInfo.isShow) return
+        if (!this.isSelected) {
+          this.isSelected = true
+          this.$store.dispatch('SingleSelected', this.item)
+          this.$store.dispatch('ToggleContextMenu')
+        }
+        if (!this.isSelected || this.contextMenuInfo.isShow) return
         // 计算鼠标的相对位置
         const distance = {
           x: event.clientX,
@@ -234,7 +246,7 @@
       // 鼠标拖动缩放事件函数
       handleResizeMoveStart (event) {
         this.resizeType = event.target.parentElement.className
-        if (!this.selected) return
+        if (!this.isSelected) return
         // 计算鼠标的相对位置
         const distance = {
           x: event.clientX,
