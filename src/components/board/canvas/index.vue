@@ -52,7 +52,7 @@
           height: (wrap.clientHeight - 30) + 'px'
         }
         // 计算缩放比例
-        let range = ((wrap.clientWidth - 120) / this.pageSettings.width)
+        let range = ((wrap.clientWidth - 100) / this.pageSettings.width)
         range = Math.round(range * 100) / 100
         if (range < 0.3) {
           range = 0.3

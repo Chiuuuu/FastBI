@@ -125,13 +125,6 @@ import { mapState } from 'vuex'
 import ResetNameModal from '@/views/dataSource/dataAccess/components/data-main/data-menu/resetName'
 import MenuFile from '@/components/dataSource/menu-group/file'
 import MenuFolder from '@/components/dataSource/menu-group/folder'
-import {
-  fetchMenuList,
-  fetchChangeFolderName,
-  fetchFolderDeleteById,
-  fetchAddNewFolder,
-  fetchDeleteFile
-} from '@/api/dataModel/api'
 export default {
   name: 'model-menu',
   components: {
@@ -151,22 +144,6 @@ export default {
       modelFolderList: [],
       modelFileList: [],
       modalFileSelectId: '',
-      // modelList: [
-      //   {
-      //     id: '1',
-      //     name: '文件夹',
-      //     items: [
-      //       {
-      //         id: '2',
-      //         name: '数据源'
-      //       }
-      //     ]
-      //   },
-      //   {
-      //     id: '3',
-      //     name: '默认的'
-      //   }
-      // ],
       folderContenxtMenu: [
         {
           name: '新建模型',
@@ -226,15 +203,13 @@ export default {
      this.$store.dispatch('dataAccess/getMenuList', this)
     },
     async handleGetMenuList() {
-      const result = await fetchMenuList({
-        url: '/admin/dev-api/datamodel/catalog/list'
-      })
+      const result = await this.$server.common.getMenuList('/datamodel/catalog/list')
 
-      if (result.data.code === 200) {
-        this.modelFolderList = [].concat(result.data.data.folders)
-        this.modelFileList = [].concat(result.data.data.items)
+      if (result.code === 200) {
+        this.modelFolderList = [].concat(result.data.folders)
+        this.modelFileList = [].concat(result.data.items)
       } else {
-        this.$message.error(result.data.msg)
+        this.$message.error(result.msg)
       }
     },
     handleFolderNewModel() {
@@ -265,40 +240,33 @@ export default {
       this.resetName.visible = true
     },
     async _resetName(form) {
-      const result = await fetchChangeFolderName({
-        url: '/admin/dev-api/datamodel/catalog/updateCatalogName',
-        data: {
-          catalogId: this.resetName.item.id,
-          catalogName: form.name
-        }
+      const result = await this.$server.common.putMenuFolderName('/datamodel/catalog/updateCatalogName', {
+        catalogId: this.resetName.item.id,
+        catalogName: form.name
       })
 
-      if (result.data.code === 200) {
+      if (result.code === 200) {
         this.resetName.item.name = form.name
-        this.$message.success('删除成功')
+        this.$message.success('修改成功')
       } else {
-        this.$message.error(result.data.msg)
+        this.$message.error(result.msg)
       }
     },
     /**
      * 文件夹删除
     */
     async handleFolderDelete(mouseEvent, event, { folder }) {
-      console.log('文件夹删除', folder)
-      const result = await fetchFolderDeleteById({
-        url: '/admin/dev-api/datamodel/catalog/removeCatalogById',
-        data: {
-          catalogId: folder.id,
-          modelIds: []
-        }
+      const result = await this.$server.common.deleMenuFolder('/datamodel/catalog/removeCatalogById', {
+        catalogId: folder.id,
+        modelIds: []
       })
 
-      if (result.data.code === 200) {
+      if (result.code === 200) {
         const index = this.modelFolderList.indexOf(folder)
         this.modelFolderList.splice(index, 1)
         this.$message.success('删除成功')
       } else {
-        this.$message.error(result.data.msg)
+        this.$message.error(result.msg)
       }
     },
     /**
@@ -311,12 +279,9 @@ export default {
      * 文件删除
     */
     async handleFileDelete(mouseEvent, event, { parent, file, index }, type) {
-      console.log('文件删除', type)
-      const result = await fetchDeleteFile({
-        url: '/admin/dev-api/datamodel/datamodelInfo/deleteModelDataModelByModelId/' + file.id
-      })
+      const result = await this.$server.common.deleMenuById(`/datamodel/datamodelInfo/deleteModelDataModelByModelId/${file.id}`)
 
-      if (result.data.code === 200) {
+      if (result.code === 200) {
         this.$message.success('删除成功')
         if (type === 'folderFile') {
           parent.items.splice(index, 1)
@@ -326,7 +291,7 @@ export default {
         const isSame = file.id === this.fileSelectId
         if (isSame) this.$store.dispatch('dataModel/setModelId', -1)
       } else {
-        this.$message.error(result.data.msg)
+        this.$message.error(result.msg)
       }
     },
     /**
@@ -369,18 +334,15 @@ export default {
       this.resetName.type = 'new'
     },
     async _addNewFolder(form) {
-      const result = await fetchAddNewFolder({
-        url: '/admin/dev-api/datamodel/catalog/addCatalog',
-        data: {
-          catalogName: form.name
-        }
+      const result = await this.$server.common.addMenuFolder('/datamodel/catalog/addCatalog', {
+        catalogName: form.name
       })
 
-      if (result.data.code === 200) {
+      if (result.code === 200) {
         this.$message.success('添加成功')
         this.handleGetMenuList()
       } else {
-        this.$message.error(result.data.msg)
+        this.$message.error(result.msg)
       }
     },
     /**

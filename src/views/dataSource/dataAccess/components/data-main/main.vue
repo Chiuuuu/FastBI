@@ -34,7 +34,6 @@ import { mapState } from 'vuex'
 import TabContentEntry from './tab-content/entry'
 import TabContentStructure from './tab-content/structure'
 import TabContentRecord from './tab-content/record'
-import { fetchReadeTable } from '../../../../../api/dataAccess/api'
 export default {
   name: 'dataAccessMain',
   components: {

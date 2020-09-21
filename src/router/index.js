@@ -5,7 +5,6 @@ import store from '../store/index'
 import routes from './routes'
 
 import BinUI from 'bin-ui'
-
 Vue.use(BinUI)
 
 Vue.use(VueRouter)

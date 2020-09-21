@@ -9,10 +9,9 @@
   </a-row>
 </template>
 <script>
-import Menu from './components/data-menu/menu'
+import Menu from './components/data-menu'
 import Main from './components/data-main/main'
 import Setting from './setting/dataAccess-setting'
-import { fetchLogin } from '../../../api/dataAccess/api'
 export default {
   components: {
     Menu,

@@ -30,6 +30,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
+import database from '@/utils/database.js'
 export default {
   props: {
     type: {
@@ -73,9 +74,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['dragFile', 'currentSelected', 'optionsTabsType', 'pageSettings', 'canvasMap', 'screenId'])
+    ...mapGetters(['dragFile', 'currentSelected', 'optionsTabsType'])
   },
   methods: {
+    ...mapActions(['saveScreenData']),
     // 将拖动的维度到所选择的放置目标节点中
     handleDropOnFilesWD(event) {
       // h5 api
@@ -118,6 +120,16 @@ export default {
     deleteFile(item, index) {
       this.fileList.splice(index, 1)
       this.getData()
+      // 维度度量删除完以后重置该图表数据
+      if (this.fileList.length < 1) {
+        let canvasMaps = database.canvasMaps
+        for (let item of canvasMaps) {
+          if (item.packageJson.name === this.currentSelected.packageJson.name) {
+            this.currentSelected.packageJson.api_data.source = item.packageJson.api_data.source
+            this.saveScreenData()
+          }
+        }
+      }
     },
     // 根据维度度量获取数据
     getData() {
@@ -140,7 +152,7 @@ export default {
         }
       }
       this.$server.screenManage.getData(params).then(res => {
-        if (res.data.code === 200) {
+        if (res.code === 200) {
           if (this.type === 'table') {
             let columns = []
             // let apiData = this.currentSelected.packageJson.api_data
@@ -151,7 +163,7 @@ export default {
                 key: item.field
               })
             }
-            let rows = res.data.rows
+            let rows = res.rows
             if (rows.length > 10) {
               rows.length = 10
             }
@@ -170,7 +182,7 @@ export default {
               columns.push(m.field) // 默认columns第二项起为指标
             }
             let rows = []
-            res.data.rows.map((item, index) => {
+            res.rows.map((item, index) => {
               let obj = {}
               obj[dimensionKeys] = item[dimensionKeys]
               for (let item2 of measureKeys) {
@@ -183,34 +195,10 @@ export default {
               rows
             }
           }
-          this.screenSave()
+          this.saveScreenData()
         }
       })
-    },
-    // 保存大屏
-      screenSave() {
-        const json = {
-          setting: this.pageSettings,
-          components: this.canvasMap
-        }
-        let params = {
-          json
-        }
-        if (!this.screenId) {
-          params.id = -1
-          params.name = this.$route.query.name
-          params.parentId = this.$route.query.parentId
-        } else {
-          params.id = this.screenId
-        }
-        this.$server.screenManage.screenSave(params).then(res => {
-          if (res.data.code === 200) {
-            this.$store.dispatch('SetScreenId', res.data.id)
-          } else {
-            this.$message.error(res.data.msg)
-          }
-        })
-      }
+    }
   }
 }
 </script>

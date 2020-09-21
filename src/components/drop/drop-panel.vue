@@ -9,8 +9,7 @@
 </template>
 
 <script>
-  import { addCanvasMap } from '../../api/canvasMaps/canvas-maps-request'
-  import { mapGetters } from 'vuex' // 导入vuex
+  import { mapGetters, mapActions } from 'vuex' // 导入vuex
 
   export default {
     name: 'DropPanel',
@@ -18,6 +17,7 @@
       ...mapGetters(['canvasMap', 'pageSettings', 'screenId'])
     },
     methods: {
+      ...mapActions(['saveScreenData']),
       // 元素drop
       handleDropOnCanvas: function (event) {
         // 获取节点数据
@@ -36,28 +36,8 @@
         //   top: offsetY + 'px'
         // }
 
-        // this.$store.dispatch('AddCanvasMap', nodeInfo)
-        this.canvasMap.push(nodeInfo)
-        let params = {
-          json: {
-            setting: this.pageSettings,
-            components: this.canvasMap
-          }
-        }
-        if (!this.screenId) {
-          params.id = -1
-          params.name = this.$route.query.name
-          params.parentId = this.$route.query.parentId
-        } else {
-          params.id = this.screenId
-        }
-        this.$server.screenManage.screenSave(params).then(res => {
-          if (res.data.code === 200) {
-            this.$store.dispatch('SetScreenId', res.data.id)
-          } else {
-            this.$message.error(res.data.msg)
-          }
-        })
+        this.$store.dispatch('AddCanvasMap', nodeInfo)
+        this.saveScreenData()
       }
     }
   }

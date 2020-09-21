@@ -36,7 +36,6 @@
   </div>
 </template>
 <script>
-import { fetchReadeTable, fetchSaveExtract } from '../../../../../../api/dataAccess/api'
 import { mapState } from 'vuex'
 const columns = [
   {
@@ -104,36 +103,21 @@ export default {
       return stringBoolean === 1
     },
     async handleGetData() {
+      if (!this.modelType) return
       this.spinning = true
-      let dabaseInfoResult
+      const modelKey = this.modelType === 'oracle' ? 'sourceOracleName' : 'sourceMysqName'
+      const dabaseInfoResult = await this.$server.dataAccess.getTableList(this.modelType, {
+        databaseName: this.formInfo.databaseName,
+        [modelKey]: this.formInfo.name
+      }).finally(() => {
+        this.spinning = false
+      })
 
-      if (this.modelType === 'mysql') {
-        dabaseInfoResult = await fetchReadeTable({
-          url: '/admin/dev-api/system/mysql/read/table',
-          data: {
-            databaseName: this.formInfo.databaseName,
-            sourceMysqName: this.formInfo.name
-          }
-        }).finally(() => {
-          this.spinning = false
-        })
-      } else if (this.modelType === 'oracle') {
-        dabaseInfoResult = await fetchReadeTable({
-          url: '/admin/dev-api/system/oracle/read/table',
-          data: {
-            databaseName: this.formInfo.databaseName,
-            sourceOracleName: this.formInfo.name
-          }
-        }).finally(() => {
-          this.spinning = false
-        })
-      }
-
-      if (dabaseInfoResult.data.code === 200) {
-        this.data = [].concat(dabaseInfoResult.data.rows)
+      if (dabaseInfoResult.code === 200) {
+        this.data = [].concat(dabaseInfoResult.rows)
         this.$store.dispatch('dataAccess/setReadRows', this.data)
       } else {
-        this.$message.error(dabaseInfoResult.data.msg)
+        this.$message.error(dabaseInfoResult.msg)
       }
     },
     async handleExtract() {
@@ -156,34 +140,27 @@ export default {
 
       let result
       if (this.modelType === 'mysql') {
-        result = await fetchSaveExtract({
-          url: '/admin/dev-api/system/mysql/datax/extract',
-          data: {
-            rows: rows,
-            tableList: this.data
-          }
+        result = await this.$server.dataAccess.actionExtract('/system/mysql/datax/extract', {
+          rows: rows,
+          tableList: this.data
         }).finally(() => {
           this.extractSping = false
         })
       } else if (this.modelType === 'oracle') {
-        result = await fetchSaveExtract({
-          url: '/admin/dev-api/system/oracle/datax',
-          data: {
-            rows: rows
-          }
+        result = await this.$server.dataAccess.actionExtract('/system/oracle/datax', {
+          rows: rows
         }).finally(() => {
           this.extractSping = false
         })
       }
 
-      if (result.data.code === 200) {
+      if (result.code === 200) {
         this.$message.success('请刷新数据查看状态')
       } else {
-        this.$message.error(result.data.msg)
+        this.$message.error(result.msg)
       }
     },
     setting(row) {
-    //   this.$router.push("/dataSource/dataAccess-setting");
       this.$emit('on-change-componet', 'Setting', row)
     }
   }

@@ -16,7 +16,7 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+  import { mapGetters, mapActions } from 'vuex'
 
   export default {
     name: 'ContextMenu',
@@ -33,7 +33,7 @@
       }
     },
     computed: {
-      ...mapGetters(['contextMenuInfo', 'pageSettings', 'canvasMap', 'screenId']),
+      ...mapGetters(['contextMenuInfo', 'pageSettings', 'canvasMap', 'screenId', 'currentSelected']),
       contextMenuStyle () {
         let x = this.contextMenuInfo.x !== undefined ? (parseInt(this.contextMenuInfo.x) > 0 ? parseInt(this.contextMenuInfo.x) : 0) : 0
         let y = this.contextMenuInfo.y !== undefined ? (parseInt(this.contextMenuInfo.y) > 0 ? parseInt(this.contextMenuInfo.y) : 0) : 0
@@ -57,32 +57,33 @@
       }
     },
     methods: {
+      ...mapActions(['saveScreenData']),
       //  执行菜单命令
       handleCommand (order) {
+        console.log(order)
         if (order === 'remove') { // 如果是删除操作则弹出一个对话框来确认
-          this.$store.dispatch('HideContextMenu')
           // this.$EventBus.$emit('context/menu/delete')
+          this.deleteOne()
         } else {
           this.$store.dispatch('ContextMenuCommand', order)
         }
-        this.screenSave()
+        this.saveScreenData()
       },
-      // 保存大屏
-      screenSave() {
-        const json = {
-          setting: this.pageSettings,
-          components: this.canvasMap
+      // 删除图表
+      deleteOne () {
+        let index = this.canvasMap.indexOf(this.currentSelected)
+        if (index > -1) {
+          this.canvasMap.splice(index, 1)
         }
         let params = {
-          id: this.screenId,
-          json
-        }
-        this.$server.screenManage.screenSave(params).then(res => {
-          if (res.data.code === 200) {
-            this.$store.dispatch('SetScreenId', res.data.id)
-          } else {
-            this.$message.error(res.data.msg)
+          id: this.$route.query.id,
+          json: {
+            components: this.canvasMap,
+            setting: this.pageSettings
           }
+        }
+        this.$server.screenManage.saveScreen(params).then(res => {
+          this.$store.dispatch('HideContextMenu')
         })
       }
     }

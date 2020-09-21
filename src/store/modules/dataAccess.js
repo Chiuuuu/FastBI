@@ -1,5 +1,4 @@
-import { fetchMenuList } from '../../api/dataAccess/api'
-
+import dataAccessApi from '../../api/modules/common'
 const state = {
     modelType: '', // 数据类型
     firstFinished: false, // 数据连接信息是否填写完成
@@ -37,13 +36,11 @@ const mutations = {
 
 const actions = {
     async getMenuList({ commit }, vm) {
-        const result = await fetchMenuList({
-            url: '/admin/dev-api/system/catalog/cataloglist'
-        })
-        if (result.data.code === 200) {
-            commit('SET_MENULIST', result.data.data)
+        const result = await dataAccessApi.getMenuList('/system/catalog/cataloglist')
+        if (result.code === 200) {
+            commit('SET_MENULIST', result.data)
         } else {
-            vm.$message.error(result.data.msg)
+            vm.$message.error(result.msg)
         }
     },
     setModelInfo({ commit }, info) {

@@ -71,10 +71,6 @@
 <script>
 import Mysql from './mysql'
 import { validateIP } from './util'
-import {
-  fetchConnect,
-  fetchSave
-} from '../../../../../../api/dataAccess/api'
 export default {
   name: 'model-oracle',
   extends: Mysql,
@@ -151,20 +147,16 @@ export default {
       this.$refs.dbForm.validate(async valid => {
         if (valid) {
           this.connectBtn = true
-          const result = await fetchConnect({
-            url: '/admin/dev-api/system/oracle/connect',
-            data: {
-              ...this.form
-            }
-          }).finally(() => {
-            this.connectBtn = false
-          })
+          const result = await this.$server.dataAccess.actionConnect('oracle', { ...this.form })
+            .finally(() => {
+              this.connectBtn = false
+            })
 
-          if (result.data.code === 200) {
+          if (result.code === 200) {
             this.connectStatus = true
             this.$message.success('连接成功')
           } else {
-            this.$message.warning(result.data.msg)
+            this.$message.warning(result.msg)
           }
         } else {
           this.connectStatus = false
@@ -172,7 +164,7 @@ export default {
         }
       })
     },
-        /**
+    /**
      * 保存数据表
      */
     handleSaveForm() {
@@ -180,24 +172,21 @@ export default {
         if (valid) {
           this.saveBtn = true
           delete this.form.dbid
-          const result = await fetchSave({
-            url: '/admin/dev-api/system/oracle',
-            data: {
-              id: this.formId,
-              ...this.form
-            }
+          const result = await this.$server.dataAccess.saveTableInfo('/system/oracle', {
+            id: this.formId,
+            ...this.form
           }).finally(() => {
             this.saveBtn = false
           })
-          if (result.data.code === 200) {
+          if (result.code === 200) {
             this.$store.dispatch('dataAccess/getMenuList')
             this.$store.dispatch('dataAccess/setFirstFinished', true)
             this.$store.dispatch('dataAccess/setModelInfo', this.form)
-            this.$store.dispatch('dataAccess/setModelId', result.data.data)
-            this.formId = result.data.data
-            this.$message.success(result.data.msg)
+            this.$store.dispatch('dataAccess/setModelId', result.data)
+            this.formId = result.data
+            this.$message.success(result.msg)
           } else {
-            this.$message.error(result.data.msg)
+            this.$message.error(result.msg)
           }
         } else {
           return false

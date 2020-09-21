@@ -10,17 +10,23 @@
       <template v-slot:coverage>
         <div class="list-item"
             :key="transform.id" v-for="transform in coverageMaps"
-            :class="[{'hovered':hoverItem===transform.id},{'selected':currentSelected&&currentSelected.id===transform.id},]"
+            :class="[{'hovered':hoverItem===transform.id},{'selected':(currentSelected&&currentSelected.id===transform.id)},]"
             :selected="currentSelected&&currentSelected.id===transform.id"
             @click.stop.prevent="handleSelected(transform)"
             @mouseenter="handleHover(transform)"
-            @mouseleave="handleNoHover()">
-            <div v-if="coverageExpand">
+            @mouseleave="handleNoHover(transform)">
+            <div class="item" v-if="coverageExpand">
               <a-icon v-if="transform.packageJson.icon" :type="transform.packageJson.icon" />
-              <span v-if="transform.packageJson.config&&transform.packageJson.config.title">
+              <a-tooltip v-if="transform.packageJson.config.title.content.length > 7">
+                <template slot="title">
+                  {{transform.packageJson.config.title.content}}
+                </template>
+                {{transform.packageJson.config.title.content.substring(0, 7) + '...'}}
+              </a-tooltip>
+              <span v-else>
                 {{ transform.packageJson.config.title.content}}
               </span>
-              <span v-else> {{ transform.packageJson.title }}</span>
+              <!-- <span v-else> {{ transform.packageJson.title }}</span> -->
             </div>
             <div v-else flex="main:center" style="padding:5px 0;">
               <a-icon :type="transform.packageJson.icon" />
@@ -36,9 +42,12 @@
                     @click.native.stop.prevent="handleSelected(transform)"
                     @contextmenu.native.stop.prevent="handleRightClickOnCanvas(transform,$event)"
                     @mouseenter.native="handleHover(transform)"
-                    @mouseleave.native="handleNoHover()">
+                    @mouseleave.native="handleNoHover(transform)">
             <!-- 文本 -->
             <chart-text v-if="transform.packageJson.name === 've-text'"
+                        ref="veText"
+                        :id="transform.id"
+                        :canEdit.sync="transform.packageJson.canEdit"
                         :config="transform.packageJson.config"
                         :background="transform.packageJson.background"></chart-text>
 
@@ -101,7 +110,8 @@
         hoverItem: null,
         deleteDialog: false,
 
-        text_content: '文本内容'
+        text_content: '文本内容',
+        canEdit: true
       }
     },
     computed: {
@@ -140,9 +150,9 @@
     methods: {
       // 获取大屏数据
       getScreenData() {
-        this.$server.screenManage.screenData(this.$route.query.id).then(res => {
-          if (res.data.code === 200) {
-            let json = res.data.data ? res.data.data.json : {}
+        this.$server.screenManage.getScreenDetailById(this.$route.query.id).then(res => {
+          if (res.code === 200) {
+            let json = res.data ? res.data.json : {}
             this.$store.dispatch('SetPageSettings', json.setting)
             this.$store.dispatch('InitCanvasMaps', json.components)
           }
@@ -152,13 +162,28 @@
       handleHover (item) {
         this.hoverItem = item.id
       },
-      handleNoHover () {
+      handleNoHover (item) {
         this.hoverItem = null
       },
       // transform点击事件
       handleSelected (item) {
         this.$store.dispatch('SingleSelected', item)
         this.$store.dispatch('ToggleContextMenu')
+
+        if (item.packageJson.name === 've-text') {
+          for (let el of this.$refs.veText) {
+            console.log(el)
+            el.$el.disabled = true
+            if (this.currentSelected.id === el.id) {
+              console.log(123)
+              el.$el.disabled = false
+              el.$el.focus()
+            }
+            // if (el.canEdit) {
+            //   el.$el.focus()
+            // }
+          }
+        }
       },
       // transform点击事件右键点击
       handleRightClickOnCanvas (item, event) {
@@ -195,14 +220,8 @@
             setting: this.pageSettings
           }
         }
-        this.$server.screenManage.screenSave(params).then(res => {})
+        this.$server.screenManage.saveScreen(params).then(res => {})
         // this.$store.dispatch('ContextMenuCommand', 'remove')
-      },
-      /**
-       * 保存大屏
-       */
-      screenSave() {
-        console.log(123)
       },
       /**
      * 是否全屏并按键ESC键的方法
