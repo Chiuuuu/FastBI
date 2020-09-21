@@ -68,12 +68,12 @@ const app = {
         // 保存大屏
         saveScreenData(store, mes) {
           const { commit, state, rootGetters } = store
-          const json = {
+          const setting = {
             setting: state.pageSettings,
             components: rootGetters.canvasMap
           }
           let params = {
-            json
+            setting
           }
           if (!state.screenId) {
             params.id = -1

@@ -141,7 +141,7 @@ export default {
     ...mapGetters(['modelExpand', 'dataModel'])
   },
   mounted() {
-    this.getModelList()
+    // this.getModelList()
   },
   methods: {
     // 点击展开收起

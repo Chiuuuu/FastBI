@@ -16,8 +16,8 @@
         <span class="caret-down" @click="handleCreateMenu"></span>
       </span>
     </div>
-    <ul class="items" v-if="handleHasFile(folder, 'items')" v-show="folderOpen">
-      <template v-for="(file, index) in folder.items">
+    <ul class="items" v-if="handleHasFile(folder, 'children')" v-show="folderOpen">
+      <template v-for="(file, index) in folder.children">
         <slot name="file" :file="file" :index="index">
           <menu-file
             :key="file.name"

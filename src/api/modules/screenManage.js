@@ -7,7 +7,8 @@ const screenManage = {
    * @returns
    */
   addFloder(params) {
-    return $axios.post('/screen/folder', params)
+    return $axios.post('/screen/catalog', params)
+    // return $axios.post('/screen/folder', params)
   },
   /**
    * @description 文件夹列表
@@ -23,8 +24,9 @@ const screenManage = {
    * @param {*} params
    * @returns
    */
-  deleFolder(params) {
-    return $axios.get('/screen/folder/screenDelete', params)
+  deleFolder(id) {
+    return $axios.get(`/screen/catalog/${id}`)
+    // return $axios.get('/screen/folder/screenDelete', params)
   },
   /**
    * @description 修改文件夹
@@ -40,7 +42,7 @@ const screenManage = {
    * @returns
    */
   saveScreen(params) {
-    return $axios.post('/screen/data/save', params)
+    return $axios.post('/screen/bigscreen/save', params)
   },
   /**
    * @description 大屏详细信息
@@ -48,7 +50,8 @@ const screenManage = {
    * @returns
    */
   getScreenDetailById(id) {
-    return $axios.get(`/screen/data/${id}`)
+    return $axios.get(`/screen/bigscreen/${id}`)
+    // return $axios.get(`/screen/data/${id}`)
   },
   /**
    * @description 刷新大屏

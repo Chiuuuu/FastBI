@@ -23,11 +23,11 @@
       <div class="menu-wrap screen-menu">
         <div
           class="group"
-          :class="handleIsFolder(folder, 'items') ? 'is-folder' : ''"
+          :class="handleIsFolder(folder) ? 'is-folder' : ''"
           v-for="(folder, index) in folderList"
           :key="folder.id"
         >
-          <template v-if="handleIsFolder(folder, 'items')">
+          <template v-if="handleIsFolder(folder)">
             <menu-folder
               :folder="folder"
               :index="index"
@@ -198,21 +198,21 @@ export default {
       }
       this.$server.screenManage.getFolderList(params).then(res => {
         if (res.code === 200) {
-          let rows = res.rows
-          const list = rows.filter(item => {
-            // 是否是文件夹
-            return item.isFolder === '1'
-          })
+          let rows = res.data
+          // const list = rows.filter(item => {
+          //   // 是否是文件夹
+          //   return item.fileType === 0
+          // })
           // 后端不会返 所以前端要判断parentId与id对应的数据
-          for (let item of list) {
-            item.items = []
-            for (let item2 of rows) {
-              if (item2.parentId === item.id) {
-                item.items.push(item2)
-              }
-            }
-          }
-          this.folderList = list
+          // for (let item of list) {
+          //   item.items = []
+          //   for (let item2 of rows) {
+          //     if (item2.parentId === item.id) {
+          //       item.items.push(item2)
+          //     }
+          //   }
+          // }
+          this.folderList = rows
         }
       })
     },
@@ -223,7 +223,7 @@ export default {
      * 是否为文件夹
      */
     handleIsFolder(item) {
-      return item.hasOwnProperty('items')
+      return item.fileType === 0
     },
     // 右键删除文件夹
     handleFolderDelete(event, item, { folder }) {
@@ -238,9 +238,9 @@ export default {
       let params = {
         id
       }
-      this.$server.screenManage.deleFolder({ params }).then(res => {
+      this.$server.common.deleMenuFolder(`/screen/catalog/${id}`).then(res => {
         if (res.code === 200) {
-          this.$message.error('删除成功')
+          this.$message.success('删除成功')
           this.getList()
           this.$store.dispatch('SetScreenId', '')
           this.$store.dispatch('SetFileName', '')
@@ -293,13 +293,14 @@ export default {
       this.isAdd = 1
       this.screenVisible = true
     },
-    // 确认新建大屏
+    // 新建/编辑大屏
     handleOk(e) {
       this.screenForm.validateFields((err, values) => {
         if (err) {
           return
         }
         if (this.isAdd === 1) { // 新增
+          console.log(112)
           this.$router.push({
             name: 'screenEdit',
             query: {
@@ -308,11 +309,11 @@ export default {
           })
         } else { // 编辑
           let params = {
-            isFolder: 0,
+            fileType: 1,
             id: this.id,
             ...values
           }
-          this.$server.screenManage.putFolder(params).then(res => {
+          this.$server.common.putMenuFolderName('/screen/catalog', params).then(res => {
             if (res.code === 200) {
               this.$message.success(res.msg)
               this.getList()
@@ -351,10 +352,12 @@ export default {
         console.log('Received values of form: ', values)
         if (this.isAdd === 1) { // 新增
           let params = {
-            isFolder: 1,
-            ...values
+            fileType: 0, // 0-文件夹,1-文件
+            ...values,
+            parentId: 0,
+            type: 3 // 0-无类型,1-数据接入，2-数据建模,3-数据大屏
           }
-          this.$server.common.addMenuFolder('/screen/folder', params).then(res => {
+          this.$server.common.addMenuFolder('/screen/catalog', params).then(res => {
             if (res.code === 200) {
               this.$message.success(res.msg)
               this.getList()
@@ -364,11 +367,11 @@ export default {
           })
         } else { // 修改
           let params = {
-            isFolder: 1,
+            fileType: 0,
             id: this.id,
             ...values
           }
-          this.$server.screenManage.putFolder(params).then(res => {
+          this.$server.common.putMenuFolderName('/screen/catalog', params).then(res => {
             if (res.code === 200) {
               this.$message.success(res.msg)
               this.getList()

@@ -170,18 +170,14 @@
         this.$store.dispatch('SingleSelected', item)
         this.$store.dispatch('ToggleContextMenu')
 
+        // 点击文本可编辑
         if (item.packageJson.name === 've-text') {
           for (let el of this.$refs.veText) {
-            console.log(el)
             el.$el.disabled = true
             if (this.currentSelected.id === el.id) {
-              console.log(123)
               el.$el.disabled = false
               el.$el.focus()
             }
-            // if (el.canEdit) {
-            //   el.$el.focus()
-            // }
           }
         }
       },
