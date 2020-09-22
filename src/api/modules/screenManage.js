@@ -91,7 +91,7 @@ const screenManage = {
    * @returns
    */
   actionUploadImage(params) {
-    return $axios.post('/screen/data/avatar', params)
+    return $axios.post('/screen/bigscreen/avatar', params)
   }
 }
 

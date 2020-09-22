@@ -33,8 +33,8 @@ const app = {
         SET_IS_SCREEN: (state, val) => {
             state.isScreen = val
         },
-        SET_SCREEN_ID: (state, val) => {
-          state.screenId = val
+        SET_SCREEN_ID (state, res) {
+          state.screenId = res
         },
         SET_FILE_NAME(state, val) {
           state.fileName = val
@@ -66,8 +66,8 @@ const app = {
           commit('SET_FILE_NAME', val)
         },
         // 保存大屏
-        saveScreenData(store, mes) {
-          const { commit, state, rootGetters } = store
+        async saveScreenData ({ commit, state, rootGetters }, obj) {
+          // const { commit, state, rootGetters } = store
           const setting = {
             setting: state.pageSettings,
             components: rootGetters.canvasMap
@@ -77,20 +77,28 @@ const app = {
           }
           if (!state.screenId) {
             params.id = -1
-            params.name = router.history.current.query.name
-            params.parentId = router.history.current.query.parentId
+            params.name = obj && obj.name ? obj.name : router.history.current.query.name
+            params.parentId = obj && obj.parentId ? obj.parentId : router.history.current.query.parentId
+            params.isSaved = 1
           } else {
             params.id = state.screenId
           }
-          screenManage.saveScreen(params).then(res => {
-            if (res.code === 200) {
-              if (mes) {
-                message.success(mes)
-              }
-              commit('SET_SCREEN_ID', res.id)
-            } else {
-              this.$message.error(res.msg)
+          screenManage.saveScreen(params).then((res) => {
+            commit('SET_SCREEN_ID', res.id)
+            if (obj && obj.mes) {
+              message.success(obj.mes)
             }
+            if (obj && obj.isAdd === 1) {
+              router.push({
+                name: 'screenEdit',
+                query: {
+                  ...obj
+                }
+              })
+            }
+          }).catch((err) => { // 需要捕获错误 否则无法传递给commit
+            message.error(err)
+            commit('SET_SCREEN_ID', '')
           })
         }
     }

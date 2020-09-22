@@ -196,7 +196,7 @@
                   </gui-field>
                 </a-collapse-panel>
               </template>
-
+              <!-- 饼图独有 -->
               <template v-if="isPie">
                 <a-collapse-panel key="properties" header="图形属性">
                   <gui-field label="中心坐标">
@@ -372,6 +372,53 @@
                         顶部
                       </a-radio-button>
                     </a-radio-group>
+                  </gui-field>
+                </a-collapse-panel>
+              </template>
+              <!--仪表盘独有-->
+              <template v-if="isGauge">
+                <a-collapse-panel key="gauge" header="图形属性">
+                  <gui-field label="中心坐标">
+                    <gui-inline>
+                      <a-input v-model="selfConfig.series.center[0]" size="small"
+                                placeholder="默认50%"
+                                @change="setSelfProperty"
+                                ><span slot="prefix">X</span></a-input>
+                    </gui-inline>
+                    <gui-inline>
+                      <a-input v-model="selfConfig.series.center[1]" size="small"
+                                placeholder="默认50%"
+                                @change="setSelfProperty"
+                                ><span slot="prefix">Y</span></a-input>
+                    </gui-inline>
+                  </gui-field>
+                  <gui-field label="进度条宽度">
+                    <a-input-number v-model="selfConfig.series.axisLine.lineStyle.width" size="small"
+                                    @change="setSelfProperty" :min=1 :max=100></a-input-number>
+                  </gui-field>
+                  <gui-field label="进度条背景色">
+                    <el-color-picker v-model="selfConfig.series.axisLine.lineStyle.color[0][1]"
+                                        @change="setSelfProperty"></el-color-picker>
+                  </gui-field>
+                  <gui-field label="刻度">
+                    <a-switch v-model="selfConfig.series.splitLine.show" size="small"
+                              @change="switchChange"></a-switch>
+                  </gui-field>
+                  <gui-field label="刻度值">
+                    <a-switch v-model="selfConfig.series.axisLabel.show" size="small"
+                              @change="switchChange"></a-switch>
+                  </gui-field>
+                  <gui-field label="刻度大小">
+                    <div class="gui-inline">
+                      <a-input-number v-model="selfConfig.series.splitLine.length" size="small"
+                                      :formatter="value => `长 ${value}`"
+                                      @change="setSelfProperty"></a-input-number>
+                      </div>
+                      <div class="gui-inline">
+                        <a-input-number v-model="selfConfig.series.splitLine.lineStyle.width" size="small"
+                                        :formatter="value => `宽 ${value}`"
+                                        @change="setSelfProperty"></a-input-number>
+                    </div>
                   </gui-field>
                 </a-collapse-panel>
               </template>
@@ -892,7 +939,7 @@
           this.globalSettings = res.data
           this.$store.dispatch('SetPageSettings', res.data)
           this.$loading.done()
-          this.saveScreenData()
+          // this.saveScreenData()
         })
       },
       // 数据源改变事件
@@ -1049,6 +1096,9 @@
       },
       isRadar () {
         return this.chartType === 've-radar'
+      },
+      isGauge () {
+        return this.chartType === 've-gauge'
       },
       isMap () {
         return this.chartType === 've-map'

@@ -111,7 +111,7 @@ import NewFolder from '@/components/newFolder/newFolder'
 import MenuFile from '@/components/dataSource/menu-group/file'
 import MenuFolder from '@/components/dataSource/menu-group/folder'
 
-import { mapGetters } from 'vuex' // 导入vuex
+import { mapGetters, mapActions } from 'vuex' // 导入vuex
 import Screen from '@/views/screen' // 预览
 import { addResizeListener, removeResizeListener } from 'bin-ui/src/utils/resize-event'
 
@@ -163,6 +163,11 @@ export default {
   watch: {
     openKeys(val) {
       console.log('openKeys', val)
+    },
+    screenId: {
+      handler(val) {},
+      deep: true,
+      immediate: true
     }
   },
   computed: {
@@ -191,6 +196,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['saveScreenData']),
     // 获取文件夹列表
     getList() {
       let params = {
@@ -299,14 +305,15 @@ export default {
         if (err) {
           return
         }
+        this.$store.dispatch('SetScreenId', '')
         if (this.isAdd === 1) { // 新增
-          console.log(112)
-          this.$router.push({
-            name: 'screenEdit',
-            query: {
-              ...values
-            }
-          })
+          this.saveScreenData({ ...values, isAdd: 1 })
+          // this.$router.push({
+          //   name: 'screenEdit',
+          //   query: {
+          //     ...values
+          //   }
+          // })
         } else { // 编辑
           let params = {
             fileType: 1,
@@ -321,7 +328,6 @@ export default {
           })
         }
         this.screenForm.resetFields()
-        this.$store.dispatch('SetScreenId', '')
         this.screenVisible = false
       })
     },

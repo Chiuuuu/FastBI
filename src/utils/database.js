@@ -782,6 +782,92 @@ const database = {
             }
         },
         {
+          id: 'v-gauge',
+          packageJson: {
+            title: '仪表盘',
+            name: 've-gauge',
+            icon: 'radar-chart',
+            type: '1',
+            modelId: '',
+            api_data: {
+                source: [
+                  { x: 'type', y: 60, s: 'value' }
+                ]
+            },
+            apis: {
+                labelMap: {
+                    'x': '类目',
+                    'y': '值',
+                    's': '系列1'
+                }
+            },
+            background: {
+                backgroundType: '1',
+                backgroundColor: '',
+                borderColor: '',
+                borderWidth: 0,
+                borderStyle: '',
+                borderRadius: 0
+            },
+            config: {
+              title: {
+                  show: true,
+                  content: '仪表盘',
+                  textAlign: 'left',
+                  textStyle: {
+                      color: '#ffffff',
+                      fontSize: 20
+                  }
+              },
+              grid: { left: 20, top: 60, right: 20, bottom: 30 },
+              xAxis: {
+                show: false
+              },
+              yAxis: {
+                show: false
+              },
+              series: {
+                name: '',
+                type: 'gauge',
+                center: ['50%', '50%'],
+                radius: '80%',
+                min: 0,
+                max: 100,
+                axisLine: {
+                    show: true,
+                    lineStyle: { // 属性lineStyle控制线条样式
+                        color: [
+                          [1, '#f5c942']
+                        ],
+                        shadowColor: '#ccc',
+                        shadowBlur: 2,
+                        width: 15
+                    }
+                },
+                splitLine: {
+                    show: true,
+                    length: 10, // 刻度节点线长度
+                    lineStyle: {
+                        width: 2,
+                        color: '#fff'
+                    } // 刻度节点线
+                },
+                axisTick: {
+                    show: false
+                },
+                axisLabel: {
+                    show: true
+                },
+                pointer: { // 指针样式
+                    length: '60%'
+                }
+              }
+              // color: DEFAULT_COLORS
+            },
+            view: { width: 400, height: 400, x: 760, y: 340 }
+          }
+        },
+        {
             id: 'v-text',
             packageJson: {
                 title: '文本',
@@ -800,7 +886,7 @@ const database = {
                 },
                 config: {
                     title: {
-                        content: '文本',
+                        content: '',
                         textAlign: 'left',
                         textStyle: {
                             color: '#ffffff',

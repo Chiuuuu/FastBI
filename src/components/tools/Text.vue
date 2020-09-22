@@ -1,5 +1,5 @@
 <template>
-<a-textarea class="dv-text" v-model="config.title.content" ref="text" :style="titleStyle" :autoSize="true" :disabled="true" />
+<a-textarea class="dv-text" placeholder="点击以输入文本内容，输入*按键可插入度量" v-model="config.title.content" ref="text" :style="titleStyle" :autoSize="true" :disabled="true" />
   <!-- <div class="dv-text" style="width: 100%;height:100%;" ref="wrap">
     <div class="titles" ref="titles" v-if="config.title" :style="titleStyle">
       <span>{{ config.title.content }}</span>
@@ -16,10 +16,6 @@
         type: Object,
         required: true
       },
-      canEdit: {
-        type: Boolean,
-        default: true
-      },
       background: {
         type: Object,
         required: true
@@ -27,15 +23,6 @@
       id: {
         type: Number,
         default: 0
-      }
-    },
-    watch: {
-      canEdit: {
-        handler(val) {
-          console.log(val)
-        },
-        deep: true,
-        immediate: true
       }
     },
     data () {

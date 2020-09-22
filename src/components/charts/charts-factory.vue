@@ -75,7 +75,7 @@
         handler (val) {
           if (val) {
             // 图例
-            this.legendVisible = val.legend.show
+            this.legendVisible = val.legend && val.legend.show
             this.chartExtend = { ...val }
             // this.colors = [...val.colors]
             // this.$log.primary('========>chartExtend')
@@ -97,8 +97,8 @@
               let data = formatData(val.source)
               this.chartData.columns = [...data.columns]
               this.chartData.rows = [...data.rows]
-              // this.$log.primary('========>chartData')
-              // this.$print(this.chartData)
+              this.$log.primary('========>chartData')
+              this.$print(this.chartData)
             }
           }
         },

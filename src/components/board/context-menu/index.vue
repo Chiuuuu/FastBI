@@ -77,7 +77,7 @@
         }
         let params = {
           id: this.$route.query.id,
-          json: {
+          setting: {
             components: this.canvasMap,
             setting: this.pageSettings
           }

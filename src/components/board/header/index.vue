@@ -30,7 +30,7 @@
           />
           <span> 预览</span>
         </div>
-        <div class="item" flex="dir:top" @click.stop="saveScreenData('保存成功')">
+        <div class="item" flex="dir:top" @click.stop="saveScreenData({mes: '保存成功'})">
           <a-icon type="save" style="font-size:18px" />
           <span> 保存</span>
         </div>
