@@ -17,7 +17,7 @@
           <div
             class="list-item"
             v-for="component in category.children"
-            :key="component.name"
+            :key="component.chartType"
             :name="component.name"
             draggable="true"
             @click="handleAdd(component, $event)"

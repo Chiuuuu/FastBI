@@ -77,6 +77,7 @@
             // 图例
             this.legendVisible = val.legend && val.legend.show
             this.chartExtend = { ...val }
+            console.log(val)
             // this.colors = [...val.colors]
             // this.$log.primary('========>chartExtend')
             // this.$print(this.chartExtend)
@@ -109,8 +110,8 @@
         handler (val) {
           if (val && val.labelMap) {
             this.chartSettings = { ...val }
-            // this.$log.primary('========>chartSettings')
-            // this.$print(this.chartSettings)
+            this.$log.primary('========>chartSettings')
+            this.$print(this.chartSettings)
           }
         },
         deep: true,

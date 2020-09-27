@@ -17,6 +17,7 @@ const database = {
             id: 'v-histogram',
             packageJson: {
                 title: '柱状图',
+                chartType: 'v-histogram',
                 name: 've-histogram',
                 icon: 'bar-chart',
                 type: '1',
@@ -133,6 +134,7 @@ const database = {
             id: 'v-line',
             packageJson: {
                 title: '折线图',
+                chartType: 'v-line',
                 name: 've-line',
                 icon: 'line-chart',
                 type: '1',
@@ -249,6 +251,7 @@ const database = {
             id: 'v-bar',
             packageJson: {
                 title: '条形图',
+                chartType: 'v-bar',
                 name: 've-bar',
                 icon: 'md-list',
                 type: '1',
@@ -365,6 +368,7 @@ const database = {
             id: 'v-pie',
             packageJson: {
                 title: '饼图',
+                chartType: 'v-pie',
                 name: 've-pie',
                 icon: 'ios-pie',
                 type: '1',
@@ -380,6 +384,10 @@ const database = {
                     ]
                 },
                 apis: {
+                  level: [
+                    ['1/1', '1/2', '1/3'],
+                    ['1/4', '1/5']
+                  ],
                     labelMap: {
                         'x': '类目',
                         'y': '值',
@@ -481,6 +489,7 @@ const database = {
             id: 'v-map',
             packageJson: {
                 title: '地图',
+                chartType: 'v-map',
                 name: 've-map',
                 icon: 'ios-map',
                 type: '1',
@@ -654,6 +663,7 @@ const database = {
             id: 'v-radar',
             packageJson: {
                 title: '雷达图',
+                chartType: 'v-radar',
                 name: 've-radar',
                 icon: 'ios-cellular',
                 type: '1',
@@ -785,6 +795,7 @@ const database = {
           id: 'v-gauge',
           packageJson: {
             title: '仪表盘',
+            chartType: 'v-gauge',
             name: 've-gauge',
             icon: 'radar-chart',
             type: '1',
@@ -795,11 +806,11 @@ const database = {
                 ]
             },
             apis: {
-                labelMap: {
-                    'x': '类目',
-                    'y': '值',
-                    's': '系列1'
-                }
+              labelMap: {
+                  'x': '类目',
+                  'y': '值',
+                  's': '系列1'
+              }
             },
             background: {
                 backgroundType: '1',
@@ -826,11 +837,27 @@ const database = {
               yAxis: {
                 show: false
               },
+              legend: {
+                show: false,
+                data: [],
+                textStyle: {
+                  color: '#ffffff',
+                  fontSize: 12
+                },
+                itemGap: 12,
+                icon: '',
+                left: 'center',
+                top: 'auto',
+                right: 'auto',
+                bottom: 'auto'
+              },
               series: {
                 name: '',
                 type: 'gauge',
                 center: ['50%', '50%'],
                 radius: '80%',
+                startAngle: 225,
+                endAngle: -45,
                 min: 0,
                 max: 100,
                 axisLine: {
@@ -858,6 +885,12 @@ const database = {
                 axisLabel: {
                     show: true
                 },
+                // title: {
+                //   show: true
+                // },
+                detail: {
+                  show: true
+                },
                 pointer: { // 指针样式
                     length: '60%'
                 }
@@ -868,9 +901,107 @@ const database = {
           }
         },
         {
+          id: 'v-ring',
+          packageJson: {
+            title: '环形图',
+            name: 've-ring',
+            chartType: 'v-ring',
+            icon: 'pie-chart',
+            type: '1',
+            modelId: '',
+            api_data: {
+                source: [
+                    { x: '1/1', y: 80, s: '系列1' },
+                    { x: '1/2', y: 20, s: '系列1' }
+                ]
+            },
+            apis: {
+              hoverAnimation: false,
+                labelMap: {
+                    'x': '类目',
+                    'y': '值',
+                    's': '系列1'
+                }
+            },
+            background: {
+                backgroundType: '1',
+                backgroundColor: '',
+                borderColor: '',
+                borderWidth: 0,
+                borderStyle: '',
+                borderRadius: 0
+            },
+            config: {
+                title: {
+                    show: true,
+                    content: '环形图',
+                    textAlign: 'left',
+                    textStyle: {
+                        color: '#ffffff',
+                        fontSize: 20
+                    }
+                },
+                tooltip: {
+                  show: false
+                },
+                grid: { left: 20, top: 20, right: 20, bottom: 30 },
+                legend: {
+                    show: false,
+                    data: [],
+                    textStyle: {
+                      color: '#ffffff',
+                      fontSize: 12
+                    },
+                    itemGap: 12,
+                    icon: '',
+                    left: 'center',
+                    top: 'auto',
+                    right: 'auto',
+                    bottom: 'auto'
+                },
+                xAxis: {
+                    show: false
+                },
+                yAxis: {
+                    show: false
+                },
+                series: {
+                  radius: ['60%', '70%'],
+                  center: ['50%', '50%'],
+                  label: {
+                    normal: {
+                      show: false,
+                      formatter: function(val) {
+                        console.log(val)
+                      },
+                      position: 'center',
+                      textStyle: {
+                        fontSize: '30'
+                      }
+                    },
+                    emphasis: {
+                      show: false,
+                      textStyle: {
+                        fontSize: '30',
+                        fontWeight: 'bold'
+                      }
+                    }
+                  }
+
+                },
+                color: DEFAULT_COLORS
+            },
+            chartEvents: {
+                click: chartClick
+            },
+            view: { width: 400, height: 400, x: 760, y: 340 }
+          }
+        },
+        {
             id: 'v-text',
             packageJson: {
                 title: '文本',
+                chartType: 'v-text',
                 name: 've-text',
                 modelId: '',
                 apiData: {},
@@ -901,6 +1032,7 @@ const database = {
             id: 'v-image',
             packageJson: {
                 title: '图片',
+                chartType: 'v-image',
                 name: 've-image',
                 icon: 'md-images',
                 modelId: '',
@@ -924,6 +1056,7 @@ const database = {
             id: 'v-tables',
             packageJson: {
                 title: '表格',
+                chartType: 'v-tables',
                 name: 've-tables',
                 icon: 'table',
                 type: '3',
