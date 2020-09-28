@@ -197,8 +197,8 @@
                 </a-collapse-panel>
               </template>
               <!-- 饼图独有 -->
-              <template v-if="isPie">
-                <a-collapse-panel key="properties" header="图形属性">
+              <template>
+                <a-collapse-panel key="properties" header="图形属性" v-if="(isPie || isRing) && selfConfig.series">
                   <gui-field label="中心坐标">
                     <gui-inline>
                       <a-input v-model="selfConfig.series.center[0]" size="small"
@@ -213,24 +213,24 @@
                                 ><span slot="prefix">y</span></a-input>
                     </gui-inline>
                   </gui-field>
-                  <gui-field label="内环大小">
+                  <gui-field label="内环大小" v-if="selfConfig.series.radius">
                     <a-input v-model="selfConfig.series.radius[0]" size="small"
                               placeholder="默认0"
                               style="width:100px"
                               @change="setSelfProperty"></a-input>
                   </gui-field>
-                  <gui-field label="外径大小">
+                  <gui-field label="外径大小" v-if="selfConfig.series.radius">
                     <a-input v-model="selfConfig.series.radius[1]" size="small"
                               placeholder="默认50%"
                               style="width:100px"
                               @change="setSelfProperty"></a-input>
                   </gui-field>
-                  <gui-field label="是否启用玫瑰图">
+                  <gui-field label="是否启用玫瑰图" v-if="isPie">
                     <a-switch v-model="selfConfig.series.roseType" size="small"
                               @change="switchChange"></a-switch>
                   </gui-field>
                 </a-collapse-panel>
-                <a-collapse-panel key="indicator" header="指标设置">
+                <a-collapse-panel key="indicator" header="指标设置" v-if="isPie || isMultiPie">
                   <a-switch slot="extra"
                             v-if="collapseActive.indexOf('indicator') > -1"
                             v-model="selfConfig.series.label.show"
@@ -259,7 +259,7 @@
               </template>
 
               <!--图例-->
-              <template v-if="selfConfig.legend">
+              <template v-if="selfConfig.legend && !isRing">
                 <a-collapse-panel key="legend" header="图例设置">
                   <a-switch slot="extra" v-if="collapseActive.indexOf('legend') > -1" v-model="selfConfig.legend.show" default-checked @change="switchChange" size="small" />
                   <gui-field label="文本">
@@ -400,6 +400,10 @@
                     <el-color-picker v-model="selfConfig.series.axisLine.lineStyle.color[0][1]"
                                         @change="setSelfProperty"></el-color-picker>
                   </gui-field>
+                  <gui-field label="显示值">
+                    <a-switch v-model="selfConfig.series.detail.show" size="small"
+                              @change="switchChange"></a-switch>
+                  </gui-field>
                   <gui-field label="刻度">
                     <a-switch v-model="selfConfig.series.splitLine.show" size="small"
                               @change="switchChange"></a-switch>
@@ -417,6 +421,18 @@
                       <div class="gui-inline">
                         <a-input-number v-model="selfConfig.series.splitLine.lineStyle.width" size="small"
                                         :formatter="value => `宽 ${value}`"
+                                        @change="setSelfProperty"></a-input-number>
+                    </div>
+                  </gui-field>
+                  <gui-field label="角度">
+                    <div class="gui-inline">
+                      <a-input-number v-model="selfConfig.series.startAngle" size="small"
+                                      :formatter="value => `起 ${value}`"
+                                      @change="setSelfProperty"></a-input-number>
+                      </div>
+                      <div class="gui-inline">
+                        <a-input-number v-model="selfConfig.series.endAngle" size="small"
+                                        :formatter="value => `终 ${value}`"
                                         @change="setSelfProperty"></a-input-number>
                     </div>
                   </gui-field>
@@ -907,6 +923,7 @@
       },
       // 设置基本属性
       setBaseProperty () {
+        console.log(this.baseProperty)
         this.$store.dispatch('SetBaseProperty', this.baseProperty)
         // 发送请求来保存数据
         setBaseProperty(this.currentSelected)
@@ -914,8 +931,10 @@
       },
       // 设置自有属性
       setSelfProperty () {
+        console.log(this.selfConfig)
         this.$store.dispatch('SetSelfProperty', this.selfConfig)
         // 发送请求来保存数据
+        console.log(this.currentSelected)
         setBaseProperty(this.currentSelected)
         this.saveScreenData()
       },
@@ -1083,34 +1102,40 @@
     computed: {
       ...mapGetters(['pageSettings', 'canvasRange', 'optionsExpand', 'currentSelected', 'screenId', 'canvasMap']),
       chartType () {
-        return this.currentSelected ? this.currentSelected.packageJson.name : ''
+        return this.currentSelected ? this.currentSelected.packageJson.chartType : ''
       },
       isLine () {
-        return this.chartType === 've-line'
+        return this.chartType === 'v-line'
       },
       isHistogram () {
-        return this.chartType === 've-histogram'
+        return this.chartType === 'v-histogram'
       },
       isPie () {
-        return this.chartType === 've-pie'
+        return this.chartType === 'v-pie'
+      },
+      isMultiPie () {
+        return this.chartType === 'v-multiPie'
       },
       isRadar () {
-        return this.chartType === 've-radar'
+        return this.chartType === 'v-radar'
       },
       isGauge () {
-        return this.chartType === 've-gauge'
+        return this.chartType === 'v-gauge'
+      },
+      isRing () {
+        return this.chartType === 'v-ring'
       },
       isMap () {
-        return this.chartType === 've-map'
+        return this.chartType === 'v-map'
       },
       isText () {
-        return this.chartType === 've-text'
+        return this.chartType === 'v-text'
       },
       isImage () {
-        return this.chartType === 've-image'
+        return this.chartType === 'v-image'
       },
       isTables () {
-        return this.chartType === 've-tables'
+        return this.chartType === 'v-tables'
       },
       showGrid () {
         return this.selfConfig.grid && (this.isLine || this.isHistogram)

@@ -8,9 +8,11 @@ const list = [{
         title: '添加图表',
         icon: 'bar-chart',
         hovered: false,
-        children: [{
+        children: [
+          {
                 title: '折线图',
                 name: 've-line',
+                chartType: 'v-line',
                 icon: 'line-chart',
                 type: '1',
                 modelId: '',
@@ -122,6 +124,7 @@ const list = [{
             },
             {
                 title: '柱状图',
+                chartType: 'v-histogram',
                 name: 've-histogram',
                 icon: 'bar-chart',
                 type: '1',
@@ -235,6 +238,7 @@ const list = [{
             },
             {
                 title: '条形图',
+                chartType: 'v-bar',
                 name: 've-bar',
                 icon: 'menu',
                 type: '1',
@@ -349,6 +353,7 @@ const list = [{
             {
                 title: '饼图',
                 name: 've-pie',
+                chartType: 'v-pie',
                 icon: 'pie-chart',
                 type: '1',
                 modelId: '',
@@ -363,6 +368,10 @@ const list = [{
                     ]
                 },
                 apis: {
+                  level: [
+                    ['1/1', '1/2', '1/3'],
+                    ['1/4', '1/5']
+                  ],
                     labelMap: {
                         'x': '类目',
                         'y': '值',
@@ -462,6 +471,7 @@ const list = [{
             {
                 title: '雷达图',
                 name: 've-radar',
+                chartType: 'v-radar',
                 icon: 'radar-chart',
                 type: '1',
                 modelId: '',
@@ -590,6 +600,7 @@ const list = [{
             {
               title: '仪表盘',
               name: 've-gauge',
+              chartType: 'v-gauge',
               icon: 'radar-chart',
               type: '1',
               modelId: '',
@@ -623,6 +634,9 @@ const list = [{
                           fontSize: 20
                       }
                   },
+                  tooltip: {
+                    show: false
+                  },
                   grid: { left: 20, top: 60, right: 20, bottom: 30 },
                   xAxis: {
                     show: false
@@ -630,13 +644,27 @@ const list = [{
                   yAxis: {
                     show: false
                   },
+                  legend: {
+                    show: false,
+                    data: [],
+                    textStyle: {
+                      color: '#ffffff',
+                      fontSize: 12
+                    },
+                    itemGap: 12,
+                    icon: '',
+                    left: 'center',
+                    top: 'auto',
+                    right: 'auto',
+                    bottom: 'auto'
+                  },
                   series: {
                     name: '',
                     type: 'gauge',
                     center: ['50%', '50%'],
                     radius: '80%',
-                    startAngle: 180,
-                    endAngle: 0,
+                    startAngle: 225,
+                    endAngle: -45,
                     min: 0,
                     max: 100,
                     axisLine: {
@@ -664,6 +692,12 @@ const list = [{
                     axisLabel: {
                         show: true
                     },
+                    // title: {
+                    //   show: true
+                    // },
+                    detail: {
+                      show: true
+                    },
                     pointer: { // 指针样式
                         length: '60%'
                     }
@@ -675,6 +709,7 @@ const list = [{
             {
                 title: '地图',
                 name: 've-map',
+                chartType: 'v-map',
                 icon: 'global',
                 modelId: '',
                 api_data: {
@@ -840,7 +875,185 @@ const list = [{
                     color: DEFAULT_COLORS
                 },
                 view: { width: 500, height: 500, x: 710, y: 290 }
-            }
+            },
+            {
+              title: '环形图',
+              name: 've-ring',
+              chartType: 'v-ring',
+              icon: 'pie-chart',
+              type: '1',
+              modelId: '',
+              api_data: {
+                  source: [
+                      { x: '1/1', y: 80, s: '系列1' },
+                      { x: '1/2', y: 20, s: '系列1' }
+                  ]
+              },
+              apis: {
+                hoverAnimation: false,
+                  labelMap: {
+                      'x': '类目',
+                      'y': '值',
+                      's': '系列1'
+                  }
+              },
+              background: {
+                  backgroundType: '1',
+                  backgroundColor: '',
+                  borderColor: '',
+                  borderWidth: 0,
+                  borderStyle: '',
+                  borderRadius: 0
+              },
+              config: {
+                  title: {
+                      show: true,
+                      content: '环形图',
+                      textAlign: 'left',
+                      textStyle: {
+                          color: '#ffffff',
+                          fontSize: 20
+                      }
+                  },
+                  tooltip: {
+                    show: false
+                  },
+                  grid: { left: 20, top: 20, right: 20, bottom: 30 },
+                  legend: {
+                      show: false,
+                      data: [],
+                      textStyle: {
+                        color: '#ffffff',
+                        fontSize: 12
+                      },
+                      itemGap: 12,
+                      icon: '',
+                      left: 'center',
+                      top: 'auto',
+                      right: 'auto',
+                      bottom: 'auto'
+                  },
+                  xAxis: {
+                      show: false
+                  },
+                  yAxis: {
+                      show: false
+                  },
+                  series: {
+                    radius: ['60%', '70%'],
+                    center: ['50%', '50%'],
+                    label: {
+                      normal: {
+                        show: false,
+                        formatter: function(val) {
+                          console.log(val)
+                        },
+                        position: 'center',
+                        textStyle: {
+                          fontSize: '30'
+                        }
+                      },
+                      emphasis: {
+                        show: false,
+                        textStyle: {
+                          fontSize: '30',
+                          fontWeight: 'bold'
+                        }
+                      }
+                    }
+
+                  },
+                  color: DEFAULT_COLORS
+              },
+              chartEvents: {
+                  click: chartClick
+              },
+              view: { width: 400, height: 400, x: 760, y: 340 }
+            },
+            {
+              title: '嵌套饼图',
+              name: 've-pie',
+              chartType: 'v-multiPie',
+              icon: 'pie-chart',
+              type: '1',
+              modelId: '',
+              api_data: {
+                  source: [
+                      { x: '1/1', y: 1393, s: '系列1' },
+                      { x: '1/2', y: 3530, s: '系列1' },
+                      { x: '1/3', y: 2923, s: '系列1' },
+                      { x: '1/4', y: 1723, s: '系列1' },
+                      { x: '1/5', y: 3792, s: '系列1' },
+                      { x: '1/6', y: 4593, s: '系列1' }
+                  ]
+              },
+              apis: {
+                level: [
+                  ['1/1', '1/2', '1/3'],
+                  ['1/4', '1/5']
+                ],
+                  labelMap: {
+                      'x': '类目',
+                      'y': '值',
+                      's': '系列1'
+                  }
+              },
+              background: {
+                  backgroundType: '1',
+                  backgroundColor: '',
+                  borderColor: '',
+                  borderWidth: 0,
+                  borderStyle: '',
+                  borderRadius: 0
+              },
+              config: {
+                  title: {
+                      show: true,
+                      content: '嵌套饼图',
+                      textAlign: 'left',
+                      textStyle: {
+                          color: '#ffffff',
+                          fontSize: 20
+                      }
+                  },
+                  grid: { left: 20, top: 60, right: 20, bottom: 30 },
+                  legend: {
+                      show: true,
+                      textStyle: {
+                          color: '#ffffff',
+                          fontSize: 12
+                      },
+                      itemGap: 12,
+                      icon: '',
+                      left: 'center',
+                      top: 'auto',
+                      right: 'auto',
+                      bottom: 'auto'
+                  },
+                  xAxis: {
+                      show: false
+                  },
+                  yAxis: {
+                      show: false
+                  },
+                  series: {
+                      label: {
+                          show: true,
+                          color: '',
+                          fontSize: 12,
+                          position: 'outside', // 可选inside
+                          formatter: '{b}: {@2012} ({d}%)'
+                      },
+                      roseType: false, // 饼图可选玫瑰图
+                      center: ['50%', '50%'] // 饼图可选
+                  },
+                  color: DEFAULT_COLORS
+              },
+              chartEvents: {
+                  click: chartClick
+              },
+              view: { width: 400, height: 400, x: 760, y: 340 }
+          }
         ]
     },
     {
@@ -851,6 +1064,7 @@ const list = [{
         children: [{
                 title: '文本',
                 name: 've-text',
+                chartType: 'v-text',
                 icon: 'edit',
                 apiData: {},
                 apis: {},
@@ -879,6 +1093,7 @@ const list = [{
             {
                 title: '图片',
                 name: 've-image',
+                chartType: 'v-image',
                 icon: 'picture',
                 modelId: '',
                 apiData: {},
@@ -902,6 +1117,7 @@ const list = [{
             {
                 title: '表格',
                 name: 've-tables',
+                chartType: 'v-tables',
                 icon: 'table',
                 type: '3',
                 modelId: '',
