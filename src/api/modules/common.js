@@ -16,12 +16,13 @@ export default {
    * @returns
    */
   deleMenuById(url) {
-    return $axios.get(url)
+    return $axios.delete(url)
   },
   /**
-   * @description 修改文件夹名称
+   * @description 修改文件夹(重命名, 移动)
    * @param {Object} params 请求参数
    * @param {string} params.name 名称
+   * @param {string} params.parentId 父节点id
    * @returns
    */
   putMenuFolderName(url, params) {

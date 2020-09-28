@@ -21,8 +21,8 @@
     <a-form-model-item label="端口" prop="port">
       <a-input style="width:528px;" v-model.number="form.port" />
     </a-form-model-item>
-    <a-form-model-item label="用户名" prop="username">
-      <a-input style="width:528px;" v-model="form.username" />
+    <a-form-model-item label="用户名" prop="user">
+      <a-input style="width:528px;" v-model="form.user" />
     </a-form-model-item>
     <a-form-model-item label="密码" prop="password">
       <a-input-password style="width:528px;" v-model="form.password" />
@@ -84,7 +84,7 @@ export default {
         name: '', // 数据源名
         ip: '', // 服务器ip
         port: '', // 端口号
-        username: '', // 用户名
+        user: '', // 用户名
         password: '', // 密码
         databaseName: '' // 数据库名称
       },
@@ -115,7 +115,7 @@ export default {
           { required: true, message: '请输入端口号' },
           { type: 'integer', message: '请输入数字', min: 0 }
         ],
-        username: [
+        user: [
           {
             required: true,
             message: '请输入用户名'
@@ -147,10 +147,19 @@ export default {
       this.$refs.dbForm.validate(async valid => {
         if (valid) {
           this.connectBtn = true
-          const result = await this.$server.dataAccess.actionConnect('oracle', { ...this.form })
-            .finally(() => {
-              this.connectBtn = false
-            })
+          const result = await this.$server.dataAccess.actionConnect({
+            name: this.form.name,
+            type: 2,
+            property: {
+              ip: this.form.ip,
+              port: this.form.port,
+              password: this.form.password,
+              user: this.form.user,
+              databaseName: this.form.databaseName || null
+            }
+          }).finally(() => {
+            this.connectBtn = false
+          })
 
           if (result.code === 200) {
             this.connectStatus = true
@@ -172,17 +181,29 @@ export default {
         if (valid) {
           this.saveBtn = true
           delete this.form.dbid
-          const result = await this.$server.dataAccess.saveTableInfo('/system/oracle', {
-            id: this.formId,
-            ...this.form
-          }).finally(() => {
-            this.saveBtn = false
-          })
+          const params = {
+            id: this.$store.state.dataAccess.modelId,
+            name: this.$store.state.dataAccess.modelInfo.name,
+            parentId: this.modelSelectType === 'new' ? 0 : this.$store.state.dataAccess.parentId,
+            property: {
+              user: this.form.user,
+              ip: this.form.ip,
+              port: this.form.port,
+              password: this.form.password,
+              databaseName: this.form.databaseName
+            },
+            type: 2
+          }
+          const result = await this.$server.dataAccess.saveTableInfo('/datasource/oracle', params)
+            .finally(() => {
+              this.saveBtn = false
+            })
           if (result.code === 200) {
             this.$store.dispatch('dataAccess/getMenuList')
             this.$store.dispatch('dataAccess/setFirstFinished', true)
             this.$store.dispatch('dataAccess/setModelInfo', this.form)
             this.$store.dispatch('dataAccess/setModelId', result.data)
+            this.$store.dispatch('dataAccess/setParentId', 0)
             this.formId = result.data
             this.$message.success(result.msg)
           } else {

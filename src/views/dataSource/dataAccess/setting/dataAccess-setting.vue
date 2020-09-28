@@ -22,11 +22,11 @@
             :scroll="{ x: 1200, y: 570 }"
             bordered
           >
-          <span slot="fieldNickname" slot-scope="text, record, index">
-            <a-input style="width:100%;height:32px" :value="text" @change.stop.prevent="handleChangeValue($event, record, index, 'fieldNickname')"/>
+          <span slot="alias" slot-scope="text, record, index">
+            <a-input style="width:100%;height:32px" :value="text" @change.stop.prevent="handleChangeValue($event, record, index, 'alias')"/>
           </span>
-          <span slot="fieldType" slot-scope="text, record, index">
-            <a-select :value="text" style="width:100%;" @change="(value) => handleSelectChangeValue(value, record, index, 'fieldType')">
+          <span slot="dataType" slot-scope="text, record, index">
+            <a-select :value="text" style="width:100%;" @change="(value) => handleSelectChangeValue(value, record, index, 'dataType')">
               <a-select-option value="INT">
                 整数
               </a-select-option>
@@ -41,21 +41,21 @@
               </a-select-option>
             </a-select>
           </span>
-          <span slot="fieldNature" slot-scope="text, record, index">
-            <a-select default-value="true" :value='`${text}`' @change="(value) => handleSelectChangeValue(value, record, index, 'fieldNature')">
-              <a-select-option value="true">
+          <span slot="role" slot-scope="text, record, index">
+            <a-select default-value="1" :value='`${text}`' @change="(value) => handleSelectChangeValue(value, record, index, 'role')">
+              <a-select-option value="1">
                 维度
               </a-select-option>
-              <a-select-option value="false">
+              <a-select-option value="2">
                 度量
               </a-select-option>
             </a-select>
           </span>
-          <span slot="fieldComment" slot-scope="text, record, index">
-            <a-input style="width:100%;height:32px" :value="text" @change.stop.prevent="handleChangeValue($event, record, index, 'fieldComment')"/>
+          <span slot="comment" slot-scope="text, record, index">
+            <a-input style="width:100%;height:32px" :value="text" @change.stop.prevent="handleChangeValue($event, record, index, 'comment')"/>
           </span>
-          <span slot="fieldDesc" slot-scope="fieldDesc">
-            {{ fieldDesc }}
+          <span slot="description" slot-scope="description">
+            {{ description }}
           </span>
           <span slot="visible" slot-scope="text, record, index">
               <a-select style="width:60px" default-value="true" :value='`${text}`' @change="(value) => handleSelectChangeValue(value, record, index, 'visible')">
@@ -93,32 +93,32 @@ import { mapState } from 'vuex'
 const columns = [
   {
     title: '原名',
-    dataIndex: 'fieldName'
+    dataIndex: 'name'
   },
   {
     title: '别名',
-    dataIndex: 'fieldNickname',
-    scopedSlots: { customRender: 'fieldNickname' }
+    dataIndex: 'alias',
+    scopedSlots: { customRender: 'alias' }
   },
   {
     title: '字段类型',
-    dataIndex: 'fieldType',
-    scopedSlots: { customRender: 'fieldType' }
+    dataIndex: 'dataType',
+    scopedSlots: { customRender: 'dataType' }
   },
   {
     title: '字段属性',
-    dataIndex: 'fieldNature',
-    scopedSlots: { customRender: 'fieldNature' }
+    dataIndex: 'role',
+    scopedSlots: { customRender: 'role' }
   },
   {
     title: '字段说明',
-    dataIndex: 'fieldComment',
-    scopedSlots: { customRender: 'fieldComment' }
+    dataIndex: 'comment',
+    scopedSlots: { customRender: 'comment' }
   },
   {
     title: '注释',
-    dataIndex: 'fieldDesc',
-    scopedSlots: { customRender: 'fieldDesc' }
+    dataIndex: 'description',
+    scopedSlots: { customRender: 'description' }
   },
   {
     title: '是否可见',
@@ -172,10 +172,10 @@ export default {
     },
     async handleGetData() {
       this.sping = true
-      const result = await this.$server.dataAccess.getTableFieldDetail(this.modelType, {
-        sourceMysqlId: this.modelId,
-        databasesName: this.formInfo.databaseName,
-        sourceMysqName: this.formInfo.name,
+      const result = await this.$server.dataAccess.getTableFieldDetail({
+        sourceId: this.modelId,
+        databaseName: this.formInfo.databaseName,
+        sourceName: this.formInfo.name,
         tableId: this.fieldInfo.id,
         tableName: this.fieldInfo.name
       }).finally(() => {

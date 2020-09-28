@@ -5,8 +5,8 @@ export default {
      * @param {Object} [params={}] 请求参数
      * @returns
      */
-    actionConnect(type, params = {}) {
-        return $axios.post(`/system/${type}/connect`, params)
+    actionConnect(params = {}) {
+        return $axios.post(`/datasource/connect`, params)
     },
     /**
      * @description 获取表的具体字段信息
@@ -14,8 +14,8 @@ export default {
      * @param {Object} [params={}] 请求参数
      * @returns {Object} 字段详细信息
      */
-    getTableFieldDetail(type, params = {}) {
-        return $axios.post(`/system/${type}/get/field`, params)
+    getTableFieldDetail(params = {}) {
+        return $axios.post(`/datasource/read/field`, params)
     },
     /**
      * @description 读取数据库的表
@@ -25,8 +25,8 @@ export default {
      * @param {string} params.sourceOracleName 源名称
      * @returns
      */
-    getTableList(type, params) {
-        return $axios.post(`/system/${type}/read/table`, params)
+    getTableList(params) {
+        return $axios.post(`/datasource/read/teble`, params)
     },
     /**
      * @description 保存数据信息
@@ -43,7 +43,7 @@ export default {
      * @returns
      */
     saveDataTable(params = {}) {
-        return $axios.post('/system/sourceTbale/save/table', params)
+        return $axios.post('/datasource/table/save/table', params)
     },
     /**
      * @description 保存修改表字段
@@ -51,7 +51,7 @@ export default {
      * @returns
      */
     saveTableField(params = {}) {
-        return $axios.post('/system/field/save/field', params)
+        return $axios.post('/datasource/field/save/field', params)
     },
     /**
      * @description 全部抽取

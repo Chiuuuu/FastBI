@@ -1,6 +1,6 @@
 <template>
   <div class="model-main">
-    <a-empty v-if="fileSelectId=== -1" class="main-empty">
+    <a-empty v-if="modelId=== -1" class="main-empty">
       <span slot="description">请新建模型或者选中左侧模型</span>
     </a-empty>
     <template v-else>
@@ -27,7 +27,7 @@
               v-for="(item, index) in renderTables"
               :key="index"
               :node-data="item"
-              title='tableName'
+              title='name'
             ></tree-node>
           </template>
         </div>
@@ -42,13 +42,13 @@
                 <div class="dim_menu">
                   <a-menu mode="inline" v-for="(value, name) in dimensions" :key="name" :default-open-keys="[name]" :inline-collapsed="false">
                     <a-sub-menu :key="name">
-                      <span slot="title"><span>{{value[0].tableName}}</span></span>
+                      <span slot="title"><span>{{value[0].name}}</span></span>
                       <a-menu-item v-for="item in value" :key="item.id">
                         <img
                           src="@/assets/images/icon_dimension.png"
                           style="width:15px;height:15px"
                         />
-                        {{item.field}}
+                        {{item.name}}
                       </a-menu-item>
                     </a-sub-menu>
                   </a-menu>
@@ -59,13 +59,13 @@
                 <div class="mea_menu">
                   <a-menu mode="inline" v-for="(value, name) in measures" :key="name" :default-open-keys="[name]" :inline-collapsed="false">
                     <a-sub-menu :key="name">
-                      <span slot="title"><span>{{value[0].tableName}}</span></span>
+                      <span slot="title"><span>{{value[0].name}}</span></span>
                       <a-menu-item v-for="item in value" :key="item.id">
                         <img
                           src="@/assets/images/icon_measure.png"
                           style="width:15px;height:15px"
                         />
-                        {{item.field}}
+                        {{item.name}}
                       </a-menu-item>
                     </a-sub-menu>
                   </a-menu>
@@ -100,17 +100,24 @@ export default {
   },
   computed: {
     ...mapState({
-      fileSelectId: state => state.dataModel.modelId
+      modelId: state => state.dataModel.modelId,
+      datasourceId: state => state.dataModel.datasourceId
     })
   },
   methods: {
     /**
      * 获取数据
     */
-    async handleGetData() {
+    async handleGetData(id) {
       this.spinning = true
       this.renderTables = []
-      const result = await this.$server.common.getDetailByMenuId(`/datamodel/datamodelInfo/getDataModelInfo/${this.fileSelectId}`)
+      let modelId = ''
+      if (typeof id === 'string') {
+        modelId = id
+      } else {
+        modelId = this.modelId
+      }
+      const result = await this.$server.dataModel.getDataModelDetailInfo(modelId)
         .finally(() => {
           this.spinning = false
         })
@@ -126,17 +133,31 @@ export default {
       }
     },
     /**
+     * 编辑时根据modelId获取数据源
+     */
+    async handleGetDataSource() {
+      // 第一个数据库id
+      const datsource = await this.$server.dataModel.getDataSourceList(this.modelId)
+      console.log('根据modelId获取数据源', datsource)
+      this.$store.dispatch('dataModel/setDatasourceId', datsource.data[0].datasourceId)
+      return datsource.data[0].datasourceId
+    },
+    /**
      * 跳转编辑状态
     */
     edit() {
-      // this.$router.push({ path: `/dataSource/Model-Edit/${this.fileSelectId}` })
-      this.$router.push({
-        name: 'modelEdit',
-        query: {
-          type: 'edit',
-          dataConnectionId: this.fileSelectId
-        }
-      })
+      // this.$router.push({ path: `/dataSource/Model-Edit/${this.modelId}` })
+      this.handleGetDataSource()
+        .then(id => {
+          this.$router.push({
+            name: 'modelEdit',
+            query: {
+              type: 'edit',
+              datasourceId: id,
+              modelId: this.modelId
+            }
+          })
+        })
     },
     /**
      * 处理树形组件

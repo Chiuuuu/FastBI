@@ -10,9 +10,9 @@
           <a-menu-item v-on:click="showModal">
             新建模型
           </a-menu-item>
-          <!-- <a-menu-item @click="handleAddNewFolder">
+          <a-menu-item @click="handleAddNewFolder">
             新建文件夹
-          </a-menu-item> -->
+          </a-menu-item>
         </a-menu>
       </a-dropdown>
     </div>
@@ -27,11 +27,11 @@
       <div class="menu-wrap modal-wrap">
         <div
           class="group"
-          :class="handleIsFolder(folder, 'items') ? 'is-folder' : ''"
-          v-for="(folder, index) in tableList"
+          :class="handleIsFolder(folder) ? 'is-folder' : ''"
+          v-for="(folder, index) in sourceList"
           :key="folder.id"
         >
-          <template v-if="handleIsFolder(folder, 'items')">
+          <template v-if="handleIsFolder(folder)">
             <menu-folder
               :folder="folder"
               :index="index"
@@ -60,8 +60,8 @@
         </div>
       </div>
     </a-modal>
-    <a-empty v-if="modelFolderList.length === 0 && modelFileList.length === 0" class="table_list-_empty">
-      <span slot="description">暂无数据源</span>
+    <a-empty v-if="modelList && modelList.length && modelList.length === 0" class="table_list-_empty">
+      <span slot="description">暂无数据模型</span>
     </a-empty>
     <template v-else>
       <!-- <div class="menu_search">
@@ -69,45 +69,43 @@
           <a-icon class="icon_search" slot="suffix" type="search" />
         </a-input>
       </div> -->
-      <p class="menu_tips">右键文件夹或选项有添加，重命名等操作</p>
+      <!-- <p class="menu_tips">右键文件夹或选项有添加，重命名等操作</p> -->
       <div class="menu-wrap">
         <div
           class="group is-folder"
-          :class="handleIsFolder(folder, 'items') ? 'is-folder' : ''"
-          v-for="(folder, index) in modelFolderList"
+          :class="handleIsFolder(folder) ? 'is-folder' : ''"
+          v-for="(folder, index) in modelList"
           :key="folder.id"
         >
-          <menu-folder
-            :folder="folder"
-            :index="index"
-            :contextmenus="folderContenxtMenu"
-          >
-            <template v-slot:file="slotProps">
+          <template v-if="handleIsFolder(folder)">
+            <menu-folder
+              :folder="folder"
+              :index="index"
+              :contextmenus="folderContenxtMenu"
+            >
+              <template v-slot:file="slotProps">
+                <menu-file
+                  :file="slotProps.file"
+                  :index="slotProps.index"
+                  :parent="folder"
+                  :isSelect='fileSelectId === slotProps.file.id'
+                  :contextmenus="fileContenxtMenu"
+                  @fileSelect="handleFileSelect"
+                ></menu-file>
+              </template>
+            </menu-folder>
+          </template>
+          <template v-else>
+            <ul class="items">
               <menu-file
-                :file="slotProps.file"
-                :index="slotProps.index"
-                :parent="folder"
-                :isSelect='fileSelectId === slotProps.file.id'
-                :contextmenus="folderFileContenxtMenu"
+                :file="folder"
+                :index="index"
+                :isSelect='fileSelectId === folder.id'
+                :contextmenus="fileContenxtMenu"
                 @fileSelect="handleFileSelect"
               ></menu-file>
-            </template>
-          </menu-folder>
-        </div>
-        <div
-          class="group"
-          v-for="(file, index) in modelFileList"
-          :key="file.id"
-        >
-          <ul class="items">
-            <menu-file
-              :file="file"
-              :index="index"
-              :isSelect='fileSelectId === file.id'
-              :contextmenus="fileContenxtMenu"
-              @fileSelect="handleFileSelect"
-            ></menu-file>
-          </ul>
+            </ul>
+          </template>
         </div>
       </div>
     </template>
@@ -117,18 +115,27 @@
       @cancel="handleResetNameCancel"
       @create="handleResetNameCreate"
     ></reset-name-modal>
+    <move-file-modal
+      :visible="moveFileVisible"
+      :selected="selectFile"
+      :menuList="folderList"
+      @cancel="moveFileVisible = false"
+      @create="handleFileMoveCreate"
+    ></move-file-modal>
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 import ResetNameModal from '@/views/dataSource/dataAccess/components/data-main/data-menu/resetName'
+import MoveFileModal from '@/views/dataSource/dataAccess/components/data-main/data-menu/moveFile'
 import MenuFile from '@/components/dataSource/menu-group/file'
 import MenuFolder from '@/components/dataSource/menu-group/folder'
 export default {
   name: 'model-menu',
   components: {
     ResetNameModal,
+    MoveFileModal,
     MenuFolder,
     MenuFile
   },
@@ -141,9 +148,12 @@ export default {
         item: ''
       },
       search: '',
+      sourceList: [],
       modelFolderList: [],
       modelFileList: [],
       modalFileSelectId: '',
+      selectFile: null, // 选中文件
+      moveFileVisible: false, // 移动文件夹弹窗
       folderContenxtMenu: [
         {
           name: '新建模型',
@@ -158,28 +168,25 @@ export default {
           onClick: this.handleFolderDelete
         }
       ],
-      folderFileContenxtMenu: [
-        {
-          name: '删除',
-          onClick: (mouseEvent, event, options) => this.handleFileDelete(mouseEvent, event, options, 'folderFile')
-        }
-      ],
       fileContenxtMenu: [
-        // {
-        //   name: '移动到',
-        //   onClick: this.handleFileMoveFolder
-        // },
+        {
+          name: '移动到',
+          onClick: this.handleFilemove
+        },
         {
           name: '删除',
-          onClick: (mouseEvent, event, options) => this.handleFileDelete(mouseEvent, event, options, 'file')
+          onClick: this.handleFileDelete
         }
       ]
     }
   },
   computed: {
     ...mapState({
-      tableList: state => state.dataAccess.menuList
+      modelList: state => state.dataModel.menuList
     }),
+    folderList() {
+      return this.modelList.filter(item => item.fileType === 0)
+    },
     fileSelectId: {
       get () {
         return this.$store.state.dataModel.modelId
@@ -197,38 +204,39 @@ export default {
   },
   methods: {
     /**
-    * 获取左侧菜单数据
+    * 获取数据源数据
     */
-    handleGetModalMenuList() {
-     this.$store.dispatch('dataAccess/getMenuList', this)
-    },
-    async handleGetMenuList() {
-      const result = await this.$server.common.getMenuList('/datamodel/catalog/list')
+    async handleGetDataSourceList() {
+      const result = await this.$server.common.getMenuList('/datasource/catalog/list/1')
 
       if (result.code === 200) {
-        this.modelFolderList = [].concat(result.data.folders)
-        this.modelFileList = [].concat(result.data.items)
+        this.sourceList = result.rows
       } else {
         this.$message.error(result.msg)
       }
     },
-    handleFolderNewModel() {
-      this.$nextTick(() => {
-        this.visible = true
-      })
+    /**
+     * 获取模型列表
+     */
+    async handleGetMenuList() {
+      this.$store.dispatch('dataModel/getMenuList', this)
+    },
+    handleFolderNewModel(mouseEvent, event, { folder }) {
+      this.$store.dispatch('dataModel/setParentId', folder.id)
+      this.showModal()
     },
     /**
      * 打开弹窗
     */
     showModal() {
       this.visible = true
-      this.handleGetModalMenuList()
+      this.handleGetDataSourceList()
     },
     /**
      * 是否为文件夹
      */
     handleIsFolder(item) {
-      return item.hasOwnProperty('items')
+      return item.fileType === 0
     },
     /**
      * 文件夹重命名
@@ -240,9 +248,12 @@ export default {
       this.resetName.visible = true
     },
     async _resetName(form) {
-      const result = await this.$server.common.putMenuFolderName('/datamodel/catalog/updateCatalogName', {
-        catalogId: this.resetName.item.id,
-        catalogName: form.name
+      const result = await this.$server.common.putMenuFolderName('/model/catalog', {
+        fileType: this.resetName.item.fileType,
+        id: this.resetName.item.id,
+        name: form.name,
+        parentId: 0,
+        type: 2
       })
 
       if (result.code === 200) {
@@ -256,40 +267,56 @@ export default {
      * 文件夹删除
     */
     async handleFolderDelete(mouseEvent, event, { folder }) {
-      const result = await this.$server.common.deleMenuFolder('/datamodel/catalog/removeCatalogById', {
-        catalogId: folder.id,
-        modelIds: []
-      })
+      const result = await this.$server.common.deleMenuById('/model/catalog/' + folder.id)
 
       if (result.code === 200) {
-        const index = this.modelFolderList.indexOf(folder)
-        this.modelFolderList.splice(index, 1)
+        this.handleGetMenuList()
+        this.$store.dispatch('dataModel/setModelId', 0)
         this.$message.success('删除成功')
       } else {
         this.$message.error(result.msg)
       }
     },
     /**
-     * 文件移动到文件夹
-    */
-    handleFileMoveFolder() {
-      console.log('文件移动到文件夹')
+     * 移动文件夹
+     */
+    handleFilemove(event, index, { file }) {
+      this.selectFile = file
+      this.$store.dispatch('dataModel/setDatasource', file)
+      this.$store.dispatch('dataModel/setModelId', file.id)
+      this.moveFileVisible = true
+    },
+    /**
+     * 选择移动文件夹弹窗确认
+     */
+    async handleFileMoveCreate(parentId) {
+      const result = await this.$server.common.putMenuFolderName('/model/catalog', {
+        fileType: this.selectFile.fileType,
+        id: this.selectFile.id,
+        name: this.selectFile.name,
+        parentId: parentId,
+        type: 2
+      })
+      if (result.code === 200) {
+        this.handleGetMenuList()
+        this.$message.success('移动成功')
+      } else {
+        this.$message.error(result.msg)
+      }
+
+      this.moveFileVisible = false
     },
     /**
      * 文件删除
     */
-    async handleFileDelete(mouseEvent, event, { parent, file, index }, type) {
-      const result = await this.$server.common.deleMenuById(`/datamodel/datamodelInfo/deleteModelDataModelByModelId/${file.id}`)
+    async handleFileDelete(mouseEvent, event, { file }) {
+      const result = await this.$server.common.deleMenuById(`/model/catalog/${file.id}`)
 
       if (result.code === 200) {
         this.$message.success('删除成功')
-        if (type === 'folderFile') {
-          parent.items.splice(index, 1)
-        } else {
-          this.modelFileList.splice(index, 1)
-        }
+        this.handleGetMenuList()
         const isSame = file.id === this.fileSelectId
-        if (isSame) this.$store.dispatch('dataModel/setModelId', -1)
+        if (isSame) this.$store.dispatch('dataModel/setModelId', 0)
       } else {
         this.$message.error(result.msg)
       }
@@ -307,8 +334,13 @@ export default {
       } else {
         if (this.modalFileSelectId === file.id) return
         this.modalFileSelectId = file.id
+        this.$store.dispatch('dataModel/setDatasource', file)
+        this.$store.dispatch('dataModel/setDatasourceId', file.id)
       }
     },
+    /**
+     * 确定选择的数据连接
+     */
     handleOk() {
       // if (!this.modalFileSelectId) return
       this.visible = false
@@ -316,7 +348,7 @@ export default {
         name: 'modelEdit',
         query: {
           type: 'add',
-          dataConnectionId: this.modalFileSelectId
+          datasourceId: this.modalFileSelectId
         }
       })
     },
@@ -334,8 +366,11 @@ export default {
       this.resetName.type = 'new'
     },
     async _addNewFolder(form) {
-      const result = await this.$server.common.addMenuFolder('/datamodel/catalog/addCatalog', {
-        catalogName: form.name
+      const result = await this.$server.common.addMenuFolder('/model/catalog', {
+        name: form.name,
+        type: 2,
+        parentId: 0,
+        fileType: 0
       })
 
       if (result.code === 200) {

@@ -14,7 +14,7 @@
         @drop.stop="handleDrop($event, nodeData, dataIndex)"
         style="border-color: rgb(8, 140, 237);"
       >
-        {{ nodeData.props.tableName }}
+        {{ nodeData.props.name }}
       </h6>
       <span class="opt">
          <b class="num">{{joinLength}}</b>
@@ -166,6 +166,7 @@ export default {
     } else {
       this.root = parent.root
     }
+    this.modelId = this.$route.query.modelId || this.$store.state.dataModel.modelId
   },
   methods: {
     async handleBtnDelete(node) {
@@ -177,13 +178,25 @@ export default {
       } else {
         this.root.handleClearRenderTables()
       }
-      await this.root.handleUpdate()
+      await this.root.handleUpdate({
+        tables: this.detailInfo.config.tables.map((item, index) => {
+          item.datamodelId = this.modelId
+          item.tableNo = index + 1
+          return item
+        })
+      })
+      // new Array(Object.assign(dragNode.getProps(), {
+      //   leftTableId: current.getProps().tableNo,
+      //   tableId: dragNode.getProps().id,
+      //   datamodelId: this.modelId
+      // }))
       this.nodeVisible = false
     },
     loopDelete(node, list) {
       const ownProps = node.getProps()
       const index = findIndex(list, ownProps)
       list.splice(index, 1)
+      console.log(list)
       if (node.children && node.children.length > 0) {
         node.children.forEach(item => {
           this.loopDelete(item, list)
@@ -228,11 +241,22 @@ export default {
       let dragNode = this.nodeStatus.dragNode
       const tables = this.detailInfo.config.tables
       if (this.nodeStatus.dragType === 'menu') {
+        dragNode.setTableId()
+        dragNode.setTableNo(tables.length + 1)
         await this.root.getJoin(current, dragNode)
-        dragNode.setTableId(tables.length + 1)
         tables.push(dragNode.getProps())
         current.add(dragNode)
-        await this.root.handleUpdate()
+        await this.root.handleUpdate({
+          tables: this.detailInfo.config.tables.map((item, index) => {
+            item.datamodelId = this.modelId
+            return item
+          })
+        })
+        // new Array(Object.assign(dragNode.getProps(), {
+        //   leftTableId: current.getProps().tableNo,
+        //   tableId: dragNode.getProps().id,
+        //   datamodelId: this.modelId
+        // }))
       }
 
       if (this.nodeStatus.dragType === 'node') {
@@ -259,9 +283,19 @@ export default {
           return node.getProps().tableNo === item.tableNo
         })
         tables.splice(index, 1, node.getProps())
-        console.log(tables)
         this.parentDeleteNode(event, dragNode)
-        await this.root.handleUpdate()
+        console.log('tables', this.detailInfo.config.tables)
+        await this.root.handleUpdate({
+          tables: this.detailInfo.config.tables.map(item => {
+            item.datamodelId = this.modelId
+            return item
+          })
+        })
+        // new Array(Object.assign(dragNode.getProps(), {
+        //   leftTableId: current.getProps().tableNo,
+        //   tableId: dragNode.getProps().id,
+        //   datamodelId: this.modelId
+        // }))
       }
     },
     lootBeforeParent(parentId, node) {
@@ -282,8 +316,8 @@ export default {
     },
     handleVisibleChange(v, node) {
       if (!v) return
-      console.log('left', node.parent.getProps().tableName)
-      console.log('right', node.getProps().tableName)
+      console.log('left', node.parent.getProps().name)
+      console.log('right', node.getProps().name)
     }
   }
 }

@@ -30,13 +30,27 @@
         </a-select>
       </div>
       <a-divider /> -->
+      <!-- <div class="menu_search">
+        <a-select>
+          <a-option v-for="database in databaseList" :key="database.id" :value="database.id">
+            {{ database.name }}
+          </a-option>
+        </a-select>
+      </div> -->
+      <div class="menu_database_name">
+        <span>数据库 {{ databaseName }}</span>
+      </div>
+      <a-divider />
       <div class="menu_search">
         <span class="search_span">表</span>
         <!-- <a-input placeholder="请输入关键词搜索" class="search_input">
           <a-icon slot="prefix" type="search" />
         </a-input> -->
       </div>
-      <edit-left ref="editLeftRef" @on-left-drag-leave="handleLeftDragLeave"></edit-left>
+      <edit-left
+        ref="editLeftRef"
+        @on-left-drag-leave="handleLeftDragLeave"
+      ></edit-left>
       <!-- <a-divider /> -->
       <!-- <div class="SQL-View"> -->
         <!-- <div class="view-head">
@@ -106,7 +120,7 @@
         <div class="detail_header">
           <span>数据模型详情</span>
           <div class="detail_btn">
-            <!-- <a-button v-on:click="check">查看表宽</a-button> -->
+            <!-- <a-button v-on:click="check">查看宽表</a-button> -->
             <a-modal
               v-model="visible"
               title="查看宽表"
@@ -406,13 +420,13 @@
             <div class="dim_menu">
               <a-menu mode="inline" v-for="(value, name) in dimensions" :key="name" :default-open-keys="[name]" :inline-collapsed="false">
                 <a-sub-menu :key="name">
-                  <span slot="title"><span>{{value[0].tableName}}</span></span>
+                  <span slot="title"><span>{{value[0].name}}</span></span>
                   <a-menu-item v-for="item in value" :key="item.id">
                     <img
                       src="@/assets/images/icon_dimension.png"
                       style="width:15px;height:15px"
                     />
-                    {{item.field}}
+                    {{item.name}}
                   </a-menu-item>
                 </a-sub-menu>
               </a-menu>
@@ -426,13 +440,13 @@
             <div class="mea_menu">
               <a-menu mode="inline" v-for="(value, name) in measures" :key="name" :default-open-keys="[name]" :inline-collapsed="false">
                 <a-sub-menu :key="name">
-                  <span slot="title"><span>{{value[0].tableName}}</span></span>
+                  <span slot="title"><span>{{value[0].name}}</span></span>
                   <a-menu-item v-for="item in value" :key="item.id">
                     <img
                       src="@/assets/images/icon_measure.png"
                       style="width:15px;height:15px"
                     />
-                    {{item.field}}
+                    {{item.name}}
                   </a-menu-item>
                 </a-sub-menu>
               </a-menu>
@@ -450,8 +464,10 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import EditLeft from './edit-left'
 import EditRightTop from './edit-right-top'
+import { Node, conversionTree } from '../util'
 import groupBy from 'lodash/groupBy'
 
 const countryData = ['中国']
@@ -753,64 +769,73 @@ export default {
             customRender: 'operation'
           }
         }
-      ]
+      ],
+      databaseList: [] // 数据库列表
     }
   },
   computed: {
+    ...mapState({
+      modelId: state => state.dataModel.modelId, // 选中的菜单id
+      parentId: state => state.dataModel.parentId, // 选中的菜单id
+      datasource: state => state.dataModel.datasource, // 数据源
+      datasourceId: state => state.dataModel.datasourceId // 数据源
+    }),
     rowSelection() {
       return {}
     },
     model() {
       return this.$route.query.type
+    },
+    databaseName() {
+      return this.databaseList.length > 0 ? this.databaseList[0].name : ''
     }
   },
   created() {
-    if (this.model === 'edit') {
-      this.handleGetData(this.$route.query.dataConnectionId)
-    }
+    // if (this.model === 'edit') {
+    //   this.handleGetDatabase()
+    // }
+    // this.modelId = this.$route.query.modelId || this.$store.state.dataModel.modelId
   },
   mounted() {
     if (this.model === 'add') {
-      this.$refs.editLeftRef.handleGetMenuList(this.$route.query)
-      this.handleAddNew()
+      this.handleGetAddModelDatamodel()
+      this.handleGetDatabase()
+    } else if (this.model === 'edit') {
+      this.handleGetData(this.$route.query.modelId)
+      this.handleGetDatabase()
     }
   },
   methods: {
     /**
-     * 新增方法
-    */
-    async handleAddNew() {
-      const result = await this.$server.dataModel.addModel(this.$route.query.dataConnectionId)
-
+     * 新增时获取空模型
+     */
+    async handleGetAddModelDatamodel() {
+      const result = await this.$server.dataModel.getAddModelDatamodel()
       if (result.code === 200) {
-        this.$message.success('获取数据成功')
         this.detailInfo = result.data
-        this.handleDimensions()
-        this.handleMeasures()
+        this.$store.dispatch('dataModel/setModelId', result.data.id)
       } else {
         this.$message.error(result.msg)
       }
     },
     /**
-     * 获取数据
-    */
-    async handleGetData(id) {
-      this.spinning = true
-      const result = await this.$server.common.getDetailByMenuId(`/datamodel/datamodelInfo/getDataModelInfo/${id}`)
-        .finally(() => {
-          this.spinning = false
-        })
+     * 根据数据源获取数据库(暂时只支持显示第一个库)
+     */
+    async handleGetDatabase() {
+      console.log('datasourceId', this.$route.query.datasourceId)
+      const result = await this.$server.dataModel.getDataBaseDataInfoList(this.$route.query.datasourceId)
 
       if (result.code === 200) {
-        this.$message.success('获取数据成功')
-        this.detailInfo = result.data
-        this.$refs.editLeftRef.handleGetMenuList(this.detailInfo)
-        this.handleDimensions()
-        this.handleMeasures()
+        this.databaseList = result.data
+        this.$refs.editLeftRef.handleGetMenuList(result.data[0].id)
+        this.$store.dispatch('dataModel/setDatabaseId', result.data[0].id)
+        // this.handleDimensions()
+        // this.handleMeasures()
       } else {
         this.$message.error(result.msg)
       }
     },
+
     /**
      * 维度数据处理
     */
@@ -824,6 +849,25 @@ export default {
     handleMeasures() {
       console.log(groupBy(this.detailInfo.pivotSchema.measures, 'tableNo'))
       this.measures = groupBy(this.detailInfo.pivotSchema.measures, 'tableNo')
+    },
+    /**
+     * 编辑时获取模型数据
+    */
+    async handleGetData(id) {
+      this.spinning = true
+      const result = await this.$server.dataModel.getDataModelDetailInfo(id)
+        .finally(() => {
+          this.spinning = false
+        })
+
+      if (result.code === 200) {
+        this.$message.success('获取数据成功')
+        this.detailInfo = result.data
+        this.handleDimensions()
+        this.handleMeasures()
+      } else {
+        this.$message.error(result.msg)
+      }
     },
     handleLeftDragLeave() {
       this.$refs.rightTopRef.handleMapRemoveClass()
@@ -911,11 +955,19 @@ export default {
         return
       }
 
+      this.detailInfo.config.tables.map(table => {
+        table.alias = table.name
+        table.joinType = 1
+      })
       const result = await this.$server.dataModel.saveModel({
-        ...this.detailInfo
+        ...this.detailInfo,
+        parentId: this.parentId
       })
 
       if (result.code === 200) {
+        if (this.model === 'add') {
+          await this.handleSaveModelSourceId()
+        }
         this.$message.success({
           content: this.model === 'add' ? '保存成功' : '编辑成功',
           duration: 0.5
@@ -926,6 +978,16 @@ export default {
       } else {
         this.$message.error(result.msg)
       }
+      this.$store.dispatch('dataModel/setParentId', '')
+    },
+    /**
+     * 保存模型后再保存关联的数据源信息
+     */
+    async handleSaveModelSourceId() {
+      this.$server.dataModel.saveDatasource({
+        sourceDatasourceList: new Array(this.datasource),
+        dataModelId: this.modelId
+      })
     }
   }
 }

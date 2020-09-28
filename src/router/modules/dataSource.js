@@ -29,8 +29,8 @@ export default {
       }
     },
     {
-      path: 'dataModelEdit',
-      name: 'dataModelEdit',
+      path: 'modelEdit',
+      name: 'modelEdit',
       component: dataModelEditView
     }
   ]

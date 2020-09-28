@@ -25,8 +25,8 @@ export default {
     }
   },
   methods: {
-    handleEmitMainGetData() {
-      this.$refs.modelMainRef.handleGetData()
+    handleEmitMainGetData(id) {
+      this.$refs.modelMainRef.handleGetData(id)
     }
   }
 }

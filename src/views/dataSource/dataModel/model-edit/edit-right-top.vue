@@ -22,6 +22,7 @@
 </template>
 <script>
 import { Utils, Node, conversionTree } from '../util'
+import { mapState } from 'vuex'
 import TreeNode from './tree-node'
 import groupBy from 'lodash/groupBy'
 export default {
@@ -69,10 +70,17 @@ export default {
     }
   },
   created() {
-    console.log('cret', this.detailInfo)
+    // console.log('cret', this.detailInfo)
+    // this.modelId = this.$route.query.modelId || this.$store.state.dataModel.modelId
   },
   mounted() {
-    console.log('mo', this.detailInfo)
+    // console.log('mo', this.detailInfo)
+  },
+  computed: {
+    ...mapState({
+      modelId: state => state.dataModel.modelId,
+      databaseId: state => state.dataModel.databaseId
+    })
   },
   watch: {
     detailInfo: {
@@ -128,7 +136,8 @@ export default {
       const tables = this.detailInfo.config.tables
       let len = tables.length
       let node = this.nodeStatus.dragNode
-      node.setTableId(tables.length + 1)
+      node.setTableId()
+      node.setTableNo(tables.length + 1)
       if (len === 0) {
         this.generateRoot(node)
       } else {
@@ -136,8 +145,14 @@ export default {
       }
     },
     async generateRoot(node) {
+      console.log(node, node.getProps())
       this.detailInfo.config.tables.push(node.getProps())
-      await this.handleUpdate()
+      await this.handleUpdate({
+        tables: new Array(Object.assign(node.getProps(), {
+          leftTableId: 0,
+          datamodelId: this.modelId
+        }))
+      })
       this.renderTables.push(node)
     },
     async loopCurrentAddNode(arry, node, key) {
@@ -148,10 +163,21 @@ export default {
 
       if (current.hasOwnProperty(key)) {
         if (current[key].length === 0) {
+          console.log('获取节点', current, node)
           await this.getJoin(current, node)
           current.add(node)
           this.detailInfo.config.tables.push(node.getProps())
-          await this.handleUpdate()
+          await this.handleUpdate({
+            tables: this.detailInfo.config.tables.map(item => {
+              item.datamodelId = this.modelId
+              return item
+            })
+          })
+          // new Array(Object.assign(node.getProps(), {
+          //     leftTableId: node.getProps().tableNo,
+          //     tableId: current.getProps().id,
+          //     datamodelId: this.modelId
+          //   }))
           console.log(this.detailInfo.config.tables)
         } else {
           this.loopCurrentAddNode(current[key], node, key)
@@ -160,26 +186,31 @@ export default {
     },
     async getJoin(left, right) {
       const result = await this.$server.dataModel.getBetweenJoin({
-        dataConnectionId: this.detailInfo.dataConnectionId,
-        dataModelId: this.detailInfo.datamodelId,
+        databaseId: this.databaseId,
+        datamodelId: this.detailInfo.id,
         left: left.getProps(),
         right: Object.assign(right.getProps(), {
-          leftTableId: left.getProps().tableNo
+          leftTableId: left.getProps().tableNo,
+          datamodelId: this.detailInfo.id
         })
       })
       if (result.code === 200) {
         right.setJoin(result.data)
-        right.setDataModelId(this.detailInfo.datamodelId)
+        right.setDataModelId(this.detailInfo.id)
       } else {
         this.$message.error(result.msg)
       }
     },
-    async handleUpdate() {
-      const result = await this.$server.dataModel.putModelDetail({
-        dataConnectionId: this.detailInfo.dataConnectionId,
-        dataModelId: this.detailInfo.dataConnectionId,
-        config: this.detailInfo.config
-      })
+    async handleUpdate(params) {
+      if (params.tables.length < 1) {
+        return this.handleClearRenderTables()
+      }
+      const result = await this.$server.dataModel.getPivotschemaByTables(params)
+      // const result = await this.$server.dataModel.putModelDetail({
+      //   dataConnectionId: this.$route.query.datasourceId,
+      //   dataModelId: this.modelId,
+      //   config: this.detailInfo.config
+      // })
 
       if (result.code === 200) {
         this.detailInfo.config = result.data.config

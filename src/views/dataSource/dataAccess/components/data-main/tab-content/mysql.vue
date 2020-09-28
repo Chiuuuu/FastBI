@@ -21,8 +21,8 @@
     <a-form-model-item label="端口" prop="port">
       <a-input style="width:528px;" v-model.number="form.port" />
     </a-form-model-item>
-    <a-form-model-item label="用户名" prop="username">
-      <a-input style="width:528px;" v-model="form.username" />
+    <a-form-model-item label="用户名" prop="user">
+      <a-input style="width:528px;" v-model="form.user" />
     </a-form-model-item>
     <a-form-model-item label="密码" prop="password">
       <a-input-password style="width:528px;" v-model="form.password" autocomplete />
@@ -48,7 +48,7 @@
           :value="item.id"
           :key="item.id"
         >
-          {{ item.databaseName }}
+          {{ item.name }}
         </a-select-option>
       </a-select>
     </a-form-model-item>
@@ -78,7 +78,7 @@ export default {
         name: '', // 数据库名
         ip: '', // 服务器ip
         port: '', // 端口号
-        username: '', // 用户名
+        user: '', // 用户名
         password: '', // 密码
         dbid: '', // 默认数据库id
         databaseName: '' // 默认数据库名称
@@ -110,7 +110,7 @@ export default {
           { required: true, message: '请输入端口号' },
           { type: 'integer', message: '请输入数字', min: 0 }
         ],
-        username: [
+        user: [
           {
             required: true,
             message: '请输入用户名'
@@ -184,6 +184,7 @@ export default {
         return item.id === value && item
       })
       const obj = item.pop()
+      // this.form.id = 
       this.form.dbid = obj.id
       this.form.databaseName = obj.databaseName
       this.$store.dispatch('dataAccess/setModelInfo', this.form)
@@ -202,12 +203,16 @@ export default {
       this.$refs.dbForm.validate(async valid => {
         if (valid) {
           this.connectBtn = true
-          const result = await this.$server.dataAccess.actionConnect('mysql', {
-            ip: this.form.ip,
+          const result = await this.$server.dataAccess.actionConnect({
             name: this.form.name,
-            password: this.form.password,
-            port: this.form.port,
-            username: this.form.username
+            type: 1,
+            property: {
+              ip: this.form.ip,
+              port: this.form.port,
+              password: this.form.password,
+              user: this.form.user,
+              databaseName: this.$store.state.dataAccess.modelInfo.databaseName || 'null'
+            }
           }).finally(() => {
             this.connectBtn = false
           })
@@ -238,27 +243,34 @@ export default {
             .filter(item => item.id === this.form.dbid)
             .pop()
           this.form = Object.assign(this.form, {
-            databaseName: datadbitem.databaseName
+            databaseName: datadbitem.name
           })
 
           this.saveBtn = true
-          const result = await this.$server.dataAccess.saveTableInfo('system/mysql/save',
-            this.modelSelectType === 'new'
-              ? Object.assign(this.form, {
-                parentId: -1,
-                id: this.$store.state.dataAccess.modelId
-              })
-              : Object.assign(this.form, {
-                id: this.$store.state.dataAccess.modelId
-              })).finally(() => {
-                this.saveBtn = false
-              })
+          const params = {
+            id: this.$store.state.dataAccess.modelId,
+            name: this.$store.state.dataAccess.modelInfo.name,
+            parentId: this.$store.state.dataAccess.parentId,
+            property: {
+              user: this.form.user,
+              ip: this.form.ip,
+              port: this.form.port,
+              password: this.form.password,
+              databaseName: this.form.databaseName
+            },
+            type: 1
+          }
+          const result = await this.$server.dataAccess.saveTableInfo('datasource/save', params)
+            .finally(() => {
+              this.saveBtn = false
+            })
 
           if (result.code === 200) {
             this.$store.dispatch('dataAccess/getMenuList')
             this.$store.dispatch('dataAccess/setFirstFinished', true)
             this.$store.dispatch('dataAccess/setModelInfo', this.form)
             this.$store.dispatch('dataAccess/setModelId', result.data)
+            this.$store.dispatch('dataAccess/setParentId', 0)
           } else {
             this.$message.error(result.msg)
           }

@@ -10,3 +10,9 @@ export let validateIP = (rule, value, callback) => {
         callback()
     }
 }
+
+// export let findParentId = (menuid, menuList) => {
+//     menuList.find(item => {
+//         item.
+//     })
+// }

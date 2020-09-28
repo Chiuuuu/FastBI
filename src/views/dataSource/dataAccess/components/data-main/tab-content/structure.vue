@@ -22,14 +22,14 @@
     </div>
     <div class="table">
       <a-table :row-selection="rowSelection" :columns="columns" :data-source="data"  rowKey='id' :loading='spinning' :pagination='false'>
-        <span slot="setBy" slot-scope="setBy">
-          {{ setBy ? '是' : '否' }}
+        <span slot="set" slot-scope="set">
+          {{ set ? '是' : '否' }}
         </span>
-        <span slot="extactBy" slot-scope="extactBy">
-          {{ extactBy ? '是' : '否' }}
+        <span slot="extracted" slot-scope="extracted">
+          {{ extracted ? '是' : '否' }}
         </span>
         <span slot="config" slot-scope="row">
-          <a v-on:click="setting(row)">{{row.setBy ? '编辑' : '设置' }}</a>
+          <a v-on:click="setting(row)">{{row.set ? '编辑' : '设置' }}</a>
         </span>
       </a-table>
     </div>
@@ -45,22 +45,22 @@ const columns = [
   },
   {
     title: '是否设置过字段',
-    dataIndex: 'setBy',
-    key: 'setBy',
-    slots: { title: 'setBy' },
-    scopedSlots: { customRender: 'setBy' }
+    dataIndex: 'set',
+    key: 'set',
+    slots: { title: 'set' },
+    scopedSlots: { customRender: 'set' }
   },
   {
     title: '是否抽取过',
-    dataIndex: 'extactBy',
-    key: 'extactBy',
-    slots: { title: 'extactBy' },
-    scopedSlots: { customRender: 'extactBy' }
+    dataIndex: 'extracted',
+    key: 'extracted',
+    slots: { title: 'extracted' },
+    scopedSlots: { customRender: 'extracted' }
   },
   {
     title: '修改时间',
-    key: 'modifiedTime',
-    dataIndex: 'modifiedTime'
+    key: 'gmtModified',
+    dataIndex: 'gmtModified'
   },
   {
     title: '字段配置',
@@ -106,13 +106,12 @@ export default {
       if (!this.modelType) return
       this.spinning = true
       const modelKey = this.modelType === 'oracle' ? 'sourceOracleName' : 'sourceMysqName'
-      const dabaseInfoResult = await this.$server.dataAccess.getTableList(this.modelType, {
+      const dabaseInfoResult = await this.$server.dataAccess.getTableList({
         databaseName: this.formInfo.databaseName,
-        [modelKey]: this.formInfo.name
+        sourceId: this.formInfo.id
       }).finally(() => {
         this.spinning = false
       })
-
       if (dabaseInfoResult.code === 200) {
         this.data = [].concat(dabaseInfoResult.rows)
         this.$store.dispatch('dataAccess/setReadRows', this.data)
@@ -128,31 +127,36 @@ export default {
       }
       const rows = this.selectedRows.map(item => {
         const _item = {
-          databasesName: this.modelInfo.databaseName,
-          sourceMysqName: this.formInfo.name,
+          databaseName: this.modelInfo.databaseName,
+          sourceId: this.formInfo.id,
+          sourceName: this.formInfo.name,
           tableId: item.id,
-          tableName: item.name,
-          sourceMysqlId: this.formInfo.id
+          tableName: item.name
         }
         return _item
       })
       this.extractSping = true
 
-      let result
-      if (this.modelType === 'mysql') {
-        result = await this.$server.dataAccess.actionExtract('/system/mysql/datax/extract', {
-          rows: rows,
-          tableList: this.data
-        }).finally(() => {
-          this.extractSping = false
-        })
-      } else if (this.modelType === 'oracle') {
-        result = await this.$server.dataAccess.actionExtract('/system/oracle/datax', {
-          rows: rows
-        }).finally(() => {
-          this.extractSping = false
-        })
-      }
+      const result = await this.$server.dataAccess.actionExtract('/datasource/extract', {
+        rows: rows,
+        tableList: this.data
+      }).finally(() => {
+        this.extractSping = false
+      })
+      // if (this.modelType === 'mysql') {
+      //   result = await this.$server.dataAccess.actionExtract('/datasource/mysql/datax/extract', {
+      //     rows: rows,
+      //     tableList: this.data
+      //   }).finally(() => {
+      //     this.extractSping = false
+      //   })
+      // } else if (this.modelType === 'oracle') {
+      //   result = await this.$server.dataAccess.actionExtract('/datasource/oracle/datax', {
+      //     rows: rows
+      //   }).finally(() => {
+      //     this.extractSping = false
+      //   })
+      // }
 
       if (result.code === 200) {
         this.$message.success('请刷新数据查看状态')

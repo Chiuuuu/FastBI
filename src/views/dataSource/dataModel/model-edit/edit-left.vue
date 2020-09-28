@@ -10,7 +10,7 @@
       @dragstart.stop="handleLeftDragStart($event, item)"
       @dragend.stop="handleLeftDragEnd"
     >
-      <span>{{ item.tableName }}</span>
+      <span>{{ item.name }}</span>
     </div>
   </div>
 </template>
@@ -56,8 +56,8 @@ export default {
     })
   },
   methods: {
-    async handleGetMenuList(detailInfo) {
-      const result = await this.$server.dataModel.getTableListById(detailInfo.dataConnectionId)
+    async handleGetMenuList(id) {
+      const result = await this.$server.dataModel.getTableListById(id)
 
       if (result.code === 200) {
         this.list = result.data

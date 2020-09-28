@@ -17,11 +17,13 @@ export class Node {
   setChildren(item) {
     this.children = item
   }
-  setTableId(id) {
-    // this.props['tableId'] = `${id}`
-    this.props['tableNo'] = id
+  setTableId() {
+    this.props['tableId'] = this.props['id']
   }
-  setDataModelId(id, key = 'dataModelId') {
+  setTableNo(no) {
+    this.props['tableNo'] = no
+  }
+  setDataModelId(id, key = 'datamodelId') {
     this.props[key] = id
   }
   setJoin(data, key = 'join') {
@@ -33,15 +35,15 @@ export class Node {
 }
 
 export function conversionTree(node, list, key, lineKey = 'leftTableId') {
-    let tableId = node.props[key]
-    list.forEach(function(item) {
-      let leftTableId = get(item, lineKey)
-      if (parseInt(leftTableId) === tableId) {
-        let _node = new Node(item)
-        node.add(_node)
-        conversionTree(_node, list, key, lineKey)
-      }
-    })
+  let tableId = node.props[key] * 1
+  list.forEach(function(item) {
+    let leftTableId = get(item, lineKey)
+    if (parseInt(leftTableId) === tableId) {
+      let _node = new Node(item)
+      node.add(_node)
+      conversionTree(_node, list, key, lineKey)
+    }
+  })
 }
 
 export const Utils = {

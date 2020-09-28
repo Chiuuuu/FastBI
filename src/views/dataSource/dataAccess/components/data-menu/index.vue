@@ -10,38 +10,38 @@
           <a-menu-item v-on:click="showModal">
             添加连接
           </a-menu-item>
-          <a-modal
-            v-model="visible"
-            title="添加连接"
-            :footer="null"
-            :bodyStyle="{
-              maxHeight: `calc( 100vh - 160px )`,
-              overflowY: 'auto'
-            }"
-          >
-            <a-row :gutter="[8, 8]">
-              <a-col v-for="item in modelList" :key="item.id" :span="24 / 3">
-                <a-card
-                  hoverable
-                  :bodyStyle="{ padding: '10px 0', fontSize: '12px' }"
-                  @click="handleSelectModelType($event, item)"
-                >
-                  <img
-                    slot="cover"
-                    :alt="item.name"
-                    class="card-img"
-                    :src="item.imgurl"
-                  />
-                  <div class="card-title">{{ item.name }}</div>
-                </a-card>
-              </a-col>
-            </a-row>
-          </a-modal>
-          <!-- <a-menu-item key="1" @click="handleAddNewFolder">
+          <a-menu-item key="1" @click="handleAddNewFolder">
             新建文件夹
-          </a-menu-item> -->
+          </a-menu-item>
         </a-menu>
       </a-dropdown>
+      <a-modal
+        v-model="visible"
+        title="添加连接"
+        :footer="null"
+        :bodyStyle="{
+          maxHeight: `calc( 100vh - 160px )`,
+          overflowY: 'auto'
+        }"
+      >
+        <a-row :gutter="[8, 8]">
+          <a-col v-for="item in modelList" :key="item.id" :span="24 / 3">
+            <a-card
+              hoverable
+              :bodyStyle="{ padding: '10px 0', fontSize: '12px' }"
+              @click="handleSelectModelType($event, item)"
+            >
+              <img
+                slot="cover"
+                :alt="item.name"
+                class="card-img"
+                :src="item.imgurl"
+              />
+              <div class="card-title">{{ item.name }}</div>
+            </a-card>
+          </a-col>
+        </a-row>
+      </a-modal>
     </div>
     <a-empty v-if="tableList.length === 0" class="table_list-_empty">
       <span slot="description">暂无数据库连接</span>
@@ -98,11 +98,19 @@
       @cancel="handleResetNameCancel"
       @create="handleResetNameCreate"
     ></reset-name-modal>
+    <move-file-modal
+      :visible="moveFileVisible"
+      :selected="selectFile"
+      :menuList="tableList"
+      @cancel="moveFileVisible = false"
+      @create="handleFileMoveCreate"
+    ></move-file-modal>
   </div>
 </template>
 
 <script>
 import ResetNameModal from '../data-main/data-menu/resetName'
+import MoveFileModal from '../data-main/data-menu/moveFile'
 import { mapState } from 'vuex'
 import { fetchTableInfo, fetchDeleteMenuById } from '../../../../../api/dataAccess/api'
 import MenuFile from '@/components/dataSource/menu-group/file'
@@ -117,6 +125,7 @@ export default {
   },
   components: {
     ResetNameModal,
+    MoveFileModal,
     MenuFile,
     MenuFolder
   },
@@ -133,6 +142,9 @@ export default {
       // fileSelectId: '', // 选中左侧菜单
       resetNameVisible: false, // 重命名弹窗显示
       resetNameType: '', // 重命名类型
+      selectFolder: null, // 选中文件夹
+      selectFile: null, // 选中文件
+      moveFileVisible: false, // 移动文件夹弹窗
       menuNode: {
         // 存储节点
         targetNode: {}, // 目标节点
@@ -153,10 +165,10 @@ export default {
         }
       ],
       fileContenxtMenu: [
-        // {
-        //   name: '移动到',
-        //   onClick: this.handleFileMoveFolder
-        // },
+        {
+          name: '移动到',
+          onClick: this.handleFilemoveFile
+        },
         {
           name: '删除',
           onClick: this.handleFileDelete
@@ -190,7 +202,7 @@ export default {
     * 获取左侧菜单数据
     */
     handleGetMenuList() {
-     this.$store.dispatch('dataAccess/getMenuList', this)
+      this.$store.dispatch('dataAccess/getMenuList', this)
     },
     /**
      * @description 获取表详情信息
@@ -212,20 +224,24 @@ export default {
     handleFileSelect(file) {
       if (this.fileSelectId === file.id) return
       this.fileSelectId = file.id
-      if (file.typeCore === 1) {
+      if (file.fileType === 1) {
         this.$store.dispatch('dataAccess/setModelType', 'mysql')
-        this.getTableInfo(`/system/mysql/${file.id}`, result => {
+        this.getTableInfo(`/datasource/${file.id}`, result => {
           this.$store.dispatch('dataAccess/setModelInfo', {
-            ...result.data,
-            port: Number(result.data.port)
+            ...result.data.properties,
+            id: this.fileSelectId,
+            name: result.data.name,
+            port: Number(result.data.properties.port)
           })
         })
-      } else if (file.typeCore === 2) {
+      } else if (file.fileType === 2) {
         this.$store.dispatch('dataAccess/setModelType', 'oracle')
-        this.getTableInfo(`/system/oracle/${file.id}`, result => {
+        this.getTableInfo(`/datasource/${file.id}`, result => {
           this.$store.dispatch('dataAccess/setModelInfo', {
-            ...result.data,
-            port: Number(result.data.port)
+            ...result.data.properties,
+            id: this.fileSelectId,
+            name: result.data.name,
+            port: Number(result.data.properties.port)
           })
         })
       }
@@ -238,15 +254,25 @@ export default {
     /**
     * 删除菜单
     */
-    async handleFileDelete(event, item, { parent, file, index }) {
-      const result = await this.$server.common.deleMenuById(`/system/catalog/delete/${file.id}`)
+    async handleFileDelete(event, item, { file }) {
+      const result = await this.$server.common.deleMenuById(`/datasource/catalog/${file.id}`)
       if (result.code === 200) {
-        if (parent) {
-          parent.splice(index, 1)
-        } else {
-          this.tableList.splice(index, 1)
-        }
+        this.handleGetMenuList()
         const isSame = file.id === this.fileSelectId
+        if (isSame) this.$store.dispatch('dataAccess/setModelType', '')
+      } else {
+        this.$message.error(result.msg)
+      }
+    },
+    /**
+     * 文件夹删除
+     */
+    async handleFolderDelete(event, index, { folder }) {
+      const result = await this.$server.common.deleMenuById(`/datasource/catalog/${folder.id}`)
+      if (result.code === 200) {
+        this.handleGetMenuList()
+        this.$message.success('删除成功')
+        const isSame = folder.id === this.fileSelectId
         if (isSame) this.$store.dispatch('dataAccess/setModelType', '')
       } else {
         this.$message.error(result.msg)
@@ -255,23 +281,19 @@ export default {
     /**
      * 打开数据类型弹窗
      */
-    showModal() {
+    showModal(e, calle, vm) {
       this.visible = true
       this.$store.dispatch('dataAccess/setModelSelectType', 'new')
-    },
-    /**
-     * 打开数据类型弹窗
-     */
-    showResetNameModal() {
-      this.resetNameVisible = true
+      this.$store.dispatch('dataAccess/setParentId', vm ? vm.folder.id : 0)
     },
     /**
     * 修改文件夹名称
     */
     handleFolderResetName(event, item, { folder }) {
       this.resetNameVisible = true
-      // this.resetNameType = 'new'
-      folder.name = 'new'
+      this.resetNameType = 'folder'
+      // folder.name = 'new'
+      this.selectFolder = folder
     },
     /**
      * 添加新文件夹
@@ -284,7 +306,8 @@ export default {
      * 是否为文件夹
      */
     handleIsFolder(item) {
-      return item.hasOwnProperty('items')
+      // return item.hasOwnProperty('items')
+      return item.fileType === 0
     },
     /**
      * 文件夹重命名
@@ -298,10 +321,31 @@ export default {
       this.handleResetNameModalShow()
     },
     /**
-     * 文件夹删除
+     * 移动文件夹
      */
-    handleResetFolderDelete(event, index) {
-      this.tableList.splice(index, 1)
+    handleFilemoveFile(event, index, { parent, file }) {
+      this.selectFile = file
+      this.moveFileVisible = true
+    },
+    /**
+     * 选择移动文件夹弹窗确认
+     */
+    async handleFileMoveCreate(parentId) {
+      const result = await this.$server.common.putMenuFolderName('/datasource/catalog/updata', {
+        fileType: this.selectFile.fileType,
+        id: this.selectFile.id,
+        name: this.selectFile.name,
+        parentId: parentId,
+        type: 1
+      })
+      if (result.code === 200) {
+        this.handleGetMenuList()
+        this.$message.success('移动成功')
+      } else {
+        this.$message.error(result.msg)
+      }
+
+      this.resetNameVisible = false
     },
     /**
      * 选择哪个类型的数据连接
@@ -312,7 +356,7 @@ export default {
       this.visible = false
       this.$store.dispatch('dataAccess/setModelType', item.type)
       this.$store.dispatch('dataAccess/setFirstFinished', false)
-      this.$store.dispatch('dataAccess/setModelId', -1)
+      this.$store.dispatch('dataAccess/setModelId', 0)
       this.$store.dispatch('dataAccess/setModelInfo', {})
       this.$EventBus.$emit('resetForm')
       this.$EventBus.$emit('set-tab-index', '1')
@@ -345,8 +389,8 @@ export default {
         } else if (this.resetNameType === 'folder') {
           this.handleResetFolderName(values)
         }
+
         form.resetFields()
-        this.resetNameVisible = false
       })
     },
     /**
@@ -361,11 +405,19 @@ export default {
         items: []
       }
       this.tableList.push(item)
+      this.$server.common.addMenuFolder('/datasource/catalog', {
+        fileType: 0,
+        name: values.name,
+        parentId: 0,
+        type: 1
+      })
+
+      this.resetNameVisible = false
     },
     /**
      * 修改文件夹名称
      */
-    handleResetFolderName(values) {
+    async handleResetFolderName(values) {
       const target = this.menuNode.targetNode
       if (values.name === target.name) {
         return this.$message.warning('名称重复')
@@ -374,9 +426,24 @@ export default {
       const isHas = this.handleHasName(this.tableList, values)
       if (isHas) return this.$message.warning('已存在')
 
-      this.menuNode.targetNode = Object.assign(target, {
-        name: values.name
+      // this.menuNode.targetNode = Object.assign(target, {
+      //   name: values.name
+      // })
+      const result = await this.$server.common.putMenuFolderName('/datasource/catalog/updata', {
+        fileType: 0,
+        id: this.selectFolder.id,
+        name: this.selectFolder.name,
+        parentId: 0,
+        type: 1
       })
+      if (result.code === 200) {
+        this.handleGetMenuList()
+        this.$message.success('修改成功')
+      } else {
+        this.$message.error(result.msg)
+      }
+
+      this.resetNameVisible = false
     },
     /**
      * 判断是否有相同名称
