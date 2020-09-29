@@ -184,7 +184,6 @@ export default {
         return item.id === value && item
       })
       const obj = item.pop()
-      // this.form.id = 
       this.form.dbid = obj.id
       this.form.databaseName = obj.databaseName
       this.$store.dispatch('dataAccess/setModelInfo', this.form)
