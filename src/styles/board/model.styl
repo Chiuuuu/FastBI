@@ -67,7 +67,7 @@
       overflow-y: scroll;
       height:730px;
       .operation {
-        height:232px;
+        height:40%;
         border-bottom: 1px solid #EFEFEF;
         .header {
           display flex;
@@ -94,8 +94,10 @@
             line-height: 25px;
             color: #01040F;
             font-size: 14px;
-            word-break: break-all;
             cursor: pointer;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
             img{
               margin-right: 10px;
             }

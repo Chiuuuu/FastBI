@@ -4,7 +4,7 @@ import { message } from 'ant-design-vue'
 
 const app = {
     state: {
-        pageSettings: { width: 1920, height: 1080, backgroundColor: '#0d2a42', gridStep: 1, backgroundSrc: '', backgroundType: 1, opacity: 1 },
+        pageSettings: { width: 1920, height: 1080, backgroundColor: '#0d2a42', gridStep: 1, backgroundSrc: '', backgroundType: '1', opacity: 1 },
         // 状态数据
         canvasRange: 0, // 画布缩放
         optionsExpand: true, // 参数面板打开关闭
@@ -12,7 +12,8 @@ const app = {
         coverageExpand: false, // 图层面板打开关闭
         isScreen: false, // 是否全屏
         screenId: '', // 大屏id
-        fileName: ''
+        fileName: '',
+        screenDataModels: []
     },
     mutations: {
         SET_CANVAS_RANGE: (state, val) => {
@@ -70,7 +71,8 @@ const app = {
           // const { commit, state, rootGetters } = store
           const setting = {
             setting: state.pageSettings,
-            components: rootGetters.canvasMap
+            components: rootGetters.canvasMap,
+            screenDataModels: state.screenDataModels.push(rootGetters.dataModel)
           }
           let params = {
             setting

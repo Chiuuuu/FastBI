@@ -382,6 +382,10 @@
                       </a-radio-button>
                     </a-radio-group>
                   </gui-field>
+                  <gui-field label="区域透明度">
+                    <a-input-number v-model="selfConfig.series.areaStyle.opacity" size="small"
+                                      :min="0" :max="1" @change="setSelfProperty"></a-input-number>
+                  </gui-field>
                 </a-collapse-panel>
               </template>
               <!--仪表盘独有-->

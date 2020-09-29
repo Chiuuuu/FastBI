@@ -19,7 +19,7 @@
               </a-menu-item>
             </a-menu>
           </a-dropdown>
-          {{item.field}}
+          {{item.name}}
       </div>
     </div>
     <div class="empty"
@@ -93,7 +93,7 @@ export default {
       if (this.type === 'table') {
         this.fileList.push(dataFile)
       }
-      this.fileList = this.uniqueFun(this.fileList, 'field')
+      this.fileList = this.uniqueFun(this.fileList, 'name')
       this.getData()
       this.isdrag = false
     },
@@ -158,9 +158,9 @@ export default {
             // let apiData = this.currentSelected.packageJson.api_data
             for (let item of this.fileList) {
               columns.push({
-                title: item.field,
-                dataIndex: item.field,
-                key: item.field
+                title: item.name,
+                dataIndex: item.name,
+                key: item.name
               })
             }
             let rows = res.rows
@@ -174,12 +174,12 @@ export default {
           } else {
             let columns = []
             let apiData = this.currentSelected.packageJson.api_data
-            let dimensionKeys = apiData.dimensions[0].field // 维度key
+            let dimensionKeys = apiData.dimensions[0].name // 维度key
             columns[0] = dimensionKeys // 默认columns第一项为维度
             let measureKeys = [] // 度量key
             for (let m of apiData.measures) {
-              measureKeys.push(m.field)
-              columns.push(m.field) // 默认columns第二项起为指标
+              measureKeys.push(m.name)
+              columns.push(m.name) // 默认columns第二项起为指标
             }
             let rows = []
             res.rows.map((item, index) => {
