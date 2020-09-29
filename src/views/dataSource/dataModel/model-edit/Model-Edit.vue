@@ -805,6 +805,9 @@ export default {
       this.handleGetDatabase()
     }
   },
+  beforeDestroy() {
+    this.$store.dispatch('dataModel/setModelId', -1)
+  },
   methods: {
     /**
      * 新增时获取空模型
