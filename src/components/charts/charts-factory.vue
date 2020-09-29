@@ -94,13 +94,15 @@
               this.chartData.rows = val.source.rows
               return
             }
-            if (val.source) {
-              let data = formatData(val.source)
-              this.chartData.columns = [...data.columns]
-              this.chartData.rows = [...data.rows]
-              this.$log.primary('========>chartData')
-              this.$print(this.chartData)
-            }
+            this.chartData.columns = val.columns
+            this.chartData.rows = val.rows
+            // if (val.source) {
+            //   let data = formatData(val.source)
+            //   this.chartData.columns = [...data.columns]
+            //   this.chartData.rows = [...data.rows]
+            //   this.$log.primary('========>chartData')
+            //   this.$print(this.chartData)
+            // }
           }
         },
         deep: true,
