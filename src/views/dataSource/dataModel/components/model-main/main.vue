@@ -42,7 +42,7 @@
                 <div class="dim_menu">
                   <a-menu mode="inline" v-for="(value, name) in dimensions" :key="name" :default-open-keys="[name]" :inline-collapsed="false">
                     <a-sub-menu :key="name">
-                      <span slot="title"><span>{{value[0].name}}</span></span>
+                      <span slot="title"><span>{{value[0].tableName}}</span></span>
                       <a-menu-item v-for="item in value" :key="item.id">
                         <img
                           src="@/assets/images/icon_dimension.png"
@@ -59,7 +59,7 @@
                 <div class="mea_menu">
                   <a-menu mode="inline" v-for="(value, name) in measures" :key="name" :default-open-keys="[name]" :inline-collapsed="false">
                     <a-sub-menu :key="name">
-                      <span slot="title"><span>{{value[0].name}}</span></span>
+                      <span slot="title"><span>{{value[0].tableName}}</span></span>
                       <a-menu-item v-for="item in value" :key="item.id">
                         <img
                           src="@/assets/images/icon_measure.png"
