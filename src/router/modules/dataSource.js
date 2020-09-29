@@ -1,4 +1,5 @@
 const RouteView = () => import('@/layout/routeView')
+const PageView = () => import('@/layout/pageView')
 const dataAccessView = () => import('@/views/dataSource/dataAccess/dataAccess')
 const dataModelView = () => import('@/views/dataSource/dataModel/dataModel')
 const dataModelEditView = () => import('@/views/dataSource/dataModel/model-edit/Model-Edit')
@@ -23,15 +24,29 @@ export default {
     {
       path: 'dataModel',
       name: 'dataModel',
-      component: dataModelView,
+      redirect: '/dataSource/dataModel/modelShow',
+      component: PageView,
       meta: {
         title: '数据模型'
-      }
-    },
-    {
-      path: 'modelEdit',
-      name: 'modelEdit',
-      component: dataModelEditView
+      },
+      children: [
+        {
+          path: 'modelShow',
+          name: 'modelShow',
+          component: dataModelView,
+          meta: {
+            sideBar: 'dataModel'
+          }
+        },
+        {
+          path: 'modelEdit',
+          name: 'modelEdit',
+          component: dataModelEditView,
+          meta: {
+            sideBar: 'dataModel'
+          }
+        }
+      ]
     }
   ]
 }

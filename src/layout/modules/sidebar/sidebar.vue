@@ -37,7 +37,7 @@ export default {
     const menuData = this.getMenuData(ManageRoutes.children)
     const path = this.$route.path
     const defaultOpenKeys = ['/' + path.split('/').splice(1).shift()]
-    const defaultSelectedKeys = [this.$router.currentRoute.name]
+    const defaultSelectedKeys = [this.$router.currentRoute.meta.sideBar || this.$router.currentRoute.name]
     return {
       menuData: menuData,
       openKeys: defaultOpenKeys,
@@ -46,7 +46,7 @@ export default {
   },
   watch: {
     '$route.path': function(value) {
-      this.selectedKeys = [value.split('/').pop()]
+      this.selectedKeys = [this.$router.currentRoute.meta.sideBar || this.$router.currentRoute.name] // [value.split('/').pop()]
     }
   },
   methods: {
