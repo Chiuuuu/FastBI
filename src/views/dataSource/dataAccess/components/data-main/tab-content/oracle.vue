@@ -194,7 +194,7 @@ export default {
             },
             type: 2
           }
-          const result = await this.$server.dataAccess.saveTableInfo('/datasource/oracle', params)
+          const result = await this.$server.dataAccess.saveTableInfo('/datasource/save', params)
             .finally(() => {
               this.saveBtn = false
             })

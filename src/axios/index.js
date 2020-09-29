@@ -24,14 +24,17 @@ const service = axios.create({
 })
 
 const errorHandle = {
-  401: function(message) {
-    console.log(message || '未登录状态，跳转登录页')
+  401: function(msg) {
+    message.error(msg || '未登录状态，跳转登录页')
   },
-  403: function(message) {
-    console.log(message || '登录过期，请重新登录')
+  403: function(msg) {
+    message.error(msg || '登录过期，请重新登录')
   },
-  404: function(message) {
-    console.log(message || '请求资源不存在')
+  404: function(msg) {
+    message.error(msg || '请求资源不存在')
+  },
+  500: function(msg) {
+    message.error(msg || '请求异常')
   }
 }
 
@@ -62,7 +65,6 @@ service.interceptors.response.use(
       const errorHandleFun = errorHandle[code]
       if (errorHandleFun instanceof Function) {
         errorHandleFun(msg)
-      } else {
         return Promise.reject(msg)
       }
     }
