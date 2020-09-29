@@ -66,7 +66,7 @@ const screenManage = {
    * @returns
    */
   getCatalogList() {
-    return $axios.get(`/datamodel/catalog/list`)
+    return $axios.get(`/model/catalog/list/2`)
   },
   /**
    * @description 数据模型--维度、度量列表
@@ -74,7 +74,7 @@ const screenManage = {
    * @returns
    */
   getPivoSchemaList(id) {
-    return $axios.get(`/datamodel/pivotschema/getPivoSchemaList/${id}`)
+    return $axios.get(`/model/pivotschema/selectModelPivotschemaListByRole/${id}`)
   },
   /**
    * @description 根据维度度量获取数据

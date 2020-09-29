@@ -194,6 +194,15 @@
                     <a-input size="small" @change="setSelfProperty"
                              v-model="selfConfig.series.barWidth" clearable></a-input>
                   </gui-field>
+                  <gui-field label="堆叠柱状图" v-if="isHistogram">
+                    <a-switch v-model="selfConfig.stack" size="small" @change="setHistogram($event, 'stack')"></a-switch>
+                  </gui-field>
+                  <gui-field label="混合状图" v-if="isHistogram">
+                    <a-switch v-model="selfConfig.mixed" size="small" @change="setHistogram($event, 'mixed')"></a-switch>
+                  </gui-field>
+                  <!-- <gui-field label="混合状图" v-if="isHistogram && selfConfig.mixed">
+                    <a-switch v-model="selfConfig.mixed" size="small" @change="setHistogram($event, 'mixed')"></a-switch>
+                  </gui-field> -->
                 </a-collapse-panel>
               </template>
               <!-- 饼图独有 -->
@@ -442,6 +451,9 @@
               <template v-if="showXAxis">
                 <a-collapse-panel key="xAxis" header="x轴">
                   <a-switch slot="extra" v-if="collapseActive.indexOf('xAxis') > -1" v-model="selfConfig.xAxis.show" default-checked @change="switchChange" size="small" />
+                  <gui-field label="标题">
+                    <a-input v-model="selfConfig.xAxis.name" @change="setSelfProperty" style="width:100px;" size="small"></a-input>
+                  </gui-field>
                   <gui-field label="文本">
                     <gui-inline label="字号">
                       <a-input-number v-model="selfConfig.xAxis.axisLabel.fontSize" size="small"
@@ -467,15 +479,18 @@
                     <el-color-picker v-model="selfConfig.xAxis.splitLine.lineStyle.color"
                                       show-alpha @change="setSelfProperty"></el-color-picker>
                   </gui-field>
-                  <gui-field label="标题">
-                    <a-input v-model="selfConfig.xAxis.name" @change="setSelfProperty" style="width:100px;" size="small"></a-input>
-                  </gui-field>
                 </a-collapse-panel>
               </template>
               <!--y轴-->
               <template v-if="showYAxis">
                 <a-collapse-panel key="yAxis" header="y轴">
                   <a-switch slot="extra" v-if="collapseActive.indexOf('yAxis') > -1" v-model="selfConfig.yAxis.axisLine.show" default-checked @change="switchChange" size="small" />
+                  <gui-field label="y1标题" v-if="isHistogram">
+                    <a-input v-model="apis.yAxisName[0]" @change="setApis" style="width:100px;" size="small"></a-input>
+                  </gui-field>
+                  <gui-field label="y2标题" v-if="isHistogram">
+                    <a-input v-model="apis.yAxisName[1]" @change="setApis" style="width:100px;" size="small"></a-input>
+                  </gui-field>
                   <gui-field label="文本">
                     <gui-inline label="字号">
                       <a-input-number v-model="selfConfig.yAxis.axisLabel.fontSize" size="small"
@@ -931,15 +946,13 @@
       },
       // 设置自有属性
       setSelfProperty () {
-        console.log(this.selfConfig)
         this.$store.dispatch('SetSelfProperty', this.selfConfig)
         // 发送请求来保存数据
-        console.log(this.currentSelected)
         setBaseProperty(this.currentSelected)
         this.saveScreenData()
       },
       // 设置数据映射
-      setApiLabelMap () {
+      setApis () {
         this.$store.dispatch('SetApis', this.apis)
         // 发送请求来保存数据
         setBaseProperty(this.currentSelected)
@@ -1059,6 +1072,35 @@
       onRadioChange(e, data, key) {
         this.$set(data, key, e.target.value)
         this.setSelfProperty()
+      },
+
+      // 状图设置
+      setHistogram(val, type) {
+        let apiData = deepClone(this.apiData)
+        let columns = apiData.columns
+        // 堆叠柱状图
+        if (val && type === 'stack') {
+          this.apis.stack = {
+            '用户': []
+          }
+        } else {
+          this.apis.stack = {}
+        }
+        // 混合柱状图
+        if (val && type === 'mixed') {
+          this.apis.showLine = [columns[columns.length - 1]]
+          this.apis.axisSite = { right: [columns[columns.length - 1]] }
+        } else {
+          this.apis.showLine = []
+          this.apis.axisSite = {}
+        }
+        this.$store.dispatch('SetSelfProperty', this.selfConfig)
+        this.setApis()
+      },
+
+      // 混合柱状图
+      setMixed(val) {
+
       }
     },
     watch: {

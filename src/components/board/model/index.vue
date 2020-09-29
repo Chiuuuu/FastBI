@@ -141,7 +141,7 @@ export default {
     ...mapGetters(['modelExpand', 'dataModel'])
   },
   mounted() {
-    // this.getModelList()
+    this.getModelList()
   },
   methods: {
     // 点击展开收起
@@ -174,8 +174,9 @@ export default {
     getModelList() {
       this.$server.screenManage.getCatalogList().then(res => {
         if (res.code === 200) {
-          this.modelList = res.data.folders
-          this.modelList = this.modelList.concat(res.data.items)
+          this.modelList = res.data
+          // this.modelList = res.data.folders
+          // this.modelList = this.modelList.concat(res.data.items)
         }
       })
     },
