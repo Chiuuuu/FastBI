@@ -776,7 +776,8 @@ export default {
   computed: {
     ...mapState({
       modelId: state => state.dataModel.modelId, // 选中的菜单id
-      parentId: state => state.dataModel.parentId, // 选中的菜单id
+      addModelId: state => state.dataModel.addModelId, // 新增的模型id
+      parentId: state => state.dataModel.parentId, // 选中的文件夹id
       datasource: state => state.dataModel.datasource, // 数据源
       datasourceId: state => state.dataModel.datasourceId // 数据源
     }),
@@ -794,7 +795,6 @@ export default {
     // if (this.model === 'edit') {
     //   this.handleGetDatabase()
     // }
-    // this.modelId = this.$route.query.modelId || this.$store.state.dataModel.modelId
   },
   mounted() {
     if (this.model === 'add') {
@@ -806,7 +806,7 @@ export default {
     }
   },
   beforeDestroy() {
-    this.$store.dispatch('dataModel/setModelId', -1)
+    this.$store.dispatch('dataModel/setAddModelId', -1)
   },
   methods: {
     /**
@@ -816,7 +816,8 @@ export default {
       const result = await this.$server.dataModel.getAddModelDatamodel()
       if (result.code === 200) {
         this.detailInfo = result.data
-        this.$store.dispatch('dataModel/setModelId', result.data.id)
+        // this.$store.dispatch('dataModel/setModelId', result.data.id)
+        this.$store.dispatch('dataModel/setAddModelId', result.data.id)
       } else {
         this.$message.error(result.msg)
       }
@@ -989,7 +990,7 @@ export default {
     async handleSaveModelSourceId() {
       this.$server.dataModel.saveDatasource({
         sourceDatasourceList: new Array(this.datasource),
-        dataModelId: this.modelId
+        dataModelId: this.model === 'add' ? this.addModelId : this.modelId
       })
     }
   }

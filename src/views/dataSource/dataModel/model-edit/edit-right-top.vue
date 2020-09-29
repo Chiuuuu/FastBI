@@ -78,9 +78,12 @@ export default {
   },
   computed: {
     ...mapState({
-      modelId: state => state.dataModel.modelId,
+      // modelId: state => state.dataModel.modelId,
       databaseId: state => state.dataModel.databaseId
-    })
+    }),
+    modelId() {
+      return this.$route.query.modelId || this.$store.state.dataModel.addModelId
+    }
   },
   watch: {
     detailInfo: {

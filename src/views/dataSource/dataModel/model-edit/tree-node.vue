@@ -157,6 +157,9 @@ export default {
   computed: {
     joinLength() {
       return this.nodeData.props.join && this.nodeData.props.join.conditions.length
+    },
+    modelId() {
+      return this.$route.query.modelId || this.$store.state.dataModel.addModelId
     }
   },
   created() {
@@ -166,7 +169,6 @@ export default {
     } else {
       this.root = parent.root
     }
-    this.modelId = this.$route.query.modelId || this.$store.state.dataModel.modelId
   },
   methods: {
     async handleBtnDelete(node) {

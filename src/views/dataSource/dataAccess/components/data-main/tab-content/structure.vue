@@ -93,6 +93,7 @@ export default {
   computed: {
     ...mapState({
       formInfo: state => state.dataAccess.modelInfo,
+      modelId: state => state.dataAccess.modelId,
       databaseid: state => state.dataAccess.databaseid,
       modelInfo: state => state.dataAccess.modelInfo,
       modelType: state => state.dataAccess.modelType
@@ -108,7 +109,7 @@ export default {
       const modelKey = this.modelType === 'oracle' ? 'sourceOracleName' : 'sourceMysqName'
       const dabaseInfoResult = await this.$server.dataAccess.getTableList({
         databaseName: this.formInfo.databaseName,
-        sourceId: this.formInfo.id
+        sourceId: this.modelId
       }).finally(() => {
         this.spinning = false
       })
