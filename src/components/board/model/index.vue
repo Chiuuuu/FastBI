@@ -33,7 +33,7 @@
                 <div class="dim_main">
                   <a-collapse v-model="dimensionsKey" :bordered="false">
                     <a-collapse-panel v-for="(item, index) in dimensions" :key="String(index)"
-                      :header="item[0].tableName" :style="customStyle">
+                      :header="item[0] ? item[0].tableName : ''" :style="customStyle">
                       <ul class="filewrap">
                         <li v-for="(item2, index2) in item"
                             class="filelist"
@@ -42,7 +42,7 @@
                             @dragstart="dragstart(item2, 'dimension', $event)"
                             @dragend="dragsend(item2, $event)">
                           <img src="@/assets/images/icon_dimension.png" />
-                          {{ item2.field }}
+                          {{ item2.name }}
                         </li>
                       </ul>
                     </a-collapse-panel>
@@ -67,7 +67,7 @@
                               @dragstart="dragstart(item2, 'measure', $event)"
                               @dragend="dragsend(item2, $event)">
                             <img src="@/assets/images/icon_measure.png" />
-                            {{ item2.field }}
+                            {{ item2.name }}
                           </li>
                         </ul>
                     </a-collapse-panel>
@@ -127,7 +127,7 @@ export default {
   data() {
     return {
       customStyle:
-        'background: #ffffff;border-radius: 4px;border: 0;overflow: hidden;',
+        'background: #ffffff;border-radius: 4px;border: 0;overflow: hidden;color:red !important;',
       modelKey: ['0', '1', '2', '3'],
       dimensionsKey: ['0', '1', '2', '3'], // 默认展开
       measuresKey: ['0', '1', '2', '3'],
@@ -174,6 +174,9 @@ export default {
     getModelList() {
       this.$server.screenManage.getCatalogList().then(res => {
         if (res.code === 200) {
+          res.data.map(item => {
+            item.selected = false
+          })
           this.modelList = res.data
           // this.modelList = res.data.folders
           // this.modelList = this.modelList.concat(res.data.items)
@@ -186,6 +189,7 @@ export default {
         if (res.code === 200) {
           let dimensions = res.data.dimensions
           let measures = res.data.measures
+          console.log(this.dimensions)
           this.dimensions = this.transData(dimensions)
           this.measures = this.transData(measures)
         }
@@ -208,3 +212,9 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus">
+.ant-collapse >  .customStyle > .ant-collapse-header{
+  color:#ccc;
+}
+</style>

@@ -518,14 +518,12 @@ const list = [{
                 type: '1',
                 modelId: '',
                 api_data: {
-                  columns: ['日期', '访问用户', '下单用户', '下单率'],
+                  columns: ['日期', '访问用户', '下单用户', '下单率', '日期'],
                   rows: [
                     { '日期': '1/1', '访问用户': 1393, '下单用户': 1093, '下单率': 0.32 },
                     { '日期': '1/2', '访问用户': 3530, '下单用户': 3230, '下单率': 0.26 },
                     { '日期': '1/3', '访问用户': 2923, '下单用户': 2623, '下单率': 0.76 },
-                    { '日期': '1/4', '访问用户': 1723, '下单用户': 1423, '下单率': 0.49 },
-                    { '日期': '1/5', '访问用户': 3792, '下单用户': 3492, '下单率': 0.323 },
-                    { '日期': '1/6', '访问用户': 4593, '下单用户': 4293, '下单率': 0.78 }
+                    { '日期': '1/4', '访问用户': 1723, '下单用户': 1423, '下单率': 0.49 }
                   ]
                     // source: [
                     //     { x: '1/1', y: 1393, s: '指标1' },
@@ -552,9 +550,9 @@ const list = [{
                 },
                 apis: {
                     labelMap: {
-                        'x': '类目',
-                        'y': '值',
-                        's': '系列1'
+                        // 'x': '类目',
+                        // 'y': '值',
+                        // 's': '系列1'
                     }
                 },
                 background: {
@@ -590,9 +588,34 @@ const list = [{
                         bottom: 'auto'
                     },
                     radar: { // 雷达图可选
-                        shape: 'circle', // polygon
+                        shape: 'circle', // polygon, circle
                         center: ['50%', '60%'],
-                        radius: '75%'
+                        radius: '75%',
+                        name: {
+                          formatter: '{value}',
+                          textStyle: {
+                              fontSize: 12, // 外圈标签字体大小
+                              color: '#fff' // 外圈标签字体颜色
+                          }
+                        },
+                        splitArea: {
+                          areaStyle: {
+                              color: 'transparent', // 圆环颜色
+                              shadowColor: 'aqua', // 圆颜色
+                              shadowBlur: 10
+                          }
+                        },
+                        axisLine: {
+                          lineStyle: {
+                              color: '#fff' // 分割线
+                          }
+                        },
+                        splitLine: {
+                            lineStyle: {
+                                color: '#fff', // 圆线
+                                width: 1
+                            }
+                        }
                     },
                     xAxis: {
                         show: false
@@ -601,15 +624,16 @@ const list = [{
                         show: false
                     },
                     series: {
-                        label: {
-                            show: false,
-                            color: '',
-                            fontSize: 12,
-                            position: 'inside' // 可选inside
-                        },
-                        areaStyle: { // 可选的
-                            opacity: 0
-                        }
+                      type: 'radar',
+                      label: {
+                          show: false,
+                          color: '',
+                          fontSize: 12,
+                          position: 'inside' // 可选inside
+                      },
+                      areaStyle: { // 可选的
+                          opacity: 0.3
+                      }
                     },
                     color: DEFAULT_COLORS
                 },
