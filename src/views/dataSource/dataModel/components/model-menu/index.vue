@@ -342,7 +342,9 @@ export default {
      * 确定选择的数据连接
      */
     handleOk() {
-      // if (!this.modalFileSelectId) return
+      if (!this.modalFileSelectId) {
+        return this.$message.error('请选择数据源')
+      }
       this.visible = false
       this.$router.push({
         name: 'modelEdit',
