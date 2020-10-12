@@ -7,6 +7,7 @@
     ref="file"
     draggable
     @dragstart="handleFileDragStart"
+    @dragend="handleFileDragEnd"
     @click="handleFileSelect"
   >
     <h4 class="title" :title="file[fileName]">
@@ -98,6 +99,11 @@ export default {
     },
     handleFileDragStart(e) {
       e.stopPropagation()
+      this.file.parentId = this.parent ? this.parent.id : 0
+      this.$emit('fileDrag', this.file)
+    },
+    handleFileDragEnd(e) {
+      this.$emit('fileDrag', '')
     },
     handleCreateMenu(e) {
       e.stopPropagation()

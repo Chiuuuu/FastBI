@@ -1,7 +1,7 @@
 <template>
   <a-modal
     :visible="visible"
-    title="新建文件夹"
+    :title="resetName.type === 'reset' ? '文件夹重命名' : '新建文件夹'"
     cancelText="取消"
     okText="确定"
     :afterClose="handleAfterClose"
@@ -10,50 +10,62 @@
         $emit('cancel');
       }
     "
-    @ok="
-      () => {
-        $emit('create');
-      }
-    "
+    @ok="handleOk"
   >
-    <a-form layout="vertical" :form="form" class="resetNameForm">
-      <a-form-item label="文件夹名称">
-        <a-input
-          v-decorator="[
-            'name',
-            {
-              rules: [
-                {
-                  required: true,
-                  message: '请填写名称'
-                },
-                {
-                  type: 'string',
-                  min: 1,
-                  max: 20,
-                  message: '长度在1~20内'
-                }
-              ]
-            }
-          ]"
-        />
-      </a-form-item>
-    </a-form>
+    <a-form-model :model="form" :rules="rules" ref="resetNameForm" class="resetNameForm">
+      <a-form-model-item label="文件夹名称" prop="name">
+        <a-input v-model="form.name" />
+      </a-form-model-item>
+    </a-form-model>
   </a-modal>
 </template>
 <script>
 export default {
   name: 'resetName',
-  props: ['visible'],
-  beforeCreate() {
-    this.form = this.$form.createForm(this, { name: 'form_in_modal' })
+  props: ['visible', 'resetName'],
+  data() {
+    return {
+      form: {
+        name: ''
+      },
+      rules: {
+        name: [
+          {
+            required: true,
+            message: '请填写名称'
+          },
+          {
+            type: 'string',
+            min: 1,
+            max: 20,
+            message: '长度在1~20内'
+          }
+        ]
+      }
+    }
+  },
+  watch: {
+    visible(newValue, oldValue) {
+      if (newValue) {
+        const type = this.resetName.type
+        const name = type === 'reset' ? this.resetName.item.name : ''
+        this.$set(this.form, 'name', name)
+      }
+    }
   },
   methods: {
     /**
      * 弹出框完成关闭后
     */
     handleAfterClose() {
-      this.form.resetFields()
+      this.$refs.resetNameForm.resetFields()
+    },
+    handleOk() {
+      this.$refs.resetNameForm.validate()
+        .then(res => {
+          this.$emit('create', this.form)
+        })
+        .catch(err => err)
     }
   }
 }

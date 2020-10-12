@@ -37,15 +37,16 @@
         连接
       </a-button>
     </a-form-model-item>
-    <a-form-model-item label="默认连接库" prop="dbid" v-if="connectStatus">
+    <a-form-model-item label="默认连接库" prop="databaseName" v-if="connectStatus">
       <a-select
         style="width: 528px"
-        v-model="form.dbid"
+        v-model="form.databaseName"
+        :default-value="form.databaseName || databaseList[0].name"
         @change="handleDefaultDbSelect"
       >
         <a-select-option
           v-for="item in databaseList"
-          :value="item.id"
+          :value="item.name"
           :key="item.id"
         >
           {{ item.name }}
@@ -177,15 +178,15 @@ export default {
     },
     /**
      * 默认选择数据库操作
-     * value 选中的id值
+     * value 选中的name
      */
     handleDefaultDbSelect(value) {
       const item = this.databaseList.filter(item => {
-        return item.id === value && item
+        return item.name === value && item
       })
       const obj = item.pop()
       this.form.dbid = obj.id
-      this.form.databaseName = obj.databaseName
+      this.form.databaseName = obj.name
       this.$store.dispatch('dataAccess/setModelInfo', this.form)
     },
     /**
@@ -218,9 +219,9 @@ export default {
 
           if (result.code === 200) {
             this.databaseList = [].concat(result.rows)
-            // 设置默认选中第一个
-            this.form.dbid = this.databaseList[0].id
-            this.form.databaseName = this.databaseList[0].name
+            const item = this.databaseList.find(item => item.name === this.$store.state.dataAccess.modelInfo.databaseName)
+            this.form.dbid = item.id
+            this.form.databaseName = item.name
             this.connectStatus = true
             this.$message.success('连接成功')
           } else {
@@ -238,12 +239,12 @@ export default {
     handleSaveForm() {
       this.$refs.dbForm.validate(async valid => {
         if (valid) {
-          const datadbitem = this.databaseList
-            .filter(item => item.id === this.form.dbid)
-            .pop()
-          this.form = Object.assign(this.form, {
-            databaseName: datadbitem.name
-          })
+          // const datadbitem = this.databaseList
+          //   .filter(item => item.id === this.form.dbid)
+          //   .pop()
+          // this.form = Object.assign(this.form, {
+          //   databaseName: datadbitem.name
+          // })
 
           this.saveBtn = true
           const params = {

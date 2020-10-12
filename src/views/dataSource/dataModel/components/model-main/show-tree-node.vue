@@ -80,7 +80,7 @@ export default {
         .opt {
             position: absolute;
             z-index: 9;
-            left: -56px;
+            left: -68px;
             top: 50%;
             width: 26px;
             height: 26px;
