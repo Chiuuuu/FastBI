@@ -15,7 +15,7 @@
           </a-menu>
         </a-dropdown>
       </div>
-      <div class="menu_search">
+      <div class="menu_search" v-if="folderList.length > 0">
         <a-input placeholder="搜索大屏目录" v-model="searchName" @change="menuSearch">
           <a-icon slot="prefix" type="search" />
         </a-input>
@@ -60,7 +60,7 @@
       </div>
     </div>
     <div class="right">
-      <div class="right-header">
+      <div class="right-header" v-if="fileSelectId !== ''">
         <span class="nav_title">{{fileName}}</span>
         <a-button class="btn_n1" @click="openScreen">
           全屏
@@ -200,9 +200,10 @@ export default {
     // 获取文件夹列表
     getList() {
       let params = {
-        name: this.searchName
+        name: this.searchName,
+        type: 3
       }
-      this.$server.screenManage.getFolderList(params).then(res => {
+      this.$server.screenManage.getFolderList({ params }).then(res => {
         if (res.code === 200) {
           let rows = res.data
           // const list = rows.filter(item => {

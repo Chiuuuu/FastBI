@@ -2,7 +2,8 @@ const options = {
   state: {
     dragFile: '', // 拖拽的维度
     dataModel: {}, // 选中的数据模型
-    optionsTabsType: 0 // 页面设置选中项 样式/数据/交互
+    optionsTabsType: 0, // 页面设置选中项 样式/数据/交互
+    modelFile: {}
   },
   mutations: {
     SET_DRAG_FILE: (state, val) => {

@@ -63,6 +63,7 @@
                           :background="transform.packageJson.background"></chart-tables>
 
             <charts-factory v-else
+                            :key="transform.id"
                             :type-name="transform.packageJson.name"
                             :config="transform.packageJson.config"
                             :api-data="transform.packageJson.api_data"
@@ -91,7 +92,7 @@
   import navigateList from '@/config/navigate' // 导航条菜单
   import DragList from '@/components/drag/DragList' // 导航条拖动模块
   import DragItem from '@/components/drag/DragItem' // 板块设置（长宽高比例悬停）
-  import { mapGetters } from 'vuex' // 导入vuex
+  import { mapGetters, mapActions } from 'vuex' // 导入vuex
   import { on, off } from 'bin-ui/src/utils/dom' //
   import { getCanvasMaps } from '@/api/canvasMaps/canvas-maps-request' // 图层的方法
   import { getPageSettings, resetPageSettings } from '@/api/app/app-request' // axious请求，拦截器
@@ -126,7 +127,7 @@
       // getPageSettings().then(res => {
       //   this.$store.dispatch('SetPageSettings', res.data)
       // })
-      console.log(this.canvasMap)
+      console.log(this.navigate)
       // 拉取页面canvasMaps
       // 先清空数据
       this.$store.dispatch('InitCanvasMaps', [])
@@ -148,6 +149,7 @@
       }
     },
     methods: {
+      ...mapActions(['saveScreenData']),
       // 获取大屏数据
       getScreenData() {
         this.$server.screenManage.getScreenDetailById(this.$route.query.id).then(res => {
@@ -208,16 +210,9 @@
         let index = this.canvasMap.indexOf(this.currentSelected)
         if (index > -1) {
           this.canvasMap.splice(index, 1)
+          this.$store.dispatch('SingleSelected', null)
+          this.saveScreenData()
         }
-        let params = {
-          id: this.$route.query.id,
-          setting: {
-            components: this.canvasMap,
-            setting: this.pageSettings
-          }
-        }
-        this.$server.screenManage.saveScreen(params).then(res => {})
-        // this.$store.dispatch('ContextMenuCommand', 'remove')
       },
       /**
      * 是否全屏并按键ESC键的方法

@@ -1,6 +1,6 @@
 <template>
   <div class="dragArea"
-       :class="{'dragable-vaild':type===dragFile || isdrag && type==='table'}"
+       :class="{'dragable-vaild':type===dragFile || isdrag && type==='tableList'}"
        @drop.stop.prevent="handleDropOnFilesWD($event)"
        @dragover.stop.prevent
        @dragenter="dragenter"
@@ -30,7 +30,9 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
-import database from '@/utils/database.js'
+import { deepClone } from '@/utils/deepClone'
+import navigateList from '@/config/navigate' // 导航条菜单
+
 export default {
   props: {
     type: {
@@ -41,10 +43,10 @@ export default {
   data() {
     return {
       emptyText: {
-        'dimension': '拖入维度',
-        'measure': '拖入度量',
+        'dimensions': '拖入维度',
+        'measures': '拖入度量',
         'filter': '拖入字段',
-        'table': '拖入字段'
+        'tableList': '拖入字段'
       },
       isdrag: false, // 是否拖拽中
       fileList: [], // 维度字段数组
@@ -55,17 +57,16 @@ export default {
     currentSelected: {
       handler (val) {
         if (val) {
-          console.log(val)
           // 当前选中的图表显示维度度量的数据
           this.fileList = []
-          if (this.type === 'dimension' && val.packageJson.api_data.dimensions) { // 维度
-            this.fileList = val.packageJson.api_data.dimensions
+          if (this.type === 'dimensions' && val.packageJson.api_data.dimensions) { // 维度
+            this.fileList = deepClone(val.packageJson.api_data.dimensions)
           }
-          if (this.type === 'measure' && val.packageJson.api_data.measures) { // 度量
-            this.fileList = val.packageJson.api_data.measures
+          if (this.type === 'measures' && val.packageJson.api_data.measures) { // 度量
+            this.fileList = deepClone(val.packageJson.api_data.measures)
           }
-          if (this.type === 'table' && val.packageJson.api_data.tableList) { // 表格不区分维度度量
-            this.fileList = val.packageJson.api_data.tableList
+          if (this.type === 'tableList' && val.packageJson.api_data.tableList) { // 表格不区分维度度量
+            this.fileList = deepClone(val.packageJson.api_data.tableList)
           }
         }
       },
@@ -76,6 +77,9 @@ export default {
   computed: {
     ...mapGetters(['dragFile', 'currentSelected', 'optionsTabsType'])
   },
+  mounted() {
+    this.current = deepClone(this.currentSelected)
+  },
   methods: {
     ...mapActions(['saveScreenData']),
     // 将拖动的维度到所选择的放置目标节点中
@@ -83,14 +87,14 @@ export default {
       // h5 api
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
       dataFile.showMore = false // 是否点击显示更多
-      if (this.type === 'dimension' && this.dragFile === this.type) {
+      if (this.type === 'dimensions' && this.dragFile === this.type) {
         // 维度暂时只能拉入一个字段
         this.fileList[0] = dataFile
       }
-      if (this.type === 'measure' && this.dragFile === this.type) {
+      if (this.type === 'measures' && this.dragFile === this.type) {
         this.fileList.push(dataFile)
       }
-      if (this.type === 'table') {
+      if (this.type === 'tableList') {
         this.fileList.push(dataFile)
       }
       this.fileList = this.uniqueFun(this.fileList, 'name')
@@ -122,7 +126,7 @@ export default {
       this.getData()
       // 维度度量删除完以后重置该图表数据
       if (this.fileList.length < 1) {
-        let canvasMaps = database.canvasMaps
+        let canvasMaps = navigateList[0].children
         for (let item of canvasMaps) {
           if (item.packageJson.name === this.currentSelected.packageJson.name) {
             this.currentSelected.packageJson.api_data.source = item.packageJson.api_data.source
@@ -136,16 +140,16 @@ export default {
       for (let item of this.fileList) {
         item.defaultAggregator = 'SUM'
       }
-      console.log(this.fileList)
-      if (this.type === 'dimension') {
+      if (this.type === 'dimensions') {
         this.currentSelected.packageJson.api_data.dimensions = this.fileList
       }
-      if (this.type === 'measure') {
+      if (this.type === 'measures') {
         this.currentSelected.packageJson.api_data.measures = this.fileList
       }
-      if (this.type === 'table') {
+      if (this.type === 'tableList') {
         this.currentSelected.packageJson.api_data.tableList = this.fileList
       }
+      let apiData = deepClone(this.currentSelected.packageJson.api_data)
       let params = {
         setting: {
           ...this.currentSelected
@@ -153,7 +157,7 @@ export default {
       }
       this.$server.screenManage.getData(params).then(res => {
         if (res.code === 200) {
-          if (this.type === 'table') {
+          if (this.type === 'tableList') {
             let columns = []
             // let apiData = this.currentSelected.packageJson.api_data
             for (let item of this.fileList) {
@@ -173,7 +177,7 @@ export default {
             }
           } else {
             let columns = []
-            let apiData = this.currentSelected.packageJson.api_data
+            // let apiData = this.currentSelected.packageJson.api_data
             let dimensionKeys = apiData.dimensions[0].name // 维度key
             columns[0] = dimensionKeys // 默认columns第一项为维度
             let measureKeys = [] // 度量key
@@ -190,10 +194,11 @@ export default {
               }
               rows.push(obj)
             })
-            this.currentSelected.packageJson.api_data.source = {
+            apiData.source = {
               columns,
               rows
             }
+            this.$store.dispatch('SetSelfDataSource', apiData)
           }
           this.saveScreenData()
         }

@@ -59,7 +59,7 @@ const screenManage = {
    * @returns
    */
   actionRefreshScreen(params) {
-    return $axios.get(`/screen/data/refresh`, params)
+    return $axios.get(`/screen/bigscreen/refresh`, params)
   },
   /**
    * @description 数据模型目录

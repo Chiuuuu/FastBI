@@ -17,6 +17,9 @@ const list = [{
                 type: '1',
                 modelId: '',
                 api_data: {
+                  dimensions: [],
+                  measures: [],
+                  source: {},
                   columns: ['日期', '访问用户', '下单用户', '下单率'],
                   rows: [
                     { '日期': '1/1', '访问用户': 1393, '下单用户': 1093, '下单率': 0.32 },
@@ -112,6 +115,7 @@ const list = [{
                         }
                     },
                     series: {
+                      type: 'line',
                         smooth: false, // 可选的
                         step: false, // step line
                         lineStyle: {
@@ -410,10 +414,10 @@ const list = [{
                     // ]
                 },
                 apis: {
-                  level: [
-                    ['1/1', '1/2', '1/3'],
-                    ['1/4', '1/5']
-                  ],
+                  // level: [
+                  //   ['1/1', '1/2', '1/3'],
+                  //   ['1/4', '1/5']
+                  // ],
                     labelMap: {
                         'x': '类目',
                         'y': '值',

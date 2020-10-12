@@ -25,7 +25,9 @@ const getters = {
 
     screenId: state => state.app.screenId, // 大屏id
 
-    fileName: state => state.app.fileName
+    fileName: state => state.app.fileName,
+
+    modelFile: state => state.options.modelFile
 }
 
 export default getters

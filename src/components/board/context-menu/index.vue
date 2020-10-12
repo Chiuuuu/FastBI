@@ -74,6 +74,7 @@
         let index = this.canvasMap.indexOf(this.currentSelected)
         if (index > -1) {
           this.canvasMap.splice(index, 1)
+          this.$store.dispatch('SingleSelected', null)
         }
         let params = {
           id: this.$route.query.id,

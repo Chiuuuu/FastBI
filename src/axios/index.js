@@ -32,10 +32,10 @@ const errorHandle = {
   },
   404: function(msg) {
     message.error(msg || '请求资源不存在')
-  },
-  500: function(msg) {
-    message.error(msg || '请求异常')
   }
+  // 500: function(msg) {
+  //   message.error(msg || '请求异常')
+  // }
 }
 
 // 添加请求拦截器

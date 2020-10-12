@@ -39,7 +39,7 @@
                             class="filelist"
                             :key="index2 + '_'"
                             draggable="true"
-                            @dragstart="dragstart(item2, 'dimension', $event)"
+                            @dragstart="dragstart(item2, 'dimensions', $event)"
                             @dragend="dragsend(item2, $event)">
                           <img src="@/assets/images/icon_dimension.png" />
                           {{ item2.name }}
@@ -64,7 +64,7 @@
                           <li v-for="(item2, index2) in item"
                               class="filelist"
                               :key="index2 + '_'" draggable="true"
-                              @dragstart="dragstart(item2, 'measure', $event)"
+                              @dragstart="dragstart(item2, 'measures', $event)"
                               @dragend="dragsend(item2, $event)">
                             <img src="@/assets/images/icon_measure.png" />
                             {{ item2.name }}
@@ -189,7 +189,6 @@ export default {
         if (res.code === 200) {
           let dimensions = res.data.dimensions
           let measures = res.data.measures
-          console.log(this.dimensions)
           this.dimensions = this.transData(dimensions)
           this.measures = this.transData(measures)
         }

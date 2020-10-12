@@ -77,7 +77,6 @@
             // 图例
             this.legendVisible = val.legend && val.legend.show
             this.chartExtend = { ...val }
-            console.log(val)
             // this.colors = [...val.colors]
             // this.$log.primary('========>chartExtend')
             // this.$print(this.chartExtend)
@@ -88,16 +87,18 @@
       },
       apiData: {
         handler (val) {
+          console.log(val)
           if (val) {
-            if (val.dimensions && val.measures) {
+            if (val.dimensions && val.dimensions.length > 0 && val.measures && val.measures.length > 0) {
               this.chartData = val.source
-              this.chartData.rows = val.source.rows
+              console.log(this.chartData)
               return
             }
-            this.chartData.columns = val.columns
-            this.chartData.rows = val.rows
+            this.chartData.columns = [...val.columns]
+            this.chartData.rows = [...val.rows]
             // if (val.source) {
             //   let data = formatData(val.source)
+            //   // let data = val.source
             //   this.chartData.columns = [...data.columns]
             //   this.chartData.rows = [...data.rows]
             //   this.$log.primary('========>chartData')

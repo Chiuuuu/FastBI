@@ -1,14 +1,14 @@
 <template>
   <div class="data-source">
     <a-collapse v-model="activeKey" :bordered="false">
-      <a-collapse-panel key="dimension" header="维度" v-if="currentSelected.packageJson.name!=='ve-tables'">
-        <drag-area type="dimension"></drag-area>
+      <a-collapse-panel key="dimensions" header="维度" v-if="currentSelected.packageJson.name!=='ve-tables'">
+        <drag-area type="dimensions" :fileList="fileObj.dimensions"></drag-area>
       </a-collapse-panel>
-      <a-collapse-panel key="measure" header="度量" v-if="currentSelected.packageJson.name!=='ve-tables'">
-        <drag-area type="measure"></drag-area>
+      <a-collapse-panel key="measures" header="度量" v-if="currentSelected.packageJson.name!=='ve-tables'">
+        <drag-area type="measures" :fileList="fileObj.measures"></drag-area>
       </a-collapse-panel>
-      <a-collapse-panel key="table" header="列" v-if="currentSelected.packageJson.name==='ve-tables'">
-        <drag-area type="table"></drag-area>
+      <a-collapse-panel key="tableList" header="列" v-if="currentSelected.packageJson.name==='ve-tables'">
+        <drag-area type="tableList"></drag-area>
       </a-collapse-panel>
       <!-- <a-collapse-panel key="filter" header="数据筛选">
         <div class="empty">拖入字段</div>
@@ -32,12 +32,32 @@ export default {
   },
   data() {
     return {
-      activeKey: ['dimension', 'measure', 'filter', 'sort', 'tips', 'refresh', 'table'] // 所有面板默认打开
+      activeKey: ['dimensions', 'measures', 'filter', 'sort', 'tips', 'refresh', 'tableList'], // 所有面板默认打开
+      fileObj: {
+        dimensions: [],
+        measures: []
+      } // 存储维度度量数据
     }
   },
   watch: {
     currentSelected: {
       handler (val) {
+        if (val) {
+          // 当前选中的图表显示维度度量的数据
+          // this.fileList = []
+          if (this.type === 'dimensions' && val.packageJson.api_data.dimensions) { // 维度
+            this.fileObj.dimensions = JSON.parse(JSON.stringify(val.packageJson.api_data.dimensions))
+            // this.fileList = JSON.parse(JSON.stringify(val.packageJson.api_data.dimensions))
+          }
+          if (this.type === 'measures' && val.packageJson.api_data.measures) { // 度量
+            this.fileObj.measures = JSON.parse(JSON.stringify(val.packageJson.api_data.measures))
+            // this.fileList = JSON.parse(JSON.stringify(val.packageJson.api_data.measures))
+          }
+          if (this.type === 'tableList' && val.packageJson.api_data.tableList) { // 表格不区分维度度量
+            this.fileObj.tableList = JSON.parse(JSON.stringify(val.packageJson.api_data.tableList))
+            // this.fileList = JSON.parse(JSON.stringify(val.packageJson.api_data.tableList))
+          }
+        }
       },
       deep: true,
       immediate: true
