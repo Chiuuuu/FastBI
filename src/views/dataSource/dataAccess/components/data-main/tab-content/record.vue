@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="search_bar">
-      <a-input placeholder="请输入关键词" class="search_input">
+      <a-input placeholder="请输入关键词" class="search_input" style="width:100%">
         <a-icon slot="prefix" type="search" />
       </a-input>
     </div>
@@ -50,8 +50,8 @@ export default {
   name: 'tabContentRecord',
   data() {
     return {
-        column,
-        datas
+      column,
+      datas
     }
   },
   mounted() {

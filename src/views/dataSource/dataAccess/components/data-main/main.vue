@@ -38,8 +38,8 @@ export default {
   name: 'dataAccessMain',
   components: {
     TabContentEntry,
-    TabContentStructure
-    // TabContentRecord
+    TabContentStructure,
+    TabContentRecord
   },
   props: ['tabindex'],
   data() {

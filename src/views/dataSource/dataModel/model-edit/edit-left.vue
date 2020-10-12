@@ -1,5 +1,5 @@
 <template>
-  <div class="sheet_list">
+  <div class="sheet_list" v-if="list.length > 0">
     <div
       class="sheet_list_item"
       v-for="item in list"
@@ -13,6 +13,7 @@
       <span>{{ item.name }}</span>
     </div>
   </div>
+  <a-empty style="margin-top:50px;color:#000" v-else description="数据源未进行数据抽取，请先抽取数据"></a-empty>
 </template>
 <script>
 import { Node } from '../util'

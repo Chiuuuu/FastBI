@@ -100,6 +100,7 @@ export default {
     handleDrop(event) {
       event.stopPropagation()
       removeClass(this.$refs.folder, 'dragable-current')
+      this.$emit('fileDrop', this.folder)
     },
     handleFolderOpen() {
       this.folderOpen = !this.folderOpen

@@ -29,10 +29,10 @@
           </div>
           <div class="popover-type">
             <ul>
-              <li v-for='item in popoverType' :key="item">
+              <li v-for='(item, index) in popoverType' :key="item">
                 <div class="wap" @click="handlePopoverType(item, nodeData)">
-                  <div class="inner" :class="popoverTypeActive === item ? 'active':''">
-                    <div class="img img-05"></div>
+                  <div class="inner" :class="popoverTypeActive === item ? 'active' : ''">
+                    <div class="img" :class="'img-0' + (index + 1)"></div>
                     <div class="txt">{{item}}</div>
                   </div>
                 </div>
@@ -41,18 +41,24 @@
           </div>
           <div class="popover-body">
             <div class="sprt">
-              <div class="item">订单</div>
-              <div class="item">类别</div>
+              <div class="item">{{ popoverLeftTable }}</div>
+              <div class="item">{{ popoverRightTable }}</div>
             </div>
             <div class="popover-form">
-              <a-form>
+              <a-form-model
+                v-for="(condition, index) in popoverForm"
+                :key="index"
+                :ref="'condition' + index"
+                :model="condition">
                 <a-row>
                   <a-col :span="10">
-                    <a-form-item>
+                    <a-form-model-item class="item">
                       <a-select
                         show-search
                         placeholder="Select a person"
                         style="width: 100%"
+                        prop="left"
+                        v-model="condition.left"
                       >
                         <a-select-option value="jack">
                           Jack
@@ -64,17 +70,19 @@
                           Tom
                         </a-select-option>
                       </a-select>
-                    </a-form-item>
+                    </a-form-model-item>
                   </a-col>
                   <a-col :span="2">
-                    <span>=</span>
+                    <div class="equal">=</div>
                   </a-col>
                   <a-col :span="10">
-                    <a-form-item>
+                    <a-form-model-item class="item">
                       <a-select
                         show-search
                         placeholder="Select a person"
                         style="width: 100%"
+                        prop="right"
+                        v-model="condition.right"
                       >
                         <a-select-option value="jack">
                           Jack
@@ -86,18 +94,18 @@
                           Tom
                         </a-select-option>
                       </a-select>
-                    </a-form-item>
+                    </a-form-model-item>
                   </a-col>
-                  <a-col :span='2'>
-                    <a-button type='link'><a-icon type="delete" /></a-button>
+                  <a-col :span='2' class="delete">
+                    <a-button type='link' @click="handledeleteCondition(index)"><a-icon type="delete" /></a-button>
                   </a-col>
                 </a-row>
-              </a-form>
-              <a-button type="link">
-                <a-icon type="plus" />添加
-              </a-button>
-              <a-button type="link">全部删除</a-button>
+              </a-form-model>
             </div>
+            <a-button type="link" @click="handleAddCondition">
+              <a-icon type="plus" />添加
+            </a-button>
+            <a-button type="link" @click="handleClearCondition">全部删除</a-button>
           </div>
         </div>
         <span class="opt">
@@ -151,7 +159,10 @@ export default {
       nodeVisible: false,
       mark: '',
       popoverTypeActive: '内部',
-      popoverType: ['内部', '左侧', '右侧', '完全外部']
+      popoverType: ['内部', '左侧', '右侧', '完全外部'],
+      popoverLeftTable: '',
+      popoverRightTable: '',
+      popoverForm: []
     }
   },
   computed: {
@@ -171,28 +182,38 @@ export default {
     }
   },
   methods: {
-    async handleBtnDelete(node) {
+    handledeleteCondition(index) {
+      this.popoverForm.splice(index, 1)
+    },
+    handleAddCondition() {
+      this.popoverForm.push({ left: '', right: '' })
+    },
+    handleClearCondition() {
+      this.popoverForm = []
+    },
+    handleBtnDelete(node) {
       // let deleteList = []
-      this.loopDelete(node, this.detailInfo.config.tables)
-      if (node.parent) {
-        const index = node.parent.children.indexOf(node)
-        node.parent.children.splice(index, 1)
-      } else {
-        this.root.handleClearRenderTables()
-      }
-      await this.root.handleUpdate({
-        tables: this.detailInfo.config.tables.map((item, index) => {
-          item.datamodelId = this.modelId
-          item.tableNo = index + 1
-          return item
-        })
+      this.$confirm({
+        title: '确认提示',
+        content: '确定删除该表?',
+        onOk: async () => {
+          this.loopDelete(node, this.detailInfo.config.tables)
+          if (node.parent) {
+            const index = node.parent.children.indexOf(node)
+            node.parent.children.splice(index, 1)
+          } else {
+            this.root.handleClearRenderTables()
+          }
+          await this.root.handleUpdate({
+            tables: this.detailInfo.config.tables.map((item, index) => {
+              item.datamodelId = this.modelId
+              item.tableNo = index + 1
+              return item
+            })
+          })
+          this.nodeVisible = false
+        }
       })
-      // new Array(Object.assign(dragNode.getProps(), {
-      //   leftTableId: current.getProps().tableNo,
-      //   tableId: dragNode.getProps().id,
-      //   datamodelId: this.modelId
-      // }))
-      this.nodeVisible = false
     },
     loopDelete(node, list) {
       const ownProps = node.getProps()
@@ -254,11 +275,6 @@ export default {
             return item
           })
         })
-        // new Array(Object.assign(dragNode.getProps(), {
-        //   leftTableId: current.getProps().tableNo,
-        //   tableId: dragNode.getProps().id,
-        //   datamodelId: this.modelId
-        // }))
       }
 
       if (this.nodeStatus.dragType === 'node') {
@@ -286,18 +302,12 @@ export default {
         })
         tables.splice(index, 1, node.getProps())
         this.parentDeleteNode(event, dragNode)
-        console.log('tables', this.detailInfo.config.tables)
         await this.root.handleUpdate({
           tables: this.detailInfo.config.tables.map(item => {
             item.datamodelId = this.modelId
             return item
           })
         })
-        // new Array(Object.assign(dragNode.getProps(), {
-        //   leftTableId: current.getProps().tableNo,
-        //   tableId: dragNode.getProps().id,
-        //   datamodelId: this.modelId
-        // }))
       }
     },
     lootBeforeParent(parentId, node) {
@@ -313,13 +323,15 @@ export default {
     handleClosePopover() {
       this.visible = false
     },
-    handlePopoverType(type) {
+    handlePopoverType(type, nodeData) {
       this.popoverTypeActive = type
     },
     handleVisibleChange(v, node) {
       if (!v) return
-      console.log('left', node.parent.getProps().name)
-      console.log('right', node.getProps().name)
+      // console.log('left', node.parent.getProps().name)
+      // console.log('right', node.getProps().name)
+      this.popoverLeftTable = node.parent.getProps().name
+      this.popoverRightTable = node.getProps().name
     }
   }
 }
@@ -383,7 +395,7 @@ export default {
         .opt {
             position: absolute;
             z-index: 9;
-            left: -56px;
+            left: -68px;
             top: 50%;
             width: 26px;
             height: 26px;
@@ -519,7 +531,8 @@ export default {
                   background-position: 0 -77px
                 }
                 &-04{
-                  background-position: 0 -116px
+                  background-position: -52px -116px
+                  // background-position: 0 -116px
                 }
                 &-05{
                   background-position: -52px -116px
@@ -548,16 +561,34 @@ export default {
         .item {
           float: left;
           width: 50%;
+          padding-left: 20px;
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
         }
       }
       .popover-form {
-        padding: 20px 0;
-        max-height: 300px;
+        padding-top: 20px;
+        max-height: 260px;
         overflow-y: auto;
         overflow-x: hidden;
+        border-bottom: 1px solid #ededed;
+
+        .item {
+          padding-left: 20px;
+        }
+        .equal {
+          width: 40px;
+          height: 40px;
+          line-height: 40px;
+          text-align: right;
+          font-size: 20px;
+        }
+        .delete {
+          width: 40px;
+          height: 36px;
+          line-height: 38px;
+        }
       }
     }
   }
