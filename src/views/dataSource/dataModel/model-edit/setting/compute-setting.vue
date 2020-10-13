@@ -35,14 +35,8 @@
               <div class="modal_select">
                 <a-select
                   style="width: 110px;"
-                  v-decorator="[
-                    'dim',
-                    {
-                      rules: [
-                        { required: true, message: '选择维度' }
-                      ]
-                    }
-                  ]"
+                  @select="handleSelectDimension"
+                  v-model="dimension"
                   placeholder="插入维度"
                 >
                   <a-select-option value="aaa">
@@ -54,14 +48,8 @@
                 </a-select>
                 <a-select
                   style="width: 110px;"
-                  v-decorator="[
-                    'mea',
-                    {
-                      rules: [
-                        { required: true, message: '选择度量' }
-                      ]
-                    }
-                  ]"
+                  @select="handleSelectMeasure"
+                  v-model="measure"
                   placeholder="插入度量"
                 >
                   <a-select-option value="ccc">
@@ -83,8 +71,10 @@
               class="u-txt u-txt-area expinput u-code-input"
               row="5"
               spellcheck="false"
+              ref="textarea"
               v-model="textareaValue"
               @scroll="handleScroll"
+              @blur.stop="handleTextAreaBlur"
             ></textarea>
           </div>
         </div>
@@ -109,6 +99,13 @@
               {{ express.name }}
             </a-select-option>
           </a-select>
+          <ul class="list">
+            <li
+              class="list-item"
+              v-for="express in expression"
+              :key="express.id"
+            >{{ express.name }}</li>
+          </ul>
         </div>
         <div class="text">
           <div class="tit">{{expression[activeIndex].syntax}}</div>
@@ -127,74 +124,74 @@
 import findIndex from 'lodash/findIndex'
 const expression = [
   {
-    id: "SUM",
-    name: "求和聚合",
-    expression: "SUM(表达式)",
-    description: "返回表达式中所有值的总和。SUM 只能用于数字字段。",
-    example: "SUM([销售额])",
-    syntax: "SUM(表达式)",
-    groups: ["aggregator"],
+    id: 'SUM',
+    name: '求和聚合',
+    expression: 'SUM(表达式)',
+    description: '返回表达式中所有值的总和。SUM 只能用于数字字段。',
+    example: 'SUM([销售额])',
+    syntax: 'SUM(表达式)',
+    groups: ['aggregator']
   },
   {
-    id: "MAX",
-    name: "最大值聚合",
-    expression: "MAX(表达式)",
+    id: 'MAX',
+    name: '最大值聚合',
+    expression: 'MAX(表达式)',
     description:
-      "返回表达式在所有记录中的最大值。MAX只能用于数字、日期、日期时间字段。",
-    example: "MAX([访问量])",
-    syntax: "MAX(表达式)",
-    groups: ["aggregator", "date", "logic"],
+      '返回表达式在所有记录中的最大值。MAX只能用于数字、日期、日期时间字段。',
+    example: 'MAX([访问量])',
+    syntax: 'MAX(表达式)',
+    groups: ['aggregator', 'date', 'logic']
   },
   {
-    id: "MIN",
-    name: "最小值聚合",
-    expression: "MIN(表达式)",
+    id: 'MIN',
+    name: '最小值聚合',
+    expression: 'MIN(表达式)',
     description:
-      "返回表达式在所有记录中的最小值。MIN只能用于数字、日期、日期时间字段。",
-    example: "MIN([访问量])",
-    syntax: "MIN(表达式)",
-    groups: ["aggregator", "date", "logic"],
+      '返回表达式在所有记录中的最小值。MIN只能用于数字、日期、日期时间字段。',
+    example: 'MIN([访问量])',
+    syntax: 'MIN(表达式)',
+    groups: ['aggregator', 'date', 'logic']
   },
   {
-    id: "+",
-    name: "加法",
-    expression: "表达式1 + 表达式2\\\\数值",
+    id: '+',
+    name: '加法',
+    expression: '表达式1 + 表达式2\\\\数值',
     description:
-      "当表达式1和表达式2的类型均为数值时，做算术加法；当它们的类型为字符串时，做字符串连接；当表达式1为日期\\\\日期时间时，做日期天数的加法。",
+      '当表达式1和表达式2的类型均为数值时，做算术加法；当它们的类型为字符串时，做字符串连接；当表达式1为日期\\\\日期时间时，做日期天数的加法。',
     example:
       '用法1，数值相加：[固定成本] + [非固定成本]；\n用法2，字符串连接：[省份] + "/" + [城市] ；\n用法3，日期\\\\日期时间增加天数：[订单日期]+10。',
-    syntax: "表达式1 + 表达式2",
-    groups: ["string", "calculation"],
+    syntax: '表达式1 + 表达式2',
+    groups: ['string', 'calculation']
   },
   {
-    id: "-",
-    name: "减法",
-    expression: "表达式1 - 表达式2\\\\数值",
+    id: '-',
+    name: '减法',
+    expression: '表达式1 - 表达式2\\\\数值',
     description:
-      "当表达式1和表达式2的类型均为数值时，做算术减法；当表达式1为日期\\\\日期时间时，做日期天数的减法。",
+      '当表达式1和表达式2的类型均为数值时，做算术减法；当表达式1为日期\\\\日期时间时，做日期天数的减法。',
     example:
-      "用法1，数值相减：[销售额] - [成本]；\n用法2，日期相减：[发货日期]-[订单日期]，得到日期天数；\n用法3，日期\\\\日期时间减少天数：[订单日期]-10。",
-    syntax: "表达式1 - 表达式2",
-    groups: ["string", "calculation"],
+      '用法1，数值相减：[销售额] - [成本]；\n用法2，日期相减：[发货日期]-[订单日期]，得到日期天数；\n用法3，日期\\\\日期时间减少天数：[订单日期]-10。',
+    syntax: '表达式1 - 表达式2',
+    groups: ['string', 'calculation']
   },
   {
-    id: "*",
-    name: "乘法",
-    expression: "表达式1 * 表达式2",
-    description: "* 作为乘法运算符，只能用于数字字段。",
-    example: "[单价] * [个数]",
-    syntax: "表达式1 * 表达式2",
-    groups: ["calculation"],
+    id: '*',
+    name: '乘法',
+    expression: '表达式1 * 表达式2',
+    description: '* 作为乘法运算符，只能用于数字字段。',
+    example: '[单价] * [个数]',
+    syntax: '表达式1 * 表达式2',
+    groups: ['calculation']
   },
   {
-    id: "/",
-    name: "除法",
-    expression: "表达式1 / 表达式2",
-    description: "/ 作为除法运算符，只能用于数字字段。",
-    example: "[总人口] / [城市数量]",
-    syntax: "表达式1 / 表达式2",
-    groups: ["calculation"],
-  },
+    id: '/',
+    name: '除法',
+    expression: '表达式1 / 表达式2',
+    description: '/ 作为除法运算符，只能用于数字字段。',
+    example: '[总人口] / [城市数量]',
+    syntax: '表达式1 / 表达式2',
+    groups: ['calculation']
+  }
 ]
 
 export default {
@@ -206,25 +203,37 @@ export default {
     return {
       expression,
       activeIndex: 0,
-      textareaValue: "",
+      textareaValue: '',
       form: this.$form.createForm(this, {
         name: 'coordinated'
-      })
+      }),
+      dimension: '',
+      measure: ''
     }
   },
   computed: {
     explain() {
-      return this.expression[this.activeIndex].example.replace(/\n/gm,"<br/>")
+      return this.expression[this.activeIndex].example.replace(/\n/gm, '<br/>')
     }
   },
   methods: {
     change(value) {
       this.activeIndex = findIndex(this.expression, {
         id: value
-      });
+      })
     },
     filterOption(value, option) {
       return option.componentOptions.children[0].text.toLowerCase().indexOf(value.toLowerCase()) >= 0
+    },
+    handleSelectDimension(value) {
+      console.log(value)
+      this.dimension = ''
+      this.textareaValue += value
+    },
+    handleSelectMeasure(value) {
+      console.log(value)
+      this.measure = ''
+      this.textareaValue += value
     },
     handleSave() {
       this.handleClose()
@@ -232,9 +241,12 @@ export default {
     handleClose() {
       this.$emit('close')
     },
+    handleTextAreaBlur(e) {
+      console.log(window.getSelection())
+    },
     handleScroll(event) {
-      this.$refs["js-expshow"].scrollLeft = event.target.scrollLeft;
-      this.$refs["js-expshow"].scrollTop = event.target.scrollTop;
+      this.$refs['js-expshow'].scrollLeft = event.target.scrollLeft
+      this.$refs['js-expshow'].scrollTop = event.target.scrollTop
     }
   }
 }
