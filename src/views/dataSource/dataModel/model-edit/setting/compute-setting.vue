@@ -32,33 +32,25 @@
               />
             </a-form-item>
             <a-form-item label="表达式">
-              <div class="modal_select">
-                <a-select
-                  style="width: 110px;"
-                  @select="handleSelectDimension"
-                  v-model="dimension"
-                  placeholder="插入维度"
-                >
-                  <a-select-option value="aaa">
-                    aaa
-                  </a-select-option>
-                  <a-select-option value="bbb">
-                    bbb
-                  </a-select-option>
-                </a-select>
-                <a-select
-                  style="width: 110px;"
-                  @select="handleSelectMeasure"
-                  v-model="measure"
-                  placeholder="插入度量"
-                >
-                  <a-select-option value="ccc">
-                    ccc
-                  </a-select-option>
-                  <a-select-option value="ddd">
-                    ddd
-                  </a-select-option>
-                </a-select>
+              <div class="modal_dropdown">
+                <a-dropdown v-model="visible1" :trigger="['click']">
+                  <div class="dropdown">插入维度</div>
+                  <a-menu slot="overlay" @click="handleSelectDimensions">
+                    <a-input placeholder="搜索" @input="handleSearchDimensions"></a-input>
+                    <a-menu-item v-for="item in dimensionResult" :key="item.value">
+                      {{ item.name }}
+                    </a-menu-item>
+                  </a-menu>
+                </a-dropdown>
+                <a-dropdown v-model="visible2" :trigger="['click']">
+                  <div class="dropdown">插入度量</div>
+                  <a-menu slot="overlay" @click="handleSelectMeasures">
+                    <a-input placeholder="搜索" @input="handleSearchMeasures"></a-input>
+                    <a-menu-item v-for="item in measureResult" :key="item.value">
+                      {{ item.name }}
+                    </a-menu-item>
+                  </a-menu>
+                </a-dropdown>
               </div>
             </a-form-item>
           </a-form>
@@ -207,9 +199,35 @@ export default {
       form: this.$form.createForm(this, {
         name: 'coordinated'
       }),
-      dimension: '',
-      measure: ''
+      visible1: false,
+      visible2: false,
+      dimensions: [
+        {
+          name: '地区',
+          value: '地区'
+        },
+        {
+          name: '地区经理',
+          value: '地区经理'
+        }
+      ],
+      dimensionResult: [],
+      measures: [
+        {
+          name: '利润',
+          value: '利润'
+        },
+        {
+          name: '折扣',
+          value: '折扣'
+        }
+      ],
+      measureResult: []
     }
+  },
+  created () {
+    this.dimensionResult = this.dimensions
+    this.measureResult = this.measures
   },
   computed: {
     explain() {
@@ -217,6 +235,10 @@ export default {
     }
   },
   methods: {
+    preventDefault(e) {
+      e.preventDefault()
+      return false
+    },
     change(value) {
       this.activeIndex = findIndex(this.expression, {
         id: value
@@ -225,15 +247,35 @@ export default {
     filterOption(value, option) {
       return option.componentOptions.children[0].text.toLowerCase().indexOf(value.toLowerCase()) >= 0
     },
-    handleSelectDimension(value) {
-      console.log(value)
-      this.dimension = ''
-      this.textareaValue += value
+    handleSelectDimensions(menu) {
+      if (menu.key) {
+        this.textareaValue += menu.key
+        this.visible1 = false
+      }
     },
-    handleSelectMeasure(value) {
-      console.log(value)
-      this.measure = ''
-      this.textareaValue += value
+    handleSearchDimensions(e) {
+      const value = e.target.value
+      if (value === '') {
+        this.dimensionResult = this.dimensions
+      } else {
+        this.dimensionResult = this.dimensions.filter(item => item.value.toLowerCase().indexOf(value.toLowerCase()) > -1)
+      }
+      console.log('搜索结果', this.dimensionResult)
+    },
+    handleSelectMeasures(menu) {
+      if (menu.key) {
+        this.textareaValue += menu.key
+        this.visible2 = false
+      }
+    },
+    handleSearchMeasures(e) {
+      const value = e.target.value
+      if (value === '') {
+        this.measureResult = this.measures
+      } else {
+        this.measureResult = this.measures.filter(item => item.value.toLowerCase().indexOf(value.toLowerCase()) > -1)
+      }
+      console.log('搜索结果', this.measureResult)
     },
     handleSave() {
       this.handleClose()
