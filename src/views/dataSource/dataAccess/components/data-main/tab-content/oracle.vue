@@ -199,13 +199,13 @@ export default {
               this.saveBtn = false
             })
           if (result.code === 200) {
+            this.$message.success('保存成功，可抽取库表')
             this.$store.dispatch('dataAccess/getMenuList')
             this.$store.dispatch('dataAccess/setFirstFinished', true)
             this.$store.dispatch('dataAccess/setModelInfo', this.form)
             this.$store.dispatch('dataAccess/setModelId', result.data)
             this.$store.dispatch('dataAccess/setParentId', 0)
             this.formId = result.data
-            this.$message.success(result.msg)
           } else {
             this.$message.error(result.msg)
           }

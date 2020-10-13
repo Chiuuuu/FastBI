@@ -1,7 +1,7 @@
 <template>
   <div class="menu" id="menuRef">
     <div class="menu_title">
-      <span class="m-t-s">数据连接</span>
+      <span class="m-t-s">数据接入</span>
       <a-dropdown :trigger="['click']" placement="bottomLeft">
         <a class="ant-dropdown-link">
           <a-icon type="plus-square" class="menu_icon" />
@@ -44,7 +44,7 @@
       </a-modal>
     </div>
     <div class="menu_search">
-      <a-input placeholder="搜索数据连接名称" @input="handleSearchMenu">
+      <a-input placeholder="搜索数据接入名称" @input="handleSearchMenu">
         <a-icon class="icon_search" slot="suffix" type="search" />
       </a-input>
     </div>
@@ -297,7 +297,7 @@ export default {
     handleFileDelete(event, item, { file }) {
       this.$confirm({
         title: '确认提示',
-        content: '确定删除该数据连接?',
+        content: '确定删除该数据接入?',
         onOk: async () => {
           const result = await this.$server.common.deleMenuById(`/datasource/catalog/${file.id}`)
           if (result.code === 200) {
@@ -447,7 +447,7 @@ export default {
       this.resetNameVisible = false
     },
     /**
-     * 选择哪个类型的数据连接
+     * 选择哪个类型的数据接入
      */
     handleSelectModelType(event, item) {
       event.stopPropagation()

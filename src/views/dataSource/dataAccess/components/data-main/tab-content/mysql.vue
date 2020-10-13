@@ -266,6 +266,7 @@ export default {
             })
 
           if (result.code === 200) {
+            this.$message.success('保存成功，可抽取库表')
             this.$store.dispatch('dataAccess/getMenuList')
             this.$store.dispatch('dataAccess/setFirstFinished', true)
             this.$store.dispatch('dataAccess/setModelInfo', this.form)

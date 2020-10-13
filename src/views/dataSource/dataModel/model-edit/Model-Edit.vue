@@ -2,7 +2,7 @@
   <div class="Model-Edit">
     <div class="left">
       <!-- <div class="menu_title">
-        <span>数据链接</span>
+        <span>数据接入</span>
       </div>
       <div class="selector">
         <a-select default-value="银行账户" style="width: 94%;">
@@ -85,7 +85,7 @@
         <div class="detail_header">
           <span>数据模型详情</span>
           <div class="detail_btn">
-            <a-button v-on:click="check">查看宽表</a-button>
+            <!-- <a-button v-on:click="check">查看宽表</a-button> -->
             <!-- <a-button v-on:click="batch">批量编辑字段</a-button> -->
           </div>
         </div>
@@ -115,7 +115,7 @@
           <div class="measurement">
             <span class="mea_span">度量</span>
             <div class="mea_operation">
-              <a v-on:click="dim_mea('度量')" style="color:#627CFF;margin-right:20px;line-height:38px">新建计算度量</a>
+              <!-- <a v-on:click="dim_mea('度量')" style="color:#627CFF;margin-right:20px;line-height:38px">新建计算度量</a> -->
             </div>
             <div class="mea_menu">
               <a-menu mode="inline" v-for="(value, name) in measures" :key="name" :default-open-keys="[name]" :inline-collapsed="false">

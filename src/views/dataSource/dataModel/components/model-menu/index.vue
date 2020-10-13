@@ -16,14 +16,14 @@
         </a-menu>
       </a-dropdown>
     </div>
-    <a-modal v-model="visible" title="选择数据连接" :bodyStyle="{
+    <a-modal v-model="visible" title="选择数据接入" :bodyStyle="{
       height: `300px`,
       overflowY: 'auto'
     }" @ok="handleOk">
-      <a-input ref="userNameInput" v-model="search" placeholder="搜索数据连接" @input='handleSearchSource'>
+      <a-input ref="userNameInput" v-model="search" placeholder="搜索数据接入" @input='handleSearchSource'>
         <a-icon slot="prefix" type="search" />
       </a-input>
-      <router-link to="/dataSource/dataAccess" class="modal-item hover">新建数据连接</router-link>
+      <router-link to="/dataSource/dataAccess" class="modal-item hover">新建数据接入</router-link>
       <div class="menu-wrap modal-wrap">
         <div
           class="group"
@@ -63,15 +63,15 @@
         </div>
       </div>
     </a-modal>
-    <a-empty v-if="modelList && modelList.length && modelList.length === 0" class="table_list-_empty">
+    <div class="menu_search">
+      <a-input placeholder="搜索数据模型名称" @input="handleSearchModel">
+        <a-icon class="icon_search" slot="suffix" type="search" />
+      </a-input>
+    </div>
+    <a-empty v-if="modelResultList.length === 0" class="table_list-_empty">
       <span slot="description">暂无数据模型</span>
     </a-empty>
     <template v-else>
-      <div class="menu_search">
-        <a-input placeholder="搜索数据模型名称" @input="handleSearchModel">
-          <a-icon class="icon_search" slot="suffix" type="search" />
-        </a-input>
-      </div>
       <!-- <p class="menu_tips">右键文件夹或选项有添加，重命名等操作</p> -->
       <div class="menu-wrap" @dragover.stop="handleDragOver" @drop="handleWrapDrop">
         <div
@@ -436,7 +436,7 @@ export default {
       }
     },
     /**
-     * 确定选择的数据连接
+     * 确定选择的数据接入
      */
     handleOk() {
       if (!this.modalFileSelectId) {

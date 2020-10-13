@@ -16,7 +16,7 @@
           :multiple="true"
           :headers="{ 'content-type': 'multipart/form-data' }"
           :showUploadList="false"
-          :before-upload="beforeUpload"
+          :before-upload="beforeFileUpload"
           @change="handleFileChange"
         >
           <a-button style="border-color:rgba(97, 123, 255, 1);">
@@ -28,9 +28,8 @@
             <a-list-item
               slot="renderItem"
               slot-scope="item"
-              style="margin-left:10px"
             >
-              {{ item.name }}
+              <div class="excel-list-item" :title="item.name">{{ item.name }}</div>
               <a-icon
                 slot="actions"
                 type="delete"
@@ -66,7 +65,13 @@
         <div class="preview-tab">
           <div class="tab-title">预览表</div>
           <ul>
-            <li class="preview-tab-item" :class="{ 'active': currentTab === index }" v-for="(item, index) in tabList" :key="item.name">{{ item.name }}</li>
+            <li
+              class="preview-tab-item"
+              :class="{ 'active': currentTabIndex === index }"
+              v-for="(sheet, index) in sheetList"
+              :key="sheet.name"
+              @click="handleChangeTab(sheet, index)"
+            >{{ sheet.name }}</li>
           </ul>
         </div>
       </a-col>
@@ -74,7 +79,7 @@
         <div class="preview-controller">
           <span>从第</span>
           <div class="preview-line">
-            <a-input style="width:60px" v-model="lineCnt" />
+            <a-input style="width:60px" v-model="line" @keyup.enter.stop="handleEnterLine" />
             <div class="arrow-box" style="width:16px">
               <div class="arrow" @click="countLine('plus')">
                 <i class="arrow-up"></i>
@@ -85,16 +90,19 @@
             </div>
           </div>
           <span>行开始获取数据</span>
-          <a-checkbox style="margin-left: 50px">自动生成列名</a-checkbox>
+          <a-checkbox style="margin-left: 50px" @change="handleCheckBox">自动生成列名</a-checkbox>
         </div>
         <a-table
           class="preview-table"
           bordered
-          :columns="columns"
-          :data-source="data"
+          :columns="currentColumns"
+          :data-source="currentFieldList"
+          :loading="spinning"
           :pagination="false"
           :scroll="{ x: 780, y: 377 }"
-        ></a-table>
+        >
+          <template #no="text, record, index">{{ index + 1 }}</template>
+        </a-table>
       </a-col>
     </a-row>
     <a-button
@@ -111,7 +119,7 @@
 <script>
 import { mapState } from 'vuex'
 
-const tabList = [
+const sheetList = [
   { name: 'tab1' },
   { name: 'tab2' },
   { name: 'tab3' }
@@ -121,17 +129,17 @@ const columns = [
   {
     title: '序号',
     dataIndex: 'no',
-    key: 'no'
+    scopedSlots: {
+      customRender: 'no'
+    }
   },
   {
     title: '币种',
-    dataIndex: 'type',
-    key: 'type'
+    dataIndex: 'type'
   },
   {
     title: '值',
-    dataIndex: 'value',
-    key: 'value'
+    dataIndex: 'value'
   }
 ]
 
@@ -148,10 +156,10 @@ export default {
   data() {
     return {
       loading: false,
+      spinning: false,
       form: {
-        // 连接信息表单
         name: '',
-        catalog: '数据连接目录'
+        catalog: '数据接入目录'
       },
       rules: {
         name: [
@@ -176,12 +184,18 @@ export default {
       labelCol: {
         span: 4
       },
-      fileList: [],
-      tabList,
-      currentTab: 0,
-      line: 1,
-      columns,
-      data
+      fileList: [], // 文件列表
+      sheetList, // 当前文件的sheet列表
+      currentTabIndex: 0, // 当前选中sheet
+      isSetTableHead: false, // 是否自动生成列名
+      line: 1, // 当前显示的首行
+      requestLine: 1, // 记录上次设置的首行
+      columns: [], // 表头数据
+      noTitleColumns: [], // 自动生成表头时的表头
+      currentColumns: [], // 当前显示的表头
+      fieldList: [], // 列表数据
+      noTitleFieldList: [], // 自动生成表头时的列表
+      currentFieldList: [] // 当前显示的列表
     }
   },
   computed: {
@@ -189,17 +203,65 @@ export default {
       excel: state => state.dataAccess.modelType === 'excel',
       fileType: state =>
         state.dataAccess.modelType === 'excel' ? 'Excel' : 'Csv'
-    }),
-    lineCnt: {
-      get() {
-        return this.line
-      },
-      set(v) {
-        this.line = v
-      }
-    }
+    })
+  },
+  created () {
+    this.handleGetData()
   },
   methods: {
+    handleGetData() {
+      this.spinning = true
+      setTimeout(() => {
+        this.spinning = false
+
+        // 写入表头信息
+        this.columns = columns
+        this.currentColumns = this.columns
+        this.noTitleColumns = this.columns.map((item, index) => {
+          if (index === 0) {
+            return item
+          } else {
+            return {
+              title: 'F' + (index - 1),
+              dataIndex: item.dataIndex
+            }
+          }
+        })
+
+        // 写入表信息
+        this.fieldList = data
+        const head = {}
+        this.columns.map(item => {
+          head[item.dataIndex] = item.title
+        })
+        this.noTitleFieldList = [].concat(this.fieldList)
+        this.noTitleFieldList.unshift(head)
+        this.currentFieldList = data
+      }, 400)
+    },
+    handleChangeTab(sheet, index) {
+      this.currentTabIndex = index
+      this.handleGetData()
+    },
+    /**
+     * 是否自动生成表头
+     */
+    handleCheckBox(e) {
+      const checked = e.target.checked
+      if (this.isSetTableHead === checked) return
+      this.isSetTableHead = checked
+      if (checked) {
+        this.currentColumns = this.noTitleColumns
+        this.currentFieldList = this.noTitleFieldList
+      } else {
+        this.currentColumns = this.columns
+        this.currentFieldList = this.fieldList
+      }
+    },
+    beforeFileUpload() {
+      return false
+    },
+    // 删除文件
     handleRemove(file) {
       this.$confirm({
         title: '确认提示',
@@ -210,9 +272,7 @@ export default {
         }
       })
     },
-    beforeUpload() {
-      return false
-    },
+    // 上传文件
     handleFileChange(e) {
       console.log(e)
       // 校验大小
@@ -232,6 +292,38 @@ export default {
         this.$message.warning(name + '不是excel文件')
       }
     },
+    // 箭头设置首行数
+    countLine(type) {
+      if (type === 'plus') {
+        if (++this.line > 1000) {
+          this.line = 1000
+        } else {
+          this.requestLine = this.line
+          this.handleChangeFieldList()
+        }
+      } else if (type === 'minus') {
+        if (--this.line < 1) {
+          this.line = 1
+        } else {
+          this.requestLine = this.line
+          this.handleChangeFieldList()
+        }
+      }
+    },
+    // 回车设置首行
+    handleEnterLine(e) {
+      const value = e.target.value
+      if (!isNaN(value) && value >= 1 && value <= 1000) {
+        this.line = value
+        this.requestLine = value
+      } else {
+        this.line = this.requestLine
+      }
+    },
+    handleChangeFieldList() {
+      const currentFieldList = this.isSetTableHead ? this.noTitleFieldList : this.fieldList
+      this.currentFieldList = currentFieldList.slice(this.requestLine - 1)
+    },
     async handleSaveForm() {
       try {
         await this.$refs.fileForm.validate()
@@ -245,13 +337,6 @@ export default {
       })
       // 保存后清空列表
       this.fileList = []
-    },
-    countLine(type) {
-      if (type === 'plus' && ++this.lineCnt > 1000) {
-        this.lineCnt = 1000
-      } else if (type === 'minus' && --this.lineCnt < 0) {
-        this.lineCnt = 0
-      }
     }
   }
 }

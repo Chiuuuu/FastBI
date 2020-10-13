@@ -81,7 +81,7 @@
         <div class="model-contain" v-else>
           <div class="model-search">
             <a-input-search
-              placeholder="搜索数据连接名称"
+              placeholder="搜索数据接入名称"
               style="width:90%;margin-left:15px"
             />
           </div>
