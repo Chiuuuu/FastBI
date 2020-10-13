@@ -95,6 +95,7 @@
         <a-table
           class="preview-table"
           bordered
+          rowKey="no"
           :columns="currentColumns"
           :data-source="currentFieldList"
           :loading="spinning"
@@ -237,6 +238,10 @@ export default {
         this.noTitleFieldList = [].concat(this.fieldList)
         this.noTitleFieldList.unshift(head)
         this.currentFieldList = data
+
+        this.$nextTick(() => {
+          this.handleChangeFieldList()
+        })
       }, 400)
     },
     handleChangeTab(sheet, index) {
@@ -316,6 +321,7 @@ export default {
       if (!isNaN(value) && value >= 1 && value <= 1000) {
         this.line = value
         this.requestLine = value
+        this.handleChangeFieldList()
       } else {
         this.line = this.requestLine
       }

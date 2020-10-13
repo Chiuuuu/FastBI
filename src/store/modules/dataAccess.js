@@ -2,6 +2,7 @@ import dataAccessApi from '../../api/modules/common'
 const state = {
   modelType: '', // 数据类型
   firstFinished: false, // 数据接入信息是否填写完成
+  modelName: '',
   modelInfo: {}, // 数据源信息
   modelId: 0, // 选中的菜单id
   menuList: [], // 左边菜单列表
@@ -12,6 +13,9 @@ const state = {
 }
 
 const mutations = {
+  SET_MODELNAME(state, name) {
+    state.modelName = name
+  },
   SET_MODELINFO(state, info) {
     state.modelInfo = info
   },
@@ -48,6 +52,11 @@ const actions = {
     } else {
       vm.$message.error(result.msg)
     }
+  },
+  setModelName({
+    commit
+  }, info) {
+    commit('SET_MODELNAME', info)
   },
   setModelInfo({
     commit

@@ -266,25 +266,13 @@ export default {
       this.fileSelectId = file.id
       if (file.fileType === 1) {
         this.$store.dispatch('dataAccess/setModelType', 'mysql')
-        this.getTableInfo(`/datasource/${file.id}`, result => {
-          this.$store.dispatch('dataAccess/setModelInfo', {
-            ...result.data.properties,
-            id: this.fileSelectId,
-            name: result.data.name,
-            port: Number(result.data.properties.port)
-          })
-        })
       } else if (file.fileType === 2) {
         this.$store.dispatch('dataAccess/setModelType', 'oracle')
-        this.getTableInfo(`/datasource/${file.id}`, result => {
-          this.$store.dispatch('dataAccess/setModelInfo', {
-            ...result.data.properties,
-            id: this.fileSelectId,
-            name: result.data.name,
-            port: Number(result.data.properties.port)
-          })
-        })
       }
+      this.getTableInfo(`/datasource/${file.id}`, result => {
+        this.$store.dispatch('dataAccess/setModelInfo', result.data.properties)
+        this.$store.dispatch('dataAccess/setModelName', result.data.name)
+      })
       this.$store.dispatch('dataAccess/setFirstFinished', false)
       this.$store.dispatch('dataAccess/setModelId', file.id)
       this.$EventBus.$emit('set-tab-index', '1')

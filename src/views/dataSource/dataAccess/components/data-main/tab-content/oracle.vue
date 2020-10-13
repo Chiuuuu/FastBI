@@ -183,7 +183,7 @@ export default {
           delete this.form.dbid
           const params = {
             id: this.$store.state.dataAccess.modelId,
-            name: this.$store.state.dataAccess.modelInfo.name,
+            name: this.$store.state.dataAccess.modelName,
             parentId: this.modelSelectType === 'new' ? 0 : this.$store.state.dataAccess.parentId,
             property: {
               user: this.form.user,

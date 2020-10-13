@@ -138,6 +138,7 @@ export default {
   computed: {
     ...mapState({
       modelInfo: state => state.dataAccess.modelInfo,
+      modelName: state => state.dataAccess.modelName,
       tableList: state => state.dataAccess.menuList,
       modelType: state => state.dataAccess.modelType, // 数据类型
       modelSelectType: state => state.dataAccess.modelSelectType,
@@ -155,7 +156,7 @@ export default {
   methods: {
     handleSetFormData() {
       this.handleResetForm()
-      this.form = Object.assign(this.form, this.modelInfo)
+      this.form = Object.assign(this.form, this.modelInfo, { name: this.modelName })
     },
     /**
      * 任一表单项被校验后触发
@@ -204,14 +205,14 @@ export default {
         if (valid) {
           this.connectBtn = true
           const result = await this.$server.dataAccess.actionConnect({
-            name: this.form.name,
+            name: this.modelName,
             type: 1,
             property: {
               ip: this.form.ip,
               port: this.form.port,
               password: this.form.password,
               user: this.form.user,
-              databaseName: this.$store.state.dataAccess.modelInfo.databaseName || 'null'
+              databaseName: this.form.databaseName || 'null'
             }
           }).finally(() => {
             this.connectBtn = false
@@ -220,8 +221,13 @@ export default {
           if (result.code === 200) {
             this.databaseList = [].concat(result.rows)
             const item = this.databaseList.find(item => item.name === this.$store.state.dataAccess.modelInfo.databaseName)
-            this.form.dbid = item.id
-            this.form.databaseName = item.name
+            if (item) {
+              this.form.dbid = item.id
+              this.form.databaseName = item.name
+            } else {
+              this.form.databaseName = this.databaseList[0].name
+              this.form.dbid = this.databaseList[0].id
+            }
             this.connectStatus = true
             this.$message.success('连接成功')
           } else {
@@ -249,7 +255,7 @@ export default {
           this.saveBtn = true
           const params = {
             id: this.$store.state.dataAccess.modelId,
-            name: this.$store.state.dataAccess.modelInfo.name,
+            name: this.$store.state.dataAccess.modelName,
             parentId: this.$store.state.dataAccess.parentId,
             property: {
               user: this.form.user,

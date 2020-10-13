@@ -3,7 +3,7 @@
     <div class="right">
       <div class="header">
         <span class="data_con">{{
-          modelType ? (formInfo.name ? formInfo.name : '未命名连接') : "请连接数据"
+          modelType ? (modelName ? modelName : '未命名连接') : "请连接数据"
         }}</span>
         <span class="data_category" v-if="modelType"
           >（类型：{{ modelType }}）</span
@@ -60,6 +60,7 @@ export default {
           return item === state.dataAccess.modelType
         })
       },
+      modelName: state => state.dataAccess.modelName,
       tabChangeAble: state => state.dataAccess.firstFinished // 是否完成第一部分
     })
   },
@@ -74,10 +75,8 @@ export default {
      * 设置表名称
     */
     handleSetTableName(name) {
-      this.$set(this.formInfo, 'name', name)
-      this.$store.dispatch('dataAccess/setModelInfo', Object.assign(this.formInfo, {
-        name
-      }))
+      // this.$set(this.formInfo, 'name', name)
+      this.$store.dispatch('dataAccess/setModelName', name)
     },
     handleSetTab(key) {
       this.defaultTab = key
