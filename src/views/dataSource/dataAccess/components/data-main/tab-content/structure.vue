@@ -129,7 +129,7 @@ export default {
       const rows = this.selectedRows.map(item => {
         const _item = {
           databaseName: this.modelInfo.databaseName,
-          sourceId: this.formInfo.id,
+          sourceId: this.modelId,
           sourceName: this.formInfo.name,
           tableId: item.id,
           tableName: item.name
