@@ -98,6 +98,7 @@
     <reset-name-modal
       ref="resetNameForm"
       :visible="resetNameVisible"
+      :reset-type="1"
       :reset-name="resetName"
       @cancel="handleResetNameCancel"
       @create="handleResetNameCreate"

@@ -1,7 +1,7 @@
 <template>
   <a-modal
     :visible="visible"
-    :title="resetName.type === 'reset' ? '文件夹重命名' : '新建文件夹'"
+    :title="title"
     cancelText="取消"
     okText="确定"
     :afterClose="handleAfterClose"
@@ -13,7 +13,7 @@
     @ok="handleOk"
   >
     <a-form-model :model="form" :rules="rules" ref="resetNameForm" class="resetNameForm">
-      <a-form-model-item label="文件夹名称" prop="name">
+      <a-form-model-item label="名称" prop="name">
         <a-input v-model="form.name" />
       </a-form-model-item>
     </a-form-model>
@@ -22,7 +22,19 @@
 <script>
 export default {
   name: 'resetName',
-  props: ['visible', 'resetName'],
+  props: ['visible', 'resetName', 'resetType'],
+  computed: {
+    title() {
+      let title = this.resetName.type === 'reset' ? '重命名' : '新建'
+      const fileType = this.resetName.item.fileType
+      if (this.resetType === 1) {
+        title += (fileType === 1 ? '数据接入' : '文件夹')
+      } else if (this.resetType === 2) {
+        title += (fileType === 1 ? '数据模型' : '文件夹')
+      }
+      return title
+    }
+  },
   data() {
     return {
       form: {

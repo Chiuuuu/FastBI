@@ -119,7 +119,7 @@
       ref="resetNameForm"
       :visible="resetName.visible"
       :reset-name="resetName"
-      :modal-title="resetName.type === 'reset' ? '文件夹重命名' : '新建文件夹'"
+      :reset-type="2"
       @cancel="handleResetNameCancel"
       @create="handleResetNameCreate"
     ></reset-name-modal>
