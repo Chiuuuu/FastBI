@@ -211,6 +211,7 @@
         if (index > -1) {
           this.canvasMap.splice(index, 1)
           this.$store.dispatch('SingleSelected', null)
+          console.log(123)
           this.saveScreenData()
         }
       },

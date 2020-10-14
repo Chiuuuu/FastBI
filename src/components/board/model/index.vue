@@ -95,13 +95,13 @@
                 />
               </template>
               <template v-for="(item, index) in modelList">
-                <a-collapse-panel :showArrow="Boolean(item.isFolder)"
+                <a-collapse-panel :showArrow="Boolean(item.fileType === 0)"
                 :key="String(index)"
                 :header="item.name"
                 :style="customStyle"
                 @click.native="modelHandle(item)">
-                  <div style="margin-left:25px">
-                    <p @click="modelHandle(item2)" v-for="item2 in item.items" :key="item2.id">{{item2.name}}</p>
+                  <div style="margin-left:25px;cursor: pointer">
+                    <p @click="modelHandle(item2)" v-for="item2 in item.children" :key="item2.id">{{item2.name}}</p>
                   </div>
                 </a-collapse-panel>
               </template>
@@ -128,7 +128,7 @@ export default {
     return {
       customStyle:
         'background: #ffffff;border-radius: 4px;border: 0;overflow: hidden;color:red !important;',
-      modelKey: ['0', '1', '2', '3'],
+      modelKey: ['0', '1', '2', '3', '4', '5', '6', '7'],
       dimensionsKey: ['0', '1', '2', '3'], // 默认展开
       measuresKey: ['0', '1', '2', '3'],
       model: false,
@@ -154,7 +154,7 @@ export default {
     },
     // 点击选中模型
     modelHandle(item) {
-      if (!item.isFolder) {
+      if (item.fileType !== 0) {
         this.model = !this.model
         this.$store.dispatch('SetDataModel', item)
         this.getPivoSchemaList()
