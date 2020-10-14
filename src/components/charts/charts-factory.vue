@@ -88,15 +88,18 @@
       apiData: {
         handler (val) {
           if (val) {
-            if ((val.dimensions.length === 0 && val.measures.length > 0) || (val.dimensions.length > 0 && val.measures.length === 0)) {
-              return
+            console.log(val)
+            if (val.dimensions && val.measures) {
+              if ((val.dimensions.length === 0 && val.measures.length > 0) || (val.dimensions.length > 0 && val.measures.length === 0)) {
+                return
+              }
+              if (val.dimensions.length > 0 && val.measures.length > 0) {
+                this.chartData = val.source
+                return
+              }
             }
-            if (val.dimensions && val.dimensions.length > 0 && val.measures && val.measures.length > 0) {
-              this.chartData = val.source
-              return
-            }
-            this.chartData.columns = [...val.columns]
-            this.chartData.rows = [...val.rows]
+            this.chartData.columns = val.columns
+            this.chartData.rows = val.rows
             // if (val.source) {
             //   let data = formatData(val.source)
             //   // let data = val.source

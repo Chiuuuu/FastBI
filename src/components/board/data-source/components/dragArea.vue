@@ -122,25 +122,23 @@ export default {
     },
     // 删除当前维度或者度量
     deleteFile(item, index) {
-      console.log(item)
-      console.log(this.fileList)
       this.fileList.splice(index, 1)
-      this.getData()
+      let current = deepClone(this.currentSelected)
       // 维度度量删除完以后重置该图表数据
-      // if (this.fileList.length < 1) {
-      //   let canvasMaps = navigateList[0].children
-      //   for (let maps of canvasMaps) {
-      //     if (maps.name === current.name) {
-      //       let apiData = {
-      //         ...maps.api_data
-      //       }
-      //       console.log(apiData)
-      //       this.$store.dispatch('SetSelfDataSource', apiData)
-      //       // this.currentSelected.packageJson.api_data.source = maps.packageJson.api_data.source
-      //       this.saveScreenData()
-      //     }
-      //   }
-      // }
+      if (current.packageJson.api_data.dimensions.length === 0 && current.packageJson.api_data.measures.length === 0) {
+        let canvasMaps = navigateList[0].children
+        for (let maps of canvasMaps) {
+          if (maps.name === current.name) {
+            let apiData = {
+              ...maps.api_data
+            }
+            this.$store.dispatch('SetSelfDataSource', apiData)
+            // this.currentSelected.packageJson.api_data.source = maps.packageJson.api_data.source
+            this.saveScreenData()
+          }
+        }
+      }
+      this.getData()
     },
     // 根据维度度量获取数据
     getData() {
