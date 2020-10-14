@@ -87,11 +87,12 @@
       },
       apiData: {
         handler (val) {
-          console.log(val)
           if (val) {
+            if ((val.dimensions.length === 0 && val.measures.length > 0) || (val.dimensions.length > 0 && val.measures.length === 0)) {
+              return
+            }
             if (val.dimensions && val.dimensions.length > 0 && val.measures && val.measures.length > 0) {
               this.chartData = val.source
-              console.log(this.chartData)
               return
             }
             this.chartData.columns = [...val.columns]
