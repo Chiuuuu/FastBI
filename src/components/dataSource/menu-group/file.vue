@@ -95,6 +95,7 @@ export default {
       this.handleCreateMenu(e)
     },
     handleFileSelect() {
+      this.file.parentId = this.parent ? this.parent.id : 0
       this.$emit('fileSelect', this.file)
     },
     handleFileDragStart(e) {

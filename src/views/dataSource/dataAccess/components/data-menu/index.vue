@@ -265,6 +265,7 @@ export default {
     handleFileSelect(file) {
       if (this.fileSelectId === file.id) return
       this.fileSelectId = file.id
+      this.$store.dispatch('dataAccess/setParentId', file.parentId)
       if (file.fileType === 1) {
         this.$store.dispatch('dataAccess/setModelType', 'mysql')
       } else if (file.fileType === 2) {
