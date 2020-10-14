@@ -193,6 +193,7 @@ export default {
     },
     handleBtnDelete(node) {
       // let deleteList = []
+      this.nodeVisible = false
       this.$confirm({
         title: '确认提示',
         content: '确定删除该表?',
@@ -211,7 +212,6 @@ export default {
               return item
             })
           })
-          this.nodeVisible = false
         }
       })
     },

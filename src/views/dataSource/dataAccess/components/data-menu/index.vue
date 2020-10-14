@@ -432,7 +432,7 @@ export default {
         this.$message.error(result.msg)
       }
 
-      this.resetNameVisible = false
+      this.moveFileVisible = false
     },
     /**
      * 选择哪个类型的数据接入
@@ -445,6 +445,7 @@ export default {
       this.$store.dispatch('dataAccess/setFirstFinished', false)
       this.$store.dispatch('dataAccess/setModelId', 0)
       this.$store.dispatch('dataAccess/setModelInfo', {})
+      this.$store.dispatch('dataAccess/setModelName', '')
       this.$EventBus.$emit('resetForm')
       this.$EventBus.$emit('set-tab-index', '1')
     },
