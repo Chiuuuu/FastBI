@@ -141,6 +141,23 @@ export default {
   },
   methods: {
     /**
+     * 任一表单项被校验后触发
+     * prop 字段名称
+     * result 是否校验成功
+     * err 错误信息
+     */
+    handleValidateFiled(prop, result, err) {
+      if (!result) {
+        this.connectStatus = false
+        this.$emit('on-set-tab', '1')
+        let setFirstFinished = false
+        if (prop === 'password' && this.modelId !== '') {
+          setFirstFinished = true
+        }
+        this.$store.dispatch('dataAccess/setFirstFinished', setFirstFinished)
+      }
+    },
+    /**
      * 连接数据库
      */
     handleConnect() {

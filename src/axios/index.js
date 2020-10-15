@@ -12,6 +12,7 @@
 import axios from 'axios'
 import baseURL from '@/api/base'
 import store from '@/store'
+import router from '@/router'
 // import { messages } from 'bin-ui'
 import { message } from 'ant-design-vue'
 
@@ -29,6 +30,7 @@ const errorHandle = {
   },
   403: function(msg) {
     message.error(msg || '登录过期，请重新登录')
+    router.replace('/login')
   },
   404: function(msg) {
     message.error(msg || '请求资源不存在')
@@ -41,11 +43,17 @@ const errorHandle = {
 // 添加请求拦截器
 service.interceptors.request.use(
   function(config) {
-    const token = store.state.common.adminToken
-    if (token) {
+    const { adminToken, expires } = store.state.common
+    if (adminToken) {
       // 判断token是否存在，如果存在则每个请求都带上token
       // Bearer是JWT的认证头部信息
-      config.headers.common['Authorization'] = `Bearer ${token}`
+      config.headers.common['Authorization'] = `Bearer ${adminToken}`
+    }
+
+    // 判断token过期时间, 暂定剩余3分钟刷新token
+    if (!expires || expires - (+new Date()) <= 3 * 60 * 1000) {
+      const user = JSON.parse(window.localStorage.getItem('user'))
+      store.dispatch('common/get_token', user)
     }
 
     return config

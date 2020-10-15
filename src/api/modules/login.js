@@ -1,4 +1,5 @@
-import $axios from '@/axios'
+import $axios from 'axios'
+import baseURL from '@/api/base'
 
 const login = {
   /**
@@ -7,7 +8,7 @@ const login = {
  * @param {Object} params 登录参数
  */
   actionLogin(params) {
-    return $axios.post('/login', params)
+    return $axios.post(baseURL + '/login', params)
   }
 }
 

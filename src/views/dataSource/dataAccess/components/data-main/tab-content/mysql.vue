@@ -138,6 +138,7 @@ export default {
   computed: {
     ...mapState({
       modelInfo: state => state.dataAccess.modelInfo,
+      modelId: state => state.dataAccess.modelId,
       modelName: state => state.dataAccess.modelName,
       tableList: state => state.dataAccess.menuList,
       modelType: state => state.dataAccess.modelType, // 数据类型
@@ -168,7 +169,11 @@ export default {
       if (!result) {
         this.connectStatus = false
         this.$emit('on-set-tab', '1')
-        this.$store.dispatch('dataAccess/setFirstFinished', false)
+        let setFirstFinished = false
+        if (prop === 'password' && this.modelId !== '') {
+          setFirstFinished = true
+        }
+        this.$store.dispatch('dataAccess/setFirstFinished', setFirstFinished)
       }
     },
     /**
