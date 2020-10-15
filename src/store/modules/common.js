@@ -44,7 +44,6 @@ const actions = {
             })
     },
     set_token(state, token) {
-        debugger
         const expires = +new Date() + 30 * 60 * 1000
         state.commit('set_expires', expires)
         state.commit('SET_TOKEN', token)
