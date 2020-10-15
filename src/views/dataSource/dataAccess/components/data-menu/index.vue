@@ -138,8 +138,8 @@ export default {
   },
   data() {
     return {
-      modelList: ['mysql', 'oracle', 'excel'].map(function(item) {
-      // modelList: ['mysql', 'oracle'].map(function(item) {
+      // modelList: ['mysql', 'oracle', 'excel'].map(function(item) {
+      modelList: ['mysql', 'oracle'].map(function(item) {
         // 弹窗选项列表
         return {
           imgurl: require(`@/assets/images/icon_${item}.png`),
