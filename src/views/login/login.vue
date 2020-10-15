@@ -103,7 +103,7 @@ export default {
               path: '/screenManage/catalog'
             })
           } else {
-            this.$message.error(res.msg)
+            this.$message.error(res.data.msg)
           }
         })
       })

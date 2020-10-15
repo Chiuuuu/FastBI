@@ -48,12 +48,13 @@ service.interceptors.request.use(
       // 判断token是否存在，如果存在则每个请求都带上token
       // Bearer是JWT的认证头部信息
       config.headers.common['Authorization'] = `Bearer ${adminToken}`
-    }
 
-    // 判断token过期时间, 暂定剩余3分钟刷新token
-    if (!expires || expires - (+new Date()) <= 3 * 60 * 1000) {
-      const user = JSON.parse(window.localStorage.getItem('user'))
-      store.dispatch('common/get_token', user)
+      // 判断token过期时间, 暂定剩余3分钟刷新token
+      const now = +new Date()
+      if (!isNaN(expires) && expires > now && expires - now <= 3 * 60 * 1000) {
+        const user = JSON.parse(window.localStorage.getItem('user'))
+        store.dispatch('common/get_token', user)
+      }
     }
 
     return config

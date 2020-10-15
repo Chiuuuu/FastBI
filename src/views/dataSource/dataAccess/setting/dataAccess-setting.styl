@@ -1,9 +1,15 @@
 .data-access-setting {
     display: flex;
     justify-content: space-between;
+    height: 100%;
     .set-main {
         background-color: #ffffff;
         width: 100%;
+        height: 100%;
+        .scrollable {
+            height: calc(100% - 63px);  
+            overflow-y: auto;  
+        }
         .header {
             display: flex;
             justify-content: space-between;

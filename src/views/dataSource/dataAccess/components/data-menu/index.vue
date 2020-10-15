@@ -293,6 +293,7 @@ export default {
           const result = await this.$server.common.deleMenuById(`/datasource/catalog/${file.id}`)
           if (result.code === 200) {
             this.handleGetMenuList()
+            this.$message.success('删除成功')
             const isSame = file.id === this.fileSelectId
             if (isSame) this.$store.dispatch('dataAccess/setModelType', '')
           } else {
