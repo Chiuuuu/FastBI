@@ -827,7 +827,7 @@
                     <a-select-option value="solid">
                       实线
                     </a-select-option>
-                    <a-select-option value="dot">
+                    <a-select-option value="dotted">
                       点状
                     </a-select-option>
                     <a-select-option value="dashed">
@@ -1138,7 +1138,7 @@
         handler (val) {
           if (val) {
             console.log(val)
-            this.globalSettings = { ...val }
+            this.globalSettings = deepClone(val)
           }
         },
         deep: true,
