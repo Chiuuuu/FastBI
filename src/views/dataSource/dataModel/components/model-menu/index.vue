@@ -312,7 +312,7 @@ export default {
 
           if (result.code === 200) {
             this.handleGetMenuList()
-            this.$store.dispatch('dataModel/setModelId', '')
+            this.$store.dispatch('dataModel/setModelId', 0)
             this.$message.success('删除成功')
           } else {
             this.$message.error(result.msg)
@@ -363,7 +363,7 @@ export default {
             this.$message.success('删除成功')
             this.handleGetMenuList()
             const isSame = file.id === this.fileSelectId
-            if (isSame) this.$store.dispatch('dataModel/setModelId', '')
+            if (isSame) this.$store.dispatch('dataModel/setModelId', 0)
           } else {
             this.$message.error(result.msg)
           }

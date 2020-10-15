@@ -170,7 +170,7 @@ export default {
         this.connectStatus = false
         this.$emit('on-set-tab', '1')
         let setFirstFinished = false
-        if (prop === 'password' && this.modelId !== '') {
+        if (prop === 'password' && this.modelId !== 0) {
           setFirstFinished = true
         }
         this.$store.dispatch('dataAccess/setFirstFinished', setFirstFinished)

@@ -5,6 +5,7 @@ import store from '../store/index'
 import routes from './routes'
 
 import BinUI from 'bin-ui'
+import { Modal } from 'ant-design-vue'
 Vue.use(BinUI)
 
 Vue.use(VueRouter)
@@ -17,6 +18,7 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   BinUI.LoadingBar.start()
+  Modal.destroyAll()
   store.dispatch('SingleSelected', null)
   next()
 })

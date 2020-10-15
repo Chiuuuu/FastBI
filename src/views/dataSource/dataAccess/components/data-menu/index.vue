@@ -447,7 +447,7 @@ export default {
       this.visible = false
       this.$store.dispatch('dataAccess/setModelType', item.type)
       this.$store.dispatch('dataAccess/setFirstFinished', false)
-      this.$store.dispatch('dataAccess/setModelId', '')
+      this.$store.dispatch('dataAccess/setModelId', 0)
       this.$store.dispatch('dataAccess/setModelInfo', {})
       this.$store.dispatch('dataAccess/setModelName', '')
       this.$EventBus.$emit('resetForm')
