@@ -123,8 +123,8 @@ export default {
     async handleExtract() {
       if (this.selectedRows.length === 0) {
         return this.$message.error('请选择至少一项')
-      } else if (this.selectedRows.length > 3) {
-        return this.$message.error('一次抽取最多只能选择三个')
+      } else if (this.selectedRows.length > 10) {
+        return this.$message.error('一次抽取最多只能选择10个')
       }
       const rows = this.selectedRows.map(item => {
         const _item = {
