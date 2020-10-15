@@ -1,6 +1,6 @@
 <template>
   <div
-    class="m-dml-map m-map edit"
+    class="m-dml-map m-map edit scrollbar"
     ref="mapRef"
     @dragenter.prevent.stop="handleMapDragEnter"
     @dragover.prevent.stop
@@ -234,7 +234,7 @@ export default {
 .m-map {
     position: relative;
     box-sizing: border-box;
-    padding: 25px;
+    margin: 21px;
     overflow: auto;
     -webkit-user-select: none;
     -moz-user-select: none;

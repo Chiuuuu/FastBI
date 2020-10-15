@@ -9,8 +9,8 @@
           >（类型：{{ modelType }}）</span
         >
       </div>
-      <div class="tab">
-        <a-tabs default-active-key="1" v-model="defaultTab" :wrapper-col="wrapperCol" @change="handleChangeTab">
+      <div class="tab scrollbar">
+        <a-tabs class="tabs" default-active-key="1" v-model="defaultTab" :wrapper-col="wrapperCol" @change="handleChangeTab">
           <a-tab-pane key="1" tab="连接信息">
             <tab-content-entry
               ref="entry"

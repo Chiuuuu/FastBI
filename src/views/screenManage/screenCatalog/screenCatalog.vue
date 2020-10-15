@@ -20,7 +20,7 @@
           <a-icon slot="prefix" type="search" />
         </a-input>
       </div>
-      <div class="menu-wrap screen-menu">
+      <div class="menu-wrap scrollbar screen-menu">
         <div
           class="group"
           :class="handleIsFolder(folder) ? 'is-folder' : ''"
@@ -59,7 +59,7 @@
         </div>
       </div>
     </div>
-    <div class="right">
+    <div class="right scrollbar">
       <div class="right-header" v-if="fileSelectId !== ''">
         <span class="nav_title">{{fileName}}</span>
         <a-button class="btn_n1" @click="openScreen">
@@ -83,7 +83,7 @@
 
     <a-modal v-model="screenVisible" :title="isAdd===1?'新建大屏':'重命名大屏'" @ok="handleOk">
       <a-form :form="screenForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
-        <a-form-item label="大屏名称">
+        <a-form-item label="名称">
           <a-input class="mod_input"
            v-decorator="['name', { rules: [{ required: true, message: '请输入大屏名称'}] }]"
            placeholder="请输入大屏名称"
@@ -102,7 +102,7 @@
       </a-form>
     </a-modal>
 
-    <new-folder ref="newFolderForm" :visible="folderVisible" @cancel="hideFolder" @create="creatFolder"></new-folder>
+    <new-folder ref="newFolderForm" :title="folderTitle" :visible="folderVisible" @cancel="hideFolder" @create="creatFolder"></new-folder>
   </div>
 </template>
 
@@ -130,6 +130,7 @@ export default {
       screenVisible: false, // 新建大屏弹窗
       isAdd: 1, // 1新增 2编辑 3删除
       folderVisible: false, // 新建文件夹弹窗
+      folderTitle: '',
       screenForm: this.$form.createForm(this), // 新建大屏弹窗
       customStyle: 'background: #ffffff;border: 0;overflow: hidden;color:#3B3C43;',
       folderContenxtMenu: [
@@ -259,6 +260,7 @@ export default {
       this.isAdd = 2
       this.id = folder.id
       this.folderVisible = true
+      this.folderTitle = '重命名文件夹'
       this.$nextTick(() => {
         this.$refs.newFolderForm.form.setFieldsValue({
           name: folder.name
@@ -348,6 +350,7 @@ export default {
     addFolder() {
       this.isAdd = 1
       this.folderVisible = true
+      this.folderTitle = '新建文件夹'
     },
     // 创建文件夹
     creatFolder() {

@@ -24,7 +24,7 @@
         <a-icon slot="prefix" type="search" />
       </a-input>
       <router-link to="/dataSource/dataAccess" class="modal-item hover">新建数据接入</router-link>
-      <div class="menu-wrap modal-wrap">
+      <div class="menu-wrap modal-wrap scrollbar">
         <div
           class="group"
           :class="handleIsFolder(folder) ? 'is-folder' : ''"
@@ -73,7 +73,7 @@
     </a-empty>
     <template v-else>
       <!-- <p class="menu_tips">右键文件夹或选项有添加，重命名等操作</p> -->
-      <div class="menu-wrap" @dragover.stop="handleDragOver" @drop="handleWrapDrop">
+      <div class="menu-wrap scrollbar" @dragover.stop="handleDragOver" @drop="handleWrapDrop">
         <div
           class="group"
           :class="handleIsFolder(folder) ? 'is-folder' : ''"

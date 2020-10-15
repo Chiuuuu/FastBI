@@ -53,7 +53,7 @@
     </a-empty>
     <template v-else>
       <!-- <p class="menu_tips">右键文件夹或选项有添加，重命名等操作</p> -->
-      <div class="menu-wrap" @dragover.stop="handleDragOver" @drop="handleWrapDrop">
+      <div class="menu-wrap scrollbar" @dragover.stop="handleDragOver" @drop="handleWrapDrop">
         <div
           class="group"
           :class="handleIsFolder(folder, 'items') ? 'is-folder' : ''"
@@ -138,8 +138,8 @@ export default {
   },
   data() {
     return {
-      // modelList: ['mysql', 'oracle', 'excel'].map(function(item) {
-      modelList: ['mysql', 'oracle'].map(function(item) {
+      modelList: ['mysql', 'oracle', 'excel'].map(function(item) {
+      // modelList: ['mysql', 'oracle'].map(function(item) {
         // 弹窗选项列表
         return {
           imgurl: require(`@/assets/images/icon_${item}.png`),
@@ -265,7 +265,6 @@ export default {
     handleFileSelect(file) {
       if (this.fileSelectId === file.id) return
       this.fileSelectId = file.id
-      this.$store.dispatch('dataAccess/setParentId', file.parentId)
       if (file.fileType === 1) {
         this.$store.dispatch('dataAccess/setModelType', 'mysql')
       } else if (file.fileType === 2) {
@@ -277,6 +276,8 @@ export default {
       })
       this.$store.dispatch('dataAccess/setFirstFinished', false)
       this.$store.dispatch('dataAccess/setModelId', file.id)
+      this.$store.dispatch('dataAccess/setParentId', file.parentId)
+      this.$store.dispatch('dataAccess/setFirstFinished', true)
       this.$EventBus.$emit('set-tab-index', '1')
       this.$emit('on-menuChange-componet', 'Main')
       this.$store.dispatch('dataAccess/setModelSelectType', '')

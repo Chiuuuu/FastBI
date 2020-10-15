@@ -15,7 +15,7 @@
       }
     "
   >
-    <a-form-model :form="form" class="resetNameForm">
+    <a-form-model :form="form" class="resetNameForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
       <a-form-model-item label="选择文件夹" prop="folderId">
         <a-select v-model="form.folderId">
           <a-select-option v-for="item in menuList" :key="item.id" :value="item.id">

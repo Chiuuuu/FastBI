@@ -1,7 +1,7 @@
 <template>
   <a-modal
     :visible="visible"
-    title="名称"
+    :title="title"
     cancelText="取消"
     okText="确定"
     :afterClose="handleAfterClose"
@@ -16,7 +16,7 @@
       }
     "
   >
-    <a-form layout="vertical" :form="form" class="resetNameForm">
+    <a-form layout="vertical" :form="form" class="resetNameForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
       <a-form-item label="名称">
         <a-input
           :maxLength="20"
@@ -45,7 +45,7 @@
 <script>
 export default {
   name: 'newFolder',
-  props: ['visible'],
+  props: ['visible', 'title'],
   beforeCreate() {
     this.form = this.$form.createForm(this, { name: 'form_in_modal' })
   },

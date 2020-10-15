@@ -1,5 +1,5 @@
 <template>
-  <div class="data-model">
+  <div class="data-model screen-manage">
     <Menu @getModelInfo='handleEmitMainGetData'></Menu>
     <Main ref='modelMainRef'></Main>
   </div>

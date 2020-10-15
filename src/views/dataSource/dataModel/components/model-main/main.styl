@@ -1,7 +1,14 @@
 .model-main{
-    position: relative;
-    background-color: #ffffff;
+        position: relative;
+        height: 100%;
+        // overflow-y: auto;
+        background-color: #ffffff;
         width: 79%;
+        /deep/ .ant-spin-container {
+            height calc(100vh - 101px)
+            display: flex;
+            flex-direction: column;
+        }
         .header {
             display: flex;
             justify-content: space-between;
@@ -25,6 +32,11 @@
                 margin-top: 9px;
                 margin-right: 20px;
             }
+        }
+        .scrollable {
+            width 100%
+            flex 1
+            overflow-y auto    
         }
         .description {
             width: 97%;
@@ -169,7 +181,7 @@
 .m-map {
     position: relative;
     box-sizing: border-box;
-    padding: 25px;
+    margin: 21px;
     overflow: auto;
     -webkit-user-select: none;
     -moz-user-select: none;

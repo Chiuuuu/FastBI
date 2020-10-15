@@ -1,9 +1,9 @@
 <template>
-  <a-row :gutter="16">
-    <a-col class="gutter-row" :span="5">
+  <a-row :gutter="16" class="screen-manage">
+    <a-col class="gutter-row screen-manage" :span="5">
       <Menu @on-menuChange-componet="handleMenuChangeComponet"></Menu>
     </a-col>
-    <a-col class="gutter-row" :span="19">
+    <a-col class="gutter-row screen-manage" :span="19">
       <component :is="showWhat" @on-change-componet="handleChangeComponet" :tabindex="tabindex" :fieldInfo="fieldInfo"></component>
     </a-col>
   </a-row>

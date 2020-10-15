@@ -188,7 +188,7 @@ export default {
       const obj = item.pop()
       this.form.dbid = obj.id
       this.form.databaseName = obj.name
-      this.$store.dispatch('dataAccess/setModelInfo', this.form)
+      // this.$store.dispatch('dataAccess/setModelInfo', this.form)
     },
     /**
      * 重置表单

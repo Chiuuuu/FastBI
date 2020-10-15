@@ -12,7 +12,7 @@
     "
     @ok="handleOk"
   >
-    <a-form-model :model="form" :rules="rules" ref="resetNameForm" class="resetNameForm">
+    <a-form-model :model="form" :rules="rules" ref="resetNameForm" class="resetNameForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
       <a-form-model-item label="名称" prop="name">
         <a-input v-model="form.name" />
       </a-form-model-item>
