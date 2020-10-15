@@ -1,9 +1,14 @@
 <template>
   <div class="board-header" flex>
     <div class="header-title">
-      <span style="font-size:18px;margin-top:10px">{{fileName}}</span>
+      <!-- <span style="font-size:18px;margin-top:10px">{{fileName}}</span> -->
+      <!-- <a-input placeholder="请输入大屏标题" v-model="fileName" style="border:none;background:none;color:#fff;" /> -->
       <!-- <i class="el-icon-arrow-left" style="margin-left:20px;font-size:22px;cursor: pointer;margin-top:8px"></i> -->
       <!-- <span v-if="config.title">{{ config.title.text }}</span> -->
+      <span v-if="!isFocus">{{screenName}}</span>
+      <input class="header-title-text" :maxLength="20" :autofocus="isFocus"
+        :class="isFocus?'focus':'nofocus'" type="text" v-model="screenName"
+        @focus="onfocus" @blur="onBlur" >
     </div>
     <div class="control" flex-box="1">
       <slot>control box</slot>
@@ -39,7 +44,7 @@
             type="close"
             style="font-size:18px"
           />
-          <span> 关闭</span>
+          <span> 保存并关闭</span>
         </div>
     </div>
   </div>
@@ -57,23 +62,46 @@ export default {
   },
   data() {
     return {
-      fileName: '', // 大屏名称
-      userId: ''
+      screenName: '', // 大屏名称
+      userId: '',
+      isFocus: false // 大屏名称是否聚焦
     }
   },
   computed: {
-    ...mapGetters(['isScreen', 'pageSettings', 'canvasMap', 'screenId'])
+    ...mapGetters(['isScreen', 'pageSettings', 'canvasMap', 'screenId', 'fileName'])
   },
   created() {
-    if (this.$route.query.name) {
-      this.fileName = this.$route.query.name
-    }
+    // if (this.$route.query.name) {
+    //   this.fileName = this.$route.query.name
+    // }
+    this.screenName = this.fileName
     this.userId = 'dv1e443967LZP2Dj'
   },
   methods: {
       ...mapActions(['saveScreenData']),
       goBack() {
         this.$router.go(-1)
+      },
+      onfocus() {
+        this.isFocus = true
+      },
+      onBlur() {
+        if (this.screenName === '') {
+          this.screenName = this.fileName
+          return
+        }
+        this.isFocus = false
+        let params = {
+          fileType: 1,
+          id: this.screenId,
+          name: this.screenName
+        }
+        this.$server.common.putMenuFolderName('/screen/catalog', params).then(res => {
+          if (res.code === 200) {
+            this.$store.dispatch('SetFileName', this.screenName)
+            console.log('修改大屏名称')
+          }
+        })
       },
       // 打开全屏
       openScreen () {

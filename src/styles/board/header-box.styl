@@ -13,7 +13,8 @@
   background: #040D2E;
   transition: all .5s ease-in .1s;
   .header-title {
-    width: 200px;
+    position: relative;
+    width: 300px;
     height: 62px;
     // height: 7.33%;
     display: inline-block;
@@ -29,10 +30,32 @@
     span {
       display: inline-block;
       vertical-align: top;
-      font-size: 12px;
+      font-size: 14px;
       line-height: 40px;
       color: $color-text-primary;
       padding-left: 20px;
+      margin-top: 10px;
+      width: 100%;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    &-text{
+      background: none;
+    }
+    .focus{
+      position: absolute;
+      left: 20px;
+      top: 10px;
+      border: 1px solid #ccc;
+      width: 300px;
+    }
+    .nofocus{
+      width: 300px;
+      position: absolute;
+      left: 20px;
+      top: 10px;
+      opacity:0;
     }
   }
   .control {

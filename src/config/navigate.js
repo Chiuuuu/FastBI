@@ -1141,7 +1141,7 @@ const list = [{
                 name: 've-text',
                 chartType: 'v-text',
                 icon: 'edit',
-                apiData: {},
+                api_data: {},
                 apis: {},
                 modelId: '',
                 canEdit: false,
@@ -1171,7 +1171,7 @@ const list = [{
                 chartType: 'v-image',
                 icon: 'picture',
                 modelId: '',
-                apiData: {},
+                api_data: {},
                 apis: {},
                 config: {
                     noTitle: true,

@@ -1,7 +1,7 @@
 <!-- 8-14 数据模型侧栏 -->
 <template>
   <div class="board-model" :style="config.style">
-    <div flex="dir:top" style="height:100%">
+    <div style="height:100%">
       <div class="model-header" v-show="config.title.enable">
         <span class="model-span" v-if="modelExpand">{{ config.title.text }}</span>
         <a-icon class="model-icon" :type="modelExpand ? 'menu-unfold' : 'menu-fold'" @click="toCollapse" />
@@ -85,28 +85,30 @@
               style="width:90%;margin-left:15px"
             />
           </div>
-          <div class="model-main" flex-box="1">
-            <a-collapse v-model="modelKey" :bordered="false">
-              <template #expandIcon="props">
-                <a-icon
-                  type="folder"
-                  :rotate="props.isActive ? 0 : 0"
-                  style="font-size:16px"
-                />
-              </template>
-              <template v-for="(item, index) in modelList">
-                <a-collapse-panel :showArrow="Boolean(item.fileType === 0)"
-                :key="String(index)"
-                :header="item.name"
-                :style="customStyle"
-                @click.native="modelHandle(item)">
-                  <div style="margin-left:25px;cursor: pointer">
-                    <p @click="modelHandle(item2)" v-for="item2 in item.children" :key="item2.id">{{item2.name}}</p>
-                  </div>
-                </a-collapse-panel>
-              </template>
-            </a-collapse>
-          </div>
+          <b-scrollbar style="height: 100%;">
+            <div class="model-main">
+              <a-collapse v-model="modelKey" :bordered="false">
+                <template #expandIcon="props">
+                  <a-icon
+                    type="folder"
+                    :rotate="props.isActive ? 0 : 0"
+                    style="font-size:16px"
+                  />
+                </template>
+                <template v-for="(item, index) in modelList">
+                  <a-collapse-panel :showArrow="Boolean(item.fileType === 0)"
+                  :key="String(index)"
+                  :header="item.name"
+                  :style="customStyle"
+                  @click.native="modelHandle(item)">
+                    <div style="margin-left:25px;cursor: pointer">
+                      <p @click="modelHandle(item2)" v-for="item2 in item.children" :key="item2.id">{{item2.name}}</p>
+                    </div>
+                  </a-collapse-panel>
+                </template>
+              </a-collapse>
+            </div>
+          </b-scrollbar>
         </div>
       </div>
     </div>

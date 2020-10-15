@@ -1,6 +1,6 @@
 <template>
   <div class="board-edit-slider">
-    <div class="label">{{ range }}</div>
+    <div class="label">{{ range.toFixed(2) }}</div>
     <div class="data-slider">
       <b-icon name="ios-remove-circle-outline" class="zoom-out" @click.native="changeRange(-1)"></b-icon>
       <input type="range" :min="min" :max="max" class="input-range" step="0.05"
