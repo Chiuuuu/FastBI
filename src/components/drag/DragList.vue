@@ -73,7 +73,6 @@
       },
       // 点击图表添加到大屏
       handleAdd(component) {
-        console.log({ ...component })
         component.api_data.dimensions = []
         component.api_data.measures = []
         component.api_data.tableList = []
