@@ -42,22 +42,22 @@ export default {
   watch: {
     currentSelected: {
       handler (val) {
-        if (val) {
-          // 当前选中的图表显示维度度量的数据
-          // this.fileList = []
-          if (this.type === 'dimensions' && val.packageJson.api_data.dimensions) { // 维度
-            this.fileObj.dimensions = JSON.parse(JSON.stringify(val.packageJson.api_data.dimensions))
-            // this.fileList = JSON.parse(JSON.stringify(val.packageJson.api_data.dimensions))
-          }
-          if (this.type === 'measures' && val.packageJson.api_data.measures) { // 度量
-            this.fileObj.measures = JSON.parse(JSON.stringify(val.packageJson.api_data.measures))
-            // this.fileList = JSON.parse(JSON.stringify(val.packageJson.api_data.measures))
-          }
-          if (this.type === 'tableList' && val.packageJson.api_data.tableList) { // 表格不区分维度度量
-            this.fileObj.tableList = JSON.parse(JSON.stringify(val.packageJson.api_data.tableList))
-            // this.fileList = JSON.parse(JSON.stringify(val.packageJson.api_data.tableList))
-          }
-        }
+        // if (val) {
+        //   // 当前选中的图表显示维度度量的数据
+        //   // this.fileList = []
+        //   if (this.type === 'dimensions' && val.packageJson.api_data.dimensions) { // 维度
+        //     this.fileObj.dimensions = JSON.parse(JSON.stringify(val.packageJson.api_data.dimensions))
+        //     // this.fileList = JSON.parse(JSON.stringify(val.packageJson.api_data.dimensions))
+        //   }
+        //   if (this.type === 'measures' && val.packageJson.api_data.measures) { // 度量
+        //     this.fileObj.measures = JSON.parse(JSON.stringify(val.packageJson.api_data.measures))
+        //     // this.fileList = JSON.parse(JSON.stringify(val.packageJson.api_data.measures))
+        //   }
+        //   if (this.type === 'tableList' && val.packageJson.api_data.tableList) { // 表格不区分维度度量
+        //     this.fileObj.tableList = JSON.parse(JSON.stringify(val.packageJson.api_data.tableList))
+        //     // this.fileList = JSON.parse(JSON.stringify(val.packageJson.api_data.tableList))
+        //   }
+        // }
       },
       deep: true,
       immediate: true

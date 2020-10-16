@@ -371,6 +371,9 @@ export default {
             if (res.code === 200) {
               this.$message.success(res.msg)
               this.getList()
+              // 新建文件夹后 返回空页面 不显示大屏
+              this.$store.dispatch('SetScreenId', '')
+              this.$store.dispatch('SetFileName', '')
             } else {
               this.$message.error(res.msg)
             }
