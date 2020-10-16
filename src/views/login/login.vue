@@ -91,19 +91,17 @@ export default {
           return
         }
         console.log('Received values of form: ', values)
-        // 更新用户信息
-        window.localStorage.setItem('user', JSON.stringify(values))
         let params = {
           ...values
         }
         this.$server.login.actionLogin(params).then(res => {
-          if (res.data.code === 200) {
-            this.$store.dispatch('common/set_token', res.data.token)
+          if (res.code === 200) {
+            this.$store.dispatch('common/set_token', res.token)
             this.$router.push({
               path: '/screenManage/catalog'
             })
           } else {
-            this.$message.error(res.data.msg)
+            this.$message.error(res.msg)
           }
         })
       })
