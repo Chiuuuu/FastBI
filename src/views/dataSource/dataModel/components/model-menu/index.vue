@@ -304,6 +304,9 @@ export default {
      * 文件夹删除
     */
     handleFolderDelete(mouseEvent, event, { folder }) {
+      if (folder.children && folder.children.length > 0) {
+        return this.$message.warning('文件夹下存在数据模型不可删除')
+      }
       this.$confirm({
         title: '确认提示',
         content: '确定删除该文件夹?',
