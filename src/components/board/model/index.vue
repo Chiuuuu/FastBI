@@ -85,30 +85,32 @@
               style="width:90%;margin-left:15px"
             />
           </div>
-          <b-scrollbar style="height: 100%;">
-            <div class="model-main">
-              <a-collapse v-model="modelKey" :bordered="false">
-                <template #expandIcon="props">
-                  <a-icon
-                    type="folder"
-                    :rotate="props.isActive ? 0 : 0"
-                    style="font-size:16px"
-                  />
-                </template>
-                <template v-for="(item, index) in modelList">
-                  <a-collapse-panel :showArrow="Boolean(item.fileType === 0)"
-                  :key="String(index)"
-                  :header="item.name"
-                  :style="customStyle"
-                  @click.native="modelHandle(item)">
-                    <div style="margin-left:25px;cursor: pointer">
-                      <p @click="modelHandle(item2)" v-for="item2 in item.children" :key="item2.id">{{item2.name}}</p>
-                    </div>
-                  </a-collapse-panel>
-                </template>
-              </a-collapse>
-            </div>
-          </b-scrollbar>
+          <div>
+            <b-scrollbar style="height: 100%;">
+              <div class="model-main">
+                <a-collapse v-model="modelKey" :bordered="false">
+                  <template #expandIcon="props">
+                    <a-icon
+                      type="folder"
+                      :rotate="props.isActive ? 0 : 0"
+                      style="font-size:16px"
+                    />
+                  </template>
+                  <template v-for="(item, index) in modelList">
+                    <a-collapse-panel :showArrow="Boolean(item.fileType === 0)"
+                    :key="String(index)"
+                    :header="item.name"
+                    :style="customStyle"
+                    @click.native="modelHandle(item)">
+                      <div style="margin-left:25px;cursor: pointer">
+                        <p @click="modelHandle(item2)" v-for="item2 in item.children" :key="item2.id">{{item2.name}}</p>
+                      </div>
+                    </a-collapse-panel>
+                  </template>
+                </a-collapse>
+              </div>
+            </b-scrollbar>
+          </div>
         </div>
       </div>
     </div>

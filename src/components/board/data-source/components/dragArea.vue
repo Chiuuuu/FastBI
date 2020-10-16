@@ -90,15 +90,19 @@ export default {
       if (this.type === 'dimensions' && this.dragFile === this.type) {
         // 维度暂时只能拉入一个字段
         this.fileList[0] = dataFile
+        this.fileList = this.uniqueFun(this.fileList, 'name')
+        this.getData()
       }
       if (this.type === 'measures' && this.dragFile === this.type) {
         this.fileList.push(dataFile)
+        this.fileList = this.uniqueFun(this.fileList, 'name')
+        this.getData()
       }
       if (this.type === 'tableList') {
         this.fileList.push(dataFile)
+        this.fileList = this.uniqueFun(this.fileList, 'name')
+        this.getData()
       }
-      this.fileList = this.uniqueFun(this.fileList, 'name')
-      this.getData()
       this.isdrag = false
     },
     // 对象数组去重,type表示对象里面的一个属性

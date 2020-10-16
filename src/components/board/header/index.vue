@@ -35,17 +35,17 @@
           />
           <span> 预览</span>
         </div>
-        <div class="item" flex="dir:top" @click.stop="saveScreenData({mes: '保存成功'})">
+        <div class="item" flex="dir:top" @click.stop="saveScreenData({mes: '保存成功', callback:goBack})">
           <a-icon type="save" style="font-size:18px" />
-          <span> 保存</span>
+          <span> 保存并关闭</span>
         </div>
-        <div class="item" flex="dir:top" @click="goBack">
+        <!-- <div class="item" flex="dir:top" @click="goBack">
           <a-icon
             type="close"
             style="font-size:18px"
           />
           <span> 保存并关闭</span>
-        </div>
+        </div> -->
     </div>
   </div>
 </template>

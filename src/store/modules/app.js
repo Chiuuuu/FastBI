@@ -98,6 +98,9 @@ const app = {
                 }
               })
             }
+            if (obj.callback) {
+              obj.callback()
+            }
           }).catch((err) => { // 需要捕获错误 否则无法传递给commit
             message.error(err)
             commit('SET_SCREEN_ID', '')
