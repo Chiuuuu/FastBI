@@ -73,7 +73,6 @@ service.interceptors.response.use(
     return response.data
   },
   error => {
-    debugger
     const { response } = error
     // messages({ content: response ? response.data : '请求错误', type: 'danger', duration: 5 })
     message.error(response && response.data ? response.data.msg : '请求错误')

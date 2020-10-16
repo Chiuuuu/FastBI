@@ -61,5 +61,29 @@ export default {
      */
     actionExtract(url, params = {}) {
         return $axios.post(url, params)
+    },
+    /**
+     * @description 上传文件
+     * @param {Object} file 文件
+     */
+    actionUploadFile(data) {
+        return $axios({
+            method: 'post',
+            headers: { 'Content-Type': 'multipart/form-data' },
+            url: '/datasource/excel/read',
+            data
+        })
+    },
+    /**
+     * @description 上传文件
+     * @param {Object} data 文件
+     */
+    saveExcelInfo(data) {
+        return $axios({
+            method: 'post',
+            headers: { 'Content-Type': 'multipart/form-data' },
+            url: '/datasource/excel/save',
+            data
+        })
     }
 }
