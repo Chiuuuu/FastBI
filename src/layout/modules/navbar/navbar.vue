@@ -34,7 +34,7 @@ export default {
       this.$router.push({
         path: '/login'
       })
-      this.$store.commit('common/set_token', '')
+      this.$store.dispatch('common/set_token', '')
       sessionStorage.clear()
     },
 

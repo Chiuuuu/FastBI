@@ -26,11 +26,11 @@ const service = axios.create({
 
 const errorHandle = {
   401: function(msg) {
-    message.error(msg || '未登录状态，跳转登录页')
+    // message.error(msg || '未登录状态，跳转登录页')
+    router.replace('/login')
   },
   403: function(msg) {
-    message.error(msg || '登录过期，请重新登录')
-    router.replace('/login')
+    message.error(msg || '没有权限，请联系管理员授权')
   },
   404: function(msg) {
     message.error(msg || '请求资源不存在')
@@ -43,18 +43,11 @@ const errorHandle = {
 // 添加请求拦截器
 service.interceptors.request.use(
   function(config) {
-    const { adminToken, expires } = store.state.common
+    const { adminToken } = store.state.common
     if (adminToken) {
       // 判断token是否存在，如果存在则每个请求都带上token
       // Bearer是JWT的认证头部信息
       config.headers.common['Authorization'] = `Bearer ${adminToken}`
-
-      // 判断token过期时间, 暂定剩余3分钟刷新token
-      const now = +new Date()
-      if (!isNaN(expires) && expires > now && expires - now <= 3 * 60 * 1000) {
-        const user = JSON.parse(window.localStorage.getItem('user'))
-        store.dispatch('common/get_token', user)
-      }
     }
 
     return config
@@ -80,9 +73,10 @@ service.interceptors.response.use(
     return response.data
   },
   error => {
+    debugger
     const { response } = error
     // messages({ content: response ? response.data : '请求错误', type: 'danger', duration: 5 })
-    message.error(response ? response.data : '请求错误')
+    message.error(response && response.data ? response.data.msg : '请求错误')
     return Promise.reject(error)
   }
 )
