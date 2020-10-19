@@ -265,12 +265,12 @@ export default {
     handleFileSelect(file) {
       if (this.fileSelectId === file.id) return
       this.fileSelectId = file.id
-      if (file.fileType === 1) {
-        this.$store.dispatch('dataAccess/setModelType', 'mysql')
-      } else if (file.fileType === 2) {
-        this.$store.dispatch('dataAccess/setModelType', 'oracle')
-      }
       this.getTableInfo(`/datasource/${file.id}`, result => {
+        if (result.data.type === 1) {
+          this.$store.dispatch('dataAccess/setModelType', 'mysql')
+        } else if (result.data.type === 2) {
+          this.$store.dispatch('dataAccess/setModelType', 'oracle')
+        }
         this.$store.dispatch('dataAccess/setModelInfo', result.data.properties)
         this.$store.dispatch('dataAccess/setModelName', result.data.name)
       })
