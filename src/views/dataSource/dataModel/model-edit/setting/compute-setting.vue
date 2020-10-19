@@ -56,6 +56,7 @@
           </a-form>
         </div>
         <div class="u-txtwrap u-code-input">
+          <span class="u-errtip" :title="errorMessage">{{ errorMessage }}</span>
           <div class="u-txt u-txt-area expshow" ref="js-expshow"></div>
           <div class="dropp">
             <textarea
@@ -100,7 +101,7 @@
           </ul>
         </div>
         <div class="text">
-          <div class="tit">{{expression[activeIndex].syntax}}</div>
+          <div class="tit">{{expression[activeIndex].expression}}</div>
           <div class="des">{{expression[activeIndex].description}}</div>
           <div class="example">
             <span class="title">示例: </span>
@@ -113,7 +114,11 @@
 </template>
 
 <script>
+import { TokenStream } from './parse/TokenStream'
+import { Parse } from './parse/Parse'
+import { Verify } from './parse/Verify'
 import findIndex from 'lodash/findIndex'
+import debounce from 'lodash/debounce'
 const expression = [
   {
     id: 'SUM',
@@ -196,6 +201,7 @@ export default {
       expression,
       activeIndex: 0,
       textareaValue: '',
+      errorMessage: '',
       form: this.$form.createForm(this, {
         name: 'coordinated'
       }),
@@ -229,9 +235,18 @@ export default {
     this.dimensionResult = this.dimensions
     this.measureResult = this.measures
   },
+  mounted () {
+    this.debounceFn = debounce(this.check, 1500)
+  },
   computed: {
     explain() {
       return this.expression[this.activeIndex].example.replace(/\n/gm, '<br/>')
+    }
+  },
+  watch: {
+    textareaValue(val) {
+      this.$refs['js-expshow'].innerHTML = ''
+      this.getExpshow(val)
     }
   },
   methods: {
@@ -286,9 +301,38 @@ export default {
     handleTextAreaBlur(e) {
       console.log(window.getSelection())
     },
+    getExpshow(val) {
+      const tokenStream = new TokenStream(val)
+      const str = tokenStream.getTokenArray()
+      // console.log('词法分析', str)
+      this.generator(str)
+      this.debounceFn(val)
+    },
+    generator(ary = []) {
+      ary.forEach((element) => {
+        const span = document.createElement('span')
+        span.className = `tok-${element.type}`
+        span.innerHTML = `${element.value}`
+        this.$refs['js-expshow'].appendChild(span)
+      })
+    },
     handleScroll(event) {
       this.$refs['js-expshow'].scrollLeft = event.target.scrollLeft
       this.$refs['js-expshow'].scrollTop = event.target.scrollTop
+    },
+    check(str) {
+      try {
+        const parse = new Parse(str)
+        const ast = parse.parseAST()
+        console.log('语法树', ast)
+        const verify = new Verify()
+        const result = verify.validate(ast)
+        if (result) this.errorMessage = ''
+        console.log('结果', result)
+      } catch (error) {
+        console.log(error.message)
+        this.errorMessage = error.message
+      }
     }
   }
 }
