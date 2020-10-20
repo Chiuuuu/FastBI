@@ -24,6 +24,9 @@ export default {
       this.handleEmitMainGetData()
     }
   },
+  beforeDestroy() {
+    this.$store.dispatch('dataModel/setModelId', -1)
+  },
   methods: {
     handleEmitMainGetData(id) {
       this.$refs.modelMainRef.handleGetData(id)
