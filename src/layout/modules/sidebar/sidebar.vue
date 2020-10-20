@@ -1,7 +1,7 @@
 <template>
   <div class="sidebar">
     <div class="header">
-      <span>智能BI可视化平台</span>
+      <img src="../../../assets/images/common/logo.png" />
     </div>
     <a-menu
       :defaultOpenKeys="openKeys"
