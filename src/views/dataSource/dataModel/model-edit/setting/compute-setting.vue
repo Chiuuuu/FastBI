@@ -97,6 +97,7 @@
               class="list-item"
               v-for="express in expression"
               :key="express.id"
+              @click="handleSelectExpression(express)"
             >{{ express.name }}</li>
           </ul>
         </div>
@@ -301,6 +302,9 @@ export default {
     handleTextAreaBlur(e) {
       console.log(window.getSelection())
     },
+    /**
+     * 编辑器展示
+    */
     getExpshow(val) {
       const tokenStream = new TokenStream(val)
       const str = tokenStream.getTokenArray()
@@ -308,6 +312,9 @@ export default {
       this.generator(str)
       this.debounceFn(val)
     },
+    /**
+     * 生成对应的词法
+    */
     generator(ary = []) {
       ary.forEach((element) => {
         const span = document.createElement('span')
@@ -316,10 +323,16 @@ export default {
         this.$refs['js-expshow'].appendChild(span)
       })
     },
+    /**
+     * textarea模拟滚动
+    */
     handleScroll(event) {
       this.$refs['js-expshow'].scrollLeft = event.target.scrollLeft
       this.$refs['js-expshow'].scrollTop = event.target.scrollTop
     },
+    /**
+     * 校验和计算
+    */
     check(str) {
       try {
         const parse = new Parse(str)
@@ -333,6 +346,12 @@ export default {
         console.log(error.message)
         this.errorMessage = error.message
       }
+    },
+    /**
+     * 右侧栏选中
+    */
+    handleSelectExpression(express) {
+      console.log(express)
     }
   }
 }
