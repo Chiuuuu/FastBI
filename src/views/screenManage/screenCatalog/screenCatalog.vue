@@ -185,6 +185,7 @@ export default {
   },
   mounted() {
     this.getList()
+    console.log(this.fileName)
     this.$on('fileSelect', this.handleFileSelect)
 
     window.onresize = () => {
@@ -314,6 +315,8 @@ export default {
         this.$store.dispatch('SetScreenId', '')
         if (this.isAdd === 1) { // 新增
           this.saveScreenData({ ...values, isAdd: 1 })
+          console.log(values)
+          this.$store.dispatch('SetFileName', values.name)
           // this.$router.push({
           //   name: 'screenEdit',
           //   query: {
