@@ -199,7 +199,7 @@ export default {
       this.model = !this.model
     },
     modelChange(val) {
-      this.getPivoSchemaList(val)
+      // this.getPivoSchemaList(val)
       // this.selectedModelList.map(item => {
       //   if (item.modelid === val) {
       //     this.dimensions = this.transData(item.dimensions)
@@ -212,10 +212,10 @@ export default {
       if (item.fileType !== 0 && !this.disableId.includes(item.id)) {
         this.model = !this.model
         this.$store.dispatch('SetDataModel', item)
-        this.getPivoSchemaList(item.id)
+        // this.getPivoSchemaList(item.id)
         this.add = true // 点击模型
         this.saveModal(item.id)
-        this.modelId = item.id
+        // this.modelId = item.id
       }
     },
     // 获取大屏数据
