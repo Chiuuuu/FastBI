@@ -27,7 +27,7 @@
               bordered
             >
             <span slot="alias" slot-scope="text, record, index">
-              <a-input style="width:100%;height:32px" :value="text" @change.stop.prevent="handleChangeValue($event, record, index, 'alias')"/>
+              <a-input style="width:100%;height:32px" :value="text" @blur.stop.prevent="handleAliasBlur($event, record, index, 'alias')" @change.stop.prevent="handleChangeValue($event, record, index, 'alias')"/>
             </span>
             <span slot="dataType" slot-scope="text, record, index">
               <a-select :value="text" style="width:100%;" @change="(value) => handleSelectChangeValue(value, record, index, 'dataType')">
@@ -137,6 +137,8 @@
 
 <script>
 import { mapState } from 'vuex'
+import { message } from 'ant-design-vue'
+
 const columns = [
   {
     title: '原名',
@@ -226,6 +228,12 @@ export default {
     handleChangeValue(event, record, index, key) {
       const newValue = event.target.value
       record[key] = newValue
+    },
+    handleAliasBlur(event, record, index, key) {
+      if (!event.target.value) {
+        message.error('别名不能为空')
+        record[key] = record.name
+      }
     },
     handleSelectChangeValue(value, record, index, key) {
       record[key] = value

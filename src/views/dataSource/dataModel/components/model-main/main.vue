@@ -49,7 +49,7 @@
                             src="@/assets/images/icon_dimension.png"
                             style="width:15px;height:15px"
                           />
-                          {{item.name}}
+                          {{item.alias}}
                         </a-menu-item>
                       </a-sub-menu>
                     </a-menu>
@@ -66,7 +66,7 @@
                             src="@/assets/images/icon_measure.png"
                             style="width:15px;height:15px"
                           />
-                          {{item.name}}
+                          {{item.alias}}
                         </a-menu-item>
                       </a-sub-menu>
                     </a-menu>

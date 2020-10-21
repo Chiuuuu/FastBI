@@ -455,6 +455,8 @@ export default {
       this.$store.dispatch('dataAccess/setModelName', '')
       this.$EventBus.$emit('resetForm')
       this.$EventBus.$emit('set-tab-index', '1')
+      this.$emit('on-menuChange-componet', 'Main')
+      this.$store.dispatch('dataAccess/setModelSelectType', '')
     },
     /**
      * 重命名弹窗显示
