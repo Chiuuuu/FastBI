@@ -155,8 +155,9 @@ export default {
         if (val.length > 0) {
           if (!this.add) {
             this.modelId = val[0].modelid
-            this.dimensions = this.transData(val[0].dimensions)
-            this.measures = this.transData(val[0].measures)
+            this.getPivoSchemaList(val[0].modelid)
+            // this.dimensions = this.transData(val[0].dimensions)
+            // this.measures = this.transData(val[0].measures)
             this.model = true
           }
           val.map(item => {
@@ -171,7 +172,6 @@ export default {
         if (val) {
           if (val.packageJson.api_data) {
             this.apiData = deepClone(val.packageJson.api_data)
-            console.log(this.apiData)
             if (this.apiData.modelId) {
               this.modelId = this.apiData.modelId
             }
@@ -194,23 +194,23 @@ export default {
       this.model = !this.model
     },
     modelChange(val) {
-      this.selectedModelList.map(item => {
-        if (item.modelid === val) {
-          this.dimensions = this.transData(item.dimensions)
-          this.measures = this.transData(item.measures)
-        }
-      })
+      this.getPivoSchemaList(val)
+      // this.selectedModelList.map(item => {
+      //   if (item.modelid === val) {
+      //     this.dimensions = this.transData(item.dimensions)
+      //     this.measures = this.transData(item.measures)
+      //   }
+      // })
     },
     // 点击选中模型
     modelHandle(item) {
       if (item.fileType !== 0 && !this.disableId.includes(item.id)) {
         this.model = !this.model
         this.$store.dispatch('SetDataModel', item)
-        this.modelId = item.id
-        this.getPivoSchemaList()
+        this.getPivoSchemaList(item.id)
         this.add = true // 点击模型
         this.saveModal(item.id)
-        this.getScreenData()
+        this.modelId = item.id
       }
     },
     // 获取大屏数据
@@ -229,6 +229,8 @@ export default {
       }
       this.$server.screenManage.screenModuleSave({ params }).then(res => {
         console.log(res)
+        this.getScreenData()
+        this.modelId = id
       })
     },
     // 拖动开始 type 拖拽的字段类型维度或者度量
@@ -256,8 +258,8 @@ export default {
       })
     },
     // 维度、度量列表
-    getPivoSchemaList() {
-      this.$server.screenManage.getPivoSchemaList(this.modelId).then(res => {
+    getPivoSchemaList(id) {
+      this.$server.screenManage.getPivoSchemaList(id).then(res => {
         if (res.code === 200) {
           let dimensions = res.data.dimensions
           let measures = res.data.measures

@@ -220,6 +220,7 @@ export default {
               columns,
               rows
             }
+            console.log(apiData)
             this.$store.dispatch('SetSelfDataSource', apiData)
           }
           this.saveScreenData()
