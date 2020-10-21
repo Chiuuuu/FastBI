@@ -201,7 +201,7 @@ export default {
           const params = {
             id: this.$store.state.dataAccess.modelId,
             name: this.$store.state.dataAccess.modelName,
-            parentId: this.modelSelectType === 'new' ? 0 : this.$store.state.dataAccess.parentId,
+            parentId: this.$store.state.dataAccess.parentId,
             property: {
               user: this.form.user,
               ip: this.form.ip,
