@@ -71,10 +71,10 @@ export default {
     ...mapGetters(['isScreen', 'pageSettings', 'canvasMap', 'screenId', 'fileName'])
   },
   created() {
-    // if (this.$route.query.name) {
-    //   this.fileName = this.$route.query.name
-    // }
-    this.screenName = this.fileName
+    if (this.$route.query.name) {
+      this.screenName = this.$route.query.name
+    }
+    // this.screenName = this.fileName
     this.userId = 'dv1e443967LZP2Dj'
   },
   methods: {

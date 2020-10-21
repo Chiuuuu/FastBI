@@ -17,7 +17,7 @@ export function setPageSettings (setting) {
 
 // 重置页面参数配置
 export function resetPageSettings () {
-  return api.resetPageSettings()
+  return api.state.pageSettings()
 }
 
 // 初始化所有参数配置

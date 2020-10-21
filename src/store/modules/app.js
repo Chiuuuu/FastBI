@@ -74,29 +74,40 @@ const app = {
             components: rootGetters.canvasMap,
             screenDataModels: state.screenDataModels.push(rootGetters.dataModel)
           }
-          let params = {
-            setting
-          }
+          let params = {}
           if (!state.screenId) {
-            params.id = -1
-            params.name = obj && obj.name ? obj.name : router.history.current.query.name
-            params.parentId = obj && obj.parentId ? obj.parentId : router.history.current.query.parentId
-            params.isSaved = 1
+            commit('SET_PAGE_SETTING', { width: 1920, height: 1080, backgroundColor: '#0d2a42', gridStep: 1, backgroundSrc: '', backgroundType: '1', opacity: 1 })
+            params = {
+              id: -1,
+              name: obj && obj.name ? obj.name : router.history.current.query.name,
+              parentId: obj && obj.parentId ? obj.parentId : router.history.current.query.parentId,
+              isSaved: 1,
+              setting: {
+                setting: state.pageSettings,
+                components: {}
+              }
+            }
           } else {
             params.id = state.screenId
+            params.setting = setting
           }
           screenManage.saveScreen(params).then((res) => {
-            commit('SET_SCREEN_ID', res.id)
-            if (obj && obj.mes) {
-              message.success(obj.mes)
-            }
-            if (obj && obj.isAdd === 1) {
-              router.push({
-                name: 'screenEdit',
-                query: {
-                  ...obj
-                }
-              })
+            if (res.code === 200) {
+              commit('SET_SCREEN_ID', res.id)
+              if (obj && obj.mes) {
+                message.success(obj.mes)
+              }
+              if (obj && obj.isAdd === 1) {
+                router.push({
+                  name: 'screenEdit',
+                  query: {
+                    ...obj
+                  }
+                })
+              }
+            } else {
+              message.error(res.msg)
+              return false
             }
             // if (obj.callback) {
             //   console.log(123)
