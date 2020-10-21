@@ -6,7 +6,8 @@ const state = {
   menuList: [],
   databaseId: '', // 数据库id
   datasource: null, // 数据源
-  datasourceId: ''
+  datasourceId: '',
+  selectedModelList: [] // 选中的数据模型
 }
 
 const mutations = {
@@ -30,6 +31,9 @@ const mutations = {
   },
   SET_DATASOURCEID(state, id) {
     state.datasourceId = id
+  },
+  SET_SELECTEDMODELlIST(state, list) {
+    state.selectedModelList = list
   }
 }
 
@@ -59,6 +63,9 @@ const actions = {
   },
   setDatasourceId({ commit }, id) {
     commit('SET_DATASOURCEID', id)
+  },
+  setSelectedModelList({ commit }, list) {
+    commit('SET_SELECTEDMODELlIST', list)
   }
 }
 

@@ -92,6 +92,14 @@ const screenManage = {
    */
   actionUploadImage(params) {
     return $axios.post('/screen/bigscreen/avatar', params)
+  },
+  /**
+   * @description 保存当前大屏选中的数据模型
+   * @param {*} params
+   * @returns
+   */
+  screenModuleSave(params) {
+    return $axios.get('/screen/pivotschema/ScreenModuleSave', params)
   }
 }
 

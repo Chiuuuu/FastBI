@@ -7,12 +7,15 @@
         <a-icon class="model-icon" :type="modelExpand ? 'menu-unfold' : 'menu-fold'" @click="toCollapse" />
       </div>
       <!-- 操作界面 -->
-      <div v-if="modelExpand">
+      <div v-if="modelExpand" style="height:calc(100% - 150px);">
         <div class="model-operation" v-if="model">
           <div class="operation_select">
-            <a-select :default-value="dataModel.id" style="width:90%">
-              <a-select-option :value="dataModel.id">
+            <a-select v-model="modelId" style="width:90%" @change="modelChange">
+              <!-- <a-select-option :value="dataModel.id">
                 {{dataModel.name}}
+              </a-select-option> -->
+              <a-select-option v-for="item in selectedModelList" :value="item.modelid" :key="item.modelid">
+                {{item.modelname}}
               </a-select-option>
               <a-select-option value="添加数据模型">
                 <span @click="modelAdd">添加数据模型</span>
@@ -78,39 +81,38 @@
           </div>
         </div>
         <!-- 初始界面 -->
-        <div class="model-contain" v-else>
+        <div class="model-contain" v-else style="height:100%;">
           <div class="model-search">
             <a-input-search
               placeholder="搜索数据接入名称"
               style="width:90%;margin-left:15px"
             />
           </div>
-          <div>
-            <b-scrollbar style="height: 100%;">
-              <div class="model-main">
-                <a-collapse v-model="modelKey" :bordered="false">
-                  <template #expandIcon="props">
-                    <a-icon
-                      type="folder"
-                      :rotate="props.isActive ? 0 : 0"
-                      style="font-size:16px"
-                    />
-                  </template>
-                  <template v-for="(item, index) in modelList">
-                    <a-collapse-panel :showArrow="Boolean(item.fileType === 0)"
-                    :key="String(index)"
-                    :header="item.name"
-                    :style="customStyle"
-                    @click.native="modelHandle(item)">
-                      <div style="margin-left:25px;cursor: pointer">
-                        <p @click="modelHandle(item2)" v-for="item2 in item.children" :key="item2.id">{{item2.name}}</p>
-                      </div>
-                    </a-collapse-panel>
-                  </template>
-                </a-collapse>
-              </div>
-            </b-scrollbar>
-          </div>
+          <b-scrollbar style="height: 100%;">
+            <div class="model-main">
+              <a-collapse v-model="modelKey" :bordered="false">
+                <template #expandIcon="props">
+                  <a-icon
+                    type="folder"
+                    :rotate="props.isActive ? 0 : 0"
+                    style="font-size:16px"
+                  />
+                </template>
+                <template v-for="(item, index) in modelList">
+                  <a-collapse-panel :showArrow="Boolean(item.fileType === 0)"
+                  :key="String(index)"
+                  :header="item.name"
+                  :style="customStyle"
+                  :class="disableId.includes(item.id)?'disable':''"
+                  @click.native="modelHandle(item)">
+                    <div style="margin-left:25px;cursor: pointer;" >
+                      <p @click="modelHandle(item2)" v-for="item2 in item.children" :key="item2.id" :class="disableId.includes(item2.id)?'disable':''">{{item2.name}}</p>
+                    </div>
+                  </a-collapse-panel>
+                </template>
+              </a-collapse>
+            </div>
+          </b-scrollbar>
         </div>
       </div>
     </div>
@@ -119,7 +121,7 @@
 
 <script>
   import { mapGetters, mapActions } from 'vuex'
-
+  import { deepClone } from '@/utils/deepClone'
 export default {
   name: 'BoardModel',
   props: {
@@ -138,11 +140,46 @@ export default {
       model: false,
       modelList: [], // 数据模型列表
       dimensions: [], // 维度列表
-      measures: [] // 度量列表
+      measures: [], // 度量列表
+      modelId: '',
+      disableId: [] // 已经选中的数据模型无法点击
     }
   },
   computed: {
-    ...mapGetters(['modelExpand', 'dataModel'])
+    ...mapGetters(['modelExpand', 'dataModel', 'screenId', 'selectedModelList', 'currentSelected'])
+  },
+  watch: {
+    selectedModelList: {
+      handler(val) {
+        console.log(val)
+        if (val.length > 0) {
+          if (!this.add) {
+            this.modelId = val[0].modelid
+            this.dimensions = this.transData(val[0].dimensions)
+            this.measures = this.transData(val[0].measures)
+            this.model = true
+          }
+          val.map(item => {
+            this.disableId.push(item.modelid)
+          })
+        }
+      },
+      deep: true
+    },
+    currentSelected: {
+      handler(val) {
+        if (val) {
+          if (val.packageJson.api_data) {
+            this.apiData = deepClone(val.packageJson.api_data)
+            console.log(this.apiData)
+            if (this.apiData.modelId) {
+              this.modelId = this.apiData.modelId
+            }
+          }
+        }
+      },
+      deep: true
+    }
   },
   mounted() {
     this.getModelList()
@@ -156,16 +193,47 @@ export default {
     modelAdd() {
       this.model = !this.model
     },
+    modelChange(val) {
+      this.selectedModelList.map(item => {
+        if (item.modelid === val) {
+          this.dimensions = this.transData(item.dimensions)
+          this.measures = this.transData(item.measures)
+        }
+      })
+    },
     // 点击选中模型
     modelHandle(item) {
-      if (item.fileType !== 0) {
+      if (item.fileType !== 0 && !this.disableId.includes(item.id)) {
         this.model = !this.model
         this.$store.dispatch('SetDataModel', item)
+        this.modelId = item.id
         this.getPivoSchemaList()
+        this.add = true // 点击模型
+        this.saveModal(item.id)
+        this.getScreenData()
       }
+    },
+    // 获取大屏数据
+    getScreenData() {
+      this.$server.screenManage.getScreenDetailById(this.screenId).then(res => {
+        if (res.code === 200) {
+          this.$store.dispatch('dataModel/setSelectedModelList', res.list)
+        }
+      })
+    },
+    // 保存选中的模型
+    saveModal(id) {
+      let params = {
+        datamodelId: id,
+        screenId: this.screenId
+      }
+      this.$server.screenManage.screenModuleSave({ params }).then(res => {
+        console.log(res)
+      })
     },
     // 拖动开始 type 拖拽的字段类型维度或者度量
     dragstart(item, type, event) {
+      item.modelId = this.modelId
       item.file = type
       event.dataTransfer.setData('dataFile', JSON.stringify(item))
       this.$store.dispatch('SetDragFile', type)
@@ -189,7 +257,7 @@ export default {
     },
     // 维度、度量列表
     getPivoSchemaList() {
-      this.$server.screenManage.getPivoSchemaList(this.dataModel.id).then(res => {
+      this.$server.screenManage.getPivoSchemaList(this.modelId).then(res => {
         if (res.code === 200) {
           let dimensions = res.data.dimensions
           let measures = res.data.measures
@@ -219,5 +287,8 @@ export default {
 <style lang="stylus">
 .ant-collapse >  .customStyle > .ant-collapse-header{
   color:#ccc;
+}
+.disable, .disable .ant-collapse-header{
+  color:#ccc !important;
 }
 </style>

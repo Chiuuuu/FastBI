@@ -179,6 +179,11 @@ const canvasMaps = {
       if (state.singleSelected) {
         commit('SET_CURRENT_SELF', { data: background, property: 'background' })
       }
+    },
+    SetModelId({ commit, state }, modelId) {
+      if (state.singleSelected) {
+        commit('SET_CURRENT_SELF', modelId)
+      }
     }
   }
 }

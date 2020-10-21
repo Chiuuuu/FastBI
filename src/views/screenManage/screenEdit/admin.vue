@@ -118,8 +118,12 @@
     computed: {
       ...mapGetters(['canvasMap', 'currentSelected', 'isScreen', 'coverageExpand', 'pageSettings']),
       coverageMaps () {
-        let maps = [...this.canvasMap]
-        return maps.reverse()
+        if (this.canvasMap.length > 0) {
+          let maps = [...this.canvasMap]
+          return maps.reverse()
+        } else {
+          return []
+        }
       }
     },
     created () {
@@ -155,8 +159,10 @@
         this.$server.screenManage.getScreenDetailById(this.$route.query.id).then(res => {
           if (res.code === 200) {
             let json = res.data ? res.data.setting : {}
+            console.log(json)
             this.$store.dispatch('SetPageSettings', json.setting)
             this.$store.dispatch('InitCanvasMaps', json.components)
+            this.$store.dispatch('dataModel/setSelectedModelList', res.list)
           }
         })
       },
@@ -211,7 +217,6 @@
         if (index > -1) {
           this.canvasMap.splice(index, 1)
           this.$store.dispatch('SingleSelected', null)
-          console.log(123)
           this.saveScreenData()
         }
       },

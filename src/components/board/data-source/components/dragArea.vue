@@ -75,7 +75,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['dragFile', 'currentSelected', 'optionsTabsType'])
+    ...mapGetters(['dragFile', 'currentSelected', 'optionsTabsType', 'dataModel'])
   },
   mounted() {
     this.current = deepClone(this.currentSelected)
@@ -86,6 +86,11 @@ export default {
     handleDropOnFilesWD(event) {
       // h5 api
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
+      // let apiData = deepClone(this.currentSelected.packageJson.api_data)
+      // if (apiData.modelId && apiData.modelId !== dataFile.datamodelId) {
+      //   this.$message.error('一个图表只能拖入一个数据模型的字段')
+      //   return false
+      // }
       dataFile.showMore = false // 是否点击显示更多
       if (this.type === 'dimensions' && this.dragFile === this.type) {
         // 维度暂时只能拉入一个字段
@@ -128,6 +133,7 @@ export default {
     deleteFile(item, index) {
       this.fileList.splice(index, 1)
       let current = deepClone(this.currentSelected)
+      console.log(current.packageJson.api_data)
       // 维度度量删除完以后重置该图表数据
       if (current.packageJson.api_data.dimensions.length === 0 && current.packageJson.api_data.measures.length === 0) {
         let canvasMaps = navigateList[0].children
@@ -137,7 +143,6 @@ export default {
               ...maps.api_data
             }
             this.$store.dispatch('SetSelfDataSource', apiData)
-            // this.currentSelected.packageJson.api_data.source = maps.packageJson.api_data.source
             this.saveScreenData()
           }
         }
@@ -159,7 +164,11 @@ export default {
         this.currentSelected.packageJson.api_data.tableList = this.fileList
       }
       let apiData = deepClone(this.currentSelected.packageJson.api_data)
-      if (apiData.dimensions.length === 0 || apiData.measures.length === 0) {
+      if ((!apiData.modelId || apiData.modelId === '') && this.fileList.length === 1) {
+        this.currentSelected.packageJson.api_data.modelId = this.fileList[0].datamodelId
+        // this.$store.dispatch('SetSelfDataSource', apiData)
+      }
+      if (this.type !== 'tableList' && (apiData.dimensions.length === 0 || apiData.measures.length === 0)) {
         return
       }
       let params = {
@@ -183,10 +192,11 @@ export default {
             if (rows.length > 10) {
               rows.length = 10
             }
-            this.currentSelected.packageJson.api_data.source = {
+            apiData.source = {
               columns,
               rows
             }
+            this.$store.dispatch('SetSelfDataSource', apiData)
           } else {
             let columns = []
             // let apiData = this.currentSelected.packageJson.api_data

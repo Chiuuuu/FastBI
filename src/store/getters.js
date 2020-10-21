@@ -27,7 +27,9 @@ const getters = {
 
     fileName: state => state.app.fileName,
 
-    modelFile: state => state.options.modelFile
+    modelFile: state => state.options.modelFile,
+
+    selectedModelList: state => state.dataModel.selectedModelList // 选中的数据模型列表
 }
 
 export default getters

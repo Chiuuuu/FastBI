@@ -10,7 +10,7 @@ const database = {
         height: 1080, // 全局面包的宽高
         backgroundColor: '#0d2a42', // 背景颜色
         gridStep: 8, // 栅格间距
-        backgroundType: '1',
+        backgroundType: 1,
         backgroundSrc: ''
     },
     canvasMaps: [{
