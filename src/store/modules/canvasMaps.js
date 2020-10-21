@@ -16,7 +16,11 @@ const canvasMaps = {
   },
   mutations: {
     SET_CANVAS_MAPS (state, maps) {
-      state.canvasMap = [...maps]
+      if (JSON.stringify(maps) !== '{}') {
+        state.canvasMap = [...maps]
+      } else {
+        state.canvasMap = []
+      }
     },
     ADD_CANVAS_MAP (state, nodeInfo) {
       state.canvasMap.push(nodeInfo)

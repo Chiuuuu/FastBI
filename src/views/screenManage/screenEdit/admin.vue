@@ -159,11 +159,8 @@
         this.$server.screenManage.getScreenDetailById(this.$route.query.id).then(res => {
           if (res.code === 200) {
             let json = res.data ? res.data.setting : {}
-            console.log(json)
             this.$store.dispatch('SetPageSettings', json.setting)
-            if (json.components.length > 0) {
-              this.$store.dispatch('InitCanvasMaps', json.components)
-            }
+            this.$store.dispatch('InitCanvasMaps', json.components)
             this.$store.dispatch('dataModel/setSelectedModelList', res.list)
           }
         })
