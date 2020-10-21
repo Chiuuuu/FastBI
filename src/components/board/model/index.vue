@@ -179,6 +179,11 @@ export default {
         }
       },
       deep: true
+    },
+    modelId(val) {
+      if (val) {
+        this.getPivoSchemaList(val)
+      }
     }
   },
   mounted() {

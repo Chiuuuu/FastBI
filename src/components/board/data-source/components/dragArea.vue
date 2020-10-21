@@ -86,11 +86,11 @@ export default {
     handleDropOnFilesWD(event) {
       // h5 api
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
-      // let apiData = deepClone(this.currentSelected.packageJson.api_data)
-      // if (apiData.modelId && apiData.modelId !== dataFile.datamodelId) {
-      //   this.$message.error('一个图表只能拖入一个数据模型的字段')
-      //   return false
-      // }
+      let apiData = deepClone(this.currentSelected.packageJson.api_data)
+      if (apiData.modelId && apiData.modelId !== dataFile.datamodelId) {
+        this.$message.error('一个图表只能拖入一个数据模型的字段')
+        return false
+      }
       dataFile.showMore = false // 是否点击显示更多
       if (this.type === 'dimensions' && this.dragFile === this.type) {
         // 维度暂时只能拉入一个字段
