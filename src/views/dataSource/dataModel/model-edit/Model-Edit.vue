@@ -115,7 +115,7 @@
           <div class="measurement">
             <span class="mea_span">度量</span>
             <div class="mea_operation">
-              <!-- <a v-on:click="dim_mea('度量')" style="color:#627CFF;margin-right:20px;line-height:38px">新建计算度量</a> -->
+              <a v-on:click="dim_mea('度量')" style="color:#627CFF;margin-right:20px;line-height:38px">新建计算度量</a>
             </div>
             <div class="mea_menu">
               <a-menu mode="inline" v-for="(value, name) in measures" :key="name" :default-open-keys="[name]" :inline-collapsed="false">
