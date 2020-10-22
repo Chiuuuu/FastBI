@@ -75,7 +75,7 @@ service.interceptors.response.use(
   error => {
     const { response } = error
     // messages({ content: response ? response.data : '请求错误', type: 'danger', duration: 5 })
-    message.error(response && response.data ? response.data.msg : '请求错误')
+    message.error(response && response.data ? (response.data.msg || '请求错误') : '请求错误')
     return Promise.reject(error)
   }
 )
