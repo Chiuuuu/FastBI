@@ -1,0 +1,224 @@
+@import "../dataModel-common.styl";
+.Model-Edit {
+    .left {
+        .sheet_list {
+            margin-top: 15px;
+            color: #01040f;
+            line-height: 1.5;
+            overflow-y: auto;
+            height: 300px;
+            .sheet_list_item {
+                color: #020510;
+                cursor: move;
+                cursor: -webkit-grab;
+                cursor: -ms-grab;
+                cursor: -o-grab;
+                overflow: hidden;
+                word-wrap: normal;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                border-left: 2px solid transparent;
+                padding: 0 28px 0 22px;
+                height: 30px;
+                line-height: 30px;
+                font-size: 14px;
+                &:hover {
+                    background: #627CFF;
+                    color: #fff;
+                }
+            }
+        }
+        .sheet_list::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .sheet_list::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.05);
+            border-radius: 5px;
+            -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .sheet_list:hover::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .sheet_list::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(0, 0, 0, 0.4);
+            -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .sheet_list::-webkit-scrollbar-track {
+            border-radius: 5px;
+            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0);
+            background-color: white;
+        }
+
+        .sheet_list::-webkit-scrollbar-track:hover {
+            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.4);
+            background-color: rgba(0, 0, 0, 0.01);
+        }
+        .SQL-View {
+            color: #000;
+            
+            .view-title {
+                line-height: normal;
+            }
+            .view-icon {
+                float: right;
+                margin-top: 5px;
+                margin-right: 10px;
+                font-size: 16px;
+                color: #617bff;
+                cursor: pointer;
+            } 
+        }
+    }
+    .right {
+        background-color: #ffffff;
+        width: 79%;
+        .header {
+            display: flex;
+            justify-content: space-between;
+            .data_con {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                width: 350px;
+                height: 40px;
+            }
+        }
+        .data_con_add {
+            width: 1100px;
+            margin-top: 20px;
+        }
+        // .description {
+        //     margin-top: 20px;
+        // }
+        .draw_board {
+            border-top: 10px solid #f6f6f6;
+            border-bottom: 10px solid #f6f6f6;
+        }
+        .detail_main {
+            overflow: hidden;
+            .dimensionality {
+                .dim_menu {
+                    background-color #fff;
+                    overflow-y: auto;
+                    height: 140px;
+                }
+                .dim_menu::-webkit-scrollbar {
+                    width: 8px;
+                    height: 8px;
+                }
+
+                .dim_menu::-webkit-scrollbar-thumb {
+                    background-color: rgba(0, 0, 0, 0.05);
+                    border-radius: 5px;
+                    -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
+                }
+
+                .dim_menu:hover::-webkit-scrollbar-thumb {
+                    background-color: rgba(0, 0, 0, 0.2);
+                    border-radius: 5px;
+                    -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
+                }
+
+                .dim_menu::-webkit-scrollbar-thumb:hover {
+                    background-color: rgba(0, 0, 0, 0.4);
+                    -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
+                }
+
+                .dim_menu::-webkit-scrollbar-track {
+                    border-radius: 5px;
+                    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0);
+                    background-color: white;
+                }
+
+                .dim_menu::-webkit-scrollbar-track:hover {
+                    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.4);
+                    background-color: rgba(0, 0, 0, 0.01);
+                }
+            }
+            .measurement {
+                .mea_menu {
+                    background-color #fff;
+                    overflow-y: auto;
+                    height: 140px;
+                }
+                .mea_menu::-webkit-scrollbar {
+                    width: 8px;
+                    height: 8px;
+                }
+
+                .mea_menu::-webkit-scrollbar-thumb {
+                    background-color: rgba(0, 0, 0, 0.05);
+                    border-radius: 5px;
+                    -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
+                }
+
+                .mea_menu:hover::-webkit-scrollbar-thumb {
+                    background-color: rgba(0, 0, 0, 0.2);
+                    border-radius: 5px;
+                    -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
+                }
+
+                .mea_menu::-webkit-scrollbar-thumb:hover {
+                    background-color: rgba(0, 0, 0, 0.4);
+                    -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
+                }
+
+                .mea_menu::-webkit-scrollbar-track {
+                    border-radius: 5px;
+                    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0);
+                    background-color: white;
+                }
+
+                .mea_menu::-webkit-scrollbar-track:hover {
+                    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.4);
+                    background-color: rgba(0, 0, 0, 0.01);
+                }
+            }
+        }
+        .submit_btn {
+            border-top 1px solid #e8e8e8;
+            padding-top: 20px;
+            margin-right: 20px;
+            text-align right;
+        }
+    }
+}
+.mod {
+    .modal_l {
+        .modal_dropdown {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 40px;
+            width: 257px;
+            .dropdown {
+                position relative
+                width 120px
+                height 32px
+                line-height 1.5
+                border 1px solid #d9d9d9
+                padding 4px 11px
+                cursor pointer
+                &::after {
+                    content: "";
+                    display: block;
+                    width: 0;
+                    height: 0;
+                    border-style: solid dashed dashed;
+                    border-width: 6px 5px;
+                    border-color: #aaa transparent transparent transparent;
+                    position: absolute;
+                    right: 12px;
+                    top: 12px;    
+                }
+            }
+        }
+    }
+}
