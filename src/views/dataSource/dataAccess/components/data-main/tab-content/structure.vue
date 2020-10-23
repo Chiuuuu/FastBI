@@ -10,6 +10,7 @@
         <a-col>
           <a-button type="primary" style="margin:0 10px;" class="select_button" @click="handleExtract" :loading="extractSping">全部抽取</a-button>
           <a-button type="primary" class="select_button" @click="handleGetData" :loading="spinning">刷新数据</a-button>
+          <a-button type="primary" style="margin:0 10px;" @click="showSetting('batch')" class="select_button">批量抽取设置</a-button>
         </a-col>
         <!-- <a-col>
           <a-select default-value="全部" class="search_select">
@@ -29,14 +30,78 @@
           {{ extracted ? '是' : '否' }}
         </span>
         <span slot="config" slot-scope="row">
-          <a v-on:click="setting(row)">{{row.set ? '编辑' : '设置' }}</a>
+          <a v-on:click="setting(row)">{{row.set ? '字段编辑' : '字段设置' }}</a>
+        </span>
+        <span slot="regular" slot-scope="row">
+          <a v-on:click="showSetting('single', row)">定时设置</a>
         </span>
       </a-table>
+      <a-modal title="批量抽取设置" :visible="visible" @cancel="visible = false">
+        <div><a-button @click="setRegular">添加定时任务</a-button></div>
+        <a-table
+          rowKey='id'
+          :columns="regColumns"
+          :data-source="regData"
+          :loading='modalSpin'
+          :pagination='false'
+        >
+          <span slot="frequency" slot-scope="row">
+            {{' 只执行一次' }}
+          </span>
+          <span slot="config" slot-scope="row">
+            <a style="margin-right: 20px" v-on:click="handleRegular(row, 'edit')">编辑</a>
+            <a v-on:click="handleRegular(row, 'delete')">删除</a>
+          </span>
+        </a-table>
+      </a-modal>
+      <regular :show="visible1" :show-table="showTable" :table-data="data" :form-data="regularForm" @close="closeRegular" />
     </div>
   </div>
 </template>
 <script>
 import { mapState } from 'vuex'
+import Regular from './regular'
+
+const regColumns = [
+  {
+    title: '任务名称',
+    dataIndex: 'name',
+    key: 'name'
+  },
+  {
+    title: '执行频率',
+    dataIndex: 'frequency',
+    key: 'frequency',
+    scopedSlots: { customRender: 'frequency' }
+  },
+  {
+    title: '开始时间',
+    dataIndex: 'starttime',
+    key: 'starttime',
+    scopedSlots: { customRender: 'starttime' }
+  },
+  {
+    title: '操作',
+    key: 'config',
+    scopedSlots: { customRender: 'config' }
+  }
+]
+
+const regData = [
+  {
+    id: '1',
+    name: '任务一',
+    frequency: '只执行一次',
+    starttime: '2020-10-12 12:23:00'
+  },
+  {
+    id: '2',
+    name: '任务一',
+    frequency: '只执行一次',
+    starttime: '2020-10-12 12:23:00'
+  }
+]
+
 const columns = [
   {
     title: '表名',
@@ -66,18 +131,32 @@ const columns = [
     title: '字段配置',
     key: 'config',
     scopedSlots: { customRender: 'config' }
+  },
+  {
+    title: '定时配置',
+    key: 'regular',
+    scopedSlots: { customRender: 'regular' }
   }
 ]
-
 export default {
   name: 'tabContentStructure',
+  components: {
+    Regular
+  },
   data() {
     return {
       columns,
       data: [],
+      regColumns,
+      regData,
+      visible: false, // 批量设置定时弹窗
+      visible1: false, // 添加定时任务弹窗
+      regularForm: '',
+      showTable: false,
       spinning: true,
       selectedRows: [],
       extractSping: false,
+      modalSpin: false,
       rowSelection: {
         onSelect: (record, selected, selectedRows) => {
           console.log(record, selected, selectedRows)
@@ -167,6 +246,41 @@ export default {
     },
     setting(row) {
       this.$emit('on-change-componet', 'Setting', row)
+    },
+    showSetting(type, row) {
+      this.showTable = type === 'batch'
+      this.visible = true
+      this.modalSpin = true
+      setTimeout(() => {
+        this.modalSpin = false
+      }, 300)
+    },
+    setRegular() {
+      this.visible1 = true
+      this.regularForm = ''
+    },
+    handleRegular(row, type) {
+      if (type === 'edit') {
+        this.visible1 = true
+        this.regularForm = row
+      } else if (type === 'delete') {
+        this.$confirm({
+          title: '确认提示',
+          message: '确定要删除该任务吗',
+          onOk() {
+            const id = row.id
+            this.regData.map((item, index) => {
+              if (item.id === id) {
+                this.regData.splice(index, 1)
+              }
+            })
+          }
+        })
+      }
+    },
+    closeRegular() {
+      this.visible1 = false
+      this.showTable = false
     }
   }
 }
