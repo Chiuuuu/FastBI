@@ -199,11 +199,8 @@ export default {
         content: '确定删除该表?',
         onOk: async () => {
           this.loopDelete(node, this.detailInfo.config.tables)
-          if (node.parent) {
-            const index = node.parent.children.indexOf(node)
-            node.parent.children.splice(index, 1)
-          } else {
-            this.root.handleClearRenderTables()
+          if (this.detailInfo.config.tables.length < 1) {
+            return this.root.handleClearRenderTables()
           }
           await this.root.handleUpdate({
             tables: this.detailInfo.config.tables.map((item, index) => {
