@@ -114,6 +114,8 @@ import MenuFolder from '@/components/dataSource/menu-group/folder'
 import { mapGetters, mapActions } from 'vuex' // 导入vuex
 import Screen from '@/views/screen' // 预览
 import { addResizeListener, removeResizeListener } from 'bin-ui/src/utils/resize-event'
+import debounce from 'lodash/debounce'
+import { menuSearchLoop } from '@/views/dataSource/dataModel/util'
 
 export default {
   components: {
@@ -172,7 +174,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['pageSettings', 'canvasRange', 'screenId', 'fileName', 'isScreen']),
+    ...mapGetters(['pageSettings', 'canvasRange', 'screenId', 'fileName', 'isScreen', 'parentId']),
     fileSelectId: {
       get () {
         return this.screenId
@@ -181,11 +183,13 @@ export default {
         this.$store.dispatch('SetScreenId', value)
         // this.$store.commit('dataAccess/SET_MODELID', value)
       }
+    },
+    menuList() {
+      return this.searchValue ? this.searchList : this.tableList
     }
   },
   mounted() {
     this.getList()
-    console.log(this.fileName)
     this.$on('fileSelect', this.handleFileSelect)
 
     window.onresize = () => {
@@ -202,31 +206,32 @@ export default {
     // 获取文件夹列表
     getList() {
       let params = {
-        name: this.searchName,
         type: 3
       }
       this.$server.screenManage.getFolderList({ params }).then(res => {
         if (res.code === 200) {
           let rows = res.data
-          // const list = rows.filter(item => {
-          //   // 是否是文件夹
-          //   return item.fileType === 0
-          // })
-          // 后端不会返 所以前端要判断parentId与id对应的数据
-          // for (let item of list) {
-          //   item.items = []
-          //   for (let item2 of rows) {
-          //     if (item2.parentId === item.id) {
-          //       item.items.push(item2)
-          //     }
-          //   }
-          // }
           this.folderList = rows
         }
       })
     },
-    menuSearch() {
-      this.getList()
+    // 搜索
+    menuSearch: debounce(function(event) {
+      const value = event.target.value
+      if (value !== '') {
+        this.handleGetSearchList(value)
+      } else {
+        this.getList()
+      }
+    }, 400),
+    handleGetSearchList(value) {
+      let result = []
+      this.folderList.map(item => {
+        const newItem = menuSearchLoop(item, value)
+        if (newItem) result.push(newItem)
+      })
+      this.folderList = result
+      console.log('搜索结果', this.folderList)
     },
     /**
      * 是否为文件夹
@@ -256,6 +261,7 @@ export default {
           this.getList()
           this.$store.dispatch('SetScreenId', '')
           this.$store.dispatch('SetFileName', '')
+          this.$store.dispatch('SetParentId', '')
         }
       })
     },
@@ -300,6 +306,7 @@ export default {
       this.fileSelectId = file.id
       this.$store.dispatch('SetScreenId', file.id)
       this.$store.dispatch('SetFileName', file.name)
+      this.$store.dispatch('SetParentId', file.parentId)
     },
     // 点击新建大屏
     addScreen() {
@@ -315,7 +322,6 @@ export default {
         this.$store.dispatch('SetScreenId', '')
         if (this.isAdd === 1) { // 新增
           this.saveScreenData({ ...values, isAdd: 1 })
-          console.log(values)
           this.$store.dispatch('SetFileName', values.name)
           // this.$router.push({
           //   name: 'screenEdit',

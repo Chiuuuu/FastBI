@@ -27,6 +27,8 @@ const getters = {
 
     fileName: state => state.app.fileName,
 
+    parentId: state => state.app.parentId,
+
     modelFile: state => state.options.modelFile,
 
     selectedModelList: state => state.dataModel.selectedModelList // 选中的数据模型列表
