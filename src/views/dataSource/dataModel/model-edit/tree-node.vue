@@ -198,10 +198,22 @@ export default {
         title: '确认提示',
         content: '确定删除该表?',
         onOk: async () => {
+          // 循环递归删除tables的数据
           this.loopDelete(node, this.detailInfo.config.tables)
+
+          // 需要前端自行删除渲染节点的数据
+          if (node.parent) {
+            // 有根节点的情况
+            const index = node.parent.children.indexOf(node)
+            node.parent.children.splice(index, 1)
+          }
+
           if (this.detailInfo.config.tables.length < 1) {
+            // 无根节点的情况
             return this.root.handleClearRenderTables()
           }
+
+          // 更新维度度量
           await this.root.handleUpdate({
             tables: this.detailInfo.config.tables.map((item, index) => {
               item.datamodelId = this.modelId
@@ -216,7 +228,6 @@ export default {
       const ownProps = node.getProps()
       const index = findIndex(list, ownProps)
       list.splice(index, 1)
-      console.log(list)
       if (node.children && node.children.length > 0) {
         node.children.forEach(item => {
           this.loopDelete(item, list)
