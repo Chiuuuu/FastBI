@@ -4,7 +4,7 @@ import get from 'lodash/get'
 export class Node {
   constructor(props) {
     this.props = assing({
-      joinType:1
+      joinType: 1
     }, props)
     this.parent = null
     this.children = []

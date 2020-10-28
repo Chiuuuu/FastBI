@@ -73,10 +73,10 @@
           </a-form-item>
         </a-form>
       </div>
-      <!-- <div class="description">
-        <span class="d-s">描述： {{detailInfo.description}}<a-icon type="edit" v-on:click="open"/></span>
-      </div> -->
-      <a-divider />
+      <div class="description">
+        <span class="d-s">描述： {{detailInfo.description}}</span>
+        <a-icon type="edit" v-on:click="open" class="d-s-icon"/>
+      </div>
       <div class="draw_board">
         <edit-right-top ref='rightTopRef' :detailInfo="detailInfo"></edit-right-top>
       </div>

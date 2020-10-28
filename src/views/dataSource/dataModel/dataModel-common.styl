@@ -94,8 +94,20 @@
                 font-family:Microsoft YaHei;
                 font-weight:400;
                 color:rgba(59,60,67,1);
-                line-height:48px;
-                }
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                max-width: calc(100% - 35px);
+                display: inline-block;
+                height: 20px;
+                line-height: 20px;
+            }
+            .d-s-icon{
+                color:rgba(59,60,67,1);
+                position relative;
+                top: -5px;
+                margin-left: 4px;
+            }
         }
         .conneted1{
             position: relative;
