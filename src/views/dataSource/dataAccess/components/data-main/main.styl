@@ -54,24 +54,6 @@
                 background-color rgba(220,220,220,.2)    
             }
         }
-        .excel-list::-webkit-scrollbar {
-            /*滚动条整体样式*/
-            width: 10px;
-            /*高宽分别对应横竖滚动条的尺寸*/
-            height: 1px;
-        }
-        .excel-list::-webkit-scrollbar-thumb {
-            /*滚动条里面小方块*/
-            border-radius: 10px;
-            -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-            background: #ccc;
-        }
-        .excel-list::-webkit-scrollbar-track {
-            /*滚动条里面轨道*/
-            -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-            // border-radius: 10px;
-            background: #ededed;
-        }
         .excel-list-item {
             display flex
             justify-content space-between
@@ -82,7 +64,8 @@
             border-bottom 1px solid #e5e5e5
             cursor pointer
             &:hover {
-                background-color #617bff    
+                background-color #617bff  
+                color #fff     
             }
             &.active {
                 background-color #617bff 
@@ -103,27 +86,28 @@
             .preview-tab {
                 background-color #f6f6f6;
                 padding-top: 5px;
-                padding-left: 5px;
                 margin-right: 20px;
                 .tab-title {
-                    color: #999;
-                    font-size: 12px;
+                    color: #000000D9;
+                    padding-left: 5px;
                     margin-bottom: 10px;
                     // margin-top: 20px;
                 }
             }
             .preview-tab-item {
                 padding-top 5px
+                padding-left: 5px;
                 padding-bottom 5px
                 cursor pointer
                 &:hover, &.active {
-                    background-color #fff
+                    background-color #617bff
+                    color #fff
                 }  
             }
             .preview-controller {
                 display flex
                 align-items: center
-                margin 20px 0
+                margin-top 20px
             }
             .preview-line {
                 display flex
@@ -169,26 +153,6 @@
                 .arrow-down {
                     top 3px
                     transform: rotate(-135deg)
-                }
-            }
-            .preview-table{
-                .ant-table-body::-webkit-scrollbar {
-                    /*滚动条整体样式*/
-                    width: 10px;
-                    /*高宽分别对应横竖滚动条的尺寸*/
-                    height: 1px;
-                }
-                .ant-table-body::-webkit-scrollbar-thumb {
-                    /*滚动条里面小方块*/
-                    border-radius: 10px;
-                    -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-                    background: #ccc;
-                }
-                .ant-table-body::-webkit-scrollbar-track {
-                    /*滚动条里面轨道*/
-                    -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-                    // border-radius: 10px;
-                    background: #ededed;
                 }
             }
         }
