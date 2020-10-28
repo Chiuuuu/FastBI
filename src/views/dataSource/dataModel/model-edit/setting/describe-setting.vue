@@ -19,18 +19,24 @@ export default {
     isShow: Boolean,
     description: String
   },
-  computed: {
-    describe: {
-      get() {
-        return this.description
-      },
-      set(value) {
-        this.$set(this.$parent.detailInfo, 'description', value)
+  data() {
+    return {
+      describe: this.description
+    }
+  },
+  watch: {
+    isShow: {
+      immediate: true,
+      handler(newVal) {
+        if (newVal) {
+          this.describe = this.description
+        }
       }
     }
   },
   methods: {
     handleSave() {
+      this.$set(this.$parent.detailInfo, 'description', this.describe)
       this.handleClose()
     },
     handleClose() {

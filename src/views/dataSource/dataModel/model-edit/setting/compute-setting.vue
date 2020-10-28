@@ -64,10 +64,9 @@
               class="u-txt u-txt-area expinput u-code-input"
               row="5"
               spellcheck="false"
-              ref="textarea"
+              ref="js-textarea"
               v-model="textareaValue"
               @scroll="handleScroll"
-              @blur.stop="handleTextAreaBlur"
             ></textarea>
           </div>
         </div>
@@ -94,10 +93,12 @@
           </a-select>
           <ul class="list">
             <li
+              v-for="(express, index) in expression"
               class="list-item"
-              v-for="express in expression"
+              :class="activeIndex === index ? 'active':''"
               :key="express.id"
-              @click="handleSelectExpression(express)"
+              @dblclick="handleSelectExpression(express)"
+              @click="getActiveIndex(express.id)"
             >{{ express.name }}</li>
           </ul>
         </div>
@@ -255,17 +256,28 @@ export default {
       e.preventDefault()
       return false
     },
-    change(value) {
+    /**
+     * 获取activeIndex
+    */
+    getActiveIndex(value) {
       this.activeIndex = findIndex(this.expression, {
         id: value
       })
+    },
+    /**
+     * 搜索框
+    */
+    change(value) {
+      this.getActiveIndex(value)
+      this.handleSelectExpression(this.expression[this.activeIndex])
     },
     filterOption(value, option) {
       return option.componentOptions.children[0].text.toLowerCase().indexOf(value.toLowerCase()) >= 0
     },
     handleSelectDimensions(menu) {
       if (menu.key) {
-        this.textareaValue += menu.key
+        // this.textareaValue += menu.key
+        this.insertText(this.$refs['js-textarea'], menu.key)
         this.visible1 = false
       }
     },
@@ -280,7 +292,8 @@ export default {
     },
     handleSelectMeasures(menu) {
       if (menu.key) {
-        this.textareaValue += menu.key
+        // this.textareaValue += menu.key
+        this.insertText(this.$refs['js-textarea'], menu.key)
         this.visible2 = false
       }
     },
@@ -297,10 +310,9 @@ export default {
       this.handleClose()
     },
     handleClose() {
+      this.textareaValue = ''
+      this.errorMessage = ''
       this.$emit('close')
-    },
-    handleTextAreaBlur(e) {
-      console.log(window.getSelection())
     },
     /**
      * 编辑器展示
@@ -351,7 +363,30 @@ export default {
      * 右侧栏选中
     */
     handleSelectExpression(express) {
-      console.log(express)
+      this.insertText(this.$refs['js-textarea'], express.syntax)
+    },
+    /**
+     * 插入到光标处
+    */
+    insertText(el, text) {
+      if (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA') {
+        return
+      }
+      if (document.selection) {
+          el.focus()
+          var cr = document.selection.createRange()
+          cr.text = text
+          cr.collapse()
+          cr.select()
+      } else if (el.selectionStart || el.selectionStart === 0) {
+          var start = el.selectionStart
+          var end = el.selectionEnd
+          el.value = el.value.substring(0, start) + text + el.value.substring(end, el.value.length)
+          el.selectionStart = el.selectionEnd = start + text.length
+      } else {
+        el.value += text
+      }
+      this.textareaValue = el.value
     }
   }
 }

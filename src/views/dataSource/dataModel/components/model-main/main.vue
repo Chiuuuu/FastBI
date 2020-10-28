@@ -16,7 +16,6 @@
           <div class="description">
               <span class="d-s">描述：{{detailInfo.description}}</span>
           </div>
-          <a-divider />
           <div
             class="m-dml-map m-map scrollbar"
           >

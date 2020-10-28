@@ -73,10 +73,10 @@
           </a-form-item>
         </a-form>
       </div>
-      <!-- <div class="description">
-        <span class="d-s">描述： {{detailInfo.description}}<a-icon type="edit" v-on:click="open"/></span>
-      </div> -->
-      <a-divider />
+      <div class="description">
+        <span class="d-s">描述： {{detailInfo.description}}</span>
+        <a-icon type="edit" v-on:click="open" class="d-s-icon"/>
+      </div>
       <div class="draw_board">
         <edit-right-top ref='rightTopRef' :detailInfo="detailInfo"></edit-right-top>
       </div>
@@ -85,7 +85,7 @@
         <div class="detail_header">
           <span>数据模型详情</span>
           <div class="detail_btn">
-            <!-- <a-button v-on:click="check">查看宽表</a-button> -->
+            <a-button v-on:click="checkWidthTable" :disabled="disableByDetailInfo">查看宽表</a-button>
             <!-- <a-button v-on:click="batch">批量编辑字段</a-button> -->
           </div>
         </div>
@@ -138,6 +138,7 @@
       <component
         v-bind:is="modalName"
         :is-show="visible"
+        :detailInfo="detailInfo"
         :compute-type="computeType"
         :tables="dimensions"
         :sql-form="sqlForm"
@@ -166,12 +167,12 @@ import ComputeSetting from './setting/compute-setting'
 import { Node, conversionTree } from '../util'
 import groupBy from 'lodash/groupBy'
 
-const setting = [
-  {
-    key: '1',
-    last_name: 'authorityEntityType'
-  }
-]
+// const setting = [
+//   {
+//     key: '1',
+//     last_name: 'authorityEntityType'
+//   }
+// ]
 
 export default {
   components: {
@@ -204,20 +205,10 @@ export default {
       },
       measures: '',
       dimensions: '',
-      setting,
+      // setting,
       activeIndex: 0,
-      current: ['mail'],
-      openKeys: ['sub1'],
       modalName: '',
       visible: false, // 设置弹窗(描述, 宽表, 批量, 地理, 维度度量)
-      rules: {
-        Function: [
-          {
-            required: true,
-            message: '请选择关联方式'
-          }
-        ]
-      },
       labelCol: {
         span: 4
       },
@@ -225,53 +216,6 @@ export default {
         span: 14
       },
       computeType: '', // 新建计算字段类型(维度, 度量)
-      formLayout: ' horizontal ',
-      dataSource: [
-        {
-          key: '0',
-          name: 'Edward King 0',
-          age: '32',
-          address: 'London, Park Lane no. 0'
-        },
-        {
-          key: '1',
-          name: 'Edward King 1',
-          age: '32',
-          address: 'London, Park Lane no. 1'
-        }
-      ],
-      count: 2,
-      c: [
-        {
-          title: '表1',
-          dataIndex: 'table1',
-          width: '30%',
-          scopedSlots: {
-            customRender: 'table1'
-          }
-        },
-        {
-          title: '连接',
-          dataIndex: 'link',
-          scopedSlots: {
-            customRender: 'link'
-          }
-        },
-        {
-          title: '表2',
-          dataIndex: 'table2',
-          scopedSlots: {
-            customRender: 'table2'
-          }
-        },
-        {
-          title: '操作',
-          dataIndex: 'operation',
-          scopedSlots: {
-            customRender: 'operation'
-          }
-        }
-      ],
       databaseList: [] // 数据库列表
     }
   },
@@ -288,6 +232,13 @@ export default {
     },
     databaseName() {
       return this.databaseList.length > 0 ? this.databaseList[0].name : ''
+    },
+    disableByDetailInfo() {
+      if (this.detailInfo === '') {
+        return true
+      }
+
+      return this.detailInfo.config.tables && this.detailInfo.config.tables.length === 0
     }
   },
   mounted() {
@@ -351,15 +302,28 @@ export default {
       // this.detailInfo.pivotSchema.measures = []
     },
     /**
-     * 表格column处理
-     */
-    handleFormatTableColumn() {
-
+     * 同字段名处理
+    */
+    handleSameName(list) {
+      if (Array.isArray(list) && list.length > 1) {
+        const map = new Map()
+        list.forEach(element => {
+          if (map.has(element.alias)) {
+            const value = `${map.get(element.alias)}${element.tableNo}`
+            map.set(element.alias, value)
+            element.alias += `(${element.tableNo})`
+          } else {
+            map.set(element.alias, 1)
+          }
+        })
+      }
+      return list
     },
     /**
      * 维度数据处理
     */
     handleDimensions() {
+      this.handleSameName(this.detailInfo.pivotSchema.dimensions)
       console.log(groupBy(this.detailInfo.pivotSchema.dimensions, 'tableNo'))
       this.dimensions = groupBy(this.detailInfo.pivotSchema.dimensions, 'tableNo')
     },
@@ -367,6 +331,7 @@ export default {
      * 度量数据处理
     */
     handleMeasures() {
+      this.handleSameName(this.detailInfo.pivotSchema.measures)
       console.log(groupBy(this.detailInfo.pivotSchema.measures, 'tableNo'))
       this.measures = groupBy(this.detailInfo.pivotSchema.measures, 'tableNo')
     },
@@ -395,7 +360,8 @@ export default {
     handleLeftDragLeave() {
       this.$refs.rightTopRef.handleMapRemoveClass()
     },
-    check() {
+    checkWidthTable() {
+      // if(this.detailInfo.config.tables.length === 0)
       this.visible = true
       this.modalName = 'check-table'
     },
