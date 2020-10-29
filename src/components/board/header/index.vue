@@ -68,7 +68,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['isScreen', 'pageSettings', 'canvasMap', 'screenId', 'fileName'])
+    ...mapGetters(['isScreen', 'pageSettings', 'canvasMap', 'screenId', 'fileName', 'parentId'])
   },
   created() {
     if (this.$route.query.name) {
@@ -94,12 +94,16 @@ export default {
         let params = {
           fileType: 1,
           id: this.screenId,
-          name: this.screenName
+          name: this.screenName,
+          parentId: this.parentId
         }
         this.$server.common.putMenuFolderName('/screen/catalog', params).then(res => {
           if (res.code === 200) {
             this.$store.dispatch('SetFileName', this.screenName)
             console.log('修改大屏名称')
+          } else {
+            this.$$message.error(res.msg)
+            return false
           }
         })
       },
