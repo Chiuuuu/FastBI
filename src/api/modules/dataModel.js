@@ -105,5 +105,14 @@ export default {
    */
   getWidthTableInfo(params) {
     return $axios.post('/model/datamodel/getWideTableInfo', params)
+  },
+  /**
+   * @description 两表之间的关联列表
+   * @param {String|Number} leftTableId
+   * @param {String|Number} rightTableId
+   * @returns
+   */
+  getDataSourceFieldDataInfoList(leftTableId, rightTableId) {
+    return $axios.get(`/model/datamodel/getDataSourceFieldDataInfoList/${leftTableId}/${rightTableId}`)
   }
 }
