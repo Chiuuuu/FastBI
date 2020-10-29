@@ -13,6 +13,7 @@ const app = {
         isScreen: false, // 是否全屏
         screenId: '', // 大屏id
         fileName: '',
+        parentId: '', // 大屏父id
         screenDataModels: []
     },
     mutations: {
@@ -39,6 +40,9 @@ const app = {
         },
         SET_FILE_NAME(state, val) {
           state.fileName = val
+        },
+        SET_PARENT_ID(state, id) {
+          state.parentId = id
         }
     },
     actions: {
@@ -65,6 +69,9 @@ const app = {
         },
         SetFileName({ commit }, val) {
           commit('SET_FILE_NAME', val)
+        },
+        SetParentId({ commit }, id) {
+          commit('SET_PARENT_ID', id)
         },
         // 保存大屏
         async saveScreenData ({ commit, state, rootGetters }, obj) {

@@ -17,8 +17,8 @@
         </div> -->
       </div>
     </div>
-    <div class="options-body">
-      <b-scrollbar style="height: 100%;">
+    <div class="options-body scrollbar">
+      <!-- <b-scrollbar style="height: 100%;"> -->
         <div class="page-config" v-if="!currentSelected">
           <gui-field label="页面尺寸">
             <div class="gui-inline">
@@ -868,7 +868,7 @@
             <div flex="main:center">暂无交互事件</div>
           </div>
         </div>
-      </b-scrollbar>
+      <!-- </b-scrollbar> -->
     </div>
     <div class="expand-hover" @click="$emit('on-toggle')">
       <div class="inner">
@@ -1156,6 +1156,9 @@
       isHistogram () {
         return this.chartType === 'v-histogram'
       },
+      isBar () {
+        return this.chartType === 'v-bar'
+      },
       isPie () {
         return this.chartType === 'v-pie'
       },
@@ -1184,13 +1187,13 @@
         return this.chartType === 'v-tables'
       },
       showGrid () {
-        return this.selfConfig.grid && (this.isLine || this.isHistogram)
+        return this.selfConfig.grid && (this.isLine || this.isHistogram || this.isBar)
       },
       showXAxis () {
-        return this.selfConfig.xAxis && (this.isLine || this.isHistogram)
+        return this.selfConfig.xAxis && (this.isLine || this.isHistogram || this.isBar)
       },
       showYAxis () {
-        return this.selfConfig.yAxis && (this.isLine || this.isHistogram)
+        return this.selfConfig.yAxis && (this.isLine || this.isHistogram || this.isBar)
       }
     },
     components: { GuiField, GuiInline, GuiColors, DataSource }
