@@ -158,12 +158,15 @@ export default {
       for (let item of this.fileList) {
         item.defaultAggregator = 'SUM'
       }
+      // 维度
       if (this.type === 'dimensions') {
         this.currentSelected.packageJson.api_data.dimensions = this.fileList
       }
+      // 度量
       if (this.type === 'measures') {
         this.currentSelected.packageJson.api_data.measures = this.fileList
       }
+      // 表格
       if (this.type === 'tableList') {
         this.currentSelected.packageJson.api_data.tableList = this.fileList
       }

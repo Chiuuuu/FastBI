@@ -332,7 +332,6 @@ export default {
             ...dimensions,
             ...measures
           ]
-          console.log('搜索列表', this.searchList)
         }
       })
     },

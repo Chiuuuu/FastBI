@@ -67,6 +67,18 @@
             <a-input-number v-model="globalSettings.gridStep" size="small" :min="2" :max="20"
                             @change="setPageSetting"></a-input-number>
           </gui-field>
+          <a-collapse defaultActiveKey="refresh" :bordered="false">
+            <a-collapse-panel key="refresh"  header="定时刷新">
+              <a-switch slot="extra" v-model="globalSettings.refresh.isRefresh" default-checked @change="refreshChange" size="small" />
+              <a-input-number v-model="globalSettings.refresh.frequency" :min="1" @change="frequencyChange" size="small"
+                              style="width: 100px;margin-right:10px" />
+              <a-select v-model="globalSettings.refresh.unit" placeholder="请选择"  @change="unitChange" size="small"
+                        style="width: 100px">
+                <a-select-option v-for="(item,index) in refreshList" :key="index" :value="item.value">{{item.name}}</a-select-option>
+              </a-select>
+            </a-collapse-panel>
+          </a-collapse>
+
           <gui-field label="重置">
             <a-button type="primary" size="small" @click="resetSetting">恢复默认配置</a-button>
           </gui-field>
@@ -919,13 +931,24 @@
         }, // 单选radio样式
         showSlide: false, // 显示透明滑动条
         imageUrl: '', // 上传图片url
-        loading: false // 是否上传图片中
+        loading: false, // 是否上传图片中
+        refreshList: [
+          { name: '分', value: 'min' },
+          { name: '小时', value: 'hour' }
+        ]
       }
     },
     mounted() {
       if (!this.screenId) {
         this.resetSetting()
       }
+      if (this.$route.path === '/screen/edit') {
+        this.setTimer()
+      }
+    },
+    destroyed() {
+      clearInterval(this.timer)
+      this.timer = null
     },
     methods: {
       ...mapActions(['saveScreenData']),
@@ -970,13 +993,65 @@
       },
       // 重置全局配置
       resetSetting () {
-        this.$loading.start()
-        resetPageSettings().then(res => {
-          this.globalSettings = res.data
-          this.$store.dispatch('SetPageSettings', res.data)
-          this.$loading.done()
-          // this.saveScreenData()
-        })
+        let pageSettings = {
+           width: 1920,
+           height: 1080,
+           backgroundColor: '#0d2a42',
+           gridStep: 1,
+           backgroundSrc: '',
+           backgroundType: '1',
+           opacity: 1,
+           refresh: { frequency: '', isRefresh: false }
+        }
+        this.globalSettings = pageSettings
+        this.$store.dispatch('SetPageSettings', pageSettings)
+      },
+      // 全局刷新打开关闭
+      refreshChange(checked) {
+        // 阻止默认事件，取消收起
+        event.stopPropagation()
+        this.globalSettings.refresh.isRefresh = checked
+        if (checked) {
+          this.frequencyChange(1)
+          this.unitChange(1)
+        }
+        this.$store.dispatch('SetPageSettings', this.globalSettings)
+        this.saveScreenData()
+        this.setTimer()
+      },
+      frequencyChange(val) {
+        if (this.globalSettings.refresh.isRefresh) {
+          if (this.globalSettings.refresh.unit === 'min' && this.globalSettings.refresh.frequency > 1440) {
+            this.$message.error('时间设置不超过1天, 请重新设置')
+            this.resetSetting()
+          }
+          if (this.globalSettings.refresh.unit === 'hour' && this.globalSettings.refresh.frequency > 24) {
+            this.$message.error('时间设置不超过24天, 请重新设置')
+            this.resetSetting()
+          }
+        }
+        if (val !== 1) {
+          this.$store.dispatch('SetPageSettings', this.globalSettings)
+          this.saveScreenData()
+          this.setTimer()
+        }
+      },
+      unitChange(val) {
+        if (this.globalSettings.refresh.isRefresh) {
+          if (this.globalSettings.refresh.frequency > 1440 && this.globalSettings.refresh.unit === 'min') {
+            this.$message.error('时间设置不超过1天, 请重新设置')
+            this.resetSetting()
+          }
+          if (this.globalSettings.refresh.frequency > 24 && this.globalSettings.refresh.unit === 'hour') {
+            this.$message.error('时间设置不超过1天, 请重新设置')
+            this.resetSetting()
+          }
+        }
+        if (val !== 1) {
+          this.$store.dispatch('SetSelfDataSource', this.globalSettings)
+          this.saveScreenData()
+          this.setTimer()
+        }
       },
       // 数据源改变事件
       dataSourceChange () {
@@ -1105,6 +1180,48 @@
       // 混合柱状图
       setMixed(val) {
 
+      },
+      // 定时器设置
+      setTimer() {
+        if (this.timer) {
+          clearInterval(this.timer)
+          this.timer = null
+        } else {
+          // 所有条件都满足才开始倒计时刷新
+          if (this.globalSettings.refresh.isRefresh && this.globalSettings.refresh.unit && this.globalSettings.refresh.frequency > 0) {
+            let count = 0
+            if (this.globalSettings.refresh.unit === 'min') {
+              count = this.globalSettings.refresh.frequency * 60 * 1000
+            } else if (this.globalSettings.refresh.unit === 'hour') {
+              count = this.globalSettings.refresh.frequency * 60 * 60 * 1000
+            }
+            this.timer = setInterval(() => {
+              this.refreshData()
+            }, count)
+          }
+        }
+      },
+      // 刷新大屏
+      refreshData() {
+        let params = {
+          id: this.screenId
+        }
+        this.$server.screenManage.actionRefreshScreen({ params }).then(res => {
+          if (res.code === 200) {
+            let screenDataList = res.data.screenDataList
+            for (let item of screenDataList) {
+              for (let item2 of this.canvasMap) {
+                let apidata = deepClone(item2.packageJson.api_data)
+                if (item2.id === item.id) {
+                  if (this.globalSettings.unit && this.globalSettings.frequency > 0) {
+                    item2.packageJson.api_data.source.rows = item.value
+                  }
+                }
+              }
+            }
+            this.saveScreenData()
+          }
+        })
       }
     },
     watch: {

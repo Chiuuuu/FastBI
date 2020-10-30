@@ -354,8 +354,7 @@ export default {
       }
       this.$router.push({ name: 'screenEdit',
       query: {
-        id: this.fileSelectId,
-        name: this.fileName
+        id: this.fileSelectId
       } })
     },
     // 点击新建文件夹
