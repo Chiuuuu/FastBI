@@ -95,5 +95,24 @@ export default {
    */
   saveModel(params) {
     return $axios.put('/model/datamodel/updateDataModelDetailInfo', params)
+  },
+  /**
+   * @description 查看宽表
+   * @param {Object} params 请求体
+   * @param {Object} params.config 配置
+   * @param {Object} params.pivotSchema 维度度量等参数
+   * @returns
+   */
+  getWidthTableInfo(params) {
+    return $axios.post('/model/datamodel/getWideTableInfo', params)
+  },
+  /**
+   * @description 两表之间的关联列表
+   * @param {String|Number} leftTableId
+   * @param {String|Number} rightTableId
+   * @returns
+   */
+  getDataSourceFieldDataInfoList(leftTableId, rightTableId) {
+    return $axios.get(`/model/datamodel/getDataSourceFieldDataInfoList/${leftTableId}/${rightTableId}`)
   }
 }

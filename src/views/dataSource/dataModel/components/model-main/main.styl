@@ -39,17 +39,23 @@
             overflow-y auto    
         }
         .description {
-            width: 97%;
-            height: 35px;
-            margin-left: 20px;
-            margin-top: 24px;
+            padding-left: 20px;
+            margin-bottom: 20px;
+            margin-top: 10px;
+            border-bottom: 1px solid #e8e8e8;
             .d-s{
                 font-size:14px;
                 font-family:Microsoft YaHei;
                 font-weight:400;
                 color:rgba(59,60,67,1);
-                line-height:48px;
-                }
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                max-width: calc(100% - 35px);
+                display: inline-block;
+                height: 20px;
+                line-height: 20px;
+            }
         }
         .detail_header {
             margin-left: 21px;

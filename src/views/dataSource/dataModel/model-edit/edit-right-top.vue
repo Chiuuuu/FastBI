@@ -100,6 +100,10 @@ export default {
     handleClearRenderTables() {
       this.renderTables = []
       this.detailInfo.config.tables = []
+      this.detailInfo.pivotSchema.dimensions = []
+      this.detailInfo.pivotSchema.measures = []
+      this.$parent.handleDimensions()
+      this.$parent.handleMeasures()
     },
     /**
      * 处理树形组件
@@ -205,9 +209,9 @@ export default {
       }
     },
     async handleUpdate(params) {
-      if (params.tables.length < 1) {
-        return this.handleClearRenderTables()
-      }
+      // if (params.tables.length < 1) {
+      //   return this.handleClearRenderTables()
+      // }
       const result = await this.$server.dataModel.getPivotschemaByTables(params)
       // const result = await this.$server.dataModel.putModelDetail({
       //   dataConnectionId: this.$route.query.datasourceId,

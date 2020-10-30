@@ -16,10 +16,7 @@
       >
         {{ nodeData.props.name }}
       </h6>
-      <span class="opt">
-         <b class="num">{{joinLength}}</b>
-      </span>
-      <!-- <a-popover v-model="visible" trigger="click" overlayClassName='model-popover-box' @visibleChange="(v)=> handleVisibleChange(v, nodeData)">
+      <a-popover v-model="visible" trigger="click" overlayClassName='model-popover-box' @visibleChange="(v)=> handleVisibleChange(v, nodeData)">
         <div slot="content" class='popover-content'>
           <div class="popover-header">
             <div class="popover-header-title">
@@ -29,11 +26,11 @@
           </div>
           <div class="popover-type">
             <ul>
-              <li v-for='(item, index) in popoverType' :key="item">
+              <li v-for='(item, index) in popoverType' :key="item.type">
                 <div class="wap" @click="handlePopoverType(item, nodeData)">
-                  <div class="inner" :class="popoverTypeActive === item ? 'active' : ''">
+                  <div class="inner" :class="item.type === nodeData.props.joinType ? 'active' : ''">
                     <div class="img" :class="'img-0' + (index + 1)"></div>
-                    <div class="txt">{{item}}</div>
+                    <div class="txt">{{item.name}}</div>
                   </div>
                 </div>
               </li>
@@ -45,62 +42,17 @@
               <div class="item">{{ popoverRightTable }}</div>
             </div>
             <div class="popover-form">
-              <a-form-model
-                v-for="(condition, index) in popoverForm"
-                :key="index"
-                :ref="'condition' + index"
-                :model="condition">
-                <a-row>
-                  <a-col :span="10">
-                    <a-form-model-item class="item">
-                      <a-select
-                        show-search
-                        placeholder="Select a person"
-                        style="width: 100%"
-                        prop="left"
-                        v-model="condition.left"
-                      >
-                        <a-select-option value="jack">
-                          Jack
-                        </a-select-option>
-                        <a-select-option value="lucy">
-                          Lucy
-                        </a-select-option>
-                        <a-select-option value="tom">
-                          Tom
-                        </a-select-option>
-                      </a-select>
-                    </a-form-model-item>
-                  </a-col>
-                  <a-col :span="2">
-                    <div class="equal">=</div>
-                  </a-col>
-                  <a-col :span="10">
-                    <a-form-model-item class="item">
-                      <a-select
-                        show-search
-                        placeholder="Select a person"
-                        style="width: 100%"
-                        prop="right"
-                        v-model="condition.right"
-                      >
-                        <a-select-option value="jack">
-                          Jack
-                        </a-select-option>
-                        <a-select-option value="lucy">
-                          Lucy
-                        </a-select-option>
-                        <a-select-option value="tom">
-                          Tom
-                        </a-select-option>
-                      </a-select>
-                    </a-form-model-item>
-                  </a-col>
-                  <a-col :span='2' class="delete">
-                    <a-button type='link' @click="handledeleteCondition(index)"><a-icon type="delete" /></a-button>
-                  </a-col>
-                </a-row>
-              </a-form-model>
+              <tree-node-poporver-row
+                v-for="(row,index) in popoverForm"
+                :key="row.id"
+                :index="index"
+                :row="row"
+                :list="popoverForm"
+                :popoverLeftList="popoverLeftList"
+                :popoverRightList="popoverRightList"
+                @update-condition="handleUpateCondition"
+                @dele-condition="handleDeleteCondition"
+              ></tree-node-poporver-row>
             </div>
             <a-button type="link" @click="handleAddCondition">
               <a-icon type="plus" />添加
@@ -109,9 +61,9 @@
           </div>
         </div>
         <span class="opt">
-          <b class="num">{{joinLength}}</b>
+          <b class="num">{{handleGetConditionLength(nodeData)}}</b>
         </span>
-      </a-popover> -->
+      </a-popover>
       <a-popover v-model="nodeVisible" trigger="click"  overlayClassName='btn-box'>
         <ul slot="content" class="btn-box-ul">
           <li class="btn-box-li" @click="handleBtnDelete(nodeData)">删除</li>
@@ -133,6 +85,7 @@
 <script>
 import { Utils, Node } from '../util'
 import findIndex from 'lodash/findIndex'
+import TreeNodePoporverRow from './tree-node-popover-row'
 export default {
   name: 'tree-node',
   inject: ['nodeStatus'],
@@ -151,6 +104,9 @@ export default {
       type: [String, Object]
     }
   },
+  components: {
+    TreeNodePoporverRow
+  },
   data() {
     return {
       isDrag: false,
@@ -158,10 +114,23 @@ export default {
       visible: false,
       nodeVisible: false,
       mark: '',
-      popoverTypeActive: '内部',
-      popoverType: ['内部', '左侧', '右侧', '完全外部'],
-      popoverLeftTable: '',
-      popoverRightTable: '',
+      popoverType: [{
+        type: 1,
+        name: '内联'
+      }, {
+        type: 2,
+        name: '左侧'
+      }, {
+        type: 3,
+        name: '右侧'
+      }, {
+        type: 4,
+        name: '完全外部'
+      }],
+      popoverLeftTable: '', // 左表名称
+      popoverRightTable: '', // 右表名称
+      popoverLeftList: [],
+      popoverRightList: [],
       popoverForm: []
     }
   },
@@ -182,14 +151,39 @@ export default {
     }
   },
   methods: {
-    handledeleteCondition(index) {
-      this.popoverForm.splice(index, 1)
+    handleGetConditionLength(nodeData) {
+      return nodeData.props.join && nodeData.props.join.conditions.length
+    },
+    handleUpateCondition(index, row) {
+      if (this.popoverForm.length > this.nodeData.props.join.conditions.length) {
+        this.nodeData.props.join.conditions.push(row)
+        // 这里需要强制更新
+        this.$forceUpdate()
+      } else {
+        const replaceItem = this.nodeData.props.join.conditions[index]
+        this.nodeData.props.join.conditions.splice(index, 1, {
+          ...replaceItem,
+          ...row
+        })
+      }
+    },
+    handleDeleteCondition(index) {
+      this.nodeData.props.join.conditions.splice(index, 1)
     },
     handleAddCondition() {
-      this.popoverForm.push({ left: '', right: '' })
+      this.popoverForm.push({
+        datamodelId: this.modelId,
+        leftTableNo: Number(this.nodeData.parent.getProps().tableNo),
+        operator: '=',
+        leftFieldId: '',
+        rightFieldId: '',
+        tableNo: this.nodeData.getProps().tableNo
+      })
     },
     handleClearCondition() {
       this.popoverForm = []
+      this.nodeData.props.join.conditions = []
+      this.handleAddCondition()
     },
     handleBtnDelete(node) {
       // let deleteList = []
@@ -198,13 +192,22 @@ export default {
         title: '确认提示',
         content: '确定删除该表?',
         onOk: async () => {
+          // 循环递归删除tables的数据
           this.loopDelete(node, this.detailInfo.config.tables)
+
+          // 需要前端自行删除渲染节点的数据
           if (node.parent) {
+            // 有根节点的情况
             const index = node.parent.children.indexOf(node)
             node.parent.children.splice(index, 1)
-          } else {
-            this.root.handleClearRenderTables()
           }
+
+          if (this.detailInfo.config.tables.length < 1) {
+            // 无根节点的情况
+            return this.root.handleClearRenderTables()
+          }
+
+          // 更新维度度量
           await this.root.handleUpdate({
             tables: this.detailInfo.config.tables.map((item, index) => {
               item.datamodelId = this.modelId
@@ -219,7 +222,6 @@ export default {
       const ownProps = node.getProps()
       const index = findIndex(list, ownProps)
       list.splice(index, 1)
-      console.log(list)
       if (node.children && node.children.length > 0) {
         node.children.forEach(item => {
           this.loopDelete(item, list)
@@ -323,15 +325,38 @@ export default {
     handleClosePopover() {
       this.visible = false
     },
-    handlePopoverType(type, nodeData) {
-      this.popoverTypeActive = type
+    handlePopoverType(item, nodeData) {
+      nodeData.setJoinType(item.type)
+      const index = findIndex(this.detailInfo.config.tables, {
+        id: nodeData.getProps().id
+      })
+      this.detailInfo.config.tables.splice(index, 1, nodeData.getProps())
     },
     handleVisibleChange(v, node) {
       if (!v) return
+
+      if (this.handleGetConditionLength(node)) {
+        this.popoverForm = [].concat(this.nodeData.props.join.conditions)
+      }
       // console.log('left', node.parent.getProps().name)
       // console.log('right', node.getProps().name)
-      this.popoverLeftTable = node.parent.getProps().name
-      this.popoverRightTable = node.getProps().name
+      const leftNodeProps = node.parent.getProps()
+      const rightNodeProps = node.getProps()
+
+      this.popoverLeftTable = leftNodeProps.name
+      this.popoverRightTable = rightNodeProps.name
+      this.handleGetLRTableList(leftNodeProps.tableId, rightNodeProps.tableId)
+    },
+    async handleGetLRTableList(leftTableId, rightTableId) {
+      const result = await this.$server.dataModel.getDataSourceFieldDataInfoList(leftTableId, rightTableId)
+      console.log(result)
+
+      if (result.code === 200) {
+        this.popoverLeftList = [].concat(result.data.left)
+        this.popoverRightList = [].concat(result.data.right)
+      } else {
+        this.$message.error(result.msg)
+      }
     }
   }
 }
@@ -568,20 +593,35 @@ export default {
         }
       }
       .popover-form {
-        padding-top: 20px;
+        padding-left: 20px;
+        padding-top: 10px;
         max-height: 260px;
         overflow-y: auto;
         overflow-x: hidden;
         border-bottom: 1px solid #ededed;
 
+        .popover-row {
+          margin-bottom: 10px;
+          &.z-err {
+            /deep/.ant-select-selection{
+              border-color: red;
+            }
+            .err-message{
+              display: block;
+            }
+          }
+          .err-message {
+            display: none;
+            height: 20px;
+            line-height: 20px;
+            color: red;
+          }
+        }
         .item {
           padding-left: 20px;
         }
         .equal {
-          width: 40px;
-          height: 40px;
-          line-height: 40px;
-          text-align: right;
+          text-align: center;
           font-size: 20px;
         }
         .delete {

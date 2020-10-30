@@ -3,7 +3,9 @@ import get from 'lodash/get'
 
 export class Node {
   constructor(props) {
-    this.props = assing({}, props)
+    this.props = assing({
+      joinType: 1
+    }, props)
     this.parent = null
     this.children = []
   }
@@ -22,6 +24,9 @@ export class Node {
   }
   setTableNo(no) {
     this.props['tableNo'] = no
+  }
+  setJoinType(type) {
+    this.props['joinType'] = type
   }
   setDataModelId(id, key = 'datamodelId') {
     this.props[key] = id

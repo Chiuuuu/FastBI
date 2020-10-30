@@ -1,19 +1,21 @@
 <template>
-  <div class="sheet_list" v-if="list.length > 0">
-    <div
-      class="sheet_list_item"
-      v-for="item in list"
-      :key="item.id"
-      :draggable="isDrag"
-      @mouseleave.stop="handleMouseLeave"
-      @mousedown.stop="handleMouseDown"
-      @dragstart.stop="handleLeftDragStart($event, item)"
-      @dragend.stop="handleLeftDragEnd"
-    >
-      <span>{{ item.name }}</span>
+  <a-spin :spinning="loading">
+    <div class="sheet_list" v-if="list.length > 0">
+      <div
+        class="sheet_list_item"
+        v-for="item in list"
+        :key="item.id"
+        :draggable="isDrag"
+        @mouseleave.stop="handleMouseLeave"
+        @mousedown.stop="handleMouseDown"
+        @dragstart.stop="handleLeftDragStart($event, item)"
+        @dragend.stop="handleLeftDragEnd"
+      >
+        <span>{{ item.name }}</span>
+      </div>
     </div>
-  </div>
-  <a-empty style="margin-top:50px;color:#000" v-else description="数据源未进行数据抽取，请先抽取数据"></a-empty>
+    <a-empty style="margin-top:50px;color:#000" v-else description="数据源未进行数据抽取，请先抽取数据"></a-empty>
+  </a-spin>
 </template>
 <script>
 import { Node } from '../util'
@@ -25,6 +27,7 @@ export default {
   data() {
     return {
       isDrag: false,
+      loading: true,
       list: ''
       // list: [
       //   {
@@ -58,7 +61,9 @@ export default {
   },
   methods: {
     async handleGetMenuList(id) {
-      const result = await this.$server.dataModel.getTableListById(id)
+      const result = await this.$server.dataModel.getTableListById(id).finally(() => {
+        this.loading = false
+      })
 
       if (result.code === 200) {
         this.list = result.data
