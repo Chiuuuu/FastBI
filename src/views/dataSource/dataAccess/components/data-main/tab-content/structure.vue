@@ -45,7 +45,7 @@
           :loading='modalSpin'
           :pagination='false'
         >
-          <span slot="frequency" slot-scope="row">
+          <span slot="frequency">
             {{' 只执行一次' }}
           </span>
           <span slot="config" slot-scope="row">

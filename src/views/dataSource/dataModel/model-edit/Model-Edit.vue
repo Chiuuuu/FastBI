@@ -423,9 +423,18 @@ export default {
         return
       }
 
+      if (this.detailInfo.config.tables.length > 1) {
+        const hasEmpty = this.detailInfo.config.tables.slice(1).some(table => {
+          return table.join.conditions.length === 0
+        })
+        if (hasEmpty) {
+          this.$message.error('还有表未关联')
+          return
+        }
+      }
+
       this.detailInfo.config.tables.map(table => {
         table.alias = table.name
-        table.joinType = 1
       })
       const result = await this.$server.dataModel.saveModel({
         ...this.detailInfo,
