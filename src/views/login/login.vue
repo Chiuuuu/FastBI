@@ -5,7 +5,7 @@
       <div class="login_form" flex="dir:top">
         <span class="login_title">智能BI可视化平台</span>
         <!-- <img class="login_title" src="../../assets/images/login_title.png" /> -->
-        <span class="login_title_span">账号登录</span>
+        <div class="login_title_span">账号登录</div>
         <div class="login_main_form">
           <a-form
             id="components-form-demo-normal-login"
@@ -48,7 +48,7 @@
             </a-form-item>
             <a-form-item>
               <a-checkbox
-                style="width:100%;height:50px"
+                style="width:100%;height:40px"
                 v-decorator="[
                   'remember',
                   {
