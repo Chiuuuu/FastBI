@@ -99,7 +99,7 @@ export default {
             this.$store.dispatch('SetFileName', this.screenName)
             console.log('修改大屏名称')
           } else {
-            this.$$message.error(res.msg)
+            this.$message.error(res.msg)
             return false
           }
         })
