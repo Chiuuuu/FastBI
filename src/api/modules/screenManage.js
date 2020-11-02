@@ -73,8 +73,9 @@ const screenManage = {
    * @param {*} id
    * @returns
    */
-  getPivoSchemaList(id) {
-    return $axios.get(`/model/pivotschema/selectModelPivotschemaListByRole/${id}`)
+  getPivoSchemaList(dataModelId, screenId) {
+    // return $axios.get(`/model/pivotschema/selectModelPivotschemaListByRole/${id}`)
+    return $axios.get(`/screen/pivotschema/selectModelPivotschemaListByRole/${dataModelId}/${screenId}`)
   },
   /**
    * @description 根据维度度量获取数据
@@ -100,6 +101,12 @@ const screenManage = {
    */
   screenModuleSave(params) {
     return $axios.get('/screen/pivotschema/ScreenModuleSave', params)
+  },
+  /**
+   * 数据模型维度度量转换
+   */
+  screenModuleTransform(params) {
+    return $axios.post('/screen/pivotschema/ScreenModuleTransform', params)
   }
 }
 

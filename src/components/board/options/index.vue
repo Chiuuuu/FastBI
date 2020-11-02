@@ -1255,7 +1255,13 @@
         handler (val) {
           if (val) {
             console.log(val)
-            this.globalSettings = deepClone(val)
+            let setting = val
+            if (!setting.refresh) {
+              setting.refresh = {
+                frequency: '', isRefresh: false
+              }
+            }
+            this.globalSettings = deepClone(setting)
           }
         },
         deep: true,
