@@ -244,6 +244,11 @@ const list = [{
                             fontSize: 12,
                             position: 'top'
                         },
+                        itemStyle: {
+                          normal: {
+                            barBorderRadius: [0]
+                          }
+                        },
                         barWidth: 'auto' // 可选
                     },
                     color: DEFAULT_COLORS

@@ -66,11 +66,18 @@ export default {
           if (this.type === 'measures' && val.packageJson.api_data.measures) { // 度量
             this.fileList = deepClone(val.packageJson.api_data.measures)
           }
+          // 表格不区分维度跟度量
           if (this.type === 'tableList' && val.packageJson.api_data.tableList) { // 表格不区分维度度量
             this.fileList = deepClone(val.packageJson.api_data.tableList)
           }
+<<<<<<< HEAD
           // if (val.packageJson.api_data.options) {
           //   this.getData()
+=======
+          // 仪表盘只有度量
+          // if (val.packageJson.chartType === 'v-gauge' && this.type === 'measures' && val.packageJson.api_data.measures) {
+          //   this.fileList = deepClone(val.packageJson.api_data.measures)
+>>>>>>> feature-大屏v1.3.0
           // }
         }
       },
@@ -142,19 +149,6 @@ export default {
       if (current.packageJson.api_data.dimensions.length === 0 && current.packageJson.api_data.measures.length === 0) {
         current.packageJson.api_data.modelId = ''
         this.$store.dispatch('SetSelfDataSource', current.packageJson.api_data)
-        // let canvasMaps = navigateList[0].children
-        // for (let maps of canvasMaps) {
-        //   console.log(1111)
-        //   if (maps.name === current.name) {
-        //     console.log(maps.api_data)
-        //     maps.api_data.modelId = ''
-        //     let apiData = {
-        //       ...maps.api_data
-        //     }
-        //     this.$store.dispatch('SetSelfDataSource', apiData)
-        //     this.saveScreenData()
-        //   }
-        // }
       }
     },
     // 根据维度度量获取数据
@@ -179,7 +173,7 @@ export default {
         this.currentSelected.packageJson.api_data.modelId = this.fileList[0].datamodelId
         // this.$store.dispatch('SetSelfDataSource', apiData)
       }
-      if (this.type !== 'tableList' && (apiData.dimensions.length === 0 || apiData.measures.length === 0)) {
+      if (this.currentSelected.packageJson.chartType !== 'v-gauge' && this.type !== 'tableList' && (apiData.dimensions.length === 0 || apiData.measures.length === 0)) {
         return
       }
       let params = {
