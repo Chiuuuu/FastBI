@@ -1,7 +1,7 @@
 <template>
   <div class="sidebar">
     <div class="header">
-      <img src="../../../assets/images/common/logo.png" />
+      <img src="../../../assets/images/login/login_logo.png" />
     </div>
     <a-menu
       :defaultOpenKeys="openKeys"

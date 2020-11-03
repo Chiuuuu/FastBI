@@ -22,8 +22,7 @@
               :columns="columns"
               :data-source="data"
               :loading='sping'
-              :pagination='false'
-              :scroll="{ x: 1200, y: 570 }"
+              :scroll="{ x: 1200 }"
               bordered
             >
             <template slot="alias" slot-scope="text, record, index">
