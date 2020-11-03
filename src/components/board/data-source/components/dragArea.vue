@@ -56,6 +56,7 @@ export default {
   watch: {
     currentSelected: {
       handler (val) {
+        console.log(val)
         if (val) {
           // 当前选中的图表显示维度度量的数据
           this.fileList = []
@@ -68,6 +69,9 @@ export default {
           if (this.type === 'tableList' && val.packageJson.api_data.tableList) { // 表格不区分维度度量
             this.fileList = deepClone(val.packageJson.api_data.tableList)
           }
+          // if (val.packageJson.api_data.options) {
+          //   this.getData()
+          // }
         }
       },
       deep: true,
@@ -223,6 +227,10 @@ export default {
               }
               rows.push(obj)
             })
+            // 仪表盘只保留一个数据
+            if (this.currentSelected.packageJson.name === 've-gauge') {
+              rows.length = 1
+            }
             apiData.source = {
               columns,
               rows

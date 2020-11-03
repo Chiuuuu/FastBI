@@ -1,6 +1,6 @@
 <template>
   <div class="gui-field">
-    <div class="gui-field-name">{{label}}</div>
+    <div class="gui-field-name">{{label?label:'&nbsp;&nbsp;'}}</div>
     <div class="gui-field-container">
       <slot></slot>
     </div>
