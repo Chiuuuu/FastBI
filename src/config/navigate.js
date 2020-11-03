@@ -258,6 +258,11 @@ const list = [{
                             fontSize: 12,
                             position: 'top'
                         },
+                        itemStyle: {
+                          normal: {
+                            barBorderRadius: [0]
+                          }
+                        },
                         barWidth: 'auto' // 可选
                     },
                     color: DEFAULT_COLORS
@@ -648,7 +653,7 @@ const list = [{
               name: 've-gauge',
               chartType: 'v-gauge',
               icon: 'radar-chart',
-              type: '1',
+              type: '2',
               modelId: '',
               api_data: {
                 columns: ['type', 'value'],

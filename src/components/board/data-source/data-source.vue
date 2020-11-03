@@ -1,13 +1,13 @@
 <template>
   <div class="data-source">
     <a-collapse v-model="activeKey" :bordered="false">
-      <a-collapse-panel key="dimensions" header="维度" v-if="currentSelected.packageJson.name!=='ve-tables'">
+      <a-collapse-panel key="dimensions" header="维度" v-if="chartType!=='v-tables' && chartType!=='v-gauge'">
         <drag-area type="dimensions" :fileList="fileObj.dimensions"></drag-area>
       </a-collapse-panel>
-      <a-collapse-panel key="measures" header="度量" v-if="currentSelected.packageJson.name!=='ve-tables'">
+      <a-collapse-panel key="measures" header="度量" v-if="chartType!=='v-tables'">
         <drag-area type="measures" :fileList="fileObj.measures"></drag-area>
       </a-collapse-panel>
-      <a-collapse-panel key="tableList" header="列" v-if="currentSelected.packageJson.name==='ve-tables'">
+      <a-collapse-panel key="tableList" header="列" v-if="chartType==='v-tables'">
         <drag-area type="tableList"></drag-area>
       </a-collapse-panel>
       <!-- <a-collapse-panel key="filter" header="数据筛选">
@@ -64,7 +64,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['currentSelected'])
+    ...mapGetters(['currentSelected']),
+    chartType () {
+      return this.currentSelected ? this.currentSelected.packageJson.chartType : ''
+    }
   },
   methods: {
 

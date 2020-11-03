@@ -190,16 +190,22 @@
                                         @change="setSelfProperty"></el-color-picker>
                     </gui-inline>
                   </gui-field>
-                  <gui-field label="柱条宽度" v-if="isHistogram">
-                    <a-input size="small" @change="setSelfProperty"
-                             v-model="selfConfig.series.barWidth" clearable></a-input>
-                  </gui-field>
-                  <gui-field label="堆叠柱状图" v-if="isHistogram">
-                    <a-switch v-model="selfConfig.stack" size="small" @change="setHistogram($event, 'stack')"></a-switch>
-                  </gui-field>
-                  <gui-field label="混合状图" v-if="isHistogram">
-                    <a-switch v-model="selfConfig.mixed" size="small" @change="setHistogram($event, 'mixed')"></a-switch>
-                  </gui-field>
+                  <div v-if="isHistogram">
+                    <gui-field label="柱条宽度">
+                      <a-input size="small" @change="setSelfProperty"
+                              v-model="selfConfig.series.barWidth" clearable></a-input>
+                    </gui-field>
+                    <gui-field label="柱形圆角">
+                      <a-switch v-model="selfConfig.radius" size="small" @change="setHistogram($event, 'radius')"></a-switch>
+                    </gui-field>
+                    <gui-field label="堆叠柱状图">
+                      <a-switch v-model="selfConfig.stack" size="small" @change="setHistogram($event, 'stack')"></a-switch>
+                    </gui-field>
+                    <gui-field label="混合状图">
+                      <a-switch v-model="selfConfig.mixed" size="small" @change="setHistogram($event, 'mixed')"></a-switch>
+                    </gui-field>
+                  </div>
+
                   <!-- <gui-field label="混合状图" v-if="isHistogram && selfConfig.mixed">
                     <a-switch v-model="selfConfig.mixed" size="small" @change="setHistogram($event, 'mixed')"></a-switch>
                   </gui-field> -->
@@ -477,7 +483,7 @@
                                       show-alpha @change="setSelfProperty"></el-color-picker>
                   </gui-field>
                   <gui-field label="是否网格线">
-                    <a-switch v-model="selfConfig.xAxis.splitLine.show" default-checked @change="switchChange" size="small" />
+                    <a-switch v-model="selfConfig.yAxis.splitLine.show" default-checked @change="switchChange" size="small" />
                   </gui-field>
                   <gui-field label="网格线颜色" v-if="selfConfig.xAxis.splitLine.show">
                     <el-color-picker v-model="selfConfig.xAxis.splitLine.lineStyle.color"
@@ -510,7 +516,7 @@
                                       show-alpha @change="setSelfProperty"></el-color-picker>
                   </gui-field>
                   <gui-field label="是否网格线">
-                    <a-switch v-model="selfConfig.yAxis.splitLine.show" default-checked @change="switchChange" size="small" />
+                    <a-switch v-model="selfConfig.xAxis.splitLine.show" default-checked @change="switchChange" size="small" />
                   </gui-field>
                   <gui-field label="网格线颜色" v-if="selfConfig.yAxis.splitLine.show">
                     <el-color-picker v-model="selfConfig.yAxis.splitLine.lineStyle.color"
@@ -1078,7 +1084,7 @@
         this.setSelfProperty()
       },
 
-      // 状图设置
+      // 状图图设置
       setHistogram(val, type) {
         let apiData = deepClone(this.apiData)
         let columns = apiData.columns
@@ -1089,6 +1095,12 @@
           }
         } else {
           this.apis.stack = {}
+        }
+        // 圆形柱状图
+        if (val && type === 'radius') {
+          this.selfConfig.series.itemStyle.normal.barBorderRadius = [50, 50, 0, 0]
+        } else {
+          this.selfConfig.series.itemStyle.normal.barBorderRadius = [0]
         }
         // 混合柱状图
         if (val && type === 'mixed') {
