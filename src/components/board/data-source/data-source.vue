@@ -2,7 +2,7 @@
   <div class="data-source">
     <a-collapse v-model="activeKey" :bordered="false">
       <a-collapse-panel key="dimensions" header="维度" v-if="currentSelected.packageJson.name!=='ve-tables'">
-        <drag-area type="dimensions" :fileList="fileObj.dimensions"></drag-area>
+        <drag-area type="dimensions" ref="child" :fileList="fileObj.dimensions"></drag-area>
       </a-collapse-panel>
       <a-collapse-panel key="measures" header="度量" v-if="currentSelected.packageJson.name!=='ve-tables'">
         <drag-area type="measures" :fileList="fileObj.measures"></drag-area>
@@ -12,7 +12,8 @@
       </a-collapse-panel>
       <a-collapse-panel key="sort" header="排序">
         <div style="display: flex;">
-          <a-select v-model="sortData.fileid" placeholder="选择字段" style="width: 120px;margin-right:10px" @change="sortFileChange">
+          <a-select v-model="sortData.fileid" placeholder="选择字段" style="width: 120px;margin-right:10px"
+                    @change="sortFileChange">
             <a-select-option v-for="item in sortList" :value="item.id" :key="item.id">
               {{item.name}}
             </a-select-option>
@@ -148,14 +149,16 @@ export default {
       }
       this.apiData.options = options
       this.$store.dispatch('SetSelfDataSource', this.apiData)
-      this.saveScreenData()
+      this.$refs.child.getData()
+      // this.saveScreenData()
     },
     // 排序类型 升序 降序
     ascChange() {
       if (this.sortData.fileid) {
         this.apiData.options.sort.asc = this.sortData.asc
         this.$store.dispatch('SetSelfDataSource', this.apiData)
-        this.saveScreenData()
+        this.$refs.child.getData()
+        // this.saveScreenData()
       }
     },
     // 定时刷新开关
@@ -251,13 +254,6 @@ export default {
                 }
               }
             }
-            // let id = this.currentSelected.id
-            // if (String(item.id) === String(id)) {
-            //   console.log(111)
-            //   this.apiData.source.rows = item.value
-            //   console.log(this.apiData)
-            //   this.$store.dispatch('SetSelfDataSource', this.apiData)
-            // }
           }
           this.saveScreenData()
         }
