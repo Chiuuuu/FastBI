@@ -8,7 +8,7 @@
         <drag-area type="measures" :fileList="fileObj.measures"></drag-area>
       </a-collapse-panel>
       <a-collapse-panel key="tableList" header="列" v-if="currentSelected.packageJson.name==='ve-tables'">
-        <drag-area type="tableList"></drag-area>
+        <drag-area type="tableList" ref="table"></drag-area>
       </a-collapse-panel>
       <a-collapse-panel key="sort" header="排序">
         <div style="display: flex;">
@@ -103,6 +103,9 @@ export default {
           if (apiData.measures) {
             this.sortList = this.sortList.concat(apiData.measures)
           }
+          if (val.packageJson.name === 've-tables') {
+            this.sortList = this.sortList.concat(apiData.tableList)
+          }
           // 回显排序信息
           console.log(apiData)
           if (apiData.options && apiData.options.sort) {
@@ -149,16 +152,22 @@ export default {
       }
       this.apiData.options = options
       this.$store.dispatch('SetSelfDataSource', this.apiData)
-      this.$refs.child.getData()
-      // this.saveScreenData()
+      if (this.currentSelected.packageJson.name === 've-tables') {
+        this.$refs.table.getData()
+      } else {
+        this.$refs.child.getData()
+      }
     },
     // 排序类型 升序 降序
     ascChange() {
       if (this.sortData.fileid) {
         this.apiData.options.sort.asc = this.sortData.asc
         this.$store.dispatch('SetSelfDataSource', this.apiData)
-        this.$refs.child.getData()
-        // this.saveScreenData()
+        if (this.currentSelected.packageJson.name === 've-tables') {
+          this.$refs.table.getData()
+        } else {
+          this.$refs.child.getData()
+        }
       }
     },
     // 定时刷新开关

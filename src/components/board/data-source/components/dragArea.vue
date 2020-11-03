@@ -219,6 +219,8 @@ export default {
               columns.push(m.name) // 默认columns第二项起为指标
             }
             let rows = []
+            let level1 = []
+            let level2 = []
             res.rows.map((item, index) => {
               let obj = {}
               obj[dimensionKeys] = item[dimensionKeys]
@@ -235,7 +237,21 @@ export default {
               columns,
               rows
             }
-            console.log(apiData)
+            // 嵌套饼图设置apis
+            if (this.currentSelected.packageJson.name === 've-pie') {
+              rows.map((item, index) => {
+                if (index < 2) {
+                  level1.push(item[columns[0]])
+                } else {
+                  level2.push(item[columns[0]])
+                }
+              })
+              let apis = {
+                level: [level1, level2]
+              }
+              console.log(apis)
+              this.$store.dispatch('SetApis', apis)
+            }
             this.$store.dispatch('SetSelfDataSource', apiData)
           }
           this.saveScreenData()

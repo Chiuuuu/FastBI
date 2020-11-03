@@ -115,7 +115,7 @@
       },
       apis: {
         handler (val) {
-          if (val && val.labelMap) {
+          if (val) {
             this.chartSettings = { ...val }
             this.$log.primary('========>chartSettings')
             this.$print(this.chartSettings)
