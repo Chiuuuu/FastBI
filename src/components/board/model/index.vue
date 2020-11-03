@@ -57,9 +57,18 @@
                             draggable="true"
                             @click="fileClick(item2.id)"
                             @dragstart="dragstart(item2, 'dimensions', $event)"
-                            @dragend="dragsend(item2, $event)">
+                            @dragend="dragsend(item2, $event)"
+                            @contextmenu.prevent="showMore(item2)">
                           <img src="@/assets/images/icon_dimension.png" />
                           {{ item2.name }}
+                          <a-dropdown :trigger="['click', 'contextmenu']" v-model="item2.showMore">
+                            <a-icon class="icon-more" type="caret-down" />
+                            <a-menu slot="overlay" @click="changeItem(item2, 2)">
+                              <a-menu-item key="3">
+                                转为度量
+                              </a-menu-item>
+                            </a-menu>
+                          </a-dropdown>
                         </li>
                       </ul>
                     </a-collapse-panel>
@@ -84,9 +93,18 @@
                               :key="index2 + '_'" draggable="true"
                               @click="fileClick(item2.id)"
                               @dragstart="dragstart(item2, 'measures', $event)"
-                              @dragend="dragsend(item2, $event)">
+                              @dragend="dragsend(item2, $event)"
+                              @contextmenu.prevent="showMore(item2)">
                             <img src="@/assets/images/icon_measure.png" />
                             {{ item2.name }}
+                            <a-dropdown :trigger="['click', 'contextmenu']" v-model="item2.showMore">
+                              <a-icon class="icon-more" type="caret-down" />
+                              <a-menu slot="overlay" @click="changeItem(item2, 1)">
+                                <a-menu-item key="3">
+                                  转为维度
+                                </a-menu-item>
+                              </a-menu>
+                            </a-dropdown>
                           </li>
                         </ul>
                     </a-collapse-panel>
@@ -123,7 +141,7 @@
                   :style="customStyle"
                   :class="disableId.includes(item.id)?'disable':''"
                   @click.native="modelHandle(item)">
-                    <div style="margin-left:25px;cursor: pointer;" >
+                    <div style="margin-left:25px;cursor: pointer;">
                       <p @click="modelHandle(item2)" v-for="item2 in item.children" :key="item2.id" :class="disableId.includes(item2.id)?'disable':''">{{item2.name}}</p>
                     </div>
                   </a-collapse-panel>
@@ -295,6 +313,7 @@ export default {
         if (res.code === 200) {
           res.data.map(item => {
             item.selected = false
+            item.showMore = false
           })
           this.modelList = res.data
           // this.modelList = res.data.folders
@@ -320,10 +339,35 @@ export default {
     handleChange(value) {
       this.searchSelected = value
     },
+    // 右键显示更多
+    showMore(item) {
+      item.showMore = true
+    },
+    // 转为维度或者度量
+    changeItem(item, num) {
+      console.log(item)
+      let params = {
+        datamodelId: item.datamodelId,
+        pivotschemaId: item.pivotschemaId,
+        role: num, // 转成维度传1，转成度量传2
+        screenId: this.screenId
+      }
+      this.$server.screenManage.screenModuleTransform(params).then(res => {
+        if (res.code === 200) {
+          this.getPivoSchemaList(this.modelId)
+        }
+      })
+    },
     // 维度、度量列表
     getPivoSchemaList(id) {
-      this.$server.screenManage.getPivoSchemaList(id).then(res => {
+      this.$server.screenManage.getPivoSchemaList(id, this.screenId).then(res => {
         if (res.code === 200) {
+          res.data.dimensions.map(item => {
+            item.showMore = false
+          })
+          res.data.measures.map(item => {
+            item.showMore = false
+          })
           let dimensions = res.data.dimensions
           let measures = res.data.measures
           this.dimensions = this.transData(dimensions)
@@ -332,7 +376,6 @@ export default {
             ...dimensions,
             ...measures
           ]
-          console.log('搜索列表', this.searchList)
         }
       })
     },

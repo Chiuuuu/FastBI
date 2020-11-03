@@ -71,10 +71,7 @@ export default {
     ...mapGetters(['isScreen', 'pageSettings', 'canvasMap', 'screenId', 'fileName', 'parentId'])
   },
   created() {
-    if (this.$route.query.name) {
-      this.screenName = this.$route.query.name
-    }
-    // this.screenName = this.fileName
+    this.screenName = this.fileName
     this.userId = 'dv1e443967LZP2Dj'
   },
   methods: {
@@ -102,7 +99,7 @@ export default {
             this.$store.dispatch('SetFileName', this.screenName)
             console.log('修改大屏名称')
           } else {
-            this.$$message.error(res.msg)
+            this.$message.error(res.msg)
             return false
           }
         })
@@ -141,7 +138,7 @@ export default {
             for (let item of screenDataList) {
               for (let item2 of this.canvasMap) {
                 if (item2.id === item.id) {
-                  item2.packageJson.api_data.source.rows = item2.value
+                  item2.packageJson.api_data.source.rows = item.value
                 }
               }
             }

@@ -76,6 +76,8 @@
         component.api_data.dimensions = []
         component.api_data.measures = []
         component.api_data.tableList = []
+        component.api_data.options = null
+        component.api_data.refresh = {}
         // 拖拽的节点数据
         let nodeInfo = {
           // 唯一标识

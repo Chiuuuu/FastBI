@@ -282,6 +282,7 @@ export default {
       this.isAdd = 2
       this.id = file.id
       this.screenVisible = true
+      this.pid = file.parentId
       // dom渲染以后才能给form赋值
       this.$nextTick(() => {
         this.screenForm.setFieldsValue({
@@ -333,12 +334,15 @@ export default {
           let params = {
             fileType: 1,
             id: this.id,
+            parentId: this.pid,
             ...values
           }
           this.$server.common.putMenuFolderName('/screen/catalog', params).then(res => {
             if (res.code === 200) {
               this.$message.success(res.msg)
               this.getList()
+            } else {
+              this.$message.error(res.msg)
             }
           })
         }
@@ -354,8 +358,7 @@ export default {
       }
       this.$router.push({ name: 'screenEdit',
       query: {
-        id: this.fileSelectId,
-        name: this.fileName
+        id: this.fileSelectId
       } })
     },
     // 点击新建文件夹

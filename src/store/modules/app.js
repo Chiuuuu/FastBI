@@ -30,6 +30,7 @@ const app = {
           state.coverageExpand = !state.coverageExpand
       },
         SET_PAGE_SETTING: (state, setting) => {
+          console.log(setting)
             state.pageSettings = { ...setting }
         },
         SET_IS_SCREEN: (state, val) => {
@@ -83,7 +84,7 @@ const app = {
           }
           let params = {}
           if (!state.screenId) {
-            commit('SET_PAGE_SETTING', { width: 1920, height: 1080, backgroundColor: '#0d2a42', gridStep: 1, backgroundSrc: '', backgroundType: '1', opacity: 1 })
+            commit('SET_PAGE_SETTING', { width: 1920, height: 1080, backgroundColor: '#0d2a42', gridStep: 1, backgroundSrc: '', backgroundType: '1', opacity: 1, refresh: { frequency: '', isRefresh: false } })
             params = {
               id: -1,
               name: obj && obj.name ? obj.name : router.history.current.query.name,
