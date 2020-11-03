@@ -311,7 +311,7 @@ export default {
           if (map.has(element.alias)) {
             const value = `${map.get(element.alias)}${element.tableNo}`
             map.set(element.alias, value)
-            element.alias += `(${element.tableNo})`
+            element.alias += `${element.tableNo}`
           } else {
             map.set(element.alias, 1)
           }
