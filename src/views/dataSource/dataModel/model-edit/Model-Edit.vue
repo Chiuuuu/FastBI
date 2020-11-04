@@ -32,15 +32,26 @@
       </div>
       <edit-left
         ref="editLeftRef"
+        :list="leftMenuList"
         @on-left-drag-leave="handleLeftDragLeave"
       ></edit-left>
       <!-- <a-divider /> -->
-      <!-- <div v-if="isDatabase" class="SQL-View">
+      <div v-if="isDatabase" class="SQL-View">
         <div class="menu_search">
           <span class="search_span">自定义SQL视图</span>
           <a-icon class="view-icon" type="plus-square" @click="handleAddSQL('new')" />
         </div>
-        <div class="sheet_list">
+        <div class="text-center">
+          <edit-left
+            ref="editSqlRef"
+            type="sql"
+            :list="rightMenuList"
+            @on-left-drag-leave="handleLeftDragLeave"
+            @edit="item => handleAddSQL('edit', item)"
+            @delete="item => handleSQLDelete(item)"
+          ></edit-left>
+        </div>
+        <!-- <div class="sheet_list">
           <a-dropdown class="sheet_list_item" :trigger="['contextmenu']">
             <div>
               银行账户
@@ -57,8 +68,8 @@
               </a-menu-item>
             </a-menu>
           </a-dropdown>
-        </div>
-      </div> -->
+        </div> -->
+      </div>
     </div>
     <div class="right">
       <div class="header" v-if="model==='edit'">
@@ -74,7 +85,7 @@
         </a-form>
       </div>
       <div class="description">
-        <span class="d-s">描述： {{detailInfo.description}}</span>
+        <span class="d-s" :title="detailInfo.description">描述： {{detailInfo.description}}</span>
         <a-icon type="edit" v-on:click="open" class="d-s-icon"/>
       </div>
       <div class="draw_board">
@@ -136,18 +147,22 @@
       </div>
       <!-- 动态弹窗组件 -->
       <component
+        ref='componentRef'
         v-bind:is="modalName"
         :is-show="visible"
         :detailInfo="detailInfo"
         :compute-type="computeType"
         :tables="dimensions"
         :sql-form="sqlForm"
+        :status="modalStatus"
         :description="detailInfo.description"
+        @get-fetch-param="handleGetFetchParams"
         @close="close"
+        @success="data => componentSuccess(data)"
       />
       <div class="submit_btn">
-        <a-button>保存并新建报告</a-button>
-        <a-button type="primary" @click="handleSave">保 存</a-button>
+        <a-button :disabled="!detailInfo">保存并新建报告</a-button>
+        <a-button type="primary" @click="handleSave" :disabled="!detailInfo">保 存</a-button>
         <a-button v-on:click="exit">退 出</a-button>
       </div>
     </div>
@@ -155,6 +170,7 @@
 </template>
 
 <script>
+import findIndex from 'lodash/findIndex'
 import { mapState } from 'vuex'
 import EditLeft from './edit-left'
 import EditRightTop from './edit-right-top'
@@ -196,7 +212,10 @@ export default {
       spinning: false,
       detailInfo: '',
       isDatabase: true, // 是否是SQL数据源, 控制自定义SQL渲染
+      leftMenuList: [],
+      rightMenuList: [],
       sqlForm: {},
+      modalStatus: 'new',
       globalStatus: {
         dragType: '',
         dragNode: {},
@@ -246,6 +265,7 @@ export default {
       this.handleGetAddModelDatamodel()
     } else if (this.model === 'edit') {
       this.handleGetData(this.$route.query.modelId)
+      this.$store.dispatch('dataModel/setModelId', this.$route.query.modelId)
     }
   },
   beforeDestroy() {
@@ -282,8 +302,14 @@ export default {
       if (result.code === 200) {
         this.databaseList = result.data
         if (this.databaseList.length && this.databaseList.length > 0) {
-          this.$refs.editLeftRef.handleGetMenuList(result.data[0].id)
-          this.$store.dispatch('dataModel/setDatabaseId', result.data[0].id)
+          const listResult = await this.$server.dataModel.getTableListById(result.data[0].id)
+          if (listResult.code === 200) {
+            this.leftMenuList = [].concat(listResult.data.filter(item => item.type === false))
+            this.rightMenuList = [].concat(listResult.data.filter(item => item.type === true))
+            this.$store.dispatch('dataModel/setDatabaseId', result.data[0].id)
+          } else {
+            this.$message.error(listResult.msg)
+          }
         }
         // this.handleDimensions()
         // this.handleMeasures()
@@ -383,24 +409,49 @@ export default {
       this.computeType = type
     },
     handleAddSQL(type, item) {
-      if (type === 'new') {
-        this.sqlForm = {
-          name: '',
-          content: ''
-        }
-      } else if (type === 'edit') {
-        if (item) {
-          this.sqlForm = {
-            name: item.name,
-            content: item.content
-          }
-        }
-      }
+      this.modalStatus = type
       this.visible = true
       this.modalName = 'sql-setting'
+      if (this.modalStatus === 'edit') {
+        this.$nextTick(() => {
+          this.$refs.componentRef.handleGetDetail(item)
+        })
+      }
     },
-    close() {
+    handleSQLDelete(item) {
+      const index = this.rightMenuList.indexOf(item)
+      this.rightMenuList.splice(index, 1)
+      this.$server.dataModel.deleCustomSql({
+        name: item.name,
+        tableId: item.id
+      }).then(res => {
+        if (res.code !== 200) {
+          this.$message.error(res.msg)
+        }
+      })
+    },
+    close(data) {
       this.visible = false
+    },
+    componentSuccess(data) {
+      if (this.modalName === 'sql-setting') {
+        if (this.modalStatus === 'new') {
+          this.handleSQLAdd(data)
+        }
+        if (this.modalStatus === 'edit') {
+          this.handleUpdateSQL(data)
+        }
+      }
+      this.close()
+    },
+    handleSQLAdd(data) {
+      this.rightMenuList.push(data)
+    },
+    handleUpdateSQL(data) {
+      const index = findIndex(this.rightMenuList, {
+        id: data.id
+      })
+      this.rightMenuList.splice(index, 1, data)
     },
     exit() {
       this.$router.go(-1)
@@ -465,6 +516,16 @@ export default {
         sourceDatasourceList: new Array(this.datasource),
         dataModelId: this.model === 'add' ? this.addModelId : this.modelId
       })
+    },
+    handleGetFetchParams(data) {
+      if (this.modalName === 'sql-setting') {
+        this.$refs.componentRef.pushFetchParam({
+          sourceId: this.$route.query.datasourceId,
+          databaseName: this.databaseName,
+          databaseId: this.databaseList.length > 0 ? this.databaseList[0].id : '',
+          dataModelId: this.model === 'add' ? this.addModelId : this.modelId
+        })
+      }
     }
   }
 }
