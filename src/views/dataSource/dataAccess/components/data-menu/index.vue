@@ -138,8 +138,8 @@ export default {
   },
   data() {
     return {
-      // modelList: ['mysql', 'oracle', 'excel'].map(function(item) {
-      modelList: ['mysql', 'oracle'].map(function(item) {
+      modelList: ['mysql', 'oracle', 'excel', 'csv'].map(function(item) {
+      // modelList: ['mysql', 'oracle'].map(function(item) {
         // 弹窗选项列表
         return {
           imgurl: require(`@/assets/images/icon_${item}.png`),
@@ -270,17 +270,17 @@ export default {
           this.$store.dispatch('dataAccess/setModelType', 'mysql')
         } else if (result.data.type === 2) {
           this.$store.dispatch('dataAccess/setModelType', 'oracle')
+        } else if (result.data.type === 4) {
+          this.$store.dispatch('dataAccess/setModelType', 'excel')
         }
         this.$store.dispatch('dataAccess/setModelInfo', result.data.properties)
         this.$store.dispatch('dataAccess/setModelName', result.data.name)
       })
-      this.$store.dispatch('dataAccess/setFirstFinished', false)
       this.$store.dispatch('dataAccess/setModelId', file.id)
       this.$store.dispatch('dataAccess/setParentId', file.parentId)
       this.$store.dispatch('dataAccess/setFirstFinished', true)
       this.$EventBus.$emit('set-tab-index', '1')
       this.$emit('on-menuChange-componet', 'Main')
-      this.$store.dispatch('dataAccess/setModelSelectType', '')
     },
     /**
     * 删除菜单
@@ -307,7 +307,7 @@ export default {
      */
     handleFolderDelete(event, index, { folder }) {
       if (folder.children && folder.children.length > 0) {
-        return this.$message.warning('文件夹下存在数据接入不可删除')
+        return this.$message.error('文件夹下存在数据接入不可删除')
       }
       this.$confirm({
         title: '确认提示',
@@ -486,7 +486,7 @@ export default {
      */
     async handleAddItem(values) {
       // const isHas = this.handleHasName(this.tableList, values)
-      // if (isHas) return this.$message.warning('已存在')
+      // if (isHas) return this.$message.error('已存在')
       // const item = {
       //   id: this.tableList.length + 1,
       //   name: values.name,
@@ -514,11 +514,11 @@ export default {
     async handleResetName(values) {
       // const target = this.menuNode.targetNode
       // if (values.name === target.name) {
-      //   return this.$message.warning('名称重复')
+      //   return this.$message.error('名称重复')
       // }
 
       // const isHas = this.handleHasName(this.tableList, values)
-      // if (isHas) return this.$message.warning('已存在')
+      // if (isHas) return this.$message.error('已存在')
 
       // this.menuNode.targetNode = Object.assign(target, {
       //   name: values.name
@@ -549,27 +549,6 @@ export default {
       console.log(isHas)
       return !!(isHas && isHas.length > 0)
     },
-    /**
-     * 选中哪个表
-    */
-    // async handleSelect({ item, key, selectedKeys }) {
-    //   const itemObj = this.tableList.filter(item => {
-    //     return item.id === key
-    //   }).pop()
-    //   if (itemObj.typeCore === 1) {
-    //     this.$store.dispatch('dataAccess/setModelType', 'mysql')
-    //     this.getTableInfo(`/system/mysql/${itemObj.id}`, result => {
-    //       this.$store.dispatch('dataAccess/setModelInfo', {
-    //         ...result.data,
-    //         port: Number(result.data.port)
-    //       })
-    //     })
-    //   } else if (itemObj.typeCode === 2) {
-    //     this.$store.dispatch('dataAccess/setModelType', 'oracle')
-    //   }
-    //   this.$store.dispatch('dataAccess/setFirstFinished', false)
-    //   this.$store.dispatch('dataAccess/setModelId', itemObj.id)
-    // },
     mouseenter(icon) {
       this.icon = true
     },

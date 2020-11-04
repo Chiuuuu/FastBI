@@ -122,6 +122,7 @@ const areaData = {
 }
 
 export default {
+  name: 'geoSetting',
   props: {
     isShow: Boolean
   },

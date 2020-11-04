@@ -246,6 +246,7 @@ export default {
       this.handleGetAddModelDatamodel()
     } else if (this.model === 'edit') {
       this.handleGetData(this.$route.query.modelId)
+      this.$store.dispatch('dataModel/setModelId', this.$route.query.modelId)
     }
   },
   beforeDestroy() {

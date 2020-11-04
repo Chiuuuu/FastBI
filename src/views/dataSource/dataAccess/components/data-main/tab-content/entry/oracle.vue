@@ -25,8 +25,27 @@
       <a-input style="width:528px;" v-model="form.user" />
     </a-form-model-item>
     <a-form-model-item label="密码" prop="password">
-      <a-input-password style="width:528px;" v-model="form.password" autocomplete />
+      <a-input-password style="width:528px;" v-model="form.password" />
     </a-form-model-item>
+    <a-row>
+      <a-col :span="7">
+        <a-form-model-item label="连接方式" :label-col="{span: 14}" required labelAlign="left">
+          <a-select default-value="servername" style="width:115px;margin-left:-4px">
+            <a-select-option value="sid">
+              SID
+            </a-select-option>
+            <a-select-option value="servername">
+              ServerName
+            </a-select-option>
+          </a-select>
+        </a-form-model-item>
+      </a-col>
+      <a-col :span="10">
+        <a-form-model-item prop="databaseName" :wrapper-col="{span:24}">
+          <a-input v-model="form.databaseName" style="width:400px;"/>
+        </a-form-model-item>
+      </a-col>
+    </a-row>
     <a-form-model-item :wrapper-col="{ span: 14, offset: 4 }">
       <a-button
         :loading="connectBtn"
@@ -36,22 +55,6 @@
       >
         连接
       </a-button>
-    </a-form-model-item>
-    <a-form-model-item label="默认连接库" prop="databaseName" v-if="connectStatus">
-      <a-select
-        style="width: 528px"
-        v-model="form.databaseName"
-        :default-value="form.databaseName || databaseList[0].name"
-        @change="handleDefaultDbSelect"
-      >
-        <a-select-option
-          v-for="item in databaseList"
-          :value="item.name"
-          :key="item.id"
-        >
-          {{ item.name }}
-        </a-select-option>
-      </a-select>
     </a-form-model-item>
   </a-form-model>
   <a-button
@@ -66,23 +69,24 @@
 </div>
 </template>
 <script>
-import { mapState } from 'vuex'
-import { validateIP } from './util'
+import Mysql from './mysql'
+import { validateIP } from '../util'
 export default {
-  name: 'model-mysql',
+  name: 'model-oracle',
+  extends: Mysql,
   data() {
     return {
       labelCol: { span: 4 },
       wrapperCol: { span: 10 },
+      formId: '',
       form: {
         // 连接信息表单
-        name: '', // 数据库名
+        name: '', // 数据源名
         ip: '', // 服务器ip
         port: '', // 端口号
         user: '', // 用户名
         password: '', // 密码
-        dbid: '', // 默认数据库id
-        databaseName: '' // 默认数据库名称
+        databaseName: '' // 数据库名称
       },
       rules: {
         name: [
@@ -123,42 +127,19 @@ export default {
             message: '请输入密码'
           }
         ],
-        dbid: [
+        databaseName: [
           {
-            required: true
+            required: true,
+            message: '请输入数据库名称'
           }
         ]
       },
       connectBtn: false,
       connectStatus: false, // 是否连接
-      saveBtn: false,
-      databaseList: []
+      saveBtn: false
     }
   },
-  computed: {
-    ...mapState({
-      modelInfo: state => state.dataAccess.modelInfo,
-      modelId: state => state.dataAccess.modelId,
-      modelName: state => state.dataAccess.modelName,
-      tableList: state => state.dataAccess.menuList,
-      modelType: state => state.dataAccess.modelType, // 数据类型
-      modelSelectType: state => state.dataAccess.modelSelectType,
-      tabChangeAble: state => state.dataAccess.firstFinished // 是否完成第一部分
-    })
-  },
-  created() {
-    this.$EventBus.$on('setFormData', this.handleSetFormData)
-    this.$EventBus.$on('resetForm', this.handleResetForm)
-  },
-  beforeDestroy() {
-    this.$EventBus.$off('resetForm', this.handleResetForm)
-    this.$EventBus.$off('setFormData', this.handleSetFormData)
-  },
   methods: {
-    handleSetFormData() {
-      this.handleResetForm()
-      this.form = Object.assign(this.form, this.modelInfo, { name: this.modelName })
-    },
     /**
      * 任一表单项被校验后触发
      * prop 字段名称
@@ -177,32 +158,6 @@ export default {
       }
     },
     /**
-     * 设置表单名称
-     */
-    handleSetTableName() {
-      this.$emit('on-set-table-name', this.form.name)
-    },
-    /**
-     * 默认选择数据库操作
-     * value 选中的name
-     */
-    handleDefaultDbSelect(value) {
-      const item = this.databaseList.filter(item => {
-        return item.name === value && item
-      })
-      const obj = item.pop()
-      this.form.dbid = obj.id
-      this.form.databaseName = obj.name
-      // this.$store.dispatch('dataAccess/setModelInfo', this.form)
-    },
-    /**
-     * 重置表单
-     */
-    handleResetForm() {
-      this.$refs['dbForm'] && this.$refs.dbForm.resetFields()
-      this.connectStatus = false
-    },
-    /**
      * 连接数据库
      */
     handleConnect() {
@@ -210,33 +165,24 @@ export default {
         if (valid) {
           this.connectBtn = true
           const result = await this.$server.dataAccess.actionConnect({
-            name: this.modelName,
-            type: 1,
+            name: this.form.name,
+            type: 2,
             property: {
               ip: this.form.ip,
               port: this.form.port,
               password: this.form.password,
               user: this.form.user,
-              databaseName: this.form.databaseName || 'null'
+              databaseName: this.form.databaseName || null
             }
           }).finally(() => {
             this.connectBtn = false
           })
 
           if (result.code === 200) {
-            this.databaseList = [].concat(result.rows)
-            const item = this.databaseList.find(item => item.name === this.$store.state.dataAccess.modelInfo.databaseName)
-            if (item) {
-              this.form.dbid = item.id
-              this.form.databaseName = item.name
-            } else {
-              this.form.databaseName = this.databaseList[0].name
-              this.form.dbid = this.databaseList[0].id
-            }
             this.connectStatus = true
             this.$message.success('连接成功')
           } else {
-            this.$message.warning(result.msg)
+            this.$message.error(result.msg)
           }
         } else {
           this.connectStatus = false
@@ -250,14 +196,8 @@ export default {
     handleSaveForm() {
       this.$refs.dbForm.validate(async valid => {
         if (valid) {
-          // const datadbitem = this.databaseList
-          //   .filter(item => item.id === this.form.dbid)
-          //   .pop()
-          // this.form = Object.assign(this.form, {
-          //   databaseName: datadbitem.name
-          // })
-
           this.saveBtn = true
+          delete this.form.dbid
           const params = {
             id: this.$store.state.dataAccess.modelId,
             name: this.$store.state.dataAccess.modelName,
@@ -269,13 +209,12 @@ export default {
               password: this.form.password,
               databaseName: this.form.databaseName
             },
-            type: 1
+            type: 2
           }
-          const result = await this.$server.dataAccess.saveTableInfo('datasource/save', params)
+          const result = await this.$server.dataAccess.saveTableInfo('/datasource/save', params)
             .finally(() => {
               this.saveBtn = false
             })
-
           if (result.code === 200) {
             this.$message.success('保存成功，可抽取库表')
             this.$store.dispatch('dataAccess/getMenuList')
@@ -283,6 +222,7 @@ export default {
             this.$store.dispatch('dataAccess/setModelInfo', this.form)
             this.$store.dispatch('dataAccess/setModelId', result.data)
             this.$store.dispatch('dataAccess/setParentId', 0)
+            this.formId = result.data
           } else {
             this.$message.error(result.msg)
           }

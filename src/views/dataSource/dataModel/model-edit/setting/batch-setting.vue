@@ -183,6 +183,7 @@ const column = [
 ]
 
 export default {
+  name: 'batchSetting',
   props: {
     isShow: Boolean,
     tables: [Array, Object, String]
