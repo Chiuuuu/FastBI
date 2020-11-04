@@ -10,38 +10,40 @@
       <a-form-model-item label="任务名称" prop="name">
         <a-input v-model="form.name" placeholder="请输入任务名称"></a-input>
       </a-form-model-item>
-      <a-form-model-item label="执行频率" prop="type">
-        <a-select v-model="form.type" placeholder="请选择更新方式">
-          <a-select-option value="1">只执行一次</a-select-option>
-          <a-select-option value="2">重复执行</a-select-option>
+      <a-form-model-item label="执行频率" prop="isRepeat">
+        <a-select v-model="form.isRepeat" placeholder="请选择更新方式">
+          <a-select-option value="0">只执行一次</a-select-option>
+          <a-select-option value="1">重复执行</a-select-option>
         </a-select>
       </a-form-model-item>
-      <a-form-model-item style="margin-left: 16.6%" prop="freq" v-show="form.type === '2'">
+      <a-form-model-item style="margin-left: 16.6%" prop="interval" v-show="form.isRepeat === '1'">
         <div>
           <span>每隔&nbsp;</span>
-          <a-input style="width:100px" v-model="form.freq"></a-input>
-          <a-select class="regular-bordered" style="width:80px" v-model="form.freqType" placeholder="请选择更新方式">
+          <a-input style="width:100px" v-model="form.interval"></a-input>
+          <a-select class="regular-bordered" style="width:80px" v-model="form.frequency" placeholder="请选择更新方式">
             <a-select-option value="1">小时</a-select-option>
             <a-select-option value="2">天</a-select-option>
+            <a-select-option value="3">周</a-select-option>
+            <a-select-option value="4">月</a-select-option>
           </a-select>
           <span>&nbsp;执行一次</span>
         </div>
       </a-form-model-item>
-      <a-form-model-item label="开始时间" prop="starttime">
+      <a-form-model-item label="开始时间" prop="gmtStart">
         <a-date-picker
           style="width:100%"
           show-time
-          v-model="form.starttime"
+          v-model="form.gmtStart"
           :disabled-date="disabledStartDate"
           valueFormat="YYYY-MM-DD HH:mm:ss"
           placeholder="请选择开始时间"
           ></a-date-picker>
       </a-form-model-item>
-      <a-form-model-item label="结束时间" prop="endtime">
+      <a-form-model-item label="结束时间" prop="gmtEnd">
         <a-date-picker
           style="width:100%"
           show-time
-          v-model="form.endtime"
+          v-model="form.gmtEnd"
           :disabled-date="disabledEndDate"
           :disabled-time="disabledEndTime"
           valueFormat="YYYY-MM-DD HH:mm:ss"
@@ -74,23 +76,25 @@
 
 <script>
 import moment from 'moment'
+import { mapState } from 'vuex'
 
 const columns = [
   {
     title: '表名',
     dataIndex: 'name',
     ellipsis: true
-  },
-  {
-    title: '抽取方式',
-    dataIndex: 'extractType',
-    scopedSlots: { customRender: 'extractType' }
-  },
-  {
-    title: '增量字段',
-    dataIndex: 'field',
-    scopedSlots: { customRender: 'field' }
   }
+  // 暂不支持增量
+  // {
+  //   title: '抽取方式',
+  //   dataIndex: 'extractType',
+  //   scopedSlots: { customRender: 'extractType' }
+  // },
+  // {
+  //   title: '增量字段',
+  //   dataIndex: 'field',
+  //   scopedSlots: { customRender: 'field' }
+  // }
 ]
 
 export default {
@@ -115,16 +119,16 @@ export default {
       bodyStyle: { 'maxHeight': 'calc(100vh - 240px)', 'overflow-y': 'auto' },
       form: {
         name: undefined,
-        type: undefined,
-        freq: undefined,
-        freqType: '1',
-        starttime: undefined,
-        endtime: undefined
+        isRepeat: undefined,
+        interval: undefined,
+        frequency: '1',
+        gmtStart: undefined,
+        gmtEnd: undefined
       },
       regRules: {
         name: [{ required: true, message: '请输入任务名称' }],
-        type: [{ required: true, message: '请选择更新方式' }],
-        freq: [
+        isRepeat: [{ required: true, message: '请选择更新方式' }],
+        interval: [
           { validator(rule, value, callback) {
               if (isNaN(value)) {
                 callback(new Error('freq inValid'))
@@ -136,10 +140,10 @@ export default {
             trigger: 'change'
           }
         ],
-        starttime: [{ required: true, message: '请选择开始时间' }],
-        endtime: [
+        gmtStart: [{ required: true, message: '请选择开始时间' }],
+        gmtEnd: [
           {
-            validator: this.endtimeValidator,
+            validator: this.gmtEndValidator,
             message: '结束时间不能小于开始时间',
             trigger: 'change'
           }
@@ -157,13 +161,19 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapState({
+      modelName: state => state.dataAccess.modelName,
+      modelId: state => state.dataAccess.modelId
+    })
+  },
   watch: {
     show(newValue, oldValue) {
       if (newValue && typeof this.formData === 'object') {
         const newForm = {}
         for (const key in this.form) {
-          if (key === 'freqType' && !this.formData[key]) {
-            newForm[key] = '1'
+          if (key === 'isRepeat' && !this.formData[key]) {
+            newForm[key] = '0'
           } else {
             newForm[key] = this.formData[key]
           }
@@ -175,7 +185,6 @@ export default {
   },
   filters: {
     toMomentObj: function(value) {
-      console.log('toMomentObj', value)
       return value ? moment(value, 'YYYY-MM-DD HH:mm:ss') : null
     }
   },
@@ -184,7 +193,7 @@ export default {
       return date && date < moment().subtract(1, 'days')
     },
     disabledEndDate(date) {
-      let time = this.form.starttime || ''
+      let time = this.form.gmtStart || ''
       // 如果开始时间在今天之前, 禁用从开始到今天的时间段
       if (time && +new Date(time) > +new Date()) {
         return date && date < moment(time, 'YYYY-MM-DD HH:mm:ss').startOf('hour')
@@ -198,15 +207,15 @@ export default {
       }
     },
     handleStartTimeChange(value, dateString) {
-      this.$set(this.form, 'starttime', dateString)
+      this.$set(this.form, 'gmtStart', dateString)
     },
     handleEndTimeChange(value, dateString) {
-      this.$set(this.form, 'endtime', dateString)
+      this.$set(this.form, 'gmtEnd', dateString)
     },
     // 自定义结束时间校验
-    endtimeValidator(rule, value, callback) {
-      if (+new Date(value) < +new Date(this.form.starttime)) {
-        callback(new Error('endtime inValid'))
+    gmtEndValidator(rule, value, callback) {
+      if (+new Date(value) < +new Date(this.form.gmtStart)) {
+        callback(new Error('gmtEnd inValid'))
       } else {
         callback()
       }
@@ -214,11 +223,11 @@ export default {
     resetForm() {
       this.form = {
         name: undefined,
-        type: undefined,
-        freq: undefined,
-        freqType: '1',
-        starttime: undefined,
-        endtime: undefined
+        isRepeat: undefined,
+        interval: undefined,
+        frequency: '1',
+        gmtStart: undefined,
+        gmtEnd: undefined
       }
     },
     handleClose() {
@@ -227,10 +236,24 @@ export default {
     handleOk() {
       this.$refs.form.validate((ok, obj) => {
         // 结束时间没问题&&选择只执行一次&&仅重复执行的表单报错时,可以保存
-        if (ok || (!obj.endtime && this.form.type === '1' && obj.freq)) {
+        if (ok || (!obj.gmtEnd && this.form.isRepeat === '0' && obj.interval)) {
           console.log(this.form)
-          this.resetForm()
-          this.handleClose()
+          this.$server.dataAccess.addRegularInfo({
+            ...this.form,
+            extractType: 0, // 暂时写死全量
+            name: this.modelName,
+            target: this.modelId
+          })
+            .then(res => {
+              if (res.code === 200) {
+                this.$message.success('添加成功')
+                this.$parent.$refs.extract.regData.push(res.data)
+                this.resetForm()
+                this.handleClose()
+              } else {
+                this.$message.error(res.msg)
+              }
+            })
         }
       })
     }

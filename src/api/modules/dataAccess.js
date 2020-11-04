@@ -63,14 +63,26 @@ export default {
         return $axios.post(url, params)
     },
     /**
-     * @description 上传文件
+     * @description 上传excel文件
      * @param {Object} file 文件
      */
-    actionUploadFile(data) {
+    actionUploadExcelFile(data) {
         return $axios({
             method: 'post',
             headers: { 'Content-Type': 'multipart/form-data' },
             url: '/datasource/excel/read',
+            data
+        })
+    },
+    /**
+     * @description 上传excel文件
+     * @param {Object} file 文件
+     */
+    actionUploadCsvFile(data) {
+        return $axios({
+            method: 'post',
+            headers: { 'Content-Type': 'multipart/form-data' },
+            url: '/datasource/csv/read',
             data
         })
     },
@@ -93,7 +105,7 @@ export default {
      * @description 查询文件下的表格内容
      * @param {String} tableId 文件id
      */
-    getFileTableInfo(tableId) {
+    getExcelFileTableInfo(tableId) {
         return $axios.get('/datasource/excel/presto/read?tableId=' + tableId)
     },
     /**
@@ -116,10 +128,88 @@ export default {
     },
     /**
      * @description 查询文件下的表格内容
+     * @param {String} tableId 文件id
+     */
+    getCsvFileTableInfo(tableId) {
+        return $axios.get('/datasource/csv/presto/read?tableId=' + tableId)
+    },
+    /**
+     * @description 保存excel数据源
+     * @param {Object} data body对象
+     * @param {String} 'sourceSaveInput.name' 名称
+     * @param {String} 'sourceSaveInput.type' 数据源类型
+     * @param {Array[string]} 'sourceSaveInput.databasesIdList' 删除的文件id
+     * @param {Array[file]} 'sourceSaveInput.fileList' 文件列表
+     * @param {String} 'sourceSaveInput.parentId' parentId
+     * @param {String} 'sourceSaveInput.id' id
+     */
+    saveCsvInfo(data) {
+        return $axios({
+            method: 'post',
+            headers: { 'Content-Type': 'multipart/form-data' },
+            url: '/datasource/csv/save',
+            data
+        })
+    },
+    /**
+     * @description 获取操作记录
      * @param {Object} params
      * @param {String} params.sourceId 数据源id
      */
     getModelRecord(params) {
         return $axios.post('/datasource/record', params)
+    },
+    /**
+     * @description 获取定时任务列表
+     * @param {Object} params
+     * @param {String} params.name 数据源名称
+     * @param {String} params.target 数据源id
+     */
+    getRegularList(params) {
+        return $axios.get('/system/schedule/list', { params })
+    },
+    /**
+     * @description 获取定时任务详情
+     * @param {String} id
+     */
+    getRegularInfo(id) {
+        return $axios.get('/system/schedule/' + id)
+    },
+    /**
+     * @description 新增定时任务
+     * @param {Object} params
+     * @param {String} params.name 数据源名称
+     * @param {String} params.target 数据源id
+     * @param {String} params.extractType 抽取类型,0-全量抽取,1-增量抽取
+     * @param {String} params.isRepeat 0-只执行一次，1-重复执行
+     * @param {String} params.frequency 1-小时,2-天3-周,4-月
+     * @param {String} params.interval 间隔时间
+     * @param {String} params.gmtStart 开始时间
+     * @param {String} params.gmtEnd 结束时间
+     */
+    addRegularInfo(params) {
+        return $axios.post('/system/schedule', params)
+    },
+    /**
+     * @description 修改定时任务
+     * @param {Object} params
+     * @param {String} params.name 数据源名称
+     * @param {String} params.target 数据源id
+     * @param {String} params.extractType 抽取类型,0-全量抽取,1-增量抽取
+     * @param {String} params.isRepeat 0-只执行一次，1-重复执行
+     * @param {String} params.frequency 1-小时,2-天3-周,4-月
+     * @param {String} params.interval 间隔时间
+     * @param {String} params.gmtStart 开始时间
+     * @param {String} params.gmtEnd 结束时间
+     */
+    putRegularInfo(params) {
+        return $axios.put('/system/schedule', params)
+    },
+    /**
+     * @description 删除定时任务
+     * @param {String} id
+     */
+    deleRegularInfo(id) {
+        return $axios.delete('/system/schedule/' + id)
     }
 }

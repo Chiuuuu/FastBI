@@ -272,6 +272,8 @@ export default {
           this.$store.dispatch('dataAccess/setModelType', 'oracle')
         } else if (result.data.type === 4) {
           this.$store.dispatch('dataAccess/setModelType', 'excel')
+        } else if (result.data.type === 5) {
+          this.$store.dispatch('dataAccess/setModelType', 'csv')
         }
         this.$store.dispatch('dataAccess/setModelInfo', result.data.properties)
         this.$store.dispatch('dataAccess/setModelName', result.data.name)

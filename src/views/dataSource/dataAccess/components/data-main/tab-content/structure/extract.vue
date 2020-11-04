@@ -1,9 +1,9 @@
 <template>
   <a-modal :title="single ? '定时设置' : '批量抽取设置'" :bodyStyle="bodyStyle" :visible="show" @cancel="handleClose" @ok="handleOk">
-    <a-form-model v-if="single" ref="form" :model="form"  :rules="rules" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
+    <!-- <a-form-model v-if="single" ref="form" :model="form"  :rules="rules" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
       <a-form-model-item label="抽取方式" prop="extractType">
         <a-radio-group style="width:100%" v-model="form.extractType">
-          <a-radio value="1">
+          <a-radio value="0">
             <span>全量覆盖抽取</span>
             <a-popover>
               <template slot="content">
@@ -12,7 +12,7 @@
               <a-icon style="margin-left:10px" type="question-circle" theme="outlined" />
             </a-popover>
           </a-radio>
-          <a-radio value="2">
+          <a-radio value="1">
             <span>增量抽取</span>
             <a-popover>
               <template slot="content">
@@ -30,7 +30,7 @@
           <a-select-option value="3">3</a-select-option>
         </a-select>
       </a-form-model-item>
-    </a-form-model>
+    </a-form-model> -->
     <div style="margin-bottom:10px"><a-button type="primary" @click="setRegular">添加定时任务</a-button></div>
     <a-table
       rowKey='id'
@@ -52,6 +52,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 
 const regColumns = [
   {
@@ -75,21 +76,6 @@ const regColumns = [
     title: '操作',
     key: 'config',
     scopedSlots: { customRender: 'config' }
-  }
-]
-
-const regData = [
-  {
-    id: '1',
-    name: '任务一',
-    type: '1',
-    starttime: '2020-10-11 11:11:11'
-  },
-  {
-    id: '2',
-    name: '任务二',
-    type: '2',
-    starttime: '2020-10-22 22:22:22'
   }
 ]
 
@@ -125,34 +111,52 @@ export default {
           { required: true, message: '请选择依据字段', trigger: 'change' }
         ]
       },
-      regData,
+      regData: [],
       regColumns
     }
   },
   computed: {
+    ...mapState({
+      modelName: state => state.dataAccess.modelName,
+      modelId: state => state.dataAccess.modelId
+    }),
     regularData() {
       return this.selectedRows.length > 0 ? this.selectedRows : this.data
     }
   },
   watch: {
     show(newValue, oldValue) {
-      if (newValue && typeof this.formData === 'object') {
-        const newForm = {}
-        for (const key in this.form) {
-          if (key === 'freqType' && !this.formData[key]) {
-            newForm[key] = '1'
-          } else {
-            newForm[key] = this.formData[key]
-          }
-        }
-        this.form = newForm
-        console.log(this.form)
+      // if (newValue && typeof this.formData === 'object') {
+      //   const newForm = {}
+      //   for (const key in this.form) {
+      //     if (key === 'freqType' && !this.formData[key]) {
+      //       newForm[key] = '1'
+      //     } else {
+      //       newForm[key] = this.formData[key]
+      //     }
+      //   }
+      //   this.form = newForm
+      //   console.log(this.form)
+      // }
+      if (newValue) {
+        this.handleGetRegularList()
       }
     }
   },
   methods: {
     setRegular() {
       this.$emit('setRegular')
+    },
+    handleGetRegularList() {
+      const res = this.$server.dataAccess.getRegularList({
+        target: this.modelId
+      })
+      if (res.code === 200) {
+        console.log(res)
+        this.regData = res.rows
+      } else {
+        this.$message.error(res.msg || '请求错误')
+      }
     },
     handleRegular(row, type) {
       if (type === 'edit') {
@@ -184,15 +188,16 @@ export default {
       this.handleClose()
     },
     handleOk() {
-      if (this.single) {
-        this.$refs.form.validate((ok, obj) => {
-          if (ok) {
-            this.handleSave()
-          }
-        })
-      } else {
-        this.handleSave()
-      }
+      // if (this.single) {
+      //   this.$refs.form.validate((ok, obj) => {
+      //     if (ok) {
+      //       this.handleSave()
+      //     }
+      //   })
+      // } else {
+      //   this.handleSave()
+      // }
+      this.handleSave()
     }
   }
 }
