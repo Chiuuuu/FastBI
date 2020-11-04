@@ -3,8 +3,8 @@
     <div class="login_form_wrap">
       <div class="login_banner"></div>
       <div class="login_form" flex="dir:top">
-        <span class="login_title">智能BI可视化平台</span>
-        <!-- <img class="login_title" src="../../assets/images/login_title.png" /> -->
+        <!-- <span class="login_title">智能BI可视化平台</span> -->
+        <img class="login_title" src="../../assets/images/login/login_logo3.png" />
         <div class="login_title_span">账号登录</div>
         <div class="login_main_form">
           <a-form

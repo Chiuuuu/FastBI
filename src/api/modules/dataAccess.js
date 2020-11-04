@@ -22,7 +22,7 @@ export default {
      * @param {string} type 类型
      * @param {Object} params 请求参数
      * @param {string} params.databaseName 数据库名称
-     * @param {string} params.sourceOracleName 源名称
+     * @param {string} params.sourceId 数据源id
      * @returns
      */
     getTableList(params) {
@@ -75,8 +75,36 @@ export default {
         })
     },
     /**
-     * @description 上传文件
-     * @param {Object} data 文件
+     * @description 读取数据源的文件列表
+     * @param {string} id 请求参数
+     * @returns
+     */
+    getModelFileList(id) {
+        return $axios.get(`/datasource/database/find/${id}`)
+    },
+    /**
+     * @description 查询文件下的表格
+     * @param {String} databaseId 文件id
+     */
+    getFileSheetList(databaseId) {
+        return $axios.get('/datasource/table/list/bydatabaseid?databaseId=' + databaseId)
+    },
+    /**
+     * @description 查询文件下的表格内容
+     * @param {String} tableId 文件id
+     */
+    getFileTableInfo(tableId) {
+        return $axios.get('/datasource/excel/presto/read?tableId=' + tableId)
+    },
+    /**
+     * @description 保存excel数据源
+     * @param {Object} data body对象
+     * @param {String} 'sourceSaveInput.name' 名称
+     * @param {String} 'sourceSaveInput.type' 数据源类型
+     * @param {Array[string]} 'sourceSaveInput.databasesIdList' 删除的文件id
+     * @param {Array[file]} 'sourceSaveInput.fileList' 文件列表
+     * @param {String} 'sourceSaveInput.parentId' parentId
+     * @param {String} 'sourceSaveInput.id' id
      */
     saveExcelInfo(data) {
         return $axios({
@@ -85,5 +113,13 @@ export default {
             url: '/datasource/excel/save',
             data
         })
+    },
+    /**
+     * @description 查询文件下的表格内容
+     * @param {Object} params
+     * @param {String} params.sourceId 数据源id
+     */
+    getModelRecord(params) {
+        return $axios.post('/datasource/record', params)
     }
 }

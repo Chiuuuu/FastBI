@@ -305,7 +305,7 @@ export default {
     */
     handleFolderDelete(mouseEvent, event, { folder }) {
       if (folder.children && folder.children.length > 0) {
-        return this.$message.warning('文件夹下存在数据模型不可删除')
+        return this.$message.error('文件夹下存在数据模型不可删除')
       }
       this.$confirm({
         title: '确认提示',
@@ -329,7 +329,6 @@ export default {
     handleFilemove(event, index, { file }) {
       this.selectFile = file
       this.$store.dispatch('dataModel/setDatasource', file)
-      this.$store.dispatch('dataModel/setModelId', file.id)
       this.moveFileVisible = true
     },
     /**

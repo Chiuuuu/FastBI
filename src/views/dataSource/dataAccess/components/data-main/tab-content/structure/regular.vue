@@ -17,39 +17,45 @@
         </a-select>
       </a-form-model-item>
       <a-form-model-item style="margin-left: 16.6%" prop="freq" v-show="form.type === '2'">
-        <span>每隔 </span>
-        <a-input style="width:100px" v-model="form.freq"></a-input>
-        <a-select style="width:80px" v-model="form.freqType" placeholder="请选择更新方式">
-          <a-select-option value="1">小时</a-select-option>
-          <a-select-option value="2">天</a-select-option>
-        </a-select>
-        <span> 执行一次</span>
+        <div>
+          <span>每隔&nbsp;</span>
+          <a-input style="width:100px" v-model="form.freq"></a-input>
+          <a-select class="regular-bordered" style="width:80px" v-model="form.freqType" placeholder="请选择更新方式">
+            <a-select-option value="1">小时</a-select-option>
+            <a-select-option value="2">天</a-select-option>
+          </a-select>
+          <span>&nbsp;执行一次</span>
+        </div>
       </a-form-model-item>
       <a-form-model-item label="开始时间" prop="starttime">
         <a-date-picker
           style="width:100%"
           show-time
-          :default-value="form.starttime"
+          v-model="form.starttime"
           :disabled-date="disabledStartDate"
+          valueFormat="YYYY-MM-DD HH:mm:ss"
           placeholder="请选择开始时间"
-          @change="handleStartTimeChange"></a-date-picker>
+          ></a-date-picker>
       </a-form-model-item>
       <a-form-model-item label="结束时间" prop="endtime">
         <a-date-picker
           style="width:100%"
           show-time
-          :default-value="form.endtime"
+          v-model="form.endtime"
           :disabled-date="disabledEndDate"
           :disabled-time="disabledEndTime"
+          valueFormat="YYYY-MM-DD HH:mm:ss"
           placeholder="请选择结束时间"
-          @change="handleEndTimeChange"></a-date-picker>
+          ></a-date-picker>
       </a-form-model-item>
     </a-form-model>
     <a-table
       v-if="showTable"
+      row-key="id"
+      size="small"
       :row-selection="rowSelection"
       :columns="columns"
-      :data-source="tableData"
+      :data-source="tableList"
     >
       <template #extractType>
         <a-select style="width: 150px" :default-value="undefined" placeholder="请选择方式">
@@ -88,6 +94,7 @@ const columns = [
 ]
 
 export default {
+  name: 'regularSetting',
   props: {
     show: {
       type: Boolean,
@@ -98,14 +105,14 @@ export default {
       default: false
     },
     formData: [Object, String],
-    tableData: {
+    tableList: {
       type: Array,
       default() { return [] }
     }
   },
   data() {
     return {
-      bodyStyle: { 'maxHeight': 'calc(100vh - 300px)', 'overflow-y': 'auto' },
+      bodyStyle: { 'maxHeight': 'calc(100vh - 240px)', 'overflow-y': 'auto' },
       form: {
         name: undefined,
         type: undefined,
@@ -155,10 +162,21 @@ export default {
       if (newValue && typeof this.formData === 'object') {
         const newForm = {}
         for (const key in this.form) {
-          newForm[key] = this.formData[key]
+          if (key === 'freqType' && !this.formData[key]) {
+            newForm[key] = '1'
+          } else {
+            newForm[key] = this.formData[key]
+          }
         }
         this.form = newForm
+        console.log(this.form)
       }
+    }
+  },
+  filters: {
+    toMomentObj: function(value) {
+      console.log('toMomentObj', value)
+      return value ? moment(value, 'YYYY-MM-DD HH:mm:ss') : null
     }
   },
   methods: {
@@ -167,15 +185,17 @@ export default {
     },
     disabledEndDate(date) {
       let time = this.form.starttime || ''
-      return date && date < moment(time, 'YYYY-MM-DD HH:mm').startOf('hour')
+      // 如果开始时间在今天之前, 禁用从开始到今天的时间段
+      if (time && +new Date(time) > +new Date()) {
+        return date && date < moment(time, 'YYYY-MM-DD HH:mm:ss').startOf('hour')
+      } else {
+        return date && date < moment().subtract(1, 'days')
+      }
     },
     disabledEndTime() {
       return {
         // disabledSeconds: () => [55, 56]
       }
-    },
-    handleDateTimeRange(now, max) {
-
     },
     handleStartTimeChange(value, dateString) {
       this.$set(this.form, 'starttime', dateString)
@@ -206,7 +226,8 @@ export default {
     },
     handleOk() {
       this.$refs.form.validate((ok, obj) => {
-        if (ok || (this.form.type === '1' && obj.freq)) {
+        // 结束时间没问题&&选择只执行一次&&仅重复执行的表单报错时,可以保存
+        if (ok || (!obj.endtime && this.form.type === '1' && obj.freq)) {
           console.log(this.form)
           this.resetForm()
           this.handleClose()
@@ -216,3 +237,12 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus" scoped>
+  /deep/ .regular-bordered .ant-select-selection {
+    border-color: #d9d9d9;
+  }
+  /deep/ .regular-bordered .ant-select-arrow {
+    color: #d9d9d9;
+  }
+</style>

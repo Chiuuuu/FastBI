@@ -17,7 +17,7 @@
       </div>
       <div class="menu_search" v-if="folderList.length > 0">
         <a-input placeholder="搜索大屏目录" v-model="searchName" @change="menuSearch">
-          <a-icon slot="prefix" type="search" />
+          <a-icon class="icon_search" slot="suffix" type="search" />
         </a-input>
       </div>
       <div class="menu-wrap scrollbar screen-menu">
@@ -242,7 +242,7 @@ export default {
     // 右键删除文件夹
     handleFolderDelete(event, item, { folder }) {
       if (folder.children && folder.children.length > 0) {
-        return this.$message.warning('文件夹下存在数据大屏不可删除')
+        return this.$message.error('文件夹下存在数据大屏不可删除')
       }
       this.handleDelete(folder.id)
     },

@@ -22,14 +22,13 @@
               :columns="columns"
               :data-source="data"
               :loading='sping'
-              :pagination='false'
-              :scroll="{ x: 1200, y: 570 }"
+              :scroll="{ x: 1200 }"
               bordered
             >
-            <span slot="alias" slot-scope="text, record, index">
+            <template slot="alias" slot-scope="text, record, index">
               <a-input style="width:100%;height:32px" :value="text" @blur.stop.prevent="handleAliasBlur($event, record, index, 'alias')" @change.stop.prevent="handleChangeValue($event, record, index, 'alias')"/>
-            </span>
-            <span slot="dataType" slot-scope="text, record, index">
+            </template>
+            <template slot="dataType" slot-scope="text, record, index">
               <a-select :value="text" style="width:100%;" @change="(value) => handleSelectChangeValue(value, record, index, 'dataType')">
                 <a-select-option value="BIGINT">
                   整数
@@ -44,8 +43,8 @@
                   小数
                 </a-select-option>
               </a-select>
-            </span>
-            <span slot="role" slot-scope="text, record, index">
+            </template>
+            <template slot="role" slot-scope="text, record, index">
               <a-select default-value="1" :value='`${text}`' @change="(value) => handleSelectChangeValue(value, record, index, 'role')">
                 <a-select-option value="1">
                   维度
@@ -54,23 +53,23 @@
                   度量
                 </a-select-option>
               </a-select>
-            </span>
-            <span slot="comment" slot-scope="text, record, index">
+            </template>
+            <template slot="comment" slot-scope="text, record, index">
               <a-input style="width:100%;height:32px" :value="text" @change.stop.prevent="handleChangeValue($event, record, index, 'comment')"/>
-            </span>
-            <span slot="description" slot-scope="description">
+            </template>
+            <template slot="description" slot-scope="description">
               {{ description }}
-            </span>
-            <span slot="visible" slot-scope="text, record, index">
-                <a-select style="width:60px" default-value="true" :value='`${text}`' @change="(value) => handleSelectChangeValue(value, record, index, 'visible')">
-                  <a-select-option value="true">
-                    是
-                  </a-select-option>
-                  <a-select-option value="false">
-                    否
-                  </a-select-option>
-                </a-select>
-            </span>
+            </template>
+            <template slot="visible" slot-scope="text, record, index">
+              <a-select style="width:60px" default-value="true" :value='`${text}`' @change="(value) => handleSelectChangeValue(value, record, index, 'visible')">
+                <a-select-option value="true">
+                  是
+                </a-select-option>
+                <a-select-option value="false">
+                  否
+                </a-select-option>
+              </a-select>
+            </template>
             </a-table>
           </div>
           <a-modal :visible="showSetting" @cancel="showSetting = false">
@@ -208,7 +207,9 @@ export default {
       formInfo: state => state.dataAccess.modelInfo,
       modelId: state => state.dataAccess.modelId,
       readRows: state => state.dataAccess.readRows,
-      modelType: state => state.dataAccess.modelType
+      modelType: state => state.dataAccess.modelType,
+      modelName: state => state.dataAccess.modelName,
+      databaseName: state => state.dataAccess.databaseName
     }),
     selectDrawer() {
       return this.selectedRows.length > 0
@@ -240,10 +241,12 @@ export default {
     },
     async handleGetData() {
       this.sping = true
+      // sql, oracle的数据库名称在formInfo里, excel的在dabaseName里
+      const databaseName = this.formInfo && this.formInfo.databaseName ? this.formInfo.databaseName : this.databaseName
       const result = await this.$server.dataAccess.getTableFieldDetail({
+        databaseName,
         sourceId: this.modelId,
-        databaseName: this.formInfo.databaseName,
-        sourceName: this.formInfo.name,
+        sourceName: this.modelName,
         tableId: this.fieldInfo.id,
         tableName: this.fieldInfo.name
       }).finally(() => {
