@@ -93,6 +93,7 @@ const columns = [
 ]
 
 export default {
+  name: 'checkTable',
   props: {
     isShow: Boolean,
     detailInfo: {

@@ -24,6 +24,7 @@
 
 <script>
 export default {
+  name: 'sqlSetting',
   props: {
     isShow: Boolean,
     sqlForm: Object

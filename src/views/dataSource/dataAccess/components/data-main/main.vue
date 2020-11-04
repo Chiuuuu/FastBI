@@ -20,9 +20,9 @@
           <a-tab-pane key="2" tab="库表结构" force-render :disabled="!tabChangeAble">
             <tab-content-structure v-on="$listeners" ref="structure" @hook:mounted="handleTT"></tab-content-structure>
           </a-tab-pane>
-          <!-- <a-tab-pane key="3" tab="操作记录" :disabled="!tabChangeAble">
+          <a-tab-pane key="3" tab="操作记录" :disabled="!tabChangeAble">
             <tab-content-record ref='record'></tab-content-record>
-          </a-tab-pane> -->
+          </a-tab-pane>
         </a-tabs>
       </div>
     </div>
@@ -100,6 +100,9 @@ export default {
         })
       } else if (activeKey === '3') {
         console.log('操作记录请求')
+        this.$nextTick(() => {
+          this.$refs.record.handleGetData()
+        })
       }
     },
     /**
