@@ -148,9 +148,9 @@ export default {
     },
     // 根据维度度量获取数据
     getData() {
-      for (let item of this.fileList) {
-        item.defaultAggregator = 'SUM'
-      }
+      // for (let item of this.fileList) {
+      //   item.defaultAggregator = 'SUM'
+      // }
       // 维度
       if (this.type === 'dimensions') {
         this.currentSelected.packageJson.api_data.dimensions = this.fileList
