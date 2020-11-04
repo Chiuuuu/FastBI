@@ -13,9 +13,9 @@
         </a-col> -->
         <a-col>
           <a-button type="primary" class="select_button" @click="handleGetData" :loading="spinning">刷新数据</a-button>
-          <a-button type="primary" style="margin:0 10px;" class="select_button" @click="showExtractLog">抽取记录</a-button>
-          <a-button type="primary" class="select_button" @click="handleExtract" :loading="extractSping">全部抽取</a-button>
-          <a-button type="primary" style="margin:0 10px;" @click="showSetting('batch')" class="select_button">批量抽取设置</a-button>
+          <a-button v-show="showExtractBtn" type="primary" style="margin:0 10px;" class="select_button" @click="showExtractLog">抽取记录</a-button>
+          <a-button v-show="showExtractBtn" type="primary" class="select_button" @click="handleExtract" :loading="extractSping">全部抽取</a-button>
+          <a-button v-show="showExtractBtn" type="primary" style="margin:0 10px;" @click="showSetting('batch')" class="select_button">批量抽取设置</a-button>
         </a-col>
         <!-- <a-col>
           <a-select default-value="全部" class="search_select">
@@ -38,7 +38,8 @@
           <a v-on:click="setting(row)">{{row.set ? '字段编辑' : '字段设置' }}</a>
         </span>
         <span slot="regular" slot-scope="row">
-          <a v-on:click="showSetting('single', row)">定时设置</a>
+          <a v-if="showExtractBtn" v-on:click="showSetting('single', row)">定时设置</a>
+          <span v-else>-</span>
         </span>
       </a-table>
       <a-modal width="920px" title="抽取记录" :bodyStyle="bodyStyle" :visible="visible1" @cancel="handleCloseExtractLog">
@@ -60,8 +61,8 @@
           </template>
         </a-table>
       </a-modal>
-      <extract-setting :show="visible" :single="isSingle" :form-data="extractForm" :row="clickRow" @close="visible = false" @setRegular="setRegular" />
-      <regular-setting :show="visible2" :show-table="!isSingle" :table-list="selectedRows" :form-data="regularForm" @close="closeRegular" />
+      <extract-setting ref="extract" :show="visible" :single="isSingle" :form-data="extractForm" :row="clickRow" @close="visible = false" @setRegular="setRegular" />
+      <regular-setting ref="regular" :show="visible2" :show-table="!isSingle" :table-list="selectedRows" :form-data="regularForm" @close="closeRegular" />
     </div>
   </div>
 </template>
@@ -189,7 +190,8 @@ export default {
       databaseName: state => state.dataAccess.databaseName,
       modelInfo: state => state.dataAccess.modelInfo,
       modelName: state => state.dataAccess.modelName,
-      modelType: state => state.dataAccess.modelType
+      modelType: state => state.dataAccess.modelType,
+      showExtractBtn: state => [ 'mysql', 'oracle' ].indexOf(state.dataAccess.modelType) > -1
     })
   },
   methods: {
@@ -296,15 +298,11 @@ export default {
       if (this.isSingle) {
         this.clickRow = row
       } else {
-        // if (this.selectedRows.length < 1) {
-        //   return this.$message.error('请选择至少一项')
-        // }
+        if (this.selectedRows.length < 1) {
+          return this.$message.error('请选择至少一项')
+        }
       }
       this.visible = true
-      this.modalSpin = true
-      setTimeout(() => {
-        this.modalSpin = false
-      }, 300)
     },
     closeRegular() {
       this.visible2 = false

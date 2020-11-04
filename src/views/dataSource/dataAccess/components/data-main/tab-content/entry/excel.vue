@@ -89,10 +89,10 @@
           <span>行开始获取数据</span>
           <a-checkbox style="margin-left: 50px" @change="handleCheckBox">自动生成列名</a-checkbox>
         </div> -->
-        <div class="sheet-table">
+        <div class="sheet-table scrollbar">
           <template v-if="currentFieldList.length > 0">
             <a-spin :spinning="spinning">
-              <div class="sheet-head">
+              <!-- <div class="sheet-head">
                 <table>
                   <thead>
                     <tr style="border: none"><th v-for="item in currentColumns" :key="item.dataIndex"><div class="cell-item">{{ item.title }}</div></th></tr>
@@ -108,7 +108,18 @@
                     </tr>
                   </tbody>
                 </table>
-              </div>
+              </div> -->
+              <table>
+                <thead class="sheet-head">
+                  <tr style="border: none"><th v-for="item in currentColumns" :key="item.dataIndex"><div class="cell-item">{{ item.title }}</div></th></tr>
+                </thead>
+                <tbody class="sheet-body">
+                  <tr v-for="(item, index) in currentFieldList" :key="item.key">
+                    <td><div class="cell-item">{{ index + 1 }}</div></td>
+                    <td v-for="col in currentColumns.slice(1)" :key="col.dataIndex"><div class="cell-item">{{ item[col.dataIndex] }}</div></td>
+                  </tr>
+                </tbody>
+              </table>
             </a-spin>
           </template>
           <a-empty style="margin: 20px 0" v-else></a-empty>
@@ -334,9 +345,9 @@ export default {
       // 校验大小
       if (file.size > 1 * 1024 * 1024) return this.$message.error('文件大于1M, 无法上传')
 
-      const name = file.name
+      let name = file.name
       // 校验重名
-      if (this.fileInfoList.some(file => file.name === name)) {
+      if (this.fileInfoList.some(file => file.name === name.slice(0, name.lastIndexOf('.')))) {
         return this.$message.error('文件命名重复, 请重新添加')
       }
 
@@ -410,7 +421,16 @@ export default {
       if (result.code === 200) {
         this.$message.success('解析成功')
         this.fileList.push(file)
-        this.fileInfoList.push(file)
+
+        const fileInfo = {
+          id: file.id,
+          name: file.name
+        }
+        const name = fileInfo.name
+        fileInfo.name = name.slice(0, name.lastIndexOf('.'))
+        this.fileInfoList.push(fileInfo)
+        console.log('name', name, fileInfo.name)
+
         const currentIndex = this.currentFileList.length - 1
         const database = new MapSheet(result.rows[0].mapSheet)
         this.$set(this.databaseList, currentIndex, database)
@@ -523,8 +543,9 @@ export default {
                 this.$store.dispatch('dataAccess/getMenuList')
                 this.$store.dispatch('dataAccess/setFirstFinished', true)
                 this.$store.dispatch('dataAccess/setModelName', this.form.name)
-                this.$store.dispatch('dataAccess/setModelId', result.data)
                 this.$store.dispatch('dataAccess/setParentId', 0)
+                this.$store.dispatch('dataAccess/setModelId', result.data.sourceId)
+                this.fileInfoList = result.data.sourceDatabases
                 // 保存后清空列表
                 this.fileList = []
               } else {
@@ -541,12 +562,12 @@ export default {
 .sheet-table {
   margin-top: 20px;
   width: 100%;
-  max-height: 420px;
+  max-height: 120px;
   overflow-x: auto;
   border: 1px solid #e8e8e8;
 
   table {
-    min-width: 100%;
+    width: 100%;
   }
 
   .sheet-head {
@@ -557,7 +578,6 @@ export default {
     max-height: 380px;
     overflow-y: auto;
   }
-
   tr {
     border-top: 1px solid #e8e8e8;
   }
