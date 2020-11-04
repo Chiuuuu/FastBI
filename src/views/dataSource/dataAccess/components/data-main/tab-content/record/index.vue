@@ -5,9 +5,8 @@
         <a-icon slot="prefix" type="search" />
       </a-input> -->
     </div>
-    <!-- 暂时加一个style -->
-    <div class="table" style="margin-top:0">
-      <a-table rowKey="id" :columns="column" :data-source="datas" :loading="loading">
+    <div class="record-table">
+      <a-table rowKey="id" :columns="column" :data-source="datas" :loading="loading" :pagination='false'>
         <template #time="text">
           <span>{{ text | formatTime }}</span>
         </template>
