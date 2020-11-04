@@ -70,14 +70,9 @@ export default {
           if (this.type === 'tableList' && val.packageJson.api_data.tableList) { // 表格不区分维度度量
             this.fileList = deepClone(val.packageJson.api_data.tableList)
           }
-<<<<<<< HEAD
-          // if (val.packageJson.api_data.options) {
-          //   this.getData()
-=======
           // 仪表盘只有度量
           // if (val.packageJson.chartType === 'v-gauge' && this.type === 'measures' && val.packageJson.api_data.measures) {
           //   this.fileList = deepClone(val.packageJson.api_data.measures)
->>>>>>> feature-大屏v1.3.0
           // }
         }
       },
@@ -204,7 +199,6 @@ export default {
             this.$store.dispatch('SetSelfDataSource', apiData)
           } else {
             let columns = []
-            // let apiData = this.currentSelected.packageJson.api_data
             let dimensionKeys = apiData.dimensions[0].name // 维度key
             columns[0] = dimensionKeys // 默认columns第一项为维度
             let measureKeys = [] // 度量key
