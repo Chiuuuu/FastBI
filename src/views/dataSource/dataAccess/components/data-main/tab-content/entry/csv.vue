@@ -342,9 +342,9 @@ export default {
       // 校验大小
       if (file.size > 1 * 1024 * 1024) return this.$message.error('文件大于1M, 无法上传')
 
-      const name = file.name
+      let name = file.name
       // 校验重名
-      if (this.fileInfoList.some(file => file.name === name)) {
+      if (this.fileInfoList.some(file => file.name === name.slice(0, name.lastIndexOf('.')))) {
         return this.$message.error('文件命名重复, 请重新添加')
       }
 
@@ -412,15 +412,26 @@ export default {
     // 上传文件
     async actionUploadFile(file) {
       const formData = new FormData()
-      formData.append('file', file)
+      formData.append('csvFile', file)
+      formData.append('delimiter', ',')
       this.spinning = true
-      const result = await this.$server.dataAccess.actionUploadFile(formData)
+      const result = await this.$server.dataAccess.actionUploadCsvFile(formData)
       if (result.code === 200) {
         this.$message.success('解析成功')
         this.fileList.push(file)
-        this.fileInfoList.push(file)
+
+        const fileInfo = {
+          id: file.id,
+          name: file.name
+        }
+        const name = fileInfo.name
+        fileInfo.name = name.slice(0, name.lastIndexOf('.'))
+        this.fileInfoList.push(fileInfo)
+        console.log('name', name, fileInfo.name)
+
         const currentIndex = this.currentFileList.length - 1
-        const database = new MapSheet(result.rows[0].mapSheet)
+        debugger
+        const database = new MapSheet(result.rows[0].tableContent)
         this.$set(this.databaseList, currentIndex, database)
         this.handleGetDataBase(currentIndex)
       } else {
@@ -434,12 +445,12 @@ export default {
       // 判断是否处理过表格信息(处理之后的是Array类型), 没有则调接口获取信息并处理
       if (!Array.isArray(table)) {
         if (!this.sheetList[index]) return
-        const res = await this.$server.dataAccess.getFileTableInfo(this.sheetList[index].id)
+        const res = await this.$server.dataAccess.getCsvFileTableInfo(this.sheetList[index].id)
         if (res.code === 200) {
           const data = res.rows[0]
           const sheetName = this.sheetList[index].name
-          const head = data.nameSheet[sheetName]
-          const tableInfo = data.mapSheet[sheetName]
+          const head = data.tableFiled
+          const tableInfo = data.tableData
           const newTable = new Array(head)
           table = newTable.concat(tableInfo)
 
@@ -522,7 +533,7 @@ export default {
             formData.append('excelType', 0)
           }
 
-          this.$server.dataAccess.saveExcelInfo(formData)
+          this.$server.dataAccess.saveCsvInfo(formData)
             .then(result => {
               console.log(result)
               if (result.code === 200) {

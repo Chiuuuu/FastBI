@@ -113,7 +113,7 @@
                 <thead class="sheet-head">
                   <tr style="border: none"><th v-for="item in currentColumns" :key="item.dataIndex"><div class="cell-item">{{ item.title }}</div></th></tr>
                 </thead>
-                <tbody class="sheet-body">
+                <tbody class="sheet-body scrollbar">
                   <tr v-for="(item, index) in currentFieldList" :key="item.key">
                     <td><div class="cell-item">{{ index + 1 }}</div></td>
                     <td v-for="col in currentColumns.slice(1)" :key="col.dataIndex"><div class="cell-item">{{ item[col.dataIndex] }}</div></td>
@@ -263,7 +263,10 @@ export default {
     // 获取当前文件对应的数据库信息
     async handleGetDataBase(index) {
       if (index < 0) {
-        this.handleClearTable()
+        this.currentColumns = []
+        this.currentFieldList = []
+        this.deleteIdList = []
+        this.$store.dispatch('dataAccess/setFirstFinished', false)
       } else {
         this.currentFileIndex = index
         let database = this.databaseList[index]
@@ -290,14 +293,18 @@ export default {
           let index = this.currentFileList.indexOf(file)
           this.databaseList.splice(index, 1)
           this.fileInfoList.splice(index, 1)
-          this.deleteIdList.push(file.id)
           // 遍历新增的文件列表, 如果有就删除对象
+          let isNewFile = false
           for (let i = 0; i < this.fileList.length; i++) {
             const item = this.fileList[i]
             if (item.id === file.id) {
+              isNewFile = true
               this.fileList.splice(i, 1)
               break
             }
+          }
+          if (!isNewFile) {
+            this.deleteIdList.push(file.id)
           }
           this.handleGetDataBase(this.currentFileList.length - 1)
         }
@@ -417,7 +424,7 @@ export default {
       const formData = new FormData()
       formData.append('file', file)
       this.spinning = true
-      const result = await this.$server.dataAccess.actionUploadFile(formData)
+      const result = await this.$server.dataAccess.actionUploadExcelFile(formData)
       if (result.code === 200) {
         this.$message.success('解析成功')
         this.fileList.push(file)
@@ -433,6 +440,8 @@ export default {
 
         const currentIndex = this.currentFileList.length - 1
         const database = new MapSheet(result.rows[0].mapSheet)
+
+        this.$store.dispatch('dataAccess/setFirstFinished', false)
         this.$set(this.databaseList, currentIndex, database)
         this.handleGetDataBase(currentIndex)
       } else {
@@ -446,7 +455,7 @@ export default {
       // 判断是否处理过表格信息(处理之后的是Array类型), 没有则调接口获取信息并处理
       if (!Array.isArray(table)) {
         if (!this.sheetList[index]) return
-        const res = await this.$server.dataAccess.getFileTableInfo(this.sheetList[index].id)
+        const res = await this.$server.dataAccess.getExcelFileTableInfo(this.sheetList[index].id)
         if (res.code === 200) {
           if (!this.sheetList[index]) return
           const data = res.rows[0]
@@ -540,6 +549,7 @@ export default {
               console.log(result)
               if (result.code === 200) {
                 this.$message.success('保存成功')
+                this.$store.dispatch('dataAccess/setFirstFinished', true)
                 this.$store.dispatch('dataAccess/getMenuList')
                 this.$store.dispatch('dataAccess/setFirstFinished', true)
                 this.$store.dispatch('dataAccess/setModelName', this.form.name)
@@ -562,33 +572,42 @@ export default {
 .sheet-table {
   margin-top: 20px;
   width: 100%;
-  max-height: 120px;
+  max-height: 460px;
   overflow-x: auto;
   border: 1px solid #e8e8e8;
 
   table {
     width: 100%;
   }
+  table thead {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+  }
 
   .sheet-head {
     max-height: 38px;
+    width: calc( 100% - 1em );
   }
 
   .sheet-body {
-    max-height: 380px;
+    max-height: 120px;
+    display: block;
+    width: 100%;
     overflow-y: auto;
   }
   tr {
+    display: table;
     border-top: 1px solid #e8e8e8;
+    width: 100%;
   }
   th, td {
     height: 21px;
-    left: 21px;
     padding: 8px;
   }
   .cell-item {
-    max-width: 200px;
-    min-width: 100px;
+    width: 200px;
+    // min-width: 100px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
