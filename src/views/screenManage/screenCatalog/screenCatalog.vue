@@ -17,7 +17,7 @@
       </div>
       <div class="menu_search" v-if="folderList.length > 0">
         <a-input placeholder="搜索大屏目录" v-model="searchName" @change="menuSearch">
-          <a-icon slot="prefix" type="search" />
+          <a-icon class="icon_search" slot="suffix" type="search" />
         </a-input>
       </div>
       <div class="menu-wrap scrollbar screen-menu">

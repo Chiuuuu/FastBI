@@ -2,6 +2,7 @@
 <div class="tab-datasource">
   <a-form-model
     ref="dbForm"
+    labelAlign="left"
     :model="form"
     :rules="rules"
     :label-col="labelCol"
@@ -10,22 +11,21 @@
   >
     <a-form-model-item label="数据源名称" prop="name">
       <a-input
-        style="width:528px;"
         v-model="form.name"
         @change="handleSetTableName"
       />
     </a-form-model-item>
     <a-form-model-item label="服务器" prop="ip">
-      <a-input style="width:528px;" v-model="form.ip" />
+      <a-input v-model="form.ip" />
     </a-form-model-item>
     <a-form-model-item label="端口" prop="port">
-      <a-input style="width:528px;" v-model.number="form.port" />
+      <a-input v-model.number="form.port" />
     </a-form-model-item>
     <a-form-model-item label="用户名" prop="user">
-      <a-input style="width:528px;" v-model="form.user" />
+      <a-input v-model="form.user" />
     </a-form-model-item>
     <a-form-model-item label="密码" prop="password">
-      <a-input-password style="width:528px;" v-model="form.password" autocomplete />
+      <a-input-password v-model="form.password" autocomplete />
     </a-form-model-item>
     <a-form-model-item :wrapper-col="{ span: 14, offset: 4 }">
       <a-button
@@ -72,8 +72,13 @@ export default {
   name: 'model-mysql',
   data() {
     return {
-      labelCol: { span: 4 },
-      wrapperCol: { span: 10 },
+      labelCol: {
+        xs: { span: 4 },
+        sm: { span: 3 },
+        md: { span: 3 },
+        lg: { span: 3 }
+      },
+      wrapperCol: { span: 14 },
       form: {
         // 连接信息表单
         name: '', // 数据库名
