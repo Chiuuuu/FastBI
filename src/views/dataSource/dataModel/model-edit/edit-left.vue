@@ -10,11 +10,19 @@
         @mousedown.stop="handleMouseDown"
         @dragstart.stop="handleLeftDragStart($event, item)"
         @dragend.stop="handleLeftDragEnd"
+        :title="item.name"
       >
         <span>{{ item.name }}</span>
+        <template v-if="type==='sql'">
+          <div class="u-icon delete"><a-icon type="delete" @click="handleSQLDelete(item)"/></div>
+          <div class="u-icon edit"><a-icon type="edit" @click="handleSQLEdit(item)"/></div>
+          <div class="u-icon eye"><a-icon type="eye" @click="handleTEst(3)"/></div>
+        </template>
       </div>
     </div>
-    <a-empty style="margin-top:50px;color:#000" v-else description="数据源未进行数据抽取，请先抽取数据"></a-empty>
+    <template v-else>
+      <a-empty style="margin-top:50px;color:#000" v-if="type !=='sql'" description="数据源未进行数据抽取，请先抽取数据"></a-empty>
+    </template>
   </a-spin>
 </template>
 <script>
@@ -23,53 +31,43 @@ import { mapState } from 'vuex'
 export default {
   name: 'model-edit-left',
   inject: ['nodeStatus'],
-  props: ['detailInfo'],
+  props: {
+    detailInfo: {
+      type: Object,
+      default: () => {}
+    },
+    type: {
+      type: String,
+      default: ''
+    },
+    list: {
+      type: Array,
+      default: () => []
+    }
+  },
   data() {
     return {
       isDrag: false,
-      loading: true,
-      list: ''
-      // list: [
-      //   {
-      //     id: 1,
-      //     tableName: '类别',
-      //     hasFilter: false,
-      //     status: 'direct',
-      //     dataConnectionId: 700468972
-      //   },
-      //   {
-      //     id: 2,
-      //     tableName: '细分',
-      //     hasFilter: false,
-      //     status: 'direct',
-      //     dataConnectionId: 700468972
-      //   },
-      //   {
-      //     id: 3,
-      //     tableName: '订单',
-      //     hasFilter: false,
-      //     status: 'direct',
-      //     dataConnectionId: 700468972
-      //   }
-      // ]
+      loading: true
     }
   },
-  computed: {
-    ...mapState({
-      fileSelectId: state => state.dataModel.modelId
-    })
+  watch: {
+    list: {
+      immediate: true,
+      handler(newValue) {
+        this.loading = false
+      }
+    }
   },
   methods: {
-    async handleGetMenuList(id) {
-      const result = await this.$server.dataModel.getTableListById(id).finally(() => {
-        this.loading = false
-      })
-
-      if (result.code === 200) {
-        this.list = result.data
-      } else {
-        this.$message.error(result.msg)
-      }
+    handleTEst(num) {
+      alert(num)
+    },
+    handleSQLEdit(item) {
+      this.$emit('edit', item)
+    },
+    handleSQLDelete(item) {
+      this.$emit('delete', item)
     },
     handleMouseDown() {
       this.isDrag = true

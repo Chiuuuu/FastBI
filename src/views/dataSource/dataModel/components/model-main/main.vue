@@ -14,7 +14,7 @@
         </div>
         <div class="scrollable scrollbar">
           <div class="description">
-              <span class="d-s">描述：{{detailInfo.description}}</span>
+              <span class="d-s" :title="detailInfo.description">描述：{{detailInfo.description}}</span>
           </div>
           <div
             class="m-dml-map m-map scrollbar"

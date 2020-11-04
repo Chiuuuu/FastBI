@@ -6,8 +6,9 @@
             color: #01040f;
             line-height: 1.5;
             overflow-y: auto;
-            height: 300px;
+            height: 260px;
             .sheet_list_item {
+                position: relative;
                 color: #020510;
                 cursor: move;
                 cursor: -webkit-grab;
@@ -25,6 +26,23 @@
                 &:hover {
                     background: #627CFF;
                     color: #fff;
+                    .u-icon {
+                        display: block;
+                    }
+                }
+                .u-icon {
+                    display: none;
+                    position: absolute;
+                    top: 0;
+                    &.eye {
+                        right: 50px;    
+                    }
+                    &.edit {
+                        right: 30px;
+                    }
+                    &.delete {
+                        right: 10px;
+                    }
                 }
             }
         }
@@ -74,6 +92,10 @@
                 color: #617bff;
                 cursor: pointer;
             } 
+            .sheet_list_item {
+                padding-right: 70px;
+                text-align: left;
+            }
         }
     }
     .right {

@@ -70,11 +70,20 @@ service.interceptors.response.use(
         return Promise.reject(msg)
       }
     }
-    return response.data
+
+    if (response.headers['content-type'] === 'application/json;charset=UTF-8' && response.config.responseType === 'blob') {
+      // 如果是下载xlsx且数据出错的情况
+      return {
+        code: 500,
+        data: response.data
+      }
+    } else {
+      // 正常情况
+      return response.data
+    }
   },
   error => {
     const { response } = error
-    // messages({ content: response ? response.data : '请求错误', type: 'danger', duration: 5 })
     message.error(response && response.data ? (response.data.msg || '请求错误') : '请求错误')
     return Promise.reject(error)
   }
