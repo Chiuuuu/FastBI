@@ -242,7 +242,7 @@ export default {
     // 右键删除文件夹
     handleFolderDelete(event, item, { folder }) {
       if (folder.children && folder.children.length > 0) {
-        return this.$message.warning('文件夹下存在数据大屏不可删除')
+        return this.$message.error('文件夹下存在数据大屏不可删除')
       }
       this.handleDelete(folder.id)
     },

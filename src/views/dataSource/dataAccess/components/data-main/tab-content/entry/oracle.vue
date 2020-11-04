@@ -70,7 +70,7 @@
 </template>
 <script>
 import Mysql from './mysql'
-import { validateIP } from './util'
+import { validateIP } from '../util'
 export default {
   name: 'model-oracle',
   extends: Mysql,
@@ -182,7 +182,7 @@ export default {
             this.connectStatus = true
             this.$message.success('连接成功')
           } else {
-            this.$message.warning(result.msg)
+            this.$message.error(result.msg)
           }
         } else {
           this.connectStatus = false
@@ -220,6 +220,7 @@ export default {
             this.$store.dispatch('dataAccess/getMenuList')
             this.$store.dispatch('dataAccess/setFirstFinished', true)
             this.$store.dispatch('dataAccess/setModelInfo', this.form)
+            this.$store.dispatch('dataAccess/setModelName', this.form.name)
             this.$store.dispatch('dataAccess/setModelId', result.data)
             this.$store.dispatch('dataAccess/setParentId', 0)
             this.formId = result.data

@@ -30,6 +30,7 @@
 <script>
 import assign from 'lodash/assign'
 export default {
+  name: 'sqlSetting',
   props: {
     isShow: Boolean,
     status: {

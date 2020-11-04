@@ -2,12 +2,13 @@ import dataAccessApi from '../../api/modules/common'
 const state = {
   modelType: '', // 数据类型
   firstFinished: false, // 数据接入信息是否填写完成
-  modelName: '',
+  modelName: '', // 数据源名称
   modelInfo: {}, // 数据源信息
   modelId: 0, // 选中的菜单id
   menuList: [], // 左边菜单列表
   parentId: 0, // 文件夹id
-  databaseid: 0, // 选择的默认表id
+  databaseId: 0, // 选择的默认表id
+  databaseName: '', // 数据库名称
   modelSelectType: '', // new: 新添加 add: 右键添加
   readRows: [] // 读表数据
 }
@@ -39,6 +40,9 @@ const mutations = {
   },
   SET_PARENTID(state, id) {
     state.parentId = id
+  },
+  SET_DATABASENAME(state, name) {
+    state.databaseName = name
   }
 }
 
@@ -92,6 +96,11 @@ const actions = {
     commit
   }, list) {
     commit('SET_READROWS', list)
+  },
+  setDatabaseName({
+    commit
+  }, name) {
+    commit('SET_DATABASENAME', name)
   }
 }
 

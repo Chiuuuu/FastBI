@@ -194,6 +194,7 @@ const expression = [
 ]
 
 export default {
+  name: 'computeSetting',
   props: {
     isShow: Boolean,
     computeType: String

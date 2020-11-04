@@ -55,6 +55,7 @@
 
 <script>
 export default {
+  name: 'checkTable',
   props: {
     isShow: Boolean,
     detailInfo: {

@@ -15,6 +15,7 @@
 
 <script>
 export default {
+  name: 'describeSetting',
   props: {
     isShow: Boolean,
     description: String
