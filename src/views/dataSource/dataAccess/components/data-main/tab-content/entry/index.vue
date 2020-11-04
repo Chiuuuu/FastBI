@@ -4,7 +4,9 @@
       <span slot="description">请在左侧新建或选择数据接入</span>
     </a-empty>
     <template v-else>
-      <upload v-if="isFileType" />
+      <template v-if="isFileType">
+        <component :is="modelType" />
+      </template>
       <div v-else>
         <component :is="modelType" @on-set-table-name="handleSetName" @hook:mounted="handleMounted" ref="entryRef"></component>
       </div>
@@ -15,13 +17,15 @@
 import { mapState } from 'vuex'
 import MySql from './mysql'
 import Oracle from './oracle'
-import Upload from './upload'
+import Excel from './excel'
+import Csv from './csv'
 export default {
   name: 'tabContentEntry',
   components: {
     mysql: MySql,
     oracle: Oracle,
-    upload: Upload
+    excel: Excel,
+    csv: Csv
   },
   data() {
     return {
