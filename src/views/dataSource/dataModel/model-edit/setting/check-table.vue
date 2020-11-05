@@ -27,13 +27,16 @@
                   <div class="hr" data-resize="true"></div>
                 </div>
               </th>
-              <template v-for="item in columns">
+              <template v-for="(item,index) in columns">
                 <th :key="item.title">
                   <div class="wrap">
                     <!-- <div class="menu-left">
                       <i class="u-icn u-icn-string"></i>
                     </div> -->
-                    <div class="txt" :title="item.title">{{item.title}}</div>
+                    <div class="txt" :title="item.title">
+                      <span>{{item.title}}</span>
+                      <span class='columns-type'>{{setColumnsType(columnsList[index])}}</span>
+                    </div>
                   </div>
                 </th>
               </template>
@@ -90,6 +93,24 @@ export default {
     */
     handleResetData() {
       Object.assign(this.$data, this.$options.data())
+    },
+    /**
+     * 设置表头类型
+    */
+    setColumnsType(item) {
+      const type = item.dataType.toUpperCase()
+      switch (type) {
+        case 'VARCHAR':
+          return '字符串'
+        case 'TIMESTAMP':
+          return '时间'
+        case 'BIGINT':
+          return '整数'
+        case 'DOUBLE':
+          return '小数'
+        default:
+          return '无知类型'
+      }
     },
     /**
      * 获取数据
@@ -219,6 +240,12 @@ export default {
     text-overflow: ellipsis;
     max-width: 168px;
     white-space: nowrap;
+  }
+  .columns-type {
+    font-size: 12px;
+    font-weight: 100;
+    color: #9c9c9c;
+    margin-left: 5px;
   }
   .txt-order {
     width: 50px;
