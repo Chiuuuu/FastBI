@@ -11,7 +11,7 @@
       style="height:200px;resize:unset"
       :maxLength='200'
     />
-    <div style="text-align:right;font-size:12px;"><span>{{describe.length}}/200</span></div>
+    <div style="text-align:right;font-size:12px;"><span>{{describe ? describe.length : 0}}/200</span></div>
   </a-modal>
 </template>
 
@@ -20,7 +20,10 @@ export default {
   name: 'describeSetting',
   props: {
     isShow: Boolean,
-    description: String
+    description: {
+      type: String,
+      default: ''
+    }
   },
   data() {
     return {
