@@ -55,6 +55,14 @@ export default {
           {
             required: true,
             message: '请输入视图名称'
+          },
+          {
+            pattern: new RegExp('^[a-zA-Z]*$'),
+            message: '只能填写字母'
+          },
+          {
+            max: 20,
+            message: '不得超过20个字符'
           }
         ],
         cloneSql: [
