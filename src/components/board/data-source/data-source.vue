@@ -2,7 +2,7 @@
   <div class="data-source">
     <a-collapse v-model="activeKey" :bordered="false">
       <a-collapse-panel key="dimensions" header="维度" v-if="chartType!=='v-tables' && chartType!=='v-gauge'">
-        <drag-area type="dimensions" :fileList="fileObj.dimensions"></drag-area>
+        <drag-area type="dimensions" :fileList="fileObj.dimensions" ref="child"></drag-area>
       </a-collapse-panel>
       <a-collapse-panel key="measures" header="度量" v-if="chartType!=='v-tables'">
         <drag-area type="measures" :fileList="fileObj.measures"></drag-area>
