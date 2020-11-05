@@ -9,7 +9,9 @@
       v-model="describe"
       placeholder="请输入描述内容"
       style="height:200px;resize:unset"
+      :maxLength='200'
     />
+    <div style="text-align:right;font-size:12px;"><span>{{describe.length}}/200</span></div>
   </a-modal>
 </template>
 
