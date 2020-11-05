@@ -192,7 +192,8 @@ export default {
       modelName: state => state.dataAccess.modelName,
       modelInfo: state => state.dataAccess.modelInfo,
       modelFileList: state => state.dataAccess.modelFileList,
-      modelType: state => state.dataAccess.modelType
+      modelType: state => state.dataAccess.modelType,
+      databaseName: state => state.dataAccess.databaseName
     }),
     currentFileList() {
       return this.fileInfoList.length > 0 ? this.fileInfoList : this.fileList
@@ -256,8 +257,17 @@ export default {
       this.$server.dataAccess.getModelFileList(this.modelId)
         .then(res => {
           this.fileInfoList = res.rows
+          const name = this.modelInfo.databaseName
+
           // 默认第一个
-          this.handleGetDataBase(0)
+          let index = 0
+          for (let i = 0; i < res.rows.length; i++) {
+            const item = res.rows[i]
+            if (name === item.name) {
+              index = i
+            }
+          }
+          this.handleGetDataBase(index)
         })
     },
     // 获取当前文件对应的数据库信息
@@ -429,6 +439,7 @@ export default {
         this.$message.success('解析成功')
         this.fileList.push(file)
 
+        // 处理掉文件后缀
         const fileInfo = {
           id: file.id,
           name: file.name
@@ -436,11 +447,12 @@ export default {
         const name = fileInfo.name
         fileInfo.name = name.slice(0, name.lastIndexOf('.'))
         this.fileInfoList.push(fileInfo)
-        console.log('name', name, fileInfo.name)
+        console.log('name:', name, fileInfo.name)
 
         const currentIndex = this.currentFileList.length - 1
         const database = new MapSheet(result.rows[0].mapSheet)
 
+        // 新增文件未保存前不能查看库表结构
         this.$store.dispatch('dataAccess/setFirstFinished', false)
         this.$set(this.databaseList, currentIndex, database)
         this.handleGetDataBase(currentIndex)
@@ -459,6 +471,7 @@ export default {
         if (res.code === 200) {
           if (!this.sheetList[index]) return
           const data = res.rows[0]
+          // 将结果处理成mapSheet结构
           const sheetName = this.sheetList[index].name
           const head = data.nameSheet[sheetName]
           const tableInfo = data.mapSheet[sheetName]
@@ -534,6 +547,7 @@ export default {
           this.deleteIdList.map((id, index) => {
             formData.append('databasesIdList[' + index + ']', id)
           })
+          formData.append('databaseName', this.databaseName)
           formData.append('sourceSaveInput.name', this.form.name)
           formData.append('sourceSaveInput.type', 4)
           formData.append('sourceSaveInput.parentId', this.parentId || 0)
@@ -591,7 +605,7 @@ export default {
   }
 
   .sheet-body {
-    max-height: 120px;
+    max-height: 412px;
     display: block;
     width: 100%;
     overflow-y: auto;
@@ -607,7 +621,6 @@ export default {
   }
   .cell-item {
     width: 200px;
-    // min-width: 100px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
