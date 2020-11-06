@@ -32,9 +32,6 @@
           </a-select>
         </div>
       </a-collapse-panel>
-      {{refresh.frequency}}
-      {{refresh.unit}}
-      {{refresh.isRefresh}}
       <!-- <a-collapse-panel key="filter" header="数据筛选">
         <div class="empty">拖入字段</div>
       </a-collapse-panel>
