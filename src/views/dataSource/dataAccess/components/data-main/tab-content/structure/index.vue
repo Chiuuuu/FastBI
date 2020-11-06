@@ -15,7 +15,7 @@
           <a-button type="primary" class="select_button" @click="handleGetData" :loading="spinning">刷新数据</a-button>
           <a-button v-show="showExtractBtn" type="primary" style="margin:0 10px;" class="select_button" @click="showExtractLog">抽取记录</a-button>
           <a-button v-show="showExtractBtn" type="primary" class="select_button" @click="handleExtract" :loading="extractSping">全部抽取</a-button>
-          <a-button v-show="showExtractBtn" type="primary" style="margin:0 10px;" @click="showSetting('batch')" class="select_button">批量抽取设置</a-button>
+          <!-- <a-button v-show="showExtractBtn" type="primary" style="margin:0 10px;" @click="showSetting('batch')" class="select_button">批量抽取设置</a-button> -->
         </a-col>
         <!-- <a-col>
           <a-select default-value="全部" class="search_select">
@@ -61,8 +61,21 @@
           </template>
         </a-table>
       </a-modal>
-      <extract-setting ref="extract" :show="visible" :single="isSingle" :form-data="extractForm" :row="clickRow" @close="visible = false" @setRegular="setRegular" />
-      <regular-setting ref="regular" :show="visible2" :show-table="!isSingle" :table-list="selectedRows" :form-data="regularForm" @close="closeRegular" />
+      <extract-setting
+        ref="extract"
+        :show="visible"
+        :single="isSingle"
+        :form-data="extractForm"
+        :row="clickRow"
+        @close="visible = false"
+        @setRegular="setRegular" />
+      <regular-setting
+        ref="regular"
+        :show="visible2"
+        :show-table="!isSingle"
+        :row="clickRow"
+        :table-list="selectedRows"
+        @close="closeRegular" />
     </div>
   </div>
 </template>
@@ -164,7 +177,6 @@ export default {
       visible: false, // 批量设置定时弹窗
       visible1: false, // 抽取记录弹窗
       visible2: false, // 添加定时任务弹窗
-      regularForm: '',
       extractForm: '',
       isSingle: false,
       spinning: true,
@@ -269,20 +281,6 @@ export default {
       }).finally(() => {
         this.extractSping = false
       })
-      // if (this.modelType === 'mysql') {
-      //   result = await this.$server.dataAccess.actionExtract('/datasource/mysql/datax/extract', {
-      //     rows: rows,
-      //     tableList: this.data
-      //   }).finally(() => {
-      //     this.extractSping = false
-      //   })
-      // } else if (this.modelType === 'oracle') {
-      //   result = await this.$server.dataAccess.actionExtract('/datasource/oracle/datax', {
-      //     rows: rows
-      //   }).finally(() => {
-      //     this.extractSping = false
-      //   })
-      // }
 
       if (result.code === 200) {
         this.$message.success('请刷新数据查看状态')
@@ -293,13 +291,15 @@ export default {
     setting(row) {
       this.$emit('on-change-componet', 'Setting', row)
     },
-    async showSetting(type, row) {
+    showSetting(type, row) {
       this.isSingle = type === 'single'
       if (this.isSingle) {
         this.clickRow = row
       } else {
         if (this.selectedRows.length < 1) {
           return this.$message.error('请选择至少一项')
+        } else if (this.selectedRows.length > 10) {
+          return this.$message.error('一次抽取最多只能选择10个')
         }
       }
       this.visible = true
@@ -307,12 +307,14 @@ export default {
     closeRegular() {
       this.visible2 = false
     },
-    setRegular(form) {
-      if (!form && !this.isSingle && this.selectedRows.length < 1) {
+    setRegular(data) {
+      if (!data && !this.isSingle && this.selectedRows.length < 1) {
         this.$message.error('请选择至少一项')
       } else {
         this.visible2 = true
-        this.regularForm = form || ''
+        if (data) {
+          this.$refs.regular.handleGetRegularInfo(data.id)
+        }
       }
     }
   }

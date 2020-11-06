@@ -297,7 +297,10 @@ export default {
             this.handleGetMenuList()
             this.$message.success('删除成功')
             const isSame = file.id === this.fileSelectId
-            if (isSame) this.$store.dispatch('dataAccess/setModelType', '')
+            if (isSame) {
+              this.$store.dispatch('dataAccess/setModelType', '')
+              this.$store.dispatch('dataAccess/setFirstFinished', false)
+            }
           } else {
             this.$message.error(result.msg)
           }
