@@ -71,9 +71,9 @@ export default {
             this.fileList = deepClone(val.packageJson.api_data.tableList)
           }
           // 仪表盘只有度量
-          // if (val.packageJson.chartType === 'v-gauge' && this.type === 'measures' && val.packageJson.api_data.measures) {
-          //   this.fileList = deepClone(val.packageJson.api_data.measures)
-          // }
+          if (val.packageJson.chartType === 'v-gauge' && this.type === 'measures' && val.packageJson.api_data.measures) {
+            this.fileList = deepClone(val.packageJson.api_data.measures)
+          }
         }
       },
       deep: true,
@@ -104,13 +104,21 @@ export default {
         this.fileList = this.uniqueFun(this.fileList, 'name')
         this.getData()
       }
-      if (this.type === 'measures' && this.dragFile === this.type) {
+      // 度量
+      if (this.type === 'measures' && this.dragFile === this.type && this.currentSelected.packageJson.chartType !== 'v-gauge') {
         this.fileList.push(dataFile)
         this.fileList = this.uniqueFun(this.fileList, 'name')
         this.getData()
       }
+      // 表格
       if (this.type === 'tableList') {
         this.fileList.push(dataFile)
+        this.fileList = this.uniqueFun(this.fileList, 'name')
+        this.getData()
+      }
+      // 仪表盘
+      if (this.currentSelected.packageJson.chartType === 'v-gauge' && this.type === 'measures' && this.dragFile === this.type) {
+        this.fileList[0] = dataFile
         this.fileList = this.uniqueFun(this.fileList, 'name')
         this.getData()
       }
@@ -148,9 +156,6 @@ export default {
     },
     // 根据维度度量获取数据
     getData() {
-      // for (let item of this.fileList) {
-      //   item.defaultAggregator = 'SUM'
-      // }
       // 维度
       if (this.type === 'dimensions') {
         this.currentSelected.packageJson.api_data.dimensions = this.fileList
@@ -198,6 +203,24 @@ export default {
             }
             this.$store.dispatch('SetSelfDataSource', apiData)
           } else {
+            // 仪表盘
+            if (this.currentSelected.packageJson.chartType === 'v-gauge') {
+              let columns = ['type', 'value'] // 维度固定
+              for (let m of apiData.measures) {
+                columns.push(m.name) // 默认columns第二项起为指标
+              }
+              let rows = [{
+                type: apiData.measures[0].name,
+                value: res.rows[0][apiData.measures[0].name]
+              }]
+              apiData.source = {
+                columns,
+                rows
+              }
+              this.$store.dispatch('SetSelfDataSource', apiData)
+              this.saveScreenData()
+              return
+            }
             let columns = []
             let dimensionKeys = apiData.dimensions[0].name // 维度key
             columns[0] = dimensionKeys // 默认columns第一项为维度
@@ -218,9 +241,9 @@ export default {
               rows.push(obj)
             })
             // 仪表盘只保留一个数据
-            if (this.currentSelected.packageJson.name === 've-gauge') {
-              rows.length = 1
-            }
+            // if (this.currentSelected.packageJson.name === 've-gauge') {
+            //   rows.length = 1
+            // }
             apiData.source = {
               columns,
               rows

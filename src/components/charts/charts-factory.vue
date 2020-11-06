@@ -88,6 +88,14 @@
       apiData: {
         handler (val) {
           if (val) {
+            console.log(this.typeName)
+            // 仪表盘
+            if (this.typeName === 've-gauge') {
+              if (val.measures && val.measures.length > 0) {
+                this.chartData = val.source
+                return
+              }
+            }
             if (val.dimensions && val.measures) {
               if ((val.dimensions.length === 0 && val.measures.length > 0) || (val.dimensions.length > 0 && val.measures.length === 0)) {
                 return

@@ -61,7 +61,7 @@
                             @contextmenu.prevent="showMore(item2)">
                           <img src="@/assets/images/icon_dimension.png" />
                           {{ item2.name }}
-                          <a-dropdown :trigger="['click', 'contextmenu']" v-model="item2.showMore">
+                          <a-dropdown :trigger="['click', 'contextmenu']" v-if="!dimensionsChecked.includes(item2.id)" v-model="item2.showMore">
                             <a-icon class="icon-more" type="caret-down" />
                             <a-menu slot="overlay" @click="changeItem(item2, 2)">
                               <a-menu-item key="3">
@@ -97,7 +97,7 @@
                               @contextmenu.prevent="showMore(item2)">
                             <img src="@/assets/images/icon_measure.png" />
                             {{ item2.name }}
-                            <a-dropdown :trigger="['click', 'contextmenu']" v-model="item2.showMore">
+                            <a-dropdown :trigger="['click', 'contextmenu']" v-if="!measuresChecked.includes(item2.id)" v-model="item2.showMore">
                               <a-icon class="icon-more" type="caret-down" />
                               <a-menu slot="overlay" @click="changeItem(item2, 1)">
                                 <a-menu-item key="3">
@@ -185,7 +185,9 @@ export default {
       searchValue: undefined, // 搜索的维度度量
       searchList: [], // 维度度量整合成一个数组可供搜索
       searchResult: [], // 维度度量搜索结果列表
-      searchSelected: '' // 搜索选中的维度度量
+      searchSelected: '', // 搜索选中的维度度量
+      dimensionsChecked: [], // 选中的维度id
+      measuresChecked: [] // 选中的度量id
     }
   },
   computed: {
@@ -194,7 +196,6 @@ export default {
   watch: {
     selectedModelList: {
       handler(val) {
-        console.log(val)
         if (val.length > 0) {
           if (!this.add) {
             this.modelId = val[0].modelid
@@ -213,11 +214,25 @@ export default {
     currentSelected: {
       handler(val) {
         if (val) {
+          console.log(val)
           if (val.packageJson.api_data) {
             this.apiData = deepClone(val.packageJson.api_data)
             if (this.apiData.modelId) {
               this.modelId = this.apiData.modelId
             }
+            this.dimensionsChecked = []
+            if (this.apiData.dimensions.length > 0) {
+              this.apiData.dimensions.map(item => {
+                this.dimensionsChecked.push(item.id)
+              })
+            }
+            this.measuresChecked = []
+            if (this.apiData.measures.length > 0) {
+              this.apiData.measures.map(item => {
+                this.measuresChecked.push(item.id)
+              })
+            }
+            console.log(this.dimensionsChecked)
           }
         }
       },
@@ -345,7 +360,6 @@ export default {
     },
     // 转为维度或者度量
     changeItem(item, num) {
-      console.log(item)
       let params = {
         datamodelId: item.datamodelId,
         pivotschemaId: item.pivotschemaId,
