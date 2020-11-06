@@ -63,7 +63,6 @@ export default {
   data() {
     return {
       screenName: '', // 大屏名称
-      userId: '',
       isFocus: false // 大屏名称是否聚焦
     }
   },
@@ -71,8 +70,8 @@ export default {
     ...mapGetters(['isScreen', 'pageSettings', 'canvasMap', 'screenId', 'fileName', 'parentId'])
   },
   created() {
-    this.screenName = this.fileName
-    this.userId = 'dv1e443967LZP2Dj'
+    // this.screenName = this.fileName
+    this.screenName = this.$route.query.name
   },
   methods: {
       ...mapActions(['saveScreenData']),
@@ -96,6 +95,7 @@ export default {
         }
         this.$server.common.putMenuFolderName('/screen/catalog', params).then(res => {
           if (res.code === 200) {
+            this.$route.query.name = this.screenName
             this.$store.dispatch('SetFileName', this.screenName)
             console.log('修改大屏名称')
           } else {
@@ -107,7 +107,6 @@ export default {
       // 打开全屏
       openScreen () {
         this.$store.dispatch('SetIsScreen', true)
-        // this.$router.push({ name: 'screen', params: { id: this.userId } })
         this.$nextTick(() => {
           var docElm = document.querySelector('.dv-screen')
           if (docElm) {
