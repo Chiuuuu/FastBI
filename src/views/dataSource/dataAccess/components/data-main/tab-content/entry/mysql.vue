@@ -37,7 +37,7 @@
         连接
       </a-button>
     </a-form-model-item>
-    <a-form-model-item label="默认连接库" prop="databaseName" v-if="connectStatus">
+    <a-form-model-item class="form-not-required" label="默认连接库" prop="databaseName" v-if="connectStatus">
       <a-select
         style="width: 528px"
         v-model="form.databaseName"
