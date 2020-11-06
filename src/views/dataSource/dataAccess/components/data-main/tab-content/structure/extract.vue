@@ -40,8 +40,8 @@
       :loading="modalSpin"
       :pagination='false'
     >
-      <span slot="frequency" slot-scope="type">
-        {{ type === '1' ? '只执行一次' : '重复执行' }}
+      <span slot="repeat" slot-scope="type">
+        {{ type === 0 ? '只执行一次' : '重复执行' }}
       </span>
       <span slot="config" slot-scope="row">
         <a style="margin-right: 20px" v-on:click="handleRegular(row, 'edit')">编辑</a>
@@ -62,15 +62,15 @@ const regColumns = [
   },
   {
     title: '执行频率',
-    dataIndex: 'type',
-    key: 'type',
-    scopedSlots: { customRender: 'frequency' }
+    dataIndex: 'repeat',
+    key: 'repeat',
+    scopedSlots: { customRender: 'repeat' }
   },
   {
     title: '开始时间',
-    dataIndex: 'starttime',
-    key: 'starttime',
-    scopedSlots: { customRender: 'starttime' }
+    dataIndex: 'gmtStart',
+    key: 'gmtStart',
+    scopedSlots: { customRender: 'gmtStart' }
   },
   {
     title: '操作',
@@ -147,9 +147,9 @@ export default {
     setRegular() {
       this.$emit('setRegular')
     },
-    handleGetRegularList() {
-      const res = this.$server.dataAccess.getRegularList({
-        target: this.modelId
+    async handleGetRegularList() {
+      const res = await this.$server.dataAccess.getRegularList({
+        target: this.row.id
       })
       if (res.code === 200) {
         console.log(res)
@@ -158,7 +158,15 @@ export default {
         this.$message.error(res.msg || '请求错误')
       }
     },
+    updateRows(row) {
+      this.regData.map((item, index) => {
+        if (item.id === row.id) {
+          this.$set(this.regData, index, row)
+        }
+      })
+    },
     handleRegular(row, type) {
+      console.log('row', row)
       if (type === 'edit') {
         this.$emit('setRegular', row)
       } else if (type === 'delete') {
@@ -167,11 +175,21 @@ export default {
           content: '确定要删除该任务吗',
           onOk: () => {
             const id = row.id
-            this.regData.map((item, index) => {
-              if (item.id === id) {
-                this.regData.splice(index, 1)
-              }
-            })
+            this.$server.dataAccess.deleRegularInfo(id)
+              .then(res => {
+                if (res.code === 200) {
+                  this.$message.success('删除成功')
+                  for (let i = 0; i < this.regData.length; i++) {
+                    const item = this.regData[i]
+                    if (item.id === id) {
+                      this.regData.splice(i, 1)
+                      break
+                    }
+                  }
+                } else {
+                  this.$message.error(res.msg)
+                }
+              })
           }
         })
       }
