@@ -1,7 +1,7 @@
 <template>
   <div class="board-layout">
     <!--顶部操作栏-->
-    <board-header :config="config.header" v-if="config.header">
+    <board-header :config="config.header" v-if="config.header" v-bind="$attrs">
       <slot name="headerBox"></slot>
     </board-header>
     <!--中间工作区-->
