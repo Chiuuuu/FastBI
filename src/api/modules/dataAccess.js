@@ -163,17 +163,17 @@ export default {
      * @description 获取定时任务列表
      * @param {Object} params
      * @param {String} params.name 数据源名称
-     * @param {String} params.target 数据源id
+     * @param {String} params.target 当前表id
      */
     getRegularList(params) {
-        return $axios.get('/system/schedule/list', { params })
+        return $axios.get('/datasource/schedule/list', { params })
     },
     /**
      * @description 获取定时任务详情
-     * @param {String} id
+     * @param {String} id id
      */
     getRegularInfo(id) {
-        return $axios.get('/system/schedule/' + id)
+        return $axios.get('/datasource/schedule/' + id)
     },
     /**
      * @description 新增定时任务
@@ -188,7 +188,7 @@ export default {
      * @param {String} params.gmtEnd 结束时间
      */
     addRegularInfo(params) {
-        return $axios.post('/system/schedule', params)
+        return $axios.post('/datasource/schedule', params)
     },
     /**
      * @description 修改定时任务
@@ -203,13 +203,13 @@ export default {
      * @param {String} params.gmtEnd 结束时间
      */
     putRegularInfo(params) {
-        return $axios.put('/system/schedule', params)
+        return $axios.put('/datasource/schedule', params)
     },
     /**
      * @description 删除定时任务
      * @param {String} id
      */
     deleRegularInfo(id) {
-        return $axios.delete('/system/schedule/' + id)
+        return $axios.delete('/datasource/schedule/delete/' + id)
     }
 }

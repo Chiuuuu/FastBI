@@ -593,15 +593,12 @@ export default {
   table {
     width: 100%;
   }
-  table thead {
+
+  .sheet-head {
     display: table;
     width: 100%;
     table-layout: fixed;
-  }
-
-  .sheet-head {
     max-height: 38px;
-    width: calc( 100% - 1em );
   }
 
   .sheet-body {
@@ -616,7 +613,7 @@ export default {
     width: 100%;
   }
   th, td {
-    height: 21px;
+    height: 22px;
     padding: 8px;
   }
   .cell-item {

@@ -54,7 +54,6 @@ export default {
   },
   filters: {
     formatTime(time) {
-      console.log(moment(time).format('YYYY-MM-DD HH:mm:ss'))
       return moment(time).format('YYYY-MM-DD HH:mm:ss')
     }
   },
