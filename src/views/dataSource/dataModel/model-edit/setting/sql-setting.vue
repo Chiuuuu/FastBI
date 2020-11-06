@@ -19,9 +19,12 @@
         <a-form-model-item label="视图名称" prop="name">
           <a-input placeholder="请输入视图名称" v-model="form.name"></a-input>
         </a-form-model-item>
-        <a-form-model-item label="SQL语句" prop="cloneSql">
-          <a-textarea style="height:200px;resize:unset" v-model="cloneSql" @blur.native.prevent.stop="handleValidateSql" />
-        </a-form-model-item>
+        <div>
+          <a-row><a-col :offset="4"><a-icon type="exclamation-circle" />SQL里不能存在同名字段</a-col></a-row>
+          <a-form-model-item label="SQL语句" prop="cloneSql">
+            <a-textarea style="height:200px;resize:unset" v-model="cloneSql" @blur.native.prevent.stop="handleValidateSql" />
+          </a-form-model-item>
+        </div>
       </a-form-model>
     </a-spin>
   </a-modal>
@@ -58,7 +61,7 @@ export default {
           },
           {
             pattern: new RegExp('^[a-zA-Z]*$'),
-            message: '只能填写字母'
+            message: '只能填英文字母'
           },
           {
             max: 20,
