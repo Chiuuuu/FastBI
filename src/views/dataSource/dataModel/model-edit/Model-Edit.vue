@@ -211,7 +211,7 @@ export default {
       modelForm: this.$form.createForm(this, { name: 'modelForm' }),
       spinning: false,
       detailInfo: '',
-      isDatabase: true, // 是否是SQL数据源, 控制自定义SQL渲染
+      isDatabase: false, // 是否是SQL数据源, 控制自定义SQL渲染
       leftMenuList: [],
       rightMenuList: [],
       sqlForm: {},
@@ -261,6 +261,7 @@ export default {
     }
   },
   mounted() {
+    this.handleGetDatabaseList()
     if (this.model === 'add') {
       this.handleGetAddModelDatamodel()
     } else if (this.model === 'edit') {
@@ -272,6 +273,16 @@ export default {
     this.$store.dispatch('dataModel/setAddModelId', -1)
   },
   methods: {
+    async handleGetDatabaseList() {
+      const result = await this.$server.dataModel.getDatabaseList(this.$route.query.datasourceId)
+      if (result.code === 200) {
+        const baseBalck = [4,5] // 黑名单
+        const type = result.data.type
+        this.isDatabase = !baseBalck.some(item => item === type)
+      } else {
+        this.$message.error(result.msg)
+      }
+    },
     /**
      * 新增时获取空模型
      */
@@ -419,6 +430,13 @@ export default {
       }
     },
     handleSQLDelete(item) {
+      const tables = this.detailInfo && this.detailInfo['config'] && this.detailInfo.config['tables'] || ''
+      if (Array.isArray(tables) && tables.length === 0) return
+
+      if (tables.some(table => table.id === item.id)) {
+        return this.$message.error('资源有依赖，不能删除')
+      }
+
       const index = this.rightMenuList.indexOf(item)
       this.rightMenuList.splice(index, 1)
       this.$server.dataModel.deleCustomSql({

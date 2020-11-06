@@ -14,9 +14,9 @@
       >
         <span>{{ item.name }}</span>
         <template v-if="type==='sql'">
-          <div class="u-icon delete"><a-icon type="delete" @click="handleSQLDelete(item)"/></div>
+          <!-- <div class="u-icon eye"><a-icon type="eye" @click="handleTableInfo(3)"/></div> -->
           <div class="u-icon edit"><a-icon type="edit" @click="handleSQLEdit(item)"/></div>
-          <div class="u-icon eye"><a-icon type="eye" @click="handleTEst(3)"/></div>
+          <div class="u-icon delete"><a-icon type="delete" @click="handleSQLDelete(item)"/></div>
         </template>
       </div>
     </div>
@@ -60,7 +60,7 @@ export default {
     }
   },
   methods: {
-    handleTEst(num) {
+    handleTableInfo(num) {
       alert(num)
     },
     handleSQLEdit(item) {

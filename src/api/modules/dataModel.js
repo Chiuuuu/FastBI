@@ -2,18 +2,19 @@ import $axios from '@/axios'
 
 export default {
   /**
-   * @description 新建状态, 关键字查询数据源列表
-   * @returns
-   */
-  getSearchDataSourceList() {
-    return $axios.post(`/model/datamodel/addModelDatamodel`)
-  },
-  /**
    * @description 新建状态, 获取一个空的数据模型
    * @returns
    */
   getAddModelDatamodel() {
     return $axios.post(`/model/datamodel/addModelDatamodel`)
+  },
+  /**
+   * @description 左侧端数据源列表对象
+   * @param {String|Number} dataSourceId
+   * @returns
+   */
+  getDatabaseList(dataSourceId) {
+    return $axios.get(`/model/datasource/returnDataModelSourceList/${dataSourceId}`)
   },
   /**
    * @description 编辑状态, 根据数据源id获取数据库

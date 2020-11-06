@@ -150,9 +150,11 @@ export default {
         Object.keys(obj).map(key => {
           const keyArry = obj[key]
           keyArry.forEach((item, index) => {
-            this.columns.push({
-              title: item.alias
-            })
+            if (item.visible) {
+              this.columns.push({
+                title: item.alias
+              })
+            }
           })
         })
       }
