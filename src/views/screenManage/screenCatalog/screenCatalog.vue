@@ -360,7 +360,8 @@ export default {
       this.$router.push({ name: 'screenEdit',
       query: {
         id: this.fileSelectId,
-        name: this.fileName
+        name: this.fileName,
+        parentId: this.parentId
       } })
     },
     // 点击新建文件夹

@@ -1,7 +1,7 @@
 <template>
   <div class="dv-admin"
       @click.stop.prevent="hideContextMenu">
-    <board v-if="!isScreen">
+    <board v-if="!isScreen" :screenData="screenData">
       <!--头部嵌套可拖拽物品-->
       <template v-slot:headerBox>
         <drag-list :drag-list="navigate"></drag-list>
@@ -112,7 +112,8 @@
         deleteDialog: false,
 
         text_content: '文本内容',
-        canEdit: true
+        canEdit: true,
+        screenData: null
       }
     },
     computed: {
@@ -158,6 +159,7 @@
       getScreenData() {
         this.$server.screenManage.getScreenDetailById(this.$route.query.id).then(res => {
           if (res.code === 200) {
+            this.screenData = res.data
             let json = res.data ? res.data.setting : {}
             this.$store.dispatch('SetPageSettings', json.setting)
             this.$store.dispatch('InitCanvasMaps', json.components)
