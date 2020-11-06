@@ -1,5 +1,5 @@
 <template>
-  <a-modal :bodyStyle="bodyStyle" width="700px" title="添加定时任务" :visible="show" @cancel="handleClose" @ok="handleOk">
+  <a-modal :bodyStyle="bodyStyle" width="700px" title="添加定时任务" :confirmLoading="loading" :visible="show" @cancel="handleClose" @ok="handleOk">
     <a-spin :spinning="spinning">
       <a-form-model
         ref="form"
@@ -17,11 +17,17 @@
             <a-select-option value="1">重复执行</a-select-option>
           </a-select>
         </a-form-model-item>
-        <a-form-model-item style="margin-left: 16.6%" prop="interval" v-show="form.repeat === '1'">
+        <a-form-model-item
+        style="margin-left: 16.6%"
+        prop="interval"
+        v-if="form.repeat === '1'"
+        :rules="intervalRules"
+        >
           <div>
             <span>每隔&nbsp;</span>
             <a-input style="width:100px" v-model="form.interval"></a-input>
-            <a-select class="regular-bordered" style="width:80px" v-model="form.frequency" placeholder="请选择更新方式">
+            <a-select class="regular-bordered" style="width:100px" v-model="form.frequency" placeholder="请选择更新方式">
+              <a-select-option value="0">分钟</a-select-option>
               <a-select-option value="1">小时</a-select-option>
               <a-select-option value="2">天</a-select-option>
               <a-select-option value="3">周</a-select-option>
@@ -122,31 +128,28 @@ export default {
     return {
       bodyStyle: { 'maxHeight': 'calc(100vh - 240px)', 'overflow-y': 'auto' },
       spinning: false,
+      loading: false,
       isEdit: false,
       form: {
         name: undefined,
         repeat: undefined,
         interval: undefined,
-        frequency: '1',
+        frequency: '0',
         gmtStart: undefined,
         gmtEnd: undefined
       },
       regData: {},
       regRules: {
-        name: [{ required: true, message: '请输入任务名称' }],
-        repeat: [{ required: true, message: '请选择更新方式' }],
-        interval: [
-          { validator(rule, value, callback) {
-              if (isNaN(value * 1)) {
-                callback(new Error('freq inValid'))
-              } else {
-                callback()
-              }
-            },
-            message: '请填写数字',
-            trigger: 'change'
+        name: [
+          { required: true, message: '请输入任务名称' },
+          {
+            type: 'string',
+            max: 20,
+            min: 1,
+            message: '长度为1~20'
           }
         ],
+        repeat: [{ required: true, message: '请选择更新方式' }],
         gmtStart: [{ required: true, message: '请选择开始时间' }],
         gmtEnd: [
           {
@@ -156,6 +159,20 @@ export default {
           }
         ]
       },
+      intervalRules: [
+        { required: true, message: '请填写频率' },
+        {
+          validator(rule, value, callback) {
+            if (isNaN(value * 1)) {
+              callback(new Error('freq inValid'))
+            } else {
+              callback()
+            }
+          },
+          message: '请填写数字',
+          trigger: 'change'
+        }
+      ],
       columns,
       selectedRows: [],
       rowSelection: {
@@ -247,7 +264,7 @@ export default {
         name: undefined,
         repeat: undefined,
         interval: undefined,
-        frequency: '1',
+        frequency: '0',
         gmtStart: undefined,
         gmtEnd: undefined
       }
@@ -263,6 +280,9 @@ export default {
         target: this.row.id,
         sourceId: this.modelId
       })
+        .finally(() => {
+          this.loading = false
+        })
     },
     async handleUpdateRegularInfo() {
       return this.$server.dataAccess.putRegularInfo({
@@ -272,12 +292,15 @@ export default {
         id: this.regData.id,
         sourceId: this.modelId
       })
+        .finally(() => {
+          this.loading = false
+        })
     },
     handleOk() {
       this.$refs.form.validate(async (ok, obj) => {
         // 结束时间没问题&&选择只执行一次&&仅重复执行的表单报错时,可以保存
-        if (ok || (!obj.gmtEnd && this.form.repeat === '0' && obj.interval)) {
-          console.log(this.row)
+        if (ok) {
+          this.loading = true
           let res
           if (this.isEdit) {
             res = await this.handleUpdateRegularInfo()

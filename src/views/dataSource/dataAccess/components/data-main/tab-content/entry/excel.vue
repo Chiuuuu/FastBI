@@ -257,7 +257,8 @@ export default {
       this.$server.dataAccess.getModelFileList(this.modelId)
         .then(res => {
           this.fileInfoList = res.rows
-          const name = this.modelInfo.databaseName
+          console.log('this', this)
+          const name = this.modelInfo ? this.modelInfo.databaseName : ''
 
           // 默认第一个
           let index = 0
@@ -267,7 +268,9 @@ export default {
               index = i
             }
           }
-          this.handleGetDataBase(index)
+          this.$nextTick(() => {
+            this.handleGetDataBase(index)
+          })
         })
     },
     // 获取当前文件对应的数据库信息
@@ -282,6 +285,7 @@ export default {
         let database = this.databaseList[index]
         if (!database) { // 不存在当前数据库, 调接口查询并写入
           this.spinning = true
+          if (!this.fileInfoList[index]) return
           const res = await this.$server.dataAccess.getFileSheetList(this.fileInfoList[index].id)
           if (res.code === 200) {
             database = new MapSheet(res.rows)
@@ -316,7 +320,9 @@ export default {
           if (!isNewFile) {
             this.deleteIdList.push(file.id)
           }
-          this.handleGetDataBase(this.currentFileList.length - 1)
+          this.$nextTick(() => {
+            this.handleGetDataBase(this.currentFileList.length - 1)
+          })
         }
       })
     },
@@ -455,7 +461,9 @@ export default {
         // 新增文件未保存前不能查看库表结构
         this.$store.dispatch('dataAccess/setFirstFinished', false)
         this.$set(this.databaseList, currentIndex, database)
-        this.handleGetDataBase(currentIndex)
+        this.$nextTick(() => {
+          this.handleGetDataBase(currentIndex)
+        })
       } else {
         this.$message.error(result.msg)
       }
@@ -540,6 +548,7 @@ export default {
       }
       this.$refs.fileForm.validate((pass, obj) => {
         if (pass) {
+          this.loading = true
           const formData = new FormData()
           this.fileList.map((file, index) => {
             formData.append('fileList[' + index + ']', file)
@@ -575,6 +584,9 @@ export default {
               } else {
                 this.$message.error(result.msg)
               }
+            })
+            .finally(() => {
+              this.loading = false
             })
         }
       })
