@@ -516,6 +516,7 @@ export default {
       }
       this.$refs.fileForm.validate((pass, obj) => {
         if (pass) {
+          this.loading = true
           const formData = new FormData()
           this.fileList.map((file, index) => {
             formData.append('fileList[' + index + ']', file)
@@ -548,6 +549,7 @@ export default {
               } else {
                 this.$message.error(result.msg)
               }
+              this.loading = false
             })
         }
       })
