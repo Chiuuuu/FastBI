@@ -148,8 +148,11 @@ export default {
       this.$emit('setRegular')
     },
     async handleGetRegularList() {
+      this.modalSpin = true
       const res = await this.$server.dataAccess.getRegularList({
         target: this.row.id
+      }).finally(() => {
+        this.modalSpin = false
       })
       if (res.code === 200) {
         console.log(res)

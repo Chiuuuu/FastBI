@@ -2,6 +2,7 @@
 <div class="tab-datasource">
   <a-form-model
     ref="dbForm"
+    labelAlign="left"
     :model="form"
     :rules="rules"
     :label-col="labelCol"
@@ -10,24 +11,23 @@
   >
     <a-form-model-item label="数据源名称" prop="name">
       <a-input
-        style="width:528px;"
         v-model="form.name"
         @change="handleSetTableName"
       />
     </a-form-model-item>
     <a-form-model-item label="服务器" prop="ip">
-      <a-input style="width:528px;" v-model="form.ip" />
+      <a-input v-model="form.ip" />
     </a-form-model-item>
     <a-form-model-item label="端口" prop="port">
-      <a-input style="width:528px;" v-model.number="form.port" />
+      <a-input v-model.number="form.port" />
     </a-form-model-item>
     <a-form-model-item label="用户名" prop="user">
-      <a-input style="width:528px;" v-model="form.user" />
+      <a-input v-model="form.user" />
     </a-form-model-item>
     <a-form-model-item label="密码" prop="password">
-      <a-input-password style="width:528px;" v-model="form.password" />
+      <a-input-password v-model="form.password" />
     </a-form-model-item>
-    <a-row>
+    <!-- <a-row>
       <a-col :span="7">
         <a-form-model-item label="连接方式" :label-col="{span: 14}" required labelAlign="left">
           <a-select default-value="servername" style="width:115px;margin-left:-4px">
@@ -45,7 +45,18 @@
           <a-input v-model="form.databaseName" style="width:400px;"/>
         </a-form-model-item>
       </a-col>
-    </a-row>
+    </a-row> -->
+    <a-form-model-item label="连接方式" prop="databaseName" :wrapper-col="{span:14}">
+      <a-select default-value="servername" style="width:115px">
+        <a-select-option value="sid">
+          SID
+        </a-select-option>
+        <a-select-option value="servername">
+          ServerName
+        </a-select-option>
+      </a-select>
+      <a-input v-model="form.databaseName" style="width:calc(100% - 115px)"/>
+    </a-form-model-item>
     <a-form-model-item :wrapper-col="{ span: 14, offset: 4 }">
       <a-button
         :loading="connectBtn"
@@ -76,8 +87,13 @@ export default {
   extends: Mysql,
   data() {
     return {
-      labelCol: { span: 4 },
-      wrapperCol: { span: 10 },
+      labelCol: {
+        xs: { span: 4 },
+        sm: { span: 3 },
+        md: { span: 3 },
+        lg: { span: 3 }
+      },
+      wrapperCol: { span: 14 },
       formId: '',
       form: {
         // 连接信息表单

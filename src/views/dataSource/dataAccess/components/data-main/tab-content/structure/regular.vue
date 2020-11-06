@@ -18,7 +18,7 @@
           </a-select>
         </a-form-model-item>
         <a-form-model-item
-        style="margin-left: 16.6%"
+        style="margin-left: 100px"
         prop="interval"
         v-if="form.repeat === '1'"
         :rules="intervalRules"
@@ -26,7 +26,7 @@
           <div>
             <span>每隔&nbsp;</span>
             <a-input style="width:100px" v-model="form.interval"></a-input>
-            <a-select class="regular-bordered" style="width:100px" v-model="form.frequency" placeholder="请选择更新方式">
+            <a-select class="regular-bordered" style="width:80px" v-model="form.frequency" placeholder="请选择更新方式">
               <a-select-option value="0">分钟</a-select-option>
               <a-select-option value="1">小时</a-select-option>
               <a-select-option value="2">天</a-select-option>
@@ -46,7 +46,7 @@
             placeholder="请选择开始时间"
             ></a-date-picker>
         </a-form-model-item>
-        <a-form-model-item label="结束时间" prop="gmtEnd">
+        <a-form-model-item class="form-not-required" label="结束时间" prop="gmtEnd">
           <a-date-picker
             style="width:100%"
             show-time
@@ -163,13 +163,12 @@ export default {
         { required: true, message: '请填写频率' },
         {
           validator(rule, value, callback) {
-            if (isNaN(value * 1)) {
-              callback(new Error('freq inValid'))
-            } else {
+            if (/^[1-9]\d*$/.test(value)) {
               callback()
+            } else {
+              callback(new Error('请填写正整数'))
             }
           },
-          message: '请填写数字',
           trigger: 'change'
         }
       ],
@@ -271,6 +270,7 @@ export default {
     },
     handleClose() {
       this.resetForm()
+      this.$refs.form.clearValidate()
       this.$emit('close')
     },
     async handleAddRegularInfo() {
@@ -333,5 +333,8 @@ export default {
   }
   /deep/ .regular-bordered .ant-select-arrow {
     color: #d9d9d9;
+  }
+  /deep/ .ant-form-item-label {
+    width: 100px !important;
   }
 </style>
