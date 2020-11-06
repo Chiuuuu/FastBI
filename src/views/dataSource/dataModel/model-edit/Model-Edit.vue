@@ -430,20 +430,20 @@ export default {
       }
     },
     handleSQLDelete(item) {
-      const tables = this.detailInfo && this.detailInfo['config'] && this.detailInfo.config['tables'] || ''
-      if (Array.isArray(tables) && tables.length === 0) return
-
-      if (tables.some(table => table.id === item.id)) {
-        return this.$message.error('资源有依赖，不能删除')
-      }
-
-      const index = this.rightMenuList.indexOf(item)
-      this.rightMenuList.splice(index, 1)
       this.$server.dataModel.deleCustomSql({
         name: item.name,
         tableId: item.id
       }).then(res => {
-        if (res.code !== 200) {
+        if (res.code === 200) {
+          const tables = this.detailInfo && this.detailInfo['config'] && this.detailInfo.config['tables'] || []
+
+          if (Array.isArray(tables) && tables.some(table => table.id === item.id)) {
+            return this.$message.error('资源有被其他资源依赖，不能被删除。')
+          }
+
+          const index = this.rightMenuList.indexOf(item)
+          this.rightMenuList.splice(index, 1)
+        } else {
           this.$message.error(res.msg)
         }
       })
