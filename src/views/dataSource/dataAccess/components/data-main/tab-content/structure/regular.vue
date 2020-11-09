@@ -40,6 +40,7 @@
           <a-date-picker
             style="width:100%"
             show-time
+            :disabled="startReadonly"
             v-model="form.gmtStart"
             :disabled-date="disabledStartDate"
             valueFormat="YYYY-MM-DD HH:mm:ss"
@@ -52,7 +53,6 @@
             show-time
             v-model="form.gmtEnd"
             :disabled-date="disabledEndDate"
-            :disabled-time="disabledEndTime"
             valueFormat="YYYY-MM-DD HH:mm:ss"
             placeholder="请选择结束时间"
             ></a-date-picker>
@@ -138,6 +138,8 @@ export default {
         gmtStart: undefined,
         gmtEnd: undefined
       },
+      startReadonly: false,
+      errorState: 0, // 0.通过 1.小于系统时间 2.大于结束时间
       regData: {},
       regRules: {
         name: [
@@ -191,10 +193,11 @@ export default {
   },
   watch: {
     show(newValue, oldValue) {
-      // // 点击编辑
-      // if (newValue && typeof this.row === 'object') {
-      //   this.handleGetRegularInfo(this.row.id)
-      // }
+      // 点击编辑时, 判断开始时间是否可以调整(已经开始的任务无法改变开始时间)
+      if (newValue && this.rows) {
+        const starttime = this.rows.gmtStart
+        this.startReadonly = +new Date(starttime) < +new Date()
+      }
     }
   },
   filters: {
@@ -213,11 +216,6 @@ export default {
         return date && date < moment(time, 'YYYY-MM-DD HH:mm:ss').startOf('hour')
       } else {
         return date && date < moment().subtract(1, 'days')
-      }
-    },
-    disabledEndTime() {
-      return {
-        // disabledSeconds: () => [55, 56]
       }
     },
     handleGetRegularInfo(id) {
@@ -243,12 +241,6 @@ export default {
           this.spinning = false
         })
     },
-    handleStartTimeChange(value, dateString) {
-      this.$set(this.form, 'gmtStart', dateString)
-    },
-    handleEndTimeChange(value, dateString) {
-      this.$set(this.form, 'gmtEnd', dateString)
-    },
     intervalValidator(rule, value, callback) {
       if (/^[1-9]\d*$/.test(value)) {
         if (this.form.frequency === '0' && (value * 1) < 30) {
@@ -261,14 +253,22 @@ export default {
       }
     },
     gmtStartValidator(rule, value, callback) {
-      if (value && +new Date(this.form.gmtEnd) < +new Date(value)) {
+      if (!this.startReadonly && +new Date(value) < +new Date() + 5 * 60 * 1000) {
+        this.errorState = 1
+        callback(new Error('开始时间最早需设置在5分钟后'))
+      } else if (value && this.form.gmtEnd && +new Date(this.form.gmtEnd) < +new Date(value)) {
+        this.errorState = 2
         callback(new Error('结束时间不能小于开始时间'))
       } else {
+        this.errorState = 0
         callback()
       }
     },
     // 自定义结束时间校验
     gmtEndValidator(rule, value, callback) {
+      if (!value && this.errorState === 2) {
+        this.$refs.form.clearValidate('gmtStart')
+      }
       if (value && +new Date(value) < +new Date(this.form.gmtStart)) {
         callback(new Error('结束时间不能小于开始时间'))
       } else {
@@ -276,14 +276,7 @@ export default {
       }
     },
     resetForm() {
-      this.form = {
-        name: undefined,
-        repeat: undefined,
-        interval: undefined,
-        frequency: '0',
-        gmtStart: undefined,
-        gmtEnd: undefined
-      }
+      this.form = Object.assign({}, this.$options.data().form)
     },
     handleClose() {
       this.isEdit = false

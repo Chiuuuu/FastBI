@@ -1,5 +1,5 @@
 <template>
-  <a-modal :title="single ? '定时设置' : '批量抽取设置'" :bodyStyle="bodyStyle" :visible="show" @cancel="handleClose" @ok="handleOk">
+  <a-modal width="764px" :title="single ? '定时设置' : '批量抽取设置'" :bodyStyle="bodyStyle" :visible="show" @cancel="handleClose" @ok="handleOk">
     <!-- <a-form-model v-if="single" ref="form" :model="form"  :rules="rules" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
       <a-form-model-item label="抽取方式" prop="extractType">
         <a-radio-group style="width:100%" v-model="form.extractType">
@@ -58,6 +58,8 @@ const regColumns = [
   {
     title: '任务名称',
     dataIndex: 'name',
+    ellipsis: true,
+    width: 200,
     key: 'name'
   },
   {
