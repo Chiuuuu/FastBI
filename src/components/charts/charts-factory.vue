@@ -9,7 +9,7 @@
               :data="chartData" :width="width" :height="height" ref="chart"
               :legend-visible="legendVisible"
               :after-config="afterConfig"
-              :title="chartType==='v-ring'?title:{}"
+              :title="chartType==='v-ring'?config.chartTitle:{}"
               :extend="chartExtend" :options="chartOptions" :settings="chartSettings"></component>
     <!-- <div v-else class="dv-charts-null">
       <a-icon  type="pie-chart" style="font-size:50px;" />
@@ -20,6 +20,7 @@
 <script>
   import { addResizeListener, removeResizeListener } from 'bin-ui/src/utils/resize-event'
   import { formatData, convertData } from '../../utils/formatData'
+  import { deepClone } from '@/utils/deepClone'
 
   export default {
     name: 'ChartsFactory',
@@ -29,6 +30,10 @@
         required: true
       },
       chartType: {
+        type: String,
+        required: true
+      },
+      type: {
         type: String,
         required: true
       },
@@ -72,19 +77,7 @@
         chartOptions: {},
         chartSettings: {},
         backgroundStyle: {},
-        colors: [],
-        title: {
-          text: '30%',
-          x: 'center',
-          y: 'center',
-          itemGap: 20,
-          textStyle: {
-            color: '#ffffff',
-            fontFamily: '微软雅黑',
-            fontSize: 20,
-            fontWeight: 'bolder'
-          }
-        }
+        colors: []
       }
     },
     watch: {
@@ -94,6 +87,7 @@
             // 图例
             this.legendVisible = val.legend && val.legend.show
             this.chartExtend = { ...val }
+
             // this.colors = [...val.colors]
             // this.$log.primary('========>chartExtend')
             // this.$print(this.chartExtend)
@@ -105,11 +99,13 @@
       apiData: {
         handler (val) {
           if (val) {
-            console.log(this.typeName)
             // 仪表盘
-            if (this.typeName === 've-gauge') {
+            if (this.type === '2') {
               if (val.measures && val.measures.length > 0) {
                 this.chartData = val.source
+                if (this.chartType === 'v-ring') {
+                  this.chartExtend.chartTitle.text = val.source.rows ? val.source.rows[0].value : ''
+                }
                 return
               }
             }

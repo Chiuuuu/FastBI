@@ -23,6 +23,7 @@
               <charts-factory v-else
                       :type-name="transform.packageJson.name"
                       :chart-type="transform.packageJson.chartType"
+                      :type="transform.packageJson.type"
                       :config="transform.packageJson.config"
                       :api-data="transform.packageJson.api_data"
                       :apis="transform.packageJson.apis"

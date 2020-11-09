@@ -897,8 +897,8 @@ const list = [{
               api_data: {
                 columns: ['日期', '访问用户'],
                 rows: [
-                  { '日期': '1/1', '访问用户': 1393 },
-                  { '日期': '1/2', '访问用户': 3530 }
+                  { '日期': '1/1', '访问用户': 3530 },
+                  { '日期': '1/2', '访问用户': 1393 }
                 ]
               },
               apis: {
@@ -926,6 +926,18 @@ const list = [{
                           color: '#ffffff',
                           fontSize: 20
                       }
+                  },
+                  chartTitle: {
+                    text: '70%',
+                    x: 'center',
+                    y: 'center',
+                    itemGap: 20,
+                    textStyle: {
+                      color: '#ffffff',
+                      fontFamily: '微软雅黑',
+                      fontSize: 20,
+                      fontWeight: 'bolder'
+                    }
                   },
                   tooltip: {
                     show: false
@@ -957,9 +969,6 @@ const list = [{
                     label: {
                       normal: {
                         show: false,
-                        formatter: function(val) {
-                          console.log(val)
-                        },
                         position: 'center',
                         textStyle: {
                           fontSize: '30'
@@ -974,7 +983,7 @@ const list = [{
                       }
                     }
                   },
-                  color: DEFAULT_COLORS
+                  color: ['#0185FE', '#9ED1FF']
               },
               chartEvents: {
                   click: chartClick

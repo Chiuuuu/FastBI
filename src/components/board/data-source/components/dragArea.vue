@@ -105,6 +105,8 @@ export default {
       // h5 api
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
       let apiData = deepClone(this.currentSelected.packageJson.api_data)
+      console.log(apiData)
+      console.log(dataFile)
       if (apiData.modelId && apiData.modelId !== dataFile.datamodelId) {
         this.$message.error('一个图表只能拖入一个数据模型的字段')
         return false
@@ -231,7 +233,11 @@ export default {
                 columns,
                 rows
               }
+              // 保存apidata数据
               this.$store.dispatch('SetSelfDataSource', apiData)
+              let config = deepClone(this.currentSelected.packageJson.config)
+              config.chartTitle.text = rows[0].value
+              this.$store.dispatch('SetSelfProperty', config)
               this.saveScreenData()
               return
             }

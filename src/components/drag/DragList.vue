@@ -59,6 +59,15 @@
       ...mapActions(['saveScreenData']),
       // 拖拽图表添加到大屏
       handleDragStart (component, event) {
+        component.api_data.dimensions = []
+        component.api_data.measures = []
+        component.api_data.tableList = []
+        component.api_data.options = null
+        component.api_data.refresh = {}
+        component.api_data.modelId = ''
+        if (component.chartType === 'v-ring') {
+          component.config.chartTitle.text = '70%'
+        }
         this.$print('drag start:' + component.name, 'primary')
         // 拖拽的节点数据
         let nodeInfo = {
@@ -73,11 +82,16 @@
       },
       // 点击图表添加到大屏
       handleAdd(component) {
+        console.log(component)
         component.api_data.dimensions = []
         component.api_data.measures = []
         component.api_data.tableList = []
         component.api_data.options = null
         component.api_data.refresh = {}
+        component.api_data.modelId = ''
+        if (component.chartType === 'v-ring') {
+          component.config.chartTitle.text = '70%'
+        }
         // 拖拽的节点数据
         let nodeInfo = {
           // 唯一标识
