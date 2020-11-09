@@ -60,19 +60,28 @@ export default {
         if (val) {
           // 当前选中的图表显示维度度量的数据
           this.fileList = []
-          if (this.type === 'dimensions' && val.packageJson.api_data.dimensions) { // 维度
-            this.fileList = deepClone(val.packageJson.api_data.dimensions)
+          // 维度度量都需要
+          if (this.chartType === '1') {
+            if (this.type === 'dimensions' && val.packageJson.api_data.dimensions) { // 维度
+              this.fileList = deepClone(val.packageJson.api_data.dimensions)
+            }
+            if (this.type === 'measures' && val.packageJson.api_data.measures) { // 度量
+              this.fileList = deepClone(val.packageJson.api_data.measures)
+            }
           }
-          if (this.type === 'measures' && val.packageJson.api_data.measures) { // 度量
-            this.fileList = deepClone(val.packageJson.api_data.measures)
+
+          // 只需要度量
+          if (this.chartType === '2') {
+            if (this.type === 'measures' && val.packageJson.api_data.measures) {
+              this.fileList = deepClone(val.packageJson.api_data.measures)
+            }
           }
+
           // 表格不区分维度跟度量
-          if (this.type === 'tableList' && val.packageJson.api_data.tableList) { // 表格不区分维度度量
-            this.fileList = deepClone(val.packageJson.api_data.tableList)
-          }
-          // 仪表盘只有度量
-          if (val.packageJson.chartType === 'v-gauge' && this.type === 'measures' && val.packageJson.api_data.measures) {
-            this.fileList = deepClone(val.packageJson.api_data.measures)
+          if (this.chartType === '3') {
+            if (this.type === 'tableList' && val.packageJson.api_data.tableList) {
+              this.fileList = deepClone(val.packageJson.api_data.tableList)
+            }
           }
         }
       },
@@ -81,7 +90,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['dragFile', 'currentSelected', 'optionsTabsType', 'dataModel'])
+    ...mapGetters(['dragFile', 'currentSelected', 'optionsTabsType', 'dataModel']),
+    chartType () {
+      return this.currentSelected ? this.currentSelected.packageJson.type : ''
+    }
   },
   mounted() {
     this.current = deepClone(this.currentSelected)
@@ -105,7 +117,7 @@ export default {
         this.getData()
       }
       // 度量
-      if (this.type === 'measures' && this.dragFile === this.type && this.currentSelected.packageJson.chartType !== 'v-gauge') {
+      if (this.type === 'measures' && this.dragFile === this.type && this.chartType === '1') {
         this.fileList.push(dataFile)
         this.fileList = this.uniqueFun(this.fileList, 'name')
         this.getData()
@@ -116,8 +128,8 @@ export default {
         this.fileList = this.uniqueFun(this.fileList, 'name')
         this.getData()
       }
-      // 仪表盘
-      if (this.currentSelected.packageJson.chartType === 'v-gauge' && this.type === 'measures' && this.dragFile === this.type) {
+      // 仪表盘/环形图
+      if (this.chartType === '2' && this.type === 'measures' && this.dragFile === this.type) {
         this.fileList[0] = dataFile
         this.fileList = this.uniqueFun(this.fileList, 'name')
         this.getData()
@@ -173,8 +185,10 @@ export default {
         this.currentSelected.packageJson.api_data.modelId = this.fileList[0].datamodelId
         // this.$store.dispatch('SetSelfDataSource', apiData)
       }
-      if (this.currentSelected.packageJson.chartType !== 'v-gauge' && this.type !== 'tableList' && (apiData.dimensions.length === 0 || apiData.measures.length === 0)) {
-        return
+      if (this.chartType === '1') {
+        if (apiData.dimensions.length === 0 || apiData.measures.length === 0) {
+          return
+        }
       }
       let params = {
         setting: {
@@ -203,8 +217,8 @@ export default {
             }
             this.$store.dispatch('SetSelfDataSource', apiData)
           } else {
-            // 仪表盘
-            if (this.currentSelected.packageJson.chartType === 'v-gauge') {
+            // 仪表盘/环形图 只显示度量
+            if (this.chartType === '2') {
               let columns = ['type', 'value'] // 维度固定
               for (let m of apiData.measures) {
                 columns.push(m.name) // 默认columns第二项起为指标

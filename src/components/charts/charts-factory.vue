@@ -9,6 +9,7 @@
               :data="chartData" :width="width" :height="height" ref="chart"
               :legend-visible="legendVisible"
               :after-config="afterConfig"
+              :title="chartType==='v-ring'?title:{}"
               :extend="chartExtend" :options="chartOptions" :settings="chartSettings"></component>
     <!-- <div v-else class="dv-charts-null">
       <a-icon  type="pie-chart" style="font-size:50px;" />
@@ -24,6 +25,10 @@
     name: 'ChartsFactory',
     props: {
       typeName: {
+        type: String,
+        required: true
+      },
+      chartType: {
         type: String,
         required: true
       },
@@ -67,7 +72,19 @@
         chartOptions: {},
         chartSettings: {},
         backgroundStyle: {},
-        colors: []
+        colors: [],
+        title: {
+          text: '30%',
+          x: 'center',
+          y: 'center',
+          itemGap: 20,
+          textStyle: {
+            color: '#ffffff',
+            fontFamily: '微软雅黑',
+            fontSize: 20,
+            fontWeight: 'bolder'
+          }
+        }
       }
     },
     watch: {

@@ -3,6 +3,13 @@ import { DEFAULT_COLORS } from '../utils/defaultColors'
 function chartClick(e) {
     console.log(e)
 }
+
+/**
+ * type = 1 维度度量都需要的图表
+ * type = 2 只有度量的图表(仪表盘、环形图)
+ * type = 3 不区分维度或者度量（表格）
+ */
+
 const list = [{
         type: 'Basic',
         title: '添加图表',
@@ -882,25 +889,17 @@ const list = [{
             },
             {
               title: '环形图',
-              name: 've-ring',
+              name: 've-pie',
               chartType: 'v-ring',
               icon: 'pie-chart',
-              type: '1',
+              type: '2',
               modelId: '',
               api_data: {
                 columns: ['日期', '访问用户'],
                 rows: [
                   { '日期': '1/1', '访问用户': 1393 },
-                  { '日期': '1/2', '访问用户': 3530 },
-                  { '日期': '1/3', '访问用户': 2923 },
-                  { '日期': '1/4', '访问用户': 1723 },
-                  { '日期': '1/5', '访问用户': 3792 },
-                  { '日期': '1/6', '访问用户': 4593 }
+                  { '日期': '1/2', '访问用户': 3530 }
                 ]
-                  // source: [
-                  //     { x: '1/1', y: 80, s: '系列1' },
-                  //     { x: '1/2', y: 20, s: '系列1' }
-                  // ]
               },
               apis: {
                 hoverAnimation: false,
@@ -974,7 +973,6 @@ const list = [{
                         }
                       }
                     }
-
                   },
                   color: DEFAULT_COLORS
               },

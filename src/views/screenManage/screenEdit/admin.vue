@@ -64,6 +64,7 @@
 
             <charts-factory v-else
                             :key="transform.id"
+                            :chart-type="transform.packageJson.chartType"
                             :type-name="transform.packageJson.name"
                             :config="transform.packageJson.config"
                             :api-data="transform.packageJson.api_data"

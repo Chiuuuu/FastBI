@@ -73,9 +73,9 @@ const screenManage = {
    * @param {*} id
    * @returns
    */
-  getPivoSchemaList(dataModelId, screenId) {
+  getPivoSchemaList(dataModelId, screenId, type) {
     // return $axios.get(`/model/pivotschema/selectModelPivotschemaListByRole/${id}`)
-    return $axios.get(`/screen/pivotschema/selectModelPivotschemaListByRole/${dataModelId}/${screenId}`)
+    return $axios.get(`/screen/pivotschema/selectModelPivotschemaListByRole/${dataModelId}/${screenId}/${type}`)
   },
   /**
    * @description 根据维度度量获取数据

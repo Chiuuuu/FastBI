@@ -368,13 +368,13 @@ export default {
       }
       this.$server.screenManage.screenModuleTransform(params).then(res => {
         if (res.code === 200) {
-          this.getPivoSchemaList(this.modelId)
+          this.getPivoSchemaList(this.modelId, 1)
         }
       })
     },
     // 维度、度量列表
-    getPivoSchemaList(id) {
-      this.$server.screenManage.getPivoSchemaList(id, this.screenId).then(res => {
+    getPivoSchemaList(id, type = 2) {
+      this.$server.screenManage.getPivoSchemaList(id, this.screenId, type).then(res => {
         if (res.code === 200) {
           res.data.dimensions.map(item => {
             item.showMore = false
