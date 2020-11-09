@@ -214,9 +214,9 @@ export default {
     },
     /**
      * @description 获取抽取记录
-     * @param {String} id
+     * @param {String} id 该数据库下任一张表的id
      */
     getExtractLogList(id) {
-        return $axios.get('/datasource/extract/list/' + id)
+        return $axios.get('/datasource/schedule/getProgressInfo/' + id)
     }
 }

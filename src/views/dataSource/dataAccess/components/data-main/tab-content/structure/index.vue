@@ -52,12 +52,15 @@
           :scroll="{ y: 300 }"
         >
           <template #status="text, row">
-            <span v-if="text === 1">成功</span>
-            <span v-else-if="text === 2">失败</span>
-            <div v-else-if="text === 3">
+            <span v-if="text === '0'">成功</span>
+            <span v-else-if="text === '1'">失败</span>
+            <div v-else-if="text === '2'">
               <span>正在抽取中</span>
               <!-- <a-progress :percent="row.progress" /> -->
             </div>
+          </template>
+          <template #startTime="text">
+            <span>{{ text | formatTime }}</span>
           </template>
         </a-table>
       </a-modal>
@@ -83,18 +86,22 @@
 import { mapState } from 'vuex'
 import RegularSetting from './regular'
 import ExtractSetting from './extract'
+import moment from 'moment'
 
 const logColumns = [
   {
     title: '抽取任务名称',
     align: 'center',
+    ellipsis: true,
+    width: 200,
     dataIndex: 'taskName'
   },
   {
     title: '抽取开始时间',
     align: 'center',
     width: 150,
-    dataIndex: 'startTime'
+    dataIndex: 'startTime',
+    scopedSlots: { customRender: 'startTime' }
   },
   {
     title: '耗时',
@@ -107,16 +114,11 @@ const logColumns = [
     dataIndex: 'status',
     scopedSlots: { customRender: 'status' }
   },
-  {
-    title: '同步的数据量',
-    align: 'center',
-    dataIndex: 'async'
-  },
-  {
-    title: '报错信息',
-    align: 'center',
-    dataIndex: 'errMsg'
-  },
+  // {
+  //   title: '报错信息',
+  //   align: 'center',
+  //   dataIndex: 'errMsg'
+  // },
   {
     title: '关联表同步数量',
     align: 'center',
@@ -206,6 +208,11 @@ export default {
       showExtractBtn: state => [ 'mysql', 'oracle' ].indexOf(state.dataAccess.modelType) > -1
     })
   },
+  filters: {
+    formatTime: function(v) {
+      return moment(v).format('YYYY-MM-DD HH:mm:ss')
+    }
+  },
   methods: {
     handleTableTypeChange(event) {
       this.tableType = event.target.value
@@ -240,35 +247,35 @@ export default {
     async showExtractLog() {
       this.visible1 = true
       this.modalSpin = true
-      const logData = []
-      for (let i = 0; i < 30; i++) {
-        logData.push({
-          id: i + '',
-          name: '任务' + i,
-          starttime: '2020-10-26 11:11:11',
-          duration: '20s',
-          state: 1,
-          progress: 70,
-          async: 20,
-          error: 2,
-          relation: 10
+      // const logData = []
+      // for (let i = 0; i < 30; i++) {
+      //   logData.push({
+      //     id: i + '',
+      //     name: '任务' + i,
+      //     starttime: '2020-10-26 11:11:11',
+      //     duration: '20s',
+      //     state: 1,
+      //     progress: 70,
+      //     async: 20,
+      //     error: 2,
+      //     relation: 10
+      //   })
+      // }
+      // setTimeout(() => {
+      //   this.logData = logData
+      //   this.modalSpin = false
+      // }, 1000)
+      this.$server.dataAccess.getExtractLogList(this.data[0].id)
+        .then(res => {
+          if (res.code === 200) {
+            this.logData = res.rows
+          } else {
+            this.$message.error(res.msg)
+          }
         })
-      }
-      setTimeout(() => {
-        this.logData = logData
-        this.modalSpin = false
-      }, 1000)
-      // this.$server.dataAccess.getExtractLogList(this.modelId)
-      //   .then(res => {
-      //     if (res.code === 200) {
-      //       this.logData = res.rows
-      //     } else {
-      //       this.$message.error(res.msg)
-      //     }
-      //   })
-      //   .finally(() => {
-      //     this.modalSpin = false
-      //   })
+        .finally(() => {
+          this.modalSpin = false
+        })
     },
     async handleExtract() {
       if (this.selectedRows.length === 0) {

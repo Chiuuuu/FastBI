@@ -317,7 +317,6 @@ export default {
               break
             }
           }
-          debugger
           if (!isNewFile) {
             this.deleteIdList.push(file.id)
           }
@@ -558,8 +557,6 @@ export default {
           this.fileList.map((file, index) => {
             formData.append('fileList[' + index + ']', file)
           })
-          console.log('deleteIdList', this.deleteIdList)
-          debugger
           this.deleteIdList.map((id, index) => {
             formData.append('databasesIdList[' + index + ']', id)
           })
@@ -588,6 +585,7 @@ export default {
                 this.fileInfoList = result.data.sourceDatabases
                 // 保存后清空列表
                 this.fileList = []
+                this.deleteIdList = []
               } else {
                 this.$message.error(result.msg)
               }
