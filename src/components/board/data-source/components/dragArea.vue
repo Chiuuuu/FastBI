@@ -255,10 +255,13 @@ export default {
             res.rows.map((item, index) => {
               let obj = {}
               obj[dimensionKeys] = item[dimensionKeys]
+              console.log(obj)
               for (let item2 of measureKeys) {
                 obj[item2] = item[item2]
               }
-              rows.push(obj)
+              if (obj[dimensionKeys]) {
+                rows.push(obj)
+              }
             })
             // 仪表盘只保留一个数据
             // if (this.currentSelected.packageJson.name === 've-gauge') {

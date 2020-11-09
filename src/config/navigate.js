@@ -928,6 +928,7 @@ const list = [{
                       }
                   },
                   chartTitle: {
+                    show: true,
                     text: '70%',
                     x: 'center',
                     y: 'center',
@@ -1007,14 +1008,6 @@ const list = [{
                   { '日期': '1/5', '访问用户': 3792 },
                   { '日期': '1/6', '访问用户': 4593 }
                 ]
-                  // source: [
-                  //     { x: '1/1', y: 1393, s: '系列1' },
-                  //     { x: '1/2', y: 3530, s: '系列1' },
-                  //     { x: '1/3', y: 2923, s: '系列1' },
-                  //     { x: '1/4', y: 1723, s: '系列1' },
-                  //     { x: '1/5', y: 3792, s: '系列1' },
-                  //     { x: '1/6', y: 4593, s: '系列1' }
-                  // ]
               },
               apis: {
                 level: [
@@ -1060,10 +1053,43 @@ const list = [{
                       bottom: 'auto'
                   },
                   xAxis: {
-                      show: false
+                      show: false,
+                      axisLabel: {
+                          color: '#ffffff',
+                          fontSize: 12,
+                          rotate: 0
+                      },
+                      axisLine: {
+                          show: false,
+                          lineStyle: {
+                              color: '#cccccc'
+                          }
+                      },
+                      splitLine: {
+                          show: false,
+                          lineStyle: {
+                              color: '#cccccc'
+                          }
+                      }
                   },
                   yAxis: {
-                      show: false
+                      show: false,
+                      axisLabel: {
+                          color: '#ffffff',
+                          fontSize: 12
+                      },
+                      axisLine: {
+                          show: false,
+                          lineStyle: {
+                              color: '#cccccc'
+                          }
+                      },
+                      splitLine: {
+                          show: false,
+                          lineStyle: {
+                              color: '#cccccc'
+                          }
+                      }
                   },
                   series: {
                       label: {
@@ -1073,7 +1099,6 @@ const list = [{
                           position: 'outside', // 可选inside
                           formatter: '{b}: {@2012} ({d}%)'
                       },
-                      roseType: false, // 饼图可选玫瑰图
                       center: ['50%', '50%'] // 饼图可选
                   },
                   color: DEFAULT_COLORS
@@ -1083,6 +1108,91 @@ const list = [{
               },
               view: { width: 400, height: 400, x: 760, y: 340 }
           }
+          //   {
+          //     title: '嵌套饼图',
+          //     name: 've-pie',
+          //     chartType: 'v-multiPie',
+          //     icon: 'pie-chart',
+          //     type: '1',
+          //     modelId: '',
+          //     api_data: {
+          //       columns: ['日期', '访问用户'],
+          //       rows: [
+          //         { '日期': '1/1', '访问用户': 1393 },
+          //         { '日期': '1/2', '访问用户': 3530 },
+          //         { '日期': '1/3', '访问用户': 2923 },
+          //         { '日期': '1/4', '访问用户': 1723 },
+          //         { '日期': '1/5', '访问用户': 3792 },
+          //         { '日期': '1/6', '访问用户': 4593 }
+          //       ]
+          //     },
+          //     apis: {
+          //       // level: [
+          //       //   ['1/1', '1/2', '1/3'],
+          //       //   ['1/4', '1/5']
+          //       // ],
+          //         labelMap: {
+          //             'x': '类目',
+          //             'y': '值',
+          //             's': '系列1'
+          //         }
+          //     },
+          //     background: {
+          //         backgroundType: '1',
+          //         backgroundColor: '',
+          //         borderColor: '',
+          //         borderWidth: 0,
+          //         borderStyle: '',
+          //         borderRadius: 0
+          //     },
+          //     config: {
+          //         title: {
+          //             show: true,
+          //             content: '嵌套饼图',
+          //             textAlign: 'left',
+          //             textStyle: {
+          //                 color: '#ffffff',
+          //                 fontSize: 20
+          //             }
+          //         },
+          //         grid: { left: 20, top: 60, right: 20, bottom: 30 },
+          //         legend: {
+          //             show: true,
+          //             textStyle: {
+          //                 color: '#ffffff',
+          //                 fontSize: 12
+          //             },
+          //             itemGap: 12,
+          //             icon: '',
+          //             left: 'center',
+          //             top: 'auto',
+          //             right: 'auto',
+          //             bottom: 'auto'
+          //         },
+          //         xAxis: {
+          //             show: false
+          //         },
+          //         yAxis: {
+          //             show: false
+          //         },
+          //         series: {
+          //             label: {
+          //                 show: true,
+          //                 color: '',
+          //                 fontSize: 12,
+          //                 position: 'outside', // 可选inside
+          //                 formatter: '{b}: {@2012} ({d}%)'
+          //             },
+          //             roseType: false, // 饼图可选玫瑰图
+          //             center: ['50%', '50%'] // 饼图可选
+          //         },
+          //         color: DEFAULT_COLORS
+          //     },
+          //     chartEvents: {
+          //         click: chartClick
+          //     },
+          //     view: { width: 400, height: 400, x: 760, y: 340 }
+          // }
         ]
     },
     {

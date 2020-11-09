@@ -225,7 +225,7 @@
               </template>
               <!-- 饼图独有 -->
               <template>
-                <a-collapse-panel key="properties" header="图形属性" v-if="(isPie || isRing) && selfConfig.series">
+                <a-collapse-panel key="properties" header="图形属性" v-if="(isPie || isRing || isMultiPie) && selfConfig.series">
                   <gui-field label="中心坐标">
                     <gui-inline>
                       <a-input v-model="selfConfig.series.center[0]" size="small"
@@ -256,6 +256,19 @@
                     <a-switch v-model="selfConfig.series.roseType" size="small"
                               @change="switchChange"></a-switch>
                   </gui-field>
+                  <!-- <gui-field label="展示数值" v-if="isRing">
+                    <a-switch v-model="selfConfig.chartTitle.show" size="small" @change="setSelfProperty"></a-switch>
+                  </gui-field>
+                  <gui-field label="文本" v-if="isRing">
+                    <gui-inline label="字号">
+                      <a-input-number v-model="selfConfig.chartTitle.textStyle.fontSize" size="small"
+                                      :min="12" :max="40" @change="setSelfProperty"></a-input-number>
+                    </gui-inline>
+                    <gui-inline label="颜色">
+                      <el-color-picker v-model="selfConfig.chartTitle.textStyle.color"
+                                        @change="setSelfProperty"></el-color-picker>
+                    </gui-inline>
+                  </gui-field> -->
                 </a-collapse-panel>
                 <a-collapse-panel key="indicator" header="指标设置" v-if="isPie || isMultiPie">
                   <a-switch slot="extra"
