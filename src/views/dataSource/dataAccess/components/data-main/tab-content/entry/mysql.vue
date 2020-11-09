@@ -39,7 +39,6 @@
     </a-form-model-item>
     <a-form-model-item class="form-not-required" label="默认连接库" prop="databaseName" v-if="connectStatus">
       <a-select
-        style="width: 528px"
         v-model="form.databaseName"
         :default-value="form.databaseName || databaseList[0].name"
         @change="handleDefaultDbSelect"
@@ -86,7 +85,7 @@ export default {
         port: '', // 端口号
         user: '', // 用户名
         password: '', // 密码
-        dbid: '', // 默认数据库id
+        // dbid: '', // 默认数据库id
         databaseName: '' // 默认数据库名称
       },
       rules: {
@@ -127,12 +126,12 @@ export default {
             required: true,
             message: '请输入密码'
           }
-        ],
-        dbid: [
-          {
-            required: true
-          }
         ]
+        // dbid: [
+        //   {
+        //     required: true
+        //   }
+        // ]
       },
       connectBtn: false,
       connectStatus: false, // 是否连接
@@ -196,9 +195,9 @@ export default {
         return item.name === value && item
       })
       const obj = item.pop()
-      this.form.dbid = obj.id
+      // this.form.dbid = obj.id
       this.form.databaseName = obj.name
-      // this.$store.dispatch('dataAccess/setModelInfo', this.form)
+      this.$store.dispatch('dataAccess/setModelInfo', this.form)
     },
     /**
      * 重置表单
@@ -232,11 +231,11 @@ export default {
             this.databaseList = [].concat(result.rows)
             const item = this.databaseList.find(item => item.name === this.$store.state.dataAccess.modelInfo.databaseName)
             if (item) {
-              this.form.dbid = item.id
+              // this.form.dbid = item.id
               this.form.databaseName = item.name
             } else {
               this.form.databaseName = this.databaseList[0].name
-              this.form.dbid = this.databaseList[0].id
+              // this.form.dbid = this.databaseList[0].id
             }
             this.connectStatus = true
             this.$message.success('连接成功')

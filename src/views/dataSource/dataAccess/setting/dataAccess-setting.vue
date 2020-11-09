@@ -241,8 +241,11 @@ export default {
     },
     async handleGetData() {
       this.sping = true
+      let databaseName = this.formInfo ? this.formInfo.databaseName : ''
       // sql, oracle的数据库名称在formInfo里, excel的在dabaseName里
-      const databaseName = this.formInfo && this.formInfo.databaseName ? this.formInfo.databaseName : this.databaseName
+      if (['excel', 'csv'].indexOf(this.modelType) > -1) {
+        databaseName = this.databaseName
+      }
       const result = await this.$server.dataAccess.getTableFieldDetail({
         databaseName,
         sourceId: this.modelId,

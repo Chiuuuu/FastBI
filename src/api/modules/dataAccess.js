@@ -211,5 +211,12 @@ export default {
      */
     deleRegularInfo(id) {
         return $axios.delete('/datasource/schedule/delete/' + id)
+    },
+    /**
+     * @description 获取抽取记录
+     * @param {String} id
+     */
+    getExtractLogList(id) {
+        return $axios.get('/datasource/extract/list/' + id)
     }
 }

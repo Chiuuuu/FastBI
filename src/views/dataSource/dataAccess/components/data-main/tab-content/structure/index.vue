@@ -51,7 +51,7 @@
           :loading="modalSpin"
           :scroll="{ y: 300 }"
         >
-          <template #state="text, row">
+          <template #status="text, row">
             <span v-if="text === 1">成功</span>
             <span v-else-if="text === 2">失败</span>
             <div v-else-if="text === 3">
@@ -88,24 +88,24 @@ const logColumns = [
   {
     title: '抽取任务名称',
     align: 'center',
-    dataIndex: 'name'
+    dataIndex: 'taskName'
   },
   {
     title: '抽取开始时间',
     align: 'center',
     width: 150,
-    dataIndex: 'starttime'
+    dataIndex: 'startTime'
   },
   {
     title: '耗时',
     align: 'center',
-    dataIndex: 'duration'
+    dataIndex: 'cost'
   },
   {
     title: '状态',
     align: 'center',
-    dataIndex: 'state',
-    scopedSlots: { customRender: 'state' }
+    dataIndex: 'status',
+    scopedSlots: { customRender: 'status' }
   },
   {
     title: '同步的数据量',
@@ -115,12 +115,12 @@ const logColumns = [
   {
     title: '报错信息',
     align: 'center',
-    dataIndex: 'error'
+    dataIndex: 'errMsg'
   },
   {
     title: '关联表同步数量',
     align: 'center',
-    dataIndex: 'relation'
+    dataIndex: 'relateTableNum'
   }
 ]
 
@@ -214,8 +214,11 @@ export default {
       if (!this.modelType) return
       this.spinning = true
       const modelKey = this.modelType === 'oracle' ? 'sourceOracleName' : 'sourceMysqName'
+      let databaseName = this.formInfo ? this.formInfo.databaseName : ''
       // sql, oracle的数据库名称在formInfo里, excel的在dabaseName里
-      const databaseName = this.formInfo && this.formInfo.databaseName ? this.formInfo.databaseName : this.databaseName
+      if (['excel', 'csv'].indexOf(this.modelType) > -1) {
+        databaseName = this.databaseName
+      }
       const dabaseInfoResult = await this.$server.dataAccess.getTableList({
         databaseName,
         sourceId: this.modelId
@@ -226,6 +229,7 @@ export default {
         this.data = [].concat(dabaseInfoResult.rows)
         this.$store.dispatch('dataAccess/setReadRows', this.data)
       } else {
+        this.data = []
         this.$message.error(dabaseInfoResult.msg)
       }
     },
@@ -254,6 +258,17 @@ export default {
         this.logData = logData
         this.modalSpin = false
       }, 1000)
+      // this.$server.dataAccess.getExtractLogList(this.modelId)
+      //   .then(res => {
+      //     if (res.code === 200) {
+      //       this.logData = res.rows
+      //     } else {
+      //       this.$message.error(res.msg)
+      //     }
+      //   })
+      //   .finally(() => {
+      //     this.modalSpin = false
+      //   })
     },
     async handleExtract() {
       if (this.selectedRows.length === 0) {
@@ -262,8 +277,11 @@ export default {
         return this.$message.error('一次抽取最多只能选择10个')
       }
       const rows = this.selectedRows.map(item => {
+        let databaseName = this.formInfo ? this.formInfo.databaseName : ''
         // sql, oracle的数据库名称在formInfo里, excel的在dabaseName里
-        const databaseName = this.formInfo && this.formInfo.databaseName ? this.formInfo.databaseName : this.databaseName
+        if (['excel', 'csv'].indexOf(this.modelType) > -1) {
+          databaseName = this.databaseName
+        }
         const _item = {
           databaseName,
           sourceId: this.modelId,
