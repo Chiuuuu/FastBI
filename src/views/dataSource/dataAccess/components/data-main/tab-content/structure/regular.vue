@@ -150,11 +150,16 @@ export default {
           }
         ],
         repeat: [{ required: true, message: '请选择更新方式' }],
-        gmtStart: [{ required: true, message: '请选择开始时间' }],
+        gmtStart: [
+          { required: true, message: '请选择开始时间' },
+          {
+            validator: this.gmtStartValidator,
+            trigger: 'change'
+          }
+        ],
         gmtEnd: [
           {
             validator: this.gmtEndValidator,
-            message: '结束时间不能小于开始时间',
             trigger: 'change'
           }
         ]
@@ -162,13 +167,7 @@ export default {
       intervalRules: [
         { required: true, message: '请填写频率' },
         {
-          validator(rule, value, callback) {
-            if (/^[1-9]\d*$/.test(value)) {
-              callback()
-            } else {
-              callback(new Error('请填写正整数'))
-            }
-          },
+          validator: this.intervalValidator,
           trigger: 'change'
         }
       ],
@@ -250,10 +249,28 @@ export default {
     handleEndTimeChange(value, dateString) {
       this.$set(this.form, 'gmtEnd', dateString)
     },
+    intervalValidator(rule, value, callback) {
+      if (/^[1-9]\d*$/.test(value)) {
+        if (this.form.frequency === '0' && (value * 1) < 30) {
+          callback(new Error('间隔不得小于30分钟'))
+        } else {
+          callback()
+        }
+      } else {
+        callback(new Error('请填写正整数'))
+      }
+    },
+    gmtStartValidator(rule, value, callback) {
+      if (value && +new Date(this.form.gmtEnd) < +new Date(value)) {
+        callback(new Error('结束时间不能小于开始时间'))
+      } else {
+        callback()
+      }
+    },
     // 自定义结束时间校验
     gmtEndValidator(rule, value, callback) {
-      if (+new Date(value) < +new Date(this.form.gmtStart)) {
-        callback(new Error('gmtEnd inValid'))
+      if (value && +new Date(value) < +new Date(this.form.gmtStart)) {
+        callback(new Error('结束时间不能小于开始时间'))
       } else {
         callback()
       }
@@ -269,6 +286,7 @@ export default {
       }
     },
     handleClose() {
+      this.isEdit = false
       this.resetForm()
       this.$refs.form.clearValidate()
       this.$emit('close')

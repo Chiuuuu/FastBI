@@ -278,7 +278,7 @@ export default {
       if (index < 0) {
         this.currentColumns = []
         this.currentFieldList = []
-        this.deleteIdList = []
+        // this.deleteIdList = []
         this.$store.dispatch('dataAccess/setFirstFinished', false)
       } else {
         this.currentFileIndex = index
@@ -317,6 +317,7 @@ export default {
               break
             }
           }
+          debugger
           if (!isNewFile) {
             this.deleteIdList.push(file.id)
           }
@@ -442,6 +443,10 @@ export default {
       this.spinning = true
       const result = await this.$server.dataAccess.actionUploadExcelFile(formData)
       if (result.code === 200) {
+        if (result.rows && result.rows.length === 0) {
+          this.spinning = false
+          return this.$message.error('解析失败')
+        }
         this.$message.success('解析成功')
         this.fileList.push(file)
 
@@ -553,6 +558,8 @@ export default {
           this.fileList.map((file, index) => {
             formData.append('fileList[' + index + ']', file)
           })
+          console.log('deleteIdList', this.deleteIdList)
+          debugger
           this.deleteIdList.map((id, index) => {
             formData.append('databasesIdList[' + index + ']', id)
           })

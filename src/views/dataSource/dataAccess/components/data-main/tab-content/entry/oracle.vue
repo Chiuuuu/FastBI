@@ -213,7 +213,6 @@ export default {
       this.$refs.dbForm.validate(async valid => {
         if (valid) {
           this.saveBtn = true
-          delete this.form.dbid
           const params = {
             id: this.$store.state.dataAccess.modelId,
             name: this.$store.state.dataAccess.modelName,
