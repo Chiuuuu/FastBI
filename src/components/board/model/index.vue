@@ -368,12 +368,12 @@ export default {
       }
       this.$server.screenManage.screenModuleTransform(params).then(res => {
         if (res.code === 200) {
-          this.getPivoSchemaList(this.modelId, 1)
+          this.getPivoSchemaList(this.modelId, 2)
         }
       })
     },
     // 维度、度量列表
-    getPivoSchemaList(id, type = 2) {
+    getPivoSchemaList(id, type = 1) {
       this.$server.screenManage.getPivoSchemaList(id, this.screenId, type).then(res => {
         if (res.code === 200) {
           res.data.dimensions.map(item => {
