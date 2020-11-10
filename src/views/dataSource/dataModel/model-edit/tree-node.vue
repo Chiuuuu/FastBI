@@ -167,8 +167,10 @@ export default {
     handleGetRowStatus(index, row, data) {
       this.popoverError = (data && data['error']) || false
       const tableNo = row.tableNo
-      if (this.popoverError && !this.errorTables.includes(row.tableNo)) {
-        this.errorTables.push(tableNo)
+      if (this.popoverError) {
+        if (!this.errorTables.includes(row.tableNo)) {
+          this.errorTables.push(tableNo)
+        }
       } else {
         this.removeErrorItem(tableNo)
       }
