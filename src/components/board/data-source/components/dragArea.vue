@@ -227,7 +227,7 @@ export default {
               }
               let rows = [{
                 type: apiData.measures[0].name,
-                value: res.rows[0][apiData.measures[0].name]
+                value: res.rows[0] ? res.rows[0][apiData.measures[0].name] : 0
               }]
               apiData.source = {
                 columns,
@@ -236,8 +236,10 @@ export default {
               // 保存apidata数据
               this.$store.dispatch('SetSelfDataSource', apiData)
               let config = deepClone(this.currentSelected.packageJson.config)
-              config.chartTitle.text = rows[0].value
-              this.$store.dispatch('SetSelfProperty', config)
+              if (this.currentSelected.packageJson.chartType === 'v-multiPie') {
+                config.chartTitle.text = rows[0].value
+                this.$store.dispatch('SetSelfProperty', config)
+              }
               this.saveScreenData()
               return
             }
