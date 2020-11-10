@@ -227,7 +227,7 @@ export default {
               }
               let rows = [{
                 type: apiData.measures[0].name,
-                value: res.rows[0] ? (res.rows[0][apiData.measures[0].name] ? res.rows[0][apiData.measures[0].name] : '') : ''
+                value: res.rows[0] ? res.rows[0][apiData.measures[0].name] : 0
               }]
               apiData.source = {
                 columns,
