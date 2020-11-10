@@ -78,9 +78,6 @@ export default {
   },
   mounted() {
     console.log(this.$attrs)
-    if (this.$attrs.screenData) {
-
-    }
     this.screenName = this.$attrs.screenData ? this.$attrs.screenData.name : this.$route.query.name
     // this.screenName = this.fileName
     // this.screenName = this.$route.query.name
