@@ -247,24 +247,6 @@ export default {
     async showExtractLog() {
       this.visible1 = true
       this.modalSpin = true
-      // const logData = []
-      // for (let i = 0; i < 30; i++) {
-      //   logData.push({
-      //     id: i + '',
-      //     name: '任务' + i,
-      //     starttime: '2020-10-26 11:11:11',
-      //     duration: '20s',
-      //     state: 1,
-      //     progress: 70,
-      //     async: 20,
-      //     error: 2,
-      //     relation: 10
-      //   })
-      // }
-      // setTimeout(() => {
-      //   this.logData = logData
-      //   this.modalSpin = false
-      // }, 1000)
       this.$server.dataAccess.getExtractLogList(this.data[0].id)
         .then(res => {
           if (res.code === 200) {

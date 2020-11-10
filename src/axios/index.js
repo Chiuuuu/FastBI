@@ -45,9 +45,11 @@ service.interceptors.request.use(
   function(config) {
     const { adminToken } = store.state.common
     if (adminToken) {
-      // 判断token是否存在，如果存在则每个请求都带上token
-      // Bearer是JWT的认证头部信息
-      config.headers.common['Authorization'] = `Bearer ${adminToken}`
+      if (config.url !== '/login') {
+        // 判断token是否存在，如果存在则每个请求都带上token
+        // Bearer是JWT的认证头部信息
+        config.headers.common['Authorization'] = `Bearer ${adminToken}`
+      }
     }
 
     return config
