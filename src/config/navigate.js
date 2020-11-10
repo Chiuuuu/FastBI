@@ -1018,7 +1018,8 @@ const list = [{
                       'x': '类目',
                       'y': '值',
                       's': '系列1'
-                  }
+                  },
+                  radius: 100
               },
               background: {
                   backgroundType: '1',

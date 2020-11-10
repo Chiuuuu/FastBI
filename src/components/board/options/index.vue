@@ -256,19 +256,12 @@
                     <a-switch v-model="selfConfig.series.roseType" size="small"
                               @change="switchChange"></a-switch>
                   </gui-field>
-                  <!-- <gui-field label="展示数值" v-if="isRing">
-                    <a-switch v-model="selfConfig.chartTitle.show" size="small" @change="setSelfProperty"></a-switch>
+                  <gui-field label="外径大小" v-if="isMultiPie">
+                    <a-input v-model="apis.radius" size="small"
+                              placeholder="默认100"
+                              style="width:100px"
+                              @change="setApis"></a-input>
                   </gui-field>
-                  <gui-field label="文本" v-if="isRing">
-                    <gui-inline label="字号">
-                      <a-input-number v-model="selfConfig.chartTitle.textStyle.fontSize" size="small"
-                                      :min="12" :max="40" @change="setSelfProperty"></a-input-number>
-                    </gui-inline>
-                    <gui-inline label="颜色">
-                      <el-color-picker v-model="selfConfig.chartTitle.textStyle.color"
-                                        @change="setSelfProperty"></el-color-picker>
-                    </gui-inline>
-                  </gui-field> -->
                 </a-collapse-panel>
                 <a-collapse-panel key="indicator" header="指标设置" v-if="isPie || isMultiPie">
                   <a-switch slot="extra"

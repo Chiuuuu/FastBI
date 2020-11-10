@@ -263,10 +263,6 @@ export default {
                 rows.push(obj)
               }
             })
-            // 仪表盘只保留一个数据
-            // if (this.currentSelected.packageJson.name === 've-gauge') {
-            //   rows.length = 1
-            // }
             apiData.source = {
               columns,
               rows

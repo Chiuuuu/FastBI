@@ -104,7 +104,6 @@ export default {
             this.sortList = this.sortList.concat(apiData.tableList)
           }
           // 回显排序信息
-          console.log(apiData)
           if (apiData.options && apiData.options.sort) {
             this.sortData = {
               fileid: apiData.options.sort.id,
