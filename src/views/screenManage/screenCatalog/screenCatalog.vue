@@ -212,9 +212,11 @@ export default {
         if (res.code === 200) {
           let rows = res.data
           this.folderList = rows
+          console.log(rows)
           if (!this.fileSelectId && this.folderList.length > 0) {
             if (this.folderList[0].children.length > 0) {
               this.fileSelectId = this.folderList[0].children[0].id
+              this.$store.dispatch('SetFileName', this.folderList[0].children[0].name)
             }
           }
         }
