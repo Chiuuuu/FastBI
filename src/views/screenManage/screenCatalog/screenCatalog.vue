@@ -61,7 +61,7 @@
     </div>
     <div class="right scrollbar">
       <div class="right-header" v-if="fileSelectId !== ''">
-        <span class="nav_title">{{fileName}}</span>
+        <span class="nav_title">{{fileSelectName}}</span>
         <a-button class="btn_n1" @click="openScreen">
           全屏
         </a-button>
@@ -181,7 +181,14 @@ export default {
       },
       set (value) {
         this.$store.dispatch('SetScreenId', value)
-        // this.$store.commit('dataAccess/SET_MODELID', value)
+      }
+    },
+    fileSelectName: {
+      get () {
+        return this.fileName
+      },
+      set (value) {
+        this.$store.dispatch('SetFileName', value)
       }
     },
     menuList() {
@@ -310,7 +317,6 @@ export default {
     },
     // 选择左侧菜单
     handleFileSelect(file) {
-      console.log(file)
       if (this.fileSelectId === file.id) return
       this.fileSelectId = file.id
       this.$store.dispatch('SetScreenId', file.id)
@@ -367,7 +373,7 @@ export default {
       this.$router.push({ name: 'screenEdit',
       query: {
         id: this.fileSelectId,
-        name: this.fileName,
+        name: this.fileSelectName,
         parentId: this.parentId
       } })
     },
