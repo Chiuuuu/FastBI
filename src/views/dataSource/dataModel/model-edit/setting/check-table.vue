@@ -34,7 +34,7 @@
                       <i class="u-icn u-icn-string"></i>
                     </div> -->
                     <div class="txt" :title="item.title">
-                      <span>{{item.title}}</span>
+                      <span class='txt-title'>{{item.title}}</span>
                       <span class='columns-type'>{{setColumnsType(columnsList[index])}}</span>
                     </div>
                   </div>
@@ -242,6 +242,14 @@ export default {
     text-overflow: ellipsis;
     max-width: 168px;
     white-space: nowrap;
+    .txt-title {
+      max-width: 100px;
+      display: inline-block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      vertical-align: bottom;
+    }
   }
   .columns-type {
     font-size: 12px;
