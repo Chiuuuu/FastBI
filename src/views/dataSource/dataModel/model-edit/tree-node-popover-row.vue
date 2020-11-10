@@ -95,14 +95,14 @@ export default {
         if (leftNode && rightNode) {
             this.error = leftNode.dataType !== rightNode.dataType
             if (!this.error) {
-              this.$emit('update-condition', this.index, row)
+              this.$emit('update-condition', this.index, row, this.$data)
             }
+            this.$emit('change-status', this.index, row, this.$data)
         }
     },
     handledeleteCondition(index, row) {
         if (row.leftFieldId && row.rightFieldId) {
-            console.log('更新操作')
-            this.$emit('dele-condition', index)
+          this.$emit('dele-condition', index)
         }
         this.list.splice(index, 1)
     }
