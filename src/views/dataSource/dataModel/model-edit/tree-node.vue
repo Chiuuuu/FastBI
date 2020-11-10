@@ -50,6 +50,7 @@
                 :list="popoverForm"
                 :popoverLeftList="popoverLeftList"
                 :popoverRightList="popoverRightList"
+                @change-status="handleGetRowStatus"
                 @update-condition="handleUpateCondition"
                 @dele-condition="handleDeleteCondition"
               ></tree-node-poporver-row>
@@ -60,7 +61,7 @@
             <a-button type="link" @click="handleClearCondition">全部删除</a-button>
           </div>
         </div>
-        <span class="opt">
+        <span class="opt" :class="popoverError ? 'err':''">
           <b class="num">{{handleGetConditionLength(nodeData)}}</b>
         </span>
       </a-popover>
@@ -78,6 +79,7 @@
         :node-data="item"
         :data-index="subindex"
         :detailInfo="detailInfo"
+        :errorTables="errorTables"
       ></tree-node>
     </div>
   </div>
@@ -102,6 +104,10 @@ export default {
     },
     detailInfo: {
       type: [String, Object]
+    },
+    errorTables: {
+      type: Array,
+      default: () => []
     }
   },
   components: {
@@ -131,7 +137,8 @@ export default {
       popoverRightTable: '', // 右表名称
       popoverLeftList: [],
       popoverRightList: [],
-      popoverForm: []
+      popoverForm: [],
+      popoverError: false
     }
   },
   computed: {
@@ -152,9 +159,28 @@ export default {
   },
   methods: {
     handleGetConditionLength(nodeData) {
+      if (nodeData.props.join && nodeData.props.join.conditions.length === 0) {
+        this.popoverError = true
+      }
       return nodeData.props.join && nodeData.props.join.conditions.length
     },
-    handleUpateCondition(index, row) {
+    handleGetRowStatus(index, row, data) {
+      this.popoverError = (data && data['error']) || false
+      const tableNo = row.tableNo
+      if (this.popoverError && !this.errorTables.includes(row.tableNo)) {
+        this.errorTables.push(tableNo)
+      } else {
+        this.removeErrorItem(tableNo)
+      }
+    },
+    removeErrorItem(tableNo) {
+      const index = this.errorTables.indexOf(tableNo)
+      if (index > -1) {
+        this.errorTables.splice(index, 1)
+      }
+    },
+    handleUpateCondition(index, row, data) {
+      const tableNo = row.tableNo
       if (this.popoverForm.length > this.nodeData.props.join.conditions.length) {
         this.nodeData.props.join.conditions.push(row)
         // 这里需要强制更新
@@ -165,6 +191,13 @@ export default {
           ...replaceItem,
           ...row
         })
+      }
+      const tables = this.detailInfo.config.tables
+      const tableIndex = findIndex(tables, {
+        tableNo: `${tableNo}`
+      })
+      if (tableIndex) {
+        this.detailInfo.config.tables[tableIndex].join = this.nodeData.props.join
       }
     },
     handleDeleteCondition(index) {
@@ -192,6 +225,7 @@ export default {
         title: '确认提示',
         content: '确定删除该表?',
         onOk: async () => {
+
           // 循环递归删除tables的数据
           this.loopDelete(node, this.detailInfo.config.tables)
 
@@ -221,7 +255,11 @@ export default {
     loopDelete(node, list) {
       const ownProps = node.getProps()
       const index = findIndex(list, ownProps)
+      const errorIndex = this.errorTables.indexOf(ownProps.tableNo)
       list.splice(index, 1)
+      if (errorIndex > -1) {
+        this.errorTables.splice(errorIndex, 1)
+      }
       if (node.children && node.children.length > 0) {
         node.children.forEach(item => {
           this.loopDelete(item, list)
@@ -432,6 +470,9 @@ export default {
             color: #999;
             background: #fff;
             cursor: pointer;
+            &.err {
+              border-color: red;
+            }
             b {
                 display: block;
                 font-size: 14px;

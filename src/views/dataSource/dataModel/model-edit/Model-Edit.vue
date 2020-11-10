@@ -276,7 +276,7 @@ export default {
     async handleGetDatabaseList() {
       const result = await this.$server.dataModel.getDatabaseList(this.$route.query.datasourceId)
       if (result.code === 200) {
-        const baseBalck = [4,5] // 黑名单
+        const baseBalck = [4, 5] // 黑名单
         const type = result.data.type
         this.isDatabase = !baseBalck.some(item => item === type)
       } else {
@@ -435,7 +435,7 @@ export default {
         tableId: item.id
       }).then(res => {
         if (res.code === 200) {
-          const tables = this.detailInfo && this.detailInfo['config'] && this.detailInfo.config['tables'] || []
+          const tables = (this.detailInfo && this.detailInfo['config'] && this.detailInfo.config['tables']) || []
 
           if (Array.isArray(tables) && tables.some(table => table.id === item.id)) {
             return this.$message.error('资源有被其他资源依赖，不能被删除。')
@@ -498,6 +498,16 @@ export default {
         })
         if (hasEmpty) {
           this.$message.error('还有表未关联')
+          return
+        }
+      }
+
+      if (this.$refs.rightTopRef.errorTables.length > 0) {
+        const hasError = this.detailInfo.config.tables.some(table => {
+          return this.$refs.rightTopRef.errorTables.some(errorNo => errorNo === table.tableNo)
+        })
+        if (hasError) {
+          this.$message.error('模型中部分关联表无法关联，请修改字段数据类型')
           return
         }
       }

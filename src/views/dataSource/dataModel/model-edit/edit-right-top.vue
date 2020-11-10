@@ -16,6 +16,7 @@
         :node-data="item"
         :data-index="index"
         :detailInfo="detailInfo"
+        :errorTables="errorTables"
       ></tree-node>
     </template>
   </div>
@@ -36,7 +37,8 @@ export default {
     return {
       isTree: true,
       info: '',
-      renderTables: [] // 用来渲染树组件
+      renderTables: [], // 用来渲染树组件
+      errorTables: [] // 接受错误的tableNo
     //   treeData: [
     //     {
     //       id: 1,
@@ -99,6 +101,7 @@ export default {
   methods: {
     handleClearRenderTables() {
       this.renderTables = []
+      this.errorTables = []
       this.detailInfo.config.tables = []
       this.detailInfo.pivotSchema.dimensions = []
       this.detailInfo.pivotSchema.measures = []
