@@ -12,7 +12,7 @@
         <div class="model-operation" v-if="model">
           <div class="operation_select">
             <a-select v-model="modelId" style="width:90%">
-              <a-select-option v-for="item in selectedModelList" :value="item.modelid" :key="item.modelid">
+              <a-select-option v-for="item in disableItem" :value="item.modelid" :key="item.modelid">
                 {{item.modelname}}
               </a-select-option>
               <a-select-option value="添加数据模型">
@@ -182,6 +182,7 @@ export default {
       measures: [], // 度量列表
       modelId: '',
       disableId: [], // 已经选中的数据模型无法点击
+      disableItem: [], // 选中的数据模型 供选择列表
       searchValue: undefined, // 搜索的维度度量
       searchList: [], // 维度度量整合成一个数组可供搜索
       searchResult: [], // 维度度量搜索结果列表
@@ -204,6 +205,7 @@ export default {
             // this.measures = this.transData(val[0].measures)
             this.model = true
           }
+          this.disableItem = val
           val.map(item => {
             this.disableId.push(item.modelid)
           })
@@ -214,7 +216,6 @@ export default {
     currentSelected: {
       handler(val) {
         if (val) {
-          console.log(val)
           if (val.packageJson.api_data) {
             this.apiData = deepClone(val.packageJson.api_data)
             if (this.apiData.modelId) {
@@ -232,7 +233,6 @@ export default {
                 this.measuresChecked.push(item.id)
               })
             }
-            console.log(this.dimensionsChecked)
           }
         }
       },
@@ -282,7 +282,11 @@ export default {
         // this.getPivoSchemaList(item.id)
         this.add = true // 点击模型
         this.saveModal(item.id)
+        this.disableItem.push(item)
         // this.modelId = item.id
+        item.modelname = item.name
+        item.modelid = item.id
+        this.$store.dispatch('dataModel/setSelectedModelList', this.disableItem)
       }
     },
     // 获取大屏数据
@@ -301,7 +305,7 @@ export default {
       }
       this.$server.screenManage.screenModuleSave({ params }).then(res => {
         console.log(res)
-        this.getScreenData()
+        // this.getScreenData()
         this.modelId = id
       })
     },
