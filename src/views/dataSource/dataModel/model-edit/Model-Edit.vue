@@ -24,24 +24,26 @@
         <a-select-option :value="databaseName">{{ databaseName }}</a-select-option>
       </a-select>
       <a-divider />
-      <div class="menu_search">
-        <span class="search_span">表</span>
-        <!-- <a-input placeholder="请输入关键词搜索" class="search_input">
-          <a-icon slot="prefix" type="search" />
-        </a-input> -->
+      <div class="table_list" :class="{'no-sql': !isDatabase}">
+        <div class="menu_search">
+          <span class="search_span">表</span>
+          <!-- <a-input placeholder="请输入关键词搜索" class="search_input">
+            <a-icon slot="prefix" type="search" />
+          </a-input> -->
+        </div>
+        <edit-left
+          ref="editLeftRef"
+          :list="leftMenuList"
+          @on-left-drag-leave="handleLeftDragLeave"
+        ></edit-left>
       </div>
-      <edit-left
-        ref="editLeftRef"
-        :list="leftMenuList"
-        @on-left-drag-leave="handleLeftDragLeave"
-      ></edit-left>
       <!-- <a-divider /> -->
-      <div v-if="isDatabase" class="SQL-View">
+      <div v-if="isDatabase" class="SQL_View table_list">
         <div class="menu_search">
           <span class="search_span">自定义SQL视图</span>
-          <a-icon class="view-icon" type="plus-square" @click="handleAddSQL('new')" />
+          <a-icon class="view_icon" type="plus-square" @click="handleAddSQL('new')" />
         </div>
-        <div class="text-center">
+        <!-- <div class="text-center"> -->
           <edit-left
             ref="editSqlRef"
             type="sql"
@@ -50,7 +52,7 @@
             @edit="item => handleAddSQL('edit', item)"
             @delete="item => handleSQLDelete(item)"
           ></edit-left>
-        </div>
+        <!-- </div> -->
         <!-- <div class="sheet_list">
           <a-dropdown class="sheet_list_item" :trigger="['contextmenu']">
             <div>
@@ -88,11 +90,11 @@
         <span class="d-s" :title="detailInfo.description">描述： {{detailInfo.description}}</span>
         <a-icon type="edit" v-on:click="open" class="d-s-icon"/>
       </div>
-      <div class="draw_board">
+      <div class="draw_board scrollbar">
         <edit-right-top ref='rightTopRef' :detailInfo="detailInfo"></edit-right-top>
       </div>
       <a-divider />
-      <div class="detail">
+      <div class="detail scrollbar">
         <div class="detail_header">
           <span>数据模型详情</span>
           <div class="detail_btn">
@@ -102,13 +104,15 @@
         </div>
         <div class="detail_main">
           <div class="dimensionality">
-            <span class="dim_span">维度</span>
-            <div class="dim_operation">
-              <!-- <a v-on:click="dim_mea('维度')" style="color:#627CFF;line-height:38px">新建计算维度</a> -->
-              <a-divider type="vertical" />
-              <!-- <a v-on:click="geography" style="color:#627CFF;">设置地理位置</a> -->
+            <div class="dim_title">
+              <span class="dim_span">维度</span>
+              <div class="dim_operation">
+                <!-- <a v-on:click="dim_mea('维度')" style="color:#627CFF;line-height:38px">新建计算维度</a> -->
+                <a-divider type="vertical" />
+                <!-- <a v-on:click="geography" style="color:#627CFF;">设置地理位置</a> -->
+              </div>
             </div>
-            <div class="dim_menu">
+            <div class="dim_menu scrollbar">
               <a-menu mode="inline" v-for="(value, name) in dimensions" :key="name" :default-open-keys="[name]" :inline-collapsed="false">
                 <a-sub-menu :key="name">
                   <span slot="title"><span>{{value[0].tableName}}</span></span>
@@ -124,11 +128,13 @@
             </div>
           </div>
           <div class="measurement">
-            <span class="mea_span">度量</span>
-            <div class="mea_operation">
-              <!-- <a v-on:click="dim_mea('度量')" style="color:#627CFF;margin-right:20px;line-height:38px">新建计算度量</a> -->
+            <div class="mea_title">
+              <span class="mea_span">度量</span>
+              <div class="mea_operation">
+                <!-- <a v-on:click="dim_mea('度量')" style="color:#627CFF;margin-right:20px;line-height:38px">新建计算度量</a> -->
+              </div>
             </div>
-            <div class="mea_menu">
+            <div class="mea_menu scrollbar">
               <a-menu mode="inline" v-for="(value, name) in measures" :key="name" :default-open-keys="[name]" :inline-collapsed="false">
                 <a-sub-menu :key="name">
                   <span slot="title"><span>{{value[0].tableName}}</span></span>
@@ -161,7 +167,7 @@
         @success="data => componentSuccess(data)"
       />
       <div class="submit_btn">
-        <a-button :disabled="!detailInfo">保存并新建报告</a-button>
+        <!-- <a-button :disabled="!detailInfo">保存并新建报告</a-button> -->
         <a-button type="primary" @click="handleSave" :disabled="!detailInfo">保 存</a-button>
         <a-button v-on:click="exit">退 出</a-button>
       </div>

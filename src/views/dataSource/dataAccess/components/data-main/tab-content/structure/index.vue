@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="tab-panel">
     <div class="search_bar">
       <!-- <a-radio-group class="search_radio" v-model="tableType" @change="handleTableTypeChange">
         <a-radio-button value="1">原始表</a-radio-button>
@@ -26,7 +26,7 @@
         </a-col> -->
       </a-row>
     </div>
-    <div class="table">
+    <div class="tab-scroll scrollbar">
       <a-table :row-selection="rowSelection" :columns="columns" :data-source="data"  rowKey='id' :loading='spinning' :pagination='false'>
         <span slot="set" slot-scope="set">
           {{ set ? '是' : '否' }}

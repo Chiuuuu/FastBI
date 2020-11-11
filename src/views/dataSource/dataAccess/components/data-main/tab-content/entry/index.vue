@@ -1,5 +1,5 @@
 <template>
-  <div class="scrollbar" style="position: relative;min-height:500px;">
+  <div class="tab-panel" style="position: relative;">
     <a-empty v-if="!modelType" class="tab-empty">
       <span slot="description">请在左侧新建或选择数据接入</span>
     </a-empty>
@@ -7,9 +7,9 @@
       <template v-if="isFileType">
         <component :is="modelType" />
       </template>
-      <div v-else>
+      <template v-else>
         <component :is="modelType" @on-set-table-name="handleSetName" @hook:mounted="handleMounted" ref="entryRef"></component>
-      </div>
+      </template>
     </template>
   </div>
 </template>

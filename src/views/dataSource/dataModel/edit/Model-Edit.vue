@@ -38,7 +38,7 @@
       </div>
       <edit-left @on-left-drag-leave="handleLeftDragLeave"></edit-left>
       <a-divider />
-      <div class="SQL-View">
+      <div class="SQL_View">
         <!-- <div class="view-head">
           <span>自定义SQL视图</span>
         </div> -->
@@ -50,7 +50,7 @@
           >
             <a-sub-menu>
               <span slot="title">
-                <span class="view-title">自定义SQL视图</span>
+                <span class="view_title">自定义SQL视图</span>
               </span>
               <a-menu-item>
                 <a-dropdown :trigger="['contextmenu']">
@@ -401,7 +401,7 @@
                 </div>
               </a-modal>
             </div>
-            <div class="dim_menu">
+            <div class="dim_menu scrollbar">
               <a-menu mode="inline">
                 <a-sub-menu>
                   <span slot="title"><span>银行账户</span></span>
@@ -445,7 +445,7 @@
             <div class="mea_operation">
               <a v-on:click="dim_mea" style="line-height:38px">新建计算度量</a>
             </div>
-            <div class="mea_menu">
+            <div class="mea_menu scrollbar">
               <a-menu mode="inline">
                 <a-sub-menu>
                   <span slot="title"><span>银行账户</span></span>
