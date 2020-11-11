@@ -99,7 +99,8 @@
       apiData: {
         handler (val) {
           if (val) {
-            // 仪表盘
+            console.log(val)
+            // 只有度量的情况
             if (this.type === '2') {
               if (val.measures && val.measures.length > 0) {
                 this.chartData = val.source
@@ -109,11 +110,22 @@
                 return
               }
             }
-            if (val.dimensions && val.measures) {
-              if ((val.dimensions.length === 0 && val.measures.length > 0) || (val.dimensions.length > 0 && val.measures.length === 0)) {
-                return
+            // 维度度量都有的情况
+            if (this.type === '1') {
+              if (val.dimensions && val.measures) {
+                if ((val.dimensions.length === 0 && val.measures.length > 0) || (val.dimensions.length > 0 && val.measures.length === 0)) {
+                  return
+                }
+                if (val.dimensions.length > 0 && val.measures.length > 0 && val.source) {
+                  this.chartData = val.source
+                  return
+                }
               }
-              if (val.dimensions.length > 0 && val.measures.length > 0) {
+            }
+
+            // 不区分维度度量的情况--表格
+            if (this.type === '3') {
+              if (val.tableList && val.tableList.length > 0) {
                 this.chartData = val.source
                 return
               }
