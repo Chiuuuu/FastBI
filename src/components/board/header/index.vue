@@ -63,19 +63,24 @@ export default {
   data() {
     return {
       screenName: '', // 大屏名称
-      userId: '',
       isFocus: false // 大屏名称是否聚焦
     }
   },
   computed: {
-    ...mapGetters(['isScreen', 'pageSettings', 'canvasMap', 'screenId', 'fileName'])
+    ...mapGetters(['isScreen', 'pageSettings', 'canvasMap', 'screenId', 'fileName', 'parentId'])
   },
-  created() {
-    if (this.$route.query.name) {
-      this.screenName = this.$route.query.name
+  watch: {
+    '$attrs'(val) {
+      // if (val.screenData.name) {
+      //    this.screenName = val.screenData.name
+      // }
     }
+  },
+  mounted() {
+    console.log(this.$attrs)
+    this.screenName = this.$attrs.screenData ? this.$attrs.screenData.name : this.$route.query.name
     // this.screenName = this.fileName
-    this.userId = 'dv1e443967LZP2Dj'
+    // this.screenName = this.$route.query.name
   },
   methods: {
       ...mapActions(['saveScreenData']),
@@ -94,19 +99,24 @@ export default {
         let params = {
           fileType: 1,
           id: this.screenId,
-          name: this.screenName
+          name: this.screenName,
+          parentId: this.$route.query.parentId
         }
         this.$server.common.putMenuFolderName('/screen/catalog', params).then(res => {
           if (res.code === 200) {
+            this.screenName = res.data
             this.$store.dispatch('SetFileName', this.screenName)
+            this.saveScreenData()
             console.log('修改大屏名称')
+          } else {
+            this.$message.error(res.msg)
+            return false
           }
         })
       },
       // 打开全屏
       openScreen () {
         this.$store.dispatch('SetIsScreen', true)
-        // this.$router.push({ name: 'screen', params: { id: this.userId } })
         this.$nextTick(() => {
           var docElm = document.querySelector('.dv-screen')
           if (docElm) {
@@ -137,7 +147,7 @@ export default {
             for (let item of screenDataList) {
               for (let item2 of this.canvasMap) {
                 if (item2.id === item.id) {
-                  item2.packageJson.api_data.source.rows = item2.value
+                  item2.packageJson.api_data.source.rows = item.value
                 }
               }
             }

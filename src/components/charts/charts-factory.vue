@@ -9,6 +9,7 @@
               :data="chartData" :width="width" :height="height" ref="chart"
               :legend-visible="legendVisible"
               :after-config="afterConfig"
+              :title="chartType==='v-ring'?config.chartTitle:{}"
               :extend="chartExtend" :options="chartOptions" :settings="chartSettings"></component>
     <!-- <div v-else class="dv-charts-null">
       <a-icon  type="pie-chart" style="font-size:50px;" />
@@ -19,11 +20,20 @@
 <script>
   import { addResizeListener, removeResizeListener } from 'bin-ui/src/utils/resize-event'
   import { formatData, convertData } from '../../utils/formatData'
+  import { deepClone } from '@/utils/deepClone'
 
   export default {
     name: 'ChartsFactory',
     props: {
       typeName: {
+        type: String,
+        required: true
+      },
+      chartType: {
+        type: String,
+        required: true
+      },
+      type: {
         type: String,
         required: true
       },
@@ -77,6 +87,7 @@
             // 图例
             this.legendVisible = val.legend && val.legend.show
             this.chartExtend = { ...val }
+
             // this.colors = [...val.colors]
             // this.$log.primary('========>chartExtend')
             // this.$print(this.chartExtend)
@@ -88,11 +99,33 @@
       apiData: {
         handler (val) {
           if (val) {
-            if (val.dimensions && val.measures) {
-              if ((val.dimensions.length === 0 && val.measures.length > 0) || (val.dimensions.length > 0 && val.measures.length === 0)) {
+            console.log(val)
+            // 只有度量的情况
+            if (this.type === '2') {
+              if (val.measures && val.measures.length > 0) {
+                this.chartData = val.source
+                if (this.chartType === 'v-ring') {
+                  this.chartExtend.chartTitle.text = val.source.rows ? val.source.rows[0].value : ''
+                }
                 return
               }
-              if (val.dimensions.length > 0 && val.measures.length > 0) {
+            }
+            // 维度度量都有的情况
+            if (this.type === '1') {
+              if (val.dimensions && val.measures) {
+                if ((val.dimensions.length === 0 && val.measures.length > 0) || (val.dimensions.length > 0 && val.measures.length === 0)) {
+                  return
+                }
+                if (val.dimensions.length > 0 && val.measures.length > 0 && val.source) {
+                  this.chartData = val.source
+                  return
+                }
+              }
+            }
+
+            // 不区分维度度量的情况--表格
+            if (this.type === '3') {
+              if (val.tableList && val.tableList.length > 0) {
                 this.chartData = val.source
                 return
               }
@@ -115,7 +148,7 @@
       },
       apis: {
         handler (val) {
-          if (val && val.labelMap) {
+          if (val) {
             this.chartSettings = { ...val }
             this.$log.primary('========>chartSettings')
             this.$print(this.chartSettings)

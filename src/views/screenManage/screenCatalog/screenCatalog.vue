@@ -17,7 +17,7 @@
       </div>
       <div class="menu_search" v-if="folderList.length > 0">
         <a-input placeholder="搜索大屏目录" v-model="searchName" @change="menuSearch">
-          <a-icon slot="prefix" type="search" />
+          <a-icon class="icon_search" slot="suffix" type="search" />
         </a-input>
       </div>
       <div class="menu-wrap scrollbar screen-menu">
@@ -61,7 +61,7 @@
     </div>
     <div class="right scrollbar">
       <div class="right-header" v-if="fileSelectId !== ''">
-        <span class="nav_title">{{fileName}}</span>
+        <span class="nav_title">{{fileSelectName}}</span>
         <a-button class="btn_n1" @click="openScreen">
           全屏
         </a-button>
@@ -114,6 +114,8 @@ import MenuFolder from '@/components/dataSource/menu-group/folder'
 import { mapGetters, mapActions } from 'vuex' // 导入vuex
 import Screen from '@/views/screen' // 预览
 import { addResizeListener, removeResizeListener } from 'bin-ui/src/utils/resize-event'
+import debounce from 'lodash/debounce'
+import { menuSearchLoop } from '@/views/dataSource/dataModel/util'
 
 export default {
   components: {
@@ -172,20 +174,29 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['pageSettings', 'canvasRange', 'screenId', 'fileName', 'isScreen']),
+    ...mapGetters(['pageSettings', 'canvasRange', 'screenId', 'fileName', 'isScreen', 'parentId']),
     fileSelectId: {
       get () {
         return this.screenId
       },
       set (value) {
         this.$store.dispatch('SetScreenId', value)
-        // this.$store.commit('dataAccess/SET_MODELID', value)
       }
+    },
+    fileSelectName: {
+      get () {
+        return this.fileName
+      },
+      set (value) {
+        this.$store.dispatch('SetFileName', value)
+      }
+    },
+    menuList() {
+      return this.searchValue ? this.searchList : this.tableList
     }
   },
   mounted() {
     this.getList()
-    console.log(this.fileName)
     this.$on('fileSelect', this.handleFileSelect)
 
     window.onresize = () => {
@@ -202,31 +213,39 @@ export default {
     // 获取文件夹列表
     getList() {
       let params = {
-        name: this.searchName,
         type: 3
       }
       this.$server.screenManage.getFolderList({ params }).then(res => {
         if (res.code === 200) {
           let rows = res.data
-          // const list = rows.filter(item => {
-          //   // 是否是文件夹
-          //   return item.fileType === 0
-          // })
-          // 后端不会返 所以前端要判断parentId与id对应的数据
-          // for (let item of list) {
-          //   item.items = []
-          //   for (let item2 of rows) {
-          //     if (item2.parentId === item.id) {
-          //       item.items.push(item2)
-          //     }
-          //   }
-          // }
           this.folderList = rows
+          console.log(rows)
+          if (!this.fileSelectId && this.folderList.length > 0) {
+            if (this.folderList[0].children.length > 0) {
+              this.fileSelectId = this.folderList[0].children[0].id
+              this.$store.dispatch('SetFileName', this.folderList[0].children[0].name)
+            }
+          }
         }
       })
     },
-    menuSearch() {
-      this.getList()
+    // 搜索
+    menuSearch: debounce(function(event) {
+      const value = event.target.value
+      if (value !== '') {
+        this.handleGetSearchList(value)
+      } else {
+        this.getList()
+      }
+    }, 400),
+    handleGetSearchList(value) {
+      let result = []
+      this.folderList.map(item => {
+        const newItem = menuSearchLoop(item, value)
+        if (newItem) result.push(newItem)
+      })
+      this.folderList = result
+      console.log('搜索结果', this.folderList)
     },
     /**
      * 是否为文件夹
@@ -237,7 +256,7 @@ export default {
     // 右键删除文件夹
     handleFolderDelete(event, item, { folder }) {
       if (folder.children && folder.children.length > 0) {
-        return this.$message.warning('文件夹下存在数据大屏不可删除')
+        return this.$message.error('文件夹下存在数据大屏不可删除')
       }
       this.handleDelete(folder.id)
     },
@@ -256,6 +275,7 @@ export default {
           this.getList()
           this.$store.dispatch('SetScreenId', '')
           this.$store.dispatch('SetFileName', '')
+          this.$store.dispatch('SetParentId', '')
         }
       })
     },
@@ -276,6 +296,7 @@ export default {
       this.isAdd = 2
       this.id = file.id
       this.screenVisible = true
+      this.pid = parent.id
       // dom渲染以后才能给form赋值
       this.$nextTick(() => {
         this.screenForm.setFieldsValue({
@@ -300,6 +321,7 @@ export default {
       this.fileSelectId = file.id
       this.$store.dispatch('SetScreenId', file.id)
       this.$store.dispatch('SetFileName', file.name)
+      this.$store.dispatch('SetParentId', file.parentId)
     },
     // 点击新建大屏
     addScreen() {
@@ -315,7 +337,6 @@ export default {
         this.$store.dispatch('SetScreenId', '')
         if (this.isAdd === 1) { // 新增
           this.saveScreenData({ ...values, isAdd: 1 })
-          console.log(values)
           this.$store.dispatch('SetFileName', values.name)
           // this.$router.push({
           //   name: 'screenEdit',
@@ -327,12 +348,15 @@ export default {
           let params = {
             fileType: 1,
             id: this.id,
+            parentId: this.pid,
             ...values
           }
           this.$server.common.putMenuFolderName('/screen/catalog', params).then(res => {
             if (res.code === 200) {
               this.$message.success(res.msg)
               this.getList()
+            } else {
+              this.$message.error(res.msg)
             }
           })
         }
@@ -349,7 +373,8 @@ export default {
       this.$router.push({ name: 'screenEdit',
       query: {
         id: this.fileSelectId,
-        name: this.fileName
+        name: this.fileSelectName,
+        parentId: this.parentId
       } })
     },
     // 点击新建文件夹

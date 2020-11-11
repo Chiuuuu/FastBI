@@ -9,28 +9,40 @@
       v-model="describe"
       placeholder="请输入描述内容"
       style="height:200px;resize:unset"
+      :maxLength='200'
     />
+    <div style="text-align:right;font-size:12px;"><span>{{describe ? describe.length : 0}}/200</span></div>
   </a-modal>
 </template>
 
 <script>
 export default {
+  name: 'describeSetting',
   props: {
     isShow: Boolean,
-    description: String
+    description: {
+      type: String,
+      default: ''
+    }
   },
-  computed: {
-    describe: {
-      get() {
-        return this.description
-      },
-      set(value) {
-        this.$set(this.$parent.detailInfo, 'description', value)
+  data() {
+    return {
+      describe: this.description
+    }
+  },
+  watch: {
+    isShow: {
+      immediate: true,
+      handler(newVal) {
+        if (newVal) {
+          this.describe = this.description
+        }
       }
     }
   },
   methods: {
     handleSave() {
+      this.$set(this.$parent.detailInfo, 'description', this.describe)
       this.handleClose()
     },
     handleClose() {

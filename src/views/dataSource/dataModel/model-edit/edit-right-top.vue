@@ -1,6 +1,6 @@
 <template>
   <div
-    class="m-dml-map m-map edit scrollbar"
+    class="m-dml-map m-map"
     ref="mapRef"
     @dragenter.prevent.stop="handleMapDragEnter"
     @dragover.prevent.stop
@@ -16,6 +16,7 @@
         :node-data="item"
         :data-index="index"
         :detailInfo="detailInfo"
+        :errorTables="errorTables"
       ></tree-node>
     </template>
   </div>
@@ -36,7 +37,8 @@ export default {
     return {
       isTree: true,
       info: '',
-      renderTables: [] // 用来渲染树组件
+      renderTables: [], // 用来渲染树组件
+      errorTables: [] // 接受错误的tableNo
     //   treeData: [
     //     {
     //       id: 1,
@@ -99,7 +101,12 @@ export default {
   methods: {
     handleClearRenderTables() {
       this.renderTables = []
+      this.errorTables = []
       this.detailInfo.config.tables = []
+      this.detailInfo.pivotSchema.dimensions = []
+      this.detailInfo.pivotSchema.measures = []
+      this.$parent.handleDimensions()
+      this.$parent.handleMeasures()
     },
     /**
      * 处理树形组件
@@ -205,9 +212,9 @@ export default {
       }
     },
     async handleUpdate(params) {
-      if (params.tables.length < 1) {
-        return this.handleClearRenderTables()
-      }
+      // if (params.tables.length < 1) {
+      //   return this.handleClearRenderTables()
+      // }
       const result = await this.$server.dataModel.getPivotschemaByTables(params)
       // const result = await this.$server.dataModel.putModelDetail({
       //   dataConnectionId: this.$route.query.datasourceId,
@@ -228,14 +235,13 @@ export default {
 }
 </script>
 <style lang="stylus" scoped>
-.m-dml-map.edit {
-    height: calc(50vh - 162px);
-}
 .m-map {
     position: relative;
     box-sizing: border-box;
-    margin: 21px;
-    overflow: auto;
+    padding: 21px;
+    height: 100%;
+    width: 100%;
+    min-height: 200px;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;

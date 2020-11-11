@@ -3,6 +3,13 @@ import { DEFAULT_COLORS } from '../utils/defaultColors'
 function chartClick(e) {
     console.log(e)
 }
+
+/**
+ * type = 1 维度度量都需要的图表
+ * type = 2 只有度量的图表(仪表盘、环形图)
+ * type = 3 不区分维度或者度量（表格）
+ */
+
 const list = [{
         type: 'Basic',
         title: '添加图表',
@@ -152,20 +159,6 @@ const list = [{
                     { '日期': '1/5', '访问用户': 3792, '下单用户': 3492, '下单率': 0.323 },
                     { '日期': '1/6', '访问用户': 4593, '下单用户': 4293, '下单率': 0.78 }
                   ]
-                    // source: [
-                    //     { x: '1/1', y: 375, s: '系列1' },
-                    //     { x: '1/2', y: 200, s: '系列1' },
-                    //     { x: '1/3', y: 25, s: '系列1' },
-                    //     { x: '1/4', y: 190, s: '系列1' },
-                    //     { x: '1/5', y: 90, s: '系列1' },
-                    //     { x: '1/6', y: 277, s: '系列1' },
-                    //     { x: '1/1', y: 123, s: '系列2' },
-                    //     { x: '1/2', y: 41, s: '系列2' },
-                    //     { x: '1/3', y: 112, s: '系列2' },
-                    //     { x: '1/4', y: 56, s: '系列2' },
-                    //     { x: '1/5', y: 122, s: '系列2' },
-                    //     { x: '1/6', y: 323, s: '系列2' }
-                    // ]
                 },
                 apis: {
                   // stack: { '用户': ['系列1', '系列2'] },
@@ -258,6 +251,11 @@ const list = [{
                             fontSize: 12,
                             position: 'top'
                         },
+                        itemStyle: {
+                          normal: {
+                            barBorderRadius: [0]
+                          }
+                        },
                         barWidth: 'auto' // 可选
                     },
                     color: DEFAULT_COLORS
@@ -281,20 +279,6 @@ const list = [{
                     { '日期': '1/5', '访问用户': 3792, '下单用户': 3492, '下单率': 0.323 },
                     { '日期': '1/6', '访问用户': 4593, '下单用户': 4293, '下单率': 0.78 }
                   ]
-                    // source: [
-                    //     { x: '1/1', y: 375, s: '系列1' },
-                    //     { x: '1/2', y: 200, s: '系列1' },
-                    //     { x: '1/3', y: 25, s: '系列1' },
-                    //     { x: '1/4', y: 190, s: '系列1' },
-                    //     { x: '1/5', y: 90, s: '系列1' },
-                    //     { x: '1/6', y: 277, s: '系列1' },
-                    //     { x: '1/1', y: 123, s: '系列2' },
-                    //     { x: '1/2', y: 41, s: '系列2' },
-                    //     { x: '1/3', y: 112, s: '系列2' },
-                    //     { x: '1/4', y: 56, s: '系列2' },
-                    //     { x: '1/5', y: 122, s: '系列2' },
-                    //     { x: '1/6', y: 323, s: '系列2' }
-                    // ]
                 },
                 apis: {
                     labelMap: {
@@ -404,14 +388,6 @@ const list = [{
                     { '日期': '1/5', '访问用户': 3792 },
                     { '日期': '1/6', '访问用户': 4593 }
                   ]
-                    // source: [
-                    //     { x: '1/1', y: 1393, s: '系列1' },
-                    //     { x: '1/2', y: 3530, s: '系列1' },
-                    //     { x: '1/3', y: 2923, s: '系列1' },
-                    //     { x: '1/4', y: 1723, s: '系列1' },
-                    //     { x: '1/5', y: 3792, s: '系列1' },
-                    //     { x: '1/6', y: 4593, s: '系列1' }
-                    // ]
                 },
                 apis: {
                   // level: [
@@ -529,28 +505,6 @@ const list = [{
                     { '日期': '1/3', '访问用户': 2923, '下单用户': 2623, '下单率': 0.76 },
                     { '日期': '1/4', '访问用户': 1723, '下单用户': 1423, '下单率': 0.49 }
                   ]
-                    // source: [
-                    //     { x: '1/1', y: 1393, s: '指标1' },
-                    //     { x: '1/2', y: 3530, s: '指标1' },
-                    //     { x: '1/3', y: 2923, s: '指标1' },
-                    //     { x: '1/4', y: 1723, s: '指标1' },
-                    //     { x: '1/5', y: 3792, s: '指标1' },
-                    //     { x: '1/6', y: 4593, s: '指标1' },
-
-                    //     { x: '1/1', y: 1093, s: '指标2' },
-                    //     { x: '1/2', y: 3230, s: '指标2' },
-                    //     { x: '1/3', y: 2323, s: '指标2' },
-                    //     { x: '1/4', y: 1212, s: '指标2' },
-                    //     { x: '1/5', y: 5643, s: '指标2' },
-                    //     { x: '1/6', y: 872, s: '指标2' },
-
-                    //     { x: '1/1', y: 1232, s: '指标3' },
-                    //     { x: '1/2', y: 1452, s: '指标3' },
-                    //     { x: '1/3', y: 3532, s: '指标3' },
-                    //     { x: '1/4', y: 2234, s: '指标3' },
-                    //     { x: '1/5', y: 2345, s: '指标3' },
-                    //     { x: '1/6', y: 1111, s: '指标3' }
-                    // ]
                 },
                 apis: {
                     labelMap: {
@@ -648,7 +602,7 @@ const list = [{
               name: 've-gauge',
               chartType: 'v-gauge',
               icon: 'radar-chart',
-              type: '1',
+              type: '2',
               modelId: '',
               api_data: {
                 columns: ['type', 'value'],
@@ -756,204 +710,184 @@ const list = [{
               },
               view: { width: 400, height: 400, x: 760, y: 340 }
             },
-            {
-                title: '地图',
-                name: 've-map',
-                chartType: 'v-map',
-                icon: 'global',
-                modelId: '',
-                api_data: {
-                  columns: ['位置', '税收', '人口', '面积'],
-                  rows: [
-                    { '位置': '吉林', '税收': 123, '人口': 123, '面积': 92134 },
-                    { '位置': '北京', '税收': 1223, '人口': 2123, '面积': 29234 },
-                    { '位置': '上海', '税收': 2123, '人口': 1243, '面积': 94234 },
-                    { '位置': '浙江', '税收': 4123, '人口': 5123, '面积': 29234 }
-                  ]
-                    // source: [
-                    //     { x: '吉林', y: 178 },
-                    //     { x: '北京', y: 23 },
-                    //     { x: '上海', y: 122 },
-                    //     { x: '徐州', y: 98 },
-                    //     { x: '南京', y: 188 },
-                    //     { x: '兰州', y: 31 },
-                    //     { x: '乌鲁木齐', y: 122 },
-                    //     { x: '马鞍山', y: 32 },
-                    //     { x: '张家界', y: 55 },
-                    //     { x: '三门峡', y: 100 }
-                    // ]
-                },
-                apis: {
-                    position: 'china',
-                    labelMap: {
-                        'x': '位置',
-                        'y': '人口',
-                        's': '系列1'
-                    }
-                },
-                background: {
-                    backgroundType: '1',
-                    backgroundColor: '',
-                    borderColor: '',
-                    borderWidth: 0,
-                    borderStyle: '',
-                    borderRadius: 0
-                },
-                config: {
-                    title: {
-                        show: true,
-                        content: '地图',
-                        textAlign: 'left',
-                        textStyle: {
-                            color: '#ffffff',
-                            fontSize: 20
-                        }
-                    },
-                    grid: { left: 20, top: 60, right: 20, bottom: 30 },
-                    legend: {
-                        show: true,
-                        textStyle: {
-                            color: '#ffffff',
-                            fontSize: 12
-                        },
-                        itemGap: 12,
-                        icon: '',
-                        left: 'center',
-                        top: 'auto',
-                        right: 'auto',
-                        bottom: 'auto'
-                    },
-                    visualMap: {
-                        show: false,
-                        type: 'piecewise',
-                        min: 0,
-                        max: 200,
-                        inRange: {
-                            color: ['#50a3ba', '#eac736', '#d94e5d'],
-                            symbolSize: [10, 16]
-                        },
-                        textStyle: {
-                            color: '#fff',
-                            fontSize: 12
-                        }
-                    },
-                    xAxis: {
-                        show: false,
-                        axisLabel: {
-                            color: '#ffffff',
-                            fontSize: 12,
-                            rotate: 0
-                        },
-                        axisLine: {
-                            show: false,
-                            lineStyle: {
-                                color: '#cccccc'
-                            }
-                        },
-                        splitLine: {
-                            show: false,
-                            lineStyle: {
-                                color: '#cccccc'
-                            }
-                        }
-                    },
-                    yAxis: {
-                        show: false,
-                        axisLabel: {
-                            color: '#ffffff',
-                            fontSize: 12
-                        },
-                        axisLine: {
-                            show: false,
-                            lineStyle: {
-                                color: '#cccccc'
-                            }
-                        },
-                        splitLine: {
-                            show: false,
-                            lineStyle: {
-                                color: '#cccccc'
-                            }
-                        }
-                    },
-                    // 地图独有的
-                    geo: {
-                        map: 'china',
-                        zoom: 1.2,
-                        label: {
-                            normal: {
-                                show: false,
-                                color: '#fff',
-                                fontSize: 12
-                            },
-                            emphasis: {
-                                show: false,
-                                color: '#fff',
-                                fontSize: 12
-                            }
-                        },
-                        itemStyle: {
-                            normal: {
-                                areaColor: '#282c3c',
-                                borderColor: '#1f9bff'
-                            },
-                            emphasis: {
-                                areaColor: '#1d2131',
-                                borderColor: '#1f9bff'
-                            }
-                        }
-                    },
-                    series: {
-                        type: 'scatter', // scatter,effectScatter
-                        coordinateSystem: 'geo',
-                        symbolSize: 10,
-                        aspectScale: 0.75,
-                        hoverAnimation: true,
-                        showEffectOn: 'render',
-                        rippleEffect: {
-                            brushType: 'stroke',
-                            scale: 3
-                        },
-                        label: {
-                            show: false,
-                            formatter: '{b}',
-                            color: '',
-                            fontSize: 12,
-                            position: 'inside' // 可选inside
-                        },
-                        itemStyle: {
-                            emphasis: {
-                                borderColor: '#fff',
-                                borderWidth: 1
-                            }
-                        },
-                        zlevel: 1
-                    },
-                    color: DEFAULT_COLORS
-                },
-                view: { width: 500, height: 500, x: 710, y: 290 }
-            },
+            // {
+            //     title: '地图',
+            //     name: 've-map',
+            //     chartType: 'v-map',
+            //     icon: 'global',
+            //     modelId: '',
+            //     api_data: {
+            //       columns: ['位置', '税收', '人口', '面积'],
+            //       rows: [
+            //         { '位置': '吉林', '税收': 123, '人口': 123, '面积': 92134 },
+            //         { '位置': '北京', '税收': 1223, '人口': 2123, '面积': 29234 },
+            //         { '位置': '上海', '税收': 2123, '人口': 1243, '面积': 94234 },
+            //         { '位置': '浙江', '税收': 4123, '人口': 5123, '面积': 29234 }
+            //       ]
+            //     },
+            //     apis: {
+            //         position: 'china',
+            //         labelMap: {
+            //             'x': '位置',
+            //             'y': '人口',
+            //             's': '系列1'
+            //         }
+            //     },
+            //     background: {
+            //         backgroundType: '1',
+            //         backgroundColor: '',
+            //         borderColor: '',
+            //         borderWidth: 0,
+            //         borderStyle: '',
+            //         borderRadius: 0
+            //     },
+            //     config: {
+            //         title: {
+            //             show: true,
+            //             content: '地图',
+            //             textAlign: 'left',
+            //             textStyle: {
+            //                 color: '#ffffff',
+            //                 fontSize: 20
+            //             }
+            //         },
+            //         grid: { left: 20, top: 60, right: 20, bottom: 30 },
+            //         legend: {
+            //             show: true,
+            //             textStyle: {
+            //                 color: '#ffffff',
+            //                 fontSize: 12
+            //             },
+            //             itemGap: 12,
+            //             icon: '',
+            //             left: 'center',
+            //             top: 'auto',
+            //             right: 'auto',
+            //             bottom: 'auto'
+            //         },
+            //         visualMap: {
+            //             show: false,
+            //             type: 'piecewise',
+            //             min: 0,
+            //             max: 200,
+            //             inRange: {
+            //                 color: ['#50a3ba', '#eac736', '#d94e5d'],
+            //                 symbolSize: [10, 16]
+            //             },
+            //             textStyle: {
+            //                 color: '#fff',
+            //                 fontSize: 12
+            //             }
+            //         },
+            //         xAxis: {
+            //             show: false,
+            //             axisLabel: {
+            //                 color: '#ffffff',
+            //                 fontSize: 12,
+            //                 rotate: 0
+            //             },
+            //             axisLine: {
+            //                 show: false,
+            //                 lineStyle: {
+            //                     color: '#cccccc'
+            //                 }
+            //             },
+            //             splitLine: {
+            //                 show: false,
+            //                 lineStyle: {
+            //                     color: '#cccccc'
+            //                 }
+            //             }
+            //         },
+            //         yAxis: {
+            //             show: false,
+            //             axisLabel: {
+            //                 color: '#ffffff',
+            //                 fontSize: 12
+            //             },
+            //             axisLine: {
+            //                 show: false,
+            //                 lineStyle: {
+            //                     color: '#cccccc'
+            //                 }
+            //             },
+            //             splitLine: {
+            //                 show: false,
+            //                 lineStyle: {
+            //                     color: '#cccccc'
+            //                 }
+            //             }
+            //         },
+            //         // 地图独有的
+            //         geo: {
+            //             map: 'china',
+            //             zoom: 1.2,
+            //             label: {
+            //                 normal: {
+            //                     show: false,
+            //                     color: '#fff',
+            //                     fontSize: 12
+            //                 },
+            //                 emphasis: {
+            //                     show: false,
+            //                     color: '#fff',
+            //                     fontSize: 12
+            //                 }
+            //             },
+            //             itemStyle: {
+            //                 normal: {
+            //                     areaColor: '#282c3c',
+            //                     borderColor: '#1f9bff'
+            //                 },
+            //                 emphasis: {
+            //                     areaColor: '#1d2131',
+            //                     borderColor: '#1f9bff'
+            //                 }
+            //             }
+            //         },
+            //         series: {
+            //             type: 'scatter', // scatter,effectScatter
+            //             coordinateSystem: 'geo',
+            //             symbolSize: 10,
+            //             aspectScale: 0.75,
+            //             hoverAnimation: true,
+            //             showEffectOn: 'render',
+            //             rippleEffect: {
+            //                 brushType: 'stroke',
+            //                 scale: 3
+            //             },
+            //             label: {
+            //                 show: false,
+            //                 formatter: '{b}',
+            //                 color: '',
+            //                 fontSize: 12,
+            //                 position: 'inside' // 可选inside
+            //             },
+            //             itemStyle: {
+            //                 emphasis: {
+            //                     borderColor: '#fff',
+            //                     borderWidth: 1
+            //                 }
+            //             },
+            //             zlevel: 1
+            //         },
+            //         color: DEFAULT_COLORS
+            //     },
+            //     view: { width: 500, height: 500, x: 710, y: 290 }
+            // },
             {
               title: '环形图',
-              name: 've-ring',
+              name: 've-pie',
               chartType: 'v-ring',
               icon: 'pie-chart',
-              type: '1',
+              type: '2',
               modelId: '',
               api_data: {
                 columns: ['日期', '访问用户'],
                 rows: [
-                  { '日期': '1/1', '访问用户': 1393 },
-                  { '日期': '1/2', '访问用户': 3530 },
-                  { '日期': '1/3', '访问用户': 2923 },
-                  { '日期': '1/4', '访问用户': 1723 },
-                  { '日期': '1/5', '访问用户': 3792 },
-                  { '日期': '1/6', '访问用户': 4593 }
+                  { '日期': '1/1', '访问用户': 3530 },
+                  { '日期': '1/2', '访问用户': 1393 }
                 ]
-                  // source: [
-                  //     { x: '1/1', y: 80, s: '系列1' },
-                  //     { x: '1/2', y: 20, s: '系列1' }
-                  // ]
               },
               apis: {
                 hoverAnimation: false,
@@ -980,6 +914,19 @@ const list = [{
                           color: '#ffffff',
                           fontSize: 20
                       }
+                  },
+                  chartTitle: {
+                    show: true,
+                    text: '70%',
+                    x: 'center',
+                    y: 'center',
+                    itemGap: 20,
+                    textStyle: {
+                      color: '#ffffff',
+                      fontFamily: '微软雅黑',
+                      fontSize: 20,
+                      fontWeight: 'bolder'
+                    }
                   },
                   tooltip: {
                     show: false
@@ -1011,9 +958,6 @@ const list = [{
                     label: {
                       normal: {
                         show: false,
-                        formatter: function(val) {
-                          console.log(val)
-                        },
                         position: 'center',
                         textStyle: {
                           fontSize: '30'
@@ -1027,9 +971,8 @@ const list = [{
                         }
                       }
                     }
-
                   },
-                  color: DEFAULT_COLORS
+                  color: ['#0185FE', '#9ED1FF']
               },
               chartEvents: {
                   click: chartClick
@@ -1053,14 +996,6 @@ const list = [{
                   { '日期': '1/5', '访问用户': 3792 },
                   { '日期': '1/6', '访问用户': 4593 }
                 ]
-                  // source: [
-                  //     { x: '1/1', y: 1393, s: '系列1' },
-                  //     { x: '1/2', y: 3530, s: '系列1' },
-                  //     { x: '1/3', y: 2923, s: '系列1' },
-                  //     { x: '1/4', y: 1723, s: '系列1' },
-                  //     { x: '1/5', y: 3792, s: '系列1' },
-                  //     { x: '1/6', y: 4593, s: '系列1' }
-                  // ]
               },
               apis: {
                 level: [
@@ -1071,7 +1006,8 @@ const list = [{
                       'x': '类目',
                       'y': '值',
                       's': '系列1'
-                  }
+                  },
+                  radius: 100
               },
               background: {
                   backgroundType: '1',
@@ -1106,10 +1042,43 @@ const list = [{
                       bottom: 'auto'
                   },
                   xAxis: {
-                      show: false
+                      show: false,
+                      axisLabel: {
+                          color: '#ffffff',
+                          fontSize: 12,
+                          rotate: 0
+                      },
+                      axisLine: {
+                          show: false,
+                          lineStyle: {
+                              color: '#cccccc'
+                          }
+                      },
+                      splitLine: {
+                          show: false,
+                          lineStyle: {
+                              color: '#cccccc'
+                          }
+                      }
                   },
                   yAxis: {
-                      show: false
+                      show: false,
+                      axisLabel: {
+                          color: '#ffffff',
+                          fontSize: 12
+                      },
+                      axisLine: {
+                          show: false,
+                          lineStyle: {
+                              color: '#cccccc'
+                          }
+                      },
+                      splitLine: {
+                          show: false,
+                          lineStyle: {
+                              color: '#cccccc'
+                          }
+                      }
                   },
                   series: {
                       label: {
@@ -1119,7 +1088,6 @@ const list = [{
                           position: 'outside', // 可选inside
                           formatter: '{b}: {@2012} ({d}%)'
                       },
-                      roseType: false, // 饼图可选玫瑰图
                       center: ['50%', '50%'] // 饼图可选
                   },
                   color: DEFAULT_COLORS
@@ -1280,7 +1248,7 @@ const list = [{
                         content: '表格',
                         textAlign: 'left',
                         textStyle: {
-                            color: '#000',
+                            color: '#fff',
                             fontSize: 20
                         }
                     },

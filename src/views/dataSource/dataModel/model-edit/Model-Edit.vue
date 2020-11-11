@@ -24,23 +24,36 @@
         <a-select-option :value="databaseName">{{ databaseName }}</a-select-option>
       </a-select>
       <a-divider />
-      <div class="menu_search">
-        <span class="search_span">表</span>
-        <!-- <a-input placeholder="请输入关键词搜索" class="search_input">
-          <a-icon slot="prefix" type="search" />
-        </a-input> -->
+      <div class="table_list" :class="{'no-sql': !isDatabase}">
+        <div class="menu_search">
+          <span class="search_span">表</span>
+          <!-- <a-input placeholder="请输入关键词搜索" class="search_input">
+            <a-icon slot="prefix" type="search" />
+          </a-input> -->
+        </div>
+        <edit-left
+          ref="editLeftRef"
+          :list="leftMenuList"
+          @on-left-drag-leave="handleLeftDragLeave"
+        ></edit-left>
       </div>
-      <edit-left
-        ref="editLeftRef"
-        @on-left-drag-leave="handleLeftDragLeave"
-      ></edit-left>
       <!-- <a-divider /> -->
-      <!-- <div v-if="isDatabase" class="SQL-View">
+      <div v-if="isDatabase" class="SQL_View table_list">
         <div class="menu_search">
           <span class="search_span">自定义SQL视图</span>
-          <a-icon class="view-icon" type="plus-square" @click="handleAddSQL('new')" />
+          <a-icon class="view_icon" type="plus-square" @click="handleAddSQL('new')" />
         </div>
-        <div class="sheet_list">
+        <!-- <div class="text-center"> -->
+          <edit-left
+            ref="editSqlRef"
+            type="sql"
+            :list="rightMenuList"
+            @on-left-drag-leave="handleLeftDragLeave"
+            @edit="item => handleAddSQL('edit', item)"
+            @delete="item => handleSQLDelete(item)"
+          ></edit-left>
+        <!-- </div> -->
+        <!-- <div class="sheet_list">
           <a-dropdown class="sheet_list_item" :trigger="['contextmenu']">
             <div>
               银行账户
@@ -57,8 +70,8 @@
               </a-menu-item>
             </a-menu>
           </a-dropdown>
-        </div>
-      </div> -->
+        </div> -->
+      </div>
     </div>
     <div class="right">
       <div class="header" v-if="model==='edit'">
@@ -73,31 +86,33 @@
           </a-form-item>
         </a-form>
       </div>
-      <!-- <div class="description">
-        <span class="d-s">描述： {{detailInfo.description}}<a-icon type="edit" v-on:click="open"/></span>
-      </div> -->
-      <a-divider />
-      <div class="draw_board">
+      <div class="description">
+        <span class="d-s" :title="detailInfo.description">描述： {{detailInfo.description}}</span>
+        <a-icon type="edit" v-on:click="open" class="d-s-icon"/>
+      </div>
+      <div class="draw_board scrollbar">
         <edit-right-top ref='rightTopRef' :detailInfo="detailInfo"></edit-right-top>
       </div>
       <a-divider />
-      <div class="detail">
+      <div class="detail scrollbar">
         <div class="detail_header">
           <span>数据模型详情</span>
           <div class="detail_btn">
-            <!-- <a-button v-on:click="check">查看宽表</a-button> -->
+            <a-button v-on:click="checkWidthTable" :disabled="disableByDetailInfo">查看宽表</a-button>
             <!-- <a-button v-on:click="batch">批量编辑字段</a-button> -->
           </div>
         </div>
         <div class="detail_main">
           <div class="dimensionality">
-            <span class="dim_span">维度</span>
-            <div class="dim_operation">
-              <!-- <a v-on:click="dim_mea('维度')" style="color:#627CFF;line-height:38px">新建计算维度</a> -->
-              <a-divider type="vertical" />
-              <!-- <a v-on:click="geography" style="color:#627CFF;">设置地理位置</a> -->
+            <div class="dim_title">
+              <span class="dim_span">维度</span>
+              <div class="dim_operation">
+                <!-- <a v-on:click="dim_mea('维度')" style="color:#627CFF;line-height:38px">新建计算维度</a> -->
+                <a-divider type="vertical" />
+                <!-- <a v-on:click="geography" style="color:#627CFF;">设置地理位置</a> -->
+              </div>
             </div>
-            <div class="dim_menu">
+            <div class="dim_menu scrollbar">
               <a-menu mode="inline" v-for="(value, name) in dimensions" :key="name" :default-open-keys="[name]" :inline-collapsed="false">
                 <a-sub-menu :key="name">
                   <span slot="title"><span>{{value[0].tableName}}</span></span>
@@ -113,11 +128,13 @@
             </div>
           </div>
           <div class="measurement">
-            <span class="mea_span">度量</span>
-            <div class="mea_operation">
-              <!-- <a v-on:click="dim_mea('度量')" style="color:#627CFF;margin-right:20px;line-height:38px">新建计算度量</a> -->
+            <div class="mea_title">
+              <span class="mea_span">度量</span>
+              <div class="mea_operation">
+                <!-- <a v-on:click="dim_mea('度量')" style="color:#627CFF;margin-right:20px;line-height:38px">新建计算度量</a> -->
+              </div>
             </div>
-            <div class="mea_menu">
+            <div class="mea_menu scrollbar">
               <a-menu mode="inline" v-for="(value, name) in measures" :key="name" :default-open-keys="[name]" :inline-collapsed="false">
                 <a-sub-menu :key="name">
                   <span slot="title"><span>{{value[0].tableName}}</span></span>
@@ -136,17 +153,22 @@
       </div>
       <!-- 动态弹窗组件 -->
       <component
+        ref='componentRef'
         v-bind:is="modalName"
         :is-show="visible"
+        :detailInfo="detailInfo"
         :compute-type="computeType"
         :tables="dimensions"
         :sql-form="sqlForm"
+        :status="modalStatus"
         :description="detailInfo.description"
+        @get-fetch-param="handleGetFetchParams"
         @close="close"
+        @success="data => componentSuccess(data)"
       />
       <div class="submit_btn">
-        <a-button>保存并新建报告</a-button>
-        <a-button type="primary" @click="handleSave">保 存</a-button>
+        <!-- <a-button :disabled="!detailInfo">保存并新建报告</a-button> -->
+        <a-button type="primary" @click="handleSave" :disabled="!detailInfo">保 存</a-button>
         <a-button v-on:click="exit">退 出</a-button>
       </div>
     </div>
@@ -154,6 +176,7 @@
 </template>
 
 <script>
+import findIndex from 'lodash/findIndex'
 import { mapState } from 'vuex'
 import EditLeft from './edit-left'
 import EditRightTop from './edit-right-top'
@@ -166,12 +189,12 @@ import ComputeSetting from './setting/compute-setting'
 import { Node, conversionTree } from '../util'
 import groupBy from 'lodash/groupBy'
 
-const setting = [
-  {
-    key: '1',
-    last_name: 'authorityEntityType'
-  }
-]
+// const setting = [
+//   {
+//     key: '1',
+//     last_name: 'authorityEntityType'
+//   }
+// ]
 
 export default {
   components: {
@@ -194,8 +217,11 @@ export default {
       modelForm: this.$form.createForm(this, { name: 'modelForm' }),
       spinning: false,
       detailInfo: '',
-      isDatabase: true, // 是否是SQL数据源, 控制自定义SQL渲染
+      isDatabase: false, // 是否是SQL数据源, 控制自定义SQL渲染
+      leftMenuList: [],
+      rightMenuList: [],
       sqlForm: {},
+      modalStatus: 'new',
       globalStatus: {
         dragType: '',
         dragNode: {},
@@ -204,20 +230,10 @@ export default {
       },
       measures: '',
       dimensions: '',
-      setting,
+      // setting,
       activeIndex: 0,
-      current: ['mail'],
-      openKeys: ['sub1'],
       modalName: '',
       visible: false, // 设置弹窗(描述, 宽表, 批量, 地理, 维度度量)
-      rules: {
-        Function: [
-          {
-            required: true,
-            message: '请选择关联方式'
-          }
-        ]
-      },
       labelCol: {
         span: 4
       },
@@ -225,53 +241,6 @@ export default {
         span: 14
       },
       computeType: '', // 新建计算字段类型(维度, 度量)
-      formLayout: ' horizontal ',
-      dataSource: [
-        {
-          key: '0',
-          name: 'Edward King 0',
-          age: '32',
-          address: 'London, Park Lane no. 0'
-        },
-        {
-          key: '1',
-          name: 'Edward King 1',
-          age: '32',
-          address: 'London, Park Lane no. 1'
-        }
-      ],
-      count: 2,
-      c: [
-        {
-          title: '表1',
-          dataIndex: 'table1',
-          width: '30%',
-          scopedSlots: {
-            customRender: 'table1'
-          }
-        },
-        {
-          title: '连接',
-          dataIndex: 'link',
-          scopedSlots: {
-            customRender: 'link'
-          }
-        },
-        {
-          title: '表2',
-          dataIndex: 'table2',
-          scopedSlots: {
-            customRender: 'table2'
-          }
-        },
-        {
-          title: '操作',
-          dataIndex: 'operation',
-          scopedSlots: {
-            customRender: 'operation'
-          }
-        }
-      ],
       databaseList: [] // 数据库列表
     }
   },
@@ -288,19 +257,38 @@ export default {
     },
     databaseName() {
       return this.databaseList.length > 0 ? this.databaseList[0].name : ''
+    },
+    disableByDetailInfo() {
+      if (this.detailInfo === '') {
+        return true
+      }
+
+      return this.detailInfo.config.tables && this.detailInfo.config.tables.length === 0
     }
   },
   mounted() {
+    this.handleGetDatabaseList()
     if (this.model === 'add') {
       this.handleGetAddModelDatamodel()
     } else if (this.model === 'edit') {
       this.handleGetData(this.$route.query.modelId)
+      this.$store.dispatch('dataModel/setModelId', this.$route.query.modelId)
     }
   },
   beforeDestroy() {
     this.$store.dispatch('dataModel/setAddModelId', -1)
   },
   methods: {
+    async handleGetDatabaseList() {
+      const result = await this.$server.dataModel.getDatabaseList(this.$route.query.datasourceId)
+      if (result.code === 200) {
+        const baseBalck = [4, 5] // 黑名单
+        const type = result.data.type
+        this.isDatabase = !baseBalck.some(item => item === type)
+      } else {
+        this.$message.error(result.msg)
+      }
+    },
     /**
      * 新增时获取空模型
      */
@@ -331,8 +319,14 @@ export default {
       if (result.code === 200) {
         this.databaseList = result.data
         if (this.databaseList.length && this.databaseList.length > 0) {
-          this.$refs.editLeftRef.handleGetMenuList(result.data[0].id)
-          this.$store.dispatch('dataModel/setDatabaseId', result.data[0].id)
+          const listResult = await this.$server.dataModel.getTableListById(result.data[0].id)
+          if (listResult.code === 200) {
+            this.leftMenuList = [].concat(listResult.data.filter(item => item.type === false))
+            this.rightMenuList = [].concat(listResult.data.filter(item => item.type === true))
+            this.$store.dispatch('dataModel/setDatabaseId', result.data[0].id)
+          } else {
+            this.$message.error(listResult.msg)
+          }
         }
         // this.handleDimensions()
         // this.handleMeasures()
@@ -351,15 +345,28 @@ export default {
       // this.detailInfo.pivotSchema.measures = []
     },
     /**
-     * 表格column处理
-     */
-    handleFormatTableColumn() {
-
+     * 同字段名处理
+    */
+    handleSameName(list) {
+      if (Array.isArray(list) && list.length > 1) {
+        const map = new Map()
+        list.forEach(element => {
+          if (map.has(element.alias)) {
+            const value = `${map.get(element.alias)}${element.tableNo}`
+            map.set(element.alias, value)
+            element.alias += `${element.tableNo}`
+          } else {
+            map.set(element.alias, 1)
+          }
+        })
+      }
+      return list
     },
     /**
      * 维度数据处理
     */
     handleDimensions() {
+      this.handleSameName(this.detailInfo.pivotSchema.dimensions)
       console.log(groupBy(this.detailInfo.pivotSchema.dimensions, 'tableNo'))
       this.dimensions = groupBy(this.detailInfo.pivotSchema.dimensions, 'tableNo')
     },
@@ -367,6 +374,7 @@ export default {
      * 度量数据处理
     */
     handleMeasures() {
+      this.handleSameName(this.detailInfo.pivotSchema.measures)
       console.log(groupBy(this.detailInfo.pivotSchema.measures, 'tableNo'))
       this.measures = groupBy(this.detailInfo.pivotSchema.measures, 'tableNo')
     },
@@ -395,7 +403,8 @@ export default {
     handleLeftDragLeave() {
       this.$refs.rightTopRef.handleMapRemoveClass()
     },
-    check() {
+    checkWidthTable() {
+      // if(this.detailInfo.config.tables.length === 0)
       this.visible = true
       this.modalName = 'check-table'
     },
@@ -417,24 +426,56 @@ export default {
       this.computeType = type
     },
     handleAddSQL(type, item) {
-      if (type === 'new') {
-        this.sqlForm = {
-          name: '',
-          content: ''
-        }
-      } else if (type === 'edit') {
-        if (item) {
-          this.sqlForm = {
-            name: item.name,
-            content: item.content
-          }
-        }
-      }
+      this.modalStatus = type
       this.visible = true
       this.modalName = 'sql-setting'
+      if (this.modalStatus === 'edit') {
+        this.$nextTick(() => {
+          this.$refs.componentRef.handleGetDetail(item)
+        })
+      }
     },
-    close() {
+    handleSQLDelete(item) {
+      this.$server.dataModel.deleCustomSql({
+        name: item.name,
+        tableId: item.id
+      }).then(res => {
+        if (res.code === 200) {
+          const tables = (this.detailInfo && this.detailInfo['config'] && this.detailInfo.config['tables']) || []
+
+          if (Array.isArray(tables) && tables.some(table => table.id === item.id)) {
+            return this.$message.error('资源有被其他资源依赖，不能被删除。')
+          }
+
+          const index = this.rightMenuList.indexOf(item)
+          this.rightMenuList.splice(index, 1)
+        } else {
+          this.$message.error(res.msg)
+        }
+      })
+    },
+    close(data) {
       this.visible = false
+    },
+    componentSuccess(data) {
+      if (this.modalName === 'sql-setting') {
+        if (this.modalStatus === 'new') {
+          this.handleSQLAdd(data)
+        }
+        if (this.modalStatus === 'edit') {
+          this.handleUpdateSQL(data)
+        }
+      }
+      this.close()
+    },
+    handleSQLAdd(data) {
+      this.rightMenuList.push(data)
+    },
+    handleUpdateSQL(data) {
+      const index = findIndex(this.rightMenuList, {
+        id: data.id
+      })
+      this.rightMenuList.splice(index, 1, data)
     },
     exit() {
       this.$router.go(-1)
@@ -457,9 +498,28 @@ export default {
         return
       }
 
+      if (this.detailInfo.config.tables.length > 1) {
+        const hasEmpty = this.detailInfo.config.tables.slice(1).some(table => {
+          return table.join.conditions.length === 0
+        })
+        if (hasEmpty) {
+          this.$message.error('还有表未关联')
+          return
+        }
+      }
+
+      if (this.$refs.rightTopRef.errorTables.length > 0) {
+        const hasError = this.detailInfo.config.tables.some(table => {
+          return this.$refs.rightTopRef.errorTables.some(errorNo => errorNo === table.tableNo)
+        })
+        if (hasError) {
+          this.$message.error('模型中部分关联表无法关联，请修改字段数据类型')
+          return
+        }
+      }
+
       this.detailInfo.config.tables.map(table => {
         table.alias = table.name
-        table.joinType = 1
       })
       const result = await this.$server.dataModel.saveModel({
         ...this.detailInfo,
@@ -490,6 +550,16 @@ export default {
         sourceDatasourceList: new Array(this.datasource),
         dataModelId: this.model === 'add' ? this.addModelId : this.modelId
       })
+    },
+    handleGetFetchParams(data) {
+      if (this.modalName === 'sql-setting') {
+        this.$refs.componentRef.pushFetchParam({
+          sourceId: this.$route.query.datasourceId,
+          databaseName: this.databaseName,
+          databaseId: this.databaseList.length > 0 ? this.databaseList[0].id : '',
+          dataModelId: this.model === 'add' ? this.addModelId : this.modelId
+        })
+      }
     }
   }
 }

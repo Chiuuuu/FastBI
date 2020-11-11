@@ -45,9 +45,11 @@ service.interceptors.request.use(
   function(config) {
     const { adminToken } = store.state.common
     if (adminToken) {
-      // 判断token是否存在，如果存在则每个请求都带上token
-      // Bearer是JWT的认证头部信息
-      config.headers.common['Authorization'] = `Bearer ${adminToken}`
+      if (config.url !== '/login') {
+        // 判断token是否存在，如果存在则每个请求都带上token
+        // Bearer是JWT的认证头部信息
+        config.headers.common['Authorization'] = `Bearer ${adminToken}`
+      }
     }
 
     return config
@@ -70,12 +72,21 @@ service.interceptors.response.use(
         return Promise.reject(msg)
       }
     }
-    return response.data
+
+    if (response.headers['content-type'] === 'application/json;charset=UTF-8' && response.config.responseType === 'blob') {
+      // 如果是下载xlsx且数据出错的情况
+      return {
+        code: 500,
+        data: response.data
+      }
+    } else {
+      // 正常情况
+      return response.data
+    }
   },
   error => {
     const { response } = error
-    // messages({ content: response ? response.data : '请求错误', type: 'danger', duration: 5 })
-    message.error(response && response.data ? response.data.msg : '请求错误')
+    message.error(response && response.data ? (response.data.msg || '请求错误') : '请求错误')
     return Promise.reject(error)
   }
 )

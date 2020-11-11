@@ -1,9 +1,10 @@
 .Model-Edit {
     display: flex;
     justify-content: space-between;
+    width: 100%;
+    height: 100%;
     .left {
         width: 20%;
-        height: 804px;
         background-color: #ffffff;
         .menu_title {
             font-size: 16px;
@@ -21,9 +22,8 @@
             // height: 64px;
         }
         .menu_search {
-            width: 90%;
             margin-left: 14px;
-            margin-right: 14px;
+            margin-right: 4px;
             margin-top: 17px;
             margin-bottom: 17px;
             font-size: 14px;
@@ -64,7 +64,7 @@
                 font-weight: 400;
             }
         }
-        .view-title{
+        .view_title{
           font-size:16px;
           font-family:Microsoft YaHei;
           font-weight:400;
@@ -94,8 +94,20 @@
                 font-family:Microsoft YaHei;
                 font-weight:400;
                 color:rgba(59,60,67,1);
-                line-height:48px;
-                }
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                max-width: calc(100% - 35px);
+                display: inline-block;
+                height: 20px;
+                line-height: 20px;
+            }
+            .d-s-icon{
+                color:rgba(59,60,67,1);
+                position relative;
+                top: -5px;
+                margin-left: 4px;
+            }
         }
         .conneted1{
             position: relative;
@@ -155,7 +167,7 @@
         .detail_btn {
             display: flex;
             justify-content: space-between;
-            width: 215px;
+            // width: 215px;
             margin-right: 20px;
         }
     }
@@ -172,6 +184,7 @@
         .dimensionality {
             margin-left: 21px;
             width: 50%;
+            height: 100%;
             background: rgba(248, 248, 248, 1);
             .dim_span {
                 font-size:14px;
@@ -192,6 +205,7 @@
         .measurement {
             margin-right: 21px;
             width: 50%;
+            height: 100%;
             background: rgba(248, 248, 248, 1);
             .mea_span {
                 font-size:14px;
@@ -372,8 +386,9 @@
             padding: 5px 12px;
             line-height: 22px;
             cursor: pointer;
-            &:hover {
-                background-color: #eee;
+            &.active {
+                background-color: #40c0a8;
+                color: #fff;
             }
         }
         .text {

@@ -17,8 +17,8 @@
         </div> -->
       </div>
     </div>
-    <div class="options-body">
-      <b-scrollbar style="height: 100%;">
+    <div class="options-body scrollbar">
+      <!-- <b-scrollbar style="height: 100%;"> -->
         <div class="page-config" v-if="!currentSelected">
           <gui-field label="页面尺寸">
             <div class="gui-inline">
@@ -67,6 +67,18 @@
             <a-input-number v-model="globalSettings.gridStep" size="small" :min="2" :max="20"
                             @change="setPageSetting"></a-input-number>
           </gui-field>
+          <a-collapse defaultActiveKey="refresh" :bordered="false">
+            <a-collapse-panel key="refresh"  header="定时刷新">
+              <a-switch slot="extra" v-model="globalSettings.refresh.isRefresh" default-checked @change="refreshChange" size="small" />
+              <a-input-number v-model="globalSettings.refresh.frequency" :min="1" @change="frequencyChange" size="small"
+                              style="width: 100px;margin-right:10px" />
+              <a-select v-model="globalSettings.refresh.unit" placeholder="请选择"  @change="unitChange" size="small"
+                        style="width: 100px">
+                <a-select-option v-for="(item,index) in refreshList" :key="index" :value="item.value">{{item.name}}</a-select-option>
+              </a-select>
+            </a-collapse-panel>
+          </a-collapse>
+
           <gui-field label="重置">
             <a-button type="primary" size="small" @click="resetSetting">恢复默认配置</a-button>
           </gui-field>
@@ -190,16 +202,22 @@
                                         @change="setSelfProperty"></el-color-picker>
                     </gui-inline>
                   </gui-field>
-                  <gui-field label="柱条宽度" v-if="isHistogram">
-                    <a-input size="small" @change="setSelfProperty"
-                             v-model="selfConfig.series.barWidth" clearable></a-input>
-                  </gui-field>
-                  <gui-field label="堆叠柱状图" v-if="isHistogram">
-                    <a-switch v-model="selfConfig.stack" size="small" @change="setHistogram($event, 'stack')"></a-switch>
-                  </gui-field>
-                  <gui-field label="混合状图" v-if="isHistogram">
-                    <a-switch v-model="selfConfig.mixed" size="small" @change="setHistogram($event, 'mixed')"></a-switch>
-                  </gui-field>
+                  <div v-if="isHistogram">
+                    <gui-field label="柱条宽度">
+                      <a-input size="small" @change="setSelfProperty"
+                              v-model="selfConfig.series.barWidth" clearable></a-input>
+                    </gui-field>
+                    <gui-field label="柱形圆角">
+                      <a-switch v-model="selfConfig.radius" size="small" @change="setHistogram($event, 'radius')"></a-switch>
+                    </gui-field>
+                    <gui-field label="堆叠柱状图">
+                      <a-switch v-model="selfConfig.stack" size="small" @change="setHistogram($event, 'stack')"></a-switch>
+                    </gui-field>
+                    <gui-field label="混合状图">
+                      <a-switch v-model="selfConfig.mixed" size="small" @change="setHistogram($event, 'mixed')"></a-switch>
+                    </gui-field>
+                  </div>
+
                   <!-- <gui-field label="混合状图" v-if="isHistogram && selfConfig.mixed">
                     <a-switch v-model="selfConfig.mixed" size="small" @change="setHistogram($event, 'mixed')"></a-switch>
                   </gui-field> -->
@@ -207,7 +225,7 @@
               </template>
               <!-- 饼图独有 -->
               <template>
-                <a-collapse-panel key="properties" header="图形属性" v-if="(isPie || isRing) && selfConfig.series">
+                <a-collapse-panel key="properties" header="图形属性" v-if="(isPie || isRing || isMultiPie) && selfConfig.series">
                   <gui-field label="中心坐标">
                     <gui-inline>
                       <a-input v-model="selfConfig.series.center[0]" size="small"
@@ -237,6 +255,12 @@
                   <gui-field label="是否启用玫瑰图" v-if="isPie">
                     <a-switch v-model="selfConfig.series.roseType" size="small"
                               @change="switchChange"></a-switch>
+                  </gui-field>
+                  <gui-field label="外径大小" v-if="isMultiPie">
+                    <a-input v-model="apis.radius" size="small"
+                              placeholder="默认100"
+                              style="width:100px"
+                              @change="setApis"></a-input>
                   </gui-field>
                 </a-collapse-panel>
                 <a-collapse-panel key="indicator" header="指标设置" v-if="isPie || isMultiPie">
@@ -477,7 +501,7 @@
                                       show-alpha @change="setSelfProperty"></el-color-picker>
                   </gui-field>
                   <gui-field label="是否网格线">
-                    <a-switch v-model="selfConfig.xAxis.splitLine.show" default-checked @change="switchChange" size="small" />
+                    <a-switch v-model="selfConfig.yAxis.splitLine.show" default-checked @change="switchChange" size="small" />
                   </gui-field>
                   <gui-field label="网格线颜色" v-if="selfConfig.xAxis.splitLine.show">
                     <el-color-picker v-model="selfConfig.xAxis.splitLine.lineStyle.color"
@@ -510,7 +534,7 @@
                                       show-alpha @change="setSelfProperty"></el-color-picker>
                   </gui-field>
                   <gui-field label="是否网格线">
-                    <a-switch v-model="selfConfig.yAxis.splitLine.show" default-checked @change="switchChange" size="small" />
+                    <a-switch v-model="selfConfig.xAxis.splitLine.show" default-checked @change="switchChange" size="small" />
                   </gui-field>
                   <gui-field label="网格线颜色" v-if="selfConfig.yAxis.splitLine.show">
                     <el-color-picker v-model="selfConfig.yAxis.splitLine.lineStyle.color"
@@ -868,7 +892,7 @@
             <div flex="main:center">暂无交互事件</div>
           </div>
         </div>
-      </b-scrollbar>
+      <!-- </b-scrollbar> -->
     </div>
     <div class="expand-hover" @click="$emit('on-toggle')">
       <div class="inner">
@@ -919,13 +943,24 @@
         }, // 单选radio样式
         showSlide: false, // 显示透明滑动条
         imageUrl: '', // 上传图片url
-        loading: false // 是否上传图片中
+        loading: false, // 是否上传图片中
+        refreshList: [
+          { name: '分', value: 'min' },
+          { name: '小时', value: 'hour' }
+        ]
       }
     },
     mounted() {
       if (!this.screenId) {
         this.resetSetting()
       }
+      if (this.$route.path === '/screen/edit') {
+        this.setTimer()
+      }
+    },
+    destroyed() {
+      clearInterval(this.timer)
+      this.timer = null
     },
     methods: {
       ...mapActions(['saveScreenData']),
@@ -970,13 +1005,65 @@
       },
       // 重置全局配置
       resetSetting () {
-        this.$loading.start()
-        resetPageSettings().then(res => {
-          this.globalSettings = res.data
-          this.$store.dispatch('SetPageSettings', res.data)
-          this.$loading.done()
-          // this.saveScreenData()
-        })
+        let pageSettings = {
+           width: 1920,
+           height: 1080,
+           backgroundColor: '#0d2a42',
+           gridStep: 1,
+           backgroundSrc: '',
+           backgroundType: '1',
+           opacity: 1,
+           refresh: { frequency: '', isRefresh: false }
+        }
+        this.globalSettings = pageSettings
+        this.$store.dispatch('SetPageSettings', pageSettings)
+      },
+      // 全局刷新打开关闭
+      refreshChange(checked) {
+        // 阻止默认事件，取消收起
+        event.stopPropagation()
+        this.globalSettings.refresh.isRefresh = checked
+        if (checked) {
+          this.frequencyChange(1)
+          this.unitChange(1)
+        }
+        this.$store.dispatch('SetPageSettings', this.globalSettings)
+        this.saveScreenData()
+        this.setTimer()
+      },
+      frequencyChange(val) {
+        if (this.globalSettings.refresh.isRefresh) {
+          if (this.globalSettings.refresh.unit === 'min' && this.globalSettings.refresh.frequency > 1440) {
+            this.$message.error('时间设置不超过1天, 请重新设置')
+            this.resetSetting()
+          }
+          if (this.globalSettings.refresh.unit === 'hour' && this.globalSettings.refresh.frequency > 24) {
+            this.$message.error('时间设置不超过24天, 请重新设置')
+            this.resetSetting()
+          }
+        }
+        if (val !== 1) {
+          this.$store.dispatch('SetPageSettings', this.globalSettings)
+          this.saveScreenData()
+          this.setTimer()
+        }
+      },
+      unitChange(val) {
+        if (this.globalSettings.refresh.isRefresh) {
+          if (this.globalSettings.refresh.frequency > 1440 && this.globalSettings.refresh.unit === 'min') {
+            this.$message.error('时间设置不超过1天, 请重新设置')
+            this.resetSetting()
+          }
+          if (this.globalSettings.refresh.frequency > 24 && this.globalSettings.refresh.unit === 'hour') {
+            this.$message.error('时间设置不超过1天, 请重新设置')
+            this.resetSetting()
+          }
+        }
+        if (val !== 1) {
+          this.$store.dispatch('SetSelfDataSource', this.globalSettings)
+          this.saveScreenData()
+          this.setTimer()
+        }
       },
       // 数据源改变事件
       dataSourceChange () {
@@ -1078,7 +1165,7 @@
         this.setSelfProperty()
       },
 
-      // 状图设置
+      // 状图图设置
       setHistogram(val, type) {
         let apiData = deepClone(this.apiData)
         let columns = apiData.columns
@@ -1089,6 +1176,12 @@
           }
         } else {
           this.apis.stack = {}
+        }
+        // 圆形柱状图
+        if (val && type === 'radius') {
+          this.selfConfig.series.itemStyle.normal.barBorderRadius = [50, 50, 0, 0]
+        } else {
+          this.selfConfig.series.itemStyle.normal.barBorderRadius = [0]
         }
         // 混合柱状图
         if (val && type === 'mixed') {
@@ -1105,6 +1198,48 @@
       // 混合柱状图
       setMixed(val) {
 
+      },
+      // 定时器设置
+      setTimer() {
+        if (this.timer) {
+          clearInterval(this.timer)
+          this.timer = null
+        } else {
+          // 所有条件都满足才开始倒计时刷新
+          if (this.globalSettings.refresh.isRefresh && this.globalSettings.refresh.unit && this.globalSettings.refresh.frequency > 0) {
+            let count = 0
+            if (this.globalSettings.refresh.unit === 'min') {
+              count = this.globalSettings.refresh.frequency * 60 * 1000
+            } else if (this.globalSettings.refresh.unit === 'hour') {
+              count = this.globalSettings.refresh.frequency * 60 * 60 * 1000
+            }
+            this.timer = setInterval(() => {
+              this.refreshData()
+            }, count)
+          }
+        }
+      },
+      // 刷新大屏
+      refreshData() {
+        let params = {
+          id: this.screenId
+        }
+        this.$server.screenManage.actionRefreshScreen({ params }).then(res => {
+          if (res.code === 200) {
+            let screenDataList = res.data.screenDataList
+            for (let item of screenDataList) {
+              for (let item2 of this.canvasMap) {
+                let apidata = deepClone(item2.packageJson.api_data)
+                if (item2.id === item.id) {
+                  if (this.globalSettings.unit && this.globalSettings.frequency > 0) {
+                    item2.packageJson.api_data.source.rows = item.value
+                  }
+                }
+              }
+            }
+            this.saveScreenData()
+          }
+        })
       }
     },
     watch: {
@@ -1138,7 +1273,13 @@
         handler (val) {
           if (val) {
             console.log(val)
-            this.globalSettings = deepClone(val)
+            let setting = val
+            if (!setting.refresh) {
+              setting.refresh = {
+                frequency: '', isRefresh: false
+              }
+            }
+            this.globalSettings = deepClone(setting)
           }
         },
         deep: true,
@@ -1155,6 +1296,9 @@
       },
       isHistogram () {
         return this.chartType === 'v-histogram'
+      },
+      isBar () {
+        return this.chartType === 'v-bar'
       },
       isPie () {
         return this.chartType === 'v-pie'
@@ -1184,13 +1328,13 @@
         return this.chartType === 'v-tables'
       },
       showGrid () {
-        return this.selfConfig.grid && (this.isLine || this.isHistogram)
+        return this.selfConfig.grid && (this.isLine || this.isHistogram || this.isBar)
       },
       showXAxis () {
-        return this.selfConfig.xAxis && (this.isLine || this.isHistogram)
+        return this.selfConfig.xAxis && (this.isLine || this.isHistogram || this.isBar)
       },
       showYAxis () {
-        return this.selfConfig.yAxis && (this.isLine || this.isHistogram)
+        return this.selfConfig.yAxis && (this.isLine || this.isHistogram || this.isBar)
       }
     },
     components: { GuiField, GuiInline, GuiColors, DataSource }

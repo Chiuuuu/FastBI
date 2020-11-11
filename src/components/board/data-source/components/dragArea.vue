@@ -59,14 +59,28 @@ export default {
         if (val) {
           // 当前选中的图表显示维度度量的数据
           this.fileList = []
-          if (this.type === 'dimensions' && val.packageJson.api_data.dimensions) { // 维度
-            this.fileList = deepClone(val.packageJson.api_data.dimensions)
+          // 维度度量都需要
+          if (this.chartType === '1') {
+            if (this.type === 'dimensions' && val.packageJson.api_data.dimensions) { // 维度
+              this.fileList = deepClone(val.packageJson.api_data.dimensions)
+            }
+            if (this.type === 'measures' && val.packageJson.api_data.measures) { // 度量
+              this.fileList = deepClone(val.packageJson.api_data.measures)
+            }
           }
-          if (this.type === 'measures' && val.packageJson.api_data.measures) { // 度量
-            this.fileList = deepClone(val.packageJson.api_data.measures)
+
+          // 只需要度量
+          if (this.chartType === '2') {
+            if (this.type === 'measures' && val.packageJson.api_data.measures) {
+              this.fileList = deepClone(val.packageJson.api_data.measures)
+            }
           }
-          if (this.type === 'tableList' && val.packageJson.api_data.tableList) { // 表格不区分维度度量
-            this.fileList = deepClone(val.packageJson.api_data.tableList)
+
+          // 表格不区分维度跟度量
+          if (this.chartType === '3') {
+            if (this.type === 'tableList' && val.packageJson.api_data.tableList) {
+              this.fileList = deepClone(val.packageJson.api_data.tableList)
+            }
           }
         }
       },
@@ -75,7 +89,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['dragFile', 'currentSelected', 'optionsTabsType', 'dataModel'])
+    ...mapGetters(['dragFile', 'currentSelected', 'optionsTabsType', 'dataModel']),
+    chartType () {
+      return this.currentSelected ? this.currentSelected.packageJson.type : ''
+    }
   },
   mounted() {
     this.current = deepClone(this.currentSelected)
@@ -87,6 +104,8 @@ export default {
       // h5 api
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
       let apiData = deepClone(this.currentSelected.packageJson.api_data)
+      console.log(apiData)
+      console.log(dataFile)
       if (apiData.modelId && apiData.modelId !== dataFile.datamodelId) {
         this.$message.error('一个图表只能拖入一个数据模型的字段')
         return false
@@ -98,13 +117,21 @@ export default {
         this.fileList = this.uniqueFun(this.fileList, 'name')
         this.getData()
       }
-      if (this.type === 'measures' && this.dragFile === this.type) {
+      // 度量
+      if (this.type === 'measures' && this.dragFile === this.type && this.chartType === '1') {
         this.fileList.push(dataFile)
         this.fileList = this.uniqueFun(this.fileList, 'name')
         this.getData()
       }
+      // 表格
       if (this.type === 'tableList') {
         this.fileList.push(dataFile)
+        this.fileList = this.uniqueFun(this.fileList, 'name')
+        this.getData()
+      }
+      // 仪表盘/环形图
+      if (this.chartType === '2' && this.type === 'measures' && this.dragFile === this.type) {
+        this.fileList[0] = dataFile
         this.fileList = this.uniqueFun(this.fileList, 'name')
         this.getData()
       }
@@ -135,46 +162,54 @@ export default {
       this.getData()
       let current = deepClone(this.currentSelected)
       // 维度度量删除完以后重置该图表数据
-      if (current.packageJson.api_data.dimensions.length === 0 && current.packageJson.api_data.measures.length === 0) {
-        current.packageJson.api_data.modelId = ''
-        this.$store.dispatch('SetSelfDataSource', current.packageJson.api_data)
-        // let canvasMaps = navigateList[0].children
-        // for (let maps of canvasMaps) {
-        //   console.log(1111)
-        //   if (maps.name === current.name) {
-        //     console.log(maps.api_data)
-        //     maps.api_data.modelId = ''
-        //     let apiData = {
-        //       ...maps.api_data
-        //     }
-        //     this.$store.dispatch('SetSelfDataSource', apiData)
-        //     this.saveScreenData()
-        //   }
-        // }
+      if (this.type === '1' || this.type === '2') {
+        if (current.packageJson.api_data.dimensions.length === 0 && current.packageJson.api_data.measures.length === 0) {
+          current.packageJson.api_data.modelId = ''
+          this.$store.dispatch('SetSelfDataSource', current.packageJson.api_data)
+        }
+      }
+      if (this.type === '3') {
+        if (current.packageJson.api_data.tableList.length === 0) {
+          current.packageJson.api_data.modelId = ''
+          this.$store.dispatch('SetSelfDataSource', current.packageJson.api_data)
+        }
       }
     },
     // 根据维度度量获取数据
     getData() {
-      for (let item of this.fileList) {
-        item.defaultAggregator = 'SUM'
-      }
+      // 维度
       if (this.type === 'dimensions') {
         this.currentSelected.packageJson.api_data.dimensions = this.fileList
       }
+      // 度量
       if (this.type === 'measures') {
         this.currentSelected.packageJson.api_data.measures = this.fileList
       }
+      // 表格
       if (this.type === 'tableList') {
         this.currentSelected.packageJson.api_data.tableList = this.fileList
       }
       let apiData = deepClone(this.currentSelected.packageJson.api_data)
-      if ((!apiData.modelId || apiData.modelId === '') && this.fileList.length === 1) {
-        this.currentSelected.packageJson.api_data.modelId = this.fileList[0].datamodelId
-        // this.$store.dispatch('SetSelfDataSource', apiData)
+      if ((!apiData.modelId || apiData.modelId === '') && this.fileList.length > 0) {
+        apiData.modelId = this.fileList[0].datamodelId
+        // this.currentSelected.packageJson.api_data.modelId = this.fileList[0].datamodelId
       }
-      if (this.type !== 'tableList' && (apiData.dimensions.length === 0 || apiData.measures.length === 0)) {
-        return
+      if (this.chartType === '1') {
+        if (!apiData.dimensions.length || !apiData.measures.length) {
+          return
+        }
       }
+      if (this.chartType === '2') {
+        if (!apiData.measures.length) {
+          return
+        }
+      }
+      // if (this.chartType === '3') {
+      //   if (!apiData.tableList.length) {
+      //     console.log(123)
+      //     return
+      //   }
+      // }
       let params = {
         setting: {
           ...this.currentSelected
@@ -202,8 +237,32 @@ export default {
             }
             this.$store.dispatch('SetSelfDataSource', apiData)
           } else {
+            // 仪表盘/环形图 只显示度量
+            if (this.chartType === '2') {
+              let columns = ['type', 'value'] // 维度固定
+              for (let m of apiData.measures) {
+                columns.push(m.name) // 默认columns第二项起为指标
+              }
+              let rows = [{
+                type: apiData.measures[0].name,
+                value: res.rows[0] ? res.rows[0][apiData.measures[0].name] : 0
+              }]
+              apiData.source = {
+                columns,
+                rows
+              }
+              // 保存apidata数据
+              this.$store.dispatch('SetSelfDataSource', apiData)
+              let config = deepClone(this.currentSelected.packageJson.config)
+              if (this.currentSelected.packageJson.chartType === 'v-multiPie') {
+                config.chartTitle.text = rows[0].value
+                this.$store.dispatch('SetSelfProperty', config)
+              }
+              this.saveScreenData()
+              return
+            }
+
             let columns = []
-            // let apiData = this.currentSelected.packageJson.api_data
             let dimensionKeys = apiData.dimensions[0].name // 维度key
             columns[0] = dimensionKeys // 默认columns第一项为维度
             let measureKeys = [] // 度量key
@@ -212,19 +271,36 @@ export default {
               columns.push(m.name) // 默认columns第二项起为指标
             }
             let rows = []
+            let level1 = []
+            let level2 = []
             res.rows.map((item, index) => {
               let obj = {}
               obj[dimensionKeys] = item[dimensionKeys]
               for (let item2 of measureKeys) {
                 obj[item2] = item[item2]
               }
-              rows.push(obj)
+              if (obj[dimensionKeys]) {
+                rows.push(obj)
+              }
             })
             apiData.source = {
               columns,
               rows
             }
-            console.log(apiData)
+            // 嵌套饼图设置apis
+            if (this.currentSelected.packageJson.name === 've-pie') {
+              rows.map((item, index) => {
+                if (index < 2) {
+                  level1.push(item[columns[0]])
+                } else {
+                  level2.push(item[columns[0]])
+                }
+              })
+              let apis = {
+                level: [level1, level2]
+              }
+              this.$store.dispatch('SetApis', apis)
+            }
             this.$store.dispatch('SetSelfDataSource', apiData)
           }
           this.saveScreenData()

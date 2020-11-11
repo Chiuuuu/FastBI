@@ -2,18 +2,19 @@ import $axios from '@/axios'
 
 export default {
   /**
-   * @description 新建状态, 关键字查询数据源列表
-   * @returns
-   */
-  getSearchDataSourceList() {
-    return $axios.post(`/model/datamodel/addModelDatamodel`)
-  },
-  /**
    * @description 新建状态, 获取一个空的数据模型
    * @returns
    */
   getAddModelDatamodel() {
     return $axios.post(`/model/datamodel/addModelDatamodel`)
+  },
+  /**
+   * @description 左侧端数据源列表对象
+   * @param {String|Number} dataSourceId
+   * @returns
+   */
+  getDatabaseList(dataSourceId) {
+    return $axios.get(`/model/datasource/returnDataModelSourceList/${dataSourceId}`)
   },
   /**
    * @description 编辑状态, 根据数据源id获取数据库
@@ -95,5 +96,71 @@ export default {
    */
   saveModel(params) {
     return $axios.put('/model/datamodel/updateDataModelDetailInfo', params)
+  },
+  /**
+   * @description 查看宽表
+   * @param {Object} params 请求体
+   * @param {Object} params.config 配置
+   * @param {Object} params.pivotSchema 维度度量等参数
+   * @returns
+   */
+  getWidthTableInfo(params) {
+    return $axios.post('/model/datamodel/getWideTableInfo', params)
+  },
+  /**
+   * 导出宽表数据
+   * @param {Object} data
+   * @returns
+   */
+  actionDownloadfile(data) {
+    return $axios({
+      method: 'post',
+      url: 'model/datamodel/export',
+      responseType: 'blob', // 注意类型
+      data
+    })
+  },
+  /**
+   * @description 两表之间的关联列表
+   * @param {String|Number} leftTableId
+   * @param {String|Number} rightTableId
+   * @returns
+   */
+  getDataSourceFieldDataInfoList(leftTableId, rightTableId) {
+    return $axios.get(`/model/datamodel/getDataSourceFieldDataInfoList/${leftTableId}/${rightTableId}`)
+  },
+  /**
+   * 保存自定义SQL
+   * @param {Object} params
+   * @returns
+   */
+  saveCustomSql(params) {
+    return $axios.post(`model/custom/excute`, params)
+  },
+  /**
+   * 删除自定义SQL
+   * @param {Object} params
+   * @param {String} params.name
+   * @param {Number} params.tableId
+   * @returns
+   */
+  deleCustomSql(params) {
+    return $axios.put('model/custom/remove', params)
+  },
+  /**
+   * 获取自定义SQL信息
+   * @param {*} id
+   * @returns
+   */
+  getCustomSqlDetail(id) {
+    return $axios.get(`model/custom/${id}`)
+  },
+  /**
+   * 校验Sql
+   * @param {*} params
+   * @returns
+   */
+  actionValidateCustomSql(params) {
+    return $axios.post(`model/custom/checkCustomizeSQL`, params)
   }
 }

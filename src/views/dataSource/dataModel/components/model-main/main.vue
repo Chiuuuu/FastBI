@@ -14,9 +14,8 @@
         </div>
         <div class="scrollable scrollbar">
           <div class="description">
-              <span class="d-s">描述：{{detailInfo.description}}</span>
+              <span class="d-s" :title="detailInfo.description">描述：{{detailInfo.description}}</span>
           </div>
-          <a-divider />
           <div
             class="m-dml-map m-map scrollbar"
           >
@@ -40,7 +39,7 @@
             <div class="detail_main">
               <div class="dimensionality">
                 <span class="dim_span">维度</span>
-                  <div class="dim_menu">
+                  <div class="dim_menu scrollbar">
                     <a-menu mode="inline" v-for="(value, name) in dimensions" :key="name" :default-open-keys="[name]" :inline-collapsed="false">
                       <a-sub-menu :key="name">
                         <span slot="title"><span>{{value[0].tableName}}</span></span>
@@ -57,7 +56,7 @@
               </div>
               <div class="measurement">
                 <span class="mea_span">度量</span>
-                  <div class="mea_menu">
+                  <div class="mea_menu scrollbar">
                     <a-menu mode="inline" v-for="(value, name) in measures" :key="name" :default-open-keys="[name]" :inline-collapsed="false">
                       <a-sub-menu :key="name">
                         <span slot="title"><span>{{value[0].tableName}}</span></span>
