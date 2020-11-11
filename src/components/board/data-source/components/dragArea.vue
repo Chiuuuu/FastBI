@@ -161,15 +161,18 @@ export default {
       this.fileList.splice(index, 1)
       this.getData()
       let current = deepClone(this.currentSelected)
+      console.log(current.packageJson.api_data)
       // 维度度量删除完以后重置该图表数据
-      if (this.type === '1' || this.type === '2') {
+      if (this.chartType === '1' || this.chartType === '2') {
         if (current.packageJson.api_data.dimensions.length === 0 && current.packageJson.api_data.measures.length === 0) {
           current.packageJson.api_data.modelId = ''
           this.$store.dispatch('SetSelfDataSource', current.packageJson.api_data)
         }
       }
-      if (this.type === '3') {
+      if (this.chartType === '3') {
+        console.log(current.packageJson.api_data.tableList.length)
         if (current.packageJson.api_data.tableList.length === 0) {
+          console.log(123)
           current.packageJson.api_data.modelId = ''
           this.$store.dispatch('SetSelfDataSource', current.packageJson.api_data)
         }
