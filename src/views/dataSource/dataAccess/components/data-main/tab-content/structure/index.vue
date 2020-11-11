@@ -304,7 +304,8 @@ export default {
       })
 
       if (result.code === 200) {
-        this.$message.success('请刷新数据查看状态')
+        this.handleGetData()
+        this.$message.success('已创建抽取任务')
       } else {
         this.$message.error(result.msg)
       }
