@@ -218,7 +218,9 @@ export default {
     handleClearCondition() {
       this.popoverForm = []
       this.nodeData.props.join.conditions = []
-      this.handleAddCondition()
+      this.$nextTick(() => {
+        this.handleAddCondition()
+      })
     },
     handleBtnDelete(node) {
       // let deleteList = []
