@@ -91,7 +91,8 @@ const columns = [
   {
     title: '表名',
     dataIndex: 'name',
-    ellipsis: true
+    ellipsis: true,
+    width: 200
   },
   {
     title: '抽取方式',

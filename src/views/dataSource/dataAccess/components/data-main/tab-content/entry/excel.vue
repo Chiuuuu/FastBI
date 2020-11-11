@@ -2,6 +2,7 @@
   <div class="tab-excel">
     <a-form-model
       ref="fileForm"
+      class="tab-datasource-model scrollbar"
       :model="form"
       :rules="rules"
       :label-col="{ span: 4 }"

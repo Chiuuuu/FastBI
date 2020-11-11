@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="tab-panel">
     <div class="search_bar">
       <!-- <a-radio-group class="search_radio" v-model="tableType" @change="handleTableTypeChange">
         <a-radio-button value="1">原始表</a-radio-button>
@@ -26,7 +26,7 @@
         </a-col> -->
       </a-row>
     </div>
-    <div class="table">
+    <div class="tab-scroll scrollbar">
       <a-table :row-selection="rowSelection" :columns="columns" :data-source="data"  rowKey='id' :loading='spinning' :pagination='false'>
         <span slot="set" slot-scope="set">
           {{ set ? '是' : '否' }}
@@ -137,6 +137,8 @@ const columns = [
   {
     title: '表名',
     dataIndex: 'name',
+    ellipsis: true,
+    width: 200,
     key: 'name'
   },
   {
@@ -301,10 +303,11 @@ export default {
         tableList: this.data
       }).finally(() => {
         this.extractSping = false
+        this.handleGetData()
       })
 
       if (result.code === 200) {
-        this.$message.success('请刷新数据查看状态')
+        this.$message.success('抽取成功')
       } else {
         this.$message.error(result.msg)
       }
