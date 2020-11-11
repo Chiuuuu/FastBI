@@ -26,7 +26,7 @@
           <div>
             <span>每隔&nbsp;</span>
             <a-input style="width:100px" v-model="form.interval"></a-input>
-            <a-select class="regular-bordered" style="width:80px" v-model="form.frequency" placeholder="请选择更新方式">
+            <a-select class="regular-bordered" style="width:80px" @select="handleSelectFrequency" v-model="form.frequency" placeholder="请选择更新方式">
               <a-select-option value="0">分钟</a-select-option>
               <a-select-option value="1">小时</a-select-option>
               <a-select-option value="2">天</a-select-option>
@@ -91,7 +91,8 @@ const columns = [
   {
     title: '表名',
     dataIndex: 'name',
-    ellipsis: true
+    ellipsis: true,
+    width: 200
   },
   {
     title: '抽取方式',
@@ -245,6 +246,16 @@ export default {
       if (/^[1-9]\d*$/.test(value)) {
         if (this.form.frequency === '0' && (value * 1) < 30) {
           callback(new Error('间隔不得小于30分钟'))
+        } else if (this.form.frequency === '0' && (value * 1) > 60) {
+          callback(new Error('间隔不得大于60分钟'))
+        } else if (this.form.frequency === '1' && (value * 1) > 24) {
+          callback(new Error('间隔不得大于24小时'))
+        } else if (this.form.frequency === '2' && (value * 1) > 365) {
+          callback(new Error('间隔不得大于365'))
+        } else if (this.form.frequency === '3' && (value * 1) > 52) {
+          callback(new Error('间隔不得大于52周'))
+        } else if (this.form.frequency === '4' && (value * 1) > 12) {
+          callback(new Error('间隔不得大于12个月'))
         } else {
           callback()
         }
@@ -274,6 +285,9 @@ export default {
       } else {
         callback()
       }
+    },
+    handleSelectFrequency() {
+      this.$refs.form.validateField('interval')
     },
     resetForm() {
       this.form = Object.assign({}, this.$options.data().form)

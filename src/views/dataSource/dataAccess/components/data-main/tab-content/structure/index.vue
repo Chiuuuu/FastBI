@@ -34,6 +34,13 @@
         <span slot="extracted" slot-scope="extracted">
           {{ extracted ? '是' : '否' }}
         </span>
+        <template slot="extractStatus" slot-scope="extractStatus">
+          <span v-if="extractStatus === 0">未抽取</span>
+          <span v-else-if="extractStatus === 1">抽取中</span>
+          <span v-else-if="extractStatus === 2">抽取成功</span>
+          <span v-else-if="extractStatus === 3">抽取失败</span>
+          <span v-else>未抽取</span>
+        </template>
         <span slot="config" slot-scope="row">
           <a v-on:click="setting(row)">{{row.set ? '字段编辑' : '字段设置' }}</a>
         </span>
@@ -130,6 +137,8 @@ const columns = [
   {
     title: '表名',
     dataIndex: 'name',
+    ellipsis: true,
+    width: 200,
     key: 'name'
   },
   {
@@ -145,6 +154,13 @@ const columns = [
     key: 'extracted',
     slots: { title: 'extracted' },
     scopedSlots: { customRender: 'extracted' }
+  },
+  {
+    title: '抽取状态',
+    dataIndex: 'extractStatus',
+    key: 'extractStatus',
+    slots: { title: 'extractStatus' },
+    scopedSlots: { customRender: 'extractStatus' }
   },
   {
     title: '修改时间',
@@ -247,24 +263,6 @@ export default {
     async showExtractLog() {
       this.visible1 = true
       this.modalSpin = true
-      // const logData = []
-      // for (let i = 0; i < 30; i++) {
-      //   logData.push({
-      //     id: i + '',
-      //     name: '任务' + i,
-      //     starttime: '2020-10-26 11:11:11',
-      //     duration: '20s',
-      //     state: 1,
-      //     progress: 70,
-      //     async: 20,
-      //     error: 2,
-      //     relation: 10
-      //   })
-      // }
-      // setTimeout(() => {
-      //   this.logData = logData
-      //   this.modalSpin = false
-      // }, 1000)
       this.$server.dataAccess.getExtractLogList(this.data[0].id)
         .then(res => {
           if (res.code === 200) {
@@ -305,10 +303,11 @@ export default {
         tableList: this.data
       }).finally(() => {
         this.extractSping = false
+        this.handleGetData()
       })
 
       if (result.code === 200) {
-        this.$message.success('请刷新数据查看状态')
+        this.$message.success('抽取成功')
       } else {
         this.$message.error(result.msg)
       }
