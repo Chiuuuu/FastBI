@@ -137,6 +137,8 @@ const columns = [
   {
     title: '表名',
     dataIndex: 'name',
+    ellipsis: true,
+    width: 200,
     key: 'name'
   },
   {
