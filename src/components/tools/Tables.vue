@@ -70,22 +70,23 @@
         handler (val) {
           console.log(val)
           if (val) {
-            // if (val.source && val.source.columns) {
-            //   for (let item of val.source.columns) {
-            //     // 表格样式
-            //     item.customHeaderCell = this.customHeaderRow
+            if (val.tableList.length > 0 && val.source && val.source.columns) {
+              for (let item of val.source.columns) {
+                // 表格样式
+                item.customHeaderCell = this.customHeaderRow
 
-            //     // 是否自动换行
-            //     if (!this.config.ellipsis) {
-            //       item.ellipsis = true
-            //     } else {
-            //       item.ellipsis = false
-            //     }
-            //   }
-            // }
-            console.log(val.columns)
+                // 是否自动换行
+                if (!this.config.ellipsis) {
+                  item.ellipsis = true
+                } else {
+                  item.ellipsis = false
+                }
+              }
+              this.columns = val.source.columns
+              this.tableData = val.source.rows
+              return
+            }
             this.columns = val.columns
-            console.log(this.columns)
             this.tableData = val.rows
           }
         },
