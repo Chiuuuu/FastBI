@@ -34,13 +34,13 @@
         <span slot="extracted" slot-scope="extracted">
           {{ extracted ? '是' : '否' }}
         </span>
-        <tamplate slot="extractStatus" slot-scope="extractStatus">
+        <template slot="extractStatus" slot-scope="extractStatus">
           <span v-if="extractStatus === 0">未抽取</span>
           <span v-else-if="extractStatus === 1">抽取中</span>
           <span v-else-if="extractStatus === 2">抽取成功</span>
           <span v-else-if="extractStatus === 3">抽取失败</span>
           <span v-else>未抽取</span>
-        </tamplate>
+        </template>
         <span slot="config" slot-scope="row">
           <a v-on:click="setting(row)">{{row.set ? '字段编辑' : '字段设置' }}</a>
         </span>
@@ -301,11 +301,11 @@ export default {
         tableList: this.data
       }).finally(() => {
         this.extractSping = false
+        this.handleGetData()
       })
 
       if (result.code === 200) {
-        this.handleGetData()
-        this.$message.success('已创建抽取任务')
+        this.$message.success('抽取成功')
       } else {
         this.$message.error(result.msg)
       }
