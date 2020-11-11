@@ -34,6 +34,13 @@
         <span slot="extracted" slot-scope="extracted">
           {{ extracted ? '是' : '否' }}
         </span>
+        <tamplate slot="extractStatus" slot-scope="extractStatus">
+          <span v-if="extractStatus === 0">未抽取</span>
+          <span v-else-if="extractStatus === 1">抽取中</span>
+          <span v-else-if="extractStatus === 2">抽取成功</span>
+          <span v-else-if="extractStatus === 3">抽取失败</span>
+          <span v-else>未抽取</span>
+        </tamplate>
         <span slot="config" slot-scope="row">
           <a v-on:click="setting(row)">{{row.set ? '字段编辑' : '字段设置' }}</a>
         </span>
@@ -145,6 +152,13 @@ const columns = [
     key: 'extracted',
     slots: { title: 'extracted' },
     scopedSlots: { customRender: 'extracted' }
+  },
+  {
+    title: '抽取状态',
+    dataIndex: 'extractStatus',
+    key: 'extractStatus',
+    slots: { title: 'extractStatus' },
+    scopedSlots: { customRender: 'extractStatus' }
   },
   {
     title: '修改时间',
