@@ -1170,28 +1170,24 @@ const list = [{
                       dataIndex: 'date',
                       key: 'date',
                       scopedSlots: { customRender: 'date' }
-                      // customHeaderCell: function() {}
                     },
                     {
                         title: '访问用户',
                         dataIndex: 'user1',
                         key: 'user1',
                         width: 80
-                        // customHeaderCell: function() {}
                     },
                     {
                         title: '下单用户',
                         dataIndex: 'user2',
                         key: 'user2',
                         ellipsis: true
-                        // customHeaderCell: function() {}
                     },
                     {
                         title: '下单率',
                         dataIndex: 'rate',
                         key: 'rate',
                         ellipsis: true
-                        // customHeaderCell: function() {}
                     }
                   ],
                   rows: [{

@@ -119,6 +119,7 @@
                 return
               }
             }
+            console.log(112)
             this.chartData.columns = val.columns
             this.chartData.rows = val.rows
 
