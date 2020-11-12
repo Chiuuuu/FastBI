@@ -149,13 +149,6 @@ const columns = [
     scopedSlots: { customRender: 'set' }
   },
   {
-    title: '抽取状态',
-    dataIndex: 'extractStatus',
-    key: 'extractStatus',
-    slots: { title: 'extractStatus' },
-    scopedSlots: { customRender: 'extractStatus' }
-  },
-  {
     title: '是否抽取过',
     dataIndex: 'extracted',
     key: 'extracted',
@@ -172,6 +165,7 @@ const columns = [
   {
     title: '修改时间',
     key: 'gmtModified',
+    width: 200,
     dataIndex: 'gmtModified'
   },
   {
