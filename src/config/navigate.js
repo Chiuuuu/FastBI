@@ -390,15 +390,6 @@ const list = [{
                   ]
                 },
                 apis: {
-                  // level: [
-                  //   ['1/1', '1/2', '1/3'],
-                  //   ['1/4', '1/5']
-                  // ],
-                    labelMap: {
-                        'x': '类目',
-                        'y': '值',
-                        's': '系列1'
-                    }
                 },
                 background: {
                     backgroundType: '1',
@@ -472,16 +463,16 @@ const list = [{
                         }
                     },
                     series: {
-                        label: {
-                            show: true,
-                            color: '',
-                            fontSize: 12,
-                            position: 'outside', // 可选inside
-                            formatter: '{b}: {@2012} ({d}%)'
-                        },
-                        roseType: false, // 饼图可选玫瑰图
-                        center: ['50%', '50%'], // 饼图可选
-                        radius: ['0', '70%'] // 饼图可选
+                      label: {
+                          show: true,
+                          color: '',
+                          fontSize: 12,
+                          position: 'outside', // 可选inside
+                          formatter: '{b}: {@2012} ({d}%)'
+                      },
+                      roseType: false, // 饼图可选玫瑰图
+                      center: ['50%', '50%'], // 饼图可选
+                      radius: ['0', '70%'] // 饼图可选
                     },
                     color: DEFAULT_COLORS
                 },
@@ -1224,6 +1215,13 @@ const list = [{
                       user1: 3452,
                       user2: '3210',
                       rate: '33%'
+                    },
+                    {
+                      key: '6',
+                      date: '1/6',
+                      user1: 1234,
+                      user2: '3321',
+                      rate: '30%'
                     }
                   ]
                 },
