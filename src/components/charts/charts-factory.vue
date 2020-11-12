@@ -122,6 +122,7 @@
             console.log(112)
             this.chartData.columns = val.columns
             this.chartData.rows = val.rows
+            console.log(this.chartData)
 
             // if (val.source) {
             //   let data = formatData(val.source)
