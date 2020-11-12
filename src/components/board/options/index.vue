@@ -532,8 +532,8 @@
                     <el-color-picker v-model="selfConfig.yAxis.splitLine.lineStyle.color"
                                       show-alpha @change="setSelfProperty"></el-color-picker>
                   </gui-field>
-                  <gui-field label="网格线线型">
-                    <a-select style="width: 90px" v-model="selfConfig.yAxis.splitLine.lineStyle.type" @change="setSelfProperty" placeholder="无" size="small">
+                  <gui-field label="网格线线型" v-if="selfConfig.yAxis.splitLine.show">
+                    <a-select style="width: 90px" v-model="selfConfig.yAxis.splitLine.lineStyle.type" @change="setSelfProperty" size="small">
                       <a-select-option value="solid">
                         实线
                       </a-select-option>
@@ -551,10 +551,10 @@
               <template v-if="showYAxis">
                 <a-collapse-panel key="yAxis" header="y轴">
                   <a-switch slot="extra" v-if="collapseActive.indexOf('yAxis') > -1" v-model="selfConfig.yAxis.axisLine.show" default-checked @change="switchChange" size="small" />
-                  <gui-field label="y1标题" v-if="isHistogram">
+                  <gui-field label="y1标题" >
                     <a-input v-model="apis.yAxisName[0]" @change="setApis" style="width:100px;" size="small"></a-input>
                   </gui-field>
-                  <gui-field label="y2标题" v-if="isHistogram">
+                  <gui-field label="y2标题">
                     <a-input v-model="apis.yAxisName[1]" @change="setApis" style="width:100px;" size="small"></a-input>
                   </gui-field>
                   <gui-field label="文本">

@@ -63,17 +63,20 @@ export default {
   data() {
     return {
       screenName: '', // 大屏名称
-      isFocus: false // 大屏名称是否聚焦
+      isFocus: false, // 大屏名称是否聚焦
+      screenData: null
     }
   },
   computed: {
     ...mapGetters(['isScreen', 'pageSettings', 'canvasMap', 'screenId', 'fileName', 'parentId'])
   },
   watch: {
+    '$attrs'(val) {
+      this.screenData = val
+    }
   },
   mounted() {
-    console.log(this.$attrs)
-    this.screenName = this.$attrs.screenData ? this.$attrs.screenData.name : this.$route.query.name
+    this.screenName = this.screenData ? this.screenData.name : this.$route.query.name
     // this.screenName = this.fileName
     // this.screenName = this.$route.query.name
   },

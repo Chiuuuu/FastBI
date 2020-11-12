@@ -164,9 +164,6 @@ export default {
     }
   },
   watch: {
-    openKeys(val) {
-      console.log('openKeys', val)
-    },
     screenId: {
       handler(val) {},
       deep: true,
@@ -182,7 +179,6 @@ export default {
     ...mapGetters(['pageSettings', 'canvasRange', 'screenId', 'fileName', 'isScreen', 'parentId']),
     fileSelectId: {
       get () {
-        console.log(this.screenId)
         return this.screenId
       },
       set (value) {
@@ -191,7 +187,6 @@ export default {
     },
     fileSelectName: {
       get () {
-        console.log(this.fileName)
         return this.fileName
       },
       set (value) {
@@ -334,7 +329,7 @@ export default {
       this.isAdd = 1
       this.screenVisible = true
     },
-    // 新建/编辑大屏
+    // 新建/编辑大屏名称
     handleOk(e) {
       this.screenForm.validateFields((err, values) => {
         if (err) {
