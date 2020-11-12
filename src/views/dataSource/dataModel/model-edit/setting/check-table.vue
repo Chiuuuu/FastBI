@@ -45,8 +45,8 @@
           <tbody>
             <tr v-for="(item,index) in data" :key="index">
               <td><div class="txt txt-order">{{index+1}}</div></td>
-              <td v-for="subitem in columnsList" :key="subitem.name">
-                <div class="txt" :title="item[subitem.name]">{{item[subitem.name]}}</div>
+              <td v-for="(subitem,subIndex) in item" :key="subIndex">
+                <div class="txt" :title="subitem">{{subitem}}</div>
               </td>
             </tr>
           </tbody>
