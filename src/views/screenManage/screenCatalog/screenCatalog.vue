@@ -171,12 +171,18 @@ export default {
       handler(val) {},
       deep: true,
       immediate: true
+    },
+    fileName: {
+      handler(val) {},
+      deep: true,
+      immediate: true
     }
   },
   computed: {
     ...mapGetters(['pageSettings', 'canvasRange', 'screenId', 'fileName', 'isScreen', 'parentId']),
     fileSelectId: {
       get () {
+        console.log(this.screenId)
         return this.screenId
       },
       set (value) {
@@ -185,6 +191,7 @@ export default {
     },
     fileSelectName: {
       get () {
+        console.log(this.fileName)
         return this.fileName
       },
       set (value) {
@@ -219,7 +226,6 @@ export default {
         if (res.code === 200) {
           let rows = res.data
           this.folderList = rows
-          console.log(rows)
           if (!this.fileSelectId && this.folderList.length > 0) {
             if (this.folderList[0].children.length > 0) {
               this.fileSelectId = this.folderList[0].children[0].id

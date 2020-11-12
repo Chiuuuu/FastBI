@@ -70,11 +70,6 @@ export default {
     ...mapGetters(['isScreen', 'pageSettings', 'canvasMap', 'screenId', 'fileName', 'parentId'])
   },
   watch: {
-    '$attrs'(val) {
-      // if (val.screenData.name) {
-      //    this.screenName = val.screenData.name
-      // }
-    }
   },
   mounted() {
     console.log(this.$attrs)
