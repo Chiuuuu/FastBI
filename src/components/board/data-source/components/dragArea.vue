@@ -56,7 +56,6 @@ export default {
   watch: {
     currentSelected: {
       handler (val) {
-        console.log(val)
         if (val) {
           // 当前选中的图表显示维度度量的数据
           this.fileList = []
@@ -162,10 +161,21 @@ export default {
       this.fileList.splice(index, 1)
       this.getData()
       let current = deepClone(this.currentSelected)
+      console.log(current.packageJson.api_data)
       // 维度度量删除完以后重置该图表数据
-      if (current.packageJson.api_data.dimensions.length === 0 && current.packageJson.api_data.measures.length === 0) {
-        current.packageJson.api_data.modelId = ''
-        this.$store.dispatch('SetSelfDataSource', current.packageJson.api_data)
+      if (this.chartType === '1' || this.chartType === '2') {
+        if (current.packageJson.api_data.dimensions.length === 0 && current.packageJson.api_data.measures.length === 0) {
+          current.packageJson.api_data.modelId = ''
+          this.$store.dispatch('SetSelfDataSource', current.packageJson.api_data)
+        }
+      }
+      if (this.chartType === '3') {
+        console.log(current.packageJson.api_data.tableList.length)
+        if (current.packageJson.api_data.tableList.length === 0) {
+          console.log(123)
+          current.packageJson.api_data.modelId = ''
+          this.$store.dispatch('SetSelfDataSource', current.packageJson.api_data)
+        }
       }
     },
     // 根据维度度量获取数据
@@ -183,15 +193,26 @@ export default {
         this.currentSelected.packageJson.api_data.tableList = this.fileList
       }
       let apiData = deepClone(this.currentSelected.packageJson.api_data)
-      if ((!apiData.modelId || apiData.modelId === '') && this.fileList.length === 1) {
-        this.currentSelected.packageJson.api_data.modelId = this.fileList[0].datamodelId
-        // this.$store.dispatch('SetSelfDataSource', apiData)
+      if ((!apiData.modelId || apiData.modelId === '') && this.fileList.length > 0) {
+        apiData.modelId = this.fileList[0].datamodelId
+        // this.currentSelected.packageJson.api_data.modelId = this.fileList[0].datamodelId
       }
       if (this.chartType === '1') {
-        if (apiData.dimensions.length === 0 || apiData.measures.length === 0) {
+        if (!apiData.dimensions.length || !apiData.measures.length) {
           return
         }
       }
+      if (this.chartType === '2') {
+        if (!apiData.measures.length) {
+          return
+        }
+      }
+      // if (this.chartType === '3') {
+      //   if (!apiData.tableList.length) {
+      //     console.log(123)
+      //     return
+      //   }
+      // }
       let params = {
         setting: {
           ...this.currentSelected
@@ -243,6 +264,7 @@ export default {
               this.saveScreenData()
               return
             }
+
             let columns = []
             let dimensionKeys = apiData.dimensions[0].name // 维度key
             columns[0] = dimensionKeys // 默认columns第一项为维度
@@ -257,7 +279,6 @@ export default {
             res.rows.map((item, index) => {
               let obj = {}
               obj[dimensionKeys] = item[dimensionKeys]
-              console.log(obj)
               for (let item2 of measureKeys) {
                 obj[item2] = item[item2]
               }
@@ -281,7 +302,6 @@ export default {
               let apis = {
                 level: [level1, level2]
               }
-              console.log(apis)
               this.$store.dispatch('SetApis', apis)
             }
             this.$store.dispatch('SetSelfDataSource', apiData)

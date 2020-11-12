@@ -165,6 +165,7 @@ const columns = [
   {
     title: '修改时间',
     key: 'gmtModified',
+    width: 200,
     dataIndex: 'gmtModified'
   },
   {

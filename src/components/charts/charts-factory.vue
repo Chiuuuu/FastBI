@@ -99,7 +99,8 @@
       apiData: {
         handler (val) {
           if (val) {
-            // 仪表盘
+            console.log(val)
+            // 只有度量的情况
             if (this.type === '2') {
               if (val.measures && val.measures.length > 0) {
                 this.chartData = val.source
@@ -113,11 +114,12 @@
               if ((val.dimensions.length === 0 && val.measures.length > 0) || (val.dimensions.length > 0 && val.measures.length === 0)) {
                 return
               }
-              if (val.dimensions.length > 0 && val.measures.length > 0) {
+              if (val.dimensions.length > 0 && val.measures.length > 0 && val.source) {
                 this.chartData = val.source
                 return
               }
             }
+            console.log(112)
             this.chartData.columns = val.columns
             this.chartData.rows = val.rows
 
