@@ -1,6 +1,6 @@
 <template>
   <div
-    class="m-dml-map m-map edit scrollbar"
+    class="m-dml-map m-map"
     ref="mapRef"
     @dragenter.prevent.stop="handleMapDragEnter"
     @dragover.prevent.stop
@@ -235,14 +235,12 @@ export default {
 }
 </script>
 <style lang="stylus" scoped>
-.m-dml-map.edit {
-    height: calc(50vh - 162px);
-}
 .m-map {
     position: relative;
     box-sizing: border-box;
-    margin: 21px;
-    overflow: auto;
+    padding: 21px;
+    height: 100%;
+    width: 100%;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;

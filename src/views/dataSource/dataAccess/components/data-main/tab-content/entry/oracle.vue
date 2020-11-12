@@ -2,6 +2,7 @@
 <div class="tab-datasource">
   <a-form-model
     ref="dbForm"
+    class="tab-datasource-model scrollbar"
     labelAlign="left"
     :model="form"
     :rules="rules"

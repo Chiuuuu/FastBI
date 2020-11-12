@@ -2,6 +2,7 @@
 <div class="tab-datasource">
   <a-form-model
     ref="dbForm"
+    class="tab-datasource-model scrollbar"
     labelAlign="left"
     :model="form"
     :rules="rules"
@@ -27,11 +28,11 @@
     <a-form-model-item label="密码" prop="password">
       <a-input-password v-model="form.password" autocomplete />
     </a-form-model-item>
-    <a-form-model-item :wrapper-col="{ span: 14, offset: 4 }">
+    <a-form-model-item :wrapper-col="{ span: 14 }">
       <a-button
         :loading="connectBtn"
         type="primary"
-        style="width:88px;height:30px"
+        style="width:88px;height:30px;margin-left:150px"
         @click="handleConnect"
       >
         连接

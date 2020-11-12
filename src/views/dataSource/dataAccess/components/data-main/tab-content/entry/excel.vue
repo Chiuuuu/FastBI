@@ -1,131 +1,133 @@
 <template>
-  <div class="tab-excel">
-    <a-form-model
-      ref="fileForm"
-      :model="form"
-      :rules="rules"
-      :label-col="{ span: 4 }"
-      :wrapper-col="{ span: 14 }"
-    >
-      <a-form-model-item label="数据源名称" prop="name">
-        <a-input v-model="form.name" />
-      </a-form-model-item>
-      <a-form-model-item :label="modelType + '文件'" required>
-        <div
-          class="excel-list scrollbar"
-          ref="files"
-          @dragenter.stop="fileDragEnter"
-        >
+  <div class="tab-excel tab-datasource">
+    <div class="tab-datasource-model scrollbar">
+      <a-form-model
+        ref="fileForm"
+        :model="form"
+        :rules="rules"
+        :label-col="{ span: 4 }"
+        :wrapper-col="{ span: 14 }"
+      >
+        <a-form-model-item label="数据源名称" prop="name">
+          <a-input v-model="form.name" />
+        </a-form-model-item>
+        <a-form-model-item :label="modelType + '文件'" required>
           <div
-            class="mask"
-            v-show="isDragenter"
-            @dragleave.stop="fileDragLeave"
-            @dragover.stop.prevent
-            @drop.stop="fileDrop"
-          ></div>
-          <template v-if="currentFileList.length > 0">
+            class="excel-list scrollbar"
+            ref="files"
+            @dragenter.stop="fileDragEnter"
+          >
             <div
-              class="excel-list-item"
-              :class="{ active: currentFileIndex === index }"
-              v-for="(item, index) in currentFileList"
-              :key="item.id"
-              :title="item.name"
-              @click="handleGetDataBase(index)"
-            >
-              <div class="text">{{ item.name }}</div>
-              <a-icon
-                slot="actions"
-                type="delete"
-                @click.stop="handleRemove(item)"
-              ></a-icon>
-            </div>
-          </template>
-          <a-empty style="margin-top:35px" v-else>
-            <span slot="description">点击添加或将文件拖拽至此上传</span>
-          </a-empty>
-        </div>
-        <a-upload
-          name="file"
-          :headers="{ 'content-type': 'multipart/form-data' }"
-          :showUploadList="false"
-          :before-upload="beforeFileUpload"
-          @change="handleFileChange"
-        >
-          <a-button type="primary">
-            添加文件
-          </a-button>
-        </a-upload>
-      </a-form-model-item>
-    </a-form-model>
-    <a-row class="preview-list">
-      <a-col :span="4">
-        <div class="preview-tab">
-          <div class="tab-title">Sheet子表</div>
-          <ul>
-            <li
-              class="preview-tab-item"
-              :class="{ 'active': currentSheetIndex === index }"
-              v-for="(sheet, index) in sheetList"
-              :key="index"
-              @click="handleChangeTab(sheet, index)"
-            >{{ sheet.name }}</li>
-          </ul>
-        </div>
-      </a-col>
-      <a-col :span="19">
-        <!-- <div class="preview-controller">
-          <span>从第</span>
-          <div class="preview-line">
-            <a-input style="width:60px" v-model="line" @keyup.enter.stop="handleEnterLine" />
-            <div class="arrow-box" style="width:16px">
-              <div class="arrow" @click="countLine('plus')">
-                <i class="arrow-up"></i>
+              class="mask"
+              v-show="isDragenter"
+              @dragleave.stop="fileDragLeave"
+              @dragover.stop.prevent
+              @drop.stop="fileDrop"
+            ></div>
+            <template v-if="currentFileList.length > 0">
+              <div
+                class="excel-list-item"
+                :class="{ active: currentFileIndex === index }"
+                v-for="(item, index) in currentFileList"
+                :key="item.id"
+                :title="item.name"
+                @click="handleGetDataBase(index)"
+              >
+                <div class="text">{{ item.name }}</div>
+                <a-icon
+                  slot="actions"
+                  type="delete"
+                  @click.stop="handleRemove(item)"
+                ></a-icon>
               </div>
-              <div class="arrow" @click="countLine('minus')">
-                <i class="arrow-down"></i>
-              </div>
-            </div>
+            </template>
+            <a-empty style="margin-top:35px" v-else>
+              <span slot="description">点击添加或将文件拖拽至此上传</span>
+            </a-empty>
           </div>
-          <span>行开始获取数据</span>
-          <a-checkbox style="margin-left: 50px" @change="handleCheckBox">自动生成列名</a-checkbox>
-        </div> -->
-        <div class="sheet-table scrollbar">
-          <template v-if="currentFieldList.length > 0">
-            <a-spin :spinning="spinning">
-              <!-- <div class="sheet-head">
+          <a-upload
+            name="file"
+            :headers="{ 'content-type': 'multipart/form-data' }"
+            :showUploadList="false"
+            :before-upload="beforeFileUpload"
+            @change="handleFileChange"
+          >
+            <a-button type="primary">
+              添加文件
+            </a-button>
+          </a-upload>
+        </a-form-model-item>
+      </a-form-model>
+      <a-row class="preview-list">
+        <a-col :span="4">
+          <div class="preview-tab">
+            <div class="tab-title">Sheet子表</div>
+            <ul>
+              <li
+                class="preview-tab-item"
+                :class="{ 'active': currentSheetIndex === index }"
+                v-for="(sheet, index) in sheetList"
+                :key="index"
+                @click="handleChangeTab(sheet, index)"
+              >{{ sheet.name }}</li>
+            </ul>
+          </div>
+        </a-col>
+        <a-col :span="19">
+          <!-- <div class="preview-controller">
+            <span>从第</span>
+            <div class="preview-line">
+              <a-input style="width:60px" v-model="line" @keyup.enter.stop="handleEnterLine" />
+              <div class="arrow-box" style="width:16px">
+                <div class="arrow" @click="countLine('plus')">
+                  <i class="arrow-up"></i>
+                </div>
+                <div class="arrow" @click="countLine('minus')">
+                  <i class="arrow-down"></i>
+                </div>
+              </div>
+            </div>
+            <span>行开始获取数据</span>
+            <a-checkbox style="margin-left: 50px" @change="handleCheckBox">自动生成列名</a-checkbox>
+          </div> -->
+          <div class="sheet-table scrollbar">
+            <template v-if="currentFieldList.length > 0">
+              <a-spin :spinning="spinning">
+                <!-- <div class="sheet-head">
+                  <table>
+                    <thead>
+                      <tr style="border: none"><th v-for="item in currentColumns" :key="item.dataIndex"><div class="cell-item">{{ item.title }}</div></th></tr>
+                    </thead>
+                  </table>
+                </div>
+                <div class="sheet-body scrollbar">
+                  <table>
+                    <tbody>
+                      <tr v-for="(item, index) in currentFieldList" :key="item.key">
+                        <td><div class="cell-item">{{ index + 1 }}</div></td>
+                        <td v-for="col in currentColumns.slice(1)" :key="col.dataIndex"><div class="cell-item">{{ item[col.dataIndex] }}</div></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div> -->
                 <table>
-                  <thead>
+                  <thead class="sheet-head">
                     <tr style="border: none"><th v-for="item in currentColumns" :key="item.dataIndex"><div class="cell-item">{{ item.title }}</div></th></tr>
                   </thead>
-                </table>
-              </div>
-              <div class="sheet-body scrollbar">
-                <table>
-                  <tbody>
+                  <tbody class="sheet-body scrollbar">
                     <tr v-for="(item, index) in currentFieldList" :key="item.key">
                       <td><div class="cell-item">{{ index + 1 }}</div></td>
                       <td v-for="col in currentColumns.slice(1)" :key="col.dataIndex"><div class="cell-item">{{ item[col.dataIndex] }}</div></td>
                     </tr>
                   </tbody>
                 </table>
-              </div> -->
-              <table>
-                <thead class="sheet-head">
-                  <tr style="border: none"><th v-for="item in currentColumns" :key="item.dataIndex"><div class="cell-item">{{ item.title }}</div></th></tr>
-                </thead>
-                <tbody class="sheet-body scrollbar">
-                  <tr v-for="(item, index) in currentFieldList" :key="item.key">
-                    <td><div class="cell-item">{{ index + 1 }}</div></td>
-                    <td v-for="col in currentColumns.slice(1)" :key="col.dataIndex"><div class="cell-item">{{ item[col.dataIndex] }}</div></td>
-                  </tr>
-                </tbody>
-              </table>
-            </a-spin>
-          </template>
-          <a-empty style="margin: 20px 0" v-else></a-empty>
-        </div>
-      </a-col>
-    </a-row>
+              </a-spin>
+            </template>
+            <a-empty style="margin: 20px 0" v-else></a-empty>
+          </div>
+        </a-col>
+      </a-row>
+    </div>
     <a-button
       type="primary"
       class="btn_upload"

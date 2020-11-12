@@ -13,9 +13,9 @@
               :scroll="{ y: 240 }"
               size="middle"
               >
-        <span slot="index" slot-scope="text, record, index" v-if="config.index.show">
+        <!-- <span slot="index" slot-scope="text, record, index" v-if="config.index.show">
           {{index + 1}}
-        </span>
+        </span> -->
       </a-table>
     </div>
   </div>
@@ -68,8 +68,9 @@
       },
       apiData: {
         handler (val) {
+          console.log(val)
           if (val) {
-            if (val.source) {
+            if (val.tableList.length > 0 && val.source && val.source.columns) {
               for (let item of val.source.columns) {
                 // 表格样式
                 item.customHeaderCell = this.customHeaderRow
@@ -81,9 +82,12 @@
                   item.ellipsis = false
                 }
               }
+              this.columns = val.source.columns
+              this.tableData = val.source.rows
+              return
             }
-            this.columns = val.source.columns
-            this.tableData = val.source.rows
+            this.columns = val.columns
+            this.tableData = val.rows
           }
         },
         deep: true,

@@ -23,7 +23,6 @@
               :data-source="data"
               :loading='sping'
               :scroll="{ x: 1200 }"
-              bordered
             >
             <template slot="alias" slot-scope="text, record, index">
               <a-input style="width:100%;height:32px" :value="text" @blur.stop.prevent="handleAliasBlur($event, record, index, 'alias')" @change.stop.prevent="handleChangeValue($event, record, index, 'alias')"/>
@@ -54,11 +53,11 @@
                 </a-select-option>
               </a-select>
             </template>
-            <template slot="comment" slot-scope="text, record, index">
+            <template slot="description" slot-scope="text, record, index">
               <a-input style="width:100%;height:32px" :value="text" @change.stop.prevent="handleChangeValue($event, record, index, 'comment')"/>
             </template>
-            <template slot="description" slot-scope="description">
-              {{ description }}
+            <template slot="comment" slot-scope="comment">
+              {{ comment }}
             </template>
             <template slot="visible" slot-scope="text, record, index">
               <a-select style="width:60px" default-value="true" :value='`${text}`' @change="(value) => handleSelectChangeValue(value, record, index, 'visible')">
@@ -141,6 +140,8 @@ import { message } from 'ant-design-vue'
 const columns = [
   {
     title: '原名',
+    ellipsis: true,
+    width: 200,
     dataIndex: 'name'
   },
   {
@@ -160,13 +161,15 @@ const columns = [
   },
   {
     title: '字段说明',
-    dataIndex: 'comment',
-    scopedSlots: { customRender: 'comment' }
+    dataIndex: 'description',
+    scopedSlots: { customRender: 'description' }
   },
   {
     title: '注释',
-    dataIndex: 'description',
-    scopedSlots: { customRender: 'description' }
+    dataIndex: 'comment',
+    ellipsis: true,
+    width: 200,
+    scopedSlots: { customRender: 'comment' }
   },
   {
     title: '是否可见',

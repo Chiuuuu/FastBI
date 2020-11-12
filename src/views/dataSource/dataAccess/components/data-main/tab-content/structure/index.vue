@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="tab-panel">
     <div class="search_bar">
       <!-- <a-radio-group class="search_radio" v-model="tableType" @change="handleTableTypeChange">
         <a-radio-button value="1">原始表</a-radio-button>
@@ -26,7 +26,7 @@
         </a-col> -->
       </a-row>
     </div>
-    <div class="table">
+    <div class="tab-scroll scrollbar">
       <a-table :row-selection="rowSelection" :columns="columns" :data-source="data"  rowKey='id' :loading='spinning' :pagination='false'>
         <span slot="set" slot-scope="set">
           {{ set ? '是' : '否' }}
@@ -34,13 +34,13 @@
         <span slot="extracted" slot-scope="extracted">
           {{ extracted ? '是' : '否' }}
         </span>
-        <tamplate slot="extractStatus" slot-scope="extractStatus">
+        <template slot="extractStatus" slot-scope="extractStatus">
           <span v-if="extractStatus === 0">未抽取</span>
           <span v-else-if="extractStatus === 1">抽取中</span>
           <span v-else-if="extractStatus === 2">抽取成功</span>
           <span v-else-if="extractStatus === 3">抽取失败</span>
           <span v-else>未抽取</span>
-        </tamplate>
+        </template>
         <span slot="config" slot-scope="row">
           <a v-on:click="setting(row)">{{row.set ? '字段编辑' : '字段设置' }}</a>
         </span>
@@ -137,6 +137,8 @@ const columns = [
   {
     title: '表名',
     dataIndex: 'name',
+    ellipsis: true,
+    width: 200,
     key: 'name'
   },
   {
@@ -159,6 +161,13 @@ const columns = [
     key: 'extracted',
     slots: { title: 'extracted' },
     scopedSlots: { customRender: 'extracted' }
+  },
+  {
+    title: '抽取状态',
+    dataIndex: 'extractStatus',
+    key: 'extractStatus',
+    slots: { title: 'extractStatus' },
+    scopedSlots: { customRender: 'extractStatus' }
   },
   {
     title: '修改时间',
@@ -301,10 +310,11 @@ export default {
         tableList: this.data
       }).finally(() => {
         this.extractSping = false
+        this.handleGetData()
       })
 
       if (result.code === 200) {
-        this.$message.success('请刷新数据查看状态')
+        this.$message.success('抽取成功')
       } else {
         this.$message.error(result.msg)
       }

@@ -1,11 +1,11 @@
 <template>
-  <div>
-    <div class="search_bar">
-      <!-- <a-input placeholder="请输入关键词" class="search_input" style="width:60%">
+  <div class="tab-panel">
+    <!-- <div class="search_bar">
+      <a-input placeholder="请输入关键词" class="search_input" style="width:60%">
         <a-icon slot="prefix" type="search" />
-      </a-input> -->
-    </div>
-    <div class="record-table">
+      </a-input>
+    </div> -->
+    <div class="tab-scroll scrollbar">
       <a-table rowKey="id" :columns="column" :data-source="datas" :loading="loading" :pagination='false'>
         <template #time="text">
           <span>{{ text | formatTime }}</span>
