@@ -98,8 +98,7 @@ const list = [{
                         }
                     },
                     yAxis: {
-                        show: true,
-                        name: '',
+                        name: [''],
                         axisLabel: {
                             color: '#ffffff',
                             fontSize: 12

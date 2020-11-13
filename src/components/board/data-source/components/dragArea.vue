@@ -119,7 +119,12 @@ export default {
       }
       // 度量
       if (this.type === 'measures' && this.dragFile === this.type && this.chartType === '1') {
-        this.fileList.push(dataFile)
+        // 饼图类型只能拉入一个度量
+        if (this.currentSelected.packageJson.name === 've-pie') {
+          this.fileList[0] = dataFile
+        } else {
+          this.fileList.push(dataFile)
+        }
         this.fileList = this.uniqueFun(this.fileList, 'name')
         this.getData()
       }
@@ -296,8 +301,10 @@ export default {
               columns,
               rows
             }
+            console.log(apiData)
             // 嵌套饼图设置apis
             if (this.currentSelected.packageJson.chartType === 'v-multiPie') {
+              console.log(columns)
               rows.map((item, index) => {
                 if (index < 2) {
                   level1.push(item[columns[0]])
@@ -308,6 +315,7 @@ export default {
               let apis = {
                 level: [level1, level2]
               }
+              console.log(apis)
               this.$store.dispatch('SetApis', apis)
             }
             this.$store.dispatch('SetSelfDataSource', apiData)
