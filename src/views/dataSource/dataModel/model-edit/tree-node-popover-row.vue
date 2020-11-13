@@ -48,6 +48,7 @@
   </div>
 </template>
 <script>
+import { Row } from 'ant-design-vue'
 export default {
   name: 'TreeNodePopoverRow',
   props: {
@@ -102,7 +103,7 @@ export default {
     },
     handledeleteCondition(index, row) {
         if (row.leftFieldId && row.rightFieldId) {
-          this.$emit('dele-condition', index)
+          this.$emit('dele-condition', index, row)
         }
         this.list.splice(index, 1)
     }
