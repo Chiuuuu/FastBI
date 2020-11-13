@@ -4,10 +4,11 @@
         // overflow-y: auto;
         background-color: #ffffff;
         width: 79%;
+        .main-box {
+            height 100%    
+        }
         /deep/ .ant-spin-container {
-            height calc(100vh - 101px)
-            display: flex;
-            flex-direction: column;
+            height 100%
         }
         .header {
             display: flex;
@@ -35,8 +36,7 @@
         }
         .scrollable {
             width 100%
-            flex 1
-            overflow-y auto    
+            height calc(100% - 50px)
         }
         .description {
             padding-left: 20px;
@@ -69,9 +69,21 @@
         .detail_main {
             display: flex;
             justify-content: space-around;
+            height: calc(100% - 50px);
+            
+            .dim_title, .mea_title {
+                height: 38px    
+            }
+            .dim_menu, .mea_menu {
+                clear: both;
+                height: calc(100% - 38px);
+                background-color #fff;
+                overflow-y: auto;
+            }
             .dimensionality {
                 margin-left: 21px;
                 width: 50%;
+                height: 100%;
                 background: rgba(248, 248, 248, 1);
                 .dim_span {
                     font-size:14px;
@@ -81,15 +93,11 @@
                     line-height:38px;
                     margin-left: 40px;
                 }
-                .dim_menu {
-                    margin-top: 10px;
-                    overflow-y: scroll;
-                    height: 190px;
-                }
             }
             .measurement {
                 margin-right: 21px;
                 width: 50%;
+                height: 100%;
                 background: rgba(248, 248, 248, 1);
                 .mea_span {
                     font-size:14px;
@@ -98,11 +106,6 @@
                     color:rgba(1,4,15,1);
                     line-height:38px;
                     margin-left: 50px;
-                }
-                .mea_menu {
-                    margin-top: 10px;
-                    overflow-y: scroll;
-                    height: 190px;
                 }
             }
         }
@@ -115,15 +118,19 @@
 .ant-form-explain {
     float: left;
 }
-.m-dml-map {
-    height: calc(50vh - 150px);
-    background: #fff;
+.draw_board {
+    height: calc(50% - 60px);
+    overflow: auto;
+    margin-right: 20px;
+    border-top: 10px solid #f6f6f6;
+    border-bottom: 10px solid #f6f6f6;
 }
 .m-map {
     position: relative;
     box-sizing: border-box;
-    margin: 21px;
-    overflow: auto;
+    padding: 21px;
+    height: 100%;
+    width: 100%;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -142,4 +149,8 @@
     top: 50%;
     transform: translateY(-50%);
     color: rgba(0, 0, 0, 0.65);
+}
+.detail {
+    height: calc(50% - 60px);
+    width: 100%;
 }

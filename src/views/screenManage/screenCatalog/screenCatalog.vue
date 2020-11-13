@@ -164,10 +164,12 @@ export default {
     }
   },
   watch: {
-    openKeys(val) {
-      console.log('openKeys', val)
-    },
     screenId: {
+      handler(val) {},
+      deep: true,
+      immediate: true
+    },
+    fileName: {
       handler(val) {},
       deep: true,
       immediate: true
@@ -219,7 +221,6 @@ export default {
         if (res.code === 200) {
           let rows = res.data
           this.folderList = rows
-          console.log(rows)
           if (!this.fileSelectId && this.folderList.length > 0) {
             if (this.folderList[0].children.length > 0) {
               this.fileSelectId = this.folderList[0].children[0].id
@@ -328,7 +329,7 @@ export default {
       this.isAdd = 1
       this.screenVisible = true
     },
-    // 新建/编辑大屏
+    // 新建/编辑大屏名称
     handleOk(e) {
       this.screenForm.validateFields((err, values) => {
         if (err) {

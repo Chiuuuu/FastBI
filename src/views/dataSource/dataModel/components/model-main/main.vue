@@ -1,10 +1,10 @@
 <template>
-  <div class="model-main scrollbar">
+  <div class="model-main">
     <a-empty v-if="modelId=== -1" class="main-empty">
       <span slot="description">请新建模型或者选中左侧模型</span>
     </a-empty>
     <template v-else>
-      <a-spin :spinning="spinning">
+      <a-spin class="main-box" :spinning="spinning">
         <div class="header">
           <span class="data_con">{{detailInfo.name}}</span>
           <div class="data_btn">
@@ -16,20 +16,20 @@
           <div class="description">
               <span class="d-s" :title="detailInfo.description">描述：{{detailInfo.description}}</span>
           </div>
-          <div
-            class="m-dml-map m-map scrollbar"
-          >
-            <a-empty v-if="tablesEmpty" class="main-empty">
-              <span slot="description">暂无数据</span>
-            </a-empty>
-            <template v-else>
-              <tree-node
-                v-for="(item, index) in renderTables"
-                :key="index"
-                :node-data="item"
-                title='name'
-              ></tree-node>
-            </template>
+          <div class="draw_board scrollbar">
+            <div class="m-dml-map m-map">
+              <a-empty v-if="tablesEmpty" class="main-empty">
+                <span slot="description">暂无数据</span>
+              </a-empty>
+              <template v-else>
+                <tree-node
+                  v-for="(item, index) in renderTables"
+                  :key="index"
+                  :node-data="item"
+                  title='name'
+                ></tree-node>
+              </template>
+            </div>
           </div>
           <a-divider />
           <div class="detail">
@@ -38,37 +38,41 @@
             </div>
             <div class="detail_main">
               <div class="dimensionality">
-                <span class="dim_span">维度</span>
-                  <div class="dim_menu scrollbar">
-                    <a-menu mode="inline" v-for="(value, name) in dimensions" :key="name" :default-open-keys="[name]" :inline-collapsed="false">
-                      <a-sub-menu :key="name">
-                        <span slot="title"><span>{{value[0].tableName}}</span></span>
-                        <a-menu-item v-for="item in value" :key="item.id">
-                          <img
-                            src="@/assets/images/icon_dimension.png"
-                            style="width:15px;height:15px"
-                          />
-                          {{item.alias}}
-                        </a-menu-item>
-                      </a-sub-menu>
-                    </a-menu>
-                  </div>
+                <div class="dim_title">
+                  <span class="dim_span">维度</span>
+                </div>
+                <div class="dim_menu scrollbar">
+                  <a-menu mode="inline" v-for="(value, name) in dimensions" :key="name" :default-open-keys="[name]" :inline-collapsed="false">
+                    <a-sub-menu :key="name">
+                      <span slot="title"><span>{{value[0].tableName}}</span></span>
+                      <a-menu-item v-for="item in value" :key="item.id">
+                        <img
+                          src="@/assets/images/icon_dimension.png"
+                          style="width:15px;height:15px"
+                        />
+                        {{item.alias}}
+                      </a-menu-item>
+                    </a-sub-menu>
+                  </a-menu>
+                </div>
               </div>
               <div class="measurement">
-                <span class="mea_span">度量</span>
-                  <div class="mea_menu scrollbar">
-                    <a-menu mode="inline" v-for="(value, name) in measures" :key="name" :default-open-keys="[name]" :inline-collapsed="false">
-                      <a-sub-menu :key="name">
-                        <span slot="title"><span>{{value[0].tableName}}</span></span>
-                        <a-menu-item v-for="item in value" :key="item.id">
-                          <img
-                            src="@/assets/images/icon_measure.png"
-                            style="width:15px;height:15px"
-                          />
-                          {{item.alias}}
-                        </a-menu-item>
-                      </a-sub-menu>
-                    </a-menu>
+                <div class="dim_title">
+                  <span class="mea_span">度量</span>
+                </div>
+                <div class="mea_menu scrollbar">
+                  <a-menu mode="inline" v-for="(value, name) in measures" :key="name" :default-open-keys="[name]" :inline-collapsed="false">
+                    <a-sub-menu :key="name">
+                      <span slot="title"><span>{{value[0].tableName}}</span></span>
+                      <a-menu-item v-for="item in value" :key="item.id">
+                        <img
+                          src="@/assets/images/icon_measure.png"
+                          style="width:15px;height:15px"
+                        />
+                        {{item.alias}}
+                      </a-menu-item>
+                    </a-sub-menu>
+                  </a-menu>
                 </div>
               </div>
             </div>

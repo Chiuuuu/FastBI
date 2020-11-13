@@ -241,7 +241,6 @@ export default {
     padding: 21px;
     height: 100%;
     width: 100%;
-    min-height: 200px;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;

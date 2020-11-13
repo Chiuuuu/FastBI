@@ -165,6 +165,7 @@ const columns = [
   {
     title: '修改时间',
     key: 'gmtModified',
+    width: 200,
     dataIndex: 'gmtModified'
   },
   {
@@ -307,7 +308,7 @@ export default {
       })
 
       if (result.code === 200) {
-        this.$message.success('抽取成功')
+        this.$message.success('抽取任务已下达')
       } else {
         this.$message.error(result.msg)
       }
