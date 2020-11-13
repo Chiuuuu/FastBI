@@ -182,7 +182,6 @@ export default {
       }
     },
     handleUpateCondition(index, row, data) {
-      const tableNo = row.tableNo
       if (this.popoverForm.length > this.nodeData.props.join.conditions.length) {
         this.nodeData.props.join.conditions.push(row)
         // 这里需要强制更新
@@ -194,6 +193,14 @@ export default {
           ...row
         })
       }
+      this.changeTablesJoinConditions(row)
+    },
+    handleDeleteCondition(index, row) {
+      this.nodeData.props.join.conditions.splice(index, 1)
+      this.changeTablesJoinConditions(row)
+    },
+    changeTablesJoinConditions(row){
+      const tableNo = row.tableNo
       const tables = this.detailInfo.config.tables
       const tableIndex = findIndex(tables, {
         tableNo: `${tableNo}`
@@ -201,9 +208,6 @@ export default {
       if (tableIndex) {
         this.detailInfo.config.tables[tableIndex].join = this.nodeData.props.join
       }
-    },
-    handleDeleteCondition(index) {
-      this.nodeData.props.join.conditions.splice(index, 1)
     },
     handleAddCondition() {
       this.popoverForm.push({
