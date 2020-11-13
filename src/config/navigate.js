@@ -27,23 +27,15 @@ const list = [{
                   dimensions: [],
                   measures: [],
                   source: {},
-                  columns: ['日期', '访问用户', '下单用户', '下单率'],
+                  columns: ['日期', '访问用户', '下单用户'],
                   rows: [
-                    { '日期': '1/1', '访问用户': 1393, '下单用户': 1093, '下单率': 0.32 },
-                    { '日期': '1/2', '访问用户': 3530, '下单用户': 3230, '下单率': 0.26 },
-                    { '日期': '1/3', '访问用户': 2923, '下单用户': 2623, '下单率': 0.76 },
-                    { '日期': '1/4', '访问用户': 1723, '下单用户': 1423, '下单率': 0.49 },
-                    { '日期': '1/5', '访问用户': 3792, '下单用户': 3492, '下单率': 0.323 },
-                    { '日期': '1/6', '访问用户': 4593, '下单用户': 4293, '下单率': 0.78 }
+                    { '日期': '1/1', '访问用户': 1393, '下单用户': 1093 },
+                    { '日期': '1/2', '访问用户': 3530, '下单用户': 3230 },
+                    { '日期': '1/3', '访问用户': 2923, '下单用户': 2623 },
+                    { '日期': '1/4', '访问用户': 1723, '下单用户': 1423 },
+                    { '日期': '1/5', '访问用户': 3792, '下单用户': 3492 },
+                    { '日期': '1/6', '访问用户': 4593, '下单用户': 4293 }
                   ]
-                    // source: [
-                    //     { x: '1/1', y: 375 },
-                    //     { x: '1/2', y: 200 },
-                    //     { x: '1/3', y: 25 },
-                    //     { x: '1/4', y: 190 },
-                    //     { x: '1/5', y: 90 },
-                    //     { x: '1/6', y: 277 }
-                    // ]
                 },
                 apis: {
                     labelMap: { 'x': '类目', 'y': '值', 's': '系列1' }
@@ -81,15 +73,15 @@ const list = [{
                         bottom: 'auto'
                     },
                     xAxis: {
-                        show: true,
                         name: '',
+                        nameTextStyle: { color: '#fff', fontSize: '12' },
                         axisLabel: {
                             color: '#ffffff',
                             fontSize: 12,
                             rotate: 0
                         },
                         axisLine: {
-                            show: false,
+                            show: true,
                             lineStyle: {
                                 color: '#fff'
                             }
@@ -97,13 +89,16 @@ const list = [{
                         splitLine: {
                             show: false,
                             lineStyle: {
-                                color: '#fff'
+                              type: 'solid',
+                              color: '#fff'
                             }
+                        },
+                        axisTick: {
+                          show: true
                         }
                     },
                     yAxis: {
-                        show: true,
-                        name: '',
+                        name: [''],
                         axisLabel: {
                             color: '#ffffff',
                             fontSize: 12
@@ -390,15 +385,6 @@ const list = [{
                   ]
                 },
                 apis: {
-                  // level: [
-                  //   ['1/1', '1/2', '1/3'],
-                  //   ['1/4', '1/5']
-                  // ],
-                    labelMap: {
-                        'x': '类目',
-                        'y': '值',
-                        's': '系列1'
-                    }
                 },
                 background: {
                     backgroundType: '1',
@@ -472,16 +458,16 @@ const list = [{
                         }
                     },
                     series: {
-                        label: {
-                            show: true,
-                            color: '',
-                            fontSize: 12,
-                            position: 'outside', // 可选inside
-                            formatter: '{b}: {@2012} ({d}%)'
-                        },
-                        roseType: false, // 饼图可选玫瑰图
-                        center: ['50%', '50%'], // 饼图可选
-                        radius: ['0', '70%'] // 饼图可选
+                      label: {
+                          show: true,
+                          color: '',
+                          fontSize: 12,
+                          position: 'outside', // 可选inside
+                          formatter: '{b}: {@2012} ({d}%)'
+                      },
+                      roseType: false, // 饼图可选玫瑰图
+                      center: ['50%', '50%'], // 饼图可选
+                      radius: ['0', '70%'] // 饼图可选
                     },
                     color: DEFAULT_COLORS
                 },
@@ -694,7 +680,11 @@ const list = [{
                         show: false
                     },
                     axisLabel: {
-                        show: true
+                        show: true,
+                        textStyle: {
+                          fontSize: 14,
+                          color: '#fff'
+                        }
                     },
                     // title: {
                     //   show: true
@@ -1224,6 +1214,13 @@ const list = [{
                       user1: 3452,
                       user2: '3210',
                       rate: '33%'
+                    },
+                    {
+                      key: '6',
+                      date: '1/6',
+                      user1: 1234,
+                      user2: '3321',
+                      rate: '30%'
                     }
                   ]
                 },

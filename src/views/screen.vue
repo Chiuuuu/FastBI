@@ -83,7 +83,7 @@
       }
     },
     created () {
-      this.getScreenData()
+      // this.getScreenData()
     },
     mounted() {
       this.$nextTick(this._calcStyle)

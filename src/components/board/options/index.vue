@@ -292,7 +292,7 @@
               </template>
 
               <!--图例-->
-              <template v-if="selfConfig.legend && !isRing">
+              <template v-if="selfConfig.legend && !isRing && !isGauge">
                 <a-collapse-panel key="legend" header="图例设置">
                   <a-switch slot="extra" v-if="collapseActive.indexOf('legend') > -1" v-model="selfConfig.legend.show" default-checked @change="switchChange" size="small" />
                   <gui-field label="文本">
@@ -449,15 +449,27 @@
                     <a-switch v-model="selfConfig.series.axisLabel.show" size="small"
                               @change="switchChange"></a-switch>
                   </gui-field>
+                  <gui-field label="刻度值文本" v-if="selfConfig.series.axisLabel.show">
+                    <gui-inline label="字号">
+                      <a-input-number v-model="selfConfig.series.axisLabel.textStyle.fontSize" size="small"
+                                      :min="12" :max="40" @change="setSelfProperty"></a-input-number>
+                    </gui-inline>
+                    <gui-inline label="颜色">
+                      <el-color-picker v-model="selfConfig.series.axisLabel.textStyle.color"
+                                        @change="setSelfProperty"></el-color-picker>
+                    </gui-inline>
+                  </gui-field>
                   <gui-field label="刻度大小">
                     <div class="gui-inline">
                       <a-input-number v-model="selfConfig.series.splitLine.length" size="small"
                                       :formatter="value => `长 ${value}`"
+                                      style="width:75px;"
                                       @change="setSelfProperty"></a-input-number>
                       </div>
                       <div class="gui-inline">
                         <a-input-number v-model="selfConfig.series.splitLine.lineStyle.width" size="small"
                                         :formatter="value => `宽 ${value}`"
+                                        style="width:75px;"
                                         @change="setSelfProperty"></a-input-number>
                     </div>
                   </gui-field>
@@ -478,11 +490,21 @@
               <!--x轴-->
               <template v-if="showXAxis">
                 <a-collapse-panel key="xAxis" header="x轴">
-                  <a-switch slot="extra" v-if="collapseActive.indexOf('xAxis') > -1" v-model="selfConfig.xAxis.show" default-checked @change="switchChange" size="small" />
+                  <a-switch slot="extra" v-if="collapseActive.indexOf('xAxis') > -1" v-model="selfConfig.xAxis.axisLine.show" default-checked @change="switchChange" size="small" />
                   <gui-field label="标题">
                     <a-input v-model="selfConfig.xAxis.name" @change="setSelfProperty" style="width:100px;" size="small"></a-input>
                   </gui-field>
-                  <gui-field label="文本">
+                  <gui-field label="标题文本">
+                    <gui-inline label="字号">
+                      <a-input-number v-model="selfConfig.xAxis.nameTextStyle.fontSize" size="small"
+                                      :min="12" :max="40" @change="setSelfProperty"></a-input-number>
+                    </gui-inline>
+                    <gui-inline label="颜色">
+                      <el-color-picker v-model="selfConfig.xAxis.nameTextStyle.color"
+                                        @change="setSelfProperty"></el-color-picker>
+                    </gui-inline>
+                  </gui-field>
+                  <gui-field label="x轴文本">
                     <gui-inline label="字号">
                       <a-input-number v-model="selfConfig.xAxis.axisLabel.fontSize" size="small"
                                       :min="12" :max="40" @change="setSelfProperty"></a-input-number>
@@ -492,20 +514,36 @@
                                        @change="setSelfProperty"></el-color-picker>
                     </gui-inline>
                   </gui-field>
+                  <gui-field label="x轴颜色">
+                    <el-color-picker v-model="selfConfig.xAxis.axisLine.lineStyle.color"
+                                      show-alpha @change="setSelfProperty"></el-color-picker>
+                  </gui-field>
+                  <gui-field label="显示轴刻度">
+                    <a-switch v-model="selfConfig.xAxis.axisTick.show" default-checked @change="switchChange" size="small" />
+                  </gui-field>
                   <gui-field label="倾斜角度">
                     <a-input-number v-model="selfConfig.xAxis.axisLabel.rotate" size="small"
                                     :min="0" :max="90" @change="setSelfProperty"></a-input-number>
                   </gui-field>
-                  <gui-field label="轴线颜色">
-                    <el-color-picker v-model="selfConfig.xAxis.axisLine.lineStyle.color"
-                                      show-alpha @change="setSelfProperty"></el-color-picker>
-                  </gui-field>
                   <gui-field label="是否网格线">
                     <a-switch v-model="selfConfig.yAxis.splitLine.show" default-checked @change="switchChange" size="small" />
                   </gui-field>
-                  <gui-field label="网格线颜色" v-if="selfConfig.xAxis.splitLine.show">
-                    <el-color-picker v-model="selfConfig.xAxis.splitLine.lineStyle.color"
+                  <gui-field label="网格线颜色" v-if="selfConfig.yAxis.splitLine.show">
+                    <el-color-picker v-model="selfConfig.yAxis.splitLine.lineStyle.color"
                                       show-alpha @change="setSelfProperty"></el-color-picker>
+                  </gui-field>
+                  <gui-field label="网格线线型">
+                    <a-select style="width: 90px" v-model="selfConfig.yAxis.splitLine.lineStyle.type" @change="setSelfProperty" placeholder="无" size="small">
+                      <a-select-option value="solid">
+                        实线
+                      </a-select-option>
+                      <a-select-option value="dotted">
+                        点状
+                      </a-select-option>
+                      <a-select-option value="dashed">
+                        虚线
+                      </a-select-option>
+                    </a-select>
                   </gui-field>
                 </a-collapse-panel>
               </template>

@@ -119,7 +119,12 @@ export default {
       }
       // 度量
       if (this.type === 'measures' && this.dragFile === this.type && this.chartType === '1') {
-        this.fileList.push(dataFile)
+        // 饼图类型只能拉入一个度量
+        if (this.currentSelected.packageJson.name === 've-pie') {
+          this.fileList[0] = dataFile
+        } else {
+          this.fileList.push(dataFile)
+        }
         this.fileList = this.uniqueFun(this.fileList, 'name')
         this.getData()
       }
@@ -165,14 +170,23 @@ export default {
       // 维度度量删除完以后重置该图表数据
       if (this.chartType === '1' || this.chartType === '2') {
         if (current.packageJson.api_data.dimensions.length === 0 && current.packageJson.api_data.measures.length === 0) {
+          // 清空modelid
           current.packageJson.api_data.modelId = ''
           this.$store.dispatch('SetSelfDataSource', current.packageJson.api_data)
+          // 嵌套饼图apis恢复原始状态
+          if (current.packageJson.chartType === 'v-multiPie') {
+            let apis = {
+              level: [
+                ['1/1', '1/2', '1/3'],
+                ['1/4', '1/5']
+              ]
+            }
+            this.$store.dispatch('SetApis', apis)
+          }
         }
       }
       if (this.chartType === '3') {
-        console.log(current.packageJson.api_data.tableList.length)
         if (current.packageJson.api_data.tableList.length === 0) {
-          console.log(123)
           current.packageJson.api_data.modelId = ''
           this.$store.dispatch('SetSelfDataSource', current.packageJson.api_data)
         }
@@ -194,25 +208,22 @@ export default {
       }
       let apiData = deepClone(this.currentSelected.packageJson.api_data)
       if ((!apiData.modelId || apiData.modelId === '') && this.fileList.length > 0) {
+        // modelId 赋值
         apiData.modelId = this.fileList[0].datamodelId
         // this.currentSelected.packageJson.api_data.modelId = this.fileList[0].datamodelId
       }
       if (this.chartType === '1') {
         if (!apiData.dimensions.length || !apiData.measures.length) {
+          this.saveScreenData()
           return
         }
       }
       if (this.chartType === '2') {
         if (!apiData.measures.length) {
+          this.saveScreenData()
           return
         }
       }
-      // if (this.chartType === '3') {
-      //   if (!apiData.tableList.length) {
-      //     console.log(123)
-      //     return
-      //   }
-      // }
       let params = {
         setting: {
           ...this.currentSelected
@@ -290,8 +301,10 @@ export default {
               columns,
               rows
             }
+            console.log(apiData)
             // 嵌套饼图设置apis
-            if (this.currentSelected.packageJson.name === 've-pie') {
+            if (this.currentSelected.packageJson.chartType === 'v-multiPie') {
+              console.log(columns)
               rows.map((item, index) => {
                 if (index < 2) {
                   level1.push(item[columns[0]])
@@ -302,6 +315,7 @@ export default {
               let apis = {
                 level: [level1, level2]
               }
+              console.log(apis)
               this.$store.dispatch('SetApis', apis)
             }
             this.$store.dispatch('SetSelfDataSource', apiData)

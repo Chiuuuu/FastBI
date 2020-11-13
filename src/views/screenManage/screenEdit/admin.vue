@@ -162,6 +162,7 @@
         this.$server.screenManage.getScreenDetailById(this.$route.query.id).then(res => {
           if (res.code === 200) {
             this.screenData = res.data
+            console.log(this.screenData, 'screenData')
             let json = res.data ? res.data.setting : {}
             this.$store.dispatch('SetPageSettings', json.setting)
             this.$store.dispatch('InitCanvasMaps', json.components)

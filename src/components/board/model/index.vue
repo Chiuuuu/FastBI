@@ -349,6 +349,11 @@ export default {
             result.push(item)
           }
         })
+        if (result.length === 0) {
+          result = [
+            { name: '没有符合的搜索结果', id: 11 }
+          ]
+        }
         this.searchResult = result
       } else {
         this.searchResult = []

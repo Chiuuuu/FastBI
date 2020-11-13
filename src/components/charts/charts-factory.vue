@@ -99,7 +99,6 @@
       apiData: {
         handler (val) {
           if (val) {
-            console.log(val)
             // 只有度量的情况
             if (this.type === '2') {
               if (val.measures && val.measures.length > 0) {
@@ -119,7 +118,6 @@
                 return
               }
             }
-            console.log(112)
             this.chartData.columns = val.columns
             this.chartData.rows = val.rows
 
@@ -140,8 +138,8 @@
         handler (val) {
           if (val) {
             this.chartSettings = { ...val }
-            this.$log.primary('========>chartSettings')
-            this.$print(this.chartSettings)
+            // this.$log.primary('========>chartSettings')
+            // this.$print(this.chartSettings)
           }
         },
         deep: true,
