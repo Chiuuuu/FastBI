@@ -27,7 +27,7 @@
             <template slot="alias" slot-scope="text, record, index">
               <a-input style="width:100%;height:32px" :value="text" @blur.stop.prevent="handleAliasBlur($event, record, index, 'alias')" @change.stop.prevent="handleChangeValue($event, record, index, 'alias')"/>
             </template>
-            <template slot="dataType" slot-scope="text, record, index">
+            <template slot="dataType" slot-scope="text, record">
               <!-- <a-select :value="text" style="width:100%;" @change="(value) => handleSelectChangeValue(value, record, index, 'dataType')">
                 <a-select-option value="BIGINT">
                   整数
@@ -49,7 +49,7 @@
                 :isDimension="record.role === 1"
               />
             </template>
-            <template slot="role" slot-scope="text, record, index">
+            <template slot="role" slot-scope="text, record">
               <!-- <a-select default-value="1" :value='`${text}`' @change="(value) => handleSelectChangeValue(value, record, index, 'role')">
                 <a-select-option value="1">
                   维度
