@@ -54,7 +54,7 @@
               </a-select>
             </template>
             <template slot="description" slot-scope="text, record, index">
-              <a-input style="width:100%;height:32px" :value="text" @change.stop.prevent="handleChangeValue($event, record, index, 'comment')"/>
+              <a-input style="width:100%;height:32px" :value="text" @change.stop.prevent="handleChangeValue($event, record, index, 'description')"/>
             </template>
             <template slot="comment" slot-scope="comment">
               {{ comment }}
