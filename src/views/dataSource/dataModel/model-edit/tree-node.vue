@@ -199,7 +199,7 @@ export default {
       this.nodeData.props.join.conditions.splice(index, 1)
       this.changeTablesJoinConditions(row)
     },
-    changeTablesJoinConditions(row){
+    changeTablesJoinConditions(row) {
       const tableNo = row.tableNo
       const tables = this.detailInfo.config.tables
       const tableIndex = findIndex(tables, {
@@ -222,6 +222,7 @@ export default {
     handleClearCondition() {
       this.popoverForm = []
       this.nodeData.props.join.conditions = []
+      this.changeTablesJoinConditions(this.nodeData.props)
       this.$nextTick(() => {
         this.handleAddCondition()
       })
@@ -233,7 +234,6 @@ export default {
         title: '确认提示',
         content: '确定删除该表?',
         onOk: async () => {
-
           // 循环递归删除tables的数据
           this.loopDelete(node, this.detailInfo.config.tables)
 
