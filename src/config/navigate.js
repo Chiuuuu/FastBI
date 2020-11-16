@@ -98,7 +98,13 @@ const list = [{
                         }
                     },
                     yAxis: {
-                        name: [''],
+                        name: '单位:个',
+                        position: 'left',
+                        nameTextStyle: {
+                          color: '#fff',
+                          fontSize: 12
+                          // padding: [0, 0, 0, -30]
+                        },
                         axisLabel: {
                             color: '#ffffff',
                             fontSize: 12
@@ -112,7 +118,8 @@ const list = [{
                         splitLine: {
                             show: true,
                             lineStyle: {
-                                color: '#fff'
+                              type: 'solid',
+                              color: '#fff'
                             }
                         }
                     },
@@ -201,27 +208,38 @@ const list = [{
                         bottom: 'auto'
                     },
                     xAxis: {
-                        show: true,
-                        axisLabel: {
-                            color: '#ffffff',
-                            fontSize: 12,
-                            rotate: 0
-                        },
-                        axisLine: {
-                            show: false,
-                            lineStyle: {
-                                color: '#fff'
-                            }
-                        },
-                        splitLine: {
-                            show: false,
-                            lineStyle: {
-                                color: '#fff'
-                            }
-                        }
+                      name: '',
+                      nameTextStyle: { color: '#fff', fontSize: '12' },
+                      axisLabel: {
+                          color: '#ffffff',
+                          fontSize: 12,
+                          rotate: 0
+                      },
+                      axisLine: {
+                          show: true,
+                          lineStyle: {
+                              color: '#fff'
+                          }
+                      },
+                      splitLine: {
+                          show: false,
+                          lineStyle: {
+                            type: 'solid',
+                            color: '#fff'
+                          }
+                      },
+                      axisTick: {
+                        show: true
+                      }
                     },
                     yAxis: {
-                        show: true,
+                        name: '单位:个',
+                        position: 'left',
+                        nameTextStyle: {
+                          color: '#fff',
+                          fontSize: 12
+                          // padding: [0, 0, 0, -30]
+                        },
                         axisLabel: {
                             color: '#ffffff',
                             fontSize: 12
@@ -235,7 +253,8 @@ const list = [{
                         splitLine: {
                             show: true,
                             lineStyle: {
-                                color: '#fff'
+                              type: 'solid',
+                              color: '#fff'
                             }
                         }
                     },
@@ -315,41 +334,53 @@ const list = [{
                         bottom: 'auto'
                     },
                     xAxis: {
-                        show: true,
-                        axisLabel: {
-                            color: '#ffffff',
-                            fontSize: 12,
-                            rotate: 0
-                        },
-                        axisLine: {
-                            show: false,
-                            lineStyle: {
-                                color: '#cccccc'
-                            }
-                        },
-                        splitLine: {
-                            show: true,
-                            lineStyle: {
-                                color: '#cccccc'
-                            }
-                        }
+                      name: '',
+                      nameTextStyle: { color: '#fff', fontSize: '12' },
+                      axisLabel: {
+                          color: '#ffffff',
+                          fontSize: 12,
+                          rotate: 0
+                      },
+                      axisLine: {
+                          show: true,
+                          lineStyle: {
+                              color: '#fff'
+                          }
+                      },
+                      splitLine: {
+                          show: false,
+                          lineStyle: {
+                            type: 'solid',
+                            color: '#fff'
+                          }
+                      },
+                      axisTick: {
+                        show: true
+                      }
                     },
                     yAxis: {
-                        show: true,
+                        name: '单位:个',
+                        position: 'left',
+                        nameTextStyle: {
+                          color: '#fff',
+                          fontSize: 12
+                          // padding: [0, 0, 0, -30]
+                        },
                         axisLabel: {
                             color: '#ffffff',
                             fontSize: 12
                         },
                         axisLine: {
-                            show: true,
+                            show: false,
                             lineStyle: {
-                                color: '#cccccc'
+                                color: '#fff'
                             }
                         },
                         splitLine: {
-                            show: false,
+                            show: true,
                             lineStyle: {
-                                color: '#cccccc'
+                              type: 'solid',
+                              color: '#fff'
                             }
                         }
                     },
