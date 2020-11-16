@@ -534,15 +534,9 @@
                   </gui-field>
                   <gui-field label="网格线线型">
                     <a-select style="width: 90px" v-model="selfConfig.yAxis.splitLine.lineStyle.type" @change="setSelfProperty" placeholder="无" size="small">
-                      <a-select-option value="solid">
-                        实线
-                      </a-select-option>
-                      <a-select-option value="dotted">
-                        点状
-                      </a-select-option>
-                      <a-select-option value="dashed">
-                        虚线
-                      </a-select-option>
+                      <a-select-option value="solid">实线</a-select-option>
+                      <a-select-option value="dotted">点状</a-select-option>
+                      <a-select-option value="dashed">虚线</a-select-option>
                     </a-select>
                   </gui-field>
                 </a-collapse-panel>
@@ -551,11 +545,24 @@
               <template v-if="showYAxis">
                 <a-collapse-panel key="yAxis" header="y轴">
                   <a-switch slot="extra" v-if="collapseActive.indexOf('yAxis') > -1" v-model="selfConfig.yAxis.axisLine.show" default-checked @change="switchChange" size="small" />
-                  <gui-field label="y1标题" v-if="isHistogram">
+                  <!-- <gui-field label="y1标题" v-if="isHistogram">
                     <a-input v-model="apis.yAxisName[0]" @change="setApis" style="width:100px;" size="small"></a-input>
                   </gui-field>
                   <gui-field label="y2标题" v-if="isHistogram">
                     <a-input v-model="apis.yAxisName[1]" @change="setApis" style="width:100px;" size="small"></a-input>
+                  </gui-field> -->
+                  <gui-field label="标题">
+                    <a-input v-model="selfConfig.yAxis.name" @change="setSelfProperty" style="width:100px;" size="small"></a-input>
+                  </gui-field>
+                  <gui-field label="标题文本">
+                    <gui-inline label="字号">
+                      <a-input-number v-model="selfConfig.yAxis.nameTextStyle.fontSize" size="small"
+                                      :min="12" :max="40" @change="setSelfProperty"></a-input-number>
+                    </gui-inline>
+                    <gui-inline label="颜色">
+                      <el-color-picker v-model="selfConfig.yAxis.nameTextStyle.color"
+                                        @change="setSelfProperty"></el-color-picker>
+                    </gui-inline>
                   </gui-field>
                   <gui-field label="文本">
                     <gui-inline label="字号">
@@ -574,9 +581,16 @@
                   <gui-field label="是否网格线">
                     <a-switch v-model="selfConfig.xAxis.splitLine.show" default-checked @change="switchChange" size="small" />
                   </gui-field>
-                  <gui-field label="网格线颜色" v-if="selfConfig.yAxis.splitLine.show">
-                    <el-color-picker v-model="selfConfig.yAxis.splitLine.lineStyle.color"
+                  <gui-field label="网格线颜色" v-if="selfConfig.xAxis.splitLine.show">
+                    <el-color-picker v-model="selfConfig.xAxis.splitLine.lineStyle.color"
                                       show-alpha @change="setSelfProperty"></el-color-picker>
+                  </gui-field>
+                  <gui-field label="网格线线型" v-if="selfConfig.xAxis.splitLine.show">
+                    <a-select style="width: 90px" v-model="selfConfig.xAxis.splitLine.lineStyle.type" @change="setSelfProperty" placeholder="无" size="small">
+                      <a-select-option value="solid">实线</a-select-option>
+                      <a-select-option value="dotted">点状</a-select-option>
+                      <a-select-option value="dashed">虚线</a-select-option>
+                    </a-select>
                   </gui-field>
                 </a-collapse-panel>
               </template>
