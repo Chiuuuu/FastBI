@@ -4,6 +4,7 @@ function checkPermission(el, binding) {
     if (value && value instanceof Array && value.length > 0) {
         const permissionRoles = value
 
+        // 【1,2】是根据登录的用户获取到权限
         const hasPermission = [1, 2].some(role => {
             return permissionRoles.includes(role)
         })
