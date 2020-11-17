@@ -264,9 +264,9 @@ export default {
       }
     },
     gmtStartValidator(rule, value, callback) {
-      if (!this.startReadonly && +new Date(value) < +new Date() + 5 * 60 * 1000) {
+      if (!this.startReadonly && +new Date(value) < +new Date() + 60 * 1000) {
         this.errorState = 1
-        callback(new Error('开始时间最早需设置在5分钟后'))
+        callback(new Error('开始时间最早需设置在1分钟后'))
       } else if (value && this.form.gmtEnd && +new Date(this.form.gmtEnd) < +new Date(value)) {
         this.errorState = 2
         callback(new Error('结束时间不能小于开始时间'))
