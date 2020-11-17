@@ -17,3 +17,7 @@ export default function checkPermission(value) {
         return false
     }
 }
+
+export function getPermissionCode(start, end) {
+    
+}

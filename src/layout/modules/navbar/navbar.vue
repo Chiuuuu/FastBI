@@ -16,6 +16,7 @@
   </div>
 </template>
 <script>
+import { resetRouter } from '@/router'
 export default {
   computed: {
     // 侧边栏展开收起
@@ -31,6 +32,8 @@ export default {
   methods: {
     // 退出登录按钮
     quitBtn() {
+      resetRouter()
+      window.roles = []
       this.$router.push({
         path: '/login'
       })
