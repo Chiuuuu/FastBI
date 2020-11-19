@@ -117,7 +117,7 @@
 import ResetNameModal from '../data-main/data-menu/resetName'
 import MoveFileModal from '../data-main/data-menu/moveFile'
 import { mapState } from 'vuex'
-import { menuSearchLoop } from '../../../dataModel/util'
+import { menuSearchLoop } from '@/utils/menuSearch'
 import { fetchTableInfo, fetchDeleteMenuById } from '../../../../../api/dataAccess/api'
 import MenuFile from '@/components/dataSource/menu-group/file'
 import MenuFolder from '@/components/dataSource/menu-group/folder'

@@ -159,7 +159,7 @@
   import { mapGetters, mapActions } from 'vuex'
   import { deepClone } from '@/utils/deepClone'
   import debounce from 'lodash/debounce'
-  import { menuSearchLoop } from '@/views/dataSource/dataModel/util'
+  import { menuSearchLoop } from '@/utils/menuSearch'
 
 export default {
   name: 'BoardModel',
