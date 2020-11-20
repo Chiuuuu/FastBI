@@ -30,17 +30,17 @@ export default {
   },
   data() {
     return {
-      
+
     }
   },
   computed: {
     ...mapState({
-      roleMode: state => state.roles.roleMode
+      roleMode: state => state.projectRoles.roleMode
     })
   },
   beforeDestroy() {
-    this.$store.commit('roles/SET_ROLEMODE', 'check')
-    this.$store.commit('roles/SET_ROLEID', 0)
+    this.$store.commit('projectRoles/SET_ROLEMODE', 'check')
+    this.$store.commit('projectRoles/SET_ROLEID', 0)
   }
 }
 </script>

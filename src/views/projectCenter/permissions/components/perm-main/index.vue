@@ -122,8 +122,8 @@ export default {
   },
   computed: {
     ...mapState({
-      permissionId: state => state.permissions.permissionId,
-      formInfo: state => state.permissions.permissionInfo
+      permissionId: state => state.projectPermissions.permissionId,
+      formInfo: state => state.projectPermissions.permissionInfo
     })
   },
   created() {
@@ -144,9 +144,9 @@ export default {
     },
     handleChangeModule(key) {
       if (key === '1') {
-        this.$store.commit('permissions/SET_EDITTYPE', 'row')
+        this.$store.commit('projectPermissions/SET_EDITTYPE', 'row')
       } else if (key === '2') {
-        this.$store.commit('permissions/SET_EDITTYPE', 'col')
+        this.$store.commit('projectPermissions/SET_EDITTYPE', 'col')
       }
     },
     handleChangeTab(activeKey) {
@@ -173,7 +173,7 @@ export default {
     },
     edit() {
       // 切换至编辑模式
-      this.$store.commit('permissions/SET_PERMISSIONMODE', 'edit')
+      this.$store.commit('projectPermissions/SET_PERMISSIONMODE', 'edit')
       this.$router.push({
         path: '/projectCenter/permissions/edit/id=' + 123
       })

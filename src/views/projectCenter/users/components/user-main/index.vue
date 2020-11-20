@@ -224,8 +224,8 @@ export default {
   },
   computed: {
     ...mapState({
-      roleId: state => state.roles.roleId,
-      formInfo: state => state.roles.roleInfo
+      roleId: state => state.projectRoles.roleId,
+      formInfo: state => state.projectRoles.roleInfo
     })
   },
   created() {

@@ -145,8 +145,8 @@ export default {
   },
   computed: {
     ...mapState({
-      roleId: state => state.roles.roleId,
-      formInfo: state => state.roles.roleInfo
+      roleId: state => state.projectRoles.roleId,
+      formInfo: state => state.projectRoles.roleInfo
     })
   },
   created() {
@@ -196,7 +196,7 @@ export default {
     },
     edit() {
       // 切换至编辑模式
-      this.$store.commit('roles/SET_ROLEMODE', 'edit')
+      this.$store.commit('projectRoles/SET_ROLEMODE', 'edit')
       this.$router.push({
         path: '/projectCenter/roles/edit/id=' + 123
       })

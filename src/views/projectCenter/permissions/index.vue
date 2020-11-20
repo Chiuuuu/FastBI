@@ -33,18 +33,18 @@ export default {
   },
   data() {
     return {
-      
+
     }
   },
   computed: {
     ...mapState({
-      permissionMode: state => state.permissions.permissionMode,
-      editType: state => state.permissions.editType
+      permissionMode: state => state.projectPermissions.permissionMode,
+      editType: state => state.projectPermissions.editType
     })
   },
   beforeDestroy() {
-    this.$store.commit('permissions/SET_PERMISSIONMODE', 'check')
-    this.$store.commit('permissions/SET_PERMISSIONID', 0)
+    this.$store.commit('projectPermissions/SET_PERMISSIONMODE', 'check')
+    this.$store.commit('projectPermissions/SET_PERMISSIONID', 0)
   }
 }
 </script>

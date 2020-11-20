@@ -216,7 +216,7 @@ export default {
   },
   computed: {
     ...mapState({
-      tableList: state => state.roles.menuList
+      tableList: state => state.projectRoles.menuList
     }),
     menuList() {
       return this.searchValue ? this.searchList : this.tableList
@@ -226,10 +226,10 @@ export default {
     },
     fileSelectId: {
       get () {
-        return this.$store.state.roles.roleId
+        return this.$store.state.projectRoles.roleId
       },
       set (value) {
-        this.$store.commit('roles/SET_ROLEID', value)
+        this.$store.commit('projectRoles/SET_ROLEID', value)
       }
     }
   },
@@ -242,7 +242,7 @@ export default {
     * 获取左侧菜单数据
     */
     handleGetMenuList() {
-      this.$store.dispatch('roles/getMenuList', this)
+      this.$store.dispatch('projectRoles/getMenuList', this)
     },
     /**
      * @description 获取表详情信息
@@ -288,10 +288,10 @@ export default {
       if (this.fileSelectId === file.id) return
       this.fileSelectId = file.id
       // this.getTableInfo(`/datasource/${file.id}`, result => {
-      //   this.$store.commit('roles/SET_ROLE_INFO', result.data)
+      //   this.$store.commit('projectRoles/SET_ROLE_INFO', result.data)
       // })
-      this.$store.commit('roles/SET_ROLEID', file.id)
-      this.$store.commit('roles/SET_PARENTID', file.parentId)
+      this.$store.commit('projectRoles/SET_ROLEID', file.id)
+      this.$store.commit('projectRoles/SET_PARENTID', file.parentId)
     },
     /**
     * 删除菜单
@@ -307,7 +307,7 @@ export default {
           //   this.$message.success('删除成功')
           //   const isSame = file.id === this.fileSelectId
           //   if (isSame) {
-          //     this.$store.commit('roles/SET_ROLEID', 0)
+          //     this.$store.commit('projectRoles/SET_ROLEID', 0)
           //   }
           // } else {
           //   this.$message.error(result.msg)

@@ -216,7 +216,7 @@ export default {
   },
   computed: {
     ...mapState({
-      tableList: state => state.permissions.menuList
+      tableList: state => state.projectPermissions.menuList
     }),
     menuList() {
       return this.searchValue ? this.searchList : this.tableList
@@ -226,10 +226,10 @@ export default {
     },
     fileSelectId: {
       get () {
-        return this.$store.state.permissions.permissionId
+        return this.$store.state.projectPermissions.permissionId
       },
       set (value) {
-        this.$store.commit('permissions/SET_PERMISSIONID', value)
+        this.$store.commit('projectPermissions/SET_PERMISSIONID', value)
       }
     }
   },
@@ -242,7 +242,7 @@ export default {
     * 获取左侧菜单数据
     */
     handleGetMenuList() {
-      this.$store.dispatch('permissions/getMenuList', this)
+      this.$store.dispatch('projectPermissions/getMenuList', this)
     },
     /**
      * @description 获取表详情信息
@@ -288,10 +288,10 @@ export default {
       if (this.fileSelectId === file.id) return
       this.fileSelectId = file.id
       // this.getTableInfo(`/datasource/${file.id}`, result => {
-      //   this.$store.commit('permissions/SET_PERMISSION_INFO', result.data)
+      //   this.$store.commit('projectPermissions/SET_PERMISSION_INFO', result.data)
       // })
-      this.$store.commit('permissions/SET_PERMISSIONID', file.id)
-      this.$store.commit('permissions/SET_PARENTID', file.parentId)
+      this.$store.commit('projectPermissions/SET_PERMISSIONID', file.id)
+      this.$store.commit('projectPermissions/SET_PARENTID', file.parentId)
     },
     /**
     * 删除菜单
@@ -307,7 +307,7 @@ export default {
           //   this.$message.success('删除成功')
           //   const isSame = file.id === this.fileSelectId
           //   if (isSame) {
-          //     this.$store.commit('permissions/SET_PERMISSIONID', 0)
+          //     this.$store.commit('projectPermissions/SET_PERMISSIONID', 0)
           //   }
           // } else {
           //   this.$message.error(result.msg)

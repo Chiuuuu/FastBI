@@ -69,8 +69,8 @@ export default {
   },
   computed: {
     ...mapState({
-      roleId: state => state.roles.roleId,
-      formInfo: state => state.roles.roleInfo
+      roleId: state => state.projectRoles.roleId,
+      formInfo: state => state.projectRoles.roleInfo
     })
   },
   created() {
@@ -88,7 +88,7 @@ export default {
     },
     back() {
       // 切换回查看模式
-      this.$store.commit('permissions/SET_PERMISSIONMODE', 'check')
+      this.$store.commit('projectPermissions/SET_PERMISSIONMODE', 'check')
       this.$router.push({
         path: '/projectCenter/permissions/list'
       })

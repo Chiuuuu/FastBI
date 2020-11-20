@@ -88,8 +88,8 @@ export default {
   },
   computed: {
     ...mapState({
-      roleId: state => state.roles.roleId,
-      formInfo: state => state.roles.roleInfo
+      roleId: state => state.projectRoles.roleId,
+      formInfo: state => state.projectRoles.roleInfo
     })
   },
   created() {
@@ -107,7 +107,7 @@ export default {
     },
     back() {
       // 切换回查看模式
-      this.$store.commit('roles/SET_ROLEMODE', 'check')
+      this.$store.commit('projectRoles/SET_ROLEMODE', 'check')
       this.$router.push({
         path: '/projectCenter/roles/list'
       })
