@@ -69,6 +69,9 @@
           <template #startTime="text">
             <span>{{ text | formatTime }}</span>
           </template>
+          <template #cost="text">
+            <span>{{ formatSecond(text) }}</span>
+          </template>
         </a-table>
       </a-modal>
       <extract-setting
@@ -113,7 +116,8 @@ const logColumns = [
   {
     title: '耗时',
     align: 'center',
-    dataIndex: 'cost'
+    dataIndex: 'cost',
+    scopedSlots: { customRender: 'cost' }
   },
   {
     title: '状态',
@@ -226,11 +230,22 @@ export default {
     })
   },
   filters: {
-    formatTime: function(v) {
+    formatTime(v) {
       return moment(v).format('YYYY-MM-DD HH:mm:ss')
     }
   },
   methods: {
+    formatSecond(v) {
+      if (v < 60) {
+        return v === 0 ? '' : (v + 's')
+      } else if (v < 3600 && v >= 60) {
+        const min = Math.floor(v / 60)
+        return min + 'min' + this.formatSecond(v - 60 * min)
+      } else if (v >= 3600) {
+        const hour = Math.floor(v / 3600)
+        return hour + 'h' + this.formatSecond(v - 3600 * hour)
+      }
+    },
     handleTableTypeChange(event) {
       this.tableType = event.target.value
     },
