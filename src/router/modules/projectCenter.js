@@ -3,7 +3,7 @@ import PERMISSION_CODE from '@/config/permission'
 const RouteView = () => import('@/layout/routeView')
 const PageView = () => import('@/layout/pageView')
 
-const UsersView = () => import('@/views/projectCenter/users')
+const UsersView = () => import('@/views/projectCenter/users/users')
 
 const RolesView = () => import('@/views/projectCenter/roles')
 const RolesEdit = () => import('@/views/projectCenter/roles')
