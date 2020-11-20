@@ -1,23 +1,90 @@
+import store from '@/store'
+import keys from 'lodash/keys'
+
 /**
- * @export checkPermission 权限校验
- * @param {Array} value 权限数组
+ * @export checkObejctPermission 对象模块权限校验
+ * @example v-if="checkObejctPermission('1')"
+ * @param {String} obj 对象权限
  * @returns {Boolean} 是否有权限
  */
-export default function checkPermission(value) {
-    if (value && value instanceof Array && value.length > 0) {
-        const permissionRoles = value
-
-        const hasPermission = [1, 2].some(role => {
-            return permissionRoles.includes(role)
-        })
-
+export function checkObejctPermission(value) {
+    if (value && typeof value === 'string') {
+        const objPermissions = keys(store.state.user.objectModule)
+        const hasPermission = objPermissions.includes(value)
+        if (!hasPermission && value !== '0') {
+            return checkObejctPermission('0')
+        }
         return hasPermission
     } else {
-        console.log(`need roles, like v-if="checkPerssion([1,2])"`)
         return false
     }
 }
 
-export function getPermissionCode(start, end) {
-    
+/**
+ * @export checkActionPermission 按钮权限校验
+ * @example v-if="checkActionPermission('1', 1 || [1])"
+ * @param {String} obj 对象权限
+ * @param {Number} value 对象操作权限
+ * @returns {Boolean} 是否有权限
+ */
+export function checkActionPermission(obj, value) {
+    const hasObjPermission = checkObejctPermission(obj)
+    if (hasObjPermission && value) {
+        const actionPermissions = store.state.user.objectModule[obj]
+        if (!actionPermissions && obj !== '0') {
+            // 当没有对应的对象权限的时候
+            return checkActionPermission('0', value)
+        }
+        let hasPermission
+        if (typeof value === 'number') {
+            hasPermission = actionPermissions.includes(value)
+        } else if (Array.isArray(value)) {
+            hasPermission = actionPermissions.some(action => value.includes(action))
+        }
+        if (!hasPermission && obj !== '0') {
+            // 当对应的对象权限的时候
+            return checkActionPermission('0', value)
+        }
+        return hasPermission
+    } else {
+        return false
+    }
+}
+
+/**
+ *
+ * @export getPermissionByTree 根据对应的key获取权限
+ * @param {Object} permissionTree 后台返回权限树
+ * @param {String} key 关键字
+ * @returns
+ */
+export function getPermissionByTree(permissionTree, key) {
+    if (permissionTree && typeof permissionTree === 'object') {
+        if (permissionTree.hasOwnProperty(key)) {
+            return permissionTree[key]
+        } else {
+            throw Error(`pemissionTree has't the ${key}`)
+        }
+    }
+}
+
+/**
+ *
+ * @export getRenderRouter 渲染菜单路由
+ * @param {Array} routes 动态的路由
+ * @returns
+ */
+export function getRenderRouter(routes) {
+  routes = routes
+    .filter(item => {
+      if (item.path === '/') {
+        return item
+      }
+    })
+    .pop()
+  const { children } = routes
+  return {
+      routes,
+      children
+  }
 }

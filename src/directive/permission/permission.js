@@ -1,19 +1,14 @@
+import { checkActionPermission } from '@/utils/permission'
 function checkPermission(el, binding) {
-    const { value } = binding
+    const { arg, value } = binding
 
-    if (value && value instanceof Array && value.length > 0) {
-        const permissionRoles = value
-
-        // 【1,2】是根据登录的用户获取到权限
-        const hasPermission = [1, 2].some(role => {
-            return permissionRoles.includes(role)
-        })
-
+    if (arg && value) {
+        const hasPermission = checkActionPermission(value, arg)
         if (!hasPermission) {
             el.parentNode && el.parentNode.removeChild(el)
         }
     } else {
-        throw new Error(`need roles, like v-perssion=[1,2]`)
+        throw new Error(`need roles, like v-permission:[PERMISSISON_CODE.OPERATOR.add]="PERMISSISON_CODE.OBJECT.datasource"`)
     }
 }
 

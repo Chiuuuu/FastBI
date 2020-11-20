@@ -1,3 +1,5 @@
+import PERMISSION_CODE from '@/config/permission'
+
 const RouteView = () => import('@/layout/routeView')
 const UsersView = () => import('@/views/projectCenter/users')
 const RolesView = () => import('@/views/projectCenter/roles')
@@ -9,7 +11,8 @@ export default {
   component: RouteView,
   meta: {
     title: '项目中心',
-    icon: 'apartment'
+    icon: 'apartment',
+    permissions: [PERMISSION_CODE.PAGE.user, PERMISSION_CODE.PAGE.role, PERMISSION_CODE.PAGE.dataPermission]
   },
   children: [
     {
@@ -17,7 +20,8 @@ export default {
       name: 'users',
       component: UsersView,
       meta: {
-        title: '用户管理'
+        title: '用户管理',
+        permissions: [PERMISSION_CODE.PAGE.user]
       }
     },
     {
@@ -25,7 +29,8 @@ export default {
       name: 'roles',
       component: RolesView,
       meta: {
-        title: '角色管理'
+        title: '角色管理',
+        permissions: [PERMISSION_CODE.PAGE.role]
       }
     },
     {
@@ -33,7 +38,8 @@ export default {
       name: 'permissions',
       component: PermissionsView,
       meta: {
-        title: '数据权限管理'
+        title: '数据权限管理',
+        permissions: [PERMISSION_CODE.PAGE.dataPermission]
       }
     }
   ]
