@@ -1,7 +1,13 @@
 const RouteView = () => import('@/layout/routeView')
+const PageView = () => import('@/layout/pageView')
+
 const UsersView = () => import('@/views/projectCenter/users')
+
 const RolesView = () => import('@/views/projectCenter/roles')
+const RolesEdit = () => import('@/views/projectCenter/roles')
+
 const PermissionsView = () => import('@/views/projectCenter/permissions')
+const PermissionsEdit = () => import('@/views/projectCenter/permissions')
 
 export default {
   path: '/projectCenter',
@@ -23,18 +29,56 @@ export default {
     {
       path: 'roles',
       name: 'roles',
-      component: RolesView,
+      redirect: '/projectCenter/roles/list',
+      component: PageView,
       meta: {
         title: '角色管理'
-      }
+      },
+      children: [
+        {
+          path: 'list',
+          name: 'rolesList',
+          component: RolesView,
+          meta: {
+            sideBar: 'roles'
+          }
+        },
+        {
+          path: 'edit/id=:id',
+          name: 'rolesEdit',
+          component: RolesEdit,
+          meta: {
+            sideBar: 'roles'
+          }
+        }
+      ]
     },
     {
       path: 'permissions',
       name: 'permissions',
-      component: PermissionsView,
+      redirect: '/projectCenter/permissions/list',
+      component: PageView,
       meta: {
         title: '数据权限管理'
-      }
+      },
+      children: [
+        {
+          path: 'list',
+          name: 'permissionsList',
+          component: PermissionsView,
+          meta: {
+            sideBar: 'permissions'
+          }
+        },
+        {
+          path: 'edit/id=:id',
+          name: 'permissionsEdit',
+          component: PermissionsEdit,
+          meta: {
+            sideBar: 'permissions'
+          }
+        }
+      ]
     }
   ]
 }
