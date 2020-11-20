@@ -1,3 +1,5 @@
+import PERMISSION_CODE from '@/config/permission'
+
 const RouteView = () => import('@/layout/routeView')
 const PageView = () => import('@/layout/pageView')
 const dataAccessView = () => import('@/views/dataSource/dataAccess/dataAccess')
@@ -10,7 +12,8 @@ export default {
   component: RouteView,
   meta: {
     title: '数据源',
-    icon: 'apartment'
+    icon: 'apartment',
+    permissions: [PERMISSION_CODE.PAGE.datasource, PERMISSION_CODE.PAGE.datamodel]
   },
   children: [
     {
@@ -18,7 +21,8 @@ export default {
       name: 'dataAccess',
       component: dataAccessView,
       meta: {
-        title: '数据接入'
+        title: '数据接入',
+        permissions: [PERMISSION_CODE.PAGE.datasource]
       }
     },
     {
@@ -27,7 +31,8 @@ export default {
       redirect: '/dataSource/dataModel/modelShow',
       component: PageView,
       meta: {
-        title: '数据模型'
+        title: '数据模型',
+        permissions: [PERMISSION_CODE.PAGE.datamodel]
       },
       children: [
         {
@@ -35,7 +40,8 @@ export default {
           name: 'modelShow',
           component: dataModelView,
           meta: {
-            sideBar: 'dataModel'
+            sideBar: 'dataModel', // 用于显示对对应的菜单
+            permissions: [PERMISSION_CODE.PAGE.datamodel]
           }
         },
         {
@@ -43,7 +49,8 @@ export default {
           name: 'modelEdit',
           component: dataModelEditView,
           meta: {
-            sideBar: 'dataModel'
+            sideBar: 'dataModel',
+            permissions: [PERMISSION_CODE.PAGE.datamodel]
           }
         }
       ]

@@ -16,7 +16,6 @@
   </div>
 </template>
 <script>
-import { resetRouter } from '@/router'
 export default {
   computed: {
     // 侧边栏展开收起
@@ -32,13 +31,12 @@ export default {
   methods: {
     // 退出登录按钮
     quitBtn() {
-      resetRouter()
-      window.roles = []
+      this.$store.dispatch('common/set_token', '')
+      sessionStorage.clear()
+      this.$store.commit('user/CLEAR_PERMISSIONS')
       this.$router.push({
         path: '/login'
       })
-      this.$store.dispatch('common/set_token', '')
-      sessionStorage.clear()
     },
 
     // 点击收起展开侧边栏

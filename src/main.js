@@ -13,6 +13,8 @@ import './styles/index.styl'
 
 import server from '@/api/index'
 
+import permission from '@/directive/permission'
+
 // element-ui 局部引用
 Vue.use(Button)
 Vue.use(ColorPicker)
@@ -23,6 +25,7 @@ Vue.use(Input)
 Vue.use(BinUI)
 Vue.use(VCharts)
 Vue.use(Antd)
+Vue.use(permission)
 
 Vue.prototype.$server = server
 Vue.prototype.$EventBus = new Vue()

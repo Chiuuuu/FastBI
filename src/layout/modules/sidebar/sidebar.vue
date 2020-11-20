@@ -31,10 +31,11 @@
 </template>
 <script>
 import ManageRoutes from '@/router/modules/layout'
-
+import { getRenderRouter } from '@/utils/permission'
 export default {
   data() {
-    const menuData = this.getMenuData(ManageRoutes.children)
+    const renderRouter = getRenderRouter(this.$store.state.permission.routes)
+    const menuData = this.getMenuData(renderRouter.children)
     const path = this.$route.path
     const defaultOpenKeys = ['/' + path.split('/').splice(1).shift()]
     const defaultSelectedKeys = [this.$router.currentRoute.meta.sideBar || this.$router.currentRoute.name]
