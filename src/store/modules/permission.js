@@ -61,7 +61,7 @@ const actions = {
       if (children && children.length > 0) {
         setRedirect(routes)
         commit('SET_ROUTES', accessedRoutes)
-        resolve(state.routes)
+        resolve(accessedRoutes)
       } else {
         reject(new Error('菜单不存在'))
       }
