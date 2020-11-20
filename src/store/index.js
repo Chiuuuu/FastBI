@@ -9,6 +9,8 @@ import options from './modules/options'
 import dataModel from './modules/dataModel'
 import user from './modules/user'
 import permission from './modules/permission'
+import roles from './modules/projectCenter/roles'
+import permissions from './modules/projectCenter/permissions'
 
 Vue.use(Vuex)
 
@@ -21,7 +23,9 @@ export default new Vuex.Store({
         options,
         dataModel,
         user,
-        permission
+        permission,
+        roles,
+        permissions
     },
     getters
 })
