@@ -353,13 +353,14 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  /deep/ .regular-bordered .ant-select-selection {
-    border-color: #d9d9d9;
-  }
-  /deep/ .regular-bordered .ant-select-arrow {
-    color: #d9d9d9;
-  }
-  /deep/ .ant-form-item-label {
-    width: 100px !important;
-  }
+@deep: ~'>>>';
+@{deep} .regular-bordered .ant-select-selection {
+  border-color: #d9d9d9;
+}
+@{deep} .regular-bordered .ant-select-arrow {
+  color: #d9d9d9;
+}
+@{deep} .ant-form-item-label {
+  width: 100px !important;
+}
 </style>

@@ -196,8 +196,9 @@ export default {
 }
 </script>
 <style lang="less" scoped>
+@deep: ~'>>>';
 .widthModal {
-  /deep/.ant-modal-body{
+  @{deep} .ant-modal-body{
     padding: 0;
   }
 }
