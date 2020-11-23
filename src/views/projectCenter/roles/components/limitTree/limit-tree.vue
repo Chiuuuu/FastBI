@@ -62,6 +62,24 @@ const treeData = [
         key: '0-0-4',
         scopedSlots: { title: 'custom' },
         permissions: []
+      },
+            {
+        title: 'parent 1-5',
+        key: '0-0-5',
+        scopedSlots: { title: 'custom' },
+        permissions: []
+      },
+            {
+        title: 'parent 1-6',
+        key: '0-0-6',
+        scopedSlots: { title: 'custom' },
+        permissions: []
+      },
+            {
+        title: 'parent 1-7',
+        key: '0-0-7',
+        scopedSlots: { title: 'custom' },
+        permissions: []
       }
     ]
   }

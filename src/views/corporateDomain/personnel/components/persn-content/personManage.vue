@@ -1,5 +1,5 @@
 <template>
-<div class="screen-manage">
+<div class="flex-col">
   <div class="role-list-controller">
     <div class="searchbar">
       <a-form-model layout="inline" :model="personSearch">
@@ -37,7 +37,7 @@
     <template #enable="text, record"><a-switch v-model="text" @change="handleSwitch($event, record)" /></template>
     <!-- 操作 -->
     <template #config="text, record">
-      <a @click="handleEdit(record)" style="margin-right: 20px">编辑</a>
+      <a class="handler-margin" @click="handleEdit(record)" style="margin-right: 20px">编辑</a>
       <a-popconfirm title="确定要删除该项目吗？" ok-text="确定" cancel-text="取消" @confirm="handleDelete(record.id)">
         <a href="#">删除</a>
       </a-popconfirm>
@@ -65,31 +65,38 @@ for (let i = 0; i < 30; i++) {
     post: '收银员',
     project: ['大茶饭', '乡村振兴'],
     enable: false,
-    gmtCreate: '2020-11-19 15:09'
+    gmtCreate: '2020-11-19 15:09:00'
   })
 }
 
 const personColumn = [
   {
     title: '用户名',
+    width: 100,
     dataIndex: 'username'
   },
   {
     title: '姓名',
+    width: 100,
     dataIndex: 'name'
   },
   {
     title: '电话',
+    width: 120,
     dataIndex: 'phone'
   },
-  {
+  { // 部门
     slots: { title: 'depart' },
     dataIndex: 'depart',
+    width: 200,
+    ellipsis: true,
     key: 'depart'
   },
-  {
+  { // 岗位
     slots: { title: 'post' },
     dataIndex: 'post',
+    width: 200,
+    ellipsis: true,
     key: 'post'
   },
   {
@@ -102,6 +109,7 @@ const personColumn = [
   {
     title: '是否启用',
     dataIndex: 'enable',
+    width: 100,
     scopedSlots: { customRender: 'enable' }
   },
   {
@@ -148,6 +156,9 @@ export default {
   methods: {
     resetForm(tab) {
       this.personSearch = this.$options.data().personSearch
+    },
+    handleSwitch() {
+
     },
     handleSetDepart() {
       const data = {} // 取当前项目下的部门岗位

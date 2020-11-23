@@ -3,16 +3,16 @@
     <div class="right" style="padding-top:16px">
       <div class="role-list-controller">
         <div class="searchbar">
-          <div class="item">
-            <span>项目名称：</span>
-            <a-input placeholder="请输入项目名称" v-model="userSearch.name" style="width: 200px"></a-input>
-          </div>
-          <div class="item">
-            <span>管理员：</span>
-            <a-input placeholder="请输入管理员姓名" v-model="userSearch.admins" style="width: 200px"></a-input>
-          </div>
-          <a-button class="main-button" type="primary" @click="getList">查询</a-button>
-          <a-button class="main-button" type="primary" @click="resetForm(2)">重置</a-button>
+          <a-form-model layout="inline" :model="userSearch">
+            <a-form-model-item label="项目名称" prop="username">
+              <a-input placeholder="请输入项目名称" v-model="userSearch.name" style="width: 200px"></a-input>
+            </a-form-model-item>
+            <a-form-model-item label="管理员" prop="name">
+              <a-input placeholder="请输入管理员姓名" v-model="userSearch.admins" style="width: 200px"></a-input>
+            </a-form-model-item>
+            <a-button class="main-button" type="primary" @click="getList">查询</a-button>
+            <a-button class="main-button" type="primary" @click="resetForm">重置</a-button>
+          </a-form-model>
         </div>
         <a-button class="main-button" type="primary" @click="showModal('add')">添加项目</a-button>
       </div>
@@ -27,8 +27,21 @@
           {{ text.toString() }}
         </template>
         <template #config="text, record">
-          <a style="margin-right:20px" @click="handleCheck(record)">查看项目用户</a>
-          <a style="margin-right:20px" @click="handleEdit(record)">编辑</a>
+          <a-popover placement="left" trigger="click">
+            <template slot="content">
+              <div :title="projectUsers.manager.toString()" class="pop-user-list">
+                管理员：{{ projectUsers.manager.toString() }}
+              </div>
+              <div :title="projectUsers.subManager.toString()" class="pop-user-list">
+                二级管理员：{{ projectUsers.subManager.toString() }}
+              </div>
+              <div :title="projectUsers.editor.toString()" class="pop-user-list">
+                编辑者：{{ projectUsers.editor.toString() }}
+              </div>
+            </template>
+            <a class="handler-margin" @click="handleCheckUsers(record)">查看项目用户</a>
+          </a-popover>
+          <a class="handler-margin" @click="handleEdit(record)">编辑</a>
           <a-popconfirm title="确定要删除该项目吗？" ok-text="确定" cancel-text="取消" @confirm="handleDelete(record.id)">
             <a href="#">删除</a>
           </a-popconfirm>
@@ -161,6 +174,11 @@ export default {
         name: '',
         admins: ''
       },
+      projectUsers: {
+        manager: [],
+        subManager: [],
+        editor: []
+      },
       userData: [],
       userColumn
     }
@@ -197,13 +215,7 @@ export default {
       this.clearModal()
     },
     handleDelete({ id }) {
-      this.$confirm({
-        title: '确认提示',
-        content: '您确定要删除该用户吗',
-        onOk: () => {
-          console.log('删除id: ', id)
-        }
-      })
+      console.log('删除id: ', id)
     },
     handleEdit(data) {
       this.form = Object.assign({}, {
@@ -214,8 +226,12 @@ export default {
       this.rowId = data.id
       this.showModal('edit')
     },
-    handleCheck(data) {
-
+    handleCheckUsers(data) {
+      this.projectUsers = {
+        manager: ['张三', '李四'],
+        subManager: ['王五', '王武'],
+        editor: ['王屋']
+      }
     },
     async getList() {
       this.loading = true
@@ -230,4 +246,11 @@ export default {
 
 <style lang="less" scoped>
 @import "../../../main.less";
+.pop-user-list {
+  margin: 10px 0;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 </style>

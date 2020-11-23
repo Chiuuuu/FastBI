@@ -1,5 +1,5 @@
 <template>
-  <div class="screen-manage" style="height: 74%">
+  <div style="height: calc(100% - 116px)">
     <a-row class="line">
       <a-col span="2">{{ roleTitle }}</a-col>
       <a-col>

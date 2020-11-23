@@ -43,8 +43,8 @@
         @{deep} .role-list-controller {
             display: flex;
             justify-content: space-between;
-            height: 50px;
             padding: 0 16px;
+            margin-bottom: 16px;
             .searchbar {
                 display: flex;
                 .item {
@@ -54,7 +54,7 @@
         }
 
         @{deep} .role-list-table {
-            height: calc(100% - 110px);
+            flex: 1;
             padding-right: 16px;
             overflow-y: auto;
         }
@@ -121,6 +121,8 @@
         }
 
         @{deep} .user-layout {
+            display: flex;
+            flex-direction: column;
             height: 100%;
         }
 
@@ -134,7 +136,7 @@
             .middle {
                 height: calc(100% - 50%);
                 .content {
-                    height: calc(100% - 105px);
+                    height: calc(100% - 77px);
                 }
             }
 
