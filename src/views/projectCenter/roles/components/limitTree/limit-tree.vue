@@ -1,21 +1,25 @@
 <template>
   <a-tree
+    class="limitTree"
     :tree-data="treeData"
     :selectable="false"
+    :blockNode="true"
   >
     <template slot="custom" slot-scope="item" style="color: #f00;width: 100%">
       <a-row>
         <a-col span="14">{{item.title}}</a-col>
-        <a-checkbox-group :value="item.permissions">
-          <a-row>
-            <a-col span="5" v-for="subitem in [
-              { value: 'Apple', name: 'Apple' },
-              { value: 'Pear', name: 'Pear' }
-              ]" :key="subitem.value">
-                  <a-checkbox :value="subitem.value" @change="(e) => onChange(subitem, e, item)"></a-checkbox>
-            </a-col>
-          </a-row>
-        </a-checkbox-group>
+        <a-col span="10">
+          <a-checkbox-group :value="item.permissions" style="width:100%">
+            <a-row>
+              <a-col span="5" v-for="subitem in [
+                { value: 'Apple', name: 'Apple' },
+                { value: 'Pear', name: 'Pear' }
+                ]" :key="subitem.value">
+                    <a-checkbox :value="subitem.value" @change="(e) => onChange(subitem, e, item)" :disabled="status === 'show' ? true : false"></a-checkbox>
+              </a-col>
+            </a-row>
+          </a-checkbox-group>
+        </a-col>
       </a-row>
     </template>
   </a-tree>
@@ -40,6 +44,24 @@ const treeData = [
         key: '0-0-1',
         scopedSlots: { title: 'custom' },
         permissions: []
+      },
+      {
+        title: 'parent 1-2',
+        key: '0-0-2',
+        scopedSlots: { title: 'custom' },
+        permissions: []
+      },
+      {
+        title: 'parent 1-3',
+        key: '0-0-3',
+        scopedSlots: { title: 'custom' },
+        permissions: []
+      },
+      {
+        title: 'parent 1-4',
+        key: '0-0-4',
+        scopedSlots: { title: 'custom' },
+        permissions: []
       }
     ]
   }
@@ -49,6 +71,12 @@ export default {
   data() {
     return {
       treeData
+    }
+  },
+  props: {
+    status: {
+      type: String,
+      default: 'show'
     }
   },
   methods: {
@@ -65,7 +93,11 @@ export default {
   }
 }
 </script>
-
-<style>
-
+<style lang="less" scoped>
+@deep: ~">>>";
+.limitTree {
+  @{deep} li ul {
+    padding: 0;
+  }
+}
 </style>

@@ -6,7 +6,7 @@ const PageView = () => import('@/layout/pageView')
 const UsersView = () => import('@/views/projectCenter/users/users')
 
 const RolesView = () => import('@/views/projectCenter/roles')
-const RolesEdit = () => import('@/views/projectCenter/roles')
+const RolesEdit = () => import('@/views/projectCenter/roles/components/role-edit')
 
 const PermissionsView = () => import('@/views/projectCenter/permissions')
 const PermissionsEdit = () => import('@/views/projectCenter/permissions')
@@ -45,7 +45,8 @@ export default {
           name: 'rolesList',
           component: RolesView,
           meta: {
-            sideBar: 'roles'
+            sideBar: 'roles',
+            permissions: [PERMISSION_CODE.PAGE.role]
           }
         },
         {
@@ -53,7 +54,8 @@ export default {
           name: 'rolesEdit',
           component: RolesEdit,
           meta: {
-            sideBar: 'roles'
+            sideBar: 'roles',
+            permissions: [PERMISSION_CODE.PAGE.role]
           }
         }
       ]
@@ -73,7 +75,8 @@ export default {
           name: 'permissionsList',
           component: PermissionsView,
           meta: {
-            sideBar: 'permissions'
+            sideBar: 'permissions',
+            permissions: [PERMISSION_CODE.PAGE.dataPermission]
           }
         },
         {
@@ -81,7 +84,8 @@ export default {
           name: 'permissionsEdit',
           component: PermissionsEdit,
           meta: {
-            sideBar: 'permissions'
+            sideBar: 'permissions',
+            permissions: [PERMISSION_CODE.PAGE.dataPermission]
           }
         }
       ]

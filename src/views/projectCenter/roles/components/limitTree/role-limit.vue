@@ -1,9 +1,9 @@
 <template>
-  <div class="screen-manage">
+  <div class="screen-manage" style="height: 74%">
     <a-row class="line">
-      <a-col span="6">{{ roleTitle }}</a-col>
+      <a-col span="2">{{ roleTitle }}</a-col>
       <a-col>
-        <a-checkbox-group :options="options"></a-checkbox-group>
+        <a-checkbox-group :options="options" :disabled="status === 'show'? true : false"></a-checkbox-group>
       </a-col>
     </a-row>
     <a-row class="line">
@@ -14,8 +14,10 @@
       <a-col span="2">删除</a-col>
       <a-col span="2">发布</a-col>
     </a-row>
-    <limit-tree></limit-tree>
-    <limit-tree></limit-tree>
+    <div class="content scrollbar">
+      <limit-tree :status="status"></limit-tree>
+      <limit-tree :status="status"></limit-tree>
+    </div>
   </div>
 </template>
 
@@ -26,7 +28,11 @@ export default {
   props: {
     roleTitle: String,
     options: Array,
-    mode: String
+    mode: String,
+    status: {
+      type: String,
+      default: 'show'
+    }
   },
   components: {
     LimitTree

@@ -2,40 +2,25 @@
   <div class="main">
     <a-spin class="main-box" :spinning="spinning">
       <div class="right edit">
-        <div class="tab scrollbar">
-          <header>
-            <span>编辑用户权限</span>
-            <div>
-              <a-button class="main-button" type="primary" @click="handleSave">保存</a-button>
-              <a-button class="main-button" @click="back">返回</a-button>
-            </div>
-          </header>
-          <a-form-model class="role-form" ref="form" :model="form" :rules="rules" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
-            <a-form-model-item label="角色名称" prop="name">
-              <a-input v-model="form.name"></a-input>
-            </a-form-model-item>
-            <a-form-model-item label="角色描述" prop="description">
-              <a-input v-model="form.description"></a-input>
-            </a-form-model-item>
-          </a-form-model>
-          <div class="title">角色权限</div>
-          <div class="content">
-            <a-tabs class="tabs scrollbar" @change="handleChangeTab">
-              <a-tab-pane style="padding-left: 16px" key="1" tab="数据大屏">
-                <role-limit role-title="数据大屏" :options="['新建数据大屏', '新建文件夹']" />
-              </a-tab-pane>
-              <a-tab-pane style="padding-left: 16px" key="2" tab="数据模型">
-                <role-limit role-title="数据模型" :options="['新建数据模型', '新建文件夹']" />
-              </a-tab-pane>
-              <a-tab-pane style="padding-left: 16px" key="3" tab="数据接入">
-                <role-limit role-title="数据接入" :options="['新建数据接入', '新建文件夹']" />
-              </a-tab-pane>
-            </a-tabs>
-          </div>
-          <div class="title">数据权限</div>
-          <div class="content scrollbar">
-            <limit-tree />
-            <limit-tree />
+        <div class="role-layout">
+          <div class="tab scrollbar">
+            <header>
+              <span>编辑用户权限</span>
+              <div>
+                <a-button class="main-button" type="primary" @click="handleSave">保存</a-button>
+                <a-button class="main-button" @click="back">返回</a-button>
+              </div>
+            </header>
+            <a-form-model class="role-form" ref="form" :model="form" :rules="rules" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
+              <a-form-model-item label="角色名称" prop="name">
+                <a-input v-model="form.name"></a-input>
+              </a-form-model-item>
+              <a-form-model-item label="角色描述" prop="description">
+                <a-input v-model="form.description"></a-input>
+              </a-form-model-item>
+            </a-form-model>
+            <RoleTabeRole status="edit"></RoleTabeRole>
+            <RolesTabDataPermission status="edit"></RolesTabDataPermission>
           </div>
         </div>
       </div>
@@ -45,19 +30,19 @@
 
 <script>
 import { mapState } from 'vuex'
-import RoleLimit from '../limitTree/role-limit'
-import LimitTree from '../limitTree/limit-tree'
+import RolesTabDataPermission from '../tab-content/rolesTabDataPermission'
+import RoleTabeRole from '../tab-content/rolesTabRole'
+
 export default {
   name: 'roleEdit',
   components: {
-    RoleLimit,
-    LimitTree
+    RolesTabDataPermission,
+    RoleTabeRole
   },
   data() {
     return {
       currentTab: '1',
       spinning: false,
-      detailInfo: {},
       form: {
         name: '',
         description: ''
@@ -99,9 +84,6 @@ export default {
     this.$EventBus.$off('set-tab-index', this.handleSetTab)
   },
   methods: {
-    handleChangeTab(activeKey) {
-      this.currentTab = activeKey
-    },
     async handleGetRoleInfo() {
 
     },
