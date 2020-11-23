@@ -50,7 +50,8 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-/deep/ .resetNameForm .ant-form-explain {
+@deep: ~'>>>';
+@{deep} .resetNameForm .ant-form-explain {
   margin-left: 0;
 }
 </style>
