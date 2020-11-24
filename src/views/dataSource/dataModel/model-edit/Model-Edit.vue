@@ -73,7 +73,7 @@
         </div> -->
       </div>
     </div>
-    <div class="right">
+    <div class="right" :class="{ 'add_new': model === 'add' }">
       <div class="header" v-if="model==='edit'">
         <span class="data_con">{{detailInfo.name}}</span>
       </div>
@@ -99,7 +99,7 @@
           <span>数据模型详情</span>
           <div class="detail_btn">
             <a-button v-on:click="checkWidthTable" :disabled="disableByDetailInfo">查看宽表</a-button>
-            <!-- <a-button v-on:click="batch">批量编辑字段</a-button> -->
+            <a-button v-on:click="batch">批量编辑字段</a-button>
           </div>
         </div>
         <div class="detail_main">

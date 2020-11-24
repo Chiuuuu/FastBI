@@ -3,8 +3,13 @@
     <a-empty v-if="!modelType" class="tab-empty">
       <span slot="description">请在左侧新建或选择数据接入</span>
     </a-empty>
-    <template>
-      <component :is="modelType" @on-set-table-name="handleSetName" @hook:mounted="handleMounted" ref="entryRef"></component>
+    <template v-else>
+      <template v-if="isFileType">
+        <component :is="modelType" />
+      </template>
+      <template v-else>
+        <component :is="modelType" @on-set-table-name="handleSetName" @hook:mounted="handleMounted" ref="entryRef"></component>
+      </template>
     </template>
   </div>
 </template>
@@ -12,7 +17,6 @@
 import { mapState } from 'vuex'
 import MySql from './mysql'
 import Oracle from './oracle'
-import Hive from './hive'
 import Excel from './excel'
 import Csv from './csv'
 export default {
@@ -20,7 +24,6 @@ export default {
   components: {
     mysql: MySql,
     oracle: Oracle,
-    hive: Hive,
     excel: Excel,
     csv: Csv
   },
@@ -51,7 +54,13 @@ export default {
   },
   computed: {
     ...mapState({
-      modelType: state => state.dataAccess.modelType // 数据类型
+      modelType: state => state.dataAccess.modelType, // 数据类型
+      isFileType(state) {
+        // 数据类型是否是文件格式
+        return ['excel', 'csv'].some(function(item) {
+          return item === state.dataAccess.modelType
+        })
+      }// 是否完成第一部分
     })
   },
   methods: {

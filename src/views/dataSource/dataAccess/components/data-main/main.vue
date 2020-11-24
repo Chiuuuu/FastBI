@@ -6,7 +6,7 @@
           modelType ? (modelName ? modelName : '未命名连接') : "请连接数据"
         }}</span>
         <span class="data_category" v-if="modelType"
-          >（类型：{{ modelType }}）</span
+          >（类型：{{ modelTypeShow }}）</span
         >
       </div>
       <div class="tab scrollbar">
@@ -60,6 +60,21 @@ export default {
           return item === state.dataAccess.modelType
         })
       },
+      modelTypeShow: state => {
+        const type = state.dataAccess.modelType
+        switch (type) {
+          case 'mysql':
+            return 'Mysql'
+          case 'oracle':
+            return 'Oracle'
+          case 'hive':
+            return 'Hadoop Hive'
+          case 'excel':
+            return 'Excel'
+          case 'csv':
+            return 'Csv'
+        }
+      },
       modelName: state => state.dataAccess.modelName,
       tabChangeAble: state => state.dataAccess.firstFinished // 是否完成第一部分
     })
@@ -84,6 +99,7 @@ export default {
     handleTT() {
       if (this.defaultTab === '2') {
         console.log('去刷新')
+        this.$refs.structure.tableType = 0
         this.$refs.structure.handleGetData()
       }
     },
