@@ -38,12 +38,12 @@
     <!-- 操作 -->
     <template #config="text, record">
       <a class="handler-margin" @click="handleEdit(record)" style="margin-right: 20px">编辑</a>
-      <a-popconfirm title="确定要删除该项目吗？" ok-text="确定" cancel-text="取消" @confirm="handleDelete(record.id)">
+      <a-popconfirm title="是否要删除？" ok-text="确定" cancel-text="取消" @confirm="handleDelete(record.id)">
         <a href="#">删除</a>
       </a-popconfirm>
     </template>
   </a-table>
-    <user-modal :show="visible1" :modal-data="modalData" :modal-type="modalType" @close="visible1 = false" />
+  <user-modal :show="visible1" :modal-data="modalData" :modal-type="modalType" @close="visible1 = false" />
   <depart-modal :show="visible2" :modal-data="modalData" @close="visible2 = false" />
   <post-modal :show="visible3" :modal-data="modalData" @close="visible3 = false" />
 </div>
@@ -107,20 +107,21 @@ const personColumn = [
     ellipsis: true
   },
   {
-    title: '是否启用',
+    title: '状态',
     dataIndex: 'enable',
-    width: 100,
+    width: 80,
     scopedSlots: { customRender: 'enable' }
   },
   {
     title: '创建时间',
     dataIndex: 'gmtCreate',
-    width: 200,
+    width: 180,
     ellipsis: true
   },
   {
     title: '操作',
     dataIndex: 'config',
+    width: 110,
     scopedSlots: { customRender: 'config' }
   }
 ]

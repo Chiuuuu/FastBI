@@ -23,7 +23,9 @@
       :loading="loading"
     >
       <template #config="text, record, index">
-        <delete-buton @delete="handleDeleteUser(record ,index)"></delete-buton>
+        <a-popconfirm title="是否要删除？" ok-text="确定" cancel-text="取消" @confirm="handleDeleteUser(record, index)">
+          <a href="#">删除</a>
+        </a-popconfirm>
       </template>
     </a-table>
     <a-modal
@@ -57,7 +59,6 @@
   </div>
 </template>
 <script>
-import DeleteButon from '@/components/button/delete';
 const tableData = []
 for (let i = 0; i < 30; i++) {
   tableData.push({
@@ -91,9 +92,6 @@ const tableColumn = [
 ]
 export default {
     name: 'roleUser',
-    components: {
-        DeleteButon
-    },
     data() {
         return {
             tableData,

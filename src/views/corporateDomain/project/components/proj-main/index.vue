@@ -42,7 +42,7 @@
             <a class="handler-margin" @click="handleCheckUsers(record)">查看项目用户</a>
           </a-popover>
           <a class="handler-margin" @click="handleEdit(record)">编辑</a>
-          <a-popconfirm title="确定要删除该项目吗？" ok-text="确定" cancel-text="取消" @confirm="handleDelete(record.id)">
+          <a-popconfirm title="是否要删除？" ok-text="确定" cancel-text="取消" @confirm="handleDelete(record.id)">
             <a href="#">删除</a>
           </a-popconfirm>
         </template>

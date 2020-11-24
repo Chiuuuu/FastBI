@@ -3,13 +3,13 @@
         <div class="role-list-controller">
             <a-form-model layout="inline" :model="userMangeForm" ref="userMangeForm">
                 <a-form-model-item label="用户名" prop="username">
-                    <a-input v-model="userMangeForm.username" class="form-item"></a-input>
+                    <a-input v-model="userMangeForm.username" class="form-item" placeholder="请输入用户名"></a-input>
                 </a-form-model-item>
                 <a-form-model-item label="姓名" prop="name">
-                    <a-input v-model="userMangeForm.name" class="form-item"></a-input>
+                    <a-input v-model="userMangeForm.name" class="form-item" placeholder="请输入姓名"></a-input>
                 </a-form-model-item>
                 <a-form-model-item label="用户角色" prop="role">
-                    <a-select v-model="userMangeForm.role" class="form-item">
+                    <a-select v-model="userMangeForm.role" mode="multiple" class="form-item" placeholder="请选择角色">
                         <a-select-option v-for="i in 25" :key="(i + 9).toString(36) + i">
                         {{ (i + 9).toString(36) + i }}
                         </a-select-option>
@@ -32,7 +32,9 @@
                 :loading="loading">
                 <template #config="text, record, index">
                     <a @click="handleEditUser(record)" style="margin-right: 20px">编辑</a>
-                    <delete-button @delete="handleDeleteUser(record, index)"></delete-button>
+                    <a-popconfirm title="是否要删除？" ok-text="确定" cancel-text="取消" @confirm="handleDeleteUser(record, index)">
+                        <a href="#">删除</a>
+                    </a-popconfirm>
                 </template>
             </a-table>
         </div>
@@ -75,7 +77,6 @@
     </div>
 </template>
 <script>
-import DeleteButton from '@/components/button/delete'
 const usersData = []
 for (let i = 0; i < 30; i++) {
   let item
@@ -133,9 +134,6 @@ const usersColumn = [
 
 export default {
     name: 'userManage',
-    components: {
-        DeleteButton
-    },
     data() {
         return {
             usersData,
@@ -143,7 +141,7 @@ export default {
             userMangeForm: { // 搜索表单
                 username: '',
                 name: '',
-                role: ''
+                role: []
             },
             modalType: 'add', // 模态窗口的类型，添加(add)/编辑(edit)
             loading: false,
@@ -161,6 +159,10 @@ export default {
                         max: 20,
                         min: 1,
                         message: '长度为1~20'
+                    },
+                    {
+                        pattern: new RegExp('^[a-zA-Z0-9]*$'),
+                        message: '只能填英文字母和数字'
                     }
                 ],
                 users: [
