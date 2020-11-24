@@ -76,7 +76,9 @@ export default {
     },
     /**
      * @description 上传excel文件
-     * @param {Object} file 文件
+     * @param {Object} data 参数
+     * @param {Object} data.file 文件
+     * @param {String} data.delimiter 分隔符
      */
     actionUploadCsvFile(data) {
         return $axios({
@@ -111,10 +113,10 @@ export default {
     /**
      * @description 保存excel数据源
      * @param {Object} data body对象
+     * @param {Array[string]} 'databasesIdList' 删除的文件id
+     * @param {Array[file]} 'fileList' 文件列表
      * @param {String} 'sourceSaveInput.name' 名称
      * @param {String} 'sourceSaveInput.type' 数据源类型
-     * @param {Array[string]} 'sourceSaveInput.databasesIdList' 删除的文件id
-     * @param {Array[file]} 'sourceSaveInput.fileList' 文件列表
      * @param {String} 'sourceSaveInput.parentId' parentId
      * @param {String} 'sourceSaveInput.id' id
      */
@@ -128,18 +130,27 @@ export default {
     },
     /**
      * @description 查询文件下的表格内容
-     * @param {String} tableId 文件id
+     * @param {Object} data 参数
+     * @param {String} data.tableId 表id
+     * @param {String} data.delimiter 分隔符
      */
-    getCsvFileTableInfo(tableId) {
-        return $axios.get('/datasource/csv/presto/read?tableId=' + tableId)
+    getCsvFileTableInfo(data) {
+        // return $axios.get('/datasource/csv/presto/read?tableId=' + tableId)
+        return $axios({
+            method: 'post',
+            headers: { 'Content-Type': 'multipart/form-data' },
+            url: '/datasource/csv/read',
+            data
+        })
     },
     /**
      * @description 保存excel数据源
      * @param {Object} data body对象
+     * @param {Array[file]} 'fileList' 文件列表
+     * @param {Array[string]} 'delDatabasesIdList' 删除的文件id
+     * @param {Array[string]} 'delimiter' 分隔符
      * @param {String} 'sourceSaveInput.name' 名称
      * @param {String} 'sourceSaveInput.type' 数据源类型
-     * @param {Array[string]} 'sourceSaveInput.databasesIdList' 删除的文件id
-     * @param {Array[file]} 'sourceSaveInput.fileList' 文件列表
      * @param {String} 'sourceSaveInput.parentId' parentId
      * @param {String} 'sourceSaveInput.id' id
      */
@@ -158,6 +169,14 @@ export default {
      */
     getModelRecord(params) {
         return $axios.post('/datasource/record', params)
+    },
+    /**
+     * @description 获取操作记录
+     * @param {Array} params
+     * @param {String} id 数据源id
+     */
+    getIncreaseFields(params) {
+        return $axios.post('/datasource/field/find/increase', params)
     },
     /**
      * @description 获取定时任务列表

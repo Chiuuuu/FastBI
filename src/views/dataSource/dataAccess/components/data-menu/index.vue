@@ -117,7 +117,7 @@
 import ResetNameModal from '../data-main/data-menu/resetName'
 import MoveFileModal from '../data-main/data-menu/moveFile'
 import { mapState } from 'vuex'
-import { menuSearchLoop } from '@/utils/menuSearch'
+import { menuSearchLoop } from '../../../dataModel/util'
 import { fetchTableInfo, fetchDeleteMenuById } from '../../../../../api/dataAccess/api'
 import MenuFile from '@/components/dataSource/menu-group/file'
 import MenuFolder from '@/components/dataSource/menu-group/folder'
@@ -138,8 +138,8 @@ export default {
   },
   data() {
     return {
-      // modelList: ['mysql', 'oracle', 'excel', 'csv'].map(function(item) {
-      modelList: ['mysql', 'oracle', 'excel'].map(function(item) {
+      modelList: ['mysql', 'oracle', 'hive', 'excel', 'csv'].map(function(item) {
+      // modelList: ['mysql', 'oracle', 'excel'].map(function(item) {
         // 弹窗选项列表
         return {
           imgurl: require(`@/assets/images/icon_${item}.png`),
@@ -270,6 +270,8 @@ export default {
           this.$store.dispatch('dataAccess/setModelType', 'mysql')
         } else if (result.data.type === 2) {
           this.$store.dispatch('dataAccess/setModelType', 'oracle')
+        } else if (result.data.type === 3) {
+          this.$store.dispatch('dataAccess/setModelType', 'hive')
         } else if (result.data.type === 4) {
           this.$store.dispatch('dataAccess/setModelType', 'excel')
         } else if (result.data.type === 5) {

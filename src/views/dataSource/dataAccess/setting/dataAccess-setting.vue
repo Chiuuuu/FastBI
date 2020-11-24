@@ -27,21 +27,7 @@
             <template slot="alias" slot-scope="text, record, index">
               <a-input style="width:100%;height:32px" :value="text" @blur.stop.prevent="handleAliasBlur($event, record, index, 'alias')" @change.stop.prevent="handleChangeValue($event, record, index, 'alias')"/>
             </template>
-            <template slot="dataType" slot-scope="text, record">
-              <!-- <a-select :value="text" style="width:100%;" @change="(value) => handleSelectChangeValue(value, record, index, 'dataType')">
-                <a-select-option value="BIGINT">
-                  整数
-                </a-select-option>
-                <a-select-option value="TIMESTAMP">
-                  日期时间
-                </a-select-option>
-                <a-select-option value="VARCHAR">
-                  字符串
-                </a-select-option>
-                <a-select-option value="DOUBLE">
-                  小数
-                </a-select-option>
-              </a-select> -->
+            <template slot="convertType" slot-scope="text, record">
               <field-select
                 :text="text | formatField"
                 :select-data="record"
@@ -50,14 +36,6 @@
               />
             </template>
             <template slot="role" slot-scope="text, record">
-              <!-- <a-select default-value="1" :value='`${text}`' @change="(value) => handleSelectChangeValue(value, record, index, 'role')">
-                <a-select-option value="1">
-                  维度
-                </a-select-option>
-                <a-select-option value="2">
-                  度量
-                </a-select-option>
-              </a-select> -->
               <field-select
                 :text="text | formatRole"
                 :select-data="record"
@@ -70,13 +48,13 @@
               />
             </template>
             <template slot="description" slot-scope="text, record, index">
-              <a-input style="width:100%;height:32px" :value="text" @change.stop.prevent="handleChangeValue($event, record, index, 'comment')"/>
+              <a-input style="width:100%;height:32px" :value="text" @change.stop.prevent="handleChangeValue($event, record, index, 'description')"/>
             </template>
             <template slot="comment" slot-scope="comment">
               {{ comment }}
             </template>
             <template slot="visible" slot-scope="text, record, index">
-              <a-select style="width:60px" default-value="true" :value='`${text}`' @change="(value) => handleSelectChangeValue(value, record, index, 'visible')">
+              <a-select style="width:60px" :value='`${text}`' @change="(value) => handleSelectChangeValue(value, record, index, 'visible')">
                 <a-select-option value="true">
                   是
                 </a-select-option>
@@ -93,9 +71,10 @@
                 <a-form-model-item label="字段类型" prop="value" required>
                   <a-select default-value="BIGINT" style="width: 100px" v-model="batchType.value">
                     <a-select-option value="BIGINT"> 整数 </a-select-option>
-                    <a-select-option value="DATE"> 日期时间 </a-select-option>
+                    <a-select-option value="TIMESTAMP"> 日期时间 </a-select-option>
+                    <a-select-option value="DATE"> 日期 </a-select-option>
                     <a-select-option value="VARCHAR"> 字符串 </a-select-option>
-                    <a-select-option value="double"> 小数 </a-select-option>
+                    <a-select-option value="DOUBLE"> 小数 </a-select-option>
                   </a-select>
                 </a-form-model-item>
               </a-form-model>
@@ -103,11 +82,11 @@
             <template v-else-if="setType === 2">
               <a-form-model :model="batchRole" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
                 <a-form-model-item label="字段属性" prop="value" required>
-                  <a-radio-group name="batchRole" default-value="1" v-model="batchRole.value">
-                    <a-radio value="1">
+                  <a-radio-group name="batchRole" :default-value="1" v-model="batchRole.value">
+                    <a-radio :value="1">
                       维度
                     </a-radio>
-                    <a-radio value="2">
+                    <a-radio :value="2">
                       度量
                     </a-radio>
                   </a-radio-group>
@@ -117,7 +96,7 @@
             <template v-else-if="setType === 3">
               <a-form-model :model="batchVisible" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
                 <a-form-model-item label="是否可见" prop="value" required>
-                  <a-radio-group name="batchVisible" default-value="true" v-model="batchVisible.value">
+                  <a-radio-group name="batchVisible" v-model="batchVisible.value">
                     <a-radio value="true">
                       是
                     </a-radio>
@@ -168,8 +147,8 @@ const columns = [
   },
   {
     title: '字段类型',
-    dataIndex: 'dataType',
-    scopedSlots: { customRender: 'dataType' }
+    dataIndex: 'convertType',
+    scopedSlots: { customRender: 'convertType' }
   },
   {
     title: '字段属性',
@@ -214,7 +193,7 @@ export default {
       showSetting: false,
       setType: '',
       batchType: { value: 'BIGINT' },
-      batchRole: { value: '1' },
+      batchRole: { value: 1 },
       batchVisible: { value: 'true' },
       columns,
       selectedRows: [],
@@ -237,6 +216,11 @@ export default {
         {
           name: '转换为字符串',
           dataType: 'VARCHAR',
+          onClick: this.switchFieldType
+        },
+        {
+          name: '转换为日期',
+          dataType: 'DATE',
           onClick: this.switchFieldType
         },
         {
@@ -283,6 +267,9 @@ export default {
         case 'TIMESTAMP':
           value = '日期时间'
           break
+        case 'DATE':
+          value = '日期'
+          break
         case 'DOUBLE':
           value = '小数'
           break
@@ -316,12 +303,10 @@ export default {
     },
     switchFieldType(e, item, vm) {
       let dataType = item.dataType
-      console.log(dataType)
-      vm.selectData.dataType = dataType
+      vm.selectData.convertType = dataType
     },
     switchRoleType(e, item, vm) {
       let roleType = item.roleType
-      console.log(roleType)
       vm.selectData.role = roleType
     },
     async handleGetData() {
@@ -365,18 +350,25 @@ export default {
       } else if (this.setType === 3) {
         this.saveBatchVisible()
       }
+      this.showSetting = false
     },
     async saveBatchType () {
       let value = this.batchType.value
-      console.log(value)
+      this.selectedRows.map(item => {
+        item.convertType = value
+      })
     },
     async saveBatchRole () {
       let value = this.batchRole.value
-      console.log(value)
+      this.selectedRows.map(item => {
+        item.role = value
+      })
     },
     async saveBatchVisible () {
       let value = this.batchVisible.value
-      console.log(value)
+      this.selectedRows.map(item => {
+        item.visible = (value === 'true')
+      })
     },
     back() {
       this.$emit('on-change-componet', 'Main')

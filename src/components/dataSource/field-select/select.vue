@@ -1,7 +1,7 @@
 <template>
-  <div class="field-select" :class="isDimension ? 'is-dimension' : 'is-measure'">
+  <div class="field-select" :class="isDimension ? 'is-dimension' : 'is-measure'" @click="handleClick">
     <span>{{ text }}</span>
-    <div class="caret-down" @click="handleClick"></div>
+    <div class="caret-down"></div>
   </div>
 </template>
 
@@ -50,6 +50,7 @@ export default {
 .field-select {
   position: relative;
   width: 100px;
+  cursor: pointer;
 }
 .caret-down {
   width: 0;
@@ -59,7 +60,6 @@ export default {
   top: 14px;
   right: 10px;
   transform: translateY(-50%);
-  cursor: pointer;
 }
 .is-dimension {
   color: #4a90e2;

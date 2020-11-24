@@ -32,20 +32,25 @@
               <a-input :value="text"
                        style="width: 156px height: 32px" />
             </template>
-            <template #dataType="text">
-              <a-select :default-value="text"
-                        style="width: 100px">
-                <a-select-option value="INT"> 整数 </a-select-option>
-                <a-select-option value="DATE"> 日期时间 </a-select-option>
-                <a-select-option value="VARCHAR"> 字符串 </a-select-option>
-                <a-select-option value="double"> 小数 </a-select-option>
-              </a-select>
+            <template #dataType="text, record">
+              <field-select
+                :text="text | formatField"
+                :select-data="record"
+                :contextmenus="fieldContenxtMenu"
+                :isDimension="record.role === 1"
+              />
             </template>
-            <template #role="text">
-              <a-select :default-value="String(text)">
-                <a-select-option value="1"> 维度 </a-select-option>
-                <a-select-option value="2"> 度量 </a-select-option>
-              </a-select>
+            <template #role="text, record">
+              <field-select
+                :text="text | formatRole"
+                :select-data="record"
+                :contextmenus="[{
+                  name: '转换为' + (text === 1 ? '度量' : '维度'),
+                  roleType: text === 1 ? 2 : 1,
+                  onClick: switchRoleType
+                }]"
+                :isDimension="record.role === 1"
+              />
             </template>
             <template #description="text">
               <a-input :value="text"
@@ -84,7 +89,7 @@
       <a-button type="primary"
                 @click="handleSave"> 保存 </a-button>
     </div>
-    <a-modal :visible="showSetting" @cancel="showSetting = false">
+    <a-modal :visible="showSetting" @cancel="showSetting = false" @ok="handleBatchSetting">
       <template v-if="setType === 1">
         <a-form-model :model="batchType" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
           <a-form-model-item label="字段类型" required>
@@ -100,11 +105,11 @@
       <template v-else-if="setType === 2">
         <a-form-model :model="batchRole" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
           <a-form-model-item label="字段属性" required>
-            <a-radio-group name="batchRole" default-value="1" v-model="batchRole.value">
-              <a-radio value="1">
+            <a-radio-group name="batchRole" :default-value="1" v-model="batchRole.value">
+              <a-radio :value="1">
                 维度
               </a-radio>
-              <a-radio value="2">
+              <a-radio :value="2">
                 度量
               </a-radio>
             </a-radio-group>
@@ -130,6 +135,8 @@
 </template>
 
 <script>
+import FieldSelect from '@/components/dataSource/field-select/select'
+
 const column = [
   {
     title: '原名',
@@ -184,6 +191,9 @@ const column = [
 
 export default {
   name: 'batchSetting',
+  components: {
+    FieldSelect
+  },
   props: {
     isShow: Boolean,
     tables: [Array, Object, String]
@@ -195,8 +205,35 @@ export default {
       showSetting: false,
       setType: '',
       batchType: { value: 'INT' },
-      batchRole: { value: '1' },
-      batchVisible: { value: 'true' }
+      batchRole: { value: 1 },
+      batchVisible: { value: 'true' },
+      fieldContenxtMenu: [
+        {
+          name: '转换为整数',
+          dataType: 'BIGINT',
+          onClick: this.switchFieldType
+        },
+        {
+          name: '转换为小数',
+          dataType: 'DOUBLE',
+          onClick: this.switchFieldType
+        },
+        {
+          name: '转换为字符串',
+          dataType: 'VARCHAR',
+          onClick: this.switchFieldType
+        },
+        {
+          name: '转换为日期',
+          dataType: 'DATE',
+          onClick: this.switchFieldType
+        },
+        {
+          name: '转换为日期时间',
+          dataType: 'TIMESTAMP',
+          onClick: this.switchFieldType
+        }
+      ]
     }
   },
   created () {
@@ -214,6 +251,32 @@ export default {
       }
     }
   },
+  filters: {
+    formatField(value) {
+      switch (value) {
+        case 'BIGINT':
+          value = '整数'
+          break
+        case 'TIMESTAMP':
+          value = '日期时间'
+          break
+        case 'DOUBLE':
+          value = '小数'
+          break
+        case 'VARCHAR':
+          value = '字符串'
+          break
+      }
+      return value
+    },
+    formatRole(value) {
+      if (value === 1) {
+        return '维度'
+      } else {
+        return '度量'
+      }
+    }
+  },
   methods: {
     handleSave() {
       this.handleClose()
@@ -221,9 +284,45 @@ export default {
     handleClose() {
       this.$emit('close')
     },
+    switchFieldType(e, item, vm) {
+      let dataType = item.dataType
+      vm.selectData.convertType = dataType
+    },
+    switchRoleType(e, item, vm) {
+      let roleType = item.roleType
+      vm.selectData.role = roleType
+    },
     handleShowSetting(e, type) {
       this.showSetting = true
       this.setType = type
+    },
+    handleBatchSetting() {
+      if (this.setType === 1) {
+        this.saveBatchType()
+      } else if (this.setType === 2) {
+        this.saveBatchRole()
+      } else if (this.setType === 3) {
+        this.saveBatchVisible()
+      }
+      this.showSetting = false
+    },
+    async saveBatchType () {
+      let value = this.batchType.value
+      this.selectedRows.map(item => {
+        item.convertType = value
+      })
+    },
+    async saveBatchRole () {
+      let value = this.batchRole.value
+      this.selectedRows.map(item => {
+        item.role = value
+      })
+    },
+    async saveBatchVisible () {
+      let value = this.batchVisible.value
+      this.selectedRows.map(item => {
+        item.visible = (value === 'true')
+      })
     }
   }
 }
