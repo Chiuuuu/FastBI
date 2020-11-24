@@ -16,9 +16,9 @@
         </a-select>
       </a-form-model-item>
     </a-form-model>
-    <a-button class="add-button" type="primary" @click="addPost">添加岗位</a-button>
+    <a-button class="add-button" type="primary" @click="handleAddItem">添加岗位</a-button>
     <div ref="scroll" class="form-list scrollbar">
-      <div v-for="(post, index) in postList" :key="post.name">
+      <div v-for="(post, index) in list" :key="post.name">
         <ModalForm
           :index="index"
           :data="post"

@@ -9,7 +9,7 @@
     @cancel="handleClose">
     <a-button class="add-button" type="primary" @click="handleAddItem">添加部门</a-button>
     <div ref="scroll" class="form-list scrollbar">
-      <div v-for="(depart, index) in list" :key="depart.id">
+      <div v-for="(depart, index) in list" :key="depart.name">
         <ModalForm
           :index="index"
           :data="depart"
