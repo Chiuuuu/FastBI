@@ -11,7 +11,7 @@ export default {
   redirect: '/dataSource/dataAccess',
   component: RouteView,
   meta: {
-    title: '数据源',
+    title: '数据管理',
     icon: 'apartment',
     permissions: [PERMISSION_CODE.PAGE.datasource, PERMISSION_CODE.PAGE.datamodel]
   },
@@ -31,7 +31,7 @@ export default {
       redirect: '/dataSource/dataModel/modelShow',
       component: PageView,
       meta: {
-        title: '数据模型',
+        title: '数据建模',
         permissions: [PERMISSION_CODE.PAGE.datamodel]
       },
       children: [

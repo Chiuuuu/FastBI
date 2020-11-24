@@ -11,8 +11,8 @@ export default {
     component: BaseLayout,
     redirect: '/screenManage/catalog',
     children: [
-        screenManageRouter,
         dataSourceRouter,
+        screenManageRouter,
         ProjectCenterRouter,
         CorporateDomainRouter
     ]
