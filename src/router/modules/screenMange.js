@@ -18,7 +18,7 @@ export default {
       name: 'catalog',
       component: catalogView,
       meta: {
-        title: '大屏目录',
+        title: '数据大屏',
         permissions: [PERMISSION_CODE.PAGE.screen]
       }
     }

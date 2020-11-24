@@ -3,6 +3,7 @@
 * PAGE 表示页面路由菜单， 必须为数字类型
 * OBJECT 表示模块的对象, 必须为字符串类型
 * OPERATOR 表示模块的对象的操作，必须为数字类型
+* http://192.168.101.240:8082/fastbi/project_manage_information/blob/master/v1.3.0/%E6%9D%83%E9%99%90%E7%B3%BB%E7%BB%9F%E8%A7%84%E8%8C%83
 */
 const PERMISSION_CODE = {
     PAGE: {
@@ -21,16 +22,14 @@ const PERMISSION_CODE = {
         datasource: '1', // 数据源 即数据接入
         database: '2', // 数据库
         table: '3', // 数据表
-        customTable: '4', // 自定义表
-        field: '5', // 数据字段
-        scheduler: '6', // 定时任务
-        operateLog: '7', // 操作日志
-        datamodel: '8', // 数据模型
-        dimension: '9', // 维度
-        measure: '10', // 度量
-        widetable: '11', // 宽表
-        screen: '12', // 大屏
-        catalog: '13' // 目录菜单
+        field: '4', // 数据字段
+        scheduler: '5', // 定时任务
+        operateLog: '6', // 操作日志
+        datamodel: '7', // 数据模型
+        pivotschema: '8', // 维度
+        widetable: '9', // 宽表
+        screen: '10', // 大屏
+        catalog: '11' // 目录菜单
     },
     OPERATOR: {
         all: 0, // 所有以下操作
@@ -43,7 +42,11 @@ const PERMISSION_CODE = {
         extract: 7, // 抽取
         export: 8, // 导出
         duplicate: 9, // 复制
-        publish: 10 // 发布
+        publish: 10, // 发布
+        rename: 11, // 重命名
+        move: 12, // 移动
+        enable: 13, // 启用
+        disable: 14 // 禁用
     }
 }
 
