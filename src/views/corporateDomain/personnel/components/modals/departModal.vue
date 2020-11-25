@@ -16,6 +16,7 @@
           :activeIndex="activeIndex"
           @edit="handleModalFormEdit"
           @save="handleModalFormSave"
+          @cancel="handleModalFormCancel"
           @delete="handleModalFormDelete"></ModalForm>
       </div>
     </div>
@@ -41,7 +42,7 @@ export default {
   methods: {
     /** 保存 */
     handleModalFormSave(formData, index) {
-      this.list.splice(index, 1 , {
+      this.list.splice(index, 1, {
         ...formData
       })
       this.activeIndex = -1
@@ -50,6 +51,13 @@ export default {
     handleModalFormDelete(data, index) {
       this.list.splice(index, 1)
       this.activeIndex = -1
+    },
+    /** 取消编辑 */
+    handleModalFormCancel(data) {
+      this.activeIndex = -1
+      if (!data.id) {
+        this.list.shift()
+      }
     }
   }
 }

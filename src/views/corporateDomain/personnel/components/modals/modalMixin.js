@@ -10,7 +10,7 @@ const ModalMixin = {
   },
   data() {
     return {
-      bodyStyle: { height: "calc(100vh - 240px)" },
+      bodyStyle: { height: 'calc(100vh - 240px)' },
       list: [],
       activeIndex: -1
     }
@@ -37,7 +37,7 @@ const ModalMixin = {
       this.activeIndex = 0
       this.$refs.scroll.scrollTo({
         top: 0,
-        behavior: "smooth"
+        behavior: 'smooth'
       })
     },
     /** 模态窗关闭 */

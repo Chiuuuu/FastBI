@@ -1,6 +1,5 @@
 import dataAccessApi from '../../../api/modules/common'
 const state = {
-  permissionMode: 'check',
   editType: 'row',
   permissionInfo: {}, // 角色信息
   permissionId: 0, // 选中的菜单id
@@ -9,9 +8,6 @@ const state = {
 }
 
 const mutations = {
-  SET_PERMISSIONMODE(state, mode) {
-    state.permissionMode = mode
-  },
   SET_EDITTYPE(state, type) {
     state.editType = type
   },

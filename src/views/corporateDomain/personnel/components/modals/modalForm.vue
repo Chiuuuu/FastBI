@@ -12,15 +12,16 @@
         </a-col>
         <a-col :span="4" class="text-center">
             <a-button type="link" v-show="isEdit" @click="handleEdit" :disabled="isDisabled">编辑</a-button>
-            <a-button type="link" v-show="!isEdit" @click="handleSave">保存</a-button>
             <a-popconfirm
                 title="是否要删除？"
                 ok-text="确定"
                 cancel-text="取消"
                 @confirm="handleDelete"
             >
-                <a-button type="link" style="margin-left:5px;">删除</a-button>
+                <a-button v-show="isEdit" type="link" style="margin-left:5px;">删除</a-button>
             </a-popconfirm>
+            <a-button type="link" v-show="!isEdit" @click="handleSave">保存</a-button>
+            <a-button type="link" v-show="!isEdit" @click="handleCancel" style="margin-left:5px;">取消</a-button>
         </a-col>
     </a-row>
   </a-form-model>
@@ -50,7 +51,7 @@ export default {
   },
   data() {
     return {
-      form: Object.assign({}, this.data),
+			form: Object.assign({}, this.data),
       rules: {
         name: { required: true, message: '请填写名称' }
       }
@@ -84,6 +85,9 @@ export default {
       },
       handleDelete() {
           this.$emit('delete', this.data, this.index)
+      },
+      handleCancel() {
+					this.$emit('cancel', this.data)
       }
   }
 }

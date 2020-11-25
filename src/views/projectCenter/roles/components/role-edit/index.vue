@@ -7,8 +7,8 @@
             <header>
               <span>编辑用户权限</span>
               <div>
-                <a-button class="main-button" type="primary" @click="handleSave">保存</a-button>
-                <a-button class="main-button" @click="back">返回</a-button>
+                <a-button class="main-button" type="primary" @click="handleSave">保 存</a-button>
+                <a-button class="main-button" @click="back">退 出</a-button>
               </div>
             </header>
             <a-form-model class="role-form" ref="form" :model="form" :rules="rules" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
@@ -77,11 +77,9 @@ export default {
       formInfo: state => state.projectRoles.roleInfo
     })
   },
-  created() {
+  mounted() {
     this.handleGetRoleInfo()
-  },
-  beforeDestroy() {
-    this.$EventBus.$off('set-tab-index', this.handleSetTab)
+    this.$store.commit('projectRoles/SET_ROLEID', this.$route.params.id)
   },
   methods: {
     async handleGetRoleInfo() {
@@ -89,7 +87,6 @@ export default {
     },
     back() {
       // 切换回查看模式
-      this.$store.commit('projectRoles/SET_ROLEMODE', 'check')
       this.$router.push({
         path: '/projectCenter/roles/list'
       })
