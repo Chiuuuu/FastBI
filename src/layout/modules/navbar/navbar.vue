@@ -1,8 +1,22 @@
 <template>
-  <div class="navbar">
-    <div class="sidebar-unfold-icon">
-      <!-- <img src="@/static/imgs/icon_expand.png" alt="" @click="sidebarUnfoldBtn" /> -->
-    </div>
+  <a-row class="navbar" type="flex" justify="end" align="middle">
+    <a-select
+      default-value="lucy"
+      style="width: 120px;margin-right:20px;"
+      @change="handleChange">
+      <a-select-option value="jack">
+        Jack
+      </a-select-option>
+      <a-select-option value="lucy">
+        Lucy
+      </a-select-option>
+      <a-select-option value="disabled" disabled>
+        Disabled
+      </a-select-option>
+      <a-select-option value="Yiminghe">
+        yiminghe
+      </a-select-option>
+    </a-select>
     <div class="user">
       <a-dropdown>
         <span>admin<img src="@/assets/images/icon_head_portrait.png" alt=""/></span>
@@ -13,7 +27,7 @@
         </a-menu>
       </a-dropdown>
     </div>
-  </div>
+  </a-row>
 </template>
 <script>
 export default {
@@ -27,8 +41,16 @@ export default {
       return this.$store.state.common.username
     }
   },
-
   methods: {
+    async handleChange(value) {
+      console.log(`selected ${value}`)
+      console.log(this.$router)
+      const result = await this.$store.dispatch('user/changeRole')
+      this.$EventBus.$emit('resetMenu')
+      this.$router.push({
+        path: '/'
+      })
+    },
     // 退出登录按钮
     quitBtn() {
       this.$store.dispatch('common/set_token', '')

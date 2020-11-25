@@ -15,11 +15,15 @@
         <a-form-model-item label="岗位" prop="post">
           <a-input v-model="personSearch.psot" style="width: 150px"></a-input>
         </a-form-model-item>
-        <a-button class="main-button" type="primary" @click="getPersonList">查询</a-button>
-        <a-button class="main-button" type="primary" @click="resetForm()">重置</a-button>
+        <a-form-model-item>
+          <a-button type="primary" @click="handleGetData" :disabled="loading">查询</a-button>
+        </a-form-model-item>
+        <a-form-model-item>
+          <a-button type="primary" @click="resetForm()" :disabled="loading">重置</a-button>
+        </a-form-model-item>
       </a-form-model>
     </div>
-    <a-button class="main-button" type="primary" @click="showModal('add')">添加</a-button>
+    <a-button class="btn-add" type="primary" @click="showModal('add')" :disabled="loading">添加</a-button>
   </div>
   <a-table
     class="role-list-table scrollbar"
@@ -34,7 +38,7 @@
     <!-- 所属项目 -->
     <template #project="text">{{ text.toString() }}</template>
     <!-- 是否启用 -->
-    <template #enable="text, record"><a-switch v-model="text" @change="handleSwitch($event, record)" /></template>
+    <template #enable="text, record"><a-switch v-model="record.enable" @change="handleSwitch($event, record)" /></template>
     <!-- 操作 -->
     <template #config="text, record">
       <a class="handler-margin" @click="handleEdit(record)" style="margin-right: 20px">编辑</a>
@@ -151,8 +155,8 @@ export default {
       personColumn
     }
   },
-  created () {
-    this.getPersonList()
+  mounted () {
+    this.handleGetData()
   },
   methods: {
     resetForm(tab) {
@@ -171,7 +175,7 @@ export default {
       this.modalData = data
       this.visible3 = true
     },
-    async getPersonList() {
+    async handleGetData() {
       this.loading = true
       setTimeout(() => {
         this.personData = personData

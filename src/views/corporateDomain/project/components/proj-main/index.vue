@@ -10,11 +10,15 @@
             <a-form-model-item label="管理员" prop="name">
               <a-input placeholder="请输入管理员姓名" v-model="userSearch.admins" style="width: 200px"></a-input>
             </a-form-model-item>
-            <a-button class="main-button" type="primary" @click="getList">查询</a-button>
-            <a-button class="main-button" type="primary" @click="resetForm">重置</a-button>
+            <a-form-model-item>
+              <a-button type="primary" @click="getList" :disabled="loading">查询</a-button>
+            </a-form-model-item>
+            <a-form-model-item>
+              <a-button type="primary" @click="resetForm" :disabled="loading">重置</a-button>
+            </a-form-model-item>
           </a-form-model>
         </div>
-        <a-button class="main-button" type="primary" @click="showModal('add')">添加项目</a-button>
+        <a-button class="btn-add" type="primary" @click="showModal('add')" :disabled="loading">添加项目</a-button>
       </div>
       <a-table
         class="role-list-table scrollbar"
@@ -48,8 +52,13 @@
         </template>
       </a-table>
     </div>
-    <a-modal title="添加项目" v-model="visible" @ok="handleOk" @close="clearModal">
-      <a-form-model :model="form" :rules="rules" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
+    <a-modal
+      v-model="visible"
+      :title="modalType === 'add' ? '添加项目' : '编辑项目'"
+      :maskClosable="false"
+      @ok="handleOk"
+      @cancel="clearModal">
+      <a-form-model ref="form" :model="form" :rules="rules" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
         <a-form-model-item label="项目名称" prop="name">
           <a-input
             mode="multiple"
@@ -189,6 +198,13 @@ export default {
       formInfo: state => state.projectRoles.roleInfo
     })
   },
+  watch: {
+    modalType(newValue) {
+      if (newValue === 'add') {
+        this.form = this.$options.data().form
+      }
+    }
+  },
   created() {
     this.getList()
   },
@@ -199,6 +215,7 @@ export default {
     },
     clearModal() {
       this.form = this.$options.data().form
+      this.$refs.form.resetFields()
     },
     resetForm() {
       this.userSearch = this.$options.data().userSearch

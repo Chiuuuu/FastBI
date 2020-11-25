@@ -52,7 +52,7 @@ export default {
   methods: {
     /** 保存 */
     handleModalFormSave(formData, index) {
-      this.list.splice(index, 1 , {
+      this.list.splice(index, 1, {
         ...formData
       })
       this.activeIndex = -1

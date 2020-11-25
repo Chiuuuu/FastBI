@@ -1,5 +1,11 @@
 <template>
-  <a-modal :title="modalType === 'edit' ? '编辑用户' : '新建用户'" :visible="show" @ok="handleOk" @cancel="clearModal">
+  <a-modal
+    :title="modalType === 'edit' ? '编辑用户' : '新建用户'"
+    :visible="show"
+    :maskClosable="false"
+    :confirmLoading="confirmLoading"
+    @ok="handleOk"
+    @cancel="handleModalCancel">
     <a-form-model ref="form" :model="form" :rules="rules" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
       <a-form-model-item label="用户名" prop="username">
         <a-input
@@ -84,22 +90,25 @@ export default {
     show: Boolean
   },
   watch: {
-    show(newValue, oldValue) {
-      if (newValue) {
+    modalType(newValue) {
+      if (newValue === 'edit') {
         this.form = Object.assign({}, this.form, this.modalData)
+      } else {
+        this.form = this.$options.data().form
       }
     }
   },
   data() {
     return {
+      confirmLoading: false, // 模态窗口确定按钮 loading
       form: {
         username: '',
         name: '',
         password: '',
         pswConfirm: '',
         phone: '',
-        depart: '',
-        post: ''
+        depart: [],
+        post: []
       },
       rules: {
         username: [
@@ -113,7 +122,17 @@ export default {
         ],
         password: [
           { required: true, message: '请填写密码' },
-          { validator: this.passwordValidate, trigger: 'change' }
+          {
+            pattern: new RegExp('^[0-9]*$'),
+            message: '只能填数字'
+          },
+          {
+            type: 'string',
+            max: 20,
+            min: 6,
+            message: '长度为6~20'
+          },
+          // { validator: this.passwordValidate, trigger: 'change' }
         ],
         pswConfirm: [
           { required: true, message: '请确认密码' },
@@ -130,9 +149,13 @@ export default {
         phone: [
           { required: true, message: '请填写电话' },
           {
-            type: 'number',
+            pattern: new RegExp('^[0-9]*$'),
+            message: '只能填数字'
+          },
+          {
+            type: 'string',
             len: 11,
-            message: '请填写11位电话号码'
+            message: '请填写11位手机号'
           }
         ]
       }
@@ -150,28 +173,33 @@ export default {
       }
     },
     confirmValidate(rule, value, callback) {
-      if (/[\u4e00-\u9fa5]/.test(value)) {
-        callback(new Error('暂不支持中文密码'))
-      } else if (value.length > 20 || value.length < 6) {
-        callback(new Error('请输入6~20位密码'))
-      } else if (value !== this.form.password) {
+      if (value !== this.form.password) {
         callback(new Error('2次密码输入不一致'))
       } else {
         callback()
       }
     },
-    clearModal() {
+    handleModalCancel() {
       this.form = this.$options.data().form
+      this.$refs.form.resetFields()
+      this.confirmLoading = false
       this.$emit('close')
     },
     handleOk() {
       const params = this.form
-      if (this.modalType === 'add') {
-        // 新增保存
-      } else if (this.modalType === 'edit') {
-        // 编辑保存
-      }
-      this.clearModal()
+      this.confirmLoading = true
+      this.$refs.form.validate(valid => {
+        if (valid) {
+          if (this.modalType === 'add') {
+            // 新增保存
+          } else if (this.modalType === 'edit') {
+            // 编辑保存
+          }
+          this.handleModalCancel()
+        } else {
+            return false
+        }
+      })
     }
   }
 }
