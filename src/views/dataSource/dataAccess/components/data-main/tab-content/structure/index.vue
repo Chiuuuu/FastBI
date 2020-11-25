@@ -240,7 +240,7 @@ export default {
     })
   },
   filters: {
-    formatTime: function(v) {
+    formatTime(v) {
       return moment(v).format('YYYY-MM-DD HH:mm:ss')
     }
   },
