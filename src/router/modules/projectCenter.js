@@ -9,7 +9,7 @@ const RolesView = () => import('@/views/projectCenter/roles')
 const RolesEdit = () => import('@/views/projectCenter/roles/components/role-edit')
 
 const PermissionsView = () => import('@/views/projectCenter/permissions')
-const PermissionsEdit = () => import('@/views/projectCenter/permissions')
+const PermissionsEdit = () => import('@/views/projectCenter/permissions/components/perm-edit')
 
 export default {
   path: '/projectCenter',

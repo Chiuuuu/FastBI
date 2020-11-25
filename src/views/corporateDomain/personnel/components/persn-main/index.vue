@@ -2,11 +2,11 @@
   <div class="main">
     <a-spin class="main-box" :spinning="spinning">
       <div class="right">
-        <a-tabs class="tabs">
-          <a-tab-pane key="1" tab="人员管理">
+        <a-tabs class="tabs" @change="handleChangeModule">
+          <a-tab-pane key="person" tab="人员管理">
             <person-manage ref="person" />
           </a-tab-pane>
-          <a-tab-pane key="2" tab="用户属性">
+          <a-tab-pane key="user" tab="用户属性">
             <user-prop ref="user" />
           </a-tab-pane>
         </a-tabs>
@@ -33,13 +33,12 @@ export default {
     }
   },
   methods: {
-    // handleChangeModule(key) {
-    //   if (key === '1') {
-    //     this.$refs.person.getPersonList()
-    //   } else if (key === '2') {
-    //     this.$refs.user.getUserList()
-    //   }
-    // },
+    handleChangeModule(key) {
+      const tab = this.$refs[`${key}`]
+      if (tab) {
+        tab.handleGetData()
+      }
+    },
     handleSwitch(value, record) {
       record.enable = value
     }

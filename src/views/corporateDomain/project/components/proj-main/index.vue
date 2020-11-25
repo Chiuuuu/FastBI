@@ -84,7 +84,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 
 const userData = []
 for (let i = 0; i < 30; i++) {
@@ -182,12 +181,6 @@ export default {
       userData: [],
       userColumn
     }
-  },
-  computed: {
-    ...mapState({
-      roleId: state => state.projectRoles.roleId,
-      formInfo: state => state.projectRoles.roleInfo
-    })
   },
   created() {
     this.getList()

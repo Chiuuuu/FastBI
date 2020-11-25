@@ -14,6 +14,7 @@
   </div>
 </template>
 <script>
+import { mapState } from 'vuex'
 import RolesTabDataPermission from '../tab-content/rolesTabDataPermission'
 import RoleTabeRole from '../tab-content/rolesTabRole'
 
@@ -23,14 +24,18 @@ export default {
         RolesTabDataPermission,
         RoleTabeRole
     },
+    computed: {
+      ...mapState({
+        roleId: state => state.projectRoles.roleId
+      })
+    },
     methods: {
-        edit() {
-          // 切换至编辑模式
-          this.$store.commit('projectRoles/SET_ROLEMODE', 'edit')
-          this.$router.push({
-              path: '/projectCenter/roles/edit/id=' + 123
-          })
-        }
+      edit() {
+        // 切换至编辑模式
+        this.$router.push({
+            path: '/projectCenter/roles/edit/id=' + this.roleId
+        })
+      }
     }
 }
 </script>
