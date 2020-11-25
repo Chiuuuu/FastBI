@@ -1,10 +1,10 @@
 <template>
   <div class="tab-panel">
     <div class="search_bar">
-      <!-- <a-radio-group class="search_radio" v-model="tableType" @change="handleTableTypeChange">
-        <a-radio-button value="1">原始表</a-radio-button>
-        <a-radio-button value="2">自定义表</a-radio-button>
-      </a-radio-group> -->
+      <a-radio-group class="search_radio" v-model="tableType" @change="handleTableTypeChange">
+        <a-radio-button :value="0">原始表</a-radio-button>
+        <a-radio-button :value="1">自定义表</a-radio-button>
+      </a-radio-group>
       <a-row type="flex" justify="end" align="middle">
         <!-- <a-col style="margin-right:auto">
           <a-input placeholder="请输入关键词" class="search_input">
@@ -15,7 +15,7 @@
           <a-button type="primary" class="select_button" @click="handleGetData" :loading="spinning">刷新数据</a-button>
           <a-button v-show="showExtractBtn" type="primary" style="margin:0 10px;" class="select_button" @click="showExtractLog">抽取记录</a-button>
           <a-button v-show="showExtractBtn" type="primary" class="select_button" @click="handleExtract" :loading="extractSping">全部抽取</a-button>
-          <!-- <a-button v-show="showExtractBtn" type="primary" style="margin:0 10px;" @click="showSetting('batch')" class="select_button">批量抽取设置</a-button> -->
+          <a-button v-show="showExtractBtn" type="primary" style="margin:0 10px;" @click="showSetting('batch')" class="select_button">批量抽取设置</a-button>
         </a-col>
         <!-- <a-col>
           <a-select default-value="全部" class="search_select">
@@ -66,6 +66,9 @@
               <!-- <a-progress :percent="row.progress" /> -->
             </div>
           </template>
+          <template #cost="text">
+            <span>{{ formatCost(text) }}</span>
+          </template>
           <template #startTime="text">
             <span>{{ text | formatTime }}</span>
           </template>
@@ -74,16 +77,15 @@
       <extract-setting
         ref="extract"
         :show="visible"
-        :single="isSingle"
-        :form-data="extractForm"
         :row="clickRow"
         @close="visible = false"
         @setRegular="setRegular" />
       <regular-setting
         ref="regular"
         :show="visible2"
-        :show-table="!isSingle"
+        :single="isSingle"
         :row="clickRow"
+        :regular-id="regularId"
         :table-list="selectedRows"
         @close="closeRegular" />
     </div>
@@ -104,6 +106,13 @@ const logColumns = [
     dataIndex: 'taskName'
   },
   {
+    title: '表名',
+    align: 'center',
+    ellipsis: true,
+    width: 200,
+    dataIndex: 'tableName'
+  },
+  {
     title: '抽取开始时间',
     align: 'center',
     width: 150,
@@ -113,11 +122,14 @@ const logColumns = [
   {
     title: '耗时',
     align: 'center',
-    dataIndex: 'cost'
+    width: 100,
+    dataIndex: 'cost',
+    scopedSlots: { customRender: 'cost' }
   },
   {
     title: '状态',
     align: 'center',
+    width: 80,
     dataIndex: 'status',
     scopedSlots: { customRender: 'status' }
   },
@@ -128,6 +140,7 @@ const logColumns = [
   // },
   {
     title: '关联表同步数量',
+    width: 120,
     align: 'center',
     dataIndex: 'relateTableNum'
   }
@@ -192,7 +205,7 @@ export default {
       logColumns,
       logData: [],
       bodyStyle: { 'maxHeight': 'calc(100vh - 240px)', 'overflow-y': 'auto' },
-      tableType: '1',
+      tableType: 0,
       visible: false, // 批量设置定时弹窗
       visible1: false, // 抽取记录弹窗
       visible2: false, // 添加定时任务弹窗
@@ -203,6 +216,7 @@ export default {
       extractSping: false,
       modalSpin: false,
       clickRow: '',
+      regularId: '',
       rowSelection: {
         onSelect: (record, selected, selectedRows) => {
           this.selectedRows = selectedRows
@@ -222,7 +236,7 @@ export default {
       modelInfo: state => state.dataAccess.modelInfo,
       modelName: state => state.dataAccess.modelName,
       modelType: state => state.dataAccess.modelType,
-      showExtractBtn: state => [ 'mysql', 'oracle' ].indexOf(state.dataAccess.modelType) > -1
+      showExtractBtn: state => [ 'mysql', 'oracle', 'hive' ].indexOf(state.dataAccess.modelType) > -1
     })
   },
   filters: {
@@ -231,8 +245,21 @@ export default {
     }
   },
   methods: {
+    formatCost(v, notCapital) {
+      if (v === 0) {
+        return notCapital ? '' : '0s'
+      } else if (v < 60) {
+        return v + 's'
+      } else if (v < 3600 && v >= 60) {
+        let min = Math.floor(v / 60)
+        return `${min}min${this.formatCost(v % 60, true)}`
+      } else if (v >= 3600) {
+        let h = Math.floor(v / 3600)
+        return `${h}h${this.formatCost(v % 3600, true)}`
+      }
+    },
     handleTableTypeChange(event) {
-      this.tableType = event.target.value
+      this.handleGetData()
     },
     async handleGetData() {
       if (!this.modelType) return
@@ -245,7 +272,8 @@ export default {
       }
       const dabaseInfoResult = await this.$server.dataAccess.getTableList({
         databaseName,
-        sourceId: this.modelId
+        sourceId: this.modelId,
+        tableType: this.tableType
       }).finally(() => {
         this.spinning = false
       })
@@ -320,26 +348,29 @@ export default {
       this.isSingle = type === 'single'
       if (this.isSingle) {
         this.clickRow = row
+        this.visible = true
       } else {
         if (this.selectedRows.length < 1) {
           return this.$message.error('请选择至少一项')
-        } else if (this.selectedRows.length > 10) {
-          return this.$message.error('一次抽取最多只能选择10个')
+        } else if (this.selectedRows.length > 3) {
+          return this.$message.error('一个定时任务最多只能选择3项')
         }
+        this.visible2 = true
       }
-      this.visible = true
     },
     closeRegular() {
       this.visible2 = false
+      this.regularId = ''
     },
     setRegular(data) {
       if (!data && !this.isSingle && this.selectedRows.length < 1) {
         this.$message.error('请选择至少一项')
       } else {
-        this.visible2 = true
         if (data) {
-          this.$refs.regular.handleGetRegularInfo(data.id)
+          this.regularId = data.id
+          // this.$refs.regular.handleGetRegularInfo(data.id)
         }
+        this.visible2 = true
       }
     }
   }
