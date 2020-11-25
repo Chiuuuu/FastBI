@@ -73,7 +73,7 @@
         </div> -->
       </div>
     </div>
-    <div class="right">
+    <div class="right" :class="{ 'add_new': model === 'add' }">
       <div class="header" v-if="model==='edit'">
         <span class="data_con">{{detailInfo.name}}</span>
       </div>
@@ -99,7 +99,7 @@
           <span>数据模型详情</span>
           <div class="detail_btn">
             <a-button v-on:click="checkWidthTable" :disabled="disableByDetailInfo">查看宽表</a-button>
-            <!-- <a-button v-on:click="batch">批量编辑字段</a-button> -->
+            <a-button v-on:click="batch">批量编辑字段</a-button>
           </div>
         </div>
         <div class="detail_main">
@@ -352,11 +352,24 @@ export default {
         const map = new Map()
         list.forEach(element => {
           if (map.has(element.alias)) {
-            const value = `${map.get(element.alias)}${element.tableNo}`
+            let value = map.get(element.alias)
+            let alias = element.alias
+            if (value === 1 && map.get('tableName') !== element.tableName) {
+              // 不同表名同字段
+              alias = `${alias}(${element.tableName})`
+            } else if (value > 1 && map.get('tableName') === element.tableName) {
+              // 同表名同字段且已经存在过(value > 1)
+              alias = `${alias}(${element.tableName})(${value})`
+            } else {
+              // 同表名同字段
+              alias = `${alias}(${value})`
+            }
+            value++
             map.set(element.alias, value)
-            element.alias += `${element.tableNo}`
+            element.alias = alias
           } else {
             map.set(element.alias, 1)
+            map.set('tableName', element.tableName)
           }
         })
       }

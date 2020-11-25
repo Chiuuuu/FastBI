@@ -546,6 +546,7 @@ export default {
 }
 </style>
 <style lang="less">
+@deep: ~'>>>';
 .model-popover-box{
   .ant-popover-inner-content {
     padding: 0;
@@ -652,7 +653,7 @@ export default {
         .popover-row {
           margin-bottom: 10px;
           &.z-err {
-            /deep/.ant-select-selection{
+            @{deep} .ant-select-selection{
               border-color: red;
             }
             .err-message{

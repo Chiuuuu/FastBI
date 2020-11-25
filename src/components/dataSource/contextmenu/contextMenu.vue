@@ -45,7 +45,7 @@ export default {
 <style lang="less" scoped>
 .m-overlay {
   position: absolute;
-  z-index: 401;
+  z-index: 1002;
 }
 .m-overlay-shadow {
   width: 182px;

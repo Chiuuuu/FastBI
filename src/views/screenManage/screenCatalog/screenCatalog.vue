@@ -115,7 +115,7 @@ import { mapGetters, mapActions } from 'vuex' // 导入vuex
 import Screen from '@/views/screen' // 预览
 import { addResizeListener, removeResizeListener } from 'bin-ui/src/utils/resize-event'
 import debounce from 'lodash/debounce'
-import { menuSearchLoop } from '@/views/dataSource/dataModel/util'
+import { menuSearchLoop } from '@/utils/menuSearch'
 
 export default {
   components: {

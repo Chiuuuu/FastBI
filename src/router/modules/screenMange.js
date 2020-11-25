@@ -1,3 +1,5 @@
+import PERMISSION_CODE from '@/config/permission'
+
 const RouteView = () => import('@/layout/routeView')
 const catalogView = () => import('@/views/screenManage/screenCatalog/screenCatalog')
 
@@ -7,7 +9,8 @@ export default {
   component: RouteView,
   meta: {
     title: '大屏管理',
-    icon: 'desktop'
+    icon: 'desktop',
+    permissions: [PERMISSION_CODE.PAGE.screen]
   },
   children: [
     {
@@ -15,7 +18,8 @@ export default {
       name: 'catalog',
       component: catalogView,
       meta: {
-        title: '大屏目录'
+        title: '数据大屏',
+        permissions: [PERMISSION_CODE.PAGE.screen]
       }
     }
   ]

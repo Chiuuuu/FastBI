@@ -139,7 +139,7 @@ import ResetNameModal from '@/views/dataSource/dataAccess/components/data-main/d
 import MoveFileModal from '@/views/dataSource/dataAccess/components/data-main/data-menu/moveFile'
 import MenuFile from '@/components/dataSource/menu-group/file'
 import MenuFolder from '@/components/dataSource/menu-group/folder'
-import { menuSearchLoop } from '../../util'
+import { menuSearchLoop } from '@/utils/menuSearch'
 import debounce from 'lodash/debounce'
 export default {
   name: 'model-menu',
