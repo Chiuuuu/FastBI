@@ -21,6 +21,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "build:zjzl": "vue-cli-service build --mode zjzl",
+    "build:test": "vue-cli-service build --mode test",
     "lint": "vue-cli-service lint",
     "dev:doc": "vuepress dev docs",
     "build:doc": "vuepress build docs"
