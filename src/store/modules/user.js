@@ -1,5 +1,6 @@
 import { getPermissionByTree } from '@/utils/permission'
-import { resetRouter } from '@/router'
+import router, { resetRouter } from '@/router'
+
 const state = {
     routesModule: [],
     objectModule: ''
@@ -45,6 +46,26 @@ const actions = {
       commit('SET_ROUTES_MODULE', roleTree)
       commit('SET_OBJECT_MODULE', roleTree)
       resolve(state)
+    })
+  },
+  changeRole({ commit, dispatch }) {
+    return new Promise(async resolve => {
+      const roleTree = {
+        module: [1, 2],
+        page: {
+          0: [1],
+          1: [1]
+        }
+      }
+      // const { roles } = await dispatch('getInfo')
+
+      commit('SET_ROUTES_MODULE', roleTree)
+      commit('SET_OBJECT_MODULE', roleTree)
+
+      resetRouter()
+      const accessRoutes = await dispatch('permission/generateRoutes', state.routesModule, { root: true })
+      router.addRoutes(accessRoutes)
+      resolve()
     })
   }
 }

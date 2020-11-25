@@ -22,7 +22,7 @@
                     <a-button type="primary" @click="handleRestForm" :disabled="loading">重置</a-button>
                 </a-form-model-item>
             </a-form-model>
-            <a-button class="btn-add" type="primary" @click="handleShowModal('add')">添加</a-button>
+            <a-button class="btn-add" type="primary" @click="handleShowModal('add')" :disabled="loading">添加</a-button>
         </div>
         <div class="role-list-table scrollbar">
             <a-table

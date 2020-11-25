@@ -32,6 +32,7 @@
 <script>
 import ManageRoutes from '@/router/modules/layout'
 import { getRenderRouter } from '@/utils/permission'
+import isEqual from 'lodash/isEqual'
 export default {
   data() {
     const renderRouter = getRenderRouter(this.$store.state.permission.routes)
@@ -50,7 +51,20 @@ export default {
       this.selectedKeys = [this.$router.currentRoute.meta.sideBar || this.$router.currentRoute.name] // [value.split('/').pop()]
     }
   },
+  created() {
+    this.$EventBus.$on('resetMenu', this.handleResetMenu)
+  },
+  beforeDestroy() {
+    this.$EventBus.$off('resetMenu', this.handleResetMenu)
+  },
   methods: {
+    handleResetMenu() {
+      const renderRouter = getRenderRouter(this.$store.state.permission.routes)
+      const menuData = this.getMenuData(renderRouter.children)
+      if (!isEqual(this.menuData, menuData)) {
+        this.menuData = menuData
+      }
+    },
     getMenuData(list) {
       const sidebar = []
       list.forEach(item => {

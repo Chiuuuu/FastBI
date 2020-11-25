@@ -1,6 +1,8 @@
 <template>
+  <div style="height:21px">
   <span v-if="index !== activeIndex">{{ title }}</span>
-  <a-input v-else :value="editValue" @change="handleChangeText"></a-input>
+  <a-input v-else :value="editValue" @change="handleChangeText" size="small"></a-input>
+  </div>
 </template>
 
 <script>

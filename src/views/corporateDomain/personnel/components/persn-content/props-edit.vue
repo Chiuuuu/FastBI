@@ -3,7 +3,7 @@
     {{ title }} <a-icon class="edit-icon" type="form" @click="handleEditProp" />
   </span>
   <div v-else>
-    <a-input style="width:120px" v-model="editValue"></a-input>
+    <a-input style="width:120px" v-model="editValue" size="small"></a-input>
     <a style="margin-right:5px" @click="handleSave">保存</a>
     <a @click="handleCancel">取消</a>
   </div>

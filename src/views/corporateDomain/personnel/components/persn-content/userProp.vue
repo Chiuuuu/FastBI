@@ -10,10 +10,10 @@
             <a-input v-model="userSearch.name" style="width: 150px"></a-input>
           </a-form-model-item>
           <a-form-model-item>
-            <a-button type="primary" @click="handleGetData">查询</a-button>
+            <a-button type="primary" @click="handleGetData" :disabled="loading">查询</a-button>
           </a-form-model-item>
           <a-form-model-item>
-            <a-button type="primary" @click="resetForm()">重置</a-button>
+            <a-button type="primary" @click="resetForm()" :disabled="loading">重置</a-button>
           </a-form-model-item>
         </a-form-model>
       </div>
