@@ -53,6 +53,18 @@
         >
         </a-input>
       </a-form-model-item>
+      <a-form-model-item label="所属项目" prop="project">
+        <a-select
+          mode="multiple"
+          v-model="form.project"
+          style="width: 100%"
+          placeholder="请选择岗位"
+        >
+          <a-select-option v-for="i in 25" :key="(i + 9).toString(36) + i">
+            {{ (i + 9).toString(36) + i }}
+          </a-select-option>
+        </a-select>
+      </a-form-model-item>
       <a-form-model-item label="部门" prop="depart">
         <a-select
           mode="multiple"
@@ -107,6 +119,7 @@ export default {
         password: '',
         pswConfirm: '',
         phone: '',
+        project: [],
         depart: [],
         post: []
       },
@@ -157,7 +170,8 @@ export default {
             len: 11,
             message: '请填写11位手机号'
           }
-        ]
+        ],
+        project: [{ required: true, message: '请选择所属项目' }]
       }
     }
   },
