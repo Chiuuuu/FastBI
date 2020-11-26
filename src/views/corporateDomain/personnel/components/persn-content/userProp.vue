@@ -25,7 +25,7 @@
       :columns="userColumn"
       :data-source="userData"
       :loading="loading"
-      :scroll="{ x: 1260 }">
+      :scroll="{ y: 'calc(100vh - 350px)', x: 1210 }">
       <!-- 列属性编辑 -->
       <template v-for="(slot, index) in 6">
         <PropsEdit
@@ -85,11 +85,13 @@ const userColumn = [
   {
     title: '用户名',
     width: 150,
+    ellipsis: true,
     dataIndex: 'username'
   },
   {
     title: '姓名',
-    width: 150,
+    width: 100,
+    ellipsis: true,
     dataIndex: 'name'
   }
 ]

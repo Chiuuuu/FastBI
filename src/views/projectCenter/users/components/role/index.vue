@@ -21,7 +21,8 @@
                 row-key="id"
                 :columns="rolesColumn"
                 :data-source="rolesData"
-                :loading="loading">
+                :loading="loading"
+                :scroll="{ y: 'calc(100vh - 350px)', x: 1450 }">
             </a-table>
         </div>
     </div>
@@ -33,40 +34,37 @@ for (let i = 0; i < 30; i++) {
     id: i + 1,
     username: 'admin' + i,
     name: '嘿嘿嘿',
-    prop1: '属性1',
-    prop2: '属性2',
-    prop3: '属性3'
+    1: '属性1',
+    2: '属性2',
+    3: '属性3',
+    4: '属性4',
+    5: '属性5',
+    6: '属性6'
   })
 }
 
 const rolesColumn = [
   {
     title: '用户名',
+    width: 150,
+    ellipsis: true,
     dataIndex: 'username'
   },
   {
     title: '姓名',
+    width: 100,
+    ellipsis: true,
     dataIndex: 'name'
-  },
-  {
-    title: '属性1',
-    dataIndex: 'prop1',
-    width: 200,
-    ellipsis: true
-  },
-  {
-    title: '属性2',
-    dataIndex: 'prop2',
-    width: 200,
-    ellipsis: true
-  },
-  {
-    title: '属性3',
-    dataIndex: 'prop3',
-    width: 200,
-    ellipsis: true
   }
 ]
+for (let i = 1; i < 7; i++) {
+  rolesColumn.push({
+    title: '属性' + i,
+    dataIndex: i,
+    width: 200,
+    ellipsis: true
+  })
+}
 
 export default {
     name: 'userRoleManage',

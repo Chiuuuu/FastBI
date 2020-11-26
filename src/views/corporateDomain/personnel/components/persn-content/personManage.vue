@@ -30,7 +30,8 @@
     row-key="id"
     :columns="personColumn"
     :data-source="personData"
-    :loading="loading">
+    :loading="loading"
+    :scroll="{ y: 'calc(100vh - 350px)', x: 1230 }">
     <!-- 部门 -->
     <span slot="depart">部门 <a-icon class="edit-icon" type="setting" @click="handleSetDepart" /></span>
     <!-- 岗位 -->
@@ -76,7 +77,7 @@ for (let i = 0; i < 30; i++) {
 const personColumn = [
   {
     title: '用户名',
-    width: 100,
+    width: 150,
     dataIndex: 'username'
   },
   {
@@ -125,6 +126,7 @@ const personColumn = [
   {
     title: '操作',
     dataIndex: 'config',
+    fixed: 'right',
     width: 110,
     scopedSlots: { customRender: 'config' }
   }

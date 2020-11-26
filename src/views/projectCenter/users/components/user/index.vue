@@ -29,7 +29,8 @@
                 row-key="id"
                 :columns="usersColumn"
                 :data-source="usersData"
-                :loading="loading">
+                :loading="loading"
+                :scroll="{ y: 'calc(100vh - 350px)', x: 770 }">
                 <template #config="text, record, index">
                     <a @click="handleEditUser(record)" style="margin-right: 20px">编辑</a>
                     <a-popconfirm title="是否要删除？" ok-text="确定" cancel-text="取消" @confirm="handleDeleteUser(record, index)">
@@ -105,18 +106,26 @@ for (let i = 0; i < 30; i++) {
 const usersColumn = [
   {
     title: '用户名',
+    width: 150,
+    ellipsis: true,
     dataIndex: 'username'
   },
   {
     title: '姓名',
+    width: 100,
+    ellipsis: true,
     dataIndex: 'name'
   },
   {
     title: '电话',
+    width: 120,
+    ellipsis: true,
     dataIndex: 'phone'
   },
   {
     title: '用户角色',
+    width: 200,
+    ellipsis: true,
     dataIndex: 'role'
   },
   {
@@ -128,6 +137,8 @@ const usersColumn = [
   {
     title: '操作',
     dataIndex: 'config',
+    fixed: 'right',
+    width: 120,
     scopedSlots: { customRender: 'config' }
   }
 ]
@@ -223,3 +234,6 @@ export default {
     }
 }
 </script>
+<style lang="less" scoped>
+@import "../../../main.less";
+</style>
