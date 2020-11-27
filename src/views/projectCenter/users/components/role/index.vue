@@ -9,9 +9,7 @@
                     <a-input v-model="userMangeForm.name" class="form-item" placeholder="请输入姓名"></a-input>
                 </a-form-model-item>
                 <a-form-model-item>
-                    <a-button type="primary" @click="
-                    
-                    " :disabled="loading">查询</a-button>
+                    <a-button type="primary" @click="handleGetData" :disabled="loading">查询</a-button>
                 </a-form-model-item>
                 <a-form-model-item>
                     <a-button type="primary" @click="handleRestForm" :disabled="loading">重置</a-button>
