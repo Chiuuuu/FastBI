@@ -3,13 +3,15 @@
         <div class="role-list-controller">
             <a-form-model layout="inline" :model="userMangeForm" ref="userMangeForm">
                 <a-form-model-item label="用户名" prop="username">
-                    <a-input v-model="userMangeForm.username" class="form-item"></a-input>
+                    <a-input v-model="userMangeForm.username" class="form-item" placeholder="请输入用户名"></a-input>
                 </a-form-model-item>
                 <a-form-model-item label="姓名" prop="name">
-                    <a-input v-model="userMangeForm.name" class="form-item"></a-input>
+                    <a-input v-model="userMangeForm.name" class="form-item" placeholder="请输入姓名"></a-input>
                 </a-form-model-item>
                 <a-form-model-item>
-                    <a-button type="primary" @click="handleGetData" :disabled="loading">查询</a-button>
+                    <a-button type="primary" @click="
+                    
+                    " :disabled="loading">查询</a-button>
                 </a-form-model-item>
                 <a-form-model-item>
                     <a-button type="primary" @click="handleRestForm" :disabled="loading">重置</a-button>
@@ -21,59 +23,19 @@
                 row-key="id"
                 :columns="rolesColumn"
                 :data-source="rolesData"
+                :scroll="{ x: `100vh`, y: `calc(100vh - 350px)`}"
                 :loading="loading">
             </a-table>
         </div>
     </div>
 </template>
 <script>
-const rolesData = []
-for (let i = 0; i < 30; i++) {
-  rolesData.push({
-    id: i + 1,
-    username: 'admin' + i,
-    name: '嘿嘿嘿',
-    prop1: '属性1',
-    prop2: '属性2',
-    prop3: '属性3'
-  })
-}
-
-const rolesColumn = [
-  {
-    title: '用户名',
-    dataIndex: 'username'
-  },
-  {
-    title: '姓名',
-    dataIndex: 'name'
-  },
-  {
-    title: '属性1',
-    dataIndex: 'prop1',
-    width: 200,
-    ellipsis: true
-  },
-  {
-    title: '属性2',
-    dataIndex: 'prop2',
-    width: 200,
-    ellipsis: true
-  },
-  {
-    title: '属性3',
-    dataIndex: 'prop3',
-    width: 200,
-    ellipsis: true
-  }
-]
-
 export default {
     name: 'userRoleManage',
     data() {
         return {
-            rolesData,
-            rolesColumn,
+            rolesData: [],
+            rolesColumn: [],
             userMangeForm: { // 搜索表单
                 username: '',
                 name: ''
@@ -86,12 +48,28 @@ export default {
     },
     methods: {
         /** 获取数据 */
-        handleGetData() {
+        async handleGetData() {
             this.loading = true
-            setTimeout(() => {
-                this.rolesData = rolesData
+            const result = await this.$server.projectCenter.getUserPropsList(this.userMangeForm).finally(() => {
                 this.loading = false
-            }, 400)
+            })
+
+            if (result.code === 200) {
+                const ary = []
+                result.headersKeyValue.forEach((item,index) => {
+                    let column = {
+                        title: result.headers[index],
+                        dataIndex: item,
+                        width: 200,
+                        ellipsis: true
+                    }
+                    ary.push(column)
+                })
+                this.rolesColumn = [].concat(ary)
+                this.rolesData = [].concat(result.rows)
+            } else {
+                this.$message.error(result.msg || '请求错误')
+            }
         },
         /** 重置表单 */
         handleRestForm() {

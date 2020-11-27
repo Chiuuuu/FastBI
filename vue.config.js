@@ -35,6 +35,9 @@ module.exports = {
   },
   productionSourceMap: false,
   lintOnSave: process.env.NODE_ENV !== 'production',
+  configureWebpack: {
+	  devtool: process.env.NODE_ENV === "production" ? 'false' : 'source-map',
+	},
   assetsDir: 'static',
   filenameHashing: true, // 发布打包文件是否有哈希后缀
   chainWebpack: config => {
