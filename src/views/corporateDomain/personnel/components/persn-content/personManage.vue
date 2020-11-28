@@ -9,14 +9,14 @@
         <a-form-model-item label="姓名" prop="name">
           <a-input v-model="personSearch.name" style="width: 150px"></a-input>
         </a-form-model-item>
-        <a-form-model-item label="部门" prop="depart">
-          <a-input v-model="personSearch.depart" style="width: 150px"></a-input>
+        <a-form-model-item label="部门" prop="deptName">
+          <a-input v-model="personSearch.deptName" style="width: 150px"></a-input>
         </a-form-model-item>
         <a-form-model-item label="岗位" prop="post">
           <a-input v-model="personSearch.psot" style="width: 150px"></a-input>
         </a-form-model-item>
         <a-form-model-item>
-          <a-button type="primary" @click="handleGetData" :disabled="loading">查询</a-button>
+          <a-button type="primary" @click="handleGetDataByParams" :disabled="loading">查询</a-button>
         </a-form-model-item>
         <a-form-model-item>
           <a-button type="primary" @click="resetForm()" :disabled="loading">重置</a-button>
@@ -33,7 +33,7 @@
     :loading="loading"
     :scroll="{ y: 'calc(100vh - 350px)', x: 1230 }">
     <!-- 部门 -->
-    <span slot="depart">部门 <a-icon class="edit-icon" type="setting" @click="handleSetDepart" /></span>
+    <span slot="deptName">部门 <a-icon class="edit-icon" type="setting" @click="handleSetDepart" /></span>
     <!-- 岗位 -->
     <span slot="post">岗位 <a-icon class="edit-icon" type="setting" @click="handleSetPost" /></span>
     <!-- 所属项目 -->
@@ -48,9 +48,9 @@
       </a-popconfirm>
     </template>
   </a-table>
-  <user-modal :show="visible1" :modal-data="modalData" :modal-type="modalType" @close="visible1 = false" />
-  <depart-modal :show="visible2" :modal-data="modalData" @close="visible2 = false" />
-  <post-modal :show="visible3" :modal-data="modalData" @close="visible3 = false" />
+  <UserModal ref="userModal" :show="visible1" :modal-data="modalData" :modal-type="modalType" @close="visible1 = false" />
+  <DepartModal ref="departModal" :show="visible2" :modal-data="modalData" @close="visible2 = false" />
+  <PostModal ref="postModal" :show="visible3" :modal-data="modalData" @close="visible3 = false" />
 </div>
 </template>
 
@@ -66,7 +66,7 @@ for (let i = 0; i < 30; i++) {
     username: 'admin' + i,
     name: '嘿嘿嘿',
     phone: '12345678910',
-    depart: '小卖部',
+    deptName: '小卖部',
     post: '收银员',
     project: ['大茶饭', '乡村振兴'],
     enable: false,
@@ -91,11 +91,11 @@ const personColumn = [
     dataIndex: 'phone'
   },
   { // 部门
-    slots: { title: 'depart' },
-    dataIndex: 'depart',
+    slots: { title: 'deptName' },
+    dataIndex: 'deptName',
     width: 200,
     ellipsis: true,
-    key: 'depart'
+    key: 'deptName'
   },
   { // 岗位
     slots: { title: 'post' },
@@ -106,8 +106,8 @@ const personColumn = [
   },
   {
     title: '所属项目',
-    dataIndex: 'project',
-    scopedSlots: { customRender: 'project' },
+    dataIndex: 'projects',
+    scopedSlots: { customRender: 'projects' },
     width: 200,
     ellipsis: true
   },
@@ -150,7 +150,7 @@ export default {
       personSearch: {
         username: '',
         name: '',
-        depart: '',
+        deptName: '',
         post: ''
       },
       personData: [],
@@ -171,18 +171,43 @@ export default {
       const data = {} // 取当前项目下的部门岗位
       this.modalData = data
       this.visible2 = true
+      this.$refs.departModal.handleGetData()
     },
     handleSetPost() {
       const data = {} // 取当前项目下的部门岗位
       this.modalData = data
       this.visible3 = true
+      this.$refs.postModal.handleGetData()
     },
     async handleGetData() {
       this.loading = true
-      setTimeout(() => {
-        this.personData = personData
-        this.loading = false
-      }, 400)
+      const res = await this.$server.corporateDomain.getPersonList()
+        .finally(() => {
+          this.loading = false
+        })
+
+      if (res.code === 200) {
+        this.personData = res.rows
+      } else {
+        this.$message.error(res.msg)
+        this.personData = []
+      }
+    },
+    async handleGetDataByParams() {
+      this.loading = true
+      const res = await this.$server.corporateDomain.getPersonListByParams({
+
+      })
+        .finally(() => {
+          this.loading = false
+        })
+
+      if (res.code === 200) {
+        this.personData = res.rows
+      } else {
+        this.$message.error(res.msg)
+        this.personData = []
+      }
     },
     showModal(type) {
       this.visible1 = true
@@ -191,9 +216,14 @@ export default {
     handleDelete(id) {
       console.log('删除id: ', id)
     },
-    handleEdit(data) {
-      this.modalData = data
-      this.showModal('edit')
+    async handleEdit(data) {
+      const res = await this.$server.corporateDomain.getPersonInfo(data.id)
+      if (res.code) {
+        this.modalData = res.data
+        this.showModal('edit')
+      } else {
+        this.$message.error('获取信息失败, 请重试')
+      }
     }
   }
 }

@@ -18,18 +18,18 @@
       <a-modal
         v-model="visible"
         title="添加角色"
-        :footer="null"
         :bodyStyle="{
           maxHeight: `calc( 100vh - 160px )`,
           overflowY: 'auto'
         }"
+        @ok="handleAddRole"
       >
-        <a-form-model :model="form" :rules="rules" width="500px" :label-col="{ span: 6 }" :wrapper-col="{ span: 12 }">
+        <a-form-model ref="addForm" :model="form" :rules="rules" width="500px" :label-col="{ span: 6 }" :wrapper-col="{ span: 12 }">
           <a-form-model-item label="角色名称" prop="name">
-            <a-input placeholder="请输入角色名称"></a-input>
+            <a-input v-model="form.name" placeholder="请输入角色名称"></a-input>
           </a-form-model-item>
           <a-form-model-item label="角色描述" prop="description">
-            <a-input placeholder="请输入角色描述"></a-input>
+            <a-input v-model="form.description" placeholder="请输入角色描述"></a-input>
           </a-form-model-item>
           <a-form-model-item label="存储位置" prop="parantId">
             <a-select v-model="form.parentId">
@@ -40,7 +40,7 @@
       </a-modal>
     </div>
     <div class="menu_search">
-      <a-input placeholder="搜索数据接入名称" @input="handleSearchMenu">
+      <a-input placeholder="搜索角色名称" @input="handleSearchMenu">
         <a-icon class="icon_search" slot="suffix" type="search" />
       </a-input>
     </div>
@@ -204,8 +204,8 @@ export default {
           onClick: this.handleFilemoveFile
         },
         {
-          name: '重命名',
-          onClick: this.handleFileResetName
+          name: '编辑',
+          onClick: this.handleEditRole
         },
         {
           name: '删除',
@@ -245,18 +245,22 @@ export default {
       this.$store.dispatch('projectRoles/getMenuList', this)
     },
     /**
-     * @description 获取表详情信息
+     * @description 获取角色详情信息
     */
-    async getTableInfo(url, callback) {
-      const result = await this.$server.common.getDetailByMenuId(url)
-      if (result.code === 200) {
-        if (callback && (callback instanceof Function)) {
-          callback(result)
-        }
+    async getRoleInfo() {
+      const roleInfo = await this.$server.projectCenter.getRoleInfo(this.fileSelectId)
+      // const rolePermission = await this.$server.projectCenter.getRolePermission(this.fileSelectId)
+      if (roleInfo.code === 200) {
+        this.$store.commit('projectRoles/SET_ROLEINFO', roleInfo.data)
         this.$EventBus.$emit('setFormData')
       } else {
-        this.$message.error(result.msg)
+        this.$message.error(roleInfo.msg)
       }
+      // if (rolePermission.code === 200) {
+      //   this.$EventBus.$emit('setFormData')
+      // } else {
+      //   this.$message.error(roleInfo.msg)
+      // }
     },
     /**
      * 打开弹窗
@@ -287,9 +291,8 @@ export default {
     handleFileSelect(file) {
       if (this.fileSelectId === file.id) return
       this.fileSelectId = file.id
-      // this.getTableInfo(`/datasource/${file.id}`, result => {
-      //   this.$store.commit('projectRoles/SET_ROLE_INFO', result.data)
-      // })
+      this.getRoleInfo()
+      this.$emit('handleChangeTab', 'permission')
       this.$store.commit('projectRoles/SET_ROLEID', file.id)
       this.$store.commit('projectRoles/SET_PARENTID', file.parentId)
     },
@@ -299,19 +302,19 @@ export default {
     handleFileDelete(event, item, { file }) {
       this.$confirm({
         title: '确认提示',
-        content: '确定删除该数据接入?',
+        content: '确定删除该角色?',
         onOk: async () => {
-          // const result = await this.$server.common.deleMenuById(`/datasource/catalog/${file.id}`)
-          // if (result.code === 200) {
-          //   this.handleGetMenuList()
-          //   this.$message.success('删除成功')
-          //   const isSame = file.id === this.fileSelectId
-          //   if (isSame) {
-          //     this.$store.commit('projectRoles/SET_ROLEID', 0)
-          //   }
-          // } else {
-          //   this.$message.error(result.msg)
-          // }
+          const result = await this.$server.common.deleMenuById(`/business/role/${file.id}`)
+          if (result.code === 200) {
+            this.handleGetMenuList()
+            this.$message.success('删除成功')
+            const isSame = file.id === this.fileSelectId
+            if (isSame) {
+              this.$store.commit('projectRoles/SET_ROLEID', 0)
+            }
+          } else {
+            this.$message.error(result.msg)
+          }
         }
       })
     },
@@ -320,20 +323,20 @@ export default {
      */
     handleFolderDelete(event, index, { folder }) {
       if (folder.children && folder.children.length > 0) {
-        return this.$message.error('文件夹下存在数据接入不可删除')
+        return this.$message.error('文件夹下存在角色不可删除')
       }
       this.$confirm({
         title: '确认提示',
         content: '确定删除该文件夹?',
         onOk: async () => {
-          // const result = await this.$server.common.deleMenuById(`/datasource/catalog/${file.id}`)
-          // if (result.code === 200) {
-          //   this.handleGetMenuList()
-          //   this.$message.success('删除成功')
-          //   const isSame = folder.id === this.fileSelectId
-          // } else {
-          //   this.$message.error(result.msg)
-          // }
+          const result = await this.$server.common.deleMenuById(`/business/role/deleteCatalog/${folder.id}`)
+          if (result.code === 200) {
+            this.handleGetMenuList()
+            this.$message.success('删除成功')
+            const isSame = folder.id === this.fileSelectId
+          } else {
+            this.$message.error(result.msg)
+          }
         }
       })
     },
@@ -347,13 +350,13 @@ export default {
       this.resetName.parentId = 0
     },
     /**
-     * 菜单重命名
-    */
-    handleFileResetName(mouseEvent, event, { file, parent }) {
-      this.resetName.type = 'reset'
-      this.resetNameVisible = true
-      this.resetName.item = file
-      this.resetName.parentId = parent ? parent.id : 0
+     * 编辑角色
+     */
+    handleEditRole(event, item, { file }) {
+      // 切换至编辑模式
+      this.$router.push({
+          path: '/projectCenter/roles/edit/id=' + file.id
+      })
     },
     /**
      * 添加新文件夹
@@ -379,19 +382,18 @@ export default {
      */
     async handleFileDrop(folder) {
       if (!this.dragFile || this.dragFile.parentId === folder.id) return
-      // const result = await this.$server.common.putMenuFolderName('/datasource/catalog/updata', {
-      //   fileType: this.dragFile.fileType,
-      //   id: this.dragFile.id,
-      //   name: this.dragFile.name,
-      //   parentId: folder.id,
-      //   type: 1
-      // })
-      // if (result.code === 200) {
-      //   this.handleGetMenuList()
-      //   this.$message.success('移动成功')
-      // } else {
-      //   this.$message.error(result.msg)
-      // }
+      const result = await this.$server.common.putMenuFolderName('/business/role/editSycCatlog', {
+        fileType: this.dragFile.fileType,
+        id: this.dragFile.id,
+        name: this.dragFile.name,
+        parentId: folder.id
+      })
+      if (result.code === 200) {
+        this.handleGetMenuList()
+        this.$message.success('移动成功')
+      } else {
+        this.$message.error(result.msg)
+      }
     },
     handleDragOver(e) {
       e.preventDefault()
@@ -402,19 +404,18 @@ export default {
     async handleWrapDrop(e) {
       const className = e.toElement.className
       if (className.indexOf('menu-wrap') > -1 && this.dragFile.parentId !== 0) {
-        // const result = await this.$server.common.putMenuFolderName('/datasource/catalog/updata', {
-        //   fileType: this.dragFile.fileType,
-        //   id: this.dragFile.id,
-        //   name: this.dragFile.name,
-        //   parentId: 0,
-        //   type: 1
-        // })
-        // if (result.code === 200) {
-        //   this.handleGetMenuList()
-        //   this.$message.success('移动成功')
-        // } else {
-        //   this.$message.error(result.msg)
-        // }
+        const result = await this.$server.common.putMenuFolderName('/business/role/editSycCatlog', {
+          fileType: this.dragFile.fileType,
+          id: this.dragFile.id,
+          name: this.dragFile.name,
+          parentId: 0
+        })
+        if (result.code === 200) {
+          this.handleGetMenuList()
+          this.$message.success('移动成功')
+        } else {
+          this.$message.error(result.msg)
+        }
       }
     },
     /**
@@ -428,19 +429,18 @@ export default {
      * 选择移动文件夹弹窗确认
      */
     async handleFileMoveCreate(parentId) {
-      // const result = await this.$server.common.putMenuFolderName('/datasource/catalog/updata', {
-      //   fileType: this.selectFile.fileType,
-      //   id: this.selectFile.id,
-      //   name: this.selectFile.name,
-      //   parentId: parentId,
-      //   type: 1
-      // })
-      // if (result.code === 200) {
-      //   this.handleGetMenuList()
-      //   this.$message.success('移动成功')
-      // } else {
-      //   this.$message.error(result.msg)
-      // }
+      const result = await this.$server.common.putMenuFolderName('/business/role/editSycCatlog', {
+        fileType: this.selectFile.fileType,
+        id: this.selectFile.id,
+        name: this.selectFile.name,
+        parentId: parentId
+      })
+      if (result.code === 200) {
+        this.handleGetMenuList()
+        this.$message.success('移动成功')
+      } else {
+        this.$message.error(result.msg)
+      }
 
       this.moveFileVisible = false
     },
@@ -461,48 +461,65 @@ export default {
      */
     handleResetNameCreate(values) {
       if (this.resetName.type === 'new') {
-        this.handleAddItem(values)
+        this.handleAddFolder(values)
       } else if (this.resetName.type === 'reset') {
         this.handleResetName(values)
       }
       this.resetNameVisible = false
     },
     /**
+     * 新增角色
+     */
+    async handleAddRole() {
+      const result = await this.$server.common.addMenuFolder('/business/role/addRole', {
+        fileType: 1,
+        name: this.form.name,
+        description: this.form.description,
+        parentId: this.form.parentId
+      })
+      if (result.code === 200) {
+        this.handleGetMenuList()
+        this.$message.success('新建成功')
+        this.$refs.addForm.resetFields()
+        this.visible = false
+      } else {
+        this.$message.error(result.msg)
+      }
+    },
+    /**
      * 新增文件夹
      */
-    async handleAddItem(values) {
-      // const result = await this.$server.common.addMenuFolder('/datasource/catalog', {
-      //   fileType: 0,
-      //   name: values.name,
-      //   parentId: 0,
-      //   type: 1
-      // })
-      // if (result.code === 200) {
-      //   this.handleGetMenuList()
-      //   this.$message.success('新建成功')
-      // } else {
-      //   this.$message.error(result.msg)
-      // }
+    async handleAddFolder(values) {
+      const result = await this.$server.common.addMenuFolder('/business/role/addCatalog', {
+        fileType: 0,
+        name: values.name,
+        parentId: 0
+      })
+      if (result.code === 200) {
+        this.handleGetMenuList()
+        this.$message.success('新建成功')
+      } else {
+        this.$message.error(result.msg)
+      }
 
       this.resetNameVisible = false
     },
     /**
-     * 修改文件夹及菜单名称
+     * 重命名文件夹
      */
     async handleResetName(values) {
-      // const result = await this.$server.common.putMenuFolderName('/datasource/catalog/updata', {
-      //   fileType: this.resetName.item.fileType,
-      //   id: this.resetName.item.id,
-      //   name: values.name,
-      //   parentId: this.resetName.parentId || 0,
-      //   type: 1
-      // })
-      // if (result.code === 200) {
-      //   this.handleGetMenuList()
-      //   this.$message.success('修改成功')
-      // } else {
-      //   this.$message.error(result.msg)
-      // }
+      const result = await this.$server.common.putMenuFolderName('/business/role/editSycCatlog', {
+        fileType: this.resetName.item.fileType,
+        id: this.resetName.item.id,
+        name: values.name,
+        parentId: 0
+      })
+      if (result.code === 200) {
+        this.handleGetMenuList()
+        this.$message.success('修改成功')
+      } else {
+        this.$message.error(result.msg)
+      }
 
       this.resetNameVisible = false
     },

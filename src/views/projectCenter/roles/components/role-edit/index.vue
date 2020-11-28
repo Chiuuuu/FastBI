@@ -83,7 +83,20 @@ export default {
   },
   methods: {
     async handleGetRoleInfo() {
-
+      const roleInfo = await this.$server.projectCenter.getRoleInfo(this.$route.params.id)
+      // const rolePermission = await this.$server.projectCenter.getRolePermission(this.fileSelectId)
+      if (roleInfo.code === 200) {
+        this.$store.commit('projectRoles/SET_ROLEINFO', roleInfo.data)
+        this.form.name = roleInfo.data.name
+        this.form.description = roleInfo.data.description
+      } else {
+        this.$message.error(roleInfo.msg)
+      }
+      // if (rolePermission.code === 200) {
+      //   this.$EventBus.$emit('setFormData')
+      // } else {
+      //   this.$message.error(roleInfo.msg)
+      // }
     },
     back() {
       // 切换回查看模式

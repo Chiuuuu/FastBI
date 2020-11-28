@@ -2,8 +2,8 @@
   <div class="tab scrollbar">
     <header>
       <div class="role-info">
-        <div>角色名称：<span></span></div>
-        <div class="line">角色描述：</div>
+        <div>角色名称：<span>{{ roleInfo.name }}</span></div>
+        <div class="line">角色描述：{{ roleInfo.description }}</div>
       </div>
       <a-button class="main-button" type="primary" @click="edit"
         >编辑用户</a-button
@@ -26,7 +26,8 @@ export default {
     },
     computed: {
       ...mapState({
-        roleId: state => state.projectRoles.roleId
+        roleId: state => state.projectRoles.roleId,
+        roleInfo: state => state.projectRoles.roleInfo
       })
     },
     methods: {

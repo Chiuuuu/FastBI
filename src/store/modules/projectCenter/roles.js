@@ -25,9 +25,9 @@ const actions = {
   async getMenuList({
     commit
   }, vm) {
-    const result = await dataAccessApi.getMenuList('/datasource/catalog/list/1')
+    const result = await dataAccessApi.getMenuList('/business/role/listTree')
     if (result.code === 200) {
-      commit('SET_MENULIST', result.rows)
+      commit('SET_MENULIST', result.data)
     } else {
       vm.$message.error(result.msg)
     }

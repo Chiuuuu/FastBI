@@ -63,5 +63,57 @@ export default {
      */
     getUserPropsList(params) {
         return $axios.post(`/business/userAttrValue/attrList`, params)
+    },
+
+    /** ------------------------角色管理------------------------------ */
+    /**
+     * @description 获取角色详情
+     * @param {Object} id 角色id
+     * @returns
+     */
+    getRoleInfo(id) {
+        return $axios.get('/business/role/' + id)
+    },
+    /**
+     * @description 获取角色权限
+     * @param {String} id 角色id
+     * @returns
+     */
+    getRolePermission(id) {
+        return $axios.get('/business/rolePrivilege/' + id)
+    },
+    /**
+     * @description 新增角色
+     * @param {Object} params 参数
+     * @returns
+     */
+    addRole(params) {
+        return $axios.post('/business/role/addRole', params)
+    },
+    /**
+     * @description 获取角色下的用户列表
+     * @param {String} roleId 角色id
+     * @returns
+     */
+    getRoleUserInfo(roleId) {
+        return $axios.get('/business/business/listForProjectRoleUsers/' + roleId)
+    },
+    /**
+     * @description 为角色添加用户
+     * @param {Object} params
+     * @param {Array} params.userIds
+     * @param {Array} params.roleIds
+     * @returns
+     */
+    addRoleUser(params) {
+        return $axios.post('/business/business/projectRoleAddUser', params)
+    },
+    /**
+     * @description 为角色添加用户
+     * @param {Array} id
+     * @returns
+     */
+    deleRoleUser(id) {
+        return $axios.delete('/business/business/' + id)
     }
 }

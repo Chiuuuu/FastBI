@@ -31,21 +31,31 @@ export default {
   mixins: [modalMixin],
   data() {
     return {
-      list: [
-        { id: '1', name: '研发部' },
-        { id: '2', name: '销售部' },
-        { id: '3', name: '人事部' },
-        { id: '4', name: '小卖部' }
-      ]
+      list: []
     }
   },
   methods: {
+    async handleGetData() {
+      const res = await this.$server.corporateDomain.getDeptList()
+      if (res.code === 200) {
+        this.list = res.data
+      } else {
+        this.list = []
+        this.$message.error('获取部门列表失败')
+      }
+    },
     /** 保存 */
-    handleModalFormSave(formData, index) {
-      this.list.splice(index, 1, {
-        ...formData
-      })
-      this.activeIndex = -1
+    async handleModalFormSave(formData, index) {
+      const res = await this.$server.corporateDomain.addDept(formData.name)
+      if (res.code === 200) {
+        this.$message.success('保存成功')
+        this.list.splice(index, 1, {
+          ...formData
+        })
+        this.activeIndex = -1
+      } else {
+        this.$message.error(res.msg)
+      }
     },
     /** 删除 */
     handleModalFormDelete(data, index) {

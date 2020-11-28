@@ -48,7 +48,7 @@
               />
             </template>
             <template slot="description" slot-scope="text, record, index">
-              <a-input style="width:100%;height:32px" :value="text" @change.stop.prevent="handleChangeValue($event, record, index, 'description')"/>
+              <a-input style="width:100%;height:32px" :value="text" maxlength="100" @change.stop.prevent="handleChangeValue($event, record, index, 'description')"/>
             </template>
             <template slot="comment" slot-scope="comment">
               {{ comment }}
@@ -296,6 +296,8 @@ export default {
       if (!event.target.value) {
         message.error('别名不能为空')
         record[key] = record.name
+      } else if (event.target.value.length > 20) {
+        message.error('别名不能超过20个字符')
       }
     },
     handleSelectChangeValue(value, record, index, key) {

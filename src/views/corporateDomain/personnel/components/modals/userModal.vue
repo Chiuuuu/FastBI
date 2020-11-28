@@ -1,5 +1,6 @@
 <template>
   <a-modal
+    :bodyStyle="bodyStyle"
     :title="modalType === 'edit' ? '编辑用户' : '新建用户'"
     :visible="show"
     :maskClosable="false"
@@ -58,22 +59,22 @@
           mode="multiple"
           v-model="form.project"
           style="width: 100%"
-          placeholder="请选择岗位"
+          placeholder="请选择项目"
         >
-          <a-select-option v-for="i in 25" :key="(i + 9).toString(36) + i">
-            {{ (i + 9).toString(36) + i }}
+          <a-select-option v-for="item in projectList" :key="item.id">
+            {{ item.name }}
           </a-select-option>
         </a-select>
       </a-form-model-item>
-      <a-form-model-item label="部门" prop="depart">
+      <a-form-model-item label="部门" prop="dept" @change="getPostList">
         <a-select
           mode="multiple"
-          v-model="form.depart"
+          v-model="form.dept"
           style="width: 100%"
           placeholder="请选择岗位"
         >
-          <a-select-option v-for="i in 25" :key="(i + 9).toString(36) + i">
-            {{ (i + 9).toString(36) + i }}
+          <a-select-option v-for="item in deptList" :key="item.id">
+            {{ item.name }}
           </a-select-option>
         </a-select>
       </a-form-model-item>
@@ -84,8 +85,8 @@
           style="width: 100%"
           placeholder="请选择岗位"
         >
-          <a-select-option v-for="i in 25" :key="(i + 9).toString(36) + i">
-            {{ (i + 9).toString(36) + i }}
+          <a-select-option v-for="item in postList" :key="item.id">
+            {{ item.name }}
           </a-select-option>
         </a-select>
       </a-form-model-item>
@@ -102,9 +103,19 @@ export default {
     show: Boolean
   },
   watch: {
+    show(newValue) {
+      if (newValue) {
+        // 获取项目, 部门列表
+        this.getProjectList()
+        this.getDepartList()
+      }
+    },
     modalType(newValue) {
       if (newValue === 'edit') {
         this.form = Object.assign({}, this.form, this.modalData)
+        this.projectList = this.projectList.concat(this.modalData.project)
+        this.deptList.push(this.modalData.department)
+        this.postList.push(this.modalData.post)
       } else {
         this.form = this.$options.data().form
       }
@@ -112,6 +123,7 @@ export default {
   },
   data() {
     return {
+      bodyStyle: { height: 'calc(100vh - 240px)', 'overflow-y': 'auto' },
       confirmLoading: false, // 模态窗口确定按钮 loading
       form: {
         username: '',
@@ -120,7 +132,7 @@ export default {
         pswConfirm: '',
         phone: '',
         project: [],
-        depart: [],
+        dept: [],
         post: []
       },
       rules: {
@@ -145,7 +157,7 @@ export default {
             min: 6,
             message: '长度为6~20'
           },
-          // { validator: this.passwordValidate, trigger: 'change' }
+          { validator: this.passwordValidate, trigger: 'change' }
         ],
         pswConfirm: [
           { required: true, message: '请确认密码' },
@@ -172,10 +184,44 @@ export default {
           }
         ],
         project: [{ required: true, message: '请选择所属项目' }]
-      }
+      },
+      projectList: [],
+      deptList: [],
+      postList: []
     }
   },
   methods: {
+    async getProjectList() {
+      const res = await this.$server.corporateDomain.getProjectList()
+      if (res.code === 200) {
+        this.projectList = res.data
+      } else {
+        this.projectList = []
+        this.$message.error('获取岗位列表失败')
+      }
+    },
+    async getDepartList() {
+      const res = await this.$server.corporateDomain.getDeptList()
+      if (res.code === 200) {
+        this.deptList = res.data
+        if (res.data.length > 0) {
+          this.form.dept = res.data[0].id
+          this.getPostList(res.data[0].id)
+        }
+      } else {
+        this.deptList = []
+        this.$message.error('获取部门列表失败')
+      }
+    },
+    async getPostList(id) {
+      const res = await this.$server.corporateDomain.getPostList(id)
+      if (res.code === 200) {
+        this.postList = res.data
+      } else {
+        this.postList = []
+        this.$message.error('获取岗位列表失败')
+      }
+    },
     passwordValidate(rule, value, callback) {
       if (/[\u4e00-\u9fa5]/.test(value)) {
         callback(new Error('暂不支持中文密码'))

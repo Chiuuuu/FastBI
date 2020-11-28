@@ -6,7 +6,7 @@
     <template v-else>
       <div class="right">
         <div class="role-layout">
-          <a-tabs class="tabs" @change="handleChangeModule">
+          <a-tabs v-model="activeTab" class="tabs" @change="handleChangeModule">
             <a-tab-pane key="permission" tab="权限设置">
               <role-permission ref='permissionManage'></role-permission>
             </a-tab-pane>
@@ -30,6 +30,11 @@ export default {
   components: {
     RolePermission,
     RoleUser
+  },
+  data() {
+    return {
+      activeTab: 'permission'
+    }
   },
   computed: {
     ...mapState({

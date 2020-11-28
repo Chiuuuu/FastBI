@@ -4,6 +4,7 @@ import dataModel from '@/api/modules/dataModel'
 import screenManage from '@/api/modules/screenManage'
 import login from '@/api/modules/login'
 import projectCenter from '@/api/modules/projectCenter'
+import corporateDomain from '@/api/modules/corporateDomain'
 
 const server = {
   screenManage,
@@ -11,7 +12,8 @@ const server = {
   common,
   dataAccess,
   dataModel,
-  projectCenter
+  projectCenter,
+  corporateDomain
 }
 
 export default server

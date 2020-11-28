@@ -1,10 +1,10 @@
 <template>
   <a-row :gutter="16" class="screen-manage">
     <a-col class="gutter-row screen-manage" :span="5">
-      <Menu />
+      <Menu @handleChangeTab="handleChangeTab" />
     </a-col>
     <a-col class="gutter-row screen-manage" :span="19">
-      <Main />
+      <Main ref="main" />
     </a-col>
   </a-row>
 </template>
@@ -22,6 +22,11 @@ export default {
   data() {
     return {
 
+    }
+  },
+  methods: {
+    handleChangeTab(key) {
+      this.$refs.main.activeTab = key
     }
   },
   beforeDestroy() {
