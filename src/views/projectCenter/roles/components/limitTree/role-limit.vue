@@ -1,5 +1,5 @@
 <template>
-  <div style="height: calc(100% - 116px)">
+  <div class="tab scrollbar">
     <a-row class="line">
       <a-col span="2">{{ roleTitle }}</a-col>
       <a-col>
