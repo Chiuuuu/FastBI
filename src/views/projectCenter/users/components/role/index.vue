@@ -9,7 +9,7 @@
                     <a-input v-model="userMangeForm.name" class="form-item" placeholder="请输入姓名"></a-input>
                 </a-form-model-item>
                 <a-form-model-item>
-                    <a-button type="primary" @click="handleGetData" :disabled="loading">查询</a-button>
+                    <a-button type="primary" @click="() => handleGetData()" :disabled="loading">查询</a-button>
                 </a-form-model-item>
                 <a-form-model-item>
                     <a-button type="primary" @click="handleRestForm" :disabled="loading">重置</a-button>
@@ -21,19 +21,27 @@
                 row-key="id"
                 :columns="rolesColumn"
                 :data-source="rolesData"
+                :pagination="pagination"
                 :scroll="{ x: `100vh`, y: `calc(100vh - 350px)`}"
-                :loading="loading">
+                :loading="loading"
+                @change="handleTableChange">
             </a-table>
         </div>
     </div>
 </template>
 <script>
+import omit from 'lodash/omit'
 export default {
     name: 'userRoleManage',
     data() {
         return {
             rolesData: [],
             rolesColumn: [],
+            pagination: {
+                current: 1,
+                pageSize: 10,
+                total: 0
+            },
             userMangeForm: { // 搜索表单
                 username: '',
                 name: ''
@@ -45,16 +53,23 @@ export default {
         this.handleGetData()
     },
     methods: {
+        handleTableChange(pagination) {
+            this.handleGetData(pagination)
+        },
         /** 获取数据 */
-        async handleGetData() {
+        async handleGetData(pagination) {
             this.loading = true
-            const result = await this.$server.projectCenter.getUserPropsList(this.userMangeForm).finally(() => {
+            const params = Object.assign({}, this.userMangeForm, {
+                ...omit(this.pagination, 'total'),
+                current: pagination ? pagination.current : this.$options.data().pagination.current
+            })
+            const result = await this.$server.projectCenter.getUserPropsList(params).finally(() => {
                 this.loading = false
             })
 
             if (result.code === 200) {
                 const ary = []
-                result.headersKeyValue.forEach((item,index) => {
+                result.headersKeyValue.forEach((item, index) => {
                     let column = {
                         title: result.headers[index],
                         dataIndex: item,
@@ -65,6 +80,11 @@ export default {
                 })
                 this.rolesColumn = [].concat(ary)
                 this.rolesData = [].concat(result.rows)
+
+                Object.assign(this.pagination, {
+                    current: params.current,
+                    total: result.total
+                })
             } else {
                 this.$message.error(result.msg || '请求错误')
             }
