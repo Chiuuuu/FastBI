@@ -2,15 +2,15 @@
   <div class="flex-col">
     <div class="role-list-controller">
       <div class="searchbar">
-        <a-form-model layout="inline" :model="userSearch">
+        <a-form-model ref="form" layout="inline" :model="userSearch">
           <a-form-model-item label="用户名" prop="username">
-            <a-input v-model="userSearch.username" style="width: 150px"></a-input>
+            <a-input v-model="userSearch.username" style="width: 150px" placeholder="请输入用户名"></a-input>
           </a-form-model-item>
           <a-form-model-item label="姓名" prop="name">
-            <a-input v-model="userSearch.name" style="width: 150px"></a-input>
+            <a-input v-model="userSearch.name" style="width: 150px" placeholder="请输入姓名"></a-input>
           </a-form-model-item>
           <a-form-model-item>
-            <a-button type="primary" @click="handleGetData" :disabled="loading">查询</a-button>
+            <a-button type="primary" @click="() => handleGetData()" :disabled="loading">查询</a-button>
           </a-form-model-item>
           <a-form-model-item>
             <a-button type="primary" @click="resetForm()" :disabled="loading">重置</a-button>
@@ -23,31 +23,34 @@
       ref="table"
       row-key="id"
       :columns="userColumn"
+      :pagination="pagination"
       :data-source="userData"
       :loading="loading"
-      :scroll="{ y: 'calc(100vh - 350px)', x: 1210 }">
+      :scroll="{ y: 'calc(100vh - 350px)', x: 1210 }"
+      @change="handleTableChange">
       <!-- 列属性编辑 -->
-      <template v-for="(slot, index) in 6">
+      <template v-for="index in 6">
         <PropsEdit
-          :slot="'col' + (index + 1)"
-          :key="index"
-          :index="index"
+          v-if="propNameList.length > 0"
+          :slot="'col' + (index - 1)"
+          :key="(index - 1)"
+          :index="(index - 1)"
           :active-index="activePropIndex"
-          :title="propNameList[index]"
-          @changePropsEdit="activePropIndex = index"
+          :title="propNameList[index - 1].name"
+          @changePropsEdit="activePropIndex = (index - 1)"
           @cancelPropsEdit="activePropIndex = -1"
           @savePropsEdit="handleSaveEditCol"
           />
       </template>
 
       <!-- 行属性编辑 -->
-      <template v-for="(slot, i) in 6" slot="custom" slot-scope="text, record, index">
+      <template v-for="i in 6" :slot="'custom' + (i - 1)" slot-scope="text, record, index">
         <TableEdit
           :key="i"
           :index="index"
           :active-index="activeTableIndex"
           :title="text"
-          @getChangeText="v => getChangeText(i + 1, v)"
+          @getChangeText="v => getChangeText(i - 1, v)"
         />
       </template>
 
@@ -64,23 +67,6 @@
 import PropsEdit from './props-edit'
 import TableEdit from './table-edit'
 
-const propNameList = ['属性一', '属性二', '属性三', '属性四', '属性五', '属性六']
-
-const userData = []
-for (let i = 0; i < 30; i++) {
-  userData.push({
-    id: i + 1,
-    username: 'admin' + i,
-    name: '嘿嘿嘿',
-    1: '属性1',
-    2: '属性2',
-    3: '属性3',
-    4: '属性4',
-    5: '属性5',
-    6: '属性6'
-  })
-}
-
 const userColumn = [
   {
     title: '用户名',
@@ -96,10 +82,10 @@ const userColumn = [
   }
 ]
 
-for (let i = 1; i < 7; i++) {
+for (let i = 0; i < 6; i++) {
   userColumn.push({
-    scopedSlots: { customRender: 'custom', title: 'col' + i },
-    dataIndex: i,
+    scopedSlots: { customRender: 'custom' + i, title: 'col' + i },
+    dataIndex: 'userattrList.' + i + '.attrValue',
     width: 240,
     ellipsis: true
   })
@@ -133,22 +119,62 @@ export default {
         name: ''
       },
       userData: [],
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        total: 0
+      },
       userColumn,
-      propNameList
+      propNameList: []
     }
   },
   created () {
     this.handleGetData()
   },
   methods: {
+    async handleGetData(pagination) {
+      this.activePropIndex = -1
+      this.activeTableIndex = -1
+      this.loading = true
+      const params = Object.assign({}, this.userSearch, {
+        pageSize: this.pagination.pageSize,
+        current: pagination ? pagination.current : this.$options.data().pagination.current
+      })
+      const res = await this.$server.corporateDomain.getPropListByName(params)
+        .finally(() => {
+          this.loading = false
+        })
+      if (res.code === 200) {
+        if (res.headers) {
+          this.propNameList = res.headers.slice(-6)
+        }
+        this.userData = res.rows
+        this.pagination.total = res.total
+        this.pagination.current = params.current
+      } else {
+        this.$message.error(res.msg)
+      }
+    },
     resetForm(tab) {
-      this.userSearch = this.$options.data().userSearch
+      this.$refs.form.resetFields()
+    },
+    handleTableChange(pagination, filters, sorter) {
+      this.handleGetData(pagination)
     },
     /* 处理列 */
-    handleSaveEditCol(index, data) {
-      this.propNameList.splice(index, 1, data)
-      this.activePropIndex = -1
-      this.$message.success('保存成功')
+    async handleSaveEditCol(index, data) {
+      const headers = [].concat(this.propNameList)
+      headers[index].name = data
+      const res = await this.$server.corporateDomain.updateUserProp({
+        headers
+      })
+      if (res.code === 200) {
+        this.activePropIndex = -1
+        this.$message.success('保存成功')
+        this.handleGetData()
+      } else {
+        this.$message.error('修改失败')
+      }
     },
 
     /* 处理行 */
@@ -161,21 +187,19 @@ export default {
       }
     },
     getChangeText(index, value) {
-      this.editRow[index] = value
+      this.editRow.userattrList[index].attrValue = value
     },
-    handleSaveEditRow() {
-      this.userData.splice(this.activeTableIndex, 1, this.editRow)
-      this.activeTableIndex = -1
-      this.$message.success('保存成功')
-    },
-    async handleGetData() {
-      this.activePropIndex = -1
-      this.activeTableIndex = -1
-      this.loading = true
-      setTimeout(() => {
-        this.userData = userData
-        this.loading = false
-      }, 400)
+    async handleSaveEditRow() {
+      const res = await this.$server.corporateDomain.updateUserProp({
+        rows: new Array(this.editRow)
+      })
+      if (res.code === 200) {
+        this.userData.splice(this.activeTableIndex, 1, this.editRow)
+        this.$message.success('保存成功')
+        this.activeTableIndex = -1
+      } else {
+        this.$message.error('修改失败')
+      }
     }
   }
 }

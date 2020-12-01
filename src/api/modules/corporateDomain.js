@@ -6,7 +6,7 @@ export default {
      * @description 查询当前项目人员列表
      * @returns
      */
-    getPersonList() {
+    getUserList() {
         return $axios.post('/business/user/list')
     },
     /**
@@ -14,22 +14,43 @@ export default {
      * @param {String} id 请求参数
      * @returns
      */
-    getPersonInfo(id) {
+    getUserInfo(id) {
         return $axios.get('/business/user/getDomainUserInfo/' + id)
     },
     /**
      * @description 筛选查询当前项目人员列表
      * @returns
      */
-    getPersonListByParams(params) {
+    getUserListByParams(params) {
         return $axios.post('/business/user/getUserListByParam', params)
     },
     /**
      * @description 添加用户
      * @returns
      */
-    addPerson() {
-        return $axios.get('/business/business/listRoleForProjectId')
+    addUser(params) {
+        return $axios.post('/business/user/add', params)
+    },
+    /**
+     * @description 修改用户
+     * @returns
+     */
+    updateUser(params) {
+        return $axios.put('/business/user', params)
+    },
+    /**
+     * @description 启用/禁用用户
+     * @returns
+     */
+    actionEnableUser(params) {
+        return $axios.post('/business/user/isEnableUser', params)
+    },
+    /**
+     * @description 删除用户
+     * @returns
+     */
+    deleUser(id) {
+        return $axios.delete('/business/user/' + id)
     },
     /**
      * @description 根据用户名/姓名查询用户列表
@@ -39,14 +60,6 @@ export default {
      */
     getModalUserList(params) {
         return $axios.post('/business/user/matchUsers', params)
-    },
-
-    /**
-     * @description 获取项目列表
-     * @returns
-     */
-    getProjectList() {
-      return $axios.get('/business/project/list')
     },
 
     /** ----------------------------部门------------------------------------- */
@@ -59,11 +72,29 @@ export default {
     },
     /**
      * @description 新增部门
-     * @param {String} name 部门名称
+     * @param {String} deptName 部门名称
      * @returns
      */
-    addDept() {
-      return $axios.post('/business/department/addDepartment', { name })
+    addDept(deptName) {
+      return $axios.post('/business/department/addDepartment', { deptName })
+    },
+    /**
+     * @description 新增部门
+     * @param {Object} params
+     * @param {String} params.id 部门id
+     * @param {String} params.name 部门名称
+     * @returns
+     */
+    updateDept(params) {
+      return $axios.put('/business/department', params)
+    },
+    /**
+     * @description 删除部门
+     * @param {String} id 部门id
+     * @returns
+     */
+    deleDept(id) {
+      return $axios.delete('/business/department/' + id)
     },
 
     /** ----------------------------岗位------------------------------------- */
@@ -77,11 +108,60 @@ export default {
     },
     /**
      * @description 新增岗位
-     * @param {String} name 岗位名称
+     * @param {Object} params
+     * @param {String} params.departmentId 部门id
+     * @param {String} params.name 岗位名称
      * @returns
      */
-    addPost() {
-      return $axios.post('/business/post', { name })
+    addPost(params) {
+      return $axios.post('/business/post', params)
+    },
+    /**
+     * @description 新增岗位
+     * @param {Object} params
+     * @param {String} params.departmentId 岗位id
+     * @param {String} params.name 岗位名称
+     * @returns
+     */
+    updatePost(params) {
+      return $axios.put('/business/post', params)
+    },
+    /**
+     * @description 删除部门
+     * @param {String} id 部门id
+     * @returns
+     */
+    delePost(id) {
+      return $axios.delete('/business/post/' + id)
+    },
+    /** --------------------------------角色属性-------------------------------------- */
+    /**
+     * @description 获取角色属性列表
+     * @param {Object} params
+     * @returns
+     */
+    getPropList(params) {
+      return $axios.post('/business/userAttr/list', params)
+    },
+    /**
+     * @description 获取角色属性列表
+     * @param {Object} params
+     * @param {String} params.username
+     * @param {String} params.name
+     * @returns
+     */
+    getPropListByName(params) {
+      return $axios.post('/business/userAttr/getAttrInfo', params)
+    },
+    /**
+     * @description 修改用户角色属性
+     * @param {Object} params
+     * @param {String} params.headers
+     * @param {String} params.rows
+     * @returns
+     */
+    updateUserProp(params) {
+      return $axios.put('/business/userAttr', params)
     },
     /** ----------------------------项目管理------------------------------------- */
     /**

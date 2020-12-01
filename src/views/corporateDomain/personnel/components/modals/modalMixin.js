@@ -10,7 +10,7 @@ const ModalMixin = {
   },
   data() {
     return {
-      bodyStyle: { height: 'calc(100vh - 240px)' },
+      bodyStyle: { height: 'calc(100vh - 240px)', 'overflow-y': 'auto' },
       list: [],
       activeIndex: -1
     }

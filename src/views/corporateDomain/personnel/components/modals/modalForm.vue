@@ -51,7 +51,7 @@ export default {
   },
   data() {
     return {
-			form: Object.assign({}, this.data),
+      form: Object.assign({}, this.data),
       rules: {
         name: { required: true, message: '请填写名称' }
       }
@@ -71,12 +71,11 @@ export default {
   },
   methods: {
       handleEdit() {
-          this.$emit('edit', this.index)
+        this.$emit('edit', this.index)
       },
       handleSave() {
           this.$refs.form.validate(valid => {
             if (valid) {
-                this.$message.success('保存成功')
                 this.$emit('save', this.form, this.index)
             } else {
                 return false
@@ -87,7 +86,7 @@ export default {
           this.$emit('delete', this.data, this.index)
       },
       handleCancel() {
-					this.$emit('cancel', this.data)
+          this.$emit('cancel', this.data)
       }
   }
 }
