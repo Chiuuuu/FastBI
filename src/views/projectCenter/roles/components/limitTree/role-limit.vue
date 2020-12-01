@@ -8,14 +8,9 @@
     </a-row>
     <a-row class="line">
       <a-col span="14">所有目录</a-col>
-      <a-col span="2">查看</a-col>
-      <a-col span="2">编辑</a-col>
-      <a-col span="2">复制</a-col>
-      <a-col span="2">删除</a-col>
-      <a-col span="2">发布</a-col>
+      <a-col span="2" align="left" v-for="item in ['查看', '编辑', '复制', '删除', '发布']" :key="item">{{item}}</a-col>
     </a-row>
     <div class="content scrollbar">
-      <limit-tree :status="status"></limit-tree>
       <limit-tree :status="status"></limit-tree>
     </div>
   </div>
