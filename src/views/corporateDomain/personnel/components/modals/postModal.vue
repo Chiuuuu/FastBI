@@ -10,7 +10,7 @@
     <template v-if="deptList.length > 0">
       <a-form-model ref="form" :model="form" :label-col="{ span: 3 }" :wrapper-col="{ span: 21 }" labelAlign="left">
         <a-form-model-item label="部门" prop="depart">
-          <a-select v-model="form.depart" @change="handleChangePost">
+          <a-select v-model="form.depart" @change="handleGetPostList" placeholder="请选择岗位">
             <a-select-option :value="item.id" v-for="item in deptList" :key="item.id">{{ item.name }}</a-select-option>
           </a-select>
         </a-form-model-item>
@@ -29,7 +29,7 @@
         </div>
       </div>
     </template>
-    <a-empty description="请先添加岗位"></a-empty>
+    <a-empty v-else description="请先添加岗位"></a-empty>
   </a-modal>
 </template>
 
@@ -37,36 +37,21 @@
 import modalMixin from './modalMixin'
 export default {
   name: 'personnelPostModal',
+  props: {
+    deptList: Array
+  },
   mixins: [modalMixin],
   data() {
     return {
+      spinning: false,
       form: {
-        depart: ''
+        depart: undefined
       },
-      deptList: [],
-      list: [
-        { id: '1', name: 'java' },
-        { id: '2', name: '前端' },
-        { id: '3', name: '测试' },
-        { id: '4', name: '产品' }
-      ]
+      list: []
     }
   },
   methods: {
-    async handleGetData() {
-      const res = await this.$server.corporateDomain.getDeptList()
-      if (res.code === 200) {
-        this.deptList = res.data
-        if (res.data.length > 0) {
-          this.form.depart = res.data[0].id
-          this.handleChangePost(res.data[0].id)
-        }
-      } else {
-        this.deptList = []
-        this.$message.error('获取部门列表失败')
-      }
-    },
-    async handleChangePost(id) {
+    async handleGetPostList(id) {
       const list = await this.$server.corporateDomain.getPostList(id)
       if (list.code === 200) {
         this.list = list.data
@@ -74,18 +59,58 @@ export default {
         this.list = []
         this.$message.error('获取岗位列表失败')
       }
+      this.activeIndex = -1
     },
     /** 保存 */
     handleModalFormSave(formData, index) {
-      this.list.splice(index, 1, {
-        ...formData
+      if (formData.id) {
+        this.handleModalFormUpdate(formData, index)
+      } else {
+        this.handleModalFormAdd(formData, index)
+      }
+    },
+    /** 新增 */
+    async handleModalFormAdd(formData, index) {
+      const res = await this.$server.corporateDomain.addPost({
+        name: formData.name,
+        departmentId: this.form.depart
       })
-      this.activeIndex = -1
+      if (res.code === 200) {
+        this.$message.success('保存成功')
+        this.handleGetPostList(this.form.depart)
+        this.activeIndex = -1
+      } else {
+        this.$message.error(res.msg)
+      }
+    },
+    handleModalFormEdit(index) {
+      this.activeIndex = index
+    },
+    /** 编辑 */
+    async handleModalFormUpdate(formData, index) {
+      const res = await this.$server.corporateDomain.updatePost({
+        name: formData.name,
+        departmentId: this.form.depart,
+        id: formData.id
+      })
+      if (res.code === 200) {
+        this.$message.success('保存成功')
+        this.handleGetPostList(this.form.depart)
+        this.activeIndex = -1
+      } else {
+        this.$message.error(res.msg)
+      }
     },
     /** 删除 */
-    handleModalFormDelete(data, index) {
-      this.list.splice(index, 1)
-      this.activeIndex = -1
+    async handleModalFormDelete(formData, index) {
+      const res = await this.$server.corporateDomain.delePost(formData.id)
+      if (res.code === 200) {
+        this.$message.success('删除成功')
+        this.list.splice(index, 1)
+        this.activeIndex = -1
+      } else {
+        this.$message.error(res.msg)
+      }
     },
     /** 取消编辑 */
     handleModalFormCancel(data) {
