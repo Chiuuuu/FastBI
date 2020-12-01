@@ -104,7 +104,7 @@ export default {
 
 <style lang="less" scoped>
 @import "../../../main";
-.main .right .content {
+.main .edit.right .content {
   height: calc(100% - 186px);
   @{deep} .ant-form-item-label {
       width: 100px !important;
