@@ -82,5 +82,69 @@ export default {
      */
     addPost() {
       return $axios.post('/business/post', { name })
+    },
+    /** ----------------------------项目管理------------------------------------- */
+    /**
+     * @description 获取项目列表
+     * @param {Object} params 请求参数
+     * @param {String} params.projectName 项目名称
+     * @param {String} params.adminName 管理员名称
+     */
+    getProjectList(params) {
+      return $axios.post(`/business/project/list`, params)
+    },
+    /**
+     * @description 添加新项目
+     * @param {Object} params
+     * @param {Object} params.projectName 项目名称
+     * @param {Object} params.projectDes  项目描述
+     * @param {Object} params.adminList  管理员列表
+     * @returns
+     */
+    addNewProject(params) {
+      return $axios.post(`/business/project`, params)
+    },
+    /**
+     * @description 编辑项目
+     * @param {Object} params
+     * @param {String | Number} params.projectId 项目id
+     * @param {Object} params.projectName 项目名称
+     * @param {Object} params.projectDes  项目描述
+     * @param {Object} params.adminList  管理员列表
+     * @returns
+     */
+    putProject(params) {
+      return $axios.put(`/business/project`, params)
+    },
+    /**
+     * @description 删除项目
+     * @param {Number | String} projectId 项目id
+     * @returns
+     */
+    deleProject(projectId) {
+      return $axios.delete(`/business/project/${projectId}`)
+    },
+    /**
+     * @description 获取管理员下拉列表
+     * @returns
+     */
+    getAdminList() {
+      return $axios.get(`/business/user/getUserInfoList`)
+    },
+    /**
+     * @description 查看项目的用户
+     * @param {String | Number} projectId 项目id
+     * @returns
+     */
+    getUserByProject(projectId) {
+      return $axios.get(`/business/project/getProjectUserName/${projectId}`)
+    },
+    /**
+     * @description 
+     * @param {String | Number} projectId 项目id
+     * @returns
+     */
+    getProjectInfoById(projectId) {
+      return $axios.get(`/business/project/getDomainProjectInfo/${projectId}`)
     }
 }
