@@ -349,7 +349,9 @@ export default {
     },
     // 校验文件
     fileValidate(file) {
-      console.log(file)
+      if (this.currentFileList.length > 0) {
+        return this.$message.error('只支持上传一个文件')
+      }
       // 校验大小
       if (file.size > 1 * 1024 * 1024) return this.$message.error('文件大于1M, 无法上传')
 
@@ -532,7 +534,9 @@ export default {
       })
     },
     handleSaveForm() {
-      if (this.currentFieldList.length === 0) {
+      if (this.currentFileList.length > 1) {
+        return this.$message.error('只支持上传一个文件')
+      } else if (this.currentFieldList.length === 0) {
         return this.$message.error('请上传文件')
       }
       this.$refs.fileForm.validate((pass, obj) => {
