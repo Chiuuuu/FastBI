@@ -246,7 +246,7 @@ export default {
       if (res.code === 200) {
         this.form.post = []
         this.postList = res.data
-        if (callback) {
+        if (typeof callback === 'function') {
           this.$nextTick(() => {
             callback()
           })
@@ -291,6 +291,9 @@ export default {
         ...this.form,
         isEnable: 1
       })
+        .finally(() => {
+          this.confirmLoading = false
+        })
       if (res.code === 200) {
         this.$message.success('添加成功')
         this.$parent.handleGetData()
@@ -311,6 +314,9 @@ export default {
         params.expassword = this.password
       }
       const res = await this.$server.corporateDomain.updateUser(params)
+        .finally(() => {
+          this.confirmLoading = false
+        })
       if (res.code === 200) {
         this.$message.success('修改成功')
         this.$parent.handleGetData()
@@ -330,6 +336,7 @@ export default {
             this.handleUpdateUser()
           }
         } else {
+          debugger
           this.confirmLoading = false
         }
       })

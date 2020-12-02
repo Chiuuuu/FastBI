@@ -173,7 +173,7 @@ export default {
         this.$message.success('保存成功')
         this.handleGetData()
       } else {
-        this.$message.error('修改失败')
+        this.$message.error(res.msg)
       }
     },
 

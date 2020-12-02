@@ -472,21 +472,25 @@ export default {
     /**
      * 新增角色
      */
-    async handleAddRole() {
-      const result = await this.$server.common.addMenuFolder('/business/role/addRole', {
-        fileType: 1,
-        name: this.form.name,
-        description: this.form.description,
-        parentId: this.form.parentId
+    handleAddRole() {
+      this.$refs.addForm.validate(async valid => {
+        if (valid) {
+          const result = await this.$server.common.addMenuFolder('/business/role/addRole', {
+            fileType: 1,
+            name: this.form.name,
+            description: this.form.description,
+            parentId: this.form.parentId
+          })
+          if (result.code === 200) {
+            this.handleGetMenuList()
+            this.$message.success('新建成功')
+            this.$refs.addForm.resetFields()
+            this.visible = false
+          } else {
+            this.$message.error(result.msg)
+          }
+        }
       })
-      if (result.code === 200) {
-        this.handleGetMenuList()
-        this.$message.success('新建成功')
-        this.$refs.addForm.resetFields()
-        this.visible = false
-      } else {
-        this.$message.error(result.msg)
-      }
     },
     /**
      * 新增文件夹

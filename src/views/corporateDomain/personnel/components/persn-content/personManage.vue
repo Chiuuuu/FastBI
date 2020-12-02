@@ -9,13 +9,13 @@
         <a-form-model-item label="姓名" prop="name">
           <a-input v-model="personSearch.name" style="width: 150px" placeholder="请输入姓名"></a-input>
         </a-form-model-item>
-        <a-form-model-item label="部门" prop="deptName">
-          <a-select v-model="personSearch.deptName" style="width: 150px" placeholder="请选择部门" @change="handleGetPostList">
+        <a-form-model-item label="部门" prop="department">
+          <a-select v-model="personSearch.department" style="width: 150px" placeholder="请选择部门" @change="handleGetPostList">
             <a-select-option v-for="item in departList" :key="item.id" :value="item.id">{{ item.name }}</a-select-option>
           </a-select>
         </a-form-model-item>
-        <a-form-model-item label="岗位" prop="postName">
-          <a-select v-model="personSearch.postName" style="width: 150px" placeholder="请选择岗位">
+        <a-form-model-item label="岗位" prop="post">
+          <a-select v-model="personSearch.post" style="width: 150px" placeholder="请选择岗位">
             <a-select-option v-for="item in postList" :key="item.id" :value="item.id">{{ item.name }}</a-select-option>
           </a-select>
         </a-form-model-item>
@@ -142,8 +142,8 @@ export default {
       personSearch: {
         username: '',
         name: '',
-        deptName: undefined,
-        postName: undefined
+        department: undefined,
+        post: undefined
       },
       pagination: {
         current: 1,
@@ -202,7 +202,7 @@ export default {
       }
     },
     async handleGetPostList(id) {
-      this.personSearch.postName = undefined
+      this.personSearch.post = undefined
       const res = await this.$server.corporateDomain.getPostList(id)
         .finally(() => {
           this.spinning = false
