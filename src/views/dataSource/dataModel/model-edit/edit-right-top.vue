@@ -39,44 +39,12 @@ export default {
       info: '',
       renderTables: [], // 用来渲染树组件
       errorTables: [] // 接受错误的tableNo
-    //   treeData: [
-    //     {
-    //       id: 1,
-    //       title: "三大框架",
-    //       children: [
-    //         {
-    //           id: 2,
-    //           title: "react",
-    //           children: [
-    //             {
-    //               id: 2,
-    //               title: "虚拟dom"
-    //             },
-    //             {
-    //               id: 2,
-    //               title: "ui"
-    //             }
-    //           ]
-    //         },
-    //         {
-    //           id: 2,
-    //           title: "vue"
-    //         },
-    //         {
-    //           id: 2,
-    //           title: "angular"
-    //         }
-    //       ]
-    //     }
-    //   ]
     }
   },
   created() {
-    // console.log('cret', this.detailInfo)
     // this.modelId = this.$route.query.modelId || this.$store.state.dataModel.modelId
   },
   mounted() {
-    // console.log('mo', this.detailInfo)
   },
   computed: {
     ...mapState({
