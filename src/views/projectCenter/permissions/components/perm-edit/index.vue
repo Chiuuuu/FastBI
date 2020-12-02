@@ -87,6 +87,7 @@ export default {
     },
     back() {
       // 切换回查看模式
+      this.$store.commit('projectPermissions/SET_EDITTYPE', this.$route.query.type)
       this.$router.go(-1)
     },
     handleSave() {

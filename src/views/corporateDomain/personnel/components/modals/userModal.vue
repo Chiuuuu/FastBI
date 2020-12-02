@@ -141,11 +141,6 @@ export default {
           this.getProjectList()
         }
       } else {
-        this.$refs.form.resetFields()
-      }
-    },
-    modalType(newValue) {
-      if (newValue === 'add') {
         if (this.$refs.form) this.$refs.form.resetFields()
       }
     }

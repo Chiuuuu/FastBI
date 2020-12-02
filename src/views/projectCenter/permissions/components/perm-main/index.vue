@@ -5,11 +5,11 @@
     </a-empty>
     <template v-else>
       <div class="right">
-        <a-tabs class="tabs" @change="handleChangeModule">
-          <a-tab-pane key="1" tab="行级权限">
+        <a-tabs class="tabs" :activeKey="editType" @change="handleChangeModule">
+          <a-tab-pane key="row" tab="行级权限">
             <Content type="row" />
           </a-tab-pane>
-          <a-tab-pane key="2" tab="列级权限">
+          <a-tab-pane key="col" tab="列级权限">
             <Content type="col" />
           </a-tab-pane>
         </a-tabs>
@@ -27,23 +27,16 @@ export default {
   components: {
     Content
   },
-  data() {
-    return {
-    }
-  },
   computed: {
     ...mapState({
+      editType: state => state.projectPermissions.editType,
       permissionId: state => state.projectPermissions.permissionId,
       formInfo: state => state.projectPermissions.permissionInfo
     })
   },
   methods: {
     handleChangeModule(key) {
-      if (key === '1') {
-        this.$store.commit('projectPermissions/SET_EDITTYPE', 'row')
-      } else if (key === '2') {
-        this.$store.commit('projectPermissions/SET_EDITTYPE', 'col')
-      }
+      this.$store.commit('projectPermissions/SET_EDITTYPE', key)
     }
   }
 }

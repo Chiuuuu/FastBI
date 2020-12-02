@@ -29,7 +29,7 @@
         :data-source="tableData"
         :columns="tableColumns"
         :loading="loading"
-        :scroll="{ y: type === 'row' ? 280 : 410 }"
+        :scroll="{ y: type === 'row' ? 'calc(100vh - 620px)' : 'calc(100vh - 492px)' }"
         >
           <template #config="text, record, index">
             <a @click="handleEditPermission(record)">编辑</a>

@@ -248,7 +248,9 @@ export default {
     handleSearchMenu: debounce(function(event) {
       const value = event.target.value
       this.searchValue = value
-      this.handleGetSearchList(value)
+      if (value) {
+        this.handleGetSearchList(value)
+      }
     }, 400),
     handleGetSearchList(value) {
       let result = []

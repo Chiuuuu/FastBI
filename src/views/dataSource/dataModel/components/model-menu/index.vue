@@ -459,8 +459,10 @@ export default {
     handleSearchSource: debounce(function(event) {
       const value = event.target.value
       this.sourceSearch = value
-      this.handleGetSourceSearchList(value)
-      console.log('input', value)
+      if (value) {
+        this.handleGetSourceSearchList(value)
+        console.log('input', value)
+      }
     }, 400),
     handleGetSourceSearchList(value) {
       let result = []
@@ -477,8 +479,10 @@ export default {
     handleSearchModel: debounce(function(event) {
       const value = event.target.value
       this.modelSearch = value
-      this.handleGetModelSearchList(value)
-      console.log('input', value)
+      if (value) {
+        this.handleGetModelSearchList(value)
+        console.log('input', value)
+      }
     }, 400),
     handleGetModelSearchList(value) {
       let result = []
