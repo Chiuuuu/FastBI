@@ -113,18 +113,22 @@
               </div>
             </div>
             <div class="dim_menu scrollbar">
-              <a-menu mode="inline" v-for="(value, name) in dimensions" :key="name" :default-open-keys="[name]" :inline-collapsed="false">
-                <a-sub-menu :key="name">
-                  <span slot="title"><span>{{value[0].tableName}}</span></span>
-                  <a-menu-item v-for="item in value" :key="item.id" :class="{ 'line-through': !item.visible }">
-                    <img
-                      src="@/assets/images/icon_dimension.png"
-                      style="width:15px;height:15px"
-                    />
-                    {{item.alias}}
-                  </a-menu-item>
-                </a-sub-menu>
-              </a-menu>
+              <a-collapse :bordered="false" v-model="dimensionsActiveKey">
+                <a-collapse-panel
+                  v-for="(value, name) in dimensions"
+                  :key="name"
+                  :style="customStyle"
+                  :header="value[0].tableName"
+                >
+                  <panel-item
+                    v-for="item in value"
+                    :key="item.id"
+                    className="dimensions"
+                    :imgURI="DimensionsIcon"
+                    :itemData="item"
+                  ></panel-item>
+                </a-collapse-panel>
+              </a-collapse>
             </div>
           </div>
           <div class="measurement">
@@ -135,18 +139,22 @@
               </div>
             </div>
             <div class="mea_menu scrollbar">
-              <a-menu mode="inline" v-for="(value, name) in measures" :key="name" :default-open-keys="[name]" :inline-collapsed="false">
-                <a-sub-menu :key="name">
-                  <span slot="title"><span>{{value[0].tableName}}</span></span>
-                  <a-menu-item v-for="item in value" :key="item.id" :class="{ 'line-through': !item.visible }">
-                    <img
-                      src="@/assets/images/icon_measure.png"
-                      style="width:15px;height:15px"
-                    />
-                    {{item.alias}}
-                  </a-menu-item>
-                </a-sub-menu>
-              </a-menu>
+              <a-collapse :bordered="false" v-model="measuresActiveKey">
+                <a-collapse-panel
+                  v-for="(value, name) in measures"
+                  :key="name"
+                  :style="customStyle"
+                  :header="value[0].tableName"
+                >
+                  <panel-item
+                    v-for="item in value"
+                    :key="item.id"
+                    className="measures"
+                    :imgURI="MeasureIcon"
+                    :itemData="item"
+                  ></panel-item>
+                </a-collapse-panel>
+              </a-collapse>
             </div>
           </div>
         </div>
@@ -186,9 +194,12 @@ import DescribeSetting from './setting/describe-setting'
 import BatchSetting from './setting/batch-setting'
 import GeoSetting from './setting/geo-setting'
 import ComputeSetting from './setting/compute-setting'
+import PanelItem from './panel-item'
 import { Node, conversionTree } from '../util'
 import groupBy from 'lodash/groupBy'
-
+import keys from 'lodash/keys'
+import DimensionsIcon from '@/assets/images/icon_dimension.png'
+import MeasureIcon from '@/assets/images/icon_measure.png'
 // const setting = [
 //   {
 //     key: '1',
@@ -205,7 +216,8 @@ export default {
     DescribeSetting, // 设置描述
     BatchSetting, // 批量设置字段
     GeoSetting, // 设置地理位置
-    ComputeSetting // 设置维度度量
+    ComputeSetting, // 设置维度度量
+    PanelItem
   },
   provide() {
     return {
@@ -214,6 +226,8 @@ export default {
   },
   data() {
     return {
+      DimensionsIcon,
+      MeasureIcon,
       modelForm: this.$form.createForm(this, { name: 'modelForm' }),
       spinning: false,
       detailInfo: '',
@@ -229,7 +243,10 @@ export default {
         event: null
       },
       measures: '',
+      measuresActiveKey: [],
       dimensions: '',
+      dimensionsActiveKey: [],
+      customStyle:'border: 0',
       // setting,
       activeIndex: 0,
       modalName: '',
@@ -241,7 +258,7 @@ export default {
         span: 14
       },
       computeType: '', // 新建计算字段类型(维度, 度量)
-      databaseList: [] // 数据库列表
+      databaseList: [], // 数据库列表
     }
   },
   computed: {
@@ -279,6 +296,43 @@ export default {
     this.$store.dispatch('dataModel/setAddModelId', -1)
   },
   methods: {
+    /** 组合右键菜单 */
+    handleComboContextmenus(type) {
+      const arry = [
+        {
+          name: '重命名',
+          onClick: () => {
+            console.log('重命名')
+          }
+        },
+        {
+          name: '复制字段',
+          onClick: () => {
+            console.log('复制字段')
+          }
+        },
+        {
+          name: '转换数据类型',
+          children: [
+            {
+              name: '转换数字',
+              onClick: (event) => {
+                event.stopPropagation()
+                console.log('转换数字类型数字')
+              }
+            }
+          ]
+        },
+        {
+          name: type === 'dimensions' ? '转换为度量' : '转换为维度',
+          onClick: () => {
+            console.log('转换维度度量')
+          }
+        }
+      ]
+
+      return arry
+    },
     async handleGetDatabaseList() {
       const result = await this.$server.dataModel.getDatabaseList(this.$route.query.datasourceId)
       if (result.code === 200) {
@@ -380,16 +434,16 @@ export default {
     */
     handleDimensions() {
       this.handleSameName(this.detailInfo.pivotSchema.dimensions)
-      console.log(groupBy(this.detailInfo.pivotSchema.dimensions, 'tableNo'))
       this.dimensions = groupBy(this.detailInfo.pivotSchema.dimensions, 'tableNo')
+      this.dimensionsActiveKey = keys(this.dimensions)
     },
     /**
      * 度量数据处理
     */
     handleMeasures() {
       this.handleSameName(this.detailInfo.pivotSchema.measures)
-      console.log(groupBy(this.detailInfo.pivotSchema.measures, 'tableNo'))
       this.measures = groupBy(this.detailInfo.pivotSchema.measures, 'tableNo')
+      this.measuresActiveKey = keys(this.measures)
     },
     /**
      * 编辑时获取模型数据
