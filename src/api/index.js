@@ -5,8 +5,10 @@ import screenManage from '@/api/modules/screenManage'
 import login from '@/api/modules/login'
 import projectCenter from '@/api/modules/projectCenter'
 import corporateDomain from '@/api/modules/corporateDomain'
+import user from '@/api/modules/user'
 
 const server = {
+  user,
   screenManage,
   login,
   common,

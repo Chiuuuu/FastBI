@@ -1,5 +1,6 @@
 import { getPermissionByTree } from '@/utils/permission'
 import router, { resetRouter } from '@/router'
+import { getUserInfo } from '@/api/modules/user'
 
 const state = {
     routesModule: [],
@@ -50,6 +51,9 @@ const actions = {
   },
   changeRole({ commit, dispatch }) {
     return new Promise(async resolve => {
+      getUserInfo().then(respone => {
+        console.log(respone)
+      })
       const roleTree = {
         module: [1, 2],
         page: {
