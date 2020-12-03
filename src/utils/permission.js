@@ -11,8 +11,8 @@ export function checkObejctPermission(value) {
     if (value && typeof value === 'string') {
         const objPermissions = keys(store.state.user.objectModule)
         const hasPermission = objPermissions.includes(value)
-        if (!hasPermission && value !== '0') {
-            return checkObejctPermission('0')
+        if (!hasPermission && value !== '00') {
+            return checkObejctPermission('00')
         }
         return hasPermission
     } else {
@@ -31,19 +31,19 @@ export function checkActionPermission(obj, value) {
     const hasObjPermission = checkObejctPermission(obj)
     if (hasObjPermission && value) {
         const actionPermissions = store.state.user.objectModule[obj]
-        if (!actionPermissions && obj !== '0') {
+        if (!actionPermissions && obj !== '00') {
             // 当没有对应的对象权限的时候
-            return checkActionPermission('0', value)
+            return checkActionPermission('00', value)
         }
         let hasPermission
-        if (typeof value === 'number') {
+        if (typeof value === 'string') {
             hasPermission = actionPermissions.includes(value)
         } else if (Array.isArray(value)) {
             hasPermission = actionPermissions.some(action => value.includes(action))
         }
-        if (!hasPermission && obj !== '0') {
+        if (!hasPermission && obj !== '00') {
             // 当对应的对象权限的时候
-            return checkActionPermission('0', value)
+            return checkActionPermission('00', value)
         }
         return hasPermission
     } else {

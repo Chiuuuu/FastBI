@@ -1,23 +1,38 @@
+import { message } from 'ant-design-vue'
 import { getPermissionByTree } from '@/utils/permission'
 import router, { resetRouter } from '@/router'
-import { getUserInfo } from '@/api/modules/user'
+import server from '@/api'
 
 const state = {
     routesModule: [],
-    objectModule: ''
+    objectModule: '',
+    selectProject: '',
+    projectList: [],
+    info: ''
 }
 
 const mutations = {
   SET_ROUTES_MODULE: (state, roleTree) => {
-    state.routesModule = getPermissionByTree(roleTree, 'module')
+    state.routesModule = getPermissionByTree(roleTree, 'pages')
   },
   SET_OBJECT_MODULE: (state, roleTree) => {
-    state.objectModule = getPermissionByTree(roleTree, 'page')
+    state.objectModule = getPermissionByTree(roleTree, 'permissions')
   },
   CLEAR_PERMISSIONS: (state) => {
     state.routesModule = []
     state.objectModule = ''
+    state.projectList = []
+    state.info = ''
     resetRouter()
+  },
+  SET_PROJECTLIST: (state, list) => {
+    state.projectList = [].concat(list)
+  },
+  SET_SELECTPROJECT: (state, id) => {
+    state.selectProject = id
+  },
+  SET_INFO: (state, params) => {
+    state.info = Object.assign({}, params)
   }
 }
 
@@ -35,39 +50,29 @@ const actions = {
     })
   },
   getInfo({ commit }) {
-    return new Promise(resolve => {
-      const roleTree = {
-        module: [0],
-        page: {
-          0: [1],
-          1: [1, 3]
+    return new Promise((resolve,reject) => {
+      // 根据token获取对应的权限
+      server.user.getUserInfo().then(respone => {
+        if (respone.code === 200) {
+          commit('SET_ROUTES_MODULE', respone)
+          commit('SET_OBJECT_MODULE', respone)
+          commit('SET_PROJECTLIST', respone.projects)
+          commit('SET_SELECTPROJECT', respone.projectId)
+          commit('SET_INFO', respone.user)
+          resolve(state)
+        } else {
+          message.error(respone.msg || '请求错误')
         }
-      }
-
-      commit('SET_ROUTES_MODULE', roleTree)
-      commit('SET_OBJECT_MODULE', roleTree)
-      resolve(state)
+      }).catch(error => {
+        reject(error)
+      })
     })
   },
   changeRole({ commit, dispatch }) {
     return new Promise(async resolve => {
-      getUserInfo().then(respone => {
-        console.log(respone)
-      })
-      const roleTree = {
-        module: [1, 2],
-        page: {
-          0: [1],
-          1: [1]
-        }
-      }
-      // const { roles } = await dispatch('getInfo')
-
-      commit('SET_ROUTES_MODULE', roleTree)
-      commit('SET_OBJECT_MODULE', roleTree)
-
+      const { routesModule } = await dispatch('getInfo')
       resetRouter()
-      const accessRoutes = await dispatch('permission/generateRoutes', state.routesModule, { root: true })
+      const accessRoutes = await dispatch('permission/generateRoutes', routesModule, { root: true })
       router.addRoutes(accessRoutes)
       resolve()
     })
