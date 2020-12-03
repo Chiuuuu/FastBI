@@ -246,7 +246,7 @@ export default {
       measuresActiveKey: [],
       dimensions: '',
       dimensionsActiveKey: [],
-      customStyle:'border: 0',
+      customStyle: 'border: 0',
       // setting,
       activeIndex: 0,
       modalName: '',
@@ -258,7 +258,7 @@ export default {
         span: 14
       },
       computeType: '', // 新建计算字段类型(维度, 度量)
-      databaseList: [], // 数据库列表
+      databaseList: [] // 数据库列表
     }
   },
   computed: {

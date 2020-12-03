@@ -115,5 +115,14 @@ export default {
      */
     deleRoleUser(id) {
         return $axios.delete('/business/business/' + id)
+    },
+    /**
+     * @description 获取权限树
+     * @param {Number | String} roleId 角色id
+     * @param {Number} type 类型
+     * @returns
+     */
+    getRoleTree(roleId, type) {
+        return $axios.get(`/user/RoleResourcePrivilege/showRolePrivilege/${roleId}/${type}`)
     }
 }

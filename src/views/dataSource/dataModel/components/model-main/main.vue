@@ -53,7 +53,7 @@
                         <div class="txt">
                           <div class="icon"><img src="@/assets/images/icon_dimension.png" /></div>
                           <div class="name">{{item.alias}}</div>
-                        </div>  
+                        </div>
                       </div>
                     </a-collapse-panel>
                   </a-collapse>
@@ -75,7 +75,7 @@
                         <div class="txt">
                           <div class="icon"><img src="@/assets/images/icon_measure.png" /></div>
                           <div class="name">{{item.alias}}</div>
-                        </div>  
+                        </div>
                       </div>
                     </a-collapse-panel>
                   </a-collapse>
@@ -110,7 +110,7 @@ export default {
       renderTables: [], // 用来渲染树组件
       dimensionsActiveKey: [],
       measuresActiveKey: [],
-      customStyle:'border: 0',
+      customStyle: 'border: 0'
     }
   },
   computed: {
