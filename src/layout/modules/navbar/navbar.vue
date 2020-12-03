@@ -44,10 +44,12 @@ export default {
           const result = await this.$server.user.actionSwitchProject(value)
           if (result.code === 200) {
             await this.$store.dispatch('user/changeRole')
-            this.$EventBus.$emit('resetMenu')
-            this.$router.push({
-              path: '/'
-            })
+            window.location.reload()
+            // // this.$router.go(0)
+            // this.$EventBus.$emit('resetMenu')
+            // this.$router.push({
+            //   path: '/'
+            // })
           } else {
             this.$message.error(result.msg || '请求错误')
           }

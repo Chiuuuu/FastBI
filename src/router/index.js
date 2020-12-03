@@ -29,6 +29,7 @@ export function resetRouter() {
 }
 
 router.beforeEach(async (to, from, next) => {
+  console.log(from)
   BinUI.LoadingBar.start()
   Modal.destroyAll()
   store.dispatch('SingleSelected', null)
@@ -42,7 +43,14 @@ router.beforeEach(async (to, from, next) => {
     } else {
       const hasRouterPermission = store.state.user.routesModule && store.state.user.routesModule.length > 0
       if (hasRouterPermission) {
-        next()
+        const { redirectedFrom, name } = to
+        // 当切换项目重定向找不到的时候再跳转到首页
+        if (redirectedFrom && name === '404' && from.path === '/') {
+          next({ path: '/'})
+        } else {
+          next()
+        }
+        BinUI.LoadingBar.done()
       } else {
         try {
           // 获取用户的对应的路由权限
