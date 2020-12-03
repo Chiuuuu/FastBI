@@ -4,7 +4,7 @@
       <ul>
         <li
           class="z-clickable"
-          v-for="item in menus"
+          v-for="item in renderMenus"
           :key="item.name"
           @click="handleItemClick($event, item)"
         >
@@ -25,6 +25,7 @@
   </div>
 </template>
 <script>
+import { checkActionPermission } from '@/utils/permission'
 export default {
   name: 'contextMenu',
   props: {
@@ -42,6 +43,18 @@ export default {
     },
     remove: {
       type: Function
+    }
+  },
+  computed: {
+    renderMenus() {
+      return this.menus.filter(item => {
+        let hasPermission = true
+        if (item['permission']) {
+          const { OBJECT, OPERATOR} = item.permission
+          hasPermission = checkActionPermission(OBJECT, OPERATOR)
+        }
+        if (hasPermission) return item
+      })
     }
   },
   methods: {

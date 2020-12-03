@@ -171,6 +171,10 @@ export default {
       folderContenxtMenu: [
         {
           name: '添加连接',
+          permission: {
+            OPERATOR: PERMISSISON_CODE.OPERATOR.add,
+            OBJECT: PERMISSISON_CODE.OBJECT.datasource
+          },
           onClick: this.showModal
         },
         {
