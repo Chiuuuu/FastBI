@@ -50,7 +50,7 @@ const actions = {
     })
   },
   getInfo({ commit }) {
-    return new Promise((resolve,reject) => {
+    return new Promise((resolve, reject) => {
       // 根据token获取对应的权限
       server.user.getUserInfo().then(respone => {
         if (respone.code === 200) {

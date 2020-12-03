@@ -35,8 +35,14 @@ export function checkActionPermission(obj, value) {
             // 当没有对应的对象权限的时候
             return checkActionPermission('00', value)
         }
+        
+        if (actionPermissions.some(action => action === 0)) {
+            // 优先判断是否有全部权限
+            return true
+        }
+    
         let hasPermission
-        if (typeof value === 'string') {
+        if (typeof value === 'number') {
             hasPermission = actionPermissions.includes(value)
         } else if (Array.isArray(value)) {
             hasPermission = actionPermissions.some(action => value.includes(action))
