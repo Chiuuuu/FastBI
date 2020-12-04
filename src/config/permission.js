@@ -34,7 +34,7 @@ const PERMISSION_CODE = {
         project: '13', // 项目管理
         member: '14', // 成员管理
         role: '15', // 角色管理
-        dataprivilege: '16', // 数据权限管理
+        dataprivilege: '16' // 数据权限管理
     },
     OPERATOR: {
         all: 0, // 所有以下操作

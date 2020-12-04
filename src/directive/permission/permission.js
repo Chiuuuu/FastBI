@@ -8,7 +8,7 @@ function checkPermission(el, binding) {
             el.parentNode && el.parentNode.removeChild(el)
         }
     } else {
-        throw new Error(`need roles, like v-permission:[PERMISSISON_CODE.OPERATOR.add]="PERMISSISON_CODE.OBJECT.datasource"`)
+        throw new Error(`need roles, like v-permission:[PERMISSION_CODE.OPERATOR.add]="PERMISSION_CODE.OBJECT.datasource"`)
     }
 }
 

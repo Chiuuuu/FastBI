@@ -34,6 +34,7 @@
         type="primary"
         style="width:88px;height:30px;margin-left:150px"
         @click="handleConnect"
+        v-permission:[$PERMISSION_CODE.OPERATOR.edit]="$PERMISSION_CODE.OBJECT.datasource"
       >
         连接
       </a-button>

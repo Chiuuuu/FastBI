@@ -8,7 +8,7 @@
         </a>
         <a-menu slot="overlay" class="drow_menu">
           <a-menu-item
-          v-permission:[$PERMISSISON_CODE.OPERATOR.add]="$PERMISSISON_CODE.OBJECT.datasource"
+          v-permission:[$PERMISSION_CODE.OPERATOR.add]="$PERMISSION_CODE.OBJECT.datasource"
           v-on:click="showModal">
             添加连接
           </a-menu-item>
@@ -170,8 +170,8 @@ export default {
         {
           name: '添加连接',
           permission: {
-            OPERATOR: this.$PERMISSISON_CODE.OPERATOR.add,
-            OBJECT: this.$PERMISSISON_CODE.OBJECT.datasource
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.add,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.datasource
           },
           onClick: this.showModal
         },
@@ -195,6 +195,10 @@ export default {
         },
         {
           name: '删除',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.datasource
+          },
           onClick: this.handleFileDelete
         }
       ],
@@ -291,8 +295,8 @@ export default {
       this.$store.dispatch('dataAccess/setModelId', file.id)
       this.$store.dispatch('dataAccess/setParentId', file.parentId)
       this.$store.dispatch('dataAccess/setFirstFinished', true)
-      this.$EventBus.$emit('set-tab-index', '1')
       this.$emit('on-menuChange-componet', 'Main')
+      this.$EventBus.$emit('set-tab-index', '1')
     },
     /**
     * 删除菜单
@@ -469,8 +473,8 @@ export default {
       this.$store.dispatch('dataAccess/setModelInfo', {})
       this.$store.dispatch('dataAccess/setModelName', '')
       this.$EventBus.$emit('resetForm')
-      this.$EventBus.$emit('set-tab-index', '1')
       this.$emit('on-menuChange-componet', 'Main')
+      this.$EventBus.$emit('set-tab-index', '1')
       this.$store.dispatch('dataAccess/setModelSelectType', '')
     },
     /**

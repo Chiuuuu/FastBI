@@ -259,9 +259,6 @@ export default {
   mounted() {
     this.handleGetData()
   },
-  destroyed() {
-    this.$EventBus.$emit('set-tab-index', '1')
-  },
   filters: {
     formatField(value) {
       switch (value) {

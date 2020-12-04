@@ -6,7 +6,10 @@
         <a-dropdown :trigger="['click']" placement="bottomLeft">
           <a-icon type="plus-square" class="menu_icon" />
           <a-menu slot="overlay" class="drow_menu">
-            <a-menu-item v-on:click="addScreen">
+            <a-menu-item
+              v-on:click="addScreen"
+              v-permission:[$PERMISSION_CODE.OPERATOR.add]="$PERMISSION_CODE.OBJECT.screen"
+            >
               新建大屏
             </a-menu-item>
             <a-menu-item key="1" @click="addFolder">
@@ -68,7 +71,11 @@
         <a-button class="btn_n2">
           刷新数据
         </a-button>
-        <a-button type="primary" class="btn_pr" @click="editScreen">
+        <a-button
+          type="primary"
+          class="btn_pr"
+          v-permission:[$PERMISSION_CODE.OPERATOR.edit]="$PERMISSION_CODE.OBJECT.screen"
+          @click="editScreen">
           编辑大屏
         </a-button>
       </div>
@@ -138,6 +145,10 @@ export default {
       folderContenxtMenu: [
         {
           name: '新建大屏',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.add,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.screen
+          },
           onClick: this.handleScreen
         },
         {
@@ -156,6 +167,10 @@ export default {
         },
         {
           name: '删除',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.screen
+          },
           onClick: this.handleFileDelete
         }
       ],

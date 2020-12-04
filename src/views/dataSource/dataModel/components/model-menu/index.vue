@@ -8,7 +8,7 @@
         </a>
         <a-menu slot="overlay" class="drow_menu">
           <a-menu-item
-            v-permission:[$PERMISSISON_CODE.OPERATOR.add]="$PERMISSISON_CODE.OBJECT.datamodel"
+            v-permission:[$PERMISSION_CODE.OPERATOR.add]="$PERMISSION_CODE.OBJECT.datamodel"
             v-on:click="showModal">
             新建模型
           </a-menu-item>
@@ -175,8 +175,8 @@ export default {
         {
           name: '新建模型',
           permission: {
-            OPERATOR: this.$PERMISSISON_CODE.OPERATOR.add,
-            OBJECT: this.$PERMISSISON_CODE.OBJECT.datamodel
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.add,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.datamodel
           },
           onClick: this.handleFolderNewModel
         },
@@ -197,16 +197,16 @@ export default {
         {
           name: '重命名',
           permission: {
-            OPERATOR: this.$PERMISSISON_CODE.OPERATOR.rename,
-            OBJECT: this.$PERMISSISON_CODE.OBJECT.datamodel
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.rename,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.datamodel
           },
           onClick: this.handleFileResetName
         },
         {
           name: '删除',
           permission: {
-            OPERATOR: this.$PERMISSISON_CODE.OPERATOR.remove,
-            OBJECT: this.$PERMISSISON_CODE.OBJECT.datamodel
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.datamodel
           },
           onClick: this.handleFileDelete
         }
