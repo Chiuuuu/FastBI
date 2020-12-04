@@ -30,7 +30,7 @@
             </template>
             <template slot="convertType" slot-scope="text, record">
               <field-select
-                :text="text | formatField"
+                :text="(text || record.dataType) | formatField"
                 :select-data="record"
                 :contextmenus="fieldContenxtMenu"
                 :isDimension="record.role === 1"
@@ -258,6 +258,9 @@ export default {
   },
   mounted() {
     this.handleGetData()
+  },
+  destroyed() {
+    this.$EventBus.$emit('set-tab-index', '1')
   },
   filters: {
     formatField(value) {
