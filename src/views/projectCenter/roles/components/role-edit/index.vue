@@ -19,7 +19,7 @@
                 <a-input v-model="form.description"></a-input>
               </a-form-model-item>
             </a-form-model>
-            <RoleTabeRole status="edit"></RoleTabeRole>
+            <RoleTabeRole status="edit" @getChangeItem="getChangeItem"></RoleTabeRole>
             <RolesTabDataPermission status="edit"></RolesTabDataPermission>
           </div>
         </div>
@@ -84,7 +84,6 @@ export default {
   methods: {
     async handleGetRoleInfo() {
       const roleInfo = await this.$server.projectCenter.getRoleInfo(this.$route.params.id)
-      // const rolePermission = await this.$server.projectCenter.getRolePermission(this.fileSelectId)
       if (roleInfo.code === 200) {
         this.$store.commit('projectRoles/SET_ROLEINFO', roleInfo.data)
         this.form.name = roleInfo.data.name
@@ -92,17 +91,15 @@ export default {
       } else {
         this.$message.error(roleInfo.msg)
       }
-      // if (rolePermission.code === 200) {
-      //   this.$EventBus.$emit('setFormData')
-      // } else {
-      //   this.$message.error(roleInfo.msg)
-      // }
     },
     back() {
       // 切换回查看模式
       this.$router.push({
         path: '/projectCenter/roles/list'
       })
+    },
+    getChangeItem(role, item) {
+      console.log(role, item)
     },
     handleSave() {
       console.log('save')

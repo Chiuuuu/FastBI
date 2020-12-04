@@ -4,20 +4,23 @@
     <a-tabs class="tabs scrollbar" @change="handleChangeTab">
         <a-tab-pane style="padding-left: 16px" key="1" tab="数据大屏">
             <role-limit
+            v-on="$listeners"
             role-title="数据大屏"
-            :options="checkBoxList"
+            :options="modulePermission"
             />
         </a-tab-pane>
         <a-tab-pane style="padding-left: 16px" key="2" tab="数据模型">
             <role-limit
+            v-on="$listeners"
             role-title="数据模型"
-            :options="checkBoxList"
+            :options="modulePermission"
             />
         </a-tab-pane>
         <a-tab-pane style="padding-left: 16px" key="3" tab="数据接入">
             <role-limit
+            v-on="$listeners"
             role-title="数据接入"
-            :options="checkBoxList"
+            :options="modulePermission"
             />
         </a-tab-pane>
     </a-tabs>
@@ -32,6 +35,7 @@ export default {
         return {
             getProvideActionList: () => this.actionList,
             getProvideTreeData: () => this.treeData,
+            getCurrentRoleTab: () => this.currentTab,
             status: this.status
         }
     },
@@ -53,9 +57,9 @@ export default {
     data() {
         return {
             currentTab: '1',
-            checkBoxList: [],
+            modulePermission: {},
             actionList: [],
-            treeData: [],
+            treeData: []
         }
     },
     mounted() {
@@ -69,7 +73,7 @@ export default {
         async handleGetData() {
             const result = await this.$server.projectCenter.getRoleTree(this.roleId, this.currentTab)
             if (result.code === 200) {
-                this.checkBoxList = [].concat(result.data.basePrivilege.header)
+                this.modulePermission = result.data.basePrivilege
                 this.actionList = [].concat(result.data.header)
                 this.treeData = [].concat(result.data.folder)
             } else {

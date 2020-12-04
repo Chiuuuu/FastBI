@@ -3,7 +3,11 @@
     <a-row class="line">
       <a-col span="2">{{ roleTitle }}</a-col>
       <a-col>
-        <a-checkbox-group :options="options" :disabled="status === 'show'? true : false"></a-checkbox-group>
+        <a-checkbox-group
+          :options="options.header"
+          :disabled="status === 'show'? true : false"
+          @change="onCheck"
+          ></a-checkbox-group>
       </a-col>
     </a-row>
     <a-row class="line">
@@ -11,7 +15,7 @@
       <a-col span="2" align="left" v-for="item in injectActionList" :key="item.permission">{{item.name}}</a-col>
     </a-row>
     <div class="content scrollbar">
-      <limit-tree></limit-tree>
+      <limit-tree v-on="$listeners"></limit-tree>
     </div>
   </div>
 </template>
@@ -23,7 +27,7 @@ export default {
   inject: ['status', 'getProvideActionList'],
   props: {
     roleTitle: String,
-    options: Array
+    options: Object
   },
   components: {
     LimitTree
@@ -33,6 +37,11 @@ export default {
       return this.getProvideActionList()
     }
   },
+  methods: {
+    onCheck(value) {
+      this.options.permissions.push(value)
+    }
+  }
   // watch: {
   //   injectActionList: {
   //     deep: true,

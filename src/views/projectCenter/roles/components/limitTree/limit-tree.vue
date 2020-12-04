@@ -32,7 +32,7 @@
 <script>
 export default {
   name: 'limitTree',
-  inject: ['status', 'getProvideActionList', 'getProvideTreeData'],
+  inject: ['status', 'getProvideActionList', 'getProvideTreeData', 'getCurrentRoleTab', 'abc'],
   data() {
     return {
       replaceFields: {
@@ -49,6 +49,9 @@ export default {
     },
     injectTreeData() {
       return this.getProvideTreeData()
+    },
+    injectRoleTab() {
+      return this.getCurrentRoleTab()
     }
   },
   methods: {
@@ -63,14 +66,15 @@ export default {
       if (checked) {
         if (item.permissions.length === 0 || (!item.permissions.includes('read') && !item.permissions.includes(permission))) {
           item.permissions.push('read')
-          item.permissions.push(permission)
-        } else if (item.permissions.includes('read') && !item.permissions.includes(permission)){
+          if (permission !== 'read') item.permissions.push(permission)
+        } else if (item.permissions.includes('read') && !item.permissions.includes(permission)) {
           item.permissions.push(permission)
         }
       } else {
         const index = item.permissions.indexOf(permission)
         item.permissions.splice(index, 1)
       }
+      this.$emit('getChangeItem', this.injectRoleTab, item)
     }
   }
 }
