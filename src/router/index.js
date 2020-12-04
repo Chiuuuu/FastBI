@@ -45,7 +45,8 @@ router.beforeEach(async (to, from, next) => {
       if (hasRouterPermission) {
         const { redirectedFrom, name } = to
         // 当切换项目重定向找不到的时候再跳转到首页
-        if (redirectedFrom && name === '404' && from.path === '/') {
+        // if (redirectedFrom && name === '404' && from.path === '/') { // 重刷方法1,但是会闪白
+        if(redirectedFrom && name === '404' && from.path === redirectedFrom) { 
           next({ path: '/'})
         } else {
           next()
