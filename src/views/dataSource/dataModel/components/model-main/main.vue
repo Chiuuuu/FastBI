@@ -8,7 +8,10 @@
         <div class="header">
           <span class="data_con">{{detailInfo.name}}</span>
           <div class="data_btn">
-              <a-button type="primary" v-on:click="edit">编辑模型</a-button>
+              <a-button
+                v-permission:[$PERMISSISON_CODE.OPERATOR.edit]="$PERMISSISON_CODE.OBJECT.datamodel"
+                type="primary"
+                v-on:click="edit">编辑模型</a-button>
               <a-button @click="handleGetData">刷新数据</a-button>
           </div>
         </div>

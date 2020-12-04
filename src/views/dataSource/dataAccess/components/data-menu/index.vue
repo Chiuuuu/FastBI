@@ -8,7 +8,7 @@
         </a>
         <a-menu slot="overlay" class="drow_menu">
           <a-menu-item
-          v-permission:[PERMISSISON_CODE.OPERATOR.add]="PERMISSISON_CODE.OBJECT.datasource"
+          v-permission:[$PERMISSISON_CODE.OPERATOR.add]="$PERMISSISON_CODE.OBJECT.datasource"
           v-on:click="showModal">
             添加连接
           </a-menu-item>
@@ -124,7 +124,6 @@ import { fetchTableInfo, fetchDeleteMenuById } from '../../../../../api/dataAcce
 import MenuFile from '@/components/dataSource/menu-group/file'
 import MenuFolder from '@/components/dataSource/menu-group/folder'
 import debounce from 'lodash/debounce'
-import PERMISSISON_CODE from '@/config/permission'
 export default {
   name: 'dataMenu',
   props: {
@@ -141,7 +140,6 @@ export default {
   },
   data() {
     return {
-      PERMISSISON_CODE,
       modelList: ['mysql', 'oracle', 'hive', 'excel', 'csv'].map(function(item) {
       // modelList: ['mysql', 'oracle', 'excel'].map(function(item) {
         // 弹窗选项列表
@@ -172,8 +170,8 @@ export default {
         {
           name: '添加连接',
           permission: {
-            OPERATOR: PERMISSISON_CODE.OPERATOR.add,
-            OBJECT: PERMISSISON_CODE.OBJECT.datasource
+            OPERATOR: this.$PERMISSISON_CODE.OPERATOR.add,
+            OBJECT: this.$PERMISSISON_CODE.OBJECT.datasource
           },
           onClick: this.showModal
         },

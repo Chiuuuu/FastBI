@@ -14,6 +14,7 @@ import './styles/index.styl'
 import server from '@/api/index'
 
 import permission from '@/directive/permission'
+import PERMISSISON_CODE from '@/config/permission'
 
 // element-ui 局部引用
 Vue.use(Button)
@@ -30,7 +31,7 @@ Vue.use(permission)
 Vue.prototype.$server = server
 Vue.prototype.$EventBus = new Vue()
 Vue.prototype.$base = process.env.NODE_ENV === 'production' ? '/bin-data-site' : ''
-
+Vue.prototype.$PERMISSISON_CODE = PERMISSISON_CODE
 // if (sessionStorage.getItem('store')) {
 //   store.replaceState(
 //     Object.assign({}, store.state, JSON.parse(sessionStorage.getItem('store')))
