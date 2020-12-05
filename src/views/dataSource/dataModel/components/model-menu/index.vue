@@ -7,7 +7,9 @@
           <a-icon type="plus-square" class="menu_icon" />
         </a>
         <a-menu slot="overlay" class="drow_menu">
-          <a-menu-item v-on:click="showModal">
+          <a-menu-item
+            v-permission:[$PERMISSION_CODE.OPERATOR.add]="$PERMISSION_CODE.OBJECT.datamodel"
+            v-on:click="showModal">
             新建模型
           </a-menu-item>
           <a-menu-item @click="handleAddNewFolder">
@@ -172,6 +174,10 @@ export default {
       folderContenxtMenu: [
         {
           name: '新建模型',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.add,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.datamodel
+          },
           onClick: this.handleFolderNewModel
         },
         {
@@ -190,10 +196,18 @@ export default {
         },
         {
           name: '重命名',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.rename,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.datamodel
+          },
           onClick: this.handleFileResetName
         },
         {
           name: '删除',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.datamodel
+          },
           onClick: this.handleFileDelete
         }
       ]
@@ -459,8 +473,10 @@ export default {
     handleSearchSource: debounce(function(event) {
       const value = event.target.value
       this.sourceSearch = value
-      this.handleGetSourceSearchList(value)
-      console.log('input', value)
+      if (value) {
+        this.handleGetSourceSearchList(value)
+        console.log('input', value)
+      }
     }, 400),
     handleGetSourceSearchList(value) {
       let result = []
@@ -477,8 +493,10 @@ export default {
     handleSearchModel: debounce(function(event) {
       const value = event.target.value
       this.modelSearch = value
-      this.handleGetModelSearchList(value)
-      console.log('input', value)
+      if (value) {
+        this.handleGetModelSearchList(value)
+        console.log('input', value)
+      }
     }, 400),
     handleGetModelSearchList(value) {
       let result = []

@@ -4,10 +4,10 @@
       <div class="right edit">
         <div class="tab scrollbar">
           <header>
-            <span>编辑行级权限</span>
+            <span>编辑{{ type === 'row' ? '行' : '列' }}级权限</span>
             <div>
-              <a-button class="main-button" type="primary" @click="handleSave">保存</a-button>
-              <a-button class="main-button" @click="back">返回</a-button>
+              <a-button class="main-button" type="primary" @click="handleSave">保 存</a-button>
+              <a-button class="main-button" @click="back">退 出</a-button>
             </div>
           </header>
           <a-form-model class="role-form" ref="form" :model="form" :rules="rules" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
@@ -20,6 +20,7 @@
           </a-form-model>
           <div class="title">数据权限</div>
           <div class="content scrollbar">
+            <PermissionTable :type="type" mode="edit" />
           </div>
         </div>
       </div>
@@ -29,15 +30,17 @@
 
 <script>
 import { mapState } from 'vuex'
+import PermissionTable from '../tab-content/permission-table'
+
 export default {
-  name: 'permEditRow',
+  name: 'permEditCol',
   components: {
-    
+    PermissionTable
   },
   data() {
     return {
-      currentTab: '1',
       spinning: false,
+      type: this.$route.query.type,
       detailInfo: {},
       form: {
         name: '',
@@ -69,32 +72,32 @@ export default {
   },
   computed: {
     ...mapState({
-      roleId: state => state.projectRoles.roleId,
-      formInfo: state => state.projectRoles.roleInfo
+      permissionId: state => state.projectPermissions.permissionId,
+      formInfo: state => state.projectPermissions.permissionInfo
     })
   },
-  created() {
-    this.handleGetRoleInfo()
-  },
-  beforeDestroy() {
-    this.$EventBus.$off('set-tab-index', this.handleSetTab)
+  mounted() {
+    this.handleGetPermissionInfo()
+    this.$store.commit('projectPermissions/SET_PERMISSIONID', this.$route.params.id)
   },
   methods: {
-    handleChangeTab(activeKey) {
-      this.currentTab = activeKey
-    },
-    async handleGetRoleInfo() {
-
+    async handleGetPermissionInfo() {
+      this.spinning = true
+      this.spinning = false
     },
     back() {
       // 切换回查看模式
-      this.$store.commit('projectPermissions/SET_PERMISSIONMODE', 'check')
-      this.$router.push({
-        path: '/projectCenter/permissions/list'
-      })
+      this.$store.commit('projectPermissions/SET_EDITTYPE', this.$route.query.type)
+      this.$router.go(-1)
     },
     handleSave() {
-      console.log('save')
+      this.$refs.form.validate((ok, obj) => {
+        if (ok) {
+          this.$message.success('保存成功')
+          this.$store.commit('projectPermissions/SET_PERMISSIONID', 'id')
+          this.back()
+        }
+      })
     }
   }
 }
@@ -102,7 +105,14 @@ export default {
 
 <style lang="less" scoped>
 @import "../../../main";
-.main .right .content {
-  height: calc(100% - 122px);
+.main .edit.right .content {
+  height: calc(100% - 186px);
+  @{deep} .ant-form-item-label {
+      width: 100px !important;
+      padding-left: 16px;
+      label {
+          color: rgba(0, 0, 0, 0.65);
+      }
+  }
 }
 </style>

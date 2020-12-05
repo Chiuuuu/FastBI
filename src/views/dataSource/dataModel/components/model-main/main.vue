@@ -8,7 +8,10 @@
         <div class="header">
           <span class="data_con">{{detailInfo.name}}</span>
           <div class="data_btn">
-              <a-button type="primary" v-on:click="edit">编辑模型</a-button>
+              <a-button
+                v-permission:[$PERMISSION_CODE.OPERATOR.edit]="$PERMISSION_CODE.OBJECT.datamodel"
+                type="primary"
+                v-on:click="edit">编辑模型</a-button>
               <a-button @click="handleGetData">刷新数据</a-button>
           </div>
         </div>
@@ -42,18 +45,21 @@
                   <span class="dim_span">维度</span>
                 </div>
                 <div class="dim_menu scrollbar">
-                  <a-menu mode="inline" v-for="(value, name) in dimensions" :key="name" :default-open-keys="[name]" :inline-collapsed="false">
-                    <a-sub-menu :key="name">
-                      <span slot="title"><span>{{value[0].tableName}}</span></span>
-                      <a-menu-item v-for="item in value" :key="item.id">
-                        <img
-                          src="@/assets/images/icon_dimension.png"
-                          style="width:15px;height:15px"
-                        />
-                        {{item.alias}}
-                      </a-menu-item>
-                    </a-sub-menu>
-                  </a-menu>
+                  <a-collapse :bordered="false" v-model="dimensionsActiveKey">
+                    <a-collapse-panel
+                      v-for="(value, name) in dimensions"
+                      :key="name"
+                      :style="customStyle"
+                      :header="value[0].tableName"
+                    >
+                      <div class="u-bitem" v-for="item in value" :key="item.id">
+                        <div class="txt">
+                          <div class="icon"><img src="@/assets/images/icon_dimension.png" /></div>
+                          <div class="name">{{item.alias}}</div>
+                        </div>
+                      </div>
+                    </a-collapse-panel>
+                  </a-collapse>
                 </div>
               </div>
               <div class="measurement">
@@ -61,18 +67,21 @@
                   <span class="mea_span">度量</span>
                 </div>
                 <div class="mea_menu scrollbar">
-                  <a-menu mode="inline" v-for="(value, name) in measures" :key="name" :default-open-keys="[name]" :inline-collapsed="false">
-                    <a-sub-menu :key="name">
-                      <span slot="title"><span>{{value[0].tableName}}</span></span>
-                      <a-menu-item v-for="item in value" :key="item.id">
-                        <img
-                          src="@/assets/images/icon_measure.png"
-                          style="width:15px;height:15px"
-                        />
-                        {{item.alias}}
-                      </a-menu-item>
-                    </a-sub-menu>
-                  </a-menu>
+                  <a-collapse :bordered="false" v-model="measuresActiveKey">
+                    <a-collapse-panel
+                      v-for="(value, name) in measures"
+                      :key="name"
+                      :style="customStyle"
+                      :header="value[0].tableName"
+                    >
+                      <div class="u-bitem" v-for="item in value" :key="item.id">
+                        <div class="txt">
+                          <div class="icon"><img src="@/assets/images/icon_measure.png" /></div>
+                          <div class="name">{{item.alias}}</div>
+                        </div>
+                      </div>
+                    </a-collapse-panel>
+                  </a-collapse>
                 </div>
               </div>
             </div>
@@ -88,6 +97,7 @@ import TreeNode from './show-tree-node'
 import { Node, conversionTree } from '../../util'
 import { mapState } from 'vuex'
 import groupBy from 'lodash/groupBy'
+import keys from 'lodash/keys'
 export default {
   name: 'model-main',
   components: {
@@ -100,7 +110,10 @@ export default {
       tablesEmpty: false, // 是否表为空
       dimensions: '', // 维度
       measures: '', // 度量
-      renderTables: [] // 用来渲染树组件
+      renderTables: [], // 用来渲染树组件
+      dimensionsActiveKey: [],
+      measuresActiveKey: [],
+      customStyle: 'border: 0'
     }
   },
   computed: {
@@ -189,15 +202,15 @@ export default {
      * 维度数据处理
     */
     handleDimensions() {
-      console.log(groupBy(this.detailInfo.pivotSchema.dimensions, 'tableNo'))
       this.dimensions = groupBy(this.detailInfo.pivotSchema.dimensions, 'tableNo')
+      this.dimensionsActiveKey = [].concat(keys(this.dimensions))
     },
     /**
      * 度量数据处理
     */
     handleMeasures() {
-      console.log(groupBy(this.detailInfo.pivotSchema.measures, 'tableNo'))
       this.measures = groupBy(this.detailInfo.pivotSchema.measures, 'tableNo')
+      this.measuresActiveKey = [].concat(keys(this.measures))
     }
   }
 }

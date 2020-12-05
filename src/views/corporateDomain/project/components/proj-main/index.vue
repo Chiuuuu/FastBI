@@ -3,78 +3,92 @@
     <div class="right" style="padding-top:16px">
       <div class="role-list-controller">
         <div class="searchbar">
-          <a-form-model layout="inline" :model="userSearch">
-            <a-form-model-item label="项目名称" prop="username">
-              <a-input placeholder="请输入项目名称" v-model="userSearch.name" style="width: 200px"></a-input>
+          <a-form-model layout="inline" :model="searchForm">
+            <a-form-model-item label="项目名称" prop="projectName">
+              <a-input placeholder="请输入项目名称" v-model="searchForm.projectName" style="width: 200px"></a-input>
             </a-form-model-item>
-            <a-form-model-item label="管理员" prop="name">
-              <a-input placeholder="请输入管理员姓名" v-model="userSearch.admins" style="width: 200px"></a-input>
+            <a-form-model-item label="管理员" prop="adminName">
+              <a-input placeholder="请输入管理员姓名" v-model="searchForm.adminName" style="width: 200px"></a-input>
             </a-form-model-item>
-            <a-button class="main-button" type="primary" @click="getList">查询</a-button>
-            <a-button class="main-button" type="primary" @click="resetForm">重置</a-button>
+            <a-form-model-item>
+              <a-button type="primary" @click="() => handleGetListData()" :disabled="loading">查询</a-button>
+            </a-form-model-item>
+            <a-form-model-item>
+              <a-button type="primary" @click="handleResetForm" :disabled="loading">重置</a-button>
+            </a-form-model-item>
           </a-form-model>
         </div>
-        <a-button class="main-button" type="primary" @click="showModal('add')">添加项目</a-button>
+        <a-button class="btn-add" type="primary" @click="showModal('add')" :disabled="loading">添加项目</a-button>
       </div>
       <a-table
         class="role-list-table scrollbar"
-        row-key="id"
-        :columns="userColumn"
-        :data-source="userData"
+        row-key="projectId"
+        :columns="listColumn"
+        :data-source="listData"
         :loading="loading"
+        :pagination="pagination"
+        @change="handleTableChange"
       >
-        <template #admins="text">
-          {{ text.toString() }}
+        <template #adminName="text, record">
+          {{ record.adminName }}
         </template>
-        <template #config="text, record">
+        <template #config="text, record, index">
           <a-popover placement="left" trigger="click">
             <template slot="content">
-              <div :title="projectUsers.manager.toString()" class="pop-user-list">
-                管理员：{{ projectUsers.manager.toString() }}
-              </div>
-              <div :title="projectUsers.subManager.toString()" class="pop-user-list">
-                二级管理员：{{ projectUsers.subManager.toString() }}
-              </div>
-              <div :title="projectUsers.editor.toString()" class="pop-user-list">
-                编辑者：{{ projectUsers.editor.toString() }}
-              </div>
+              <a-spin :spinning="getUserByProjectLoading" size="small">
+                <div
+                  v-for="(item, index) in projectUsers"
+                  :key="index"
+                  :title="item.userName"
+                  class="pop-user-list">
+                  {{item.roleName}}: {{item.userName}}
+                </div>
+              </a-spin>
             </template>
             <a class="handler-margin" @click="handleCheckUsers(record)">查看项目用户</a>
           </a-popover>
           <a class="handler-margin" @click="handleEdit(record)">编辑</a>
-          <a-popconfirm title="是否要删除？" ok-text="确定" cancel-text="取消" @confirm="handleDelete(record.id)">
+          <a-popconfirm title="是否要删除？" ok-text="确定" cancel-text="取消" @confirm="handleDelete(record, index)">
             <a href="#">删除</a>
           </a-popconfirm>
         </template>
       </a-table>
     </div>
-    <a-modal title="添加项目" v-model="visible" @ok="handleOk" @close="clearModal">
-      <a-form-model :model="form" :rules="rules" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
-        <a-form-model-item label="项目名称" prop="name">
+    <a-modal
+      v-model="visible"
+      :title="modalType === 'add' ? '添加项目' : '编辑项目'"
+      :maskClosable="false"
+      :confirmLoading="confirmLoading"
+      @ok="handleModalSubmit"
+      @cancel="clearModal">
+      <a-form-model ref="form" :model="form" :rules="rules" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
+        <a-form-model-item label="项目名称" prop="projectName">
           <a-input
             mode="multiple"
-            v-model="form.name"
+            v-model="form.projectName"
             style="width: 100%"
             placeholder="请输入项目名称"
           />
         </a-form-model-item>
-        <a-form-model-item label="项目描述" prop="description">
+        <a-form-model-item label="项目描述" prop="projectDesc">
           <a-input
             mode="multiple"
-            v-model="form.description"
+            v-model="form.projectDesc"
             style="width: 100%"
             placeholder="请输入项目描述"
           />
         </a-form-model-item>
-        <a-form-model-item label="管理员" prop="admins">
+        <a-form-model-item label="管理员" prop="adminList">
+          <a-button block v-if="adminListLoading" :loading="adminListLoading"/>
           <a-select
+            v-else
             mode="multiple"
-            v-model="form.admins"
+            v-model="form.adminList"
             style="width: 100%"
             placeholder="请选择管理员"
           >
-            <a-select-option v-for="i in 25" :key="(i + 9).toString(36) + i">
-              {{ (i + 9).toString(36) + i }}
+            <a-select-option v-for="item in adminList" :key="item.id" :value="item.id" :disabled="modalType !=='add' && item.roleId === '1'">
+              {{ item.name }}
             </a-select-option>
           </a-select>
         </a-form-model-item>
@@ -84,47 +98,34 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
-
-const userData = []
-for (let i = 0; i < 30; i++) {
-  userData.push({
-    id: i + 1,
-    name: '嘿嘿嘿',
-    admins: ['打工人1', '打工人2'],
-    userCnt: 10,
-    screenCnt: 10,
-    description: '描述11111111111111111111111111111111111111111111111111111111111111111111111',
-    gmtCreate: '2020-11-20 14:06:00'
-  })
-}
-const userColumn = [
+import omit from 'lodash/omit'
+const listColumn = [
   {
     title: '项目名称',
-    dataIndex: 'name'
+    dataIndex: 'projectName'
   },
   {
     title: '管理员',
-    dataIndex: 'admins',
-    scopedSlots: { customRender: 'admins' }
+    dataIndex: 'adminName',
+    scopedSlots: { customRender: 'adminName' }
   },
   {
     title: '用户数',
-    dataIndex: 'userCnt'
+    dataIndex: 'userCount'
   },
   {
     title: '大屏数量',
-    dataIndex: 'screenCnt'
+    dataIndex: 'screenCount'
   },
   {
     title: '项目描述',
-    dataIndex: 'description',
+    dataIndex: 'projectDesc',
     width: 200,
     ellipsis: true
   },
   {
     title: '创建时间',
-    dataIndex: 'gmtCreate',
+    dataIndex: 'create_time',
     width: 200,
     ellipsis: true
   },
@@ -138,23 +139,19 @@ const userColumn = [
 
 export default {
   name: 'projMain',
-  components: {
-
-  },
   data() {
     return {
-      spinning: false,
       loading: false,
       visible: false,
       modalType: '', // 判断是编辑还是新增
-      rowId: '', // 当前编辑的用户id
-      detailInfo: {},
-      form: {
-        username: '',
-        users: []
+      rowProjectId: '', // 当前编辑的id
+      form: { // 添加新项目表单
+        projectName: '',
+        projectDes: '',
+        adminList: []
       },
       rules: {
-        name: [
+        projectName: [
           { required: true, message: '请填写项目名' },
           {
             type: 'string',
@@ -163,82 +160,160 @@ export default {
             message: '长度为1~20'
           }
         ],
-        description: [
-          { required: true, message: '请填写描述' }
+        projectDesc: [
+          { required: true, message: '请填写描述' },
+          { type: 'string', max: 200, message: '不得超过200个字符' }
         ],
-        admins: [
-          { required: true, message: '请填写描述' }
+        adminList: [
+          { required: true, message: '请选择管理员' }
         ]
       },
-      userSearch: {
-        name: '',
-        admins: ''
+      confirmLoading: false,
+      searchForm: { // 搜索表单
+        projectName: '',
+        adminName: ''
       },
-      projectUsers: {
-        manager: [],
-        subManager: [],
-        editor: []
+      projectUsers: [],
+      getUserByProjectLoading: false,
+      listData: [],
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        total: 0
       },
-      userData: [],
-      userColumn
+      listColumn,
+      adminListLoading: false,
+      adminList: []
     }
   },
-  computed: {
-    ...mapState({
-      roleId: state => state.projectRoles.roleId,
-      formInfo: state => state.projectRoles.roleInfo
-    })
+  watch: {
+    modalType(newValue) {
+      if (newValue === 'add') {
+        this.form = this.$options.data().form
+      }
+    }
   },
-  created() {
-    this.getList()
+  mounted() {
+    this.handleGetListData()
   },
   methods: {
+    handleTableChange(pagination) {
+      this.handleGetListData(pagination)
+    },
     showModal(type) {
       this.visible = true
       this.modalType = type
+      this.handleGetAdminList()
+    },
+    async handleGetAdminList() {
+      this.adminListLoading = true
+      const result = await this.$server.corporateDomain.getAdminList().finally(() => {
+        this.adminListLoading = false
+      })
+      if (result.code === 200) {
+        this.adminList = [].concat(result.data)
+      } else {
+        this.$message.error(result.msg || '请求错误')
+      }
     },
     clearModal() {
+      this.rowProjectId = ''
       this.form = this.$options.data().form
+      this.$refs.form.resetFields()
     },
-    resetForm() {
-      this.userSearch = this.$options.data().userSearch
+    handleResetForm() {
+      this.searchForm = this.$options.data().searchForm
     },
-    handleOk() {
-      const params = this.form
-      if (this.modalType === 'add') {
-        // 新增保存
-      } else if (this.modalType === 'edit') {
-        // 编辑保存
-        params.id = this.rowId
-      }
-      this.visible = false
-      this.clearModal()
-    },
-    handleDelete({ id }) {
-      console.log('删除id: ', id)
-    },
-    handleEdit(data) {
-      this.form = Object.assign({}, {
-        name: data.name,
-        description: data.description,
-        admins: data.admins
+    handleModalSubmit() {
+      this.$refs.form.validate(async valid => {
+        if (valid) {
+          this.confirmLoading = true
+          let result
+          if (this.modalType === 'add') {
+            // 新增保存
+            result = await this.$server.corporateDomain.addNewProject(this.form).finally(() => {
+              this.confirmLoading = false
+            })
+          } else if (this.modalType === 'edit') {
+            // 编辑保存
+            const params = {
+              ...this.form,
+              projectId: this.rowProjectId
+            }
+            result = await this.$server.corporateDomain.putProject(params).finally(() => {
+              this.confirmLoading = false
+            })
+          }
+          if (result.code === 200) {
+            this.$message.success(this.modalType === 'add' ? '添加成功' : '编辑成功', 1).then(() => {
+              this.handleGetListData()
+              this.visible = false
+              this.clearModal()
+            })
+          } else {
+            this.$message.error(result.msg || '请求错误')
+          }
+        } else {
+          return false
+        }
       })
-      this.rowId = data.id
-      this.showModal('edit')
     },
-    handleCheckUsers(data) {
-      this.projectUsers = {
-        manager: ['张三', '李四'],
-        subManager: ['王五', '王武'],
-        editor: ['王屋']
+    async handleDelete({ projectId }, index) {
+      const result = await this.$server.corporateDomain.deleProject(projectId)
+      if (result.code === 200) {
+        this.listData.splice(index, 1)
+        this.$message.success('删除成功', 1)
+      } else {
+        this.$message.error(result.msg || '请求错误')
       }
     },
-    async getList() {
+    async handleEdit({ projectId }) {
+      this.rowProjectId = projectId
+      const result = await this.$server.corporateDomain.getProjectInfoById(projectId)
+
+      if (result.code === 200) {
+        const list = result.data.adminList.map(item => item.id)
+        this.form = Object.assign(this.form, {
+          ...result.data,
+          adminList: list
+        })
+        this.showModal('edit')
+      } else {
+        this.$message.error(result.msg || '请求错误')
+      }
+    },
+    async handleCheckUsers({ projectId }) {
+      this.getUserByProjectLoading = true
+      const result = await this.$server.corporateDomain.getUserByProject(projectId).finally(() => {
+        this.getUserByProjectLoading = false
+      })
+      if (result.code === 200) {
+        this.projectUsers = [].concat(result.data)
+      } else {
+        this.$message.error(result.msg || '请求错误')
+      }
+    },
+    async handleGetListData(pagination) {
       this.loading = true
-      setTimeout(() => {
-        this.userData = userData
+
+      const params = Object.assign({}, this.searchForm, {
+        ...omit(this.pagination, 'total'),
+        current: pagination ? pagination.current : this.$options.data().pagination.current
+      })
+
+      const result = await this.$server.corporateDomain.getProjectList(params).finally(() => {
         this.loading = false
-      }, 400)
+      })
+      if (result.code === 200) {
+        this.listData = [].concat(result.rows)
+
+        Object.assign(this.pagination, {
+          current: params.current,
+          total: result.total
+        })
+      } else {
+        this.$message.error(result.msg || '请求错误')
+      }
     }
   }
 }

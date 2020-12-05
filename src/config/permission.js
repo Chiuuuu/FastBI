@@ -18,18 +18,23 @@ const PERMISSION_CODE = {
         project: 8 // 项目管理
     },
     OBJECT: {
-        all: '0', // 该模块下所有对象
-        datasource: '1', // 数据源 即数据接入
-        database: '2', // 数据库
-        table: '3', // 数据表
-        field: '4', // 数据字段
-        scheduler: '5', // 定时任务
-        operateLog: '6', // 操作日志
-        datamodel: '7', // 数据模型
-        pivotschema: '8', // 维度
-        widetable: '9', // 宽表
+        all: '00', // 该模块下所有对象
+        datasource: '01', // 数据源 即数据接入
+        database: '02', // 数据库
+        table: '03', // 数据表
+        field: '04', // 数据字段
+        scheduler: '05', // 定时任务
+        operateLog: '06', // 操作日志
+        datamodel: '07', // 数据模型
+        pivotschema: '08', // 维度度量
+        widetable: '09', // 宽表
         screen: '10', // 大屏
-        catalog: '11' // 目录菜单
+        folder: '11', // 目录菜单
+        user: '12', // 人员管理
+        project: '13', // 项目管理
+        member: '14', // 成员管理
+        role: '15', // 角色管理
+        dataprivilege: '16' // 数据权限管理
     },
     OPERATOR: {
         all: 0, // 所有以下操作

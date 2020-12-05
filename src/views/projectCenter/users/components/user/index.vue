@@ -8,30 +8,38 @@
                 <a-form-model-item label="姓名" prop="name">
                     <a-input v-model="userMangeForm.name" class="form-item" placeholder="请输入姓名"></a-input>
                 </a-form-model-item>
-                <a-form-model-item label="用户角色" prop="role">
-                    <a-select v-model="userMangeForm.role" mode="multiple" class="form-item" placeholder="请选择角色">
-                        <a-select-option v-for="i in 25" :key="(i + 9).toString(36) + i">
-                        {{ (i + 9).toString(36) + i }}
+                <a-form-model-item label="用户角色" prop="roleId">
+                    <a-select
+                       :disabled='roleLoading'
+                        show-search
+                        v-model="userMangeForm.roleId"
+                        class="form-item"
+                        placeholder="请选择角色">
+                        <a-select-option v-for="item in roleList" :key="item.id" :value="item.id">
+                        {{ item.name }}
                         </a-select-option>
                     </a-select>
                 </a-form-model-item>
                 <a-form-model-item>
-                    <a-button type="primary" @click="handleGetData" :disabled="loading">查询</a-button>
+                    <a-button type="primary" @click="() => handleGetTableList()" :disabled="loading">查询</a-button>
                 </a-form-model-item>
                 <a-form-model-item>
                     <a-button type="primary" @click="handleRestForm" :disabled="loading">重置</a-button>
                 </a-form-model-item>
             </a-form-model>
-            <a-button class="btn-add" type="primary" @click="handleShowModal('add')">添加</a-button>
+            <a-button class="btn-add" type="primary" @click="handleShowModal('add')" :disabled="loading">添加</a-button>
         </div>
         <div class="role-list-table scrollbar">
             <a-table
                 row-key="id"
                 :columns="usersColumn"
                 :data-source="usersData"
-                :loading="loading">
+                :loading="loading"
+                :pagination="pagination"
+                :scroll="{ y: 'calc(100vh - 350px)', x: 770 }"
+                @change="handleTableChange">
                 <template #config="text, record, index">
-                    <a @click="handleEditUser(record)" style="margin-right: 20px">编辑</a>
+                    <a @click="handleEditUser(record, index)" style="margin-right: 20px">编辑</a>
                     <a-popconfirm title="是否要删除？" ok-text="确定" cancel-text="取消" @confirm="handleDeleteUser(record, index)">
                         <a href="#">删除</a>
                     </a-popconfirm>
@@ -51,24 +59,32 @@
                 :rules="rules"
                 :label-col="{ span: 6 }"
                 :wrapper-col="{ span: 16 }">
-                <a-form-model-item label="用户名" prop="username">
-                    <a-input
+                <a-form-model-item label="用户名" prop="userIds">
+                    <a-select
                         mode="multiple"
-                        v-model="modalForm.username"
+                        :disabled="modalType !== 'add'"
+                        v-model="modalForm.userIds"
+                        :filter-option="false"
+                        :not-found-content="fetching ? undefined : null"
                         style="width: 100%"
-                        placeholder="请输入用户名"
+                        placeholder="请输入用户名/姓名"
+                        @search="handleGetModalUserList"
                     >
-                    </a-input>
+                        <a-spin v-if="fetching" slot="notFoundContent" size="small" />
+                        <a-select-option v-for="item in modalUserList" :key="item.id">
+                            {{ item.username }}
+                        </a-select-option>
+                    </a-select>
                 </a-form-model-item>
-                <a-form-model-item label="用户角色" prop="users">
+                <a-form-model-item label="用户角色" prop="roleIds">
                 <a-select
                     mode="multiple"
-                    v-model="modalForm.users"
+                    v-model="modalForm.roleIds"
                     style="width: 100%"
                     placeholder="请选择用户角色"
                 >
-                    <a-select-option v-for="i in 25" :key="(i + 9).toString(36) + i">
-                    {{ (i + 9).toString(36) + i }}
+                    <a-select-option v-for="item in roleList" :key="item.id" :value="item.id">
+                    {{ item.name }}
                     </a-select-option>
                 </a-select>
                 </a-form-model-item>
@@ -77,50 +93,33 @@
     </div>
 </template>
 <script>
-const usersData = []
-for (let i = 0; i < 30; i++) {
-  let item
-  if ([2, 4].includes(i)) {
-    item = {
-      id: i + 1,
-      name: '嘿嘿嘿',
-      phone: '12345678910',
-      role: '打工人' + (i + 1) + '号',
-      gmtCreate: '2020-11-19 15:09'
-    }
-  } else {
-    item = {
-      id: i + 1,
-      name: '嘿嘿嘿',
-      phone: '12345678910',
-      role: '打工人' + (i + 1) + '号',
-      username: 'admin' + i,
-      gmtCreate: '2020-11-19 15:09'
-    }
-  }
-
-  usersData.push(item)
-}
-
+import debounce from 'lodash/debounce'
+import omit from 'lodash/omit'
 const usersColumn = [
   {
     title: '用户名',
+    width: 150,
+    ellipsis: true,
     dataIndex: 'username'
   },
   {
     title: '姓名',
+    width: 100,
+    ellipsis: true,
     dataIndex: 'name'
   },
   {
     title: '电话',
+    width: 120,
+    ellipsis: true,
     dataIndex: 'phone'
   },
   {
     title: '用户角色',
-    dataIndex: 'role'
+    dataIndex: 'roleName'
   },
   {
-    title: '创建时间',
+    title: '添加时间',
     dataIndex: 'gmtCreate',
     width: 200,
     ellipsis: true
@@ -128,6 +127,8 @@ const usersColumn = [
   {
     title: '操作',
     dataIndex: 'config',
+    fixed: 'right',
+    width: 120,
     scopedSlots: { customRender: 'config' }
   }
 ]
@@ -136,37 +137,37 @@ export default {
     name: 'userManage',
     data() {
         return {
-            usersData,
-            usersColumn,
+            usersData: [], // 用户列表数据
+            pagination: {
+                current: 1,
+                pageSize: 10,
+                total: 0
+            },
+            roleList: [], // 角色列表数据
+            usersColumn, // 表单配置
             userMangeForm: { // 搜索表单
                 username: '',
                 name: '',
-                role: []
+                roleId: undefined
             },
             modalType: 'add', // 模态窗口的类型，添加(add)/编辑(edit)
             loading: false,
+            roleLoading: false,
             visible: false, // 模态窗口的显示
             confirmLoading: false, // 模态窗口确定按钮 loading
+            fetching: false,
+            modalUserList: [],
+            modalRoleList: [],
             modalForm: {
-                username: '',
-                users: []
+                userIds: [],
+                roleIds: []
             },
             rules: {
-                username: [
-                    { required: true, message: '请填写用户名' },
-                    {
-                        type: 'string',
-                        max: 20,
-                        min: 1,
-                        message: '长度为1~20'
-                    },
-                    {
-                        pattern: new RegExp('^[a-zA-Z0-9]*$'),
-                        message: '只能填英文字母和数字'
-                    }
+                userIds: [
+                    { required: true, message: '请输入用户名/姓名查询,可选择多个' }
                 ],
-                users: [
-                    { required: true, message: '请选择用户名' }
+                roleIds: [
+                    { required: true, message: '请选择一个或多个角色' }
                 ]
             }
         }
@@ -175,51 +176,144 @@ export default {
         this.handleGetData()
     },
     methods: {
+        handleTableChange(pagination) {
+            this.handleGetTableList(pagination)
+        },
         /** 获取数据 */
         handleGetData() {
+            this.handleGetRoleList()
+            this.handleGetTableList()
+        },
+        /** 获取角色列表数据 */
+        async handleGetRoleList() {
+            this.roleLoading = true
+            const result = await this.$server.projectCenter.getRoleList().finally(() => {
+                this.roleLoading = false
+            })
+            if (result.code === 200) {
+                this.roleList = result.rows
+            } else {
+                this.$message.error(result.msg || '请求错误')
+            }
+        },
+        /** 获取用户列表数据 */
+        async handleGetTableList(pagination) {
             this.loading = true
-            setTimeout(() => {
-                this.usersData = usersData
+            const params = Object.assign({}, this.userMangeForm, {
+                ...omit(this.pagination, 'total'),
+                current: pagination ? pagination.current : this.$options.data().pagination.current
+            })
+            const result = await this.$server.projectCenter.getList(params).finally(() => {
                 this.loading = false
-            }, 400)
+            })
+
+            if (result.code === 200) {
+                this.usersData = [].concat(result.rows)
+                Object.assign(this.pagination, {
+                    current: params.current,
+                    total: result.total
+                })
+            } else {
+                this.$message.error(result.msg || '请求错误')
+            }
         },
         /** 重置表单 */
         handleRestForm() {
             this.$refs.userMangeForm.resetFields()
         },
-        handleShowModal(type) {
-            this.confirmLoading = false
+        handleShowModal(type, data) {
+            this.confirmLoading = false                
             this.visible = true
             this.modalType = type
+
+            this.$nextTick(() => {
+                if (type === 'add') {
+                    this.modalForm = this.$options.data().modalForm
+                } else {
+                    this.modalForm = Object.assign({}, data)
+                }
+            })
         },
+        handleGetModalUserList: debounce(async function(value){
+            this.fetching = true
+            const result = await this.$server.projectCenter.getModalUserList({
+                keyword: value
+            }).finally(() => {
+                this.fetching = false
+            })
+
+            if (result.code === 200) {
+                this.modalUserList = result.rows
+            } else {
+                this.$message.error(result.msg || '请求错误')
+            }
+        }, 400),
         /** 模态窗口确定 */
         handleModalSubmit() {
-            if (this.modalType === 'add') {
-                // 新增保存
-            } else if (this.modalType === 'edit') {
-                // 编辑保存
-            }
-            this.confirmLoading = true
-            this.visible = false
-            this.handleModalCancel()
+            this.$refs.modalForm.validate(async valid => {
+                if (valid) {
+                    let result
+                    this.confirmLoading = true
+                    if (this.modalType === 'add') {
+                        // 新增保存
+                        result = await this.$server.projectCenter.addUser(this.modalForm).finally(() => {
+                            this.confirmLoading = false
+                        })
+                    } else if (this.modalType === 'edit') {
+                        // 编辑保存
+                        const params = {
+                            roleList: this.modalForm.roleIds,
+                            userId: this.modalForm.userIds.pop()
+                        }
+                        result = await this.$server.projectCenter.putUser(params).finally(() => {
+                            this.confirmLoading = false
+                        })
+                    }
+
+                    if (result.code === 200) {
+                        this.$message.success(this.modalType === 'add' ? '添加成功' : '编辑成功', 1).then(() => {
+                           this.handleGetTableList()
+                        })
+                        this.visible = false
+                        this.handleModalCancel()
+                    } else {
+                        this.$message.error(result.msg || '请求错误')
+                    }
+                } else {
+                    return false
+                }
+            })
         },
         /** 模态窗口取消 */
         handleModalCancel() {
-            this.modalForm = this.$options.data().modalForm
+            this.modalUserList = []
             this.$refs.modalForm.resetFields()
         },
         /** 编辑操作 */
-        handleEditUser(data) {
-            this.modalForm = {
-                username: data.username,
-                role: ''
-            }
-            this.handleShowModal('edit')
+        handleEditUser({ id }, index) {
+            const item = this.usersData[index]
+            this.modalUserList.push({
+                id: item.id,
+                username: item.username
+            })
+            this.handleShowModal('edit', {
+                roleIds: item.roleIds,
+                userIds: [item.id]
+            })
         },
         /** 删除操作 */
-        handleDeleteUser({ id }, index) {
-            this.usersData.splice(index, 1)
+        async handleDeleteUser({ id }, index) {
+            const result = await this.$server.projectCenter.deleUserById(id)
+            if (result.code === 200) {
+                this.$message.success('删除成功')
+                this.usersData.splice(index, 1)
+            } else {
+                this.$message.error(result.msg || '请求错误')
+            }
         }
     }
 }
 </script>
+<style lang="less" scoped>
+@import "../../../main.less";
+</style>

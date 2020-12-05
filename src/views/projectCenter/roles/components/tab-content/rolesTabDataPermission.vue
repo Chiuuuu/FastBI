@@ -32,7 +32,7 @@ const treeData = [
         key: '0-0-1',
         children: [{ key: '0-0-1-0', title: 'zcvc' }]
       }
-    ],
+    ]
   }
 ]
 export default {

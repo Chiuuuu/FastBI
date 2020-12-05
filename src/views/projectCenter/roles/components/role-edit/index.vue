@@ -7,8 +7,8 @@
             <header>
               <span>编辑用户权限</span>
               <div>
-                <a-button class="main-button" type="primary" @click="handleSave">保存</a-button>
-                <a-button class="main-button" @click="back">返回</a-button>
+                <a-button class="main-button" type="primary" @click="handleSave">保 存</a-button>
+                <a-button class="main-button" @click="back">退 出</a-button>
               </div>
             </header>
             <a-form-model class="role-form" ref="form" :model="form" :rules="rules" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
@@ -19,7 +19,7 @@
                 <a-input v-model="form.description"></a-input>
               </a-form-model-item>
             </a-form-model>
-            <RoleTabeRole status="edit"></RoleTabeRole>
+            <RoleTabeRole status="edit" @getChangeItem="getChangeItem"></RoleTabeRole>
             <RolesTabDataPermission status="edit"></RolesTabDataPermission>
           </div>
         </div>
@@ -77,22 +77,29 @@ export default {
       formInfo: state => state.projectRoles.roleInfo
     })
   },
-  created() {
+  mounted() {
     this.handleGetRoleInfo()
-  },
-  beforeDestroy() {
-    this.$EventBus.$off('set-tab-index', this.handleSetTab)
+    this.$store.commit('projectRoles/SET_ROLEID', this.$route.params.id)
   },
   methods: {
     async handleGetRoleInfo() {
-
+      const roleInfo = await this.$server.projectCenter.getRoleInfo(this.$route.params.id)
+      if (roleInfo.code === 200) {
+        this.$store.commit('projectRoles/SET_ROLEINFO', roleInfo.data)
+        this.form.name = roleInfo.data.name
+        this.form.description = roleInfo.data.description
+      } else {
+        this.$message.error(roleInfo.msg)
+      }
     },
     back() {
       // 切换回查看模式
-      this.$store.commit('projectRoles/SET_ROLEMODE', 'check')
       this.$router.push({
         path: '/projectCenter/roles/list'
       })
+    },
+    getChangeItem(role, item) {
+      console.log(role, item)
     },
     handleSave() {
       console.log('save')

@@ -15,7 +15,14 @@
           <a-button type="primary" class="select_button" @click="handleGetData" :loading="spinning">刷新数据</a-button>
           <a-button v-show="showExtractBtn" type="primary" style="margin:0 10px;" class="select_button" @click="showExtractLog">抽取记录</a-button>
           <a-button v-show="showExtractBtn" type="primary" class="select_button" @click="handleExtract" :loading="extractSping">全部抽取</a-button>
-          <a-button v-show="showExtractBtn" type="primary" style="margin:0 10px;" @click="showSetting('batch')" class="select_button">批量抽取设置</a-button>
+          <a-button
+            v-show="showExtractBtn"
+            type="primary"
+            style="margin:0 10px;"
+            @click="showSetting('batch')"
+            class="select_button"
+            v-permission:[$PERMISSION_CODE.OPERATOR.schedule]="$PERMISSION_CODE.OBJECT.datasource"
+          >批量抽取设置</a-button>
         </a-col>
         <!-- <a-col>
           <a-select default-value="全部" class="search_select">
@@ -45,7 +52,11 @@
           <a v-on:click="setting(row)">{{row.set ? '字段编辑' : '字段设置' }}</a>
         </span>
         <span slot="regular" slot-scope="row">
-          <a v-if="showExtractBtn" v-on:click="showSetting('single', row)">定时设置</a>
+          <a
+            v-if="showExtractBtn"
+            v-on:click="showSetting('single', row)"
+            v-permission:[$PERMISSION_CODE.OPERATOR.schedule]="$PERMISSION_CODE.OBJECT.datasource"
+            >定时设置</a>
           <span v-else>-</span>
         </span>
       </a-table>
@@ -96,6 +107,7 @@ import { mapState } from 'vuex'
 import RegularSetting from './regular'
 import ExtractSetting from './extract'
 import moment from 'moment'
+import { checkActionPermission } from '@/utils/permission'
 
 const logColumns = [
   {
@@ -146,52 +158,6 @@ const logColumns = [
   }
 ]
 
-const columns = [
-  {
-    title: '表名',
-    dataIndex: 'name',
-    ellipsis: true,
-    width: 200,
-    key: 'name'
-  },
-  {
-    title: '是否设置过字段',
-    dataIndex: 'set',
-    key: 'set',
-    slots: { title: 'set' },
-    scopedSlots: { customRender: 'set' }
-  },
-  {
-    title: '是否抽取过',
-    dataIndex: 'extracted',
-    key: 'extracted',
-    slots: { title: 'extracted' },
-    scopedSlots: { customRender: 'extracted' }
-  },
-  {
-    title: '抽取状态',
-    dataIndex: 'extractStatus',
-    key: 'extractStatus',
-    slots: { title: 'extractStatus' },
-    scopedSlots: { customRender: 'extractStatus' }
-  },
-  {
-    title: '修改时间',
-    key: 'gmtModified',
-    width: 200,
-    dataIndex: 'gmtModified'
-  },
-  {
-    title: '字段配置',
-    key: 'config',
-    scopedSlots: { customRender: 'config' }
-  },
-  {
-    title: '定时配置',
-    key: 'regular',
-    scopedSlots: { customRender: 'regular' }
-  }
-]
 export default {
   name: 'tabContentStructure',
   components: {
@@ -199,6 +165,56 @@ export default {
     ExtractSetting
   },
   data() {
+    // 定时权限决定表头是否显示
+    const columns = [
+      {
+        title: '表名',
+        dataIndex: 'name',
+        ellipsis: true,
+        width: 200,
+        key: 'name'
+      },
+      {
+        title: '是否设置过字段',
+        dataIndex: 'set',
+        key: 'set',
+        slots: { title: 'set' },
+        scopedSlots: { customRender: 'set' }
+      },
+      {
+        title: '是否抽取过',
+        dataIndex: 'extracted',
+        key: 'extracted',
+        slots: { title: 'extracted' },
+        scopedSlots: { customRender: 'extracted' }
+      },
+      {
+        title: '抽取状态',
+        dataIndex: 'extractStatus',
+        key: 'extractStatus',
+        slots: { title: 'extractStatus' },
+        scopedSlots: { customRender: 'extractStatus' }
+      },
+      {
+        title: '修改时间',
+        key: 'gmtModified',
+        width: 200,
+        dataIndex: 'gmtModified'
+      },
+      {
+        title: '字段配置',
+        key: 'config',
+        scopedSlots: { customRender: 'config' }
+      },
+      {
+        title: '定时配置',
+        key: 'regular',
+        scopedSlots: { customRender: 'regular' }
+      }
+    ]
+    if (!checkActionPermission(this.$PERMISSION_CODE.OBJECT.datasource, this.$PERMISSION_CODE.OPERATOR.schedule)) {
+      columns.pop()
+    }
     return {
       columns,
       data: [],

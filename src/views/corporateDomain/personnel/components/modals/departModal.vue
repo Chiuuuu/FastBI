@@ -16,6 +16,7 @@
           :activeIndex="activeIndex"
           @edit="handleModalFormEdit"
           @save="handleModalFormSave"
+          @cancel="handleModalFormCancel"
           @delete="handleModalFormDelete"></ModalForm>
       </div>
     </div>
@@ -28,28 +29,73 @@ import modalMixin from './modalMixin'
 export default {
   name: 'personnelDepartModal',
   mixins: [modalMixin],
+  props: {
+    deptList: Array
+  },
   data() {
     return {
-      list: [
-        { id: '1', name: '研发部' },
-        { id: '2', name: '销售部' },
-        { id: '3', name: '人事部' },
-        { id: '4', name: '小卖部' }
-      ]
+      list: []
+    }
+  },
+  watch: {
+    deptList(newValue, oldValue) {
+      this.list = [].concat(newValue)
     }
   },
   methods: {
     /** 保存 */
     handleModalFormSave(formData, index) {
-      this.list.splice(index, 1 , {
-        ...formData
+      if (formData.id) {
+        this.handleModalFormUpdate(formData, index)
+      } else {
+        this.handleModalFormAdd(formData, index)
+      }
+    },
+    handleModalFormEdit(index) {
+      this.activeIndex = index
+    },
+    /** 新增 */
+    async handleModalFormAdd(formData, index) {
+      const res = await this.$server.corporateDomain.addDept(formData.name)
+      if (res.code === 200) {
+        this.$message.success('保存成功')
+        this.$parent.handleGetDepartList()
+        this.activeIndex = -1
+      } else {
+        this.$message.error(res.msg)
+      }
+    },
+    /** 编辑 */
+    async handleModalFormUpdate(formData, index) {
+      const res = await this.$server.corporateDomain.updateDept({
+        name: formData.name,
+        id: formData.id
       })
-      this.activeIndex = -1
+      if (res.code === 200) {
+        this.$message.success('保存成功')
+        this.$parent.handleGetDepartList()
+        this.activeIndex = -1
+      } else {
+        this.$message.error(res.msg)
+      }
     },
     /** 删除 */
-    handleModalFormDelete(data, index) {
-      this.list.splice(index, 1)
+    async handleModalFormDelete(formData, index) {
+      const res = await this.$server.corporateDomain.deleDept(formData.id)
+      if (res.code === 200) {
+        this.$message.success('删除成功')
+        this.deptList.splice(index, 1)
+        this.activeIndex = -1
+      } else {
+        this.$message.error(res.msg)
+      }
+    },
+    /** 取消编辑 */
+    handleModalFormCancel(data) {
       this.activeIndex = -1
+      if (!data.id) {
+        this.deptList.shift()
+      }
     }
   }
 }
@@ -58,6 +104,6 @@ export default {
 <style lang="less" scoped>
 @import "./modal-common.less";
 .form-list {
-  height: calc(100% - 50px);
+  height: calc(100% - 55px);
 }
 </style>

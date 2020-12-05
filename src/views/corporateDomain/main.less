@@ -4,7 +4,7 @@
     height: 100%;
     background-color: #ffffff;
     color: #01040f;
-    .main-box, @{deep}  .ant-spin-container {
+    .main-box, @{deep} .ant-spin-nested-loading, @{deep} .ant-spin-container {
         height: 100%;
     }
     .main-empty {
@@ -101,6 +101,7 @@
             line-height: 54px;
             padding: 0 16px;
             background: #fafafa;
+            color: rgba(0, 0, 0, 0.65);
         }
         .content {
             height: calc(50% - 88px);
@@ -120,5 +121,9 @@
     }
     .handler-margin {
         margin-right: 20px;
+    }
+    .btn-add {
+        margin-right: 10px;
+        margin-top: 4px;
     }
 }

@@ -1,7 +1,7 @@
 <template>
   <div id="app">
      <a-config-provider :locale="zhCN">
-      <router-view/>
+      <router-view v-if="isRouterAlive"/>
      </a-config-provider>
   </div>
 </template>
@@ -15,7 +15,21 @@ moment.locale('zh-cn')
     name: 'App',
     data() {
       return {
-        zhCN
+        zhCN,
+        isRouterAlive: true
+      }
+    },
+    provide() {
+      return {
+        reload: this.reload
+      }
+    },
+    methods: {
+      reload() {
+        this.isRouterAlive = false
+        this.$nextTick(() => {
+          this.isRouterAlive = true
+        })
       }
     }
   }

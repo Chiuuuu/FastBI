@@ -16,26 +16,26 @@
         @change="handleSetTableName"
       />
     </a-form-model-item>
-    <!-- <a-form-model-item label="连接模式" prop="linkMode">
+    <a-form-model-item label="连接模式" prop="linkMode">
       <a-select v-model="form.linkMode">
-        <a-select-option value="1">
+        <a-select-option :value="1">
           hiveserver2
         </a-select-option>
-        <a-select-option value="2">
+        <a-select-option :value="2">
           zookeeper
         </a-select-option>
       </a-select>
-    </a-form-model-item> -->
+    </a-form-model-item>
     <a-form-model-item label="服务器" prop="ip">
       <a-input v-model="form.ip" />
     </a-form-model-item>
-    <a-form-model-item label="端口" prop="port" v-if="form.linkMode === '1'" :rules="[
+    <a-form-model-item label="端口" prop="port" v-if="form.linkMode === 1" :rules="[
       { required: true, message: '请输入端口号' },
       { type: 'integer', message: '请输入数字', min: 0 }
     ]">
       <a-input v-model.number="form.port" />
     </a-form-model-item>
-    <a-form-model-item label="命名空间" prop="namescape" v-if="form.linkMode === '2'" :rules="[{
+    <a-form-model-item label="命名空间" prop="namescape" v-if="form.linkMode === 2" :rules="[{
         required: true,
         message: '请输入命名空间'
       }]">
@@ -43,13 +43,13 @@
     </a-form-model-item>
     <a-form-model-item label="认证方式" prop="authMethod">
       <a-select v-model="form.authMethod" @change="handleChangeMethod">
-        <a-select-option value="0">无</a-select-option>
-        <!-- <a-select-option value="1">kerberos</a-select-option> -->
-        <a-select-option value="2">用户名</a-select-option>
-        <a-select-option value="3">用户名密码</a-select-option>
+        <a-select-option :value="0">无</a-select-option>
+        <a-select-option :value="1">kerberos</a-select-option>
+        <a-select-option :value="2">用户名</a-select-option>
+        <a-select-option :value="3">用户名密码</a-select-option>
       </a-select>
     </a-form-model-item>
-    <template v-if="form.authMethod === '1'">
+    <template v-if="form.authMethod === 1">
       <a-form-model-item label="服务器principal" prop="server" :rules="[
       {
         required: true,
@@ -57,9 +57,9 @@
       },
       {
         type: 'string',
-        max: 20,
+        max: 100,
         min: 1,
-        message: '长度为1~20'
+        message: '长度为1~100'
       }]">
         <a-input v-model="form.server" />
       </a-form-model-item>
@@ -70,9 +70,9 @@
         },
         {
           type: 'string',
-          max: 20,
+          max: 100,
           min: 1,
-          message: '长度为1~20'
+          message: '长度为1~100'
         }]">
         <a-input v-model="form.client" />
       </a-form-model-item>
@@ -83,13 +83,13 @@
         <input ref="uploader" class="unvisible" type="file" @change="handleUploadFile">
       </a-form-model-item>
     </template>
-    <a-form-model-item v-if="form.authMethod === '2' || form.authMethod === '3'" label="用户名" prop="user" :rules="[{
+    <a-form-model-item v-if="form.authMethod === 2 || form.authMethod === 3" label="用户名" prop="user" :rules="[{
       required: true,
       message: '请输入用户名'
     }]">
       <a-input v-model="form.user" />
     </a-form-model-item>
-    <a-form-model-item v-if="form.authMethod === '3'" label="密码" prop="password" :rules="[
+    <a-form-model-item v-if="form.authMethod === 3" label="密码" prop="password" :rules="[
       {
         required: true,
         message: '请输入密码'
@@ -153,6 +153,7 @@ export default {
       },
       wrapperCol: { span: 14 },
       formId: '',
+      keyTabFile: '',
       form: {
         // 连接信息表单
         name: '', // 数据源名
@@ -162,8 +163,8 @@ export default {
         user: '', // 用户名
         password: '', // 密码
         databaseName: '', // 数据库名称
-        linkMode: '1', // 连接模式
-        authMethod: '0' // 认证方式
+        linkMode: 1, // 连接模式
+        authMethod: 0 // 认证方式
       },
       rules: {
         name: [
@@ -226,7 +227,16 @@ export default {
     handleUploadFile(e) {
       const file = e.target.files[0]
       console.log(file)
-      this.filename = file.name.slice(0, file.name.lastIndexOf('.'))
+      let name = file.name
+      // 校验csv文件类型
+      const fileType = name.slice(name.lastIndexOf('.') + 1, name.length)
+      if (/keytab/.test(fileType)) {
+        this.filename = name.slice(0, name.lastIndexOf('.'))
+        this.keyTabFile = file
+      } else {
+        this.$message.error(name + '不是keytab文件')
+      }
+
       e.target.value = ''
     },
     /**

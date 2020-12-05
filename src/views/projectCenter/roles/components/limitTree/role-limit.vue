@@ -1,22 +1,21 @@
 <template>
-  <div style="height: calc(100% - 116px)">
+  <div class="tab scrollbar">
     <a-row class="line">
       <a-col span="2">{{ roleTitle }}</a-col>
       <a-col>
-        <a-checkbox-group :options="options" :disabled="status === 'show'? true : false"></a-checkbox-group>
+        <a-checkbox-group
+          :options="options.header"
+          :disabled="status === 'show'? true : false"
+          @change="onCheck"
+          ></a-checkbox-group>
       </a-col>
     </a-row>
     <a-row class="line">
       <a-col span="14">所有目录</a-col>
-      <a-col span="2">查看</a-col>
-      <a-col span="2">编辑</a-col>
-      <a-col span="2">复制</a-col>
-      <a-col span="2">删除</a-col>
-      <a-col span="2">发布</a-col>
+      <a-col span="2" align="left" v-for="item in injectActionList" :key="item.permission">{{item.name}}</a-col>
     </a-row>
     <div class="content scrollbar">
-      <limit-tree :status="status"></limit-tree>
-      <limit-tree :status="status"></limit-tree>
+      <limit-tree v-on="$listeners"></limit-tree>
     </div>
   </div>
 </template>
@@ -25,18 +24,32 @@
 import LimitTree from './limit-tree'
 export default {
   name: 'roleLimit',
+  inject: ['status', 'getProvideActionList'],
   props: {
     roleTitle: String,
-    options: Array,
-    mode: String,
-    status: {
-      type: String,
-      default: 'show'
-    }
+    options: Object
   },
   components: {
     LimitTree
+  },
+  computed: {
+    injectActionList() {
+      return this.getProvideActionList()
+    }
+  },
+  methods: {
+    onCheck(value) {
+      this.options.permissions.push(value)
+    }
   }
+  // watch: {
+  //   injectActionList: {
+  //     deep: true,
+  //     handler(e) {
+  //       console.log("watch", e);
+  //     }
+  //   }
+  // },
 }
 </script>
 

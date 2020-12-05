@@ -32,6 +32,7 @@
 <script>
 import ManageRoutes from '@/router/modules/layout'
 import { getRenderRouter } from '@/utils/permission'
+import isEqual from 'lodash/isEqual'
 export default {
   data() {
     const renderRouter = getRenderRouter(this.$store.state.permission.routes)

@@ -2,8 +2,8 @@
   <div class="tab scrollbar">
     <header>
       <div class="role-info">
-        <div>角色名称：<span></span></div>
-        <div class="line">角色描述：</div>
+        <div>角色名称：<span>{{ roleInfo.name }}</span></div>
+        <div class="line">角色描述：{{ roleInfo.description }}</div>
       </div>
       <a-button class="main-button" type="primary" @click="edit"
         >编辑用户</a-button
@@ -14,6 +14,7 @@
   </div>
 </template>
 <script>
+import { mapState } from 'vuex'
 import RolesTabDataPermission from '../tab-content/rolesTabDataPermission'
 import RoleTabeRole from '../tab-content/rolesTabRole'
 
@@ -23,14 +24,19 @@ export default {
         RolesTabDataPermission,
         RoleTabeRole
     },
+    computed: {
+      ...mapState({
+        roleId: state => state.projectRoles.roleId,
+        roleInfo: state => state.projectRoles.roleInfo
+      })
+    },
     methods: {
-        edit() {
-          // 切换至编辑模式
-          this.$store.commit('projectRoles/SET_ROLEMODE', 'edit')
-          this.$router.push({
-              path: '/projectCenter/roles/edit/id=' + 123
-          })
-        }
+      edit() {
+        // 切换至编辑模式
+        this.$router.push({
+            path: '/projectCenter/roles/edit/id=' + this.roleId
+        })
+      }
     }
 }
 </script>

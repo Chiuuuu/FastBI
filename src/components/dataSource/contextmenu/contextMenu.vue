@@ -4,17 +4,28 @@
       <ul>
         <li
           class="z-clickable"
-          v-for="item in menus"
+          v-for="item in renderMenus"
           :key="item.name"
           @click="handleItemClick($event, item)"
         >
-          {{ item.name }}
+          <span>{{ item.name }} <a-icon type="right" class="icon-cart" v-if="hasChildren(item)"/></span>
+          <ul class="sub" v-if="hasChildren(item)">
+            <li
+              class="z-clickable"
+              v-for="subitem in item.children"
+              :key="subitem.name"
+              @click="handleItemClick($event, subitem)"
+            >
+              {{ subitem.name }}
+            </li>
+          </ul>
         </li>
       </ul>
     </div>
   </div>
 </template>
 <script>
+import { checkActionPermission } from '@/utils/permission'
 export default {
   name: 'contextMenu',
   props: {
@@ -34,10 +45,27 @@ export default {
       type: Function
     }
   },
+  computed: {
+    renderMenus() {
+      return this.menus.filter(item => {
+        let hasPermission = true
+        if (item['permission']) {
+          const { OBJECT, OPERATOR} = item.permission
+          hasPermission = checkActionPermission(OBJECT, OPERATOR)
+        }
+        if (hasPermission) return item
+      })
+    }
+  },
   methods: {
+    hasChildren(item) {
+      return item['children'] && item.children.length
+    },
     handleItemClick(event, item) {
-      this.remove()
-      item.$$fun(event, item)
+      if (item.$$fun) {
+        this.remove()
+        item.$$fun(event, item)
+      }
     }
   }
 }
@@ -81,6 +109,26 @@ export default {
     white-space: nowrap;
     &:hover {
       background-color: #e0e0e0;
+
+      ul.sub {
+        display: block;
+      }
+    }
+
+    .icon-cart {
+      position: absolute;
+      right: 5px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    ul.sub {
+      display: none;
+      position: absolute;
+      left: -100%;
+      top: 0;
+      border: 1px solid #ccc;
+      border-right: 0;
     }
   }
 }
