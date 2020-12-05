@@ -71,9 +71,10 @@ export default {
             this.handleGetData()
         },
         async handleGetData() {
-            const result = await this.$server.projectCenter.getRoleTree(this.roleId, this.currentTab)
+            const result = await this.$server.projectCenter.getRoleTree(this.roleId || this.$route.params.id, this.currentTab)
             if (result.code === 200) {
                 this.modulePermission = result.data.basePrivilege
+                this.$emit('setBasePrivilege', this.modulePermission.permissions, this.currentTab)
                 this.actionList = [].concat(result.data.header)
                 this.treeData = [].concat(result.data.folder)
             } else {

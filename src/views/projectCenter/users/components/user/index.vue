@@ -222,7 +222,7 @@ export default {
             this.$refs.userMangeForm.resetFields()
         },
         handleShowModal(type, data) {
-            this.confirmLoading = false                
+            this.confirmLoading = false
             this.visible = true
             this.modalType = type
 
@@ -234,7 +234,7 @@ export default {
                 }
             })
         },
-        handleGetModalUserList: debounce(async function(value){
+        handleGetModalUserList: debounce(async function(value) {
             this.fetching = true
             const result = await this.$server.projectCenter.getModalUserList({
                 keyword: value

@@ -32,7 +32,7 @@
 <script>
 export default {
   name: 'limitTree',
-  inject: ['status', 'getProvideActionList', 'getProvideTreeData', 'getCurrentRoleTab', 'abc'],
+  inject: ['status', 'getProvideActionList', 'getProvideTreeData', 'getCurrentRoleTab'],
   data() {
     return {
       replaceFields: {
@@ -52,6 +52,18 @@ export default {
     },
     injectRoleTab() {
       return this.getCurrentRoleTab()
+    },
+    currentRole() {
+      switch (this.injectRoleTab) {
+        case '1':
+          return 'screen'
+        case '2':
+          return 'dataModel'
+        case '3':
+          return 'dataSource'
+        default:
+          return ''
+      }
     }
   },
   methods: {
@@ -74,7 +86,7 @@ export default {
         const index = item.permissions.indexOf(permission)
         item.permissions.splice(index, 1)
       }
-      this.$emit('getChangeItem', this.injectRoleTab, item)
+      this.$emit('getChangeItem', this.currentRole, item)
     }
   }
 }

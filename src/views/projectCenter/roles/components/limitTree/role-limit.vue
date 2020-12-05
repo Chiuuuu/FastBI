@@ -4,6 +4,7 @@
       <a-col span="2">{{ roleTitle }}</a-col>
       <a-col>
         <a-checkbox-group
+          :value="options.permissions"
           :options="options.header"
           :disabled="status === 'show'? true : false"
           @change="onCheck"
@@ -24,7 +25,7 @@
 import LimitTree from './limit-tree'
 export default {
   name: 'roleLimit',
-  inject: ['status', 'getProvideActionList'],
+  inject: ['status', 'getProvideActionList', 'getCurrentRoleTab'],
   props: {
     roleTitle: String,
     options: Object
@@ -35,11 +36,15 @@ export default {
   computed: {
     injectActionList() {
       return this.getProvideActionList()
+    },
+    injectRoleTab() {
+      return this.getCurrentRoleTab()
     }
   },
   methods: {
     onCheck(value) {
-      this.options.permissions.push(value)
+      this.options.permissions = value
+      this.$emit('setBasePrivilege', value, this.injectRoleTab)
     }
   }
   // watch: {

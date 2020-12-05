@@ -76,8 +76,8 @@ const tableColumn = [
     dataIndex: 'name'
   },
   {
-    title: '修改时间',
-    dataIndex: 'gmtModified',
+    title: '创建时间',
+    dataIndex: 'gmtCreate',
     width: 200,
     ellipsis: true
   },

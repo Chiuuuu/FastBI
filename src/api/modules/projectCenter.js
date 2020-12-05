@@ -99,6 +99,25 @@ export default {
         return $axios.get('/business/business/listForProjectRoleUsers/' + roleId)
     },
     /**
+     * @description 获取权限树
+     * @param {Number | String} roleId 角色id
+     * @param {Number} type 类型
+     * @returns
+     */
+    getRoleTree(roleId, type) {
+        return $axios.get(`/user/RoleResourcePrivilege/showRolePrivilege/${roleId}/${type}`)
+    },
+    /**
+     * @description 获取权限树
+     * @param {Object} params
+     * @param {String} params.name 名字
+     * @param {String} params.description 描述
+     * @returns
+     */
+    updateRole(params) {
+        return $axios.put(`/user/RoleResourcePrivilege/updateRolePrivilege`, params)
+    },
+    /**
      * @description 为角色添加用户
      * @param {Object} params
      * @param {Array} params.userIds
@@ -109,20 +128,11 @@ export default {
         return $axios.post('/business/business/projectRoleAddUser', params)
     },
     /**
-     * @description 为角色添加用户
+     * @description 为角色移除用户
      * @param {Array} id
      * @returns
      */
     deleRoleUser(id) {
         return $axios.delete('/business/business/' + id)
-    },
-    /**
-     * @description 获取权限树
-     * @param {Number | String} roleId 角色id
-     * @param {Number} type 类型
-     * @returns
-     */
-    getRoleTree(roleId, type) {
-        return $axios.get(`/user/RoleResourcePrivilege/showRolePrivilege/${roleId}/${type}`)
     }
 }
