@@ -21,13 +21,16 @@
         <a-select-option :value="1">
           hiveserver2
         </a-select-option>
-        <a-select-option :value="2">
+        <!-- <a-select-option :value="2">
           zookeeper
-        </a-select-option>
+        </a-select-option> -->
       </a-select>
     </a-form-model-item>
     <a-form-model-item label="服务器" prop="ip">
       <a-input v-model="form.ip" />
+    </a-form-model-item>
+    <a-form-model-item label="HiveServer2 IP" prop="hiveserver">
+      <a-input v-model="form.hiveserver" />
     </a-form-model-item>
     <a-form-model-item label="端口" prop="port" v-if="form.linkMode === 1" :rules="[
       { required: true, message: '请输入端口号' },
@@ -44,7 +47,7 @@
     <a-form-model-item label="认证方式" prop="authMethod">
       <a-select v-model="form.authMethod" @change="handleChangeMethod">
         <a-select-option :value="0">无</a-select-option>
-        <a-select-option :value="1">kerberos</a-select-option>
+        <!-- <a-select-option :value="1">kerberos</a-select-option> -->
         <a-select-option :value="2">用户名</a-select-option>
         <a-select-option :value="3">用户名密码</a-select-option>
       </a-select>
@@ -158,6 +161,7 @@ export default {
         // 连接信息表单
         name: '', // 数据源名
         ip: '', // 服务器ip
+        hiveserver: '', // 服务器ip
         port: '', // 端口号
         namescape: '', // 命名空间
         user: '', // 用户名
@@ -183,6 +187,16 @@ export default {
           {
             required: true,
             message: '请输入服务器ip地址'
+          },
+          {
+            validator: validateIP,
+            trigger: 'blur'
+          }
+        ],
+        hiveserver: [
+          {
+            required: true,
+            message: '请输入Hive ip地址'
           },
           {
             validator: validateIP,
@@ -254,6 +268,7 @@ export default {
               port: this.form.port,
               password: this.form.password,
               authMethod: this.form.authMethod,
+              hiveserver: this.form.hiveserver,
               user: this.form.user
             }
           }).finally(() => {
@@ -308,6 +323,7 @@ export default {
             property: {
               user: this.form.user,
               ip: this.form.ip,
+              hiveserver: this.form.hiveserver,
               port: this.form.port,
               password: this.form.password,
               databaseName: this.form.databaseName
