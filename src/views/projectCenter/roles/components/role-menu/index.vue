@@ -216,7 +216,8 @@ export default {
   },
   computed: {
     ...mapState({
-      tableList: state => state.projectRoles.menuList
+      tableList: state => state.projectRoles.menuList,
+      roleId: state => state.projectRoles.roleId
     }),
     menuList() {
       return this.searchValue ? this.searchList : this.tableList
@@ -236,6 +237,10 @@ export default {
   mounted() {
     this.handleGetMenuList()
     this.$on('fileSelect', this.handleFileSelect)
+    if (this.roleId) {
+      this.fileSelectId = this.roleId
+      this.getRoleInfo()
+    }
   },
   methods: {
     /**
@@ -484,6 +489,7 @@ export default {
           if (result.code === 200) {
             this.handleGetMenuList()
             this.$message.success('新建成功')
+            this.$store.commit('projectRoles/SET_ROLEID', result.msg)
             this.$refs.addForm.resetFields()
             this.visible = false
           } else {

@@ -117,6 +117,7 @@
       class="btn_sub"
       @click="handleSaveForm"
       :loading="loading"
+      v-permission:[$PERMISSION_CODE.OPERATOR.edit]="$PERMISSION_CODE.OBJECT.datasource"
     >
       保存
     </a-button>

@@ -32,9 +32,9 @@
               <a-input :value="text"
                        style="width: 156px height: 32px" />
             </template>
-            <template #dataType="text, record">
+            <template #convertType="text, record">
               <field-select
-                :text="text | formatField"
+                :text="(text || record.dataType) | formatField"
                 :select-data="record"
                 :contextmenus="fieldContenxtMenu"
                 :isDimension="record.role === 1"
@@ -152,9 +152,9 @@ const column = [
   },
   {
     title: '字段类型',
-    dataIndex: 'dataType',
+    dataIndex: 'convertType',
     scopedSlots: {
-      customRender: 'dataType'
+      customRender: 'convertType'
     }
   },
   {
@@ -236,9 +236,6 @@ export default {
       ]
     }
   },
-  created () {
-    console.log(Object.entries(this.tables))
-  },
   computed: {
     selectDrawer() {
       return this.selectedRows.length > 0
@@ -258,6 +255,9 @@ export default {
           value = '整数'
           break
         case 'TIMESTAMP':
+          value = '日期时间'
+          break
+        case 'DATE':
           value = '日期时间'
           break
         case 'DOUBLE':

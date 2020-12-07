@@ -27,13 +27,13 @@
       <div class="table_list" :class="{'no-sql': !isDatabase}">
         <div class="menu_search">
           <span class="search_span">表</span>
-          <!-- <a-input placeholder="请输入关键词搜索" class="search_input">
+          <a-input placeholder="请输入关键词搜索" :value="tableSearch" @change="handleSearchTable" class="search_input">
             <a-icon slot="prefix" type="search" />
-          </a-input> -->
+          </a-input>
         </div>
         <edit-left
           ref="editLeftRef"
-          :list="leftMenuList"
+          :list="tableSearchList"
           @on-left-drag-leave="handleLeftDragLeave"
         ></edit-left>
       </div>
@@ -73,7 +73,7 @@
         </div> -->
       </div>
     </div>
-    <div class="right" :class="{ 'add_new': model === 'add' }">
+    <div class="right" ref="rightBody" :class="{ 'add_new': model === 'add' }">
       <div class="header" v-if="model==='edit'">
         <span class="data_con">{{detailInfo.name}}</span>
       </div>
@@ -88,7 +88,7 @@
       </div>
       <div class="description">
         <span class="d-s" :title="detailInfo.description">描述： {{detailInfo.description}}</span>
-        <a-icon type="edit" v-on:click="open" class="d-s-icon"/>
+        <a-icon type="edit" v-on:click="openModal('describe-setting')" class="d-s-icon"/>
       </div>
       <div class="draw_board scrollbar">
         <edit-right-top ref='rightTopRef' :detailInfo="detailInfo"></edit-right-top>
@@ -98,8 +98,8 @@
         <div class="detail_header">
           <span>数据模型详情</span>
           <div class="detail_btn">
-            <a-button v-on:click="checkWidthTable" :disabled="disableByDetailInfo">查看宽表</a-button>
-            <a-button v-on:click="batch">批量编辑字段</a-button>
+            <a-button v-on:click="openModal('check-table')" :disabled="disableByDetailInfo">查看宽表</a-button>
+            <a-button v-on:click="openModal('batch-setting')">批量编辑字段</a-button>
           </div>
         </div>
         <div class="detail_main">
@@ -107,9 +107,9 @@
             <div class="dim_title">
               <span class="dim_span">维度</span>
               <div class="dim_operation">
-                <!-- <a v-on:click="dim_mea('维度')" style="color:#627CFF;line-height:38px">新建计算维度</a> -->
+                <!-- <a v-on:click="openModal('compute-setting', '维度')" style="color:#627CFF;line-height:38px">新建计算维度</a> -->
                 <a-divider type="vertical" />
-                <!-- <a v-on:click="geography" style="color:#627CFF;">设置地理位置</a> -->
+                <!-- <a v-on:click="openModal('geo-setting')" style="color:#627CFF;">设置地理位置</a> -->
               </div>
             </div>
             <div class="dim_menu scrollbar">
@@ -126,6 +126,8 @@
                     className="dimensions"
                     :imgURI="DimensionsIcon"
                     :itemData="item"
+                    :detail-info="detailInfo"
+                    :contextmenus="handleComboContextmenus('dimensions')"
                   ></panel-item>
                 </a-collapse-panel>
               </a-collapse>
@@ -135,7 +137,7 @@
             <div class="mea_title">
               <span class="mea_span">度量</span>
               <div class="mea_operation">
-                <!-- <a v-on:click="dim_mea('度量')" style="color:#627CFF;margin-right:20px;line-height:38px">新建计算度量</a> -->
+                <!-- <a v-on:click="openModal('compute-setting', '度量')" style="color:#627CFF;margin-right:20px;line-height:38px">新建计算度量</a> -->
               </div>
             </div>
             <div class="mea_menu scrollbar">
@@ -152,6 +154,8 @@
                     className="measures"
                     :imgURI="MeasureIcon"
                     :itemData="item"
+                    :detail-info="detailInfo"
+                    :contextmenus="handleComboContextmenus('measures')"
                   ></panel-item>
                 </a-collapse-panel>
               </a-collapse>
@@ -166,10 +170,12 @@
         :is-show="visible"
         :detailInfo="detailInfo"
         :compute-type="computeType"
-        :tables="dimensions"
+        :tables="tableFields"
         :sql-form="sqlForm"
         :status="modalStatus"
         :description="detailInfo.description"
+        :rename-data="panelData"
+        :union-data="unionNode"
         @get-fetch-param="handleGetFetchParams"
         @close="close"
         @success="data => componentSuccess(data)"
@@ -194,12 +200,15 @@ import DescribeSetting from './setting/describe-setting'
 import BatchSetting from './setting/batch-setting'
 import GeoSetting from './setting/geo-setting'
 import ComputeSetting from './setting/compute-setting'
+import RenameSetting from './setting/rename-setting'
+import UnionSetting from './setting/union-setting'
 import PanelItem from './panel-item'
 import { Node, conversionTree } from '../util'
 import groupBy from 'lodash/groupBy'
 import keys from 'lodash/keys'
 import DimensionsIcon from '@/assets/images/icon_dimension.png'
 import MeasureIcon from '@/assets/images/icon_measure.png'
+import debounce from 'lodash/debounce'
 // const setting = [
 //   {
 //     key: '1',
@@ -217,6 +226,8 @@ export default {
     BatchSetting, // 批量设置字段
     GeoSetting, // 设置地理位置
     ComputeSetting, // 设置维度度量
+    RenameSetting, // 维度度量重命名
+    UnionSetting, // 表上下合并
     PanelItem
   },
   provide() {
@@ -232,6 +243,8 @@ export default {
       spinning: false,
       detailInfo: '',
       isDatabase: false, // 是否是SQL数据源, 控制自定义SQL渲染
+      tableSearch: '', // 表搜索关键字
+      searchList: [],
       leftMenuList: [],
       rightMenuList: [],
       sqlForm: {},
@@ -242,10 +255,14 @@ export default {
         dropNode: {},
         event: null
       },
+      unionNode: {}, // 选择合并的树节点
       measures: '',
       measuresActiveKey: [],
+      customMeasures: [], // 自定义度量
       dimensions: '',
       dimensionsActiveKey: [],
+      customDimensions: [], // 自定义维度
+      panelData: {}, // 选中的维度或度量
       customStyle: 'border: 0',
       // setting,
       activeIndex: 0,
@@ -275,6 +292,16 @@ export default {
     databaseName() {
       return this.databaseList.length > 0 ? this.databaseList[0].name : ''
     },
+    tableSearchList() {
+      return this.tableSearch ? this.searchList : this.leftMenuList
+    },
+    tableFields() {
+      if (this.detailInfo.pivotSchema) {
+        return groupBy(this.detailInfo.pivotSchema.dimensions.concat(this.detailInfo.pivotSchema.measures), 'tableNo')
+      } else {
+        return []
+      }
+    },
     disableByDetailInfo() {
       if (this.detailInfo === '') {
         return true
@@ -291,8 +318,12 @@ export default {
       this.handleGetData(this.$route.query.modelId)
       this.$store.dispatch('dataModel/setModelId', this.$route.query.modelId)
     }
+    this.$EventBus.$on('deleteBelongCustom', this.handleDeleteCustomDimMea)
+    this.$EventBus.$on('tableUnion', this.handleTableUnion)
   },
   beforeDestroy() {
+    this.$EventBus.$off('deleteBelongCustom', this.handleDeleteCustomDimMea)
+    this.$EventBus.$off('tableUnion', this.handleTableUnion)
     this.$store.dispatch('dataModel/setAddModelId', -1)
   },
   methods: {
@@ -301,22 +332,22 @@ export default {
       const arry = [
         {
           name: '重命名',
-          onClick: () => {
-            console.log('重命名')
+          onClick: (event, handler, vm) => {
+            this.panelData = vm.itemData
+            this.openModal('rename-setting')
           }
         },
         {
           name: '复制字段',
-          onClick: () => {
-            console.log('复制字段')
-          }
+          onClick: this.handleCopyField
         },
         {
           name: '转换数据类型',
           children: [
             {
               name: '转换数字',
-              onClick: (event) => {
+              onClick: (event, handler, vm) => {
+                this.panelData = vm.itemData
                 event.stopPropagation()
                 console.log('转换数字类型数字')
               }
@@ -325,8 +356,8 @@ export default {
         },
         {
           name: type === 'dimensions' ? '转换为度量' : '转换为维度',
-          onClick: () => {
-            console.log('转换维度度量')
+          onClick: (event, handler, vm) => {
+            this.handleSwitchRole(type, vm)
           }
         }
       ]
@@ -350,7 +381,6 @@ export default {
       const result = await this.$server.dataModel.getAddModelDatamodel()
       if (result.code === 200) {
         this.detailInfo = result.data
-        // this.$store.dispatch('dataModel/setModelId', result.data.id)
         this.$store.dispatch('dataModel/setAddModelId', result.data.id)
         this.$nextTick(() => {
           this.handleGetDatabase()
@@ -388,6 +418,11 @@ export default {
         this.$message.error(result.msg)
       }
     },
+    handleSearchTable: debounce(function(event) {
+      const value = event.target.value
+      this.tableSearch = value
+      this.searchList = this.leftMenuList.filter(item => item.name.toLowerCase().indexOf(value.toLowerCase()) > -1)
+    }, 400),
     /**
      * 切换数据库
      */
@@ -397,6 +432,64 @@ export default {
       // this.detailInfo.config.tables = []
       // this.detailInfo.pivotSchema.dimensions = []
       // this.detailInfo.pivotSchema.measures = []
+    },
+    // 表上下合并
+    handleTableUnion(node) {
+      this.unionNode = node
+      this.openModal('union-setting')
+    },
+    // 删除表时, 删除和表关联的自定义维度度量
+    handleDeleteCustomDimMea(ownProps) {
+      // this.customDimensions = this.customDimensions.filter(item => item.modelTableId !== ownProps.id)
+      // this.customMeasures = this.customMeasures.filter(item => item.modelTableId !== ownProps.id)
+    },
+    // 转换维度度量
+    handleSwitchRole(type, vm) {
+      if (type === 'dimensions') {
+        vm.itemData.role = 2
+        if (vm.id) {
+          const index = this.detailInfo.pivotSchema.dimensions.findIndex(item => item.id === vm.itemData.id)
+          this.detailInfo.pivotSchema.measures.push(vm.itemData)
+          this.detailInfo.pivotSchema.dimensions.splice(index, 1)
+        } else {
+          vm.itemData.tableName = '自定义度量'
+          const index = this.customDimensions.findIndex(item => item.alias === vm.itemData.alias)
+          this.customMeasures.push(vm.itemData)
+          this.customDimensions.splice(index, 1)
+        }
+      } else {
+        vm.itemData.role = 1
+        if (vm.id) {
+          const index = this.detailInfo.pivotSchema.measures.findIndex(item => item.id === vm.itemData.id)
+          this.detailInfo.pivotSchema.dimensions.push(vm.itemData)
+          this.detailInfo.pivotSchema.measures.splice(index, 1)
+        } else {
+          vm.itemData.tableName = '自定义维度'
+          const index = this.customMeasures.findIndex(item => item.alias === vm.itemData.alias)
+          this.customDimensions.push(vm.itemData)
+          this.customMeasures.splice(index, 1)
+        }
+      }
+      this.handleMeasures()
+      this.handleDimensions()
+    },
+    // 复制维度度量
+    handleCopyField(event, handler, vm) {
+      const role = vm.itemData.role
+      const newField = Object.assign({}, vm.itemData, {
+        id: '',
+        tableNo: 0,
+        tableName: '自定义' + (role === 1 ? '维度' : '度量')
+      })
+      if (role === 1) {
+        this.customDimensions.push(newField)
+        this.handleDimensions()
+      } else if (role === 2) {
+        this.customMeasures.push(newField)
+        this.handleMeasures()
+      } else {
+        this.$message.error('无法复制字段, 请刷新重试')
+      }
     },
     /**
      * 同字段名处理
@@ -424,6 +517,7 @@ export default {
           } else {
             map.set(element.alias, 1)
             map.set('tableName', element.tableName)
+            console.log('map', map)
           }
         })
       }
@@ -433,16 +527,16 @@ export default {
      * 维度数据处理
     */
     handleDimensions() {
-      this.handleSameName(this.detailInfo.pivotSchema.dimensions)
-      this.dimensions = groupBy(this.detailInfo.pivotSchema.dimensions, 'tableNo')
+      this.handleSameName(this.detailInfo.pivotSchema.dimensions.concat(this.customDimensions))
+      this.dimensions = groupBy(this.detailInfo.pivotSchema.dimensions.concat(this.customDimensions), 'tableNo')
       this.dimensionsActiveKey = keys(this.dimensions)
     },
     /**
      * 度量数据处理
     */
     handleMeasures() {
-      this.handleSameName(this.detailInfo.pivotSchema.measures)
-      this.measures = groupBy(this.detailInfo.pivotSchema.measures, 'tableNo')
+      this.handleSameName(this.detailInfo.pivotSchema.measures.concat(this.customMeasures))
+      this.measures = groupBy(this.detailInfo.pivotSchema.measures.concat(this.customMeasures), 'tableNo')
       this.measuresActiveKey = keys(this.measures)
     },
     /**
@@ -470,27 +564,10 @@ export default {
     handleLeftDragLeave() {
       this.$refs.rightTopRef.handleMapRemoveClass()
     },
-    checkWidthTable() {
-      // if(this.detailInfo.config.tables.length === 0)
+    openModal(modalName, computeType) {
       this.visible = true
-      this.modalName = 'check-table'
-    },
-    open() {
-      this.visible = true
-      this.modalName = 'describe-setting'
-    },
-    geography() {
-      this.visible = true
-      this.modalName = 'geo-setting'
-    },
-    batch() {
-      this.visible = true
-      this.modalName = 'batch-setting'
-    },
-    dim_mea(type) {
-      this.visible = true
-      this.modalName = 'compute-setting'
-      this.computeType = type
+      this.modalName = modalName
+      if (computeType) this.computeType = computeType
     },
     handleAddSQL(type, item) {
       this.modalStatus = type

@@ -16,6 +16,7 @@
       >
         {{ nodeData.props.name }}
       </h6>
+      <div v-if="nodeData.props.type === 2" class="union"></div>
       <a-popover v-model="visible" trigger="click" overlayClassName='model-popover-box' @visibleChange="(v)=> handleVisibleChange(v, nodeData)">
         <div slot="content" class='popover-content'>
           <div class="popover-header">
@@ -68,6 +69,7 @@
       <a-popover v-model="nodeVisible" trigger="click"  overlayClassName='btn-box'>
         <ul slot="content" class="btn-box-ul">
           <li class="btn-box-li" @click="handleBtnDelete(nodeData)">删除</li>
+          <li class="btn-box-li" @click="handleBtnUnion(nodeData)">Union</li>
         </ul>
         <div class="caret-down"></div>
       </a-popover>
@@ -227,6 +229,10 @@ export default {
         this.handleAddCondition()
       })
     },
+    handleBtnUnion(node) {
+      this.nodeVisible = false
+      this.$EventBus.$emit('tableUnion', node)
+    },
     handleBtnDelete(node) {
       // let deleteList = []
       this.nodeVisible = false
@@ -265,6 +271,7 @@ export default {
       const index = findIndex(list, ownProps)
       const errorIndex = this.errorTables.indexOf(ownProps.tableNo)
       list.splice(index, 1)
+      this.$EventBus.$emit('deleteBelongCustom', ownProps)
       if (errorIndex > -1) {
         this.errorTables.splice(errorIndex, 1)
       }
@@ -441,6 +448,7 @@ export default {
           border: 4px solid #333;
           border-color: rgba(0, 0, 0, 0.85) transparent transparent transparent;
           position: absolute;
+          z-index: 10;
           top: 55%;
           transform: translateY(-50%);
           right: 6px;
@@ -451,6 +459,8 @@ export default {
             box-shadow: 0 0 6px #4a91e3;
         }
         h6 {
+            position: relative;
+            z-index: 10;
             padding: 0 25px 0 10px;
             overflow: hidden;
             white-space: nowrap;
@@ -462,6 +472,15 @@ export default {
             cursor: -o-grab;
             background-color: #f1f0ff;
             text-align: center;
+        }
+        .union {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            display: block;
+            width: 100%;
+            height: 100%;
+            border: 1px solid #d9d9d9;
         }
         .opt {
             position: absolute;

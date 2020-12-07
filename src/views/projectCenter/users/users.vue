@@ -7,7 +7,7 @@
             <a-tab-pane key="user" tab="用户管理">
               <user-manage ref="userManage"></user-manage>
             </a-tab-pane>
-            <a-tab-pane key="role" tab="角色属性">
+            <a-tab-pane key="role" tab="用户属性">
               <role-manage ref="roleManage"></role-manage>
             </a-tab-pane>
           </a-tabs>

@@ -5,9 +5,9 @@
         <div class="role-layout">
           <div class="tab scrollbar">
             <header>
-              <span>编辑用户权限</span>
+              <span>编辑角色</span>
               <div>
-                <a-button class="main-button" type="primary" @click="handleSave">保 存</a-button>
+                <a-button class="main-button" type="primary" :loading="loading" @click="handleSave">保 存</a-button>
                 <a-button class="main-button" @click="back">退 出</a-button>
               </div>
             </header>
@@ -19,7 +19,11 @@
                 <a-input v-model="form.description"></a-input>
               </a-form-model-item>
             </a-form-model>
-            <RoleTabeRole status="edit" @getChangeItem="getChangeItem"></RoleTabeRole>
+            <RoleTabeRole
+              status="edit"
+              @getChangeItem="getChangeItem"
+              @setBasePrivilege="getBasePrivilege"
+              ></RoleTabeRole>
             <RolesTabDataPermission status="edit"></RolesTabDataPermission>
           </div>
         </div>
@@ -43,6 +47,7 @@ export default {
     return {
       currentTab: '1',
       spinning: false,
+      loading: false,
       form: {
         name: '',
         description: ''
@@ -68,7 +73,11 @@ export default {
             message: '长度为1~200'
           }
         ]
-      }
+      },
+      basePrivilege: [],
+      screen: [],
+      dataModel: [],
+      dataSource: []
     }
   },
   computed: {
@@ -99,10 +108,48 @@ export default {
       })
     },
     getChangeItem(role, item) {
-      console.log(role, item)
+      const list = this[role]
+      const target = list.find(t => t.id === item.id)
+      if (target) {
+        target.permissions = item.permissions
+      } else {
+        list.push({
+          id: item.id,
+          permissions: item.permissions,
+          name: item.title
+        })
+      }
     },
-    handleSave() {
-      console.log('save')
+    getBasePrivilege(permissions, type) {
+      const target = this.basePrivilege.find(item => item.type === type)
+      if (target) {
+        target.permissions = permissions
+      } else {
+        this.basePrivilege.push({
+          type,
+          permissions
+        })
+      }
+    },
+    async handleSave() {
+      this.loading = true
+      const params = Object.assign({
+        id: this.roleId,
+        basePermissions: this.basePrivilege,
+        screen: this.screen,
+        dataModel: this.dataModel,
+        dataSource: this.dataSource
+      }, this.form)
+      const res = await this.$server.projectCenter.updateRole(params)
+        .finally(() => {
+          this.loading = false
+        })
+      if (res.code === 200) {
+        this.$message.success('保存成功')
+        this.back()
+      } else {
+        this.$message.error(res.msg)
+      }
     }
   }
 }

@@ -1,11 +1,13 @@
 @import "../dataModel-common.styl";
 .Model-Edit {
     .left {
+        position relative
+        z-index 501
         .sheet_list {
             margin-top: 15px;
             color: #01040f;
             line-height: 1.5;
-            height: calc(100% - 58px);
+            height: calc(100% - 90px);
             overflow-y: auto;
             .sheet_list_item {
                 position: relative;
@@ -126,6 +128,25 @@
             margin-right: 20px;
             text-align right;
         }
+        .union-list {
+            border 1px solid #d9d9d9
+            height 200px
+            overflow-y: auto
+            .union-table {
+                display flex
+                justify-content space-between
+                align-items center
+                height 30px  
+                width 100%
+                padding 0 10px
+                overflow hidden
+                text-overflow hidden
+                white-space nowrap
+                &:hover {
+                    background #e6e6e6
+                }
+            }
+        }
     }
 }
 .mod {
@@ -178,6 +199,13 @@
         cursor: -moz-grab;
         cursor: -ms-grab;
         cursor: -o-grab;
+
+        &.error,
+        &.error.file-active,
+        &.error:hover {
+            background-color: #f5b8b8 !important;
+            color: #e33131 !important; 
+        }
 
         &.dimensions.file-active,
         &.dimensions:hover {

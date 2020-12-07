@@ -10,9 +10,22 @@
     :okButtonProps="{
       props: { disabled: data.length > 0 ? false : true },
     }"
-    @ok="handleExport"
     @cancel="handleClose"
   >
+    <template #footer>
+      <a-button key="back" @click="handleClose">
+        取消
+      </a-button>
+      <a-button
+        v-permission:[$PERMISSION_CODE.OPERATOR.export]="$PERMISSION_CODE.OBJECT.datamodel"
+        key="submit"
+        type="primary"
+        :loading="confirmLoading"
+        @click="handleExport"
+      >
+        导出宽表
+      </a-button>
+    </template>
     <a-spin :spinning="loading">
       <a-empty v-if="data.length === 0" class="main-empty">
         <span slot="description">此宽表无数据</span>
