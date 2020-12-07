@@ -64,6 +64,10 @@ export default {
     },
     mounted() {
         this.handleGetData()
+        this.$EventBus.$on('roleFileSelect', this.handleGetData)
+    },
+    beforeDestroy() {
+        this.$EventBus.$off('roleFileSelect', this.handleGetData)
     },
     methods: {
         handleChangeTab(activeKey) {
