@@ -4,6 +4,7 @@
       <img src="../../../assets/images/login/login_logo.png" />
     </div>
     <a-menu
+      class="menu-body scrollbar"
       :defaultOpenKeys="openKeys"
       :selectedKeys="selectedKeys"
       mode="inline"

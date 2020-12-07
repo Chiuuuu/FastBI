@@ -5,7 +5,7 @@
         <div class="role-layout">
           <div class="tab scrollbar">
             <header>
-              <span>编辑用户权限</span>
+              <span>编辑角色</span>
               <div>
                 <a-button class="main-button" type="primary" :loading="loading" @click="handleSave">保 存</a-button>
                 <a-button class="main-button" @click="back">退 出</a-button>
