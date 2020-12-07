@@ -2,14 +2,14 @@
   <div class="footer">
     <div class="title">数据权限</div>
     <div class="content scrollbar" :class="status === 'show' ? 'show' : ''">
-      <a-tree
+      <!-- <a-tree
         checkable
         :disabled="status === 'show' ? true : false"
         :default-checked-keys="['0-0-1-0', '0-0-0-0']"
         :tree-data="treeData"
         @select="onSelect"
         @check="onCheck"
-      />
+      /> -->
     </div>
   </div>
 </template>

@@ -32,7 +32,7 @@
             <a-input v-model="form.description" placeholder="请输入角色描述"></a-input>
           </a-form-model-item>
           <a-form-model-item label="存储位置" prop="parantId">
-            <a-select v-model="form.parentId">
+            <a-select v-model="form.parentId" placeholder="选择文件夹">
               <a-select-option v-for="item in folderList" :key="item.id">{{ item.name }}</a-select-option>
             </a-select>
           </a-form-model-item>
@@ -146,7 +146,7 @@ export default {
       form: {
         name: '',
         description: '',
-        parentId: ''
+        parentId: undefined
       },
       rules: {
         name: [
@@ -258,6 +258,7 @@ export default {
       if (roleInfo.code === 200) {
         this.$store.commit('projectRoles/SET_ROLEINFO', roleInfo.data)
         this.$EventBus.$emit('setFormData')
+        this.$EventBus.$emit('roleFileSelect')
       } else {
         this.$message.error(roleInfo.msg)
       }
@@ -270,8 +271,13 @@ export default {
     /**
      * 打开弹窗
     */
-    showModal() {
+    showModal(event, item, vm) {
       this.visible = true
+      if (vm && vm.folder) {
+        this.form.parentId = vm.folder.id
+      } else {
+        this.form.parentId = undefined
+      }
     },
     /**
      * 搜索目录列表

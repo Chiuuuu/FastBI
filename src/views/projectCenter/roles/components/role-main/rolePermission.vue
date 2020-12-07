@@ -6,7 +6,7 @@
         <div class="line">角色描述：{{ roleInfo.description }}</div>
       </div>
       <a-button class="main-button" type="primary" @click="edit"
-        >编辑用户</a-button
+        >编辑角色</a-button
       >
     </header>
     <RoleTabeRole status="show"></RoleTabeRole>

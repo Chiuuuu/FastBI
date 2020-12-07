@@ -170,6 +170,10 @@ export default {
         username: [
           { required: true, message: '请填写用户名' },
           {
+            pattern: /[a-zA-Z0-9]+/g,
+            message: '不支持中文用户名'
+          },
+          {
             type: 'string',
             max: 20,
             min: 2,
