@@ -23,7 +23,7 @@
           <a-button type="primary" @click="() => handleGetData()" :disabled="loading">查询</a-button>
         </a-form-model-item>
         <a-form-model-item>
-          <a-button type="primary" @click="resetForm()" :disabled="loading">重置</a-button>
+          <a-button type="primary" @click="resetForm" :disabled="loading">重置</a-button>
         </a-form-model-item>
       </a-form-model>
     </div>
@@ -163,6 +163,9 @@ export default {
   methods: {
     resetForm(tab) {
       this.personSearch = this.$options.data().personSearch
+      this.$nextTick(() => {
+        this.handleGetData()
+      })
     },
     async handleSwitch(e, record) {
       const res = await this.$server.corporateDomain.actionEnableUser({

@@ -10,7 +10,7 @@
       >
     </header>
     <RoleTabeRole status="show"></RoleTabeRole>
-    <RolesTabDataPermission status="show"></RolesTabDataPermission>
+    <!-- <RolesTabDataPermission status="show"></RolesTabDataPermission> -->
   </div>
 </template>
 <script>

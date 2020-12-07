@@ -60,35 +60,35 @@ export default {
         }
       ]
     },
-    {
-      path: 'permissions',
-      name: 'permissions',
-      redirect: '/projectCenter/permissions/list',
-      component: PageView,
-      meta: {
-        title: '数据权限管理',
-        permissions: [PERMISSION_CODE.PAGE.dataPermission]
-      },
-      children: [
-        {
-          path: 'list',
-          name: 'permissionsList',
-          component: PermissionsView,
-          meta: {
-            sideBar: 'permissions',
-            permissions: [PERMISSION_CODE.PAGE.dataPermission]
-          }
-        },
-        {
-          path: 'edit/id=:id',
-          name: 'permissionsEdit',
-          component: PermissionsEdit,
-          meta: {
-            sideBar: 'permissions',
-            permissions: [PERMISSION_CODE.PAGE.dataPermission]
-          }
-        }
-      ]
-    }
+    // {
+    //   path: 'permissions',
+    //   name: 'permissions',
+    //   redirect: '/projectCenter/permissions/list',
+    //   component: PageView,
+    //   meta: {
+    //     title: '数据权限管理',
+    //     permissions: [PERMISSION_CODE.PAGE.dataPermission]
+    //   },
+    //   children: [
+    //     {
+    //       path: 'list',
+    //       name: 'permissionsList',
+    //       component: PermissionsView,
+    //       meta: {
+    //         sideBar: 'permissions',
+    //         permissions: [PERMISSION_CODE.PAGE.dataPermission]
+    //       }
+    //     },
+    //     {
+    //       path: 'edit/id=:id',
+    //       name: 'permissionsEdit',
+    //       component: PermissionsEdit,
+    //       meta: {
+    //         sideBar: 'permissions',
+    //         permissions: [PERMISSION_CODE.PAGE.dataPermission]
+    //       }
+    //     }
+    //   ]
+    // }
   ]
 }
