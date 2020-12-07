@@ -15,5 +15,12 @@ export default {
      */
     actionSwitchProject(id) {
         return $axios.post('/switchProject', { id })
+    },
+    /**
+     * @description 获取用户项目列表
+     * @returns
+     */
+    getProjectList() {
+        return $axios.get(`/getUserProjects?refresh=true`)
     }
 }
