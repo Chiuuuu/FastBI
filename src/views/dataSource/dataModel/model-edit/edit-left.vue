@@ -18,6 +18,9 @@
           <div class="u-icon edit"><a-icon type="edit" @click="handleSQLEdit(item)"/></div>
           <div class="u-icon delete"><a-icon type="delete" @click="handleSQLDelete(item)"/></div>
         </template>
+        <template v-else>
+          <div class="u-icon delete"><a-icon type="eye" @click="handleTableInfo(3)"/></div>
+        </template>
       </div>
     </div>
     <template v-else>

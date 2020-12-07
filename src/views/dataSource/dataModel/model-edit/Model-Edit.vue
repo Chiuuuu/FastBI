@@ -27,13 +27,13 @@
       <div class="table_list" :class="{'no-sql': !isDatabase}">
         <div class="menu_search">
           <span class="search_span">表</span>
-          <!-- <a-input placeholder="请输入关键词搜索" class="search_input">
+          <a-input placeholder="请输入关键词搜索" :value="tableSearch" @change="handleSearchTable" class="search_input">
             <a-icon slot="prefix" type="search" />
-          </a-input> -->
+          </a-input>
         </div>
         <edit-left
           ref="editLeftRef"
-          :list="leftMenuList"
+          :list="tableSearchList"
           @on-left-drag-leave="handleLeftDragLeave"
         ></edit-left>
       </div>
@@ -208,6 +208,7 @@ import groupBy from 'lodash/groupBy'
 import keys from 'lodash/keys'
 import DimensionsIcon from '@/assets/images/icon_dimension.png'
 import MeasureIcon from '@/assets/images/icon_measure.png'
+import debounce from 'lodash/debounce'
 // const setting = [
 //   {
 //     key: '1',
@@ -242,6 +243,8 @@ export default {
       spinning: false,
       detailInfo: '',
       isDatabase: false, // 是否是SQL数据源, 控制自定义SQL渲染
+      tableSearch: '', // 表搜索关键字
+      searchList: [],
       leftMenuList: [],
       rightMenuList: [],
       sqlForm: {},
@@ -288,6 +291,9 @@ export default {
     },
     databaseName() {
       return this.databaseList.length > 0 ? this.databaseList[0].name : ''
+    },
+    tableSearchList() {
+      return this.tableSearch ? this.searchList : this.leftMenuList
     },
     tableFields() {
       if (this.detailInfo.pivotSchema) {
@@ -412,6 +418,11 @@ export default {
         this.$message.error(result.msg)
       }
     },
+    handleSearchTable: debounce(function(event) {
+      const value = event.target.value
+      this.tableSearch = value
+      this.searchList = this.leftMenuList.filter(item => item.name.toLowerCase().indexOf(value.toLowerCase()) > -1)
+    }, 400),
     /**
      * 切换数据库
      */
