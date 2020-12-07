@@ -448,6 +448,7 @@ export default {
           border: 4px solid #333;
           border-color: rgba(0, 0, 0, 0.85) transparent transparent transparent;
           position: absolute;
+          z-index: 10;
           top: 55%;
           transform: translateY(-50%);
           right: 6px;
