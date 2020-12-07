@@ -11,11 +11,11 @@ const PERMISSION_CODE = {
         datasource: 1, // 数据接入
         datamodel: 2, // 数据模型
         screen: 3, // 数据大屏
-        user: 4, // 用户管理
+        user: 5, // 用户管理
         role: 5, // 角色管理
-        dataPermission: 6, // 数据权限管理
-        personnel: 7, // 人员管理
-        project: 8 // 项目管理
+        dataPermission: 5, // 数据权限管理
+        personnel: 4, // 人员管理
+        project: 4 // 项目管理
     },
     OBJECT: {
         all: '00', // 该模块下所有对象
