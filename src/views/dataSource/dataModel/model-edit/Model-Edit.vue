@@ -499,7 +499,7 @@ export default {
         const map = new Map()
         list.forEach(element => {
           if (map.has(element.alias)) {
-            let value = map.get(element.alias).value
+            let value = map.get(element.alias)
             let alias = element.alias
             if (value === 1 && map.get('tableName') !== element.tableName) {
               // 不同表名同字段
@@ -515,7 +515,7 @@ export default {
             map.set(element.alias, value)
             element.alias = alias
           } else {
-            map.set(element.alias, { value: 1, name: element.name })
+            map.set(element.alias, 1)
             map.set('tableName', element.tableName)
             console.log('map', map)
           }
