@@ -246,6 +246,7 @@ export default {
           }
           if (result.code === 200) {
             this.$message.success(this.modalType === 'add' ? '添加成功' : '编辑成功', 1).then(() => {
+              this.$store.dispatch('user/reFreshProjectList')
               this.handleGetListData()
               this.visible = false
               this.clearModal()

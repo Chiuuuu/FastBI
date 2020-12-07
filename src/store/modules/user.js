@@ -76,6 +76,14 @@ const actions = {
       router.addRoutes(accessRoutes)
       resolve()
     })
+  },
+  async reFreshProjectList({ commit }) {
+    const result = await server.user.getProjectList()
+    if (result.code === 200) {
+      commit('SET_PROJECTLIST', result.rows)
+    } else {
+      message.error(result.msg || '请求错误')
+    }
   }
 }
 
