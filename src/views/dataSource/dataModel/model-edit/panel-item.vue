@@ -1,5 +1,5 @@
 <template>
-  <div class="u-bitem edit" :class="className" ref="file">
+  <div class="u-bitem edit" :class="[className, { 'error': error }]" ref="file">
     <div class="txt">
       <div class="icon"><img :src="imgURI" /></div>
       <div class="name">{{ itemData.alias }}</div>
@@ -27,6 +27,10 @@ export default {
         type: Object,
         default: () => {}
       },
+      detailInfo: {
+        type: Object,
+        default: () => {}
+      },
       imgURI: {
           type: String,
           default: ''
@@ -51,6 +55,11 @@ export default {
   computed: {
     hasContextmenus() {
       return this.contextmenus.length !== 0
+    },
+    error() {
+      return this.detailInfo
+      ? (!this.detailInfo.config.tables.some(item => item.id === this.itemData.modelTableId))
+      : false
     }
   },
   methods: {
@@ -69,7 +78,7 @@ export default {
       const that = this
       addClass(this.$refs.file, 'file-active')
       const styleObj = {
-        left: this.className==='dimensions' ? `${e.clientX}px` : `${e.clientX -180}px`,
+        left: this.className === 'dimensions' ? `${e.clientX}px` : `${e.clientX - 180}px`,
         top: `${e.clientY - that.contextmenus.length * 28}px`
       }
        function addEvent(target) {
@@ -96,5 +105,5 @@ export default {
       })
     }
   }
-};
+}
 </script>
