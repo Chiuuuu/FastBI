@@ -24,7 +24,7 @@
               @getChangeItem="getChangeItem"
               @setBasePrivilege="getBasePrivilege"
               ></RoleTabeRole>
-            <RolesTabDataPermission status="edit"></RolesTabDataPermission>
+            <!-- <RolesTabDataPermission status="edit"></RolesTabDataPermission> -->
           </div>
         </div>
       </div>

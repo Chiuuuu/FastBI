@@ -138,6 +138,7 @@ export default {
             this.spinning = false
           })
         } else {
+          this.editPsw = true
           this.getProjectList()
         }
       } else {

@@ -92,6 +92,9 @@ export default {
         /** 重置表单 */
         handleRestForm() {
             this.$refs.userMangeForm.resetFields()
+            this.$nextTick(() => {
+                this.handleGetData()
+            })
         }
     }
 }

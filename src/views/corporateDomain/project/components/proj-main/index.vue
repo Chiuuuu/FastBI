@@ -223,6 +223,9 @@ export default {
     },
     handleResetForm() {
       this.searchForm = this.$options.data().searchForm
+      this.$nextTick(() => {
+        this.handleGetListData()
+      })
     },
     handleModalSubmit() {
       this.$refs.form.validate(async valid => {
