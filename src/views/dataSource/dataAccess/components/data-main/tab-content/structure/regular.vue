@@ -188,7 +188,7 @@ export default {
             type: 'string',
             max: 20,
             min: 1,
-            message: '长度为1~20'
+            message: '请输入1-20个字符的任务名称'
           }
         ],
         repeat: [{ required: true, message: '请选择更新方式' }],

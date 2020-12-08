@@ -158,13 +158,13 @@ export default {
             type: 'string',
             max: 20,
             min: 1,
-            message: '长度为1~20'
+            message: '请输入1-20个字的角色名称'
           }
         ],
         description: [
           {
             required: true,
-            message: '请输入用户描述'
+            message: '请输入200字以内的用户描述'
           },
           {
             type: 'string',
