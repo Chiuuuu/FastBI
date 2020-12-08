@@ -10,11 +10,15 @@ export function isSearchMatch(item, value) {
  */
 export function menuSearchLoop(item, value) {
   // 不是文件夹且匹配直接写入数组
-  if (item.fileType === 1 && isSearchMatch(item, value)) {
-    return item
+  if (item.fileType === 1) {
+    if (isSearchMatch(item, value)) {
+      return item
+    }
   } else {
     // 递归遍历文件夹
-    if (item.children && item.children.length > 0) {
+    if (isSearchMatch(item, value)) { // 文件夹名字匹配, 返回整个文件夹
+      return Object.assign({}, item)
+    } else if (item.children && item.children.length > 0) { // 不匹配, 则找到下面匹配的文件
       let newChildren = []
       item.children.map(child => {
         // 遍历子节点

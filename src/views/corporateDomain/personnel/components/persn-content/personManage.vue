@@ -48,10 +48,12 @@
     <template #enable="text, record"><a-switch :checked="record.enable" @change="handleSwitch($event, record)" /></template>
     <!-- 操作 -->
     <template #config="text, record">
-      <a class="handler-margin" @click="handleEdit(record)" style="margin-right: 20px">编辑</a>
-      <a-popconfirm title="是否要删除？" ok-text="确定" cancel-text="取消" @confirm="handleDelete(record.id)">
-        <a href="#">删除</a>
-      </a-popconfirm>
+      <template v-if="record && record.id !== '1'">
+        <a class="handler-margin" @click="handleEdit(record)" style="margin-right: 20px">编辑</a>
+        <a-popconfirm title="是否要删除？" ok-text="确定" cancel-text="取消" @confirm="handleDelete(record.id)">
+          <a href="#">删除</a>
+        </a-popconfirm>
+      </template>
     </template>
   </a-table>
   <UserModal ref="userModal" :show="visible1" :dept-list="departList" :modal-data="modalData" :modal-type="modalType" @close="visible1 = false" />
