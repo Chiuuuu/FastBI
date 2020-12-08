@@ -61,6 +61,7 @@
 </template>
 
 <script>
+import { trimFormData } from '@/utils/form-utils'
 import UserModal from '../modals/userModal'
 import DepartModal from '../modals/departModal'
 import PostModal from '../modals/postModal'
@@ -219,7 +220,7 @@ export default {
     },
     async handleGetData(pagination) {
       this.loading = true
-      const params = Object.assign({}, this.personSearch, {
+      const params = Object.assign({}, trimFormData(this.personSearch), {
         ...omit(this.pagination, 'total'),
         current: pagination ? pagination.current : this.$options.data().pagination.current
       })

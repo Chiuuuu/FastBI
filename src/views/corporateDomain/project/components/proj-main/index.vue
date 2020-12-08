@@ -99,6 +99,7 @@
 
 <script>
 import omit from 'lodash/omit'
+import { trimFormData } from '@/utils/form-utils'
 const listColumn = [
   {
     title: '项目名称',
@@ -152,17 +153,17 @@ export default {
       },
       rules: {
         projectName: [
-          { required: true, message: '请填写项目名' },
+          { required: true, message: '请输入项目名' },
           {
             type: 'string',
             max: 20,
             min: 1,
-            message: '长度为1~20'
+            message: '请输入1-20个字的项目名称'
           }
         ],
         projectDesc: [
-          { required: true, message: '请填写描述' },
-          { type: 'string', max: 200, message: '不得超过200个字符' }
+          { required: true, message: '请输入项目描述' },
+          { type: 'string', max: 200, message: '请输入200字以内的项目描述' }
         ],
         adminList: [
           { required: true, message: '请选择管理员' }
@@ -300,7 +301,7 @@ export default {
     async handleGetListData(pagination) {
       this.loading = true
 
-      const params = Object.assign({}, this.searchForm, {
+      const params = Object.assign({}, trimFormData(this.searchForm), {
         ...omit(this.pagination, 'total'),
         current: pagination ? pagination.current : this.$options.data().pagination.current
       })

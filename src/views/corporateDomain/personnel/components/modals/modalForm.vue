@@ -53,7 +53,10 @@ export default {
     return {
       form: Object.assign({}, this.data),
       rules: {
-        name: { required: true, message: '请填写名称' }
+        name: [
+            { required: true, message: '请输入名称' },
+            { max: 20, min: 1, message: '请输入1-20个字的名称' }
+        ]
       }
     }
   },

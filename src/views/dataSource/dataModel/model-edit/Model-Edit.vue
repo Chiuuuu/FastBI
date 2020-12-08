@@ -423,7 +423,7 @@ export default {
     },
     handleSearchTable: debounce(function(event) {
       const value = event.target.value
-      this.tableSearch = value
+      this.tableSearch = value ? value.trim() : value
       this.searchList = this.leftMenuList.filter(item => item.name.toLowerCase().indexOf(value.toLowerCase()) > -1)
     }, 400),
     /**
