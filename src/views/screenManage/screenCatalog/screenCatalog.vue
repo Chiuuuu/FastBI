@@ -18,12 +18,12 @@
           </a-menu>
         </a-dropdown>
       </div>
-      <div class="menu_search" v-if="folderList.length > 0">
+      <div class="menu_search">
         <a-input placeholder="搜索大屏目录" v-model="searchName" @change="menuSearch">
           <a-icon class="icon_search" slot="suffix" type="search" />
         </a-input>
       </div>
-      <div class="menu-wrap scrollbar screen-menu">
+      <div class="menu-wrap scrollbar screen-menu" v-if="folderList.length > 0">
         <div
           class="group"
           :class="handleIsFolder(folder) ? 'is-folder' : ''"
@@ -61,6 +61,9 @@
           </template>
         </div>
       </div>
+      <a-empty v-else style="margin-top: 50px; color: rgba(0, 0, 0, 0.65)">
+        <span slot="description">暂无数据大屏</span>
+      </a-empty>
     </div>
     <div class="right scrollbar">
       <div class="right-header" v-if="fileSelectId !== ''">
