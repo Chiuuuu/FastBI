@@ -171,7 +171,7 @@ export default {
         username: [
           { required: true, message: '请输入用户名' },
           {
-            pattern: /[a-zA-Z0-9]+/g,
+            pattern: /^[^\u4e00-\u9fa5]+$/,
             message: '用户名仅支持字母大小写加数字的格式'
           },
           {

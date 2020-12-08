@@ -1,5 +1,5 @@
 <template>
-  <div class="u-bitem edit" :class="[className, { 'error': error }]" ref="file">
+  <div class="u-bitem edit" :class="[className]" ref="file">
     <div class="txt">
       <div class="icon"><img :src="imgURI" /></div>
       <div class="name">{{ itemData.alias }}</div>
