@@ -55,11 +55,6 @@ export default {
   computed: {
     hasContextmenus() {
       return this.contextmenus.length !== 0
-    },
-    error() {
-      return this.detailInfo
-      ? (!this.detailInfo.config.tables.some(item => item.id === this.itemData.modelTableId))
-      : false
     }
   },
   methods: {

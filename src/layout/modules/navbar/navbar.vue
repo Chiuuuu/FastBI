@@ -45,8 +45,8 @@ export default {
           const result = await this.$server.user.actionSwitchProject(value)
           if (result.code === 200) {
             await this.$store.dispatch('user/changeRole')
-            this.reload()
-            // window.location.reload() // 重刷方法1,但是会闪白
+            // this.reload()
+            window.location.reload() // 重刷方法1,但是会闪白
           } else {
             this.$message.error(result.msg || '请求错误')
           }

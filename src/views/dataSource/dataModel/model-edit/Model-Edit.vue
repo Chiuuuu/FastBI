@@ -122,7 +122,7 @@
                 >
                   <panel-item
                     v-for="item in value"
-                    :key="item.id"
+                    :key="item.alias"
                     className="dimensions"
                     :imgURI="DimensionsIcon"
                     :itemData="item"
@@ -150,7 +150,7 @@
                 >
                   <panel-item
                     v-for="item in value"
-                    :key="item.id"
+                    :key="item.alias"
                     className="measures"
                     :imgURI="MeasureIcon"
                     :itemData="item"
@@ -257,11 +257,11 @@ export default {
       },
       unionNode: {}, // 选择合并的树节点
       measures: '',
+      cacheMeasures: [], // 缓存自定义度量
       measuresActiveKey: [],
-      customMeasures: [], // 自定义度量
       dimensions: '',
+      cacheDimensions: [], // 缓存自定义维度
       dimensionsActiveKey: [],
-      customDimensions: [], // 自定义维度
       panelData: {}, // 选中的维度或度量
       customStyle: 'border: 0',
       // setting,
@@ -448,50 +448,88 @@ export default {
     },
     // 转换维度度量
     handleSwitchRole(type, vm) {
+      let tableName = vm.itemData.tableName
+      const role = vm.itemData.role === 1 ? 2 : 1
+      if (vm.itemData.tableNo === 0) {
+        tableName = vm.itemData.role === 1 ? '自定义度量' : '自定义维度'
+      }
+      const data = {
+        ...vm.itemData,
+        tableName,
+        role
+      }
+      let index
       if (type === 'dimensions') {
-        vm.itemData.role = 2
-        if (vm.id) {
-          const index = this.detailInfo.pivotSchema.dimensions.findIndex(item => item.id === vm.itemData.id)
-          this.detailInfo.pivotSchema.measures.push(vm.itemData)
-          this.detailInfo.pivotSchema.dimensions.splice(index, 1)
+        // 维度 转去 度量
+        if (vm.itemData.tableNo === 0) {
+          // 如果是自定义
+          index = this.cacheDimensions.findIndex(item => item.alias === vm.itemData.alias)
+          this.cacheMeasures.push(data)
+          this.cacheDimensions.splice(index, 1)
         } else {
-          vm.itemData.tableName = '自定义度量'
-          const index = this.customDimensions.findIndex(item => item.alias === vm.itemData.alias)
-          this.customMeasures.push(vm.itemData)
-          this.customDimensions.splice(index, 1)
+          index = this.detailInfo.pivotSchema.dimensions.findIndex(item => item.alias === vm.itemData.alias)
+          this.detailInfo.pivotSchema.dimensions.splice(index, 1)
+          this.detailInfo.pivotSchema.measures.push(data)
         }
       } else {
-        vm.itemData.role = 1
-        if (vm.id) {
-          const index = this.detailInfo.pivotSchema.measures.findIndex(item => item.id === vm.itemData.id)
-          this.detailInfo.pivotSchema.dimensions.push(vm.itemData)
-          this.detailInfo.pivotSchema.measures.splice(index, 1)
+        // 度量 转去 维度
+        if (vm.itemData.tableNo === 0) {
+          // 如果是自定义
+          index = this.cacheMeasures.findIndex(item => item.alias === vm.itemData.alias)
+          this.cacheDimensions.push(data)
+          this.cacheMeasures.splice(index, 1)
         } else {
-          vm.itemData.tableName = '自定义维度'
-          const index = this.customMeasures.findIndex(item => item.alias === vm.itemData.alias)
-          this.customDimensions.push(vm.itemData)
-          this.customMeasures.splice(index, 1)
+          index = this.detailInfo.pivotSchema.measures.findIndex(item => item.alias === vm.itemData.alias)
+          this.detailInfo.pivotSchema.measures.splice(index, 1)
+          this.detailInfo.pivotSchema.dimensions.push(data)
         }
       }
-      this.handleMeasures()
       this.handleDimensions()
+      this.handleMeasures()
     },
     // 复制维度度量
     handleCopyField(event, handler, vm) {
       const role = vm.itemData.role
-      const newField = Object.assign({}, vm.itemData, {
+      const newField = {
+        ...vm.itemData,
         id: '',
+        expr: `${vm.itemData.tableName}${vm.itemData.tableNo}`,
         tableNo: 0,
         tableName: '自定义' + (role === 1 ? '维度' : '度量')
-      })
+      }
+      newField.alias = this.handleAddCustomField(role === 1 ? this.cacheDimensions : this.cacheMeasures, newField, newField.alias)
       if (role === 1) {
-        this.customDimensions.push(newField)
+        this.cacheDimensions.push(newField)
         this.handleDimensions()
       } else if (role === 2) {
-        this.customMeasures.push(newField)
+        this.cacheMeasures.push(newField)
         this.handleMeasures()
       } else {
         this.$message.error('无法复制字段, 请刷新重试')
+      }
+    },
+    /** 复制字段时候添加 */
+    handleAddCustomField(list, field, source, hasNumber = 1) {
+      const hasArry = list.filter(item => item.tableNo === 0)
+      if (hasArry && hasArry.length) {
+        list = hasArry
+        let len = list.length
+        let hasFind = true
+        while(len >= 0 && hasFind) {
+          field.alias = `${source}(${hasNumber})`
+          const hasSame = list.filter(item => item.alias === field.alias)
+          hasFind = hasSame && hasSame.length ? true : false
+          if (hasFind) {
+            hasNumber++
+          }
+          len--
+        }
+        return `${source}(${hasNumber})`
+      } else {
+        if (hasNumber === 1) {
+          return `${source}(${hasNumber})`
+        }
+        return field.alias
       }
     },
     /**
@@ -501,26 +539,27 @@ export default {
       if (Array.isArray(list) && list.length > 1) {
         const map = new Map()
         list.forEach(element => {
-          if (map.has(element.alias)) {
-            let value = map.get(element.alias)
-            let alias = element.alias
-            if (value === 1 && map.get('tableName') !== element.tableName) {
-              // 不同表名同字段
-              alias = `${alias}(${element.tableName})`
-            } else if (value > 1 && map.get('tableName') === element.tableName) {
-              // 同表名同字段且已经存在过(value > 1)
-              alias = `${alias}(${element.tableName})(${value})`
+          if (element.tableNo !== 0) {
+            if (map.has(element.alias)) {
+              let value = map.get(element.alias)
+              let alias = element.alias
+              if (value === 1 && map.get('tableName') !== element.tableName) {
+                // 不同表名同字段
+                alias = `${alias}(${element.tableName})`
+              } else if (value > 1 && map.get('tableName') === element.tableName) {
+                // 同表名同字段且已经存在过(value > 1)
+                alias = `${alias}(${element.tableName})(${value})`
+              } else {
+                // 同表名同字段
+                alias = `${alias}(${value})`
+              }
+              value++
+              map.set(element.alias, value)
+              element.alias = alias
             } else {
-              // 同表名同字段
-              alias = `${alias}(${value})`
+              map.set(element.alias, 1)
+              map.set('tableName', element.tableName)
             }
-            value++
-            map.set(element.alias, value)
-            element.alias = alias
-          } else {
-            map.set(element.alias, 1)
-            map.set('tableName', element.tableName)
-            console.log('map', map)
           }
         })
       }
@@ -530,16 +569,18 @@ export default {
      * 维度数据处理
     */
     handleDimensions() {
-      this.handleSameName(this.detailInfo.pivotSchema.dimensions.concat(this.customDimensions))
-      this.dimensions = groupBy(this.detailInfo.pivotSchema.dimensions.concat(this.customDimensions), 'tableNo')
+      const arry = [...this.detailInfo.pivotSchema.dimensions, ...this.cacheDimensions] //this.detailInfo.pivotSchema.dimensions.concat(this.cacheDimensions)
+      this.handleSameName(arry)
+      this.dimensions = groupBy(arry, 'tableNo')
       this.dimensionsActiveKey = keys(this.dimensions)
     },
     /**
      * 度量数据处理
     */
     handleMeasures() {
-      this.handleSameName(this.detailInfo.pivotSchema.measures.concat(this.customMeasures))
-      this.measures = groupBy(this.detailInfo.pivotSchema.measures.concat(this.customMeasures), 'tableNo')
+      const arry = [...this.detailInfo.pivotSchema.measures, ...this.cacheMeasures] //this.detailInfo.pivotSchema.measures.concat(this.cacheMeasures)
+      this.handleSameName(arry)
+      this.measures = groupBy(arry, 'tableNo')
       this.measuresActiveKey = keys(this.measures)
     },
     /**
