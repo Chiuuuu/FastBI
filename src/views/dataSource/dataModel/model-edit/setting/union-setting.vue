@@ -48,12 +48,12 @@ export default {
   data() {
     return {
       form: {
-        name: this.unionData.alias
+        name: this.unionData.alias + '-union'
       },
       rules: {
         name: [
           { required: true, message: '请输入表名称' },
-          { min: 1, max: 20, message: '长度为1~20' }
+          { min: 1, max: 20, message: '请输入1-20个字符的表名称' }
         ]
       },
       unionList: []
@@ -64,7 +64,7 @@ export default {
       immediate: true,
       handler(newVal) {
         if (newVal) {
-          this.form.name = this.unionData.alias
+          this.form.name = this.unionData.alias + '-union'
           if (Array.isArray(this.unionData)) {
             this.unionList = [].concat(this.unionData)
           } else {

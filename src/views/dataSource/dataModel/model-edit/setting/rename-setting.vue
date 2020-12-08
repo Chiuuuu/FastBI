@@ -35,7 +35,7 @@ export default {
       rules: { 
         rename: [
           { required: true, message: '命名不能为空' },
-          { min: 1, max: 20, message: '长度为1~20' }
+          { min: 1, max: 20, message: '请输入1-20个字符的名称' }
         ]
       }
     }

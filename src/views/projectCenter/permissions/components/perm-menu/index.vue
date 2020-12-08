@@ -158,7 +158,7 @@ export default {
             type: 'string',
             max: 20,
             min: 1,
-            message: '长度为1~20'
+            message: '请输入1-20个字的角色'
           }
         ],
         description: [
@@ -170,7 +170,7 @@ export default {
             type: 'string',
             max: 200,
             min: 1,
-            message: '长度为1~200'
+            message: '请输入200字以内的用户描述'
           }
         ],
         parentId: [
