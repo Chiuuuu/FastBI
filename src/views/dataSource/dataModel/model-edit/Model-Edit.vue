@@ -405,8 +405,11 @@ export default {
         if (this.databaseList.length && this.databaseList.length > 0) {
           const listResult = await this.$server.dataModel.getTableListById(result.data[0].id)
           if (listResult.code === 200) {
-            this.leftMenuList = [].concat(listResult.data.filter(item => item.type === false))
-            this.rightMenuList = [].concat(listResult.data.filter(item => item.type === true))
+            this.leftMenuList = [].concat(listResult.data.filter(item => {
+              item.type = +item.type
+              return item.type === 0
+            }))
+            this.rightMenuList = [].concat(listResult.data.filter(item => item.type === 1))
             this.$store.dispatch('dataModel/setDatabaseId', result.data[0].id)
           } else {
             this.$message.error(listResult.msg)
