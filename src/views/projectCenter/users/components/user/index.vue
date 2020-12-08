@@ -40,8 +40,8 @@
                 @change="handleTableChange">
                 <template #config="text, record, index">
                     <a @click="handleEditUser(record, index)" style="margin-right: 20px">编辑</a>
-                    <a-popconfirm title="是否要删除？" ok-text="确定" cancel-text="取消" @confirm="handleDeleteUser(record, index)">
-                        <a href="#">删除</a>
+                    <a-popconfirm title="是否要移除？" ok-text="确定" cancel-text="取消" @confirm="handleDeleteUser(record, index)">
+                        <a href="#">移除</a>
                     </a-popconfirm>
                 </template>
             </a-table>
@@ -94,6 +94,7 @@
 </template>
 <script>
 import debounce from 'lodash/debounce'
+import { trimFormData } from '@/utils/form-utils'
 import omit from 'lodash/omit'
 const usersColumn = [
   {
@@ -199,7 +200,7 @@ export default {
         /** 获取用户列表数据 */
         async handleGetTableList(pagination) {
             this.loading = true
-            const params = Object.assign({}, this.userMangeForm, {
+            const params = Object.assign({}, trimFormData(this.userMangeForm), {
                 ...omit(this.pagination, 'total'),
                 current: pagination ? pagination.current : this.$options.data().pagination.current
             })
@@ -304,11 +305,11 @@ export default {
                 userIds: [item.id]
             })
         },
-        /** 删除操作 */
+        /** 移除操作 */
         async handleDeleteUser({ id }, index) {
             const result = await this.$server.projectCenter.deleUserById(id)
             if (result.code === 200) {
-                this.$message.success('删除成功')
+                this.$message.success('移除成功')
                 this.usersData.splice(index, 1)
             } else {
                 this.$message.error(result.msg || '请求错误')

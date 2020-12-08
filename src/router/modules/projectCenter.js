@@ -17,7 +17,7 @@ export default {
   component: RouteView,
   meta: {
     title: '项目中心',
-    icon: 'apartment',
+    icon: 'appstore',
     permissions: [PERMISSION_CODE.PAGE.user, PERMISSION_CODE.PAGE.role, PERMISSION_CODE.PAGE.dataPermission]
   },
   children: [

@@ -31,6 +31,7 @@
 </template>
 <script>
 import omit from 'lodash/omit'
+import { trimFormData } from '@/utils/form-utils'
 export default {
     name: 'userRoleManage',
     data() {
@@ -59,7 +60,7 @@ export default {
         /** 获取数据 */
         async handleGetData(pagination) {
             this.loading = true
-            const params = Object.assign({}, this.userMangeForm, {
+            const params = Object.assign({}, trimFormData(this.userMangeForm), {
                 ...omit(this.pagination, 'total'),
                 current: pagination ? pagination.current : this.$options.data().pagination.current
             })

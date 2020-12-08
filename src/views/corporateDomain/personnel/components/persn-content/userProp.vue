@@ -64,6 +64,7 @@
 </template>
 
 <script>
+import { trimFormData } from '@/utils/form-utils'
 import PropsEdit from './props-edit'
 import TableEdit from './table-edit'
 
@@ -136,7 +137,7 @@ export default {
       this.activePropIndex = -1
       this.activeTableIndex = -1
       this.loading = true
-      const params = Object.assign({}, this.userSearch, {
+      const params = Object.assign({}, trimFormData(this.userSearch), {
         pageSize: this.pagination.pageSize,
         current: pagination ? pagination.current : this.$options.data().pagination.current
       })

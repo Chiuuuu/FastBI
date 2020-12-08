@@ -3,7 +3,7 @@ import $axios from '@/axios'
 export default {
     /**
      * @description 查询当前项目用户列表
-     * @param {Object} params 
+     * @param {Object} params
      * @param {Number} params.roleId 角色id
      * @param {String} params.name 姓名
      * @param {String} params.username 用户名
@@ -17,7 +17,7 @@ export default {
      * @returns
      */
     getRoleList() {
-        return $axios.get('/business/business/listRoleForProjectId')
+        return $axios.get('/business/editRoleUser/listRoleForProjectId')
     },
     /**
      * @description 根据用户名/姓名查询用户列表
@@ -36,7 +36,7 @@ export default {
      * @returns
      */
     addUser(params) {
-        return $axios.post('/business/business/projectRoleAddUser', params)
+        return $axios.post('/business/editRoleUser/projectRoleAddUser', params)
     },
     /**
      * @description 删除用户
@@ -44,7 +44,7 @@ export default {
      * @returns
      */
     deleUserById(id) {
-        return $axios.delete(`/business/business/deleteUserRoles/${id}`)
+        return $axios.delete(`/business/editRoleUser/deleteUserRoles/${id}`)
     },
     /**
      * @description 更新，编辑用户
@@ -52,7 +52,7 @@ export default {
      * @returns
      */
     putUser(params) {
-        return $axios.put(`/business/business/updateProjectUserRole`, params)
+        return $axios.put(`/business/editRoleUser/updateProjectUserRole`, params)
     },
     /**
      * @description 获取用户属性列表
@@ -96,7 +96,7 @@ export default {
      * @returns
      */
     getRoleUserInfo(roleId) {
-        return $axios.get('/business/business/listForProjectRoleUsers/' + roleId)
+        return $axios.get('/business/editRoleUser/listForProjectRoleUsers/' + roleId)
     },
     /**
      * @description 获取权限树
@@ -125,7 +125,7 @@ export default {
      * @returns
      */
     addRoleUser(params) {
-        return $axios.post('/business/business/projectRoleAddUser', params)
+        return $axios.post('/business/editRoleUser/projectRoleAddUser', params)
     },
     /**
      * @description 为角色移除用户
@@ -133,6 +133,6 @@ export default {
      * @returns
      */
     deleRoleUser(id) {
-        return $axios.delete('/business/business/' + id)
+        return $axios.delete('/business/editRoleUser/' + id)
     }
 }

@@ -497,6 +497,8 @@ export default {
             this.$message.success('新建成功')
             this.$store.commit('projectRoles/SET_ROLEID', result.msg)
             this.$refs.addForm.resetFields()
+            this.fileSelectId = result.msg
+            this.getRoleInfo()
             this.visible = false
           } else {
             this.$message.error(result.msg)

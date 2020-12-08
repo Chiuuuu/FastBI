@@ -169,20 +169,20 @@ export default {
       },
       rules: {
         username: [
-          { required: true, message: '请填写用户名' },
+          { required: true, message: '请输入用户名' },
           {
             pattern: /[a-zA-Z0-9]+/g,
-            message: '不支持中文用户名'
+            message: '用户名仅支持字母大小写加数字的格式'
           },
           {
             type: 'string',
             max: 20,
             min: 2,
-            message: '长度为2~20'
+            message: '请输入2-20个字符的用户名'
           }
         ],
         password: [
-          { required: true, message: '请填写密码' },
+          { required: true, message: '请输入密码' },
           // {
           //   pattern: new RegExp('^[0-9]*$'),
           //   message: '只能填数字'
@@ -191,24 +191,25 @@ export default {
             type: 'string',
             max: 20,
             min: 6,
-            message: '长度为6~20'
+            message: '请输入6-20个字符的密码'
           },
           { validator: this.passwordValidate, trigger: 'change' }
         ],
         expassword: [
-          { required: true, message: '请确认密码' },
+          { required: true, message: '请再次输入密码' },
           { validator: this.confirmValidate, trigger: 'change' }
         ],
         name: [
-          { required: true, message: '请填写姓名' },
+          { required: true, message: '请输入姓名' },
           {
             type: 'string',
+            min: 2,
             max: 10,
-            message: '长度为1~10'
+            message: '请输入2-10个字符的姓名'
           }
         ],
         phone: [
-          { required: true, message: '请填写电话' },
+          { required: true, message: '请输入手机号码' },
           {
             pattern: new RegExp('^[0-9]*$'),
             message: '只能填数字'
@@ -216,7 +217,7 @@ export default {
           {
             type: 'string',
             len: 11,
-            message: '请填写11位手机号'
+            message: '手机号码格式不正确'
           }
         ],
         projects: [{ required: true, message: '请选择所属项目' }],
@@ -275,7 +276,7 @@ export default {
     },
     confirmValidate(rule, value, callback) {
       if (value !== this.form.password) {
-        callback(new Error('2次密码输入不一致'))
+        callback(new Error('两次密码不一致，请重新输入确认密码'))
       } else {
         callback()
       }
@@ -300,7 +301,7 @@ export default {
           this.confirmLoading = false
         })
       if (res.code === 200) {
-        this.$message.success('添加成功')
+        this.$message.success('添加用户成功')
         this.$parent.handleGetData()
         this.handleModalCancel()
       } else {

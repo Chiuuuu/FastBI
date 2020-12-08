@@ -9,7 +9,7 @@
     <template slot="custom" slot-scope="item" style="color: #f00;width: 100%">
       <a-row>
         <a-col span="14">{{item.title}}</a-col>
-        <a-col span="10" v-if="item.fileType === 1">
+        <a-col :span="injectActionList.length * 2" v-if="item.fileType === 1">
           <a-checkbox-group :value="item.permissions" style="width:100%">
             <a-row>
               <a-col span="5" v-for="(subitem,subindex) in injectActionList" :key="subitem.permission" :style="{

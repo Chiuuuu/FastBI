@@ -2,6 +2,7 @@
  * 是否匹配关键字
  */
 export function isSearchMatch(item, value) {
+  value = typeof value === 'string' ? value.trim() : value
   return item.name.toLowerCase().indexOf(value.toLowerCase()) > -1
 }
 /**

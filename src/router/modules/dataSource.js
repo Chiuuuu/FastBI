@@ -12,7 +12,7 @@ export default {
   component: RouteView,
   meta: {
     title: '数据管理',
-    icon: 'apartment',
+    icon: 'bar-chart',
     permissions: [PERMISSION_CODE.PAGE.datasource, PERMISSION_CODE.PAGE.datamodel]
   },
   children: [

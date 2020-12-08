@@ -34,6 +34,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import { trimFormData } from '@/utils/form-utils'
 import RolesTabDataPermission from '../tab-content/rolesTabDataPermission'
 import RoleTabeRole from '../tab-content/rolesTabRole'
 
@@ -140,7 +141,7 @@ export default {
         dataModel: this.dataModel,
         dataSource: this.dataSource
       }, this.form)
-      const res = await this.$server.projectCenter.updateRole(params)
+      const res = await this.$server.projectCenter.updateRole(trimFormData(params))
         .finally(() => {
           this.loading = false
         })
