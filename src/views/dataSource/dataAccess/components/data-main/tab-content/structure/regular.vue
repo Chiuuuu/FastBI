@@ -29,7 +29,7 @@
                   <a-icon style="margin-left:10px" type="question-circle" theme="outlined" />
                 </a-popover>
               </a-radio>
-              <a-radio :value="1">
+              <a-radio :value="1" :disabled="modelType === 'hive'">
                 <span>增量抽取</span>
                 <a-popover>
                   <template slot="content">
@@ -106,7 +106,7 @@
         <template #extractType="list, record, index">
           <a-select style="width: 150px" v-model="record.extractType" placeholder="请选择方式" @change="handleSelectExtractType($event, record)">
             <a-select-option :value="0">全量更新</a-select-option>
-            <a-select-option :value="1">增量更新</a-select-option>
+            <a-select-option :value="1" :disabled="modelType === 'hive'">增量更新</a-select-option>
           </a-select>
         </template>
         <template #fieldList="list, record, index">
@@ -219,6 +219,7 @@ export default {
   computed: {
     ...mapState({
       modelName: state => state.dataAccess.modelName,
+      modelType: state => state.dataAccess.modelType,
       modelId: state => state.dataAccess.modelId
     })
   },
