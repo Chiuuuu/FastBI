@@ -80,7 +80,8 @@ const actions = {
   async reFreshProjectList({ commit }) {
     const result = await server.user.getProjectList()
     if (result.code === 200) {
-      commit('SET_PROJECTLIST', result.rows)
+      commit('SET_PROJECTLIST', result.projects)
+      commit('SET_SELECTPROJECT', result.projectId)
     } else {
       message.error(result.msg || '请求错误')
     }
