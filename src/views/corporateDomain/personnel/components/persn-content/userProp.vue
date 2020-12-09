@@ -186,7 +186,8 @@ export default {
       if (this.activeTableIndex !== -1) {
         return this.$message.error('请先完成操作')
       } else {
-        this.editRow = Object.assign({}, record)
+        // this.editRow = Object.assign({}, record)
+        this.editRow = JSON.parse(JSON.stringify(record))
         this.activeTableIndex = index
       }
     },
@@ -196,11 +197,11 @@ export default {
     async handleSaveEditRow() {
       let valid = true
       this.editRow.userattrList.map(item => {
-        if (item.attrValue.length > 50 || item.attrValue.length < 1) {
+        if (item.attrValue.length > 50) {
           valid = false
         }
       })
-      if (!valid) return this.$message.error('请输入1-50个字符的属性')
+      if (!valid) return this.$message.error('请输入50个字符以内的属性')
       const res = await this.$server.corporateDomain.updateUserProp({
         rows: new Array(this.editRow)
       })
