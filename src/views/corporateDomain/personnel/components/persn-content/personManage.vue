@@ -43,7 +43,7 @@
     <!-- 岗位 -->
     <span slot="postName">岗位 <a-icon class="edit-icon" type="setting" @click="handleSetPost" /></span>
     <!-- 所属项目 -->
-    <template #projects="text">{{ text.toString() }}</template>
+    <template #projects="text">{{ text ? text.toString() : '' }}</template>
     <!-- 是否启用 -->
     <template #enable="text, record"><a-switch :checked="record.enable" @change="handleSwitch($event, record)" /></template>
     <!-- 操作 -->

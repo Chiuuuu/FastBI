@@ -64,7 +64,6 @@
       <a-form-model ref="form" :model="form" :rules="rules" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
         <a-form-model-item label="项目名称" prop="projectName">
           <a-input
-            mode="multiple"
             v-model="form.projectName"
             style="width: 100%"
             placeholder="请输入项目名称"
@@ -72,7 +71,6 @@
         </a-form-model-item>
         <a-form-model-item label="项目描述" prop="projectDesc">
           <a-input
-            mode="multiple"
             v-model="form.projectDesc"
             style="width: 100%"
             placeholder="请输入项目描述"
@@ -148,7 +146,7 @@ export default {
       rowProjectId: '', // 当前编辑的id
       form: { // 添加新项目表单
         projectName: '',
-        projectDes: '',
+        projectDesc: '',
         adminList: []
       },
       rules: {

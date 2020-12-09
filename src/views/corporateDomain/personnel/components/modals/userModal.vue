@@ -102,6 +102,7 @@
 
 <script>
 import debounce from 'lodash/debounce'
+import commonValidateField from '@/utils/validator'
 export default {
   name: 'personnelUserModal',
   props: {
@@ -150,6 +151,16 @@ export default {
     if (typeof this.searchProject === 'function') {
       this.searchProject = debounce(this.searchProject, 500)
     }
+    const usernameValidator = commonValidateField({
+      title: '用户名',
+      min: 2,
+      max: 10
+    })
+    const nameValidator = commonValidateField({
+      title: '姓名',
+      min: 2,
+      max: 10
+    })
     return {
       bodyStyle: { height: 'calc(100vh - 240px)', 'overflow-y': 'auto' },
       searching: false,
@@ -170,16 +181,8 @@ export default {
       rules: {
         username: [
           { required: true, message: '请输入用户名' },
-          {
-            pattern: /^[^\u4e00-\u9fa5]+$/,
-            message: '用户名仅支持字母大小写加数字的格式'
-          },
-          {
-            type: 'string',
-            max: 20,
-            min: 2,
-            message: '请输入2-20个字符的用户名'
-          }
+          usernameValidator.length,
+          usernameValidator.noChinese
         ],
         password: [
           { required: true, message: '请输入密码' },
@@ -201,12 +204,8 @@ export default {
         ],
         name: [
           { required: true, message: '请输入姓名' },
-          {
-            type: 'string',
-            min: 2,
-            max: 10,
-            message: '请输入2-10个字符的姓名'
-          }
+          nameValidator.length,
+          nameValidator.noEmoji
         ],
         phone: [
           { required: true, message: '请输入手机号码' },
