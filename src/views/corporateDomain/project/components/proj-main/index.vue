@@ -268,6 +268,7 @@ export default {
       if (result.code === 200) {
         this.listData.splice(index, 1)
         this.$message.success('删除成功', 1)
+        this.$store.dispatch('user/reFreshProjectList')
       } else {
         this.$message.error(result.msg || '请求错误')
       }
