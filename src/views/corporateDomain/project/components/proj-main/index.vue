@@ -98,6 +98,7 @@
 <script>
 import omit from 'lodash/omit'
 import { trimFormData } from '@/utils/form-utils'
+import commonValidateField from '@/utils/validator'
 const listColumn = [
   {
     title: '项目名称',
@@ -161,7 +162,8 @@ export default {
         ],
         projectDesc: [
           { required: true, message: '请输入项目描述' },
-          { type: 'string', max: 200, message: '请输入200字以内的项目描述' }
+          { type: 'string', max: 200, message: '请输入200字以内的项目描述' },
+          commonValidateField.noEmoji({ title: '项目描述' })
         ],
         adminList: [
           { required: true, message: '请选择管理员' }

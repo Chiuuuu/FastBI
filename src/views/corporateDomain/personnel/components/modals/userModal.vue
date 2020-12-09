@@ -151,16 +151,6 @@ export default {
     if (typeof this.searchProject === 'function') {
       this.searchProject = debounce(this.searchProject, 500)
     }
-    const usernameValidator = commonValidateField({
-      title: '用户名',
-      min: 2,
-      max: 10
-    })
-    const nameValidator = commonValidateField({
-      title: '姓名',
-      min: 2,
-      max: 10
-    })
     return {
       bodyStyle: { height: 'calc(100vh - 240px)', 'overflow-y': 'auto' },
       searching: false,
@@ -181,8 +171,12 @@ export default {
       rules: {
         username: [
           { required: true, message: '请输入用户名' },
-          usernameValidator.length,
-          usernameValidator.noChinese
+          commonValidateField.length({
+            title: '用户名',
+            min: 2,
+            max: 10
+          }),
+          commonValidateField.noChinese({ title: '用户名' })
         ],
         password: [
           { required: true, message: '请输入密码' },
@@ -204,8 +198,12 @@ export default {
         ],
         name: [
           { required: true, message: '请输入姓名' },
-          nameValidator.length,
-          nameValidator.noEmoji
+          commonValidateField.length({
+            title: '姓名',
+            min: 2,
+            max: 10
+          }),
+          commonValidateField.noSign({ title: '姓名' })
         ],
         phone: [
           { required: true, message: '请输入手机号码' },
