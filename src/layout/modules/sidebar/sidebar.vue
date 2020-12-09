@@ -21,7 +21,6 @@
           <a-menu-item
             v-for="subItem in item.children"
             :key="subItem.path"
-            :title="subItem.path"
             @click="selectMenu(subItem)"
             >{{ subItem.meta.title }}</a-menu-item
           >

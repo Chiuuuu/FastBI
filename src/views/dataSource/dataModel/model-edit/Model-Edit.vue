@@ -493,7 +493,7 @@ export default {
       const newField = {
         ...vm.itemData,
         id: '',
-        expr: `${vm.itemData.tableName}${vm.itemData.tableNo}`,
+        expr: `${vm.itemData.tableName},${vm.itemData.tableNo}`,
         tableNo: 0,
         tableName: '自定义' + (role === 1 ? '维度' : '度量')
       }
@@ -515,10 +515,10 @@ export default {
         list = hasArry
         let len = list.length
         let hasFind = true
-        while(len >= 0 && hasFind) {
+        while (len >= 0 && hasFind) {
           field.alias = `${source}(${hasNumber})`
-          const hasSame = list.filter(item => item.alias === field.alias)
-          hasFind = hasSame && hasSame.length ? true : false
+          const hasSame = list.some(item => item.alias === field.alias)
+          hasFind = hasSame
           if (hasFind) {
             hasNumber++
           }
@@ -569,7 +569,7 @@ export default {
      * 维度数据处理
     */
     handleDimensions() {
-      const arry = [...this.detailInfo.pivotSchema.dimensions, ...this.cacheDimensions] //this.detailInfo.pivotSchema.dimensions.concat(this.cacheDimensions)
+      const arry = [...this.detailInfo.pivotSchema.dimensions, ...this.cacheDimensions]
       this.handleSameName(arry)
       this.dimensions = groupBy(arry, 'tableNo')
       this.dimensionsActiveKey = keys(this.dimensions)
@@ -578,7 +578,7 @@ export default {
      * 度量数据处理
     */
     handleMeasures() {
-      const arry = [...this.detailInfo.pivotSchema.measures, ...this.cacheMeasures] //this.detailInfo.pivotSchema.measures.concat(this.cacheMeasures)
+      const arry = [...this.detailInfo.pivotSchema.measures, ...this.cacheMeasures]
       this.handleSameName(arry)
       this.measures = groupBy(arry, 'tableNo')
       this.measuresActiveKey = keys(this.measures)
@@ -709,6 +709,12 @@ export default {
       this.detailInfo.config.tables.map(table => {
         table.alias = table.name
       })
+
+      // 处理维度度量
+      this.detailInfo.pivotSchema = {
+        dimensions: [...this.detailInfo.pivotSchema.dimensions, ...this.cacheDimensions],
+        measures: [...this.detailInfo.pivotSchema.measures, ...this.cacheMeasures]
+      }
       const result = await this.$server.dataModel.saveModel({
         ...this.detailInfo,
         parentId: this.parentId
