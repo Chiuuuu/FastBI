@@ -99,7 +99,7 @@
           <span>数据模型详情</span>
           <div class="detail_btn">
             <a-button v-on:click="openModal('check-table')" :disabled="disableByDetailInfo">查看宽表</a-button>
-            <a-button v-on:click="openModal('batch-setting')">批量编辑字段</a-button>
+            <!-- <a-button v-on:click="openModal('batch-setting')">批量编辑字段</a-button> -->
           </div>
         </div>
         <div class="detail_main">
@@ -297,7 +297,8 @@ export default {
     },
     tableFields() {
       if (this.detailInfo.pivotSchema) {
-        return groupBy(this.detailInfo.pivotSchema.dimensions.concat(this.detailInfo.pivotSchema.measures), 'tableNo')
+        const arry = [...this.detailInfo.pivotSchema.dimensions, ...this.detailInfo.pivotSchema.measures, ...this.cacheDimensions, ...this.cacheMeasures]
+        return groupBy(arry, 'tableNo')
       } else {
         return []
       }
@@ -345,12 +346,29 @@ export default {
           name: '转换数据类型',
           children: [
             {
-              name: '转换数字',
-              onClick: (event, handler, vm) => {
-                this.panelData = vm.itemData
-                event.stopPropagation()
-                console.log('转换数字类型数字')
-              }
+              name: '转换为整数',
+              dataType: 'BIGINT',
+              onClick: this.switchFieldType
+            },
+            {
+              name: '转换为小数',
+              dataType: 'DOUBLE',
+              onClick: this.switchFieldType
+            },
+            {
+              name: '转换为字符串',
+              dataType: 'VARCHAR',
+              onClick: this.switchFieldType
+            },
+            {
+              name: '转换为日期',
+              dataType: 'DATE',
+              onClick: this.switchFieldType
+            },
+            {
+              name: '转换为日期时间',
+              dataType: 'TIMESTAMP',
+              onClick: this.switchFieldType
             }
           ]
         },
@@ -363,6 +381,10 @@ export default {
       ]
 
       return arry
+    },
+    switchFieldType(e, item, vm) {
+      let dataType = item.dataType
+      vm.itemData.dataType = dataType
     },
     async handleGetDatabaseList() {
       const result = await this.$server.dataModel.getDatabaseList(this.$route.query.datasourceId)
@@ -461,7 +483,7 @@ export default {
       let index
       if (type === 'dimensions') {
         // 维度 转去 度量
-        if (vm.itemData.tableNo === 0) {
+        if (vm.itemData.tableNo === 0 && !vm.itemData.id) {
           // 如果是自定义
           index = this.cacheDimensions.findIndex(item => item.alias === vm.itemData.alias)
           this.cacheMeasures.push(data)
@@ -473,7 +495,7 @@ export default {
         }
       } else {
         // 度量 转去 维度
-        if (vm.itemData.tableNo === 0) {
+        if (vm.itemData.tableNo === 0 && !vm.itemData.id) {
           // 如果是自定义
           index = this.cacheMeasures.findIndex(item => item.alias === vm.itemData.alias)
           this.cacheDimensions.push(data)
@@ -566,22 +588,43 @@ export default {
       return list
     },
     /**
+     * 合并维度数据
+    */
+    handleConcatDimensions() {
+      return [...this.cacheDimensions, ...this.detailInfo.pivotSchema.dimensions]
+    },
+    /**
      * 维度数据处理
     */
     handleDimensions() {
-      const arry = [...this.detailInfo.pivotSchema.dimensions, ...this.cacheDimensions]
+      const arry = this.handleConcatDimensions()
       this.handleSameName(arry)
       this.dimensions = groupBy(arry, 'tableNo')
       this.dimensionsActiveKey = keys(this.dimensions)
     },
     /**
+     * 合并度量数据
+    */
+    handleConcatMeasures() {
+      return [...this.cacheMeasures, ...this.detailInfo.pivotSchema.measures]
+    },
+    /**
      * 度量数据处理
     */
     handleMeasures() {
-      const arry = [...this.detailInfo.pivotSchema.measures, ...this.cacheMeasures]
+      const arry = this.handleConcatMeasures()
       this.handleSameName(arry)
       this.measures = groupBy(arry, 'tableNo')
       this.measuresActiveKey = keys(this.measures)
+    },
+    /**
+     * 合并维度度量数据
+    */
+    handleConcat() {
+      return {
+        dimensions: this.handleConcatDimensions(),
+        measures: this.handleConcatMeasures()
+      }
     },
     /**
      * 编辑时获取模型数据
@@ -596,6 +639,11 @@ export default {
       if (result.code === 200) {
         this.$message.success('获取数据成功')
         this.detailInfo = result.data
+
+        // 将自定义维度度量剥离处理
+        this.detailInfo.pivotSchema.dimensions = this.handlePeelCustom(this.detailInfo.pivotSchema.dimensions, this.cacheDimensions)
+        this.detailInfo.pivotSchema.measures = this.handlePeelCustom(this.detailInfo.pivotSchema.measures, this.cacheMeasures)
+
         this.handleDimensions()
         this.handleMeasures()
         this.$nextTick(() => {
@@ -603,6 +651,17 @@ export default {
         })
       } else {
         this.$message.error(result.msg)
+      }
+    },
+    handlePeelCustom(list, cache) {
+      if (list && list.length) {
+        return list.filter(item => {
+          if (item.tableNo === 0) {
+            cache.push(item)
+          } else {
+            return item
+          }
+        })
       }
     },
     handleLeftDragLeave() {
@@ -709,17 +768,13 @@ export default {
       this.detailInfo.config.tables.map(table => {
         table.alias = table.name
       })
-
-      // 处理维度度量
-      this.detailInfo.pivotSchema = {
-        dimensions: [...this.detailInfo.pivotSchema.dimensions, ...this.cacheDimensions],
-        measures: [...this.detailInfo.pivotSchema.measures, ...this.cacheMeasures]
-      }
       const result = await this.$server.dataModel.saveModel({
         ...this.detailInfo,
+        pivotSchema: {
+          ...this.handleConcat() // 处理维度度量
+        },
         parentId: this.parentId
       })
-
       if (result.code === 200) {
         if (this.model === 'add') {
           await this.handleSaveModelSourceId()
