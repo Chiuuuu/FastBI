@@ -32,7 +32,7 @@ export default {
       form: {
         rename: this.renameData.alias
       },
-      rules: { 
+      rules: {
         rename: [
           { required: true, message: '命名不能为空' },
           { min: 1, max: 20, message: '请输入1-20个字符的名称' }
@@ -54,10 +54,9 @@ export default {
     handleSave() {
       this.$refs.form.validate((ok) => {
         if (ok) {
-          const role = this.renameData.role
           let valid = true
-          Object.values(this.$parent[role === 1 ? 'dimensions' : 'measures']).forEach(list => {
-            if (list.some(item => item.alias === name)) {
+          Object.values(this.$parent.tableFields).forEach(list => {
+            if (list.some(item => item.alias === this.form.rename)) {
               valid = false
             }
           })

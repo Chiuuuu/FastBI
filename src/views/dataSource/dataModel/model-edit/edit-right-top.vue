@@ -73,6 +73,8 @@ export default {
       this.detailInfo.config.tables = []
       this.detailInfo.pivotSchema.dimensions = []
       this.detailInfo.pivotSchema.measures = []
+      this.$parent.cacheDimensions = []
+      this.$parent.cacheMeasures = []
       this.$parent.handleDimensions()
       this.$parent.handleMeasures()
     },
