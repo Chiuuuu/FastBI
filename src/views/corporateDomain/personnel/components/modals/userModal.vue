@@ -31,7 +31,7 @@
           <a-input-password
             v-model="form.expassword"
             style="width: 100%"
-            placeholder="请确认密码"
+            placeholder="请输入确认密码"
             :disabled="!editPsw"
           >
           </a-input-password>
@@ -102,6 +102,7 @@
 
 <script>
 import debounce from 'lodash/debounce'
+import commonValidateField from '@/utils/validator'
 export default {
   name: 'personnelUserModal',
   props: {
@@ -170,16 +171,12 @@ export default {
       rules: {
         username: [
           { required: true, message: '请输入用户名' },
-          {
-            pattern: /^[^\u4e00-\u9fa5]+$/,
-            message: '用户名仅支持字母大小写加数字的格式'
-          },
-          {
-            type: 'string',
-            max: 20,
+          commonValidateField.length({
+            title: '用户名',
             min: 2,
-            message: '请输入2-20个字符的用户名'
-          }
+            max: 20
+          }),
+          commonValidateField.noChinese({ title: '用户名' })
         ],
         password: [
           { required: true, message: '请输入密码' },
@@ -201,12 +198,11 @@ export default {
         ],
         name: [
           { required: true, message: '请输入姓名' },
-          {
-            type: 'string',
-            min: 2,
-            max: 10,
-            message: '请输入2-10个字符的姓名'
-          }
+          commonValidateField.length({
+            title: '姓名',
+            max: 10
+          }),
+          commonValidateField.noSign({ title: '姓名' })
         ],
         phone: [
           { required: true, message: '请输入手机号码' },

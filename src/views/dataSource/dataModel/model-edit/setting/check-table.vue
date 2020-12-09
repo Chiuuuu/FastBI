@@ -40,14 +40,14 @@
                   <div class="hr" data-resize="true"></div>
                 </div>
               </th>
-              <template v-for="(item,index) in columns">
+              <template v-for="(item,index) in columnsList">
                 <th :key="item.title">
                   <div class="wrap">
                     <!-- <div class="menu-left">
                       <i class="u-icn u-icn-string"></i>
                     </div> -->
-                    <div class="txt" :title="item.title">
-                      <span class='txt-title'>{{item.title}}</span>
+                    <div class="txt" :title="item.name">
+                      <span class='txt-title'>{{item.name}}</span>
                       <span class='columns-type'>{{setColumnsType(columnsList[index])}}</span>
                     </div>
                   </div>
@@ -132,9 +132,15 @@ export default {
       this.handleResetData()
 
       // 设置表头
-      this.handleFormatTableColumn()
+      // this.handleFormatTableColumn()
 
-      const result = await this.$server.dataModel.getWidthTableInfo(this.detailInfo)
+      const params = {
+        ...this.detailInfo,
+        pivotSchema: {
+          ...this.$parent.handleConcat() // 处理维度度量
+        }
+      }
+      const result = await this.$server.dataModel.getWidthTableInfo(params)
 
       if (result.code === 200) {
         this.columnsList = result.data.columnNameList

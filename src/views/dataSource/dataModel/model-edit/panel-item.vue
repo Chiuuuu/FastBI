@@ -74,7 +74,7 @@ export default {
       addClass(this.$refs.file, 'file-active')
       const styleObj = {
         left: this.className === 'dimensions' ? `${e.clientX}px` : `${e.clientX - 180}px`,
-        top: `${e.clientY - that.contextmenus.length * 28}px`
+        top: `${e.clientY - (that.contextmenus.length + 1) * 28}px`
       }
        function addEvent(target) {
             target.$$fun = function () {

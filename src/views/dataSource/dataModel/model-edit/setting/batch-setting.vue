@@ -286,7 +286,7 @@ export default {
     },
     switchFieldType(e, item, vm) {
       let dataType = item.dataType
-      vm.selectData.convertType = dataType
+      vm.selectData.dataType = dataType
     },
     switchRoleType(e, item, vm) {
       let roleType = item.roleType

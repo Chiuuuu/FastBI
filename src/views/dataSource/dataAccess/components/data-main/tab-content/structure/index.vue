@@ -14,7 +14,13 @@
         <a-col>
           <a-button type="primary" class="select_button" @click="handleGetData" :loading="spinning">刷新数据</a-button>
           <a-button v-show="showExtractBtn" type="primary" style="margin:0 10px;" class="select_button" @click="showExtractLog">抽取记录</a-button>
-          <a-button v-show="showExtractBtn" type="primary" class="select_button" @click="handleExtract" :loading="extractSping">全部抽取</a-button>
+          <a-button
+            v-permission:[$PERMISSION_CODE.OPERATOR.extract]="$PERMISSION_CODE.OBJECT.datasource"
+            v-show="showExtractBtn"
+            type="primary"
+            class="select_button"
+            @click="handleExtract"
+            :loading="extractSping">全部抽取</a-button>
           <a-button
             v-show="showExtractBtn"
             type="primary"
