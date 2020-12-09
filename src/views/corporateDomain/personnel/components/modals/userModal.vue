@@ -31,7 +31,7 @@
           <a-input-password
             v-model="form.expassword"
             style="width: 100%"
-            placeholder="请确认密码"
+            placeholder="请输入确认密码"
             :disabled="!editPsw"
           >
           </a-input-password>
@@ -174,7 +174,7 @@ export default {
           commonValidateField.length({
             title: '用户名',
             min: 2,
-            max: 10
+            max: 20
           }),
           commonValidateField.noChinese({ title: '用户名' })
         ],
@@ -200,7 +200,6 @@ export default {
           { required: true, message: '请输入姓名' },
           commonValidateField.length({
             title: '姓名',
-            min: 2,
             max: 10
           }),
           commonValidateField.noSign({ title: '姓名' })
