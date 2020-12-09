@@ -197,7 +197,7 @@ export default {
       },
       rules: {
         projectName: [
-          { required: true, message: "请输入项目名" },
+          { required: true, message: "请输入项目名称" },
           {
             type: "string",
             max: 20,
