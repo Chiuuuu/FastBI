@@ -657,6 +657,7 @@ export default {
       this.close()
     },
     handleSQLAdd(data) {
+      data.type = +data.type
       this.rightMenuList.push(data)
     },
     handleUpdateSQL(data) {

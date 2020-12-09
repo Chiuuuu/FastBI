@@ -23,7 +23,12 @@
       :loading="loading"
     >
       <template #config="text, record, index">
-        <a-popconfirm title="是否要移除？" ok-text="确定" cancel-text="取消" @confirm="handleDeleteUser(record, index)">
+        <a-popconfirm
+          title="是否确定移除？"
+          ok-text="确定"
+          cancel-text="取消"
+          @confirm="handleDeleteUser(record, index)"
+        >
           <a href="#">移除</a>
         </a-popconfirm>
       </template>
@@ -63,124 +68,124 @@
   </div>
 </template>
 <script>
-import { mapState } from 'vuex'
-import debounce from 'lodash/debounce'
+import { mapState } from "vuex";
+import debounce from "lodash/debounce";
 
 const tableColumn = [
   {
-    title: '用户名',
-    dataIndex: 'username'
+    title: "用户名",
+    dataIndex: "username"
   },
   {
-    title: '姓名',
-    dataIndex: 'name'
+    title: "姓名",
+    dataIndex: "name"
   },
   {
-    title: '创建时间',
-    dataIndex: 'gmtCreate',
+    title: "创建时间",
+    dataIndex: "gmtCreate",
     width: 200,
     ellipsis: true
   },
   {
-    title: '操作',
-    dataIndex: 'config',
-    scopedSlots: { customRender: 'config' }
+    title: "操作",
+    dataIndex: "config",
+    scopedSlots: { customRender: "config" }
   }
-]
+];
 export default {
-    name: 'roleUser',
-    data() {
-        return {
-            tableColumn,
-            tableData: [],
-            userList: [],
-            fetching: false,
-            roleForm: {
-                username: ''
-            },
-            modalForm: {
-                users: []
-            },
-            rules: {
-                users: [
-                { required: true, message: '请选择用户名' }
-                ]
-            },
-            loading: false,
-            visible: false,
-            confirmLoading: false
-        }
+  name: "roleUser",
+  data() {
+    return {
+      tableColumn,
+      tableData: [],
+      userList: [],
+      fetching: false,
+      roleForm: {
+        username: ""
+      },
+      modalForm: {
+        users: []
+      },
+      rules: {
+        users: [{ required: true, message: "请选择用户名" }]
+      },
+      loading: false,
+      visible: false,
+      confirmLoading: false
+    };
+  },
+  mounted() {
+    this.handleGetData();
+  },
+  computed: {
+    ...mapState({
+      roleId: state => state.projectRoles.roleId
+    })
+  },
+  methods: {
+    async handleGetData() {
+      this.loading = true;
+      const res = await this.$server.projectCenter.getRoleUserInfo(this.roleId);
+      if (res.code === 200) {
+        this.tableData = res.rows;
+        this.loading = false;
+      } else {
+        this.$message.error(res.msg);
+      }
     },
-    mounted() {
-        this.handleGetData()
+    handleShowModal() {
+      // this.confirmLoading = true
+      this.visible = true;
     },
-    computed: {
-      ...mapState({
-        roleId: state => state.projectRoles.roleId
-      })
-    },
-    methods: {
-      async handleGetData() {
-          this.loading = true
-          const res = await this.$server.projectCenter.getRoleUserInfo(this.roleId)
+    /** 模态窗口确定 */
+    handleModalSubmit() {
+      this.confirmLoading = true;
+      this.visible = false;
+      this.$server.projectCenter
+        .addRoleUser({
+          userIds: this.modalForm.users,
+          roleIds: new Array(this.roleId)
+        })
+        .then(res => {
           if (res.code === 200) {
-            this.tableData = res.rows
-            this.loading = false
-          } else {
-            this.$message.error(res.msg)
+            this.$message.success("添加成功");
+            this.handleGetData();
           }
-      },
-      handleShowModal() {
-          // this.confirmLoading = true
-          this.visible = true
-      },
-      /** 模态窗口确定 */
-      handleModalSubmit() {
-          this.confirmLoading = true
-          this.visible = false
-          this.$server.projectCenter.addRoleUser({
-            userIds: this.modalForm.users,
-            roleIds: new Array(this.roleId)
-          })
-            .then(res => {
-              if (res.code === 200) {
-                this.$message.success('添加成功')
-                this.handleGetData()
-              }
-            })
-            .finally(() => {
-              this.confirmLoading = false
-              this.handleModalCancel()
-            })
-      },
-      /** 模态窗口取消 */
-      handleModalCancel() {
-          this.modalForm = this.$options.data().modalForm
-          this.$refs.modalForm.resetFields()
-      },
-      async handleDeleteUser({ id }, index) {
-        const res = await this.$server.projectCenter.deleRoleUser(id)
-        if (res.code === 200) {
-          this.$message.success('移除成功')
-          this.handleGetData()
-        } else {
-          this.$message.error(res.msg || '请求错误')
-        }
-      },
-      handleInputRole: debounce(async function(value) {
-        this.fetching = true
-        const res = await this.$server.projectCenter.getModalUserList({ keyword: value })
-          .finally(() => {
-            this.fetching = false
-          })
-        if (res.code === 200) {
-          this.userList = res.rows
-        } else {
-          this.$message.error(res.msg || '请求错误')
-        }
-      }, 400)
-    }
-}
+        })
+        .finally(() => {
+          this.confirmLoading = false;
+          this.handleModalCancel();
+        });
+    },
+    /** 模态窗口取消 */
+    handleModalCancel() {
+      this.modalForm = this.$options.data().modalForm;
+      this.$refs.modalForm.resetFields();
+    },
+    async handleDeleteUser({ id }, index) {
+      const res = await this.$server.projectCenter.deleRoleUser(id);
+      if (res.code === 200) {
+        this.$message.success("移除成功");
+        this.handleGetData();
+      } else {
+        this.$message.error(res.msg || "请求错误");
+      }
+    },
+    handleInputRole: debounce(async function(value) {
+      this.fetching = true;
+      const res = await this.$server.projectCenter
+        .getModalUserList({ keyword: value })
+        .finally(() => {
+          this.fetching = false;
+        });
+      if (res.code === 200) {
+        this.userList = res.rows;
+      } else {
+        this.$message.error(res.msg || "请求错误");
+      }
+    }, 400)
+  }
+};
 </script>
 <style lang="less" scoped>
 @import "../../../main.less";

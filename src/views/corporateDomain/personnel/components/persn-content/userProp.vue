@@ -49,7 +49,7 @@
           :key="i"
           :index="index"
           :active-index="activeTableIndex"
-          :title="text"
+          :data="text"
           @getChangeText="v => getChangeText(i - 1, v)"
         />
       </template>
@@ -86,7 +86,7 @@ const userColumn = [
 for (let i = 0; i < 6; i++) {
   userColumn.push({
     scopedSlots: { customRender: 'custom' + i, title: 'col' + i },
-    dataIndex: 'userattrList.' + i + '.attrValue',
+    dataIndex: 'userattrList.' + i,
     width: 240,
     ellipsis: true
   })
@@ -194,6 +194,13 @@ export default {
       this.editRow.userattrList[index].attrValue = value
     },
     async handleSaveEditRow() {
+      let valid = true
+      this.editRow.userattrList.map(item => {
+        if (item.attrValue.length > 50 || item.attrValue.length < 1) {
+          valid = false
+        }
+      })
+      if (!valid) return this.$message.error('请输入1-50个字符的属性')
       const res = await this.$server.corporateDomain.updateUserProp({
         rows: new Array(this.editRow)
       })

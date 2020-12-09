@@ -1,6 +1,12 @@
 <template>
   <div style="height:21px">
-  <span v-if="index !== activeIndex">{{ title }}</span>
+  <template v-if="index !== activeIndex">
+    <!-- <a-popover>
+      <template slot="content">{{ data.attrValue }}</template>
+      <span type="primary">{{ data.attrValue }}</span>
+    </a-popover> -->
+    <span :title="data.attrValue">{{ data.attrValue }}</span>
+  </template>
   <a-input v-else :value="editValue" @change="handleChangeText" size="small"></a-input>
   </div>
 </template>
@@ -9,13 +15,18 @@
 export default {
   name: 'tableEdit',
   props: {
-    title: String,
+    data: Object,
     activeIndex: Number,
     index: Number
   },
   data() {
     return {
-      editValue: this.title
+      editValue: this.data.attrValue
+    }
+  },
+  watch: {
+    'data.attrValue'(newValue) {
+      this.editValue = newValue
     }
   },
   methods: {
