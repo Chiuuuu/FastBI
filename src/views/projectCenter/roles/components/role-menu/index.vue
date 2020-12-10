@@ -31,8 +31,8 @@
           <a-form-model-item label="角色描述" prop="description">
             <a-input v-model="form.description" placeholder="请输入角色描述"></a-input>
           </a-form-model-item>
-          <a-form-model-item label="存储位置" prop="parantId">
-            <a-select v-model="form.parentId" placeholder="选择文件夹">
+          <a-form-model-item label="存储位置" prop="parentId">
+            <a-select v-model="form.parentId" placeholder="请选择存储位置" not-found-content="请先新建文件夹">
               <a-select-option v-for="item in folderList" :key="item.id">{{ item.name }}</a-select-option>
             </a-select>
           </a-form-model-item>
@@ -49,7 +49,7 @@
     </a-empty>
     <template v-else>
       <!-- <p class="menu_tips">右键文件夹或选项有添加，重命名等操作</p> -->
-      <div class="menu-wrap scrollbar" @dragover.stop="handleDragOver" @drop="handleWrapDrop">
+      <div class="menu-wrap scrollbar" @dragover.stop="handleDragOver">
         <div
           class="group"
           :class="handleIsFolder(folder, 'items') ? 'is-folder' : ''"
@@ -152,7 +152,7 @@ export default {
         name: [
           {
             required: true,
-            message: '请输入用户名称'
+            message: '请输入角色名称'
           },
           {
             type: 'string',
@@ -164,13 +164,13 @@ export default {
         description: [
           {
             required: true,
-            message: '请输入200字以内的用户描述'
+            message: '请输入角色描述'
           },
           {
             type: 'string',
             max: 200,
             min: 1,
-            message: '长度为1~200'
+            message: '请输入200字以内的角色描述'
           }
         ],
         parentId: [

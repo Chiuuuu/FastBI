@@ -101,10 +101,12 @@ export default {
                         this['spinning' + i] = false
                     })
                 if (result.code === 200) {
-                    this.$set(this.modulePermission, i, result.data.basePrivilege)
-                    this.$set(this.moduleList, i, [].concat(result.data.header))
-                    this.$set(this.treeList, i, [].concat(result.data.folder))
-                    this.$emit('setBasePrivilege', this.modulePermission[i].permissions, i + '')
+                    if (result.data) {
+                        this.$set(this.modulePermission, i, result.data.basePrivilege)
+                        this.$set(this.moduleList, i, [].concat(result.data.header))
+                        this.$set(this.treeList, i, [].concat(result.data.folder))
+                        this.$emit('setBasePrivilege', this.modulePermission[i].permissions, i + '')
+                    }
                 } else {
                     this.$message.error(result.msg || '请求错误')
                 }

@@ -13,10 +13,10 @@
             </header>
             <a-form-model class="role-form" ref="form" :model="form" :rules="rules" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
               <a-form-model-item label="角色名称" prop="name">
-                <a-input v-model="form.name"></a-input>
+                <a-input v-model="form.name" placeholder="请输入角色名称"></a-input>
               </a-form-model-item>
               <a-form-model-item label="角色描述" prop="description">
-                <a-input v-model="form.description"></a-input>
+                <a-input v-model="form.description" placeholder="请输入角色描述"></a-input>
               </a-form-model-item>
             </a-form-model>
             <RoleTabeRole
@@ -57,21 +57,25 @@ export default {
         name: [
           {
             required: true,
-            message: '请输入用户名称'
+            message: '请输入角色名称'
           },
           {
             type: 'string',
             max: 20,
             min: 1,
-            message: '长度为1~20'
+            message: '请输入1-20个字的角色名称'
           }
         ],
         description: [
           {
+            required: true,
+            message: '请输入角色描述'
+          },
+          {
             type: 'string',
             max: 200,
             min: 1,
-            message: '长度为1~200'
+            message: '请输入200字以内的用户描述'
           }
         ]
       },

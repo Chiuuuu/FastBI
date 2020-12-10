@@ -118,7 +118,7 @@
               </a-button>
             </a-col>
             <a-col>
-              <a-button type="primary" style="width:88px;height:30px;" @click="handleSave">
+              <a-button :loading="loading" type="primary" style="width:88px;height:30px;" @click="handleSave">
               保存
             </a-button>
             </a-col>
@@ -191,6 +191,7 @@ export default {
     return {
       data: [],
       sping: true,
+      loading: false,
       showSetting: false,
       setType: '',
       batchType: { value: 'BIGINT' },
@@ -380,10 +381,14 @@ export default {
       this.handleSaveWriteTable()
     },
     async handleSaveWriteTable() {
+      this.loading = true
       const writeResult = await this.$server.dataAccess.saveDataTable({
         rows: this.readRows,
         tableId: this.fieldInfo.id
       })
+        .finally(() => {
+          this.loading = false
+        })
 
       if (writeResult.code === 200) {
         this.handleSaveTableField()
