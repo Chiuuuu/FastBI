@@ -44,11 +44,11 @@
           >
           </a-input>
         </a-form-model-item>
-        <a-form-model-item label="电话" prop="phone">
+        <a-form-model-item label="手机号码" prop="phone">
           <a-input
             v-model="form.phone"
             style="width: 100%"
-            placeholder="请输入电话"
+            placeholder="请输入手机号码"
           >
           </a-input>
         </a-form-model-item>
@@ -59,7 +59,7 @@
             style="width: 100%"
             :filter-option="false"
             :not-found-content="searching ? undefined : null"
-            placeholder="请选择项目"
+            placeholder="请选择所属项目"
             @search="searchProject"
           >
             <a-select-option v-for="item in projectList" :key="item.projectId" :value="item.projectId">
@@ -71,7 +71,7 @@
           <a-select
             v-model="form.department"
             style="width: 100%"
-            placeholder="请选择岗位"
+            placeholder="请选择部门"
             @change="getPostList"
           >
             <a-select-option v-for="item in deptList" :key="item.id" :value="item.id">
@@ -193,7 +193,7 @@ export default {
           { validator: this.passwordValidate, trigger: 'change' }
         ],
         expassword: [
-          { required: true, message: '请再次输入密码' },
+          { required: true, message: '请输入确认密码' },
           { validator: this.confirmValidate, trigger: 'change' }
         ],
         name: [
@@ -338,7 +338,6 @@ export default {
             this.handleUpdateUser()
           }
         } else {
-          debugger
           this.confirmLoading = false
         }
       })

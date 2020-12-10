@@ -2,9 +2,9 @@
   <div class="u-bitem edit" :class="[className]" ref="file">
     <div class="txt">
       <div class="icon"><img :src="imgURI" /></div>
-      <div class="name">{{ itemData.alias }}</div>
+      <div class="name" :class="{ 'line-through': !itemData.visible }">{{ itemData.alias }}</div>
     </div>
-    <span class="menu" v-if="hasContextmenus">
+    <span class="menu" v-if="hasContextmenus && itemData.visible">
       <span class="caret-down" @click="handleCreateMenu"></span>
     </span>
   </div>

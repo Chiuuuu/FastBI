@@ -25,6 +25,11 @@
                 :scroll="{ x: `100vh`, y: `calc(100vh - 350px)`}"
                 :loading="loading"
                 @change="handleTableChange">
+                <template v-for="index in 6">
+                    <template :slot="'props' + index">
+                        <span :key="index" :title="propsName[index]">{{ propsName[index] }}</span>
+                    </template>
+                </template>
             </a-table>
         </div>
     </div>
@@ -38,6 +43,7 @@ export default {
         return {
             rolesData: [],
             rolesColumn: [],
+            propsName: [],
             pagination: {
                 current: 1,
                 pageSize: 10,
@@ -72,10 +78,15 @@ export default {
                 const ary = []
                 result.headersKeyValue.forEach((item, index) => {
                     let column = {
-                        title: result.headers[index],
                         dataIndex: item,
                         width: 200,
                         ellipsis: true
+                    }
+                    if (index > 1) {
+                        this.propsName[index - 1] = result.headers[index]
+                        column.scopedSlots = { title: 'props' + (index - 1) }
+                    } else {
+                        column.title = result.headers[index]
                     }
                     ary.push(column)
                 })
