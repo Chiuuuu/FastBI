@@ -128,7 +128,7 @@
               v-for="item in adminList"
               :key="item.id"
               :value="item.id"
-              :disabled="modalType !== 'add' && item.roleId === '1'"
+              :disabled="item.id === '1'"
             >
               {{ item.name }}
             </a-select-option>
@@ -140,83 +140,83 @@
 </template>
 
 <script>
-import omit from "lodash/omit";
-import { trimFormData } from "@/utils/form-utils";
-import commonValidateField from "@/utils/validator";
+import omit from 'lodash/omit'
+import { trimFormData } from '@/utils/form-utils'
+import commonValidateField from '@/utils/validator'
 const listColumn = [
   {
-    title: "项目名称",
-    dataIndex: "projectName"
+    title: '项目名称',
+    dataIndex: 'projectName'
   },
   {
-    title: "管理员",
-    dataIndex: "adminName",
-    scopedSlots: { customRender: "adminName" }
+    title: '管理员',
+    dataIndex: 'adminName',
+    scopedSlots: { customRender: 'adminName' }
   },
   {
-    title: "用户数",
-    dataIndex: "userCount"
+    title: '用户数',
+    dataIndex: 'userCount'
   },
   {
-    title: "大屏数量",
-    dataIndex: "screenCount"
+    title: '大屏数量',
+    dataIndex: 'screenCount'
   },
   {
-    title: "项目描述",
-    dataIndex: "projectDesc",
+    title: '项目描述',
+    dataIndex: 'projectDesc',
     width: 200,
     ellipsis: true
   },
   {
-    title: "创建时间",
-    dataIndex: "create_time",
+    title: '创建时间',
+    dataIndex: 'create_time',
     width: 200,
     ellipsis: true
   },
   {
-    title: "操作",
-    dataIndex: "config",
+    title: '操作',
+    dataIndex: 'config',
     width: 220,
-    scopedSlots: { customRender: "config" }
+    scopedSlots: { customRender: 'config' }
   }
-];
+]
 
 export default {
-  name: "projMain",
+  name: 'projMain',
   data() {
     return {
       loading: false,
       visible: false,
-      modalType: "", // 判断是编辑还是新增
-      rowProjectId: "", // 当前编辑的id
+      modalType: '', // 判断是编辑还是新增
+      rowProjectId: '', // 当前编辑的id
       form: {
         // 添加新项目表单
-        projectName: "",
-        projectDesc: "",
-        adminList: []
+        projectName: '',
+        projectDesc: '',
+        adminList: ['1']
       },
       rules: {
         projectName: [
-          { required: true, message: "请输入项目名称" },
+          { required: true, message: '请输入项目名称' },
           {
-            type: "string",
+            type: 'string',
             max: 20,
             min: 1,
-            message: "请输入1-20个字的项目名称"
+            message: '请输入1-20个字的项目名称'
           }
         ],
         projectDesc: [
-          { required: true, message: "请输入项目描述" },
-          { type: "string", max: 200, message: "请输入200字以内的项目描述" },
-          commonValidateField.noEmoji({ title: "项目描述" })
+          { required: true, message: '请输入项目描述' },
+          { type: 'string', max: 200, message: '请输入200字以内的项目描述' },
+          commonValidateField.noEmoji({ title: '项目描述' })
         ],
-        adminList: [{ required: true, message: "请选择管理员" }]
+        adminList: [{ required: true, message: '请选择管理员' }]
       },
       confirmLoading: false,
       searchForm: {
         // 搜索表单
-        projectName: "",
-        adminName: ""
+        projectName: '',
+        adminName: ''
       },
       projectUsers: [],
       getUserByProjectLoading: false,
@@ -229,160 +229,160 @@ export default {
       listColumn,
       adminListLoading: false,
       adminList: []
-    };
+    }
   },
   watch: {
     modalType(newValue) {
-      if (newValue === "add") {
-        this.form = this.$options.data().form;
+      if (newValue === 'add') {
+        this.form = this.$options.data().form
       }
     }
   },
   mounted() {
-    this.handleGetListData();
+    this.handleGetListData()
   },
   methods: {
     handleTableChange(pagination) {
-      this.handleGetListData(pagination);
+      this.handleGetListData(pagination)
     },
     showModal(type) {
-      this.visible = true;
-      this.modalType = type;
-      this.handleGetAdminList();
+      this.visible = true
+      this.modalType = type
+      this.handleGetAdminList()
     },
     async handleGetAdminList() {
-      this.adminListLoading = true;
+      this.adminListLoading = true
       const result = await this.$server.corporateDomain
         .getAdminList()
         .finally(() => {
-          this.adminListLoading = false;
-        });
+          this.adminListLoading = false
+        })
       if (result.code === 200) {
-        this.adminList = [].concat(result.data);
+        this.adminList = [].concat(result.data)
       } else {
-        this.$message.error(result.msg || "请求错误");
+        this.$message.error(result.msg || '请求错误')
       }
     },
     clearModal() {
-      this.rowProjectId = "";
-      this.form = this.$options.data().form;
-      this.$refs.form.resetFields();
+      this.rowProjectId = ''
+      this.form = this.$options.data().form
+      this.$refs.form.resetFields()
     },
     handleResetForm() {
-      this.searchForm = this.$options.data().searchForm;
+      this.searchForm = this.$options.data().searchForm
       this.$nextTick(() => {
-        this.handleGetListData();
-      });
+        this.handleGetListData()
+      })
     },
     handleModalSubmit() {
       this.$refs.form.validate(async valid => {
         if (valid) {
-          this.confirmLoading = true;
-          let result;
-          if (this.modalType === "add") {
+          this.confirmLoading = true
+          let result
+          if (this.modalType === 'add') {
             // 新增保存
             result = await this.$server.corporateDomain
               .addNewProject(this.form)
               .finally(() => {
-                this.confirmLoading = false;
-              });
-          } else if (this.modalType === "edit") {
+                this.confirmLoading = false
+              })
+          } else if (this.modalType === 'edit') {
             // 编辑保存
             const params = {
               ...this.form,
               projectId: this.rowProjectId
-            };
+            }
             result = await this.$server.corporateDomain
               .putProject(params)
               .finally(() => {
-                this.confirmLoading = false;
-              });
+                this.confirmLoading = false
+              })
           }
           if (result.code === 200) {
             this.$message
-              .success(this.modalType === "add" ? "添加成功" : "编辑成功", 1)
+              .success(this.modalType === 'add' ? '添加成功' : '编辑成功', 1)
               .then(() => {
-                this.$store.dispatch("user/reFreshProjectList");
-                this.handleGetListData();
-                this.visible = false;
-                this.clearModal();
-              });
+                this.$store.dispatch('user/reFreshProjectList')
+                this.handleGetListData()
+                this.visible = false
+                this.clearModal()
+              })
           } else {
-            this.$message.error(result.msg || "请求错误");
+            this.$message.error(result.msg || '请求错误')
           }
         } else {
-          return false;
+          return false
         }
-      });
+      })
     },
     async handleDelete({ projectId }, index) {
-      const result = await this.$server.corporateDomain.deleProject(projectId);
+      const result = await this.$server.corporateDomain.deleProject(projectId)
       if (result.code === 200) {
-        this.listData.splice(index, 1);
-        this.$message.success("删除成功", 1);
-        this.$store.dispatch("user/reFreshProjectList");
+        this.listData.splice(index, 1)
+        this.$message.success('删除成功', 1)
+        this.$store.dispatch('user/reFreshProjectList')
       } else {
-        this.$message.error(result.msg || "请求错误");
+        this.$message.error(result.msg || '请求错误')
       }
     },
     async handleEdit({ projectId }) {
-      this.rowProjectId = projectId;
+      this.rowProjectId = projectId
       const result = await this.$server.corporateDomain.getProjectInfoById(
         projectId
-      );
+      )
 
       if (result.code === 200) {
-        const list = result.data.adminList.map(item => item.id);
+        const list = result.data.adminList.map(item => item.id)
         this.form = Object.assign(this.form, {
           ...result.data,
           adminList: list
-        });
-        this.showModal("edit");
+        })
+        this.showModal('edit')
       } else {
-        this.$message.error(result.msg || "请求错误");
+        this.$message.error(result.msg || '请求错误')
       }
     },
     async handleCheckUsers({ projectId }) {
-      this.getUserByProjectLoading = true;
+      this.getUserByProjectLoading = true
       const result = await this.$server.corporateDomain
         .getUserByProject(projectId)
         .finally(() => {
-          this.getUserByProjectLoading = false;
-        });
+          this.getUserByProjectLoading = false
+        })
       if (result.code === 200) {
-        this.projectUsers = [].concat(result.data);
+        this.projectUsers = [].concat(result.data)
       } else {
-        this.$message.error(result.msg || "请求错误");
+        this.$message.error(result.msg || '请求错误')
       }
     },
     async handleGetListData(pagination) {
-      this.loading = true;
+      this.loading = true
 
       const params = Object.assign({}, trimFormData(this.searchForm), {
-        ...omit(this.pagination, "total"),
+        ...omit(this.pagination, 'total'),
         current: pagination
           ? pagination.current
           : this.$options.data().pagination.current
-      });
+      })
 
       const result = await this.$server.corporateDomain
         .getProjectList(params)
         .finally(() => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
       if (result.code === 200) {
-        this.listData = [].concat(result.rows);
+        this.listData = [].concat(result.rows)
 
         Object.assign(this.pagination, {
           current: params.current,
           total: result.total
-        });
+        })
       } else {
-        this.$message.error(result.msg || "请求错误");
+        this.$message.error(result.msg || '请求错误')
       }
     }
   }
-};
+}
 </script>
 
 <style lang="less" scoped>
