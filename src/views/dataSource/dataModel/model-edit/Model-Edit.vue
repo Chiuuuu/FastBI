@@ -663,6 +663,7 @@ export default {
           }
         })
       }
+      return list
     },
     handleLeftDragLeave() {
       this.$refs.rightTopRef.handleMapRemoveClass()

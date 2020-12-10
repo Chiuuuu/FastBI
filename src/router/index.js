@@ -29,7 +29,6 @@ export function resetRouter() {
 }
 
 router.beforeEach(async (to, from, next) => {
-  console.log(from)
   BinUI.LoadingBar.start()
   Modal.destroyAll()
   store.dispatch('SingleSelected', null)
@@ -47,7 +46,7 @@ router.beforeEach(async (to, from, next) => {
         // 当切换项目重定向找不到的时候再跳转到首页
         if (redirectedFrom && name === '404' && from.path === '/') { // 重刷方法1,但是会闪白
         // if(redirectedFrom && name === '404' && from.path === redirectedFrom) {
-          next({ path: '/'})
+          next({ path: '/' })
         } else {
           next()
         }
@@ -63,7 +62,7 @@ router.beforeEach(async (to, from, next) => {
           router.addRoutes(accessRoutes)
           next({ ...to, replace: true })
         } catch (error) {
-          next(`/login?redirect=${to.path}`)
+          next(`/login?redirect=${to.fullPath}`)
           BinUI.LoadingBar.done()
         }
       }
@@ -72,7 +71,7 @@ router.beforeEach(async (to, from, next) => {
     if (whiteList.indexOf(to.path) !== -1) {
       next()
     } else {
-      next(`/login?redirect=${to.path}`)
+      next(`/login?redirect=${to.fullPath}`)
       BinUI.LoadingBar.done()
     }
   }

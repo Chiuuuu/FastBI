@@ -28,7 +28,8 @@ const errorHandle = {
   401: function(msg) {
     // message.error(msg || '未登录状态，跳转登录页')
     store.dispatch('common/set_token', '')
-    sessionStorage.clear()
+    window.sessionStorage.clear()
+    window.localStorage.clear()
     router.replace({
       path: '/login',
       query: {
