@@ -133,49 +133,49 @@
   </div>
 </template>
 <script>
-import debounce from "lodash/debounce";
-import { trimFormData } from "@/utils/form-utils";
-import omit from "lodash/omit";
+import debounce from 'lodash/debounce'
+import { trimFormData } from '@/utils/form-utils'
+import omit from 'lodash/omit'
 const usersColumn = [
   {
-    title: "用户名",
+    title: '用户名',
     width: 150,
     ellipsis: true,
-    dataIndex: "username"
+    dataIndex: 'username'
   },
   {
-    title: "姓名",
+    title: '姓名',
     width: 100,
     ellipsis: true,
-    dataIndex: "name"
+    dataIndex: 'name'
   },
   {
-    title: "电话",
+    title: '电话',
     width: 120,
     ellipsis: true,
-    dataIndex: "phone"
+    dataIndex: 'phone'
   },
   {
-    title: "用户角色",
-    dataIndex: "roleName"
+    title: '用户角色',
+    dataIndex: 'roleName'
   },
   {
-    title: "添加时间",
-    dataIndex: "gmtCreate",
+    title: '添加时间',
+    dataIndex: 'gmtCreate',
     width: 200,
     ellipsis: true
   },
   {
-    title: "操作",
-    dataIndex: "config",
-    fixed: "right",
+    title: '操作',
+    dataIndex: 'config',
+    fixed: 'right',
     width: 120,
-    scopedSlots: { customRender: "config" }
+    scopedSlots: { customRender: 'config' }
   }
-];
+]
 
 export default {
-  name: "userManage",
+  name: 'userManage',
   data() {
     return {
       usersData: [], // 用户列表数据
@@ -188,11 +188,11 @@ export default {
       usersColumn, // 表单配置
       userMangeForm: {
         // 搜索表单
-        username: "",
-        name: "",
+        username: '',
+        name: '',
         roleId: undefined
       },
-      modalType: "add", // 模态窗口的类型，添加(add)/编辑(edit)
+      modalType: 'add', // 模态窗口的类型，添加(add)/编辑(edit)
       loading: false,
       roleLoading: false,
       visible: false, // 模态窗口的显示
@@ -206,170 +206,181 @@ export default {
       },
       rules: {
         userIds: [
-          { required: true, message: "请输入用户名/姓名查询,可选择多个" }
+          { required: true, message: '请输入用户名/姓名查询,可选择多个' }
         ],
-        roleIds: [{ required: true, message: "请选择一个或多个角色" }]
+        roleIds: [{ required: true, message: '请选择一个或多个角色' }]
       }
-    };
+    }
   },
   mounted() {
-    this.handleGetData();
+    this.handleGetData()
   },
   methods: {
     handleTableChange(pagination) {
-      this.handleGetTableList(pagination);
+      this.handleGetTableList(pagination)
     },
     /** 获取数据 */
     handleGetData() {
-      this.handleGetRoleList();
-      this.handleGetTableList();
+      this.handleGetRoleList()
+      this.handleGetTableList()
     },
     /** 获取角色列表数据 */
     async handleGetRoleList() {
-      this.roleLoading = true;
+      this.roleLoading = true
       const result = await this.$server.projectCenter
         .getRoleList()
         .finally(() => {
-          this.roleLoading = false;
-        });
+          this.roleLoading = false
+        })
       if (result.code === 200) {
-        this.roleList = result.rows;
+        this.roleList = result.rows
       } else {
-        this.$message.error(result.msg || "请求错误");
+        this.$message.error(result.msg || '请求错误')
       }
     },
     /** 获取用户列表数据 */
     async handleGetTableList(pagination) {
-      this.loading = true;
+      this.loading = true
       const params = Object.assign({}, trimFormData(this.userMangeForm), {
-        ...omit(this.pagination, "total"),
+        ...omit(this.pagination, 'total'),
         current: pagination
           ? pagination.current
           : this.$options.data().pagination.current
-      });
+      })
       const result = await this.$server.projectCenter
         .getList(params)
         .finally(() => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
 
       if (result.code === 200) {
-        this.usersData = [].concat(result.rows);
+        this.usersData = [].concat(result.rows)
         Object.assign(this.pagination, {
           current: params.current,
           total: result.total
-        });
+        })
       } else {
-        this.$message.error(result.msg || "请求错误");
+        this.$message.error(result.msg || '请求错误')
       }
     },
     /** 重置表单 */
     handleRestForm() {
-      this.$refs.userMangeForm.resetFields();
+      this.$refs.userMangeForm.resetFields()
       this.$nextTick(() => {
-        this.handleGetData();
-      });
+        this.handleGetData()
+      })
     },
     handleShowModal(type, data) {
-      this.confirmLoading = false;
-      this.visible = true;
-      this.modalType = type;
+      this.confirmLoading = false
+      this.visible = true
+      this.modalType = type
 
       this.$nextTick(() => {
-        if (type === "add") {
-          this.modalForm = this.$options.data().modalForm;
+        if (type === 'add') {
+          this.modalForm = this.$options.data().modalForm
         } else {
-          this.modalForm = Object.assign({}, data);
+          this.modalForm = Object.assign({}, data)
         }
-      });
+      })
     },
     handleGetModalUserList: debounce(async function(value) {
-      this.fetching = true;
+      this.fetching = true
       const result = await this.$server.projectCenter
         .getModalUserList({
           keyword: value
         })
         .finally(() => {
-          this.fetching = false;
-        });
+          this.fetching = false
+        })
 
       if (result.code === 200) {
-        this.modalUserList = result.rows;
+        this.modalUserList = result.rows
       } else {
-        this.$message.error(result.msg || "请求错误");
+        this.$message.error(result.msg || '请求错误')
       }
     }, 400),
     /** 模态窗口确定 */
     handleModalSubmit() {
       this.$refs.modalForm.validate(async valid => {
         if (valid) {
-          let result;
-          this.confirmLoading = true;
-          if (this.modalType === "add") {
+          let result
+          this.confirmLoading = true
+          if (this.modalType === 'add') {
             // 新增保存
             result = await this.$server.projectCenter
               .addUser(this.modalForm)
               .finally(() => {
-                this.confirmLoading = false;
-              });
-          } else if (this.modalType === "edit") {
+                this.confirmLoading = false
+              })
+          } else if (this.modalType === 'edit') {
             // 编辑保存
             const params = {
               roleList: this.modalForm.roleIds,
               userId: this.modalForm.userIds.pop()
-            };
+            }
             result = await this.$server.projectCenter
               .putUser(params)
               .finally(() => {
-                this.confirmLoading = false;
-              });
+                this.confirmLoading = false
+              })
           }
-
           if (result.code === 200) {
+            let message
+            if (this.modalType === 'add') {
+              message = '添加成功'
+              if (result.data && result.data.length > 0) {
+                if (result.data && result.data.length === this.modalForm.userIds.length) {
+                  return this.$message.error('所选用户已添加, 无法重复添加')
+                }
+                message += `\n其中${result.data.toString()}用户已添加, 无法重复添加`
+              }
+            } else if (this.modalType === 'edit') {
+              message = '编辑成功'
+            }
             this.$message
-              .success(this.modalType === "add" ? "添加成功" : "编辑成功", 1)
+              .success(message, 2)
               .then(() => {
-                this.handleGetTableList();
-              });
-            this.visible = false;
-            this.handleModalCancel();
+                this.handleGetTableList()
+              })
+            this.visible = false
+            this.handleModalCancel()
           } else {
-            this.$message.error(result.msg || "请求错误");
+            this.$message.error(result.msg || '请求错误')
           }
         } else {
-          return false;
+          return false
         }
-      });
+      })
     },
     /** 模态窗口取消 */
     handleModalCancel() {
-      this.modalUserList = [];
-      this.$refs.modalForm.resetFields();
+      this.modalUserList = []
+      this.$refs.modalForm.resetFields()
     },
     /** 编辑操作 */
     handleEditUser({ id }, index) {
-      const item = this.usersData[index];
+      const item = this.usersData[index]
       this.modalUserList.push({
         id: item.id,
         username: item.username
-      });
-      this.handleShowModal("edit", {
+      })
+      this.handleShowModal('edit', {
         roleIds: item.roleIds,
         userIds: [item.id]
-      });
+      })
     },
     /** 移除操作 */
     async handleDeleteUser({ id }, index) {
-      const result = await this.$server.projectCenter.deleUserById(id);
+      const result = await this.$server.projectCenter.deleUserById(id)
       if (result.code === 200) {
-        this.$message.success("移除成功");
-        this.usersData.splice(index, 1);
+        this.$message.success('移除成功')
+        this.usersData.splice(index, 1)
       } else {
-        this.$message.error(result.msg || "请求错误");
+        this.$message.error(result.msg || '请求错误')
       }
     }
   }
-};
+}
 </script>
 <style lang="less" scoped>
 @import "../../../main.less";

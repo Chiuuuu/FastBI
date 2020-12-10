@@ -152,25 +152,25 @@ export default {
         name: [
           {
             required: true,
-            message: '请输入用户名称'
+            message: '请输入权限名称'
           },
           {
             type: 'string',
             max: 20,
             min: 1,
-            message: '请输入1-20个字的角色'
+            message: '请输入1-20个字的权限名称'
           }
         ],
         description: [
           {
             required: true,
-            message: '请输入用户描述'
+            message: '请输入权限描述'
           },
           {
             type: 'string',
             max: 200,
             min: 1,
-            message: '请输入200字以内的用户描述'
+            message: '请输入200字以内的权限描述'
           }
         ],
         parentId: [

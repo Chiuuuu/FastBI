@@ -97,11 +97,12 @@
       <template #enable="text, record"
         ><a-switch
           :checked="record.enable"
+          :disabled="record && record.id === adminId"
           @change="handleSwitch($event, record)"
       /></template>
       <!-- 操作 -->
       <template #config="text, record">
-        <template v-if="record && record.id !== '1'">
+        <template v-if="record && record.id !== adminId">
           <a
             class="handler-margin"
             @click="handleEdit(record)"
@@ -145,6 +146,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import { trimFormData } from "@/utils/form-utils";
 import UserModal from "../modals/userModal";
 import DepartModal from "../modals/departModal";
@@ -163,7 +165,7 @@ const personColumn = [
     dataIndex: "name"
   },
   {
-    title: "电话",
+    title: "手机号码",
     width: 120,
     dataIndex: "phone"
   },
@@ -242,6 +244,11 @@ export default {
       departList: [],
       postList: []
     };
+  },
+  computed: {
+    ...mapState({
+      adminId: state => state.user.info.id
+    })
   },
   mounted() {
     this.handleGetData();

@@ -6,7 +6,7 @@ const commonValidateField = {
     return {
       min: config.min || 0,
       max: config.max,
-      message: `请输入${config.min}-${config.max}个字符的${config.title}`
+      message: `请输入${config.min || 0}-${config.max}个字符的${config.title}`
     }
   },
   noChinese: function(config) {

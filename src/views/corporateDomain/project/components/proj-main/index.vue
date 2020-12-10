@@ -54,7 +54,7 @@
         @change="handleTableChange"
       >
         <template #adminName="text, record">
-          {{ record.adminName }}
+          <span :title="record.adminName">{{ record.adminName }}</span>
         </template>
         <template #config="text, record, index">
           <a-popover placement="left" trigger="click">
@@ -146,11 +146,15 @@ import commonValidateField from '@/utils/validator'
 const listColumn = [
   {
     title: '项目名称',
+    width: 250,
+    ellipsis: true,
     dataIndex: 'projectName'
   },
   {
     title: '管理员',
     dataIndex: 'adminName',
+    width: 250,
+    ellipsis: true,
     scopedSlots: { customRender: 'adminName' }
   },
   {
@@ -164,7 +168,7 @@ const listColumn = [
   {
     title: '项目描述',
     dataIndex: 'projectDesc',
-    width: 200,
+    width: 300,
     ellipsis: true
   },
   {
