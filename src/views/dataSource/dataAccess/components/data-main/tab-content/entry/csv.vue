@@ -526,7 +526,6 @@ export default {
         return this.$message.error('请上传文件')
       }
       this.$refs.fileForm.validate((pass, obj) => {
-        this.loading = true
         if (pass) {
           this.loading = true
           const formData = new FormData()

@@ -22,6 +22,8 @@
           maxHeight: `calc( 100vh - 160px )`,
           overflowY: 'auto'
         }"
+        :confirmLoading="confirmLoading"
+        @cancel="handleCancelModal"
         @ok="handleAddRole"
       >
         <a-form-model ref="addForm" :model="form" :rules="rules" width="500px" :label-col="{ span: 6 }" :wrapper-col="{ span: 12 }">
@@ -148,6 +150,7 @@ export default {
         description: '',
         parentId: undefined
       },
+      confirmLoading: false,
       rules: {
         name: [
           {
@@ -278,6 +281,14 @@ export default {
       } else {
         this.form.parentId = undefined
       }
+    },
+    /**
+     * 模态窗取消
+    */
+    handleCancelModal() {
+      this.form = this.$options.data().form
+      this.$refs.addForm.resetFields()
+      this.confirmLoading = false
     },
     /**
      * 搜索目录列表
@@ -486,20 +497,23 @@ export default {
     handleAddRole() {
       this.$refs.addForm.validate(async valid => {
         if (valid) {
+          this.confirmLoading = true
           const result = await this.$server.common.addMenuFolder('/business/role/addRole', {
             fileType: 1,
             name: this.form.name,
             description: this.form.description,
             parentId: this.form.parentId
+          }).finally(() => {
+            this.confirmLoading = false
           })
           if (result.code === 200) {
             this.handleGetMenuList()
             this.$message.success('新建成功')
-            this.$store.commit('projectRoles/SET_ROLEID', result.msg)
+            this.$store.commit('projectRoles/SET_ROLEID', result.data)
             this.$refs.addForm.resetFields()
-            this.fileSelectId = result.msg
-            this.getRoleInfo()
+            this.fileSelectId = result.data
             this.visible = false
+            this.handleEditRole(null, null, { file: { id: result.data } })
           } else {
             this.$message.error(result.msg)
           }
