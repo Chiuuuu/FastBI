@@ -548,7 +548,9 @@ export default {
             formData.append('fileList[' + index + ']', file)
           })
           this.deleteIdList.map((id, index) => {
-            formData.append('databasesIdList[' + index + ']', id)
+            if (!isNaN(id)) {
+              formData.append('databasesIdList[' + index + ']', id)
+            }
           })
           formData.append('databaseName', this.databaseName)
           formData.append('sourceSaveInput.name', this.form.name)
