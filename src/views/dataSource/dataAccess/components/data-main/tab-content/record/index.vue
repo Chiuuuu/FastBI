@@ -34,11 +34,11 @@ const column = [
   },
   {
     title: '操作者',
-    dataIndex: 'nickName'
+    dataIndex: 'name'
   },
   {
     title: '账号',
-    dataIndex: 'userName'
+    dataIndex: 'username'
   },
   {
     title: '操作类型',
