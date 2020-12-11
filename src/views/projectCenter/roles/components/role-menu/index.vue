@@ -509,11 +509,11 @@ export default {
           if (result.code === 200) {
             this.handleGetMenuList()
             this.$message.success('新建成功')
-            this.$store.commit('projectRoles/SET_ROLEID', result.msg)
+            this.$store.commit('projectRoles/SET_ROLEID', result.data)
             this.$refs.addForm.resetFields()
-            this.fileSelectId = result.msg
+            this.fileSelectId = result.data
             this.visible = false
-            this.handleEditRole(null, null, { file: { id: result.msg } })
+            this.handleEditRole(null, null, { file: { id: result.data } })
           } else {
             this.$message.error(result.msg)
           }
