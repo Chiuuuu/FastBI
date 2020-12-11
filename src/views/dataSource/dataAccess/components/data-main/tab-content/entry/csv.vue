@@ -533,7 +533,9 @@ export default {
             formData.append('fileList[' + index + ']', file)
           })
           this.deleteIdList.map((id, index) => {
-            formData.append('delDatabasesIdList[' + index + ']', id)
+            if (!isNaN(id)) {
+              formData.append('delDatabasesIdList[' + index + ']', id)
+            }
           })
           formData.append('delimiter', this.queryDelimiter)
           formData.append('sourceSaveInput.name', this.form.name)
