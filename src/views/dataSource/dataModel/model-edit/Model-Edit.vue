@@ -707,6 +707,7 @@ export default {
     },
     componentSuccess(data) {
       if (this.modalName === 'sql-setting') {
+        data.type = +data.type
         if (this.modalStatus === 'new') {
           this.handleSQLAdd(data)
         }
@@ -717,7 +718,6 @@ export default {
       this.close()
     },
     handleSQLAdd(data) {
-      data.type = +data.type
       this.rightMenuList.push(data)
     },
     handleUpdateSQL(data) {
