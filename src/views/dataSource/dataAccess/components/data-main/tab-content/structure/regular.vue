@@ -29,7 +29,7 @@
                   <a-icon style="margin-left:10px" type="question-circle" theme="outlined" />
                 </a-popover>
               </a-radio>
-              <a-radio :value="1" :disabled="modelType === 'hive'">
+              <a-radio :value="1" :disabled="modelType === 'hive' || tableType === 1">
                 <span>增量抽取</span>
                 <a-popover>
                   <template slot="content">
@@ -106,7 +106,7 @@
         <template #extractType="list, record, index">
           <a-select style="width: 150px" v-model="record.extractType" placeholder="请选择方式" @change="handleSelectExtractType($event, record)">
             <a-select-option :value="0">全量更新</a-select-option>
-            <a-select-option :value="1" :disabled="modelType === 'hive'">增量更新</a-select-option>
+            <a-select-option :value="1" :disabled="modelType === 'hive' || tableType === 1">增量更新</a-select-option>
           </a-select>
         </template>
         <template #fieldList="list, record, index">
@@ -155,6 +155,7 @@ export default {
     },
     row: [Object, String],
     regularId: String,
+    tableType: Number,
     tableList: {
       type: Array,
       default() { return [] }
@@ -382,39 +383,62 @@ export default {
     },
     async handleAddRegularInfo() {
       // 传参
-      let paramList = []
-      this.increaseList.map(item => {
-        const obj = {
-          ...this.form,
-          target: item.id,
-          sourceId: this.modelId
-        }
-        // 批量时将form中的值替换成下面table的下拉框值
-        if (!this.single) {
-          obj.extractType = item.extractType
-          obj.incrementalType = item.incrementalType
-          obj.incrementalColumn = item.field
-        }
-        if (this.regularId) {
-          obj.id = this.regData.id
-        }
-        paramList.push(obj)
-      })
-      return this.$server.dataAccess.addRegularInfo(paramList)
-        .finally(() => {
-          this.loading = false
+      if (this.tableType === 0) {
+        let paramList = []
+        this.increaseList.map(item => {
+          const obj = {
+            ...this.form,
+            target: item.id,
+            sourceId: this.modelId
+          }
+          // 批量时将form中的值替换成下面table的下拉框值
+          if (!this.single) {
+            obj.extractType = item.extractType
+            obj.incrementalType = item.incrementalType
+            obj.incrementalColumn = item.field
+          }
+          paramList.push(obj)
         })
+        return this.$server.dataAccess.addRegularInfo(paramList)
+          .finally(() => {
+            this.loading = false
+          })
+      } else if (this.tableType === 1) {
+        let paramList = []
+        this.increaseList.map(item => {
+          const obj = {
+            ...this.form,
+            target: item.id
+          }
+          paramList.push(obj)
+        })
+        return this.$server.dataAccess.addCustomRegularInfo(paramList)
+          .finally(() => {
+            this.loading = false
+          })
+      }
     },
     async handleUpdateRegularInfo() {
-      return this.$server.dataAccess.putRegularInfo({
-          ...this.form,
-          id: this.regData.id,
-          target: this.increaseList[0].id,
-          sourceId: this.modelId
-        })
-        .finally(() => {
-          this.loading = false
-        })
+      if (this.tableType === 0) {
+        return this.$server.dataAccess.putRegularInfo({
+            ...this.form,
+            id: this.regData.id,
+            target: this.increaseList[0].id,
+            sourceId: this.modelId
+          })
+          .finally(() => {
+            this.loading = false
+          })
+      } else if (this.tableType === 1) {
+        return this.$server.dataAccess.putCustomRegularInfo({
+            ...this.form,
+            id: this.regData.id,
+            target: this.increaseList[0].id
+          })
+          .finally(() => {
+            this.loading = false
+          })
+      }
     },
     handleOk() {
       this.$refs.form.validate(async (ok, obj) => {
