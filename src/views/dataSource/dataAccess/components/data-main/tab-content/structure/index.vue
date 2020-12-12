@@ -13,18 +13,20 @@
         </a-col> -->
         <a-col>
           <a-button type="primary" class="select_button" @click="handleGetData" :loading="spinning">刷新数据</a-button>
-          <a-button v-show="showExtractBtn" type="primary" style="margin:0 10px;" class="select_button" @click="showExtractLog">抽取记录</a-button>
+          <a-button v-if="tableType === 0" v-show="showExtractBtn" type="primary" style="margin-left:10px;" class="select_button" @click="showExtractLog">抽取记录</a-button>
           <a-button
             v-permission:[$PERMISSION_CODE.OPERATOR.extract]="$PERMISSION_CODE.OBJECT.datasource"
             v-show="showExtractBtn"
             type="primary"
             class="select_button"
+            style="margin-left:10px;"
             @click="handleExtract"
             :loading="extractSping">全部抽取</a-button>
           <a-button
+            v-if="tableType === 0"
             v-show="showExtractBtn"
             type="primary"
-            style="margin:0 10px;"
+            style="margin-left:10px;"
             @click="showSetting('batch')"
             class="select_button"
             v-permission:[$PERMISSION_CODE.OPERATOR.schedule]="$PERMISSION_CODE.OBJECT.datasource"
@@ -40,7 +42,7 @@
       </a-row>
     </div>
     <div class="tab-scroll scrollbar">
-      <a-table :row-selection="rowSelection" :columns="columns" :data-source="data"  rowKey='id' :loading='spinning' :pagination='false'>
+      <a-table :row-selection="rowSelection" :columns="tableColumns" :data-source="data"  rowKey='id' :loading='spinning' :pagination='false'>
         <span slot="set" slot-scope="set">
           {{ set ? '是' : '否' }}
         </span>
@@ -102,6 +104,7 @@
         :show="visible2"
         :single="isSingle"
         :row="clickRow"
+        :table-type="tableType"
         :regular-id="regularId"
         :table-list="selectedRows"
         @close="closeRegular" />
@@ -259,7 +262,14 @@ export default {
       modelName: state => state.dataAccess.modelName,
       modelType: state => state.dataAccess.modelType,
       showExtractBtn: state => [ 'mysql', 'oracle', 'hive' ].indexOf(state.dataAccess.modelType) > -1
-    })
+    }),
+    tableColumns() {
+      if (!checkActionPermission(this.$PERMISSION_CODE.OBJECT.datasource, this.$PERMISSION_CODE.OPERATOR.schedule)) {
+        return this.columns
+      } else {
+        return this.tableType === 0 ? this.columns : this.columns.slice(0, -1)
+      }
+    }
   },
   filters: {
     formatTime(v) {
@@ -332,35 +342,50 @@ export default {
       } else if (this.selectedRows.length > 10) {
         return this.$message.error('一次抽取最多只能选择10个')
       }
-      const rows = this.selectedRows.map(item => {
-        let databaseName = this.formInfo ? this.formInfo.databaseName : ''
-        // sql, oracle的数据库名称在formInfo里, excel的在dabaseName里
-        if (['excel', 'csv'].indexOf(this.modelType) > -1) {
-          databaseName = this.databaseName
-        }
-        const _item = {
-          databaseName,
-          sourceId: this.modelId,
-          sourceName: this.modelName,
-          tableId: item.id,
-          tableName: item.name
-        }
-        return _item
-      })
-      this.extractSping = true
+      // 源表抽取
+      if (this.tableType === 0) {
+        const rows = this.selectedRows.map(item => {
+          let databaseName = this.formInfo ? this.formInfo.databaseName : ''
+          // sql, oracle的数据库名称在formInfo里, excel的在dabaseName里
+          if (['excel', 'csv'].indexOf(this.modelType) > -1) {
+            databaseName = this.databaseName
+          }
+          const _item = {
+            databaseName,
+            sourceId: this.modelId,
+            sourceName: this.modelName,
+            tableId: item.id,
+            tableName: item.name
+          }
+          return _item
+        })
+        this.extractSping = true
 
-      const result = await this.$server.dataAccess.actionExtract('/datasource/extract', {
-        rows: rows,
-        tableList: this.data
-      }).finally(() => {
-        this.extractSping = false
-        this.handleGetData()
-      })
+        const result = await this.$server.dataAccess.actionExtract('/datasource/extract', {
+          rows: rows,
+          tableList: this.data
+        }).finally(() => {
+          this.extractSping = false
+          this.handleGetData()
+        })
 
-      if (result.code === 200) {
-        this.$message.success('抽取任务已下达')
-      } else {
-        this.$message.error(result.msg)
+        if (result.code === 200) {
+          this.$message.success('抽取任务已下达')
+        } else {
+          this.$message.error(result.msg)
+        }
+      } else if (this.tableType === 1) { // 自定义表抽取
+        this.extractSping = true
+        const result = await this.$server.dataAccess.actionCustomExtract(this.selectedRows.map(item => item.id)).finally(() => {
+          this.extractSping = false
+          this.handleGetData()
+        })
+
+        if (result.code === 200) {
+          this.$message.success('抽取任务已下达')
+        } else {
+          this.$message.error(result.msg)
+        }
       }
     },
     setting(row) {
