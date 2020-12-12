@@ -63,6 +63,15 @@ export default {
         return $axios.post(url, params)
     },
     /**
+     * @description 自定义表抽取
+     * @param {String} url  请求地址
+     * @param {Array} [params={}] 请求参数
+     * @returns
+     */
+    actionCustomExtract(params = []) {
+        return $axios.post('/source/view/extract', params)
+    },
+    /**
      * @description 上传excel文件
      * @param {Object} file 文件
      */
@@ -210,6 +219,21 @@ export default {
         return $axios.post('/datasource/schedule', params)
     },
     /**
+     * @description 新增自定义视图定时任务
+     * @param {Object} params
+     * @param {String} params.name 数据源名称
+     * @param {String} params.target 数据源id
+     * @param {String} params.extractType 抽取类型,0-全量抽取,1-增量抽取
+     * @param {String} params.isRepeat 0-只执行一次，1-重复执行
+     * @param {String} params.frequency 1-小时,2-天3-周,4-月
+     * @param {String} params.interval 间隔时间
+     * @param {String} params.gmtStart 开始时间
+     * @param {String} params.gmtEnd 结束时间
+     */
+    addCustomRegularInfo(params) {
+        return $axios.post('/datasource/schedule/add', params)
+    },
+    /**
      * @description 修改定时任务
      * @param {Object} params
      * @param {String} params.name 数据源名称
@@ -223,6 +247,21 @@ export default {
      */
     putRegularInfo(params) {
         return $axios.put('/datasource/schedule', params)
+    },
+    /**
+     * @description 修改自定义视图定时任务
+     * @param {Object} params
+     * @param {String} params.name 数据源名称
+     * @param {String} params.target 数据源id
+     * @param {String} params.extractType 抽取类型,0-全量抽取,1-增量抽取
+     * @param {String} params.isRepeat 0-只执行一次，1-重复执行
+     * @param {String} params.frequency 1-小时,2-天3-周,4-月
+     * @param {String} params.interval 间隔时间
+     * @param {String} params.gmtStart 开始时间
+     * @param {String} params.gmtEnd 结束时间
+     */
+    putCustomRegularInfo(params) {
+        return $axios.put('/datasource/schedule/view/update', params)
     },
     /**
      * @description 删除定时任务
