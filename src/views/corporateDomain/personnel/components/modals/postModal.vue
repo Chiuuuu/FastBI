@@ -10,12 +10,12 @@
     <template v-if="deptList.length > 0">
       <a-form-model ref="form" :model="form" :label-col="{ span: 3 }" :wrapper-col="{ span: 21 }" labelAlign="left">
         <a-form-model-item label="部门" prop="depart">
-          <a-select v-model="form.depart" @change="handleGetPostList" placeholder="请选择岗位">
+          <a-select v-model="form.depart" @change="handleGetPostList" placeholder="请选择部门">
             <a-select-option :value="item.id" v-for="item in deptList" :key="item.id">{{ item.name }}</a-select-option>
           </a-select>
         </a-form-model-item>
       </a-form-model>
-      <a-button class="add-button" type="primary" @click="handleAddItem">添加岗位</a-button>
+      <a-button class="add-button" type="primary" @click="handleAddItem" :disabled="!form.depart">添加岗位</a-button>
       <div ref="scroll" class="form-list scrollbar">
         <div v-for="(post, index) in list" :key="post.name">
           <ModalForm

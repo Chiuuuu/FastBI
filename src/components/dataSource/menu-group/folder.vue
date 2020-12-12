@@ -110,6 +110,7 @@ export default {
       addClass(this.$refs.folder, 'folder-active')
       const that = this
       this.contenxtmenu = new ContextMenu({
+        vm: that,
         menus: that.contextmenus.map(item => {
           item.$$fun = function () {
               Array.prototype.push.call(arguments, that)

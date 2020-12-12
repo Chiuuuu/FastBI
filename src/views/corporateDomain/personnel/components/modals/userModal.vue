@@ -118,26 +118,35 @@ export default {
         if (this.modalType === 'edit') {
           this.spinning = true
           // 初始化项目和岗位列表
-          this.projectList = this.modalData.projects.map(item => {
-            return {
-              ...item,
-              projectId: item.id,
-              projectName: item.name
-            }
-          })
-          this.getPostList(this.modalData.department.id, () => {
-            Object.assign(this.form, this.modalData, {
-              department: this.modalData.department.id,
-              post: this.modalData.post.id,
-              projects: this.modalData.projects.map(item => item.id),
-              password: '123456',
-              expassword: '123456'
+          if (this.modalData.projects) {
+            this.projectList = this.modalData.projects.map(item => {
+              return {
+                ...item,
+                projectId: item.id,
+                projectName: item.name
+              }
             })
-            // 编辑时禁止编辑密码
-            this.editPsw = false
-            this.password = this.modalData.password
-            this.spinning = false
+          }
+          Object.assign(this.form, this.modalData, {
+            projects: this.modalData.projects.map(item => item.id),
+            password: '123456',
+            expassword: '123456'
           })
+          // 编辑时禁止编辑密码
+          this.editPsw = false
+          this.password = this.modalData.password
+
+          if (this.modalData.department) {
+            this.getPostList(this.modalData.department.id, () => {
+              Object.assign(this.form, {
+                department: this.modalData.department.id,
+                post: this.modalData.post.id
+              })
+              this.spinning = false
+            })
+          } else {
+            this.spinning = false
+          }
         } else {
           this.editPsw = true
           this.getProjectList()
@@ -200,6 +209,7 @@ export default {
           { required: true, message: '请输入姓名' },
           commonValidateField.length({
             title: '姓名',
+            min: 2,
             max: 10
           }),
           commonValidateField.noSign({ title: '姓名' })
