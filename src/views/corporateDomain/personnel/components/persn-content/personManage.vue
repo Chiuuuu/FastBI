@@ -147,74 +147,74 @@
 
 <script>
 import { mapState } from 'vuex'
-import { trimFormData } from "@/utils/form-utils";
-import UserModal from "../modals/userModal";
-import DepartModal from "../modals/departModal";
-import PostModal from "../modals/postModal";
-import omit from "lodash/omit";
+import { trimFormData } from '@/utils/form-utils'
+import UserModal from '../modals/userModal'
+import DepartModal from '../modals/departModal'
+import PostModal from '../modals/postModal'
+import omit from 'lodash/omit'
 
 const personColumn = [
   {
-    title: "用户名",
+    title: '用户名',
     width: 150,
-    dataIndex: "username"
+    dataIndex: 'username'
   },
   {
-    title: "姓名",
+    title: '姓名',
     width: 100,
-    dataIndex: "name"
+    dataIndex: 'name'
   },
   {
-    title: "手机号码",
+    title: '手机号码',
     width: 120,
-    dataIndex: "phone"
+    dataIndex: 'phone'
   },
   {
     // 部门
-    slots: { title: "deptName" },
-    dataIndex: "deptName",
+    slots: { title: 'deptName' },
+    dataIndex: 'deptName',
     width: 200,
     ellipsis: true,
-    key: "deptName"
+    key: 'deptName'
   },
   {
     // 岗位
-    slots: { title: "postName" },
-    dataIndex: "postName",
+    slots: { title: 'postName' },
+    dataIndex: 'postName',
     width: 200,
     ellipsis: true,
-    key: "postName"
+    key: 'postName'
   },
   {
-    title: "所属项目",
-    dataIndex: "projects",
-    scopedSlots: { customRender: "projects" },
+    title: '所属项目',
+    dataIndex: 'projects',
+    scopedSlots: { customRender: 'projects' },
     width: 200,
     ellipsis: true
   },
   {
-    title: "状态",
-    dataIndex: "enable",
+    title: '状态',
+    dataIndex: 'enable',
     width: 80,
-    scopedSlots: { customRender: "enable" }
+    scopedSlots: { customRender: 'enable' }
   },
   {
-    title: "创建时间",
-    dataIndex: "gmtCreate",
+    title: '创建时间',
+    dataIndex: 'gmtCreate',
     width: 180,
     ellipsis: true
   },
   {
-    title: "操作",
-    dataIndex: "config",
-    fixed: "right",
+    title: '操作',
+    dataIndex: 'config',
+    fixed: 'right',
     width: 110,
-    scopedSlots: { customRender: "config" }
+    scopedSlots: { customRender: 'config' }
   }
-];
+]
 
 export default {
-  name: "personManage",
+  name: 'personManage',
   components: {
     UserModal,
     DepartModal,
@@ -224,13 +224,13 @@ export default {
     return {
       loading: false,
       modalData: {},
-      modalType: "",
+      modalType: '',
       visible1: false,
       visible2: false,
       visible3: false,
       personSearch: {
-        username: "",
-        name: "",
+        username: '',
+        name: '',
         department: undefined,
         post: undefined
       },
@@ -243,7 +243,7 @@ export default {
       personColumn,
       departList: [],
       postList: []
-    };
+    }
   },
   computed: {
     ...mapState({
@@ -251,115 +251,115 @@ export default {
     })
   },
   mounted() {
-    this.handleGetData();
-    this.handleGetDepartList();
+    this.handleGetData()
+    this.handleGetDepartList()
   },
   methods: {
     resetForm(tab) {
-      this.personSearch = this.$options.data().personSearch;
+      this.personSearch = this.$options.data().personSearch
       this.$nextTick(() => {
-        this.handleGetData();
-      });
+        this.handleGetData()
+      })
     },
     async handleSwitch(e, record) {
       const res = await this.$server.corporateDomain.actionEnableUser({
         userId: record.id,
         isEnable: +!record.enable
-      });
+      })
       if (res.code === 200) {
-        record.enable = !record.enable;
-        this.$message.success((!record.enable ? "禁用" : "启用") + "成功");
+        record.enable = !record.enable
+        this.$message.success((!record.enable ? '禁用' : '启用') + '成功')
       } else {
-        this.$message.error(res.msg);
+        this.$message.error(res.msg)
       }
     },
     handleSetDepart() {
-      const data = {}; // 取当前项目下的部门岗位
-      this.modalData = data;
-      this.visible2 = true;
+      const data = {} // 取当前项目下的部门岗位
+      this.modalData = data
+      this.visible2 = true
     },
     handleSetPost() {
-      const data = {}; // 取当前项目下的部门岗位
-      this.modalData = data;
-      this.visible3 = true;
+      const data = {} // 取当前项目下的部门岗位
+      this.modalData = data
+      this.visible3 = true
     },
     handleTableChange(pagination) {
-      this.handleGetData(pagination);
+      this.handleGetData(pagination)
     },
     async handleGetDepartList() {
       const res = await this.$server.corporateDomain
         .getDeptList()
         .finally(() => {
-          this.spinning = false;
-        });
+          this.spinning = false
+        })
       if (res.code === 200) {
-        this.departList = res.data;
+        this.departList = res.data
       } else {
-        this.departList = [];
-        this.$message.error("获取部门列表失败");
+        this.departList = []
+        this.$message.error('获取部门列表失败')
       }
     },
     async handleGetPostList(id) {
-      this.personSearch.post = undefined;
+      this.personSearch.post = undefined
       const res = await this.$server.corporateDomain
         .getPostList(id)
         .finally(() => {
-          this.spinning = false;
-        });
+          this.spinning = false
+        })
       if (res.code === 200) {
-        this.postList = res.data;
+        this.postList = res.data
       } else {
-        this.postList = [];
-        this.$message.error("获取部门列表失败");
+        this.postList = []
+        this.$message.error('获取部门列表失败')
       }
     },
     async handleGetData(pagination) {
-      this.loading = true;
+      this.loading = true
       const params = Object.assign({}, trimFormData(this.personSearch), {
-        ...omit(this.pagination, "total"),
+        ...omit(this.pagination, 'total'),
         current: pagination
           ? pagination.current
           : this.$options.data().pagination.current
-      });
+      })
       const res = await this.$server.corporateDomain
         .getUserListByParams(params)
         .finally(() => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
 
       if (res.code === 200) {
-        this.personData = res.rows;
-        this.pagination.total = res.total;
-        this.pagination.current = params.current;
+        this.personData = res.rows
+        this.pagination.total = res.total
+        this.pagination.current = params.current
       } else {
-        this.$message.error(res.msg);
-        this.personData = [];
+        this.$message.error(res.msg)
+        this.personData = []
       }
     },
     showModal(type) {
-      this.visible1 = true;
-      this.modalType = type || "";
+      this.visible1 = true
+      this.modalType = type || ''
     },
     async handleDelete(id) {
-      const res = await this.$server.corporateDomain.deleUser(id);
+      const res = await this.$server.corporateDomain.deleUser(id)
       if (res.code === 200) {
-        this.$message.success("删除成功");
-        this.handleGetData();
+        this.$message.success('删除成功')
+        this.handleGetData()
       } else {
-        this.$message.error(res.msg);
+        this.$message.error(res.msg)
       }
     },
     async handleEdit(data) {
-      const res = await this.$server.corporateDomain.getUserInfo(data.id);
+      const res = await this.$server.corporateDomain.getUserInfo(data.id)
       if (res.code) {
-        this.modalData = res.data;
-        this.showModal("edit");
+        this.modalData = res.data
+        this.showModal('edit')
       } else {
-        this.$message.error("获取信息失败, 请重试");
+        this.$message.error('获取信息失败, 请重试')
       }
     }
   }
-};
+}
 </script>
 
 <style lang="less" scoped>

@@ -15,14 +15,14 @@
 </template>
 <script>
 import { mapState } from 'vuex'
-import RolesTabDataPermission from '../tab-content/rolesTabDataPermission'
+// import RolesTabDataPermission from '../tab-content/rolesTabDataPermission'
 import RoleTabeRole from '../tab-content/rolesTabRole'
 
 export default {
     name: 'rolePermission',
     components: {
-        RolesTabDataPermission,
-        RoleTabeRole
+      // RolesTabDataPermission,
+      RoleTabeRole
     },
     computed: {
       ...mapState({

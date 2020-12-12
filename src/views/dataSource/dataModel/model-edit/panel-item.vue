@@ -83,6 +83,7 @@ export default {
             }
        }
       this.contenxtmenu = new ContextMenu({
+        vm: that,
         menus: that.contextmenus.map(item => {
             if (item['children'] && item.children.length) {
                 item.children.forEach(subitem => {

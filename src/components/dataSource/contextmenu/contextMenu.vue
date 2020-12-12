@@ -29,6 +29,10 @@ import { checkActionPermission } from '@/utils/permission'
 export default {
   name: 'contextMenu',
   props: {
+    vm: {
+      type: Object,
+      default: () => {}
+    },
     menus: {
       type: Array,
       default: function() {
@@ -45,16 +49,36 @@ export default {
       type: Function
     }
   },
-  computed: {
-    renderMenus() {
-      return this.menus.filter(item => {
-        let hasPermission = true
-        if (item['permission']) {
-          const { OBJECT, OPERATOR} = item.permission
-          hasPermission = checkActionPermission(OBJECT, OPERATOR)
+  data() {
+    return {
+      renderMenus: []
+    }
+  },
+  watch: {
+    menus: {
+      immediate: true,
+      handler(value) {
+        if (value && Array.isArray(value)) {
+          this.renderMenus = value.filter(item => {
+            let hasPermission = true
+            if (item['permission']) {
+              const { OBJECT, OPERATOR } = item.permission
+  
+              const { file } = this.vm
+              if (file && file.privileges) {
+                // 根据接口返回的权限判断
+                hasPermission = file.privileges.includes(OPERATOR)
+              } else {
+                // 如果 file.privileges 不存在则根据全局权限判断
+                hasPermission = checkActionPermission(OBJECT, OPERATOR)
+              }
+            }
+            if (hasPermission) return item
+          })
+        } else {
+          new Error('数据不存在或者不是一个数组')
         }
-        if (hasPermission) return item
-      })
+      },
     }
   },
   methods: {
