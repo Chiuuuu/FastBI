@@ -338,7 +338,7 @@ export default {
               message = '编辑成功'
             }
             this.$message
-              .success(message, 2)
+              .success(this.modalType === 'add' ? '添加成功' : '编辑成功', 1)
               .then(() => {
                 this.handleGetTableList()
               })
