@@ -35,13 +35,13 @@
 <script>
 import { mapState } from 'vuex'
 import { trimFormData } from '@/utils/form-utils'
-import RolesTabDataPermission from '../tab-content/rolesTabDataPermission'
+// import RolesTabDataPermission from '../tab-content/rolesTabDataPermission'
 import RoleTabeRole from '../tab-content/rolesTabRole'
 
 export default {
   name: 'roleEdit',
   components: {
-    RolesTabDataPermission,
+    // RolesTabDataPermission,
     RoleTabeRole
   },
   data() {

@@ -29,6 +29,7 @@ export default {
       e.stopPropagation()
       const that = this
       this.contenxtmenu = new ContextMenu({
+        vm: that,
         menus: that.contextmenus.map(item => {
           item.$$fun = function () {
             Array.prototype.push.call(arguments, that)
