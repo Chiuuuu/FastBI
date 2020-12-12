@@ -127,21 +127,20 @@ export default {
               }
             })
           }
-          Object.assign(this.form, this.modalData, {
-            projects: this.modalData.projects.map(item => item.id),
-            password: '123456',
-            expassword: '123456'
-          })
+          this.form.username = this.modalData.username
+          this.form.name = this.modalData.name
+          this.form.phone = this.modalData.phone
+          this.form.password = '123456'
+          this.form.expassword = '123456'
+          this.form.projects = this.modalData.projects.map(item => item.id)
           // 编辑时禁止编辑密码
           this.editPsw = false
           this.password = this.modalData.password
 
           if (this.modalData.department) {
             this.getPostList(this.modalData.department.id, () => {
-              Object.assign(this.form, {
-                department: this.modalData.department.id,
-                post: this.modalData.post.id
-              })
+              this.form.department = this.modalData.department.id
+              this.form.post = this.modalData.post.id
               this.spinning = false
             })
           } else {
@@ -254,6 +253,7 @@ export default {
       }
     },
     async getPostList(id, callback) {
+      this.$refs.form.clearValidate('post')
       const res = await this.$server.corporateDomain.getPostList(id)
       if (res.code === 200) {
         this.form.post = []
