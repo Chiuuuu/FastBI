@@ -140,7 +140,7 @@ export default {
           if (this.modalData.department) {
             this.getPostList(this.modalData.department.id, () => {
               this.form.department = this.modalData.department.id
-              this.form.post = this.modalData.post.id
+              this.form.post = this.modalData.post ? this.modalData.post.id : undefined
               this.spinning = false
             })
           } else {
@@ -253,7 +253,7 @@ export default {
       }
     },
     async getPostList(id, callback) {
-      this.$refs.form.clearValidate('post')
+      if (this.$refs.form) this.$refs.form.clearValidate('post')
       const res = await this.$server.corporateDomain.getPostList(id)
       if (res.code === 200) {
         this.form.post = []
