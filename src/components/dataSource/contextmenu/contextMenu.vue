@@ -63,11 +63,15 @@ export default {
             let hasPermission = true
             if (item['permission']) {
               const { OBJECT, OPERATOR } = item.permission
-  
+
               const { file } = this.vm
               if (file && file.privileges) {
                 // 根据接口返回的权限判断
-                hasPermission = file.privileges.includes(OPERATOR)
+                if (file.privileges.includes(0)) {
+                  hasPermission = true
+                } else {
+                  hasPermission = file.privileges.includes(OPERATOR)
+                }
               } else {
                 // 如果 file.privileges 不存在则根据全局权限判断
                 hasPermission = checkActionPermission(OBJECT, OPERATOR)
