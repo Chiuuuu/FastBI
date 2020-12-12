@@ -291,7 +291,9 @@ export default {
       this.form = this.$options.data().form
       this.$refs.form.resetFields()
       this.confirmLoading = false
-      this.$emit('close')
+      this.$nextTick(() => {
+        this.$emit('close')
+      })
     },
     handleResetPsw() {
       this.editPsw = true
