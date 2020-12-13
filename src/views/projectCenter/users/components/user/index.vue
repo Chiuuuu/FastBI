@@ -23,6 +23,7 @@
             v-model="userMangeForm.roleId"
             class="form-item"
             placeholder="请选择角色"
+            :filter-option="filterOption"
           >
             <a-select-option
               v-for="item in roleList"
@@ -114,10 +115,12 @@
         </a-form-model-item>
         <a-form-model-item label="用户角色" prop="roleIds">
           <a-select
+            show-search
             mode="multiple"
             v-model="modalForm.roleIds"
             style="width: 100%"
             placeholder="请选择用户角色"
+            :filter-option="filterOption"
           >
             <a-select-option
               v-for="item in roleList"
@@ -216,6 +219,11 @@ export default {
     this.handleGetData()
   },
   methods: {
+    filterOption(input, option) {
+      return (
+        option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
+      );
+    },
     handleTableChange(pagination) {
       this.handleGetTableList(pagination)
     },
