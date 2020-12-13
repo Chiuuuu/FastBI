@@ -119,9 +119,11 @@
           <a-button block v-if="adminListLoading" :loading="adminListLoading" />
           <a-select
             v-else
+            show-search
             mode="multiple"
             v-model="form.adminList"
             style="width: 100%"
+            :filter-option="filterOption"
             placeholder="请选择管理员"
           >
             <a-select-option
@@ -246,6 +248,11 @@ export default {
     this.handleGetListData()
   },
   methods: {
+    filterOption(input, option) {
+      return (
+        option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
+      )
+    },
     handleTableChange(pagination) {
       this.handleGetListData(pagination)
     },
