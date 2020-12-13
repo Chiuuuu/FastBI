@@ -63,13 +63,19 @@
             <a-radio value="1">分号</a-radio>
             <a-radio value="2">空格</a-radio>
             <a-radio value="3">
-              其他
-              <a-input
-                style="margin-left:10px"
-                v-model="inputDelimiter"
-                :disabled="form.delimiter !== '3'"
-                @change="$refs.fileForm.validateField('delimiter')"
-              />
+              <span>其他</span>
+              <div style="display:inline-block">
+                <a-input
+                  style="margin:0 10px;width: 200px;"
+                  v-model="inputDelimiter"
+                  :disabled="form.delimiter !== '3'"
+                  @change="$refs.fileForm.validateField('delimiter')"
+                />
+              </div>
+              <a-button
+                v-show="form.delimiter === '3'"
+                @click="handleRenderByDelimiter"
+                type="primary">立即解析</a-button>
             </a-radio>
           </a-radio-group>
         </a-form-model-item>
@@ -233,11 +239,24 @@ export default {
         this.getFileList()
       }
     },
-    changeDelimiter() {
-      this.databaseList = []
-      this.$nextTick(() => {
-        this.renderCurrentTable()
-      })
+    changeDelimiter(e) {
+      const value = e.target.value
+      if (value === '3' && !this.inputDelimiter) {
+        return this.handleClearTable()
+      } else {
+        this.databaseList = []
+        this.$nextTick(() => {
+          this.renderCurrentTable()
+        })
+      }
+    },
+    handleRenderByDelimiter() {
+      if (this.inputDelimiter) {
+        this.databaseList = []
+        this.$nextTick(() => {
+          this.renderCurrentTable()
+        })
+      }
     },
     getFileList() {
       this.spinning = true
