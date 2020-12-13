@@ -56,7 +56,8 @@ export default {
     // 退出登录按钮
     quitBtn() {
       this.$store.dispatch('common/set_token', '')
-      sessionStorage.clear()
+      window.sessionStorage.clear()
+      window.localStorage.clear()
       this.$store.commit('user/CLEAR_PERMISSIONS')
       this.$router.push({
         path: '/login'
