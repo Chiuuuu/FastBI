@@ -34,7 +34,7 @@
         type="primary"
         style="width:88px;height:30px;margin-left:150px"
         @click="handleConnect"
-        v-permission:[$PERMISSION_CODE.OPERATOR.edit]="$PERMISSION_CODE.OBJECT.datasource"
+        v-permission:[btnPermission]="$PERMISSION_CODE.OBJECT.datasource"
       >
         连接
       </a-button>
@@ -61,6 +61,7 @@
     @click="handleSaveForm"
     :disabled="!connectStatus"
     :loading="saveBtn"
+    v-permission:[btnPermission]="$PERMISSION_CODE.OBJECT.datasource"
     >
     保存
     </a-button>
@@ -73,6 +74,7 @@ export default {
   name: 'model-mysql',
   data() {
     return {
+      btnPermission: [this.$PERMISSION_CODE.OPERATOR.edit, this.$PERMISSION_CODE.OPERATOR.add],
       labelCol: {
         xs: { span: 4 },
         sm: { span: 3 },
