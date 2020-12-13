@@ -16,7 +16,7 @@
       <span>{{ file[fileName] }}</span>
     </h4>
     <span class="menu" v-if="hasContextmenus">
-      <span class="caret-down" @click="handleCreateMenu"></span>
+      <span class="caret-down" @click.stop="handleCreateMenu"></span>
     </span>
   </li>
 </template>
@@ -85,10 +85,10 @@ export default {
   },
   methods: {
     initContextMenu() {
-      this.$refs.file && this.$refs.file.addEventListener('contextmenu', this.handleConextMenu)
+      this.$refs.file && this.$refs.file.addEventListener('contextmenu', this.handleConextMenu, false)
     },
     destoryContextMenu() {
-      this.$refs.file && this.$refs.file.removeEventListener('contextmenu', this.handleConextMenu)
+      this.$refs.file && this.$refs.file.removeEventListener('contextmenu', this.handleConextMenu, false)
     },
     handleConextMenu(e) {
       e.preventDefault()
@@ -111,6 +111,7 @@ export default {
       addClass(this.$refs.file, 'file-active')
       const that = this
       this.contenxtmenu = new ContextMenu({
+        vm: that,
         menus: that.contextmenus.map(item => {
           item.$$fun = function () {
               Array.prototype.push.call(arguments, that)

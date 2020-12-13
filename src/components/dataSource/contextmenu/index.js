@@ -9,7 +9,7 @@ var ContextMenu = function(options) {
 
   let mark = document.createElement('div')
   mark.className = 'm-window mask-transparent'
-  mark.style.zIndex = '400'
+  mark.style.zIndex = '1001'
 
   mark.onclick = handleRemove
 
