@@ -28,7 +28,7 @@
             </a-form-model-item>
             <a-form-model-item>
               <a-button
-                type="primary"
+                type="default"
                 @click="handleResetForm"
                 :disabled="loading"
                 >重置</a-button
@@ -39,10 +39,10 @@
         <a-button
           class="btn-add"
           type="primary"
+          ghost
           @click="showModal('add')"
           :disabled="loading"
-          >添加项目</a-button
-        >
+          >添加项目</a-button>
       </div>
       <a-table
         class="role-list-table scrollbar"

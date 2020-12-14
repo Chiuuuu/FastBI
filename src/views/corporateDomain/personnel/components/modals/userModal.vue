@@ -94,7 +94,7 @@
     </a-spin>
     <template v-if="modalType === 'edit'" #footer>
       <a-button key="back" @click="handleModalCancel">取消</a-button>
-      <a-button type="primary" :loading="confirmLoading" @click="handleResetPsw">重置密码</a-button>
+      <a-button type="primary" ghost :loading="confirmLoading" @click="handleResetPsw">重置密码</a-button>
       <a-button key="submit" type="primary" :loading="confirmLoading" @click="handleOk">确认</a-button>
     </template>
   </a-modal>

@@ -13,7 +13,7 @@
             <a-button type="primary" @click="() => handleGetData()" :disabled="loading">查询</a-button>
           </a-form-model-item>
           <a-form-model-item>
-            <a-button type="primary" @click="resetForm" :disabled="loading">重置</a-button>
+            <a-button type="default" @click="resetForm" :disabled="loading">重置</a-button>
           </a-form-model-item>
         </a-form-model>
       </div>
