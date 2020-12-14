@@ -43,7 +43,7 @@
           >
         </a-form-model-item>
         <a-form-model-item>
-          <a-button type="primary" @click="handleRestForm" :disabled="loading"
+          <a-button type="default" @click="handleRestForm" :disabled="loading"
             >重置</a-button
           >
         </a-form-model-item>
@@ -51,6 +51,7 @@
       <a-button
         class="btn-add"
         type="primary"
+        ghost
         @click="handleShowModal('add')"
         :disabled="loading"
         >添加</a-button
