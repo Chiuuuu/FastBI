@@ -281,7 +281,13 @@ export default {
     },
     // 右键删除文件
     handleFileDelete(event, item, { parent, file, index }) {
-      this.handleDelete(file.id)
+      this.$confirm({
+        title: '确认提示',
+        content: '确定删除该数据大屏?',
+        onOk: async () => {
+          this.handleDelete(file.id)
+        }
+      })
     },
     // 删除
     handleDelete(id) {
