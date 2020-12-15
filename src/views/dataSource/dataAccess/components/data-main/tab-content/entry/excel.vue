@@ -132,6 +132,7 @@ export default {
   name: 'model-excel',
   data() {
     return {
+      btnPermission: [this.$PERMISSION_CODE.OPERATOR.edit, this.$PERMISSION_CODE.OPERATOR.add],
       loading: false,
       spinning: false,
       isDragenter: false,
