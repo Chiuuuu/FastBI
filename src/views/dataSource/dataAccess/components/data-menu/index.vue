@@ -7,7 +7,9 @@
           <a-icon type="plus-square" class="menu_icon" />
         </a>
         <a-menu slot="overlay" class="drow_menu">
-          <a-menu-item v-on:click="showModal">
+          <a-menu-item
+          v-permission:[$PERMISSION_CODE.OPERATOR.add]="$PERMISSION_CODE.OBJECT.datasource"
+          v-on:click="showModal">
             添加连接
           </a-menu-item>
           <a-menu-item key="1" @click="handleAddNewFolder">
@@ -117,7 +119,7 @@
 import ResetNameModal from '../data-main/data-menu/resetName'
 import MoveFileModal from '../data-main/data-menu/moveFile'
 import { mapState } from 'vuex'
-import { menuSearchLoop } from '../../../dataModel/util'
+import { menuSearchLoop } from '@/utils/menuSearch'
 import { fetchTableInfo, fetchDeleteMenuById } from '../../../../../api/dataAccess/api'
 import MenuFile from '@/components/dataSource/menu-group/file'
 import MenuFolder from '@/components/dataSource/menu-group/folder'
@@ -138,8 +140,8 @@ export default {
   },
   data() {
     return {
-      // modelList: ['mysql', 'oracle', 'excel', 'csv'].map(function(item) {
-      modelList: ['mysql', 'oracle', 'excel'].map(function(item) {
+      modelList: ['mysql', 'oracle', 'hive', 'excel', 'csv'].map(function(item) {
+      // modelList: ['mysql', 'oracle', 'excel'].map(function(item) {
         // 弹窗选项列表
         return {
           imgurl: require(`@/assets/images/icon_${item}.png`),
@@ -167,6 +169,10 @@ export default {
       folderContenxtMenu: [
         {
           name: '添加连接',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.add,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.datasource
+          },
           onClick: this.showModal
         },
         {
@@ -189,6 +195,10 @@ export default {
         },
         {
           name: '删除',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.datasource
+          },
           onClick: this.handleFileDelete
         }
       ],
@@ -248,7 +258,9 @@ export default {
     handleSearchMenu: debounce(function(event) {
       const value = event.target.value
       this.searchValue = value
-      this.handleGetSearchList(value)
+      if (value) {
+        this.handleGetSearchList(value)
+      }
     }, 400),
     handleGetSearchList(value) {
       let result = []
@@ -270,6 +282,8 @@ export default {
           this.$store.dispatch('dataAccess/setModelType', 'mysql')
         } else if (result.data.type === 2) {
           this.$store.dispatch('dataAccess/setModelType', 'oracle')
+        } else if (result.data.type === 3) {
+          this.$store.dispatch('dataAccess/setModelType', 'hive')
         } else if (result.data.type === 4) {
           this.$store.dispatch('dataAccess/setModelType', 'excel')
         } else if (result.data.type === 5) {
@@ -281,8 +295,8 @@ export default {
       this.$store.dispatch('dataAccess/setModelId', file.id)
       this.$store.dispatch('dataAccess/setParentId', file.parentId)
       this.$store.dispatch('dataAccess/setFirstFinished', true)
-      this.$EventBus.$emit('set-tab-index', '1')
       this.$emit('on-menuChange-componet', 'Main')
+      this.$EventBus.$emit('set-tab-index', '1')
     },
     /**
     * 删除菜单
@@ -459,8 +473,8 @@ export default {
       this.$store.dispatch('dataAccess/setModelInfo', {})
       this.$store.dispatch('dataAccess/setModelName', '')
       this.$EventBus.$emit('resetForm')
-      this.$EventBus.$emit('set-tab-index', '1')
       this.$emit('on-menuChange-componet', 'Main')
+      this.$EventBus.$emit('set-tab-index', '1')
       this.$store.dispatch('dataAccess/setModelSelectType', '')
     },
     /**

@@ -7,6 +7,10 @@ import getters from './getters'
 import dataAccess from './modules/dataAccess'
 import options from './modules/options'
 import dataModel from './modules/dataModel'
+import user from './modules/user'
+import permission from './modules/permission'
+import projectRoles from './modules/projectCenter/roles'
+import projectPermissions from './modules/projectCenter/permissions'
 
 Vue.use(Vuex)
 
@@ -17,7 +21,11 @@ export default new Vuex.Store({
         common,
         dataAccess,
         options,
-        dataModel
+        dataModel,
+        user,
+        permission,
+        projectRoles,
+        projectPermissions
     },
     getters
 })

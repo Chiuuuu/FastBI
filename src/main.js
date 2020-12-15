@@ -13,6 +13,9 @@ import './styles/index.styl'
 
 import server from '@/api/index'
 
+import permission from '@/directive/permission'
+import PERMISSION_CODE from '@/config/permission'
+
 // element-ui 局部引用
 Vue.use(Button)
 Vue.use(ColorPicker)
@@ -23,11 +26,12 @@ Vue.use(Input)
 Vue.use(BinUI)
 Vue.use(VCharts)
 Vue.use(Antd)
+Vue.use(permission)
 
 Vue.prototype.$server = server
 Vue.prototype.$EventBus = new Vue()
 Vue.prototype.$base = process.env.NODE_ENV === 'production' ? '/bin-data-site' : ''
-
+Vue.prototype.$PERMISSION_CODE = PERMISSION_CODE
 // if (sessionStorage.getItem('store')) {
 //   store.replaceState(
 //     Object.assign({}, store.state, JSON.parse(sessionStorage.getItem('store')))

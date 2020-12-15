@@ -27,7 +27,15 @@ const service = axios.create({
 const errorHandle = {
   401: function(msg) {
     // message.error(msg || '未登录状态，跳转登录页')
-    router.replace('/login')
+    store.dispatch('common/set_token', '')
+    window.sessionStorage.clear()
+    window.localStorage.clear()
+    router.replace({
+      path: '/login',
+      query: {
+        redirect: router.currentRoute.path
+      }
+    })
   },
   403: function(msg) {
     message.error(msg || '没有权限，请联系管理员授权')

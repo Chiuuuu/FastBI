@@ -1,5 +1,8 @@
 import dataSourceRouter from './dataSource'
 import screenManageRouter from './screenMange'
+import CorporateDomainRouter from './corporateDomain'
+import ProjectCenterRouter from './projectCenter'
+
 const BaseLayout = () => import('@/layout/index')
 
 export default {
@@ -8,7 +11,9 @@ export default {
     component: BaseLayout,
     redirect: '/screenManage/catalog',
     children: [
+        dataSourceRouter,
         screenManageRouter,
-        dataSourceRouter
+        ProjectCenterRouter,
+        CorporateDomainRouter
     ]
 }

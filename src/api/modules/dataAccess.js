@@ -63,6 +63,15 @@ export default {
         return $axios.post(url, params)
     },
     /**
+     * @description 自定义表抽取
+     * @param {String} url  请求地址
+     * @param {Array} [params={}] 请求参数
+     * @returns
+     */
+    actionCustomExtract(params = []) {
+        return $axios.post('/source/view/extract', params)
+    },
+    /**
      * @description 上传excel文件
      * @param {Object} file 文件
      */
@@ -76,7 +85,9 @@ export default {
     },
     /**
      * @description 上传excel文件
-     * @param {Object} file 文件
+     * @param {Object} data 参数
+     * @param {Object} data.file 文件
+     * @param {String} data.delimiter 分隔符
      */
     actionUploadCsvFile(data) {
         return $axios({
@@ -111,10 +122,10 @@ export default {
     /**
      * @description 保存excel数据源
      * @param {Object} data body对象
+     * @param {Array[string]} 'databasesIdList' 删除的文件id
+     * @param {Array[file]} 'fileList' 文件列表
      * @param {String} 'sourceSaveInput.name' 名称
      * @param {String} 'sourceSaveInput.type' 数据源类型
-     * @param {Array[string]} 'sourceSaveInput.databasesIdList' 删除的文件id
-     * @param {Array[file]} 'sourceSaveInput.fileList' 文件列表
      * @param {String} 'sourceSaveInput.parentId' parentId
      * @param {String} 'sourceSaveInput.id' id
      */
@@ -128,18 +139,27 @@ export default {
     },
     /**
      * @description 查询文件下的表格内容
-     * @param {String} tableId 文件id
+     * @param {Object} data 参数
+     * @param {String} data.tableId 表id
+     * @param {String} data.delimiter 分隔符
      */
-    getCsvFileTableInfo(tableId) {
-        return $axios.get('/datasource/csv/presto/read?tableId=' + tableId)
+    getCsvFileTableInfo(data) {
+        // return $axios.get('/datasource/csv/presto/read?tableId=' + tableId)
+        return $axios({
+            method: 'post',
+            headers: { 'Content-Type': 'multipart/form-data' },
+            url: '/datasource/csv/read',
+            data
+        })
     },
     /**
      * @description 保存excel数据源
      * @param {Object} data body对象
+     * @param {Array[file]} 'fileList' 文件列表
+     * @param {Array[string]} 'delDatabasesIdList' 删除的文件id
+     * @param {Array[string]} 'delimiter' 分隔符
      * @param {String} 'sourceSaveInput.name' 名称
      * @param {String} 'sourceSaveInput.type' 数据源类型
-     * @param {Array[string]} 'sourceSaveInput.databasesIdList' 删除的文件id
-     * @param {Array[file]} 'sourceSaveInput.fileList' 文件列表
      * @param {String} 'sourceSaveInput.parentId' parentId
      * @param {String} 'sourceSaveInput.id' id
      */
@@ -158,6 +178,14 @@ export default {
      */
     getModelRecord(params) {
         return $axios.post('/datasource/record', params)
+    },
+    /**
+     * @description 获取操作记录
+     * @param {Array} params
+     * @param {String} id 数据源id
+     */
+    getIncreaseFields(params) {
+        return $axios.post('/datasource/field/find/increase', params)
     },
     /**
      * @description 获取定时任务列表
@@ -191,6 +219,21 @@ export default {
         return $axios.post('/datasource/schedule', params)
     },
     /**
+     * @description 新增自定义视图定时任务
+     * @param {Object} params
+     * @param {String} params.name 数据源名称
+     * @param {String} params.target 数据源id
+     * @param {String} params.extractType 抽取类型,0-全量抽取,1-增量抽取
+     * @param {String} params.isRepeat 0-只执行一次，1-重复执行
+     * @param {String} params.frequency 1-小时,2-天3-周,4-月
+     * @param {String} params.interval 间隔时间
+     * @param {String} params.gmtStart 开始时间
+     * @param {String} params.gmtEnd 结束时间
+     */
+    addCustomRegularInfo(params) {
+        return $axios.post('/datasource/schedule/add', params)
+    },
+    /**
      * @description 修改定时任务
      * @param {Object} params
      * @param {String} params.name 数据源名称
@@ -204,6 +247,21 @@ export default {
      */
     putRegularInfo(params) {
         return $axios.put('/datasource/schedule', params)
+    },
+    /**
+     * @description 修改自定义视图定时任务
+     * @param {Object} params
+     * @param {String} params.name 数据源名称
+     * @param {String} params.target 数据源id
+     * @param {String} params.extractType 抽取类型,0-全量抽取,1-增量抽取
+     * @param {String} params.isRepeat 0-只执行一次，1-重复执行
+     * @param {String} params.frequency 1-小时,2-天3-周,4-月
+     * @param {String} params.interval 间隔时间
+     * @param {String} params.gmtStart 开始时间
+     * @param {String} params.gmtEnd 结束时间
+     */
+    putCustomRegularInfo(params) {
+        return $axios.put('/datasource/schedule/view/update', params)
     },
     /**
      * @description 删除定时任务
