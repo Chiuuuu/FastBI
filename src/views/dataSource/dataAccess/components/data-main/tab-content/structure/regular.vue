@@ -2,7 +2,6 @@
   <a-modal
     :bodyStyle="bodyStyle"
     :maskClosable="false"
-    :zIndex="1010"
     width="700px"
     title="添加定时任务"
     :confirmLoading="loading"
