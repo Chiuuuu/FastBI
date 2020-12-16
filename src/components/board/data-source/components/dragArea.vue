@@ -171,7 +171,6 @@ export default {
       this.fileList.splice(index, 1)
       this.getData()
       let current = deepClone(this.currentSelected)
-      console.log(current.packageJson.api_data)
       // 维度度量删除完以后重置该图表数据
       if (this.chartType === '1' || this.chartType === '2') {
         if (current.packageJson.api_data.dimensions.length === 0 && current.packageJson.api_data.measures.length === 0) {
@@ -188,6 +187,12 @@ export default {
             }
             this.$store.dispatch('SetApis', apis)
           }
+        }
+        //如果是仪表盘，第二个度量是目标值（进度条最大值）,重置进度条范围
+        if (current.packageJson.chartType === 'v-gauge') {
+          current.packageJson.config.series.max = 100;
+          console.log(current.packageJson.config)
+          this.$store.dispatch('SetSelfProperty', current.packageJson.config)
         }
       }
       if (this.chartType === '3') {
@@ -279,7 +284,6 @@ export default {
               }
               //如果是仪表盘，第二个度量是目标值（进度条最大值）
               if (this.currentSelected.packageJson.chartType === 'v-gauge' && apiData.measures[1]) {
-                console.log(apiData.measures)
                 config.series.max = res.rows[0][apiData.measures[1].name];
                 this.$store.dispatch('SetSelfProperty', config)
               }
