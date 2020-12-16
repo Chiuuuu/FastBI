@@ -29,14 +29,17 @@
     <a-form-model-item label="服务器" prop="ip">
       <a-input v-model="form.ip" />
     </a-form-model-item>
-    <a-form-model-item label="HiveServer2 IP" prop="hiveserver">
-      <a-input v-model="form.hiveserver" />
-    </a-form-model-item>
     <a-form-model-item label="端口" prop="port" v-if="form.linkMode === 1" :rules="[
       { required: true, message: '请输入端口号' },
       { type: 'integer', message: '请输入数字', min: 0 }
     ]">
       <a-input v-model.number="form.port" />
+    </a-form-model-item>
+    <a-form-model-item label="HiveServer2 IP" prop="hiveserver">
+      <a-input v-model="form.hiveserver" />
+    </a-form-model-item>
+    <a-form-model-item label="hdfs端口" prop="hdfsPort">
+      <a-input v-model.number="form.hdfsPort" />
     </a-form-model-item>
     <a-form-model-item label="命名空间" prop="namescape" v-if="form.linkMode === 2" :rules="[{
         required: true,
@@ -163,8 +166,9 @@ export default {
         // 连接信息表单
         name: '', // 数据源名
         ip: '', // 服务器ip
-        hiveserver: '', // 服务器ip
         port: '', // 端口号
+        hiveserver: '', // 服务器ip
+        hdfsPort: '', // hdfs端口号
         namescape: '', // 命名空间
         user: '', // 用户名
         password: '', // 密码
@@ -204,6 +208,10 @@ export default {
             validator: validateIP,
             trigger: 'blur'
           }
+        ],
+        hdfsPort: [
+          { required: true, message: '请输入端口号' },
+          { type: 'integer', message: '请输入数字', min: 0 }
         ],
         linkMode: [
           { required: true, message: '请选择连接模式' }
@@ -271,6 +279,7 @@ export default {
               password: this.form.password,
               authMethod: this.form.authMethod,
               hiveserver: this.form.hiveserver,
+              hdfsPort: this.form.hdfsPort,
               user: this.form.user
             }
           }).finally(() => {
@@ -326,6 +335,7 @@ export default {
               user: this.form.user,
               ip: this.form.ip,
               hiveserver: this.form.hiveserver,
+              hdfsPort: this.form.hdfsPort,
               port: this.form.port,
               password: this.form.password,
               databaseName: this.form.databaseName

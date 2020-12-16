@@ -343,6 +343,7 @@ export default {
         return this.$message.error('一次抽取最多只能选择10个')
       }
       // 源表抽取
+      let result
       if (this.tableType === 0) {
         const rows = this.selectedRows.map(item => {
           let databaseName = this.formInfo ? this.formInfo.databaseName : ''
@@ -360,32 +361,32 @@ export default {
           return _item
         })
         this.extractSping = true
-
-        const result = await this.$server.dataAccess.actionExtract('/datasource/extract', {
+        result = await this.$server.dataAccess.actionExtract('/datasource/extract', {
           rows: rows,
           tableList: this.data
         }).finally(() => {
           this.extractSping = false
           this.handleGetData()
         })
-
-        if (result.code === 200) {
-          this.$message.success('抽取任务已下达')
-        } else {
-          this.$message.error(result.msg)
-        }
       } else if (this.tableType === 1) { // 自定义表抽取
         this.extractSping = true
-        const result = await this.$server.dataAccess.actionCustomExtract(this.selectedRows.map(item => item.id)).finally(() => {
+        result = await this.$server.dataAccess.actionCustomExtract(this.selectedRows.map(item => item.id)).finally(() => {
           this.extractSping = false
           this.handleGetData()
         })
-
-        if (result.code === 200) {
-          this.$message.success('抽取任务已下达')
+      }
+      if (result.code === 200) {
+        if (result.data) {
+          if (result.data.length && result.data.length < this.selectedRows.length) {
+            this.$message.info(`抽取任务已下达 \n ${result.msg}`, 5)
+          } else if (result.data.length && result.data.length === this.selectedRows.length) {
+            this.$message.error('所选表格不是orc格式, 无法抽取')
+          }
         } else {
-          this.$message.error(result.msg)
+          this.$message.success('抽取任务已下达')
         }
+      } else {
+        this.$message.error(result.msg)
       }
     },
     setting(row) {
