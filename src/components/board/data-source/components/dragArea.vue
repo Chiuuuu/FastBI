@@ -136,7 +136,12 @@ export default {
       }
       // 仪表盘/环形图
       if (this.chartType === '2' && this.type === 'measures' && this.dragFile === this.type) {
-        this.fileList[0] = dataFile
+        if (this.currentSelected.packageJson.name === 've-pie') {
+          this.fileList[0] = dataFile
+          //如果是仪表盘，需要两个度量
+        } else if(this.fileList.length<2){
+          this.fileList.push(dataFile)
+        }
         this.fileList = this.uniqueFun(this.fileList, 'name')
         this.getData()
       }
@@ -270,6 +275,12 @@ export default {
               let config = deepClone(this.currentSelected.packageJson.config)
               if (this.currentSelected.packageJson.chartType === 'v-multiPie') {
                 config.chartTitle.text = rows[0].value
+                this.$store.dispatch('SetSelfProperty', config)
+              }
+              //如果是仪表盘，第二个度量是目标值（进度条最大值）
+              if (this.currentSelected.packageJson.chartType === 'v-gauge' && apiData.measures[1]) {
+                console.log(apiData.measures)
+                config.series.max = res.rows[0][apiData.measures[1].name];
                 this.$store.dispatch('SetSelfProperty', config)
               }
               this.saveScreenData()
