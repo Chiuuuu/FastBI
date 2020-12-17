@@ -33,7 +33,7 @@ const errorHandle = {
     router.replace({
       path: '/login',
       query: {
-        redirect: router.currentRoute.path
+        redirect: router.currentRoute.fullPath
       }
     })
   },
