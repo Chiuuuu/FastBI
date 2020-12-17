@@ -107,7 +107,7 @@
             <div class="dim_title">
               <span class="dim_span">维度</span>
               <div class="dim_operation">
-                <!-- <a v-on:click="openModal('compute-setting', '维度')" style="color:#627CFF;line-height:38px">新建计算维度</a> -->
+                <a v-on:click="openModal('compute-setting', '维度')" style="color:#627CFF;line-height:38px">新建计算维度</a>
                 <a-divider type="vertical" />
                 <!-- <a v-on:click="openModal('geo-setting')" style="color:#627CFF;">设置地理位置</a> -->
               </div>
@@ -137,7 +137,7 @@
             <div class="mea_title">
               <span class="mea_span">度量</span>
               <div class="mea_operation">
-                <!-- <a v-on:click="openModal('compute-setting', '度量')" style="color:#627CFF;margin-right:20px;line-height:38px">新建计算度量</a> -->
+                <a v-on:click="openModal('compute-setting', '度量')" style="color:#627CFF;margin-right:20px;line-height:38px">新建计算度量</a>
               </div>
             </div>
             <div class="mea_menu scrollbar">
@@ -765,7 +765,6 @@ export default {
         })
         this.detailInfo.pivotSchema.dimensions = [].concat(cacheDimensions)
         this.detailInfo.pivotSchema.measures = [].concat(cacheMeasures)
-        debugger
         this.handleDimensions()
         this.handleMeasures()
       }
@@ -791,7 +790,9 @@ export default {
       this.rightMenuList.splice(index, 1, data)
     },
     exit() {
-      this.$router.go(-1)
+      this.$router.push({
+        name: 'modelShow'
+      })
     },
     async handleSave() {
       let formAllRight = true
