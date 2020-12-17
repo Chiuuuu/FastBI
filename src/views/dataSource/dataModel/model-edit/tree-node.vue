@@ -69,7 +69,7 @@
       <a-popover v-model="nodeVisible" trigger="click"  overlayClassName='btn-box'>
         <ul slot="content" class="btn-box-ul">
           <li class="btn-box-li" @click="handleBtnDelete(nodeData)">删除</li>
-          <!-- <li class="btn-box-li" @click="handleBtnUnion(nodeData)">Union</li> -->
+          <li class="btn-box-li" @click="handleBtnUnion(nodeData)">Union</li>
         </ul>
         <div class="caret-down"></div>
       </a-popover>

@@ -1,5 +1,13 @@
 <template>
-  <a-modal width="764px" :title="single ? '定时设置' : '批量抽取设置'" :bodyStyle="bodyStyle" :visible="show" @cancel="handleClose" @ok="handleOk">
+  <a-modal
+    width="764px"
+    :title="single ? '定时设置' : '批量抽取设置'"
+    :bodyStyle="bodyStyle"
+    :maskClosable="false"
+    :visible="show"
+    :zIndex="800"
+    @cancel="handleClose"
+    @ok="handleOk">
     <div style="margin-bottom:10px"><a-button type="primary" @click="setRegular">添加定时任务</a-button></div>
     <a-table
       rowKey='id'

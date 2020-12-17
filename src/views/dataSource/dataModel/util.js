@@ -34,6 +34,9 @@ export class Node {
   setJoin(data, key = 'join') {
     this.props[key] = data
   }
+  setField(field, value) {
+    this.props[field] = value
+  }
   getProps() {
     return this.props
   }
