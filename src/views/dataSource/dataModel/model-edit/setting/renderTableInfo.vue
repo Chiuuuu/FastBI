@@ -4,6 +4,7 @@
     :visible="isShow"
     :title="item.name"
     width="1000px"
+    :afterClose="handleAfterClose"
     @cancel="handleClose"
   >
     <template #footer>
@@ -81,6 +82,7 @@ export default {
      * 获取数据
     */
     async handleGetData() {
+      this.loading = true
       const result = await this.$server.dataModel.getTableDetailInfo({
         tableName: this.item.name,
         tableId: this.item.id,
@@ -101,6 +103,10 @@ export default {
     },
     handleClose() {
       this.$emit('close')
+    },
+    handleAfterClose() {
+      this.data = this.$options.data().data
+      this.columnsList = this.$options.data().columnsList
     }
   }
 }

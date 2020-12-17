@@ -31,7 +31,7 @@
             rowKey="id"
             bordered>
             <template #alias="text, record">
-              <a-input v-model="record.alias" style="width: 156px height: 32px" />
+              <a-input v-model="record.alias" @change="handleCheckName" style="width: 156px height: 32px" />
             </template>
             <template #dataType="text, record">
               <field-select
@@ -53,14 +53,14 @@
                 :isDimension="record.role === 1"
               />
             </template>
-            <template #description="text">
-              <a-input :value="text" style="width: 156px height: 32px" />
+            <template #description="text, record">
+              <a-input v-model="record.description" style="width: 156px height: 32px" />
             </template>
-            <template #comment="text">
-              <a-input :value="text" style="width: 100px height: 32px" />
+            <template #comment="text, record">
+              <a-input v-model="record.comment" style="width: 100px height: 32px" />
             </template>
-            <template #visible="text">
-              <a-select :value="`${text}`">
+            <template #visible="text, record, index">
+              <a-select :value="`${record.visible}`" @change="(value) => handleSelect(value, record, index)">
                 <a-select-option value="true">是</a-select-option>
                 <a-select-option value="false">否</a-select-option>
               </a-select>
@@ -117,11 +117,11 @@
       <template v-else-if="setType === 'visible'">
         <a-form-model :model="modalForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
           <a-form-model-item label="是否可见" required>
-            <a-radio-group name="batchVisible" default-value="true" v-model="modalForm.visible">
-              <a-radio value="true">
+            <a-radio-group name="batchVisible" :default-value="true" v-model="modalForm.visible">
+              <a-radio :value="true">
                 是
               </a-radio>
-              <a-radio value="false">
+              <a-radio :value="false">
                 否
               </a-radio>
             </a-radio-group>
@@ -135,6 +135,7 @@
 <script>
 import FieldSelect from '@/components/dataSource/field-select/select'
 import cloneDeep from 'lodash/cloneDeep'
+import debounce from 'lodash/debounce'
 const column = [
   {
     title: '原名',
@@ -206,8 +207,9 @@ export default {
       modalForm: {
         dataType: 'BIGINT',
         role: 1,
-        visible: 'true'
+        visible: true
       },
+      validatePass: true,
       fieldContenxtMenu: [
         {
           name: '转换为整数',
@@ -285,8 +287,36 @@ export default {
     }
   },
   methods: {
+    handleSelect(value, record, index) {
+      const has = Object.keys(this.cacheTables).some(item => (item === record.tableNo) || (item === `${record.tableNo}`))
+      if (has) {
+        this.cacheTables[record.tableNo].splice(index, 1, {
+          ...record,
+          visible: value === 'true'
+        })
+      }
+    },
+    handleCheckName: debounce(function(event) {
+      const value = event.target.value
+      let hasSame = false
+      Object.values(this.tables).forEach(list => {
+        if (list.some(item => item.alias === value)) {
+          hasSame = true
+        }
+      })
+      if (hasSame) {
+        this.validatePass = false
+        this.$message.error('存在同名字段, 请重新命名')
+      } else {
+        this.validatePass = true
+      }
+    }, 500),
     handleSave() {
-      this.$emit('success', this.cacheTables)
+      if (this.validatePass) {
+        this.$emit('success', this.cacheTables)
+      } else {
+        this.$message.error('存在同名字段, 请重新命名')
+      }
     },
     handleClose() {
       this.$emit('close')
