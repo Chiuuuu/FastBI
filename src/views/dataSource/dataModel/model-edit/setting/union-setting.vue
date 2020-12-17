@@ -18,6 +18,16 @@
       <a-form-model-item label="表名称" prop="name">
         <a-input v-model="form.name" placeholder="请输入表名称" />
       </a-form-model-item>
+      <a-form-model-item label="合并方式" prop="uniq">
+        <a-radio-group v-model="form.uniq">
+          <a-radio :value="false">
+            不去重
+          </a-radio>
+          <a-radio :value="true">
+            去重
+          </a-radio>
+        </a-radio-group>
+      </a-form-model-item>
     </a-form-model>
     <div
       class="union-list"
@@ -26,13 +36,14 @@
     >
       <div class="union-table" :title="table.name" v-for="(table, index) in unionList" :key="table.id">
         <span>{{ table.name }}</span>
-        <a-icon v-if="index !== 0" type="delete"></a-icon>
+        <a-icon v-if="index !== 0" type="delete" @click.stop="handleDeleteUnion(table, index)"></a-icon>
       </div>
     </div>
   </a-modal>
 </template>
 
 <script>
+import omit from 'lodash/omit'
 export default {
   name: 'unionSetting',
   inject: ['nodeStatus'],
@@ -48,12 +59,13 @@ export default {
   data() {
     return {
       form: {
-        name: this.unionData.alias + '-union'
+        name: '',
+        uniq: false
       },
       rules: {
         name: [
-          { required: true, message: '请输入表名称' },
-          { min: 1, max: 20, message: '请输入1-20个字符的表名称' }
+          { required: true, message: '请输入表名称' }
+          // { min: 1, max: 20, message: '请输入1-20个字符的表名称' }
         ]
       },
       unionList: []
@@ -64,11 +76,16 @@ export default {
       immediate: true,
       handler(newVal) {
         if (newVal) {
-          this.form.name = this.unionData.alias + '-union'
-          if (Array.isArray(this.unionData)) {
-            this.unionList = [].concat(this.unionData)
+          const nodeProps = this.unionData.getProps()
+          if (nodeProps.type !== 2) {
+            // 不是合并类型
+            this.form.name = nodeProps.name + '_Union'
+            this.unionList = [].concat([omit(nodeProps, 'union')])
           } else {
-            this.unionList = new Array(this.unionData.getProps())
+            this.form.name = nodeProps.name
+            const { connectType, tableList } = nodeProps.union
+            this.form.uniq = connectType
+            this.unionList = [...tableList]
           }
         }
       }
@@ -77,20 +94,51 @@ export default {
   methods: {
     handleDrop() {
       const nodeData = this.nodeStatus.dragNode.getProps()
-      if (this.unionList.some(item => (item.tableId || item.id) === nodeData.id)) {
-        this.$message.error('相同的表无需合并')
-      } else {
-        this.unionList.push(nodeData)
+      const data = {
+        tableId: nodeData.id,
+        name: nodeData.name,
+        datamodelId: this.unionList[0].datamodelId,
+        type: nodeData.type
       }
+      this.unionList.push(data)
+      // if (this.unionList.some(item => (item.tableId || item.id) === nodeData.id)) {
+      //   this.$message.error('相同的表无需合并')
+      // } else {
+      //   this.unionList.push(nodeData)
+      // }
     },
     handleSave() {
-      this.$refs.form.validate((ok) => {
+      this.$refs.form.validate(async (ok) => {
         if (ok) {
-          this.handleClose()
+          const hasUnionLength = this.unionList.length
+          if (hasUnionLength > 1) {
+            const params = {
+              connectType: this.form.uniq,
+              tableList: this.unionList
+            }
+            const result = await this.$server.dataModel.actionVerifyUnionTable(params)
+            if (result.code === 200) {
+              this.$emit('success', {
+                node: this.unionData,
+                union: params,
+                form: this.form
+              })
+              this.handleClose()
+            } else {
+              this.$message.error(result.msg || '请求错误')
+            }
+          } else {
+            this.$message.error('从左侧列表中拖入需要union的表')
+          }
         }
       })
     },
+    handleDeleteUnion(tabel, index) {
+      this.unionList.splice(index, 1)
+    },
     handleClose() {
+      this.form = this.$options.data().form
+      this.unionList.splice(0)
       this.$emit('close')
     }
   }

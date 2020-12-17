@@ -8,31 +8,32 @@
   >
     <div class="drawer-btn">
       <a-button style="width: 110px"
-                :disabled="!selectDrawer"
-                @click="handleShowSetting($event, 1)">设置字段类型</a-button>
+        :disabled="!selectDrawer"
+        @click="handleShowSetting($event, 'dataType')">设置字段类型</a-button>
       <a-button style="width: 110px"
-                :disabled="!selectDrawer"
-                @click="handleShowSetting($event, 2)">设置字段属性</a-button>
+        :disabled="!selectDrawer"
+        @click="handleShowSetting($event, 'role')">设置字段属性</a-button>
       <a-button style="width: 110px"
-                :disabled="!selectDrawer"
-                @click="handleShowSetting($event, 3)">设置是否可见</a-button>
+        :disabled="!selectDrawer"
+        @click="handleShowSetting($event, 'visible')">设置是否可见</a-button>
     </div>
-    <div v-if="Object.keys(tables).length > 0"
+    <div v-if="Object.keys(cacheTables).length > 0"
          class="drawer-menu">
       <a-collapse style="width: 100%">
-        <a-collapse-panel v-for="(value, name) in tables"
-                          :key="name"
-                          :header="value[0].tableName">
-          <a-table :row-selection="rowSelection"
-                   :columns="column"
-                   :data-source="value"
-                   rowKey="id"
-                   bordered>
-            <template #alias="text">
-              <a-input :value="text"
-                       style="width: 156px height: 32px" />
+        <a-collapse-panel
+          v-for="(value, name) in cacheTables"
+          :key="name"
+          :header="value[0].tableName">
+          <a-table
+            :row-selection="rowSelection"
+            :columns="column"
+            :data-source="value"
+            rowKey="id"
+            bordered>
+            <template #alias="text, record">
+              <a-input v-model="record.alias" style="width: 156px height: 32px" />
             </template>
-            <template #convertType="text, record">
+            <template #dataType="text, record">
               <field-select
                 :text="(text || record.dataType) | formatField"
                 :select-data="record"
@@ -53,17 +54,15 @@
               />
             </template>
             <template #description="text">
-              <a-input :value="text"
-                       style="width: 156px height: 32px" />
+              <a-input :value="text" style="width: 156px height: 32px" />
             </template>
             <template #comment="text">
-              <a-input :value="text"
-                       style="width: 100px height: 32px" />
+              <a-input :value="text" style="width: 100px height: 32px" />
             </template>
             <template #visible="text">
-              <a-select :default-value="String(text)">
-                <a-select-option value="true"> 是 </a-select-option>
-                <a-select-option value="false"> 否 </a-select-option>
+              <a-select :value="`${text}`">
+                <a-select-option value="true">是</a-select-option>
+                <a-select-option value="false">否</a-select-option>
               </a-select>
             </template>
           </a-table>
@@ -82,30 +81,29 @@
         textAlign: 'right',
         zIndex: 1,
       }">
-      <a-button :style="{ marginRight: '8px' }"
-                @click="$emit('close')">
+      <a-button :style="{ marginRight: '8px' }" @click="$emit('close')">
         取消
       </a-button>
-      <a-button type="primary"
-                @click="handleSave"> 保存 </a-button>
+      <a-button type="primary" @click="handleSave"> 保存 </a-button>
     </div>
-    <a-modal :visible="showSetting" @cancel="showSetting = false" @ok="handleBatchSetting">
-      <template v-if="setType === 1">
-        <a-form-model :model="batchType" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
+    <a-modal :visible="showSetting" @cancel="handleCancelModal" @ok="handleBatchSetting">
+      <template v-if="setType === 'dataType'">
+        <a-form-model :model="modalForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
           <a-form-model-item label="字段类型" required>
-            <a-select default-value="INT" style="width: 100px" v-model="batchType.value">
-              <a-select-option value="INT"> 整数 </a-select-option>
-              <a-select-option value="DATE"> 日期时间 </a-select-option>
+            <a-select default-value="BIGINT" style="width: 100px" v-model="modalForm.dataType">
+              <a-select-option value="BIGINT"> 整数 </a-select-option>
+              <a-select-option value="DOUBLE"> 小数 </a-select-option>
               <a-select-option value="VARCHAR"> 字符串 </a-select-option>
-              <a-select-option value="double"> 小数 </a-select-option>
+              <a-select-option value="DATE"> 日期 </a-select-option>
+              <a-select-option value="TIMESTAMP"> 日期时间 </a-select-option>
             </a-select>
           </a-form-model-item>
         </a-form-model>
       </template>
-      <template v-else-if="setType === 2">
-        <a-form-model :model="batchRole" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
+      <template v-else-if="setType === 'role'">
+        <a-form-model :model="modalForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
           <a-form-model-item label="字段属性" required>
-            <a-radio-group name="batchRole" :default-value="1" v-model="batchRole.value">
+            <a-radio-group name="batchRole" :default-value="1" v-model="modalForm.role">
               <a-radio :value="1">
                 维度
               </a-radio>
@@ -116,10 +114,10 @@
           </a-form-model-item>
         </a-form-model>
       </template>
-      <template v-else-if="setType === 3">
-        <a-form-model :model="batchVisible" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
+      <template v-else-if="setType === 'visible'">
+        <a-form-model :model="modalForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
           <a-form-model-item label="是否可见" required>
-            <a-radio-group name="batchVisible" default-value="true" v-model="batchVisible.value">
+            <a-radio-group name="batchVisible" default-value="true" v-model="modalForm.visible">
               <a-radio value="true">
                 是
               </a-radio>
@@ -136,7 +134,7 @@
 
 <script>
 import FieldSelect from '@/components/dataSource/field-select/select'
-
+import cloneDeep from 'lodash/cloneDeep'
 const column = [
   {
     title: '原名',
@@ -152,9 +150,9 @@ const column = [
   },
   {
     title: '字段类型',
-    dataIndex: 'convertType',
+    dataIndex: 'dataType',
     scopedSlots: {
-      customRender: 'convertType'
+      customRender: 'dataType'
     }
   },
   {
@@ -204,9 +202,12 @@ export default {
       selectedRows: [],
       showSetting: false,
       setType: '',
-      batchType: { value: 'INT' },
-      batchRole: { value: 1 },
-      batchVisible: { value: 'true' },
+      cacheTables: '',
+      modalForm: {
+        dataType: 'BIGINT',
+        role: 1,
+        visible: 'true'
+      },
       fieldContenxtMenu: [
         {
           name: '转换为整数',
@@ -233,18 +234,24 @@ export default {
           dataType: 'TIMESTAMP',
           onClick: this.switchFieldType
         }
-      ]
+      ],
+      rowSelection: {
+        onChange: (selectedRowKeys, selectedRows) => {
+          this.selectedRows = [].concat(selectedRows)
+        }
+      }
     }
   },
   computed: {
     selectDrawer() {
       return this.selectedRows.length > 0
-    },
-    rowSelection() {
-      return {
-        onChange: (selectedRowKeys, selectedRows) => {
-          this.selectedRows = selectedRows
-        }
+    }
+  },
+  watch: {
+    isShow: {
+      immediate: true,
+      handler(value) {
+        this.cacheTables = value ? cloneDeep(this.tables) : ''
       }
     }
   },
@@ -258,7 +265,7 @@ export default {
           value = '日期时间'
           break
         case 'DATE':
-          value = '日期时间'
+          value = '日期'
           break
         case 'DOUBLE':
           value = '小数'
@@ -279,7 +286,7 @@ export default {
   },
   methods: {
     handleSave() {
-      this.handleClose()
+      this.$emit('success', this.cacheTables)
     },
     handleClose() {
       this.$emit('close')
@@ -296,32 +303,22 @@ export default {
       this.showSetting = true
       this.setType = type
     },
-    handleBatchSetting() {
-      if (this.setType === 1) {
-        this.saveBatchType()
-      } else if (this.setType === 2) {
-        this.saveBatchRole()
-      } else if (this.setType === 3) {
-        this.saveBatchVisible()
-      }
+    handleCancelModal() {
+      this.modalForm = this.$options.data().modalForm
       this.showSetting = false
     },
-    async saveBatchType () {
-      let value = this.batchType.value
-      this.selectedRows.map(item => {
-        item.convertType = value
-      })
+    handleBatchSetting() {
+      this.saveBatchFiled()
+      this.showSetting = false
     },
-    async saveBatchRole () {
-      let value = this.batchRole.value
-      this.selectedRows.map(item => {
-        item.role = value
-      })
-    },
-    async saveBatchVisible () {
-      let value = this.batchVisible.value
-      this.selectedRows.map(item => {
-        item.visible = (value === 'true')
+    saveBatchFiled() {
+      let value = this.modalForm[this.setType]
+      this.selectedRows.forEach(item => {
+        if (this.setType === 'visible') {
+          item[this.setType] = (value === 'true')
+        } else {
+          item[this.setType] = value
+        }
       })
     }
   }
