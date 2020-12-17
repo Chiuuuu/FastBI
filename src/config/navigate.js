@@ -89,8 +89,9 @@ const list = [{
                         splitLine: {
                             show: false,
                             lineStyle: {
+                              width: 2,
                               type: 'solid',
-                              color: '#fff'
+                              color: '#fff',
                             }
                         },
                         axisTick: {
@@ -618,7 +619,8 @@ const list = [{
               title: '仪表盘',
               name: 've-gauge',
               chartType: 'v-gauge',
-              icon: 'radar-chart',
+              icon: null,
+              iconFont:'icon-gauge',
               type: '2',
               modelId: '',
               api_data: {
@@ -900,7 +902,8 @@ const list = [{
               title: '环形图',
               name: 've-pie',
               chartType: 'v-ring',
-              icon: 'pie-chart',
+              icon: null,
+              iconFont:'icon-Ring-Chart',
               type: '2',
               modelId: '',
               api_data: {
