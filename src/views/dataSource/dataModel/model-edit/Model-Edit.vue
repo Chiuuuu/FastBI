@@ -99,7 +99,7 @@
           <span>数据模型详情</span>
           <div class="detail_btn">
             <a-button v-on:click="openModal('check-table')" :disabled="disableByDetailInfo">查看宽表</a-button>
-            <!-- <a-button v-on:click="openModal('batch-setting')">批量编辑字段</a-button> -->
+            <a-button v-on:click="openModal('batch-setting')">批量编辑字段</a-button>
           </div>
         </div>
         <div class="detail_main">
@@ -707,15 +707,79 @@ export default {
     },
     componentSuccess(data) {
       if (this.modalName === 'sql-setting') {
-        data.type = +data.type
-        if (this.modalStatus === 'new') {
-          this.handleSQLAdd(data)
-        }
-        if (this.modalStatus === 'edit') {
-          this.handleUpdateSQL(data)
-        }
+        this.doWithSqlSetting(data)
+      }
+      if (this.modalName === 'union-setting') {
+        this.doWithUnionSetting(data)
+      }
+
+      if (this.modalName === 'batch-setting') {
+        this.doWithBatchSetting(data)
       }
       this.close()
+    },
+    doWithSqlSetting(data) {
+      data.type = +data.type
+      if (this.modalStatus === 'new') {
+        this.handleSQLAdd(data)
+      }
+      if (this.modalStatus === 'edit') {
+        this.handleUpdateSQL(data)
+      }
+    },
+    doWithUnionSetting(data) {
+      const tables = this.detailInfo.config.tables
+      this.unionNode.setField('name', data.form.name)
+      this.unionNode.setField('type', 2)
+      this.unionNode.setField('union', data.union)
+
+      const node = this.unionNode
+      const index = findIndex(tables, {
+        id: node.props.id
+      })
+      this.detailInfo.config.tables.splice(index, 1, {
+        ...tables[index],
+        ...node.props
+      })
+
+      // 由于层次过深，需要set
+      this.$set(this.detailInfo.config.tables[index]['union'], 'connectType', data.union.connectType)
+      this.$set(this.detailInfo.config.tables[index]['union'], 'tableList', [...data.union.tableList])
+
+      // 处理更改名字
+      this.detailInfo.pivotSchema.dimensions = this.handleChangeTableName(this.detailInfo.pivotSchema.dimensions, node.props.tableNo, data.form.name)
+      this.detailInfo.pivotSchema.measures = this.handleChangeTableName(this.detailInfo.pivotSchema.measures, node.props.tableNo, data.form.name)
+
+      this.handleDimensions()
+      this.handleMeasures()
+    },
+    doWithBatchSetting(data) {
+      if (data) {
+        const cacheDimensions = []
+        const cacheMeasures = []
+        Object.keys(data).forEach(item => {
+          const list = data[item]
+          list.forEach(field => {
+            field.role === 1 ? cacheDimensions.push(field) : cacheMeasures.push(field)
+          })
+        })
+        this.detailInfo.pivotSchema.dimensions = [].concat(cacheDimensions)
+        this.detailInfo.pivotSchema.measures = [].concat(cacheMeasures)
+        debugger
+        this.handleDimensions()
+        this.handleMeasures()
+      }
+    },
+    handleChangeTableName(list, tableNo, name) {
+      if (list && list.length) {
+        return list.map(item => {
+          if (item.tableNo === tableNo || `${item.tableNo}` === tableNo) {
+            item.tableName = name
+          }
+          return item
+        })
+      }
+      return list
     },
     handleSQLAdd(data) {
       this.rightMenuList.push(data)
@@ -770,13 +834,15 @@ export default {
       this.detailInfo.config.tables.map(table => {
         table.alias = table.name
       })
-      const result = await this.$server.dataModel.saveModel({
+
+      const params = {
         ...this.detailInfo,
         pivotSchema: {
           ...this.handleConcat() // 处理维度度量
         },
         parentId: this.parentId
-      })
+      }
+      const result = await this.$server.dataModel.saveModel(params)
       if (result.code === 200) {
         if (this.model === 'add') {
           await this.handleSaveModelSourceId()

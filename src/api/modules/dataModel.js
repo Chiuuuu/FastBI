@@ -162,5 +162,25 @@ export default {
    */
   actionValidateCustomSql(params) {
     return $axios.post(`model/custom/checkCustomizeSQL`, params)
+  },
+  /**
+   * 校验表上下合拼是否成功
+   * @param {Object} params
+   * @param {Number | String} params.connectType
+   * @param {Array} params.tableList
+   * @returns
+   */
+  actionVerifyUnionTable(params) {
+    return $axios.post(`/model/datamodel/verifyUnionTable`, params)
+  },
+  /**
+   * @description 查看表信息
+   * @param {Object} params
+   * @param {Object} params.tableName 源表名称
+   * @param {Object} params.tableId 源表id
+   * @param {Object} params.databaseId 数据库id
+   */
+  getTableDetailInfo(params) {
+    return $axios.post(`/model/table/getDataSourceTableDataList`, params)
   }
 }
