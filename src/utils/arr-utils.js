@@ -9,7 +9,7 @@ export function toFirst (fieldData, index) {
 export function toLast (fieldData, index) {
   let arr = [...fieldData]
   if (index !== arr.length - 1) {
-    arr.push(arr.shift())
+    arr.push(arr.splice(index, 1)[0])
   }
   return arr
 }
