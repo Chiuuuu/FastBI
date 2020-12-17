@@ -8,12 +8,12 @@
       <div class="scrollable scrollbar">
         <div class="setting">
           <div class="set_bar">
-            <a-input placeholder="请输入关键词" class="search_input">
+            <a-input :value="fieldKeyword" @change="handleGetFieldKeyword" placeholder="请输入关键词" class="search_input">
               <a-icon slot="prefix" type="search" />
             </a-input>
-            <a-button :disabled="!fieldSetable" v-on:click="handleShowSetting(1)">设置字段类型</a-button>
-            <a-button :disabled="!selectDrawer" v-on:click="handleShowSetting(2)">设置字段属性</a-button>
-            <a-button :disabled="!selectDrawer" v-on:click="handleShowSetting(3)">设置是否可见</a-button>
+            <a-button :disabled="!fieldSetable" v-on:click="handleShowSetting('convertType')">设置字段类型</a-button>
+            <a-button :disabled="!selectDrawer" v-on:click="handleShowSetting('role')">设置字段属性</a-button>
+            <a-button :disabled="!selectDrawer" v-on:click="handleShowSetting('visible')">设置是否可见</a-button>
           </div>
           <div class="table">
             <a-table
@@ -21,7 +21,7 @@
               :row-selection="rowSelection"
               :columns="columns"
               :pagination="false"
-              :data-source="data"
+              :data-source="currentData"
               :loading='sping'
               :scroll="{ x: 1200, y: 'calc(100vh - 350px)' }"
             >
@@ -66,11 +66,11 @@
             </template>
             </a-table>
           </div>
-          <a-modal :visible="showSetting" @cancel="showSetting = false" @ok="handleBatchSetting">
-            <template v-if="setType === 1">
-              <a-form-model :model="batchType" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
-                <a-form-model-item label="字段类型" prop="value" required>
-                  <a-select default-value="BIGINT" style="width: 100px" v-model="batchType.value">
+          <a-modal v-model="showSetting" @cancel="handleCancelModal" @ok="handleBatchSetting">
+            <template v-if="setType === 'convertType'">
+              <a-form-model :model="modalForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
+                <a-form-model-item label="字段类型" prop="convertType" required>
+                  <a-select default-value="BIGINT" style="width: 100px" v-model="modalForm.convertType">
                     <a-select-option value="BIGINT"> 整数 </a-select-option>
                     <a-select-option value="TIMESTAMP"> 日期时间 </a-select-option>
                     <a-select-option value="DATE"> 日期 </a-select-option>
@@ -80,10 +80,10 @@
                 </a-form-model-item>
               </a-form-model>
             </template>
-            <template v-else-if="setType === 2">
-              <a-form-model :model="batchRole" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
-                <a-form-model-item label="字段属性" prop="value" required>
-                  <a-radio-group name="batchRole" :default-value="1" v-model="batchRole.value">
+            <template v-else-if="setType === 'role'">
+              <a-form-model :model="modalForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
+                <a-form-model-item label="字段属性" prop="role" required>
+                  <a-radio-group name="batchRole" :default-value="1" v-model="modalForm.role">
                     <a-radio :value="1">
                       维度
                     </a-radio>
@@ -94,10 +94,10 @@
                 </a-form-model-item>
               </a-form-model>
             </template>
-            <template v-else-if="setType === 3">
-              <a-form-model :model="batchVisible" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
-                <a-form-model-item label="是否可见" prop="value" required>
-                  <a-radio-group name="batchVisible" v-model="batchVisible.value">
+            <template v-else-if="setType === 'visible'">
+              <a-form-model :model="modalForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
+                <a-form-model-item label="是否可见" prop="visible" required>
+                  <a-radio-group name="batchVisible" v-model="modalForm.visible">
                     <a-radio value="true">
                       是
                     </a-radio>
@@ -118,7 +118,7 @@
               </a-button>
             </a-col>
             <a-col>
-              <a-button :loading="loading" type="primary" style="width:88px;height:30px;" @click="handleSave">
+              <a-button :loading="loading" type="primary" style="width:88px;height:30px;" @click="handleSaveWriteTable">
               保存
             </a-button>
             </a-col>
@@ -133,6 +133,7 @@
 import { mapState } from 'vuex'
 import { message } from 'ant-design-vue'
 import FieldSelect from '@/components/dataSource/field-select/select'
+import debounce from 'lodash/debounce'
 
 const columns = [
   {
@@ -190,15 +191,19 @@ export default {
   data() {
     return {
       data: [],
+      fieldKeyword: '',
       sping: true,
       loading: false,
       showSetting: false,
       setType: '',
-      batchType: { value: 'BIGINT' },
-      batchRole: { value: 1 },
-      batchVisible: { value: 'true' },
+      modalForm: {
+        convertType: 'BIGINT',
+        role: 1,
+        visible: 'true'
+      },
       columns,
       selectedRows: [],
+      selectedRowKeys: [],
       current: ['mail'],
       openKeys: ['sub1'],
       visible: false,
@@ -207,27 +212,27 @@ export default {
       fieldContenxtMenu: [
         {
           name: '转换为整数',
-          dataType: 'BIGINT',
+          convertType: 'BIGINT',
           onClick: this.switchFieldType
         },
         {
           name: '转换为小数',
-          dataType: 'DOUBLE',
+          convertType: 'DOUBLE',
           onClick: this.switchFieldType
         },
         {
           name: '转换为字符串',
-          dataType: 'VARCHAR',
+          convertType: 'VARCHAR',
           onClick: this.switchFieldType
         },
         {
           name: '转换为日期',
-          dataType: 'DATE',
+          convertType: 'DATE',
           onClick: this.switchFieldType
         },
         {
           name: '转换为日期时间',
-          dataType: 'TIMESTAMP',
+          convertType: 'TIMESTAMP',
           onClick: this.switchFieldType
         }
       ]
@@ -249,10 +254,19 @@ export default {
       // 相同的字段属性(维度度量)才能批量设置字段类型
       return this.selectDrawer && !this.selectedRows.some((item, index, list) => list[0].role !== item.role)
     },
+    currentData() {
+      return this.data.filter(item => item.name.toLowerCase().indexOf(this.fieldKeyword.toLowerCase()) > -1)
+    },
     rowSelection() {
       return {
-        onChange: (selectedRowKeys, selectedRows) => {
+        selectedRowKeys: this.selectedRowKeys,
+        onSelect: (record, selected, selectedRows) => {
           this.selectedRows = selectedRows
+          this.selectedRowKeys = selectedRows.map(item => item.id)
+        },
+        onSelectAll: (selected, selectedRows, changeRows) => {
+          this.selectedRows = selectedRows
+          this.selectedRowKeys = selectedRows.map(item => item.id)
         }
       }
     }
@@ -294,6 +308,11 @@ export default {
       const newValue = event.target.value
       record[key] = newValue
     },
+    handleGetFieldKeyword: debounce(function (e) {
+      this.fieldKeyword = e.target.value
+      this.selectedRowKeys = []
+      this.selectedRows = []
+    }, 400),
     handleAliasBlur(event, record, index, key) {
       if (!event.target.value) {
         message.error('别名不能为空')
@@ -306,8 +325,8 @@ export default {
       record[key] = value
     },
     switchFieldType(e, item, vm) {
-      let dataType = item.dataType
-      vm.selectData.convertType = dataType
+      let convertType = item.convertType
+      vm.selectData.convertType = convertType
     },
     switchRoleType(e, item, vm) {
       let roleType = item.roleType
@@ -347,38 +366,21 @@ export default {
       this.setType = type
     },
     handleBatchSetting() {
-      if (this.setType === 1) {
-        this.saveBatchType()
-      } else if (this.setType === 2) {
-        this.saveBatchRole()
-      } else if (this.setType === 3) {
-        this.saveBatchVisible()
-      }
+      let value = this.modalForm[this.setType]
+      this.selectedRows.forEach(item => {
+        if (this.setType === 'visible') {
+          item[this.setType] = (value === 'true')
+        } else {
+          item[this.setType] = value
+        }
+      })
       this.showSetting = false
-    },
-    async saveBatchType () {
-      let value = this.batchType.value
-      this.selectedRows.map(item => {
-        item.convertType = value
-      })
-    },
-    async saveBatchRole () {
-      let value = this.batchRole.value
-      this.selectedRows.map(item => {
-        item.role = value
-      })
-    },
-    async saveBatchVisible () {
-      let value = this.batchVisible.value
-      this.selectedRows.map(item => {
-        item.visible = (value === 'true')
-      })
     },
     back() {
       this.$emit('on-change-componet', 'Main')
     },
-    handleSave() {
-      this.handleSaveWriteTable()
+    handleCancelModal() {
+      this.modalForm = this.$options.data().modalForm
     },
     async handleSaveWriteTable() {
       this.loading = true
