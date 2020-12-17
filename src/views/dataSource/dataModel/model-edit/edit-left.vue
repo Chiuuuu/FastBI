@@ -14,26 +14,37 @@
       >
         <span>{{ item.name }}</span>
         <template v-if="type==='sql'">
-          <!-- <div class="u-icon eye"><a-icon type="eye" @click="handleTableInfo(3)"/></div> -->
+          <div class="u-icon eye"><a-icon type="eye" @click="handleOpenTableInfo(item)"/></div>
           <div class="u-icon edit"><a-icon type="edit" @click="handleSQLEdit(item)"/></div>
           <div class="u-icon delete"><a-icon type="delete" @click="handleSQLDelete(item)"/></div>
         </template>
-        <!-- <template v-else>
-          <div class="u-icon delete"><a-icon type="eye" @click="handleTableInfo(3)"/></div>
-        </template> -->
+        <template v-else>
+          <div class="u-icon delete"><a-icon type="eye" @click="handleOpenTableInfo(item)"/></div>
+        </template>
       </div>
     </div>
     <template v-else>
       <a-empty style="margin-top:50px;color:#000" v-if="type !=='sql'" description="数据源未进行数据抽取，请先抽取数据"></a-empty>
     </template>
+    <render-table-info
+      :isShow="isRenderTable"
+      @close="handleCloseModal"
+      :item="modalData"
+    ></render-table-info>
   </a-spin>
 </template>
 <script>
 import { Node } from '../util'
 import { mapState } from 'vuex'
+import pick from 'lodash/pick'
+import assign from 'lodash/assign'
+import RenderTableInfo from './setting/renderTableInfo.vue'
 export default {
   name: 'model-edit-left',
   inject: ['nodeStatus'],
+  components: {
+    RenderTableInfo
+  },
   props: {
     detailInfo: {
       type: Object,
@@ -51,7 +62,9 @@ export default {
   data() {
     return {
       isDrag: false,
-      loading: true
+      loading: true,
+      modalData: {},
+      isRenderTable: false
     }
   },
   watch: {
@@ -63,8 +76,12 @@ export default {
     }
   },
   methods: {
-    handleTableInfo(num) {
-      alert(num)
+    handleCloseModal() {
+      this.isRenderTable = false
+    },
+    handleOpenTableInfo(item) {
+      this.isRenderTable = true
+      this.modalData = assign({}, item)
     },
     handleSQLEdit(item) {
       this.$emit('edit', item)
@@ -79,7 +96,6 @@ export default {
       this.isDrag = false
     },
     handleLeftDragStart(event, data) {
-      console.log('left-drag-start', data)
       this.nodeStatus = Object.assign(this.nodeStatus, {
         dragType: 'menu',
         dragNode: new Node(data),

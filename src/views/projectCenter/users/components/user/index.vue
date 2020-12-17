@@ -223,7 +223,7 @@ export default {
     filterOption(input, option) {
       return (
         option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
-      );
+      )
     },
     handleTableChange(pagination) {
       this.handleGetTableList(pagination)
