@@ -15,7 +15,7 @@
           <a-button type="primary" class="select_button" @click="handleGetData" :loading="spinning">刷新数据</a-button>
           <a-button v-if="tableType === 0" v-show="showExtractBtn" type="primary" style="margin-left:10px;" class="select_button" @click="showExtractLog">定时抽取记录</a-button>
           <a-button
-            v-permission:[$PERMISSION_CODE.OPERATOR.extract]="$PERMISSION_CODE.OBJECT.table"
+            v-permission:[$PERMISSION_CODE.OPERATOR.extract]="$PERMISSION_CODE.OBJECT.datasource"
             v-show="showExtractBtn"
             type="primary"
             class="select_button"
@@ -29,7 +29,7 @@
             style="margin-left:10px;"
             @click="showSetting('batch')"
             class="select_button"
-            v-permission:[$PERMISSION_CODE.OPERATOR.schedule]="$PERMISSION_CODE.OBJECT.table"
+            v-permission:[$PERMISSION_CODE.OPERATOR.schedule]="$PERMISSION_CODE.OBJECT.datasource"
           >批量抽取设置</a-button>
         </a-col>
         <!-- <a-col>
@@ -174,58 +174,8 @@ export default {
     ExtractSetting
   },
   data() {
-    // 定时权限决定表头是否显示
-    const columns = [
-      {
-        title: '表名',
-        dataIndex: 'name',
-        ellipsis: true,
-        width: 200,
-        key: 'name'
-      },
-      {
-        title: '是否设置过字段',
-        dataIndex: 'set',
-        key: 'set',
-        slots: { title: 'set' },
-        scopedSlots: { customRender: 'set' }
-      },
-      {
-        title: '是否抽取过',
-        dataIndex: 'extracted',
-        key: 'extracted',
-        slots: { title: 'extracted' },
-        scopedSlots: { customRender: 'extracted' }
-      },
-      {
-        title: '抽取状态',
-        dataIndex: 'extractStatus',
-        key: 'extractStatus',
-        slots: { title: 'extractStatus' },
-        scopedSlots: { customRender: 'extractStatus' }
-      },
-      {
-        title: '修改时间',
-        key: 'gmtModified',
-        width: 200,
-        dataIndex: 'gmtModified'
-      },
-      {
-        title: '字段配置',
-        key: 'config',
-        scopedSlots: { customRender: 'config' }
-      },
-      {
-        title: '定时配置',
-        key: 'regular',
-        scopedSlots: { customRender: 'regular' }
-      }
-    ]
-    if (!checkActionPermission(this.$PERMISSION_CODE.OBJECT.table, this.$PERMISSION_CODE.OPERATOR.schedule)) {
-      columns.pop()
-    }
     return {
-      columns,
+      columns: [],
       data: [],
       logColumns,
       logData: [],
@@ -261,6 +211,7 @@ export default {
       modelInfo: state => state.dataAccess.modelInfo,
       modelName: state => state.dataAccess.modelName,
       modelType: state => state.dataAccess.modelType,
+      privileges: state => state.dataAccess.privileges,
       showExtractBtn: state => [ 'mysql', 'oracle', 'hive' ].indexOf(state.dataAccess.modelType) > -1
     }),
     tableColumns() {
@@ -293,8 +244,62 @@ export default {
     handleTableTypeChange(event) {
       this.handleGetData()
     },
+    handleColumns() {
+      // 定时权限决定表头是否显示
+      const columns = [
+        {
+          title: '表名',
+          dataIndex: 'name',
+          ellipsis: true,
+          width: 200,
+          key: 'name'
+        },
+        {
+          title: '是否设置过字段',
+          dataIndex: 'set',
+          key: 'set',
+          slots: { title: 'set' },
+          scopedSlots: { customRender: 'set' }
+        },
+        {
+          title: '是否抽取过',
+          dataIndex: 'extracted',
+          key: 'extracted',
+          slots: { title: 'extracted' },
+          scopedSlots: { customRender: 'extracted' }
+        },
+        {
+          title: '抽取状态',
+          dataIndex: 'extractStatus',
+          key: 'extractStatus',
+          slots: { title: 'extractStatus' },
+          scopedSlots: { customRender: 'extractStatus' }
+        },
+        {
+          title: '修改时间',
+          key: 'gmtModified',
+          width: 200,
+          dataIndex: 'gmtModified'
+        },
+        {
+          title: '字段配置',
+          key: 'config',
+          scopedSlots: { customRender: 'config' }
+        },
+        {
+          title: '定时配置',
+          key: 'regular',
+          scopedSlots: { customRender: 'regular' }
+        }
+      ]
+      if (!this.privileges.includes(0) && !this.privileges.includes(this.$PERMISSION_CODE.OPERATOR.schedule)) {
+        columns.pop()
+      }
+      this.columns = columns
+    },
     async handleGetData() {
       if (!this.modelType) return
+      this.handleColumns()
       this.spinning = true
       const modelKey = this.modelType === 'oracle' ? 'sourceOracleName' : 'sourceMysqName'
       let databaseName = this.formInfo ? this.formInfo.databaseName : ''
