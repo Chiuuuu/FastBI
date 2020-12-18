@@ -144,7 +144,7 @@ export default {
       this.$server.projectCenter
         .addRoleUser({
           userIds: this.modalForm.users,
-          roleIds: new Array(this.roleId)
+          roleId: this.roleId
         })
         .then(res => {
           if (res.code === 200) {
