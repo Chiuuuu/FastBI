@@ -1,10 +1,20 @@
 <template>
   <div class="tab-panel">
-    <!-- <div class="search_bar">
-      <a-input placeholder="请输入关键词" class="search_input" style="width:60%">
-        <a-icon slot="prefix" type="search" />
-      </a-input>
-    </div> -->
+    <a-form-model ref="form" :model="form" layout="inline" class="search_bar" style="margin-left:15px">
+      <a-form-model-item prop="keyword">
+        <a-input
+          placeholder="请输入操作者或账号"
+          :value="form.keyword"
+          @change="handleGetKeyword"
+        >
+          <a-icon slot="prefix" type="search" />
+        </a-input>
+      </a-form-model-item>
+      <!-- <a-form-model-item>
+        <a-button type="primary" style="margin-right:10px" @click="() => handleGetData()">查询</a-button>
+        <a-button type="default" @click="handleResetForm">重置</a-button>
+      </a-form-model-item> -->
+    </a-form-model>
     <div class="tab-scroll scrollbar">
       <a-table
         rowKey="id"
@@ -12,7 +22,7 @@
         :data-source="datas"
         :loading="loading"
         :pagination="pagination"
-        :scroll="{ y: 'calc(100vh - 350px)' }"
+        :scroll="{ y: 'calc(100vh - 400px)' }"
         @change="handleChangeTable"
         >
         <template #time="text">
@@ -25,6 +35,7 @@
 <script>
 import { mapState } from 'vuex'
 import moment from 'moment'
+import debounce from 'lodash/debounce'
 
 const column = [
   {
@@ -52,6 +63,9 @@ export default {
     return {
       column,
       datas: [],
+      form: {
+        keyword: ''
+      },
       pagination: {
         current: 1,
         pageSize: 10,
@@ -75,6 +89,7 @@ export default {
       this.loading = true
       const params = {
         sourceId: this.modelId,
+        keyword: this.form.keyword,
         pageSize: this.pagination.pageSize,
         current: pagination ? pagination.current : this.$options.data().pagination.current
       }
@@ -87,6 +102,16 @@ export default {
         this.$message.error(res.msg)
       }
       this.loading = false
+    },
+    handleGetKeyword: debounce(function(e) {
+      this.form.keyword = e.target.value.trim()
+      this.handleGetData()
+    }, 400),
+    handleResetForm() {
+      this.$refs.form.resetFields()
+      this.$nextTick(() => {
+        this.handleGetData()
+      })
     },
     handleChangeTable(pagination) {
       this.handleGetData(pagination)

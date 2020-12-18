@@ -259,6 +259,7 @@ export default {
     },
     rowSelection() {
       return {
+        fixed: true,
         selectedRowKeys: this.selectedRowKeys,
         onSelect: (record, selected, selectedRows) => {
           this.selectedRows = selectedRows
