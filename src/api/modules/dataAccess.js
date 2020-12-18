@@ -18,6 +18,16 @@ export default {
         return $axios.post(`/datasource/read/field`, params)
     },
     /**
+     * @description 读取数据库
+     * @param {string} type 类型
+     * @param {Object} params 请求参数
+     * @param {string} params.datasourceId 数据源id
+     * @returns
+     */
+    getDatabaseList(params) {
+        return $axios.get(`/datasource/database/list`, { params })
+    },
+    /**
      * @description 读取数据库的表
      * @param {string} type 类型
      * @param {Object} params 请求参数
@@ -27,6 +37,14 @@ export default {
      */
     getTableList(params) {
         return $axios.post(`/datasource/read/teble`, params)
+    },
+    /**
+     * @description 读取数据库的表数据
+     * @param {string} id 表id
+     * @returns
+     */
+    getTableInfo(id) {
+        return $axios.get(`datasource/table/read/${id}`)
     },
     /**
      * @description 保存数据信息
@@ -180,7 +198,7 @@ export default {
         return $axios.post('/datasource/record', params)
     },
     /**
-     * @description 获取操作记录
+     * @description 获取增量字段
      * @param {Array} params
      * @param {String} id 数据源id
      */
@@ -189,19 +207,19 @@ export default {
     },
     /**
      * @description 获取定时任务列表
-     * @param {Object} params
-     * @param {String} params.name 数据源名称
-     * @param {String} params.target 当前表id
+     * @param {String} databaseId 当前数据库id
+     * @param {String} isBatch 是否批量
      */
-    getRegularList(params) {
-        return $axios.get('/datasource/schedule/list', { params })
+    getRegularList(databaseId, isBatch = 0) {
+        return $axios.get(`/datasource/schedule/list/${databaseId}/${isBatch}`)
     },
     /**
      * @description 获取定时任务详情
-     * @param {String} id id
+     * @param {String} id 任务id
+     * @param {String} groupId 批量任务id
      */
-    getRegularInfo(id) {
-        return $axios.get('/datasource/schedule/' + id)
+    getRegularInfo(id, groupId) {
+        return $axios.get(`/datasource/schedule/${id}/${groupId}`)
     },
     /**
      * @description 新增定时任务
@@ -269,6 +287,13 @@ export default {
      */
     deleRegularInfo(id) {
         return $axios.delete('/datasource/schedule/delete/' + id)
+    },
+    /**
+     * @description 删除批量定时任务
+     * @param {String} groupId
+     */
+    deleBatchRegularInfo(groupId) {
+        return $axios.delete('/datasource/schedule/batch/' + groupId)
     },
     /**
      * @description 获取抽取记录

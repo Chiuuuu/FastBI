@@ -6,12 +6,13 @@
         <a-radio-button :value="1">自定义表</a-radio-button>
       </a-radio-group>
       <a-row type="flex" justify="end" align="middle">
-        <!-- <a-col style="margin-right:auto">
-          <a-input placeholder="请输入关键词" class="search_input">
+        <a-col :span="6" style="margin-right:auto">
+          <a-input :value="tableKeyword" @change="handleGetTableKeyword" placeholder="请输入关键词" class="search_input">
             <a-icon slot="prefix" type="search" />
           </a-input>
-        </a-col> -->
-        <a-col>
+        </a-col>
+        <a-col :span="13">
+          <a-row type="flex" justify="end" align="middle">
           <a-button type="primary" class="select_button" @click="handleGetData" :loading="spinning">刷新数据</a-button>
           <a-button v-if="tableType === 0" v-show="showExtractBtn" type="primary" style="margin-left:10px;" class="select_button" @click="showExtractLog">定时抽取记录</a-button>
           <a-button
@@ -30,19 +31,40 @@
             @click="showSetting('batch')"
             class="select_button"
             v-permission:[$PERMISSION_CODE.OPERATOR.schedule]="$PERMISSION_CODE.OBJECT.datasource"
-          >批量抽取设置</a-button>
+          >批量抽取</a-button>
+          <a-button
+            v-if="tableType === 0"
+            v-show="showExtractBtn"
+            type="primary"
+            style="margin-left:10px;"
+            @click="showSetting('batchList')"
+            class="select_button"
+            v-permission:[$PERMISSION_CODE.OPERATOR.schedule]="$PERMISSION_CODE.OBJECT.datasource"
+          >批量任务列表</a-button>
+          </a-row>
         </a-col>
-        <!-- <a-col>
-          <a-select default-value="全部" class="search_select">
-            <a-select-option value="aaa">
-              aaa
+        <a-col v-show="tableType === 0" :span="4" style="margin-left:10px">
+          <a-select style="width: 100%;" :value="database" @change="handleChangeDatabase">
+            <a-select-option v-for="item in databaseList" :key="item.name" :value="item.name">
+              {{ item.name }}
             </a-select-option>
           </a-select>
-        </a-col> -->
+        </a-col>
       </a-row>
     </div>
     <div class="tab-scroll scrollbar">
-      <a-table :row-selection="rowSelection" :columns="tableColumns" :data-source="data"  rowKey='id' :loading='spinning' :pagination='false'>
+      <a-table
+        rowKey='id'
+        :row-selection="rowSelection"
+        :columns="tableColumns"
+        :data-source="currentData"
+        :loading="spinning"
+        :pagination="false"
+        :scroll="{ y: 'calc(100vh - 400px)', x: 960 }"
+      >
+        <span slot="name" slot-scope="text, record">
+          <a @click="handleCheckTable($event, record.id)">{{ text }}</a>
+        </span>
         <span slot="set" slot-scope="set">
           {{ set ? '是' : '否' }}
         </span>
@@ -68,7 +90,7 @@
           <span v-else>-</span>
         </span>
       </a-table>
-      <a-modal width="920px" title="抽取记录" :bodyStyle="bodyStyle" :visible="visible1" @cancel="handleCloseExtractLog">
+      <a-modal width="920px" title="定时抽取记录" :bodyStyle="bodyStyle" :visible="visible1" @cancel="handleCloseExtractLog">
         <a-table
           row-key="id"
           size="small"
@@ -96,18 +118,21 @@
       <extract-setting
         ref="extract"
         :show="visible"
-        :row="clickRow"
+        :rows="clickRows"
         @close="visible = false"
         @setRegular="setRegular" />
       <regular-setting
         ref="regular"
         :show="visible2"
-        :single="isSingle"
-        :row="clickRow"
+        :rows="clickRows"
         :table-type="tableType"
-        :regular-id="regularId"
-        :table-list="selectedRows"
+        :regular-info="regularInfo"
         @close="closeRegular" />
+      <table-info
+        :table-id="checkTableId"
+        :show="visible3"
+        @close="visible3 = false"
+      />
     </div>
   </div>
 </template>
@@ -115,8 +140,10 @@
 import { mapState } from 'vuex'
 import RegularSetting from './regular'
 import ExtractSetting from './extract'
+import TableInfo from './table-info'
 import moment from 'moment'
 import { checkActionPermission } from '@/utils/permission'
+import debounce from 'lodash/debounce'
 
 const logColumns = [
   {
@@ -171,12 +198,16 @@ export default {
   name: 'tabContentStructure',
   components: {
     RegularSetting,
-    ExtractSetting
+    ExtractSetting,
+    TableInfo
   },
   data() {
     return {
       columns: [],
       data: [],
+      databaseList: [],
+      database: '',
+      tableKeyword: '',
       logColumns,
       logData: [],
       bodyStyle: { 'maxHeight': 'calc(100vh - 240px)', 'overflow-y': 'auto' },
@@ -184,29 +215,22 @@ export default {
       visible: false, // 批量设置定时弹窗
       visible1: false, // 抽取记录弹窗
       visible2: false, // 添加定时任务弹窗
+      visible3: false, // 查看表信息
       extractForm: '',
-      isSingle: false,
       spinning: true,
       selectedRows: [],
+      selectedRowKeys: [],
       extractSping: false,
       modalSpin: false,
-      clickRow: '',
-      regularId: '',
-      rowSelection: {
-        onSelect: (record, selected, selectedRows) => {
-          this.selectedRows = selectedRows
-        },
-        onSelectAll: (selected, selectedRows, changeRows) => {
-          this.selectedRows = selectedRows
-        }
-      }
+      clickRows: [],
+      regularInfo: {},
+      checkTableId: '' // 查看数据的表id
     }
   },
   computed: {
     ...mapState({
       formInfo: state => state.dataAccess.modelInfo,
       modelId: state => state.dataAccess.modelId,
-      databaseId: state => state.dataAccess.databaseId,
       databaseName: state => state.dataAccess.databaseName,
       modelInfo: state => state.dataAccess.modelInfo,
       modelName: state => state.dataAccess.modelName,
@@ -220,6 +244,23 @@ export default {
       } else {
         return this.tableType === 0 ? this.columns : this.columns.slice(0, -1)
       }
+    },
+    rowSelection() {
+      return {
+        fixed: true,
+        selectedRowKeys: this.selectedRowKeys,
+        onSelect: (record, selected, selectedRows) => {
+          this.selectedRows = selectedRows
+          this.selectedRowKeys = selectedRows.map(item => item.id)
+        },
+        onSelectAll: (selected, selectedRows, changeRows) => {
+          this.selectedRows = selectedRows
+          this.selectedRowKeys = selectedRows.map(item => item.id)
+        }
+      }
+    },
+    currentData() {
+      return this.data.filter(item => item.name.toLowerCase().indexOf(this.tableKeyword.toLowerCase()) > -1)
     }
   },
   filters: {
@@ -243,6 +284,32 @@ export default {
     },
     handleTableTypeChange(event) {
       this.handleGetData()
+    },
+    handleGetTableKeyword: debounce(function(e) {
+      this.tableKeyword = e.target.value.trim()
+      this.selectedRowKeys = []
+      this.selectedRows = []
+    }, 400),
+    handleChangeDatabase(value) {
+      this.database = value
+      this.$store.commit('dataAccess/SET_DATABASENAME', value)
+      this.handleGetData()
+    },
+    async handleGetDatabase() {
+      const result = await this.$server.dataAccess.getDatabaseList({
+        datasourceId: this.modelId
+      })
+      if (result.code === 200) {
+        this.databaseList = [].concat(result.data)
+        if (this.databaseName) {
+          this.database = this.databaseName
+        } else {
+          this.database = this.formInfo ? this.formInfo.databaseName : ''
+        }
+      } else {
+        this.databaseList = []
+        this.$message.error(result.msg)
+      }
     },
     handleColumns() {
       // 定时权限决定表头是否显示
@@ -301,8 +368,12 @@ export default {
       if (!this.modelType) return
       this.handleColumns()
       this.spinning = true
-      const modelKey = this.modelType === 'oracle' ? 'sourceOracleName' : 'sourceMysqName'
-      let databaseName = this.formInfo ? this.formInfo.databaseName : ''
+      let databaseName
+      if (this.databaseName) {
+        databaseName = this.databaseName
+      } else {
+        databaseName = this.formInfo ? this.formInfo.databaseName : ''
+      }
       // sql, oracle的数据库名称在formInfo里, excel的在dabaseName里
       if (['excel', 'csv'].indexOf(this.modelType) > -1) {
         databaseName = this.databaseName
@@ -321,6 +392,10 @@ export default {
         this.data = []
         this.$message.error(dabaseInfoResult.msg)
       }
+    },
+    handleCheckTable(e, id) {
+      this.checkTableId = id
+      this.visible3 = true
     },
     handleCloseExtractLog() {
       this.visible1 = false
@@ -398,33 +473,33 @@ export default {
       this.$emit('on-change-componet', 'Setting', row)
     },
     showSetting(type, row) {
-      this.isSingle = type === 'single'
-      if (this.isSingle) {
-        this.clickRow = row
+      if (type === 'single') {
+        this.clickRows = new Array(row)
         this.visible = true
-      } else {
-        if (this.selectedRows.length < 1) {
-          return this.$message.error('请选择至少一项')
-        } else if (this.selectedRows.length > 3) {
-          return this.$message.error('一个定时任务最多只能选择3项')
+      } else if (type === 'batch') {
+        if (this.selectedRows.length < 2) {
+          return this.$message.error('请选择至少2项')
+        } else if (this.selectedRows.length > 10) {
+          return this.$message.error('最多只能选择10项')
         }
+        this.clickRows = this.selectedRows
         this.visible2 = true
+      } else if (type === 'batchList') {
+        this.clickRows = this.data[0].databaseId
+        this.visible = true
       }
     },
     closeRegular() {
       this.visible2 = false
-      this.regularId = ''
+      this.regularInfo = {}
     },
     setRegular(data) {
-      if (!data && !this.isSingle && this.selectedRows.length < 1) {
-        this.$message.error('请选择至少一项')
+      if (data) {
+        this.regularInfo = data
       } else {
-        if (data) {
-          this.regularId = data.id
-          // this.$refs.regular.handleGetRegularInfo(data.id)
-        }
-        this.visible2 = true
+        this.regularInfo = {}
       }
+      this.visible2 = true
     }
   }
 }

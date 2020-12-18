@@ -1,14 +1,14 @@
 <template>
   <a-modal
     width="764px"
+    :z-index="800"
     :title="single ? '定时设置' : '批量抽取设置'"
     :bodyStyle="bodyStyle"
     :maskClosable="false"
     :visible="show"
-    :zIndex="800"
     @cancel="handleClose"
     @ok="handleOk">
-    <div style="margin-bottom:10px"><a-button type="primary" @click="setRegular">添加定时任务</a-button></div>
+    <div v-if="typeof rows !== 'string'" style="margin-bottom:10px"><a-button type="primary" @click="setRegular">添加定时任务</a-button></div>
     <a-table
       rowKey='id'
       size="small"
@@ -65,11 +65,7 @@ export default {
       type: Boolean,
       default: false
     },
-    single: {
-      type: Boolean,
-      default: false
-    },
-    row: [Object, String],
+    rows: [Array, String],
     formData: [Object, String]
   },
   data() {
@@ -98,24 +94,15 @@ export default {
       modelName: state => state.dataAccess.modelName,
       modelId: state => state.dataAccess.modelId
     }),
+    single() {
+      return typeof this.rows !== 'string' && this.rows.length === 1
+    },
     regularData() {
       return this.selectedRows.length > 0 ? this.selectedRows : this.data
     }
   },
   watch: {
     show(newValue, oldValue) {
-      // if (newValue && typeof this.formData === 'object') {
-      //   const newForm = {}
-      //   for (const key in this.form) {
-      //     if (key === 'freqType' && !this.formData[key]) {
-      //       newForm[key] = '1'
-      //     } else {
-      //       newForm[key] = this.formData[key]
-      //     }
-      //   }
-      //   this.form = newForm
-      //   console.log(this.form)
-      // }
       if (newValue) {
         this.handleGetRegularList()
       }
@@ -127,13 +114,12 @@ export default {
     },
     async handleGetRegularList() {
       this.modalSpin = true
-      const res = await this.$server.dataAccess.getRegularList({
-        target: this.row.id
-      }).finally(() => {
-        this.modalSpin = false
-      })
+      let isString = typeof this.rows === 'string'
+      const res = await this.$server.dataAccess.getRegularList(isString ? this.rows : this.rows[0].databaseId, +isString)
+        .finally(() => {
+          this.modalSpin = false
+        })
       if (res.code === 200) {
-        console.log(res)
         this.regData = res.rows
       } else {
         this.$message.error(res.msg || '请求错误')
@@ -147,30 +133,36 @@ export default {
       })
     },
     handleRegular(row, type) {
-      console.log('row', row)
       if (type === 'edit') {
         this.$emit('setRegular', row)
       } else if (type === 'delete') {
         this.$confirm({
           title: '确认提示',
           content: '确定要删除该任务吗',
-          onOk: () => {
-            const id = row.id
-            this.$server.dataAccess.deleRegularInfo(id)
-              .then(res => {
-                if (res.code === 200) {
-                  this.$message.success('删除成功')
-                  for (let i = 0; i < this.regData.length; i++) {
-                    const item = this.regData[i]
-                    if (item.id === id) {
-                      this.regData.splice(i, 1)
-                      break
-                    }
-                  }
-                } else {
-                  this.$message.error(res.msg)
+          onOk: async () => {
+            let res, id
+            if (row.groupId !== '0') {
+              id = row.groupId
+              res = await this.$server.dataAccess.deleBatchRegularInfo(id)
+            } else {
+              id = row.id
+              res = await this.$server.dataAccess.deleRegularInfo(id)
+            }
+            if (res.code === 200) {
+              this.$message.success('删除成功')
+              for (let i = 0; i < this.regData.length; i++) {
+                const item = this.regData[i]
+                if (row.groupId === '0' && item.id === id) {
+                  this.regData.splice(i, 1)
+                  break
+                } else if (row.groupId === '0' && item.id === id) {
+                  this.regData.splice(i, 1)
+                  break
                 }
-              })
+              }
+            } else {
+              this.$message.error(res.msg)
+            }
           }
         })
       }
@@ -181,21 +173,8 @@ export default {
     handleClose() {
       this.$emit('close')
     },
-    handleSave() {
-      console.log('save')
-      this.handleClose()
-    },
     handleOk() {
-      // if (this.single) {
-      //   this.$refs.form.validate((ok, obj) => {
-      //     if (ok) {
-      //       this.handleSave()
-      //     }
-      //   })
-      // } else {
-      //   this.handleSave()
-      // }
-      this.handleSave()
+      this.handleClose()
     }
   }
 }

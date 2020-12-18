@@ -96,7 +96,7 @@
       </a-form-model>
       <a-table
         v-if="!single"
-        row-key="id"
+        row-key="target"
         size="small"
         :loading="tableLoading"
         :columns="columns"
@@ -125,7 +125,7 @@ import { mapState } from 'vuex'
 const columns = [
   {
     title: '表名',
-    dataIndex: 'name',
+    dataIndex: 'targetName',
     ellipsis: true,
     width: 200
   },
@@ -148,17 +148,9 @@ export default {
       type: Boolean,
       default: false
     },
-    single: {
-      type: Boolean,
-      default: false
-    },
-    row: [Object, String],
-    regularId: String,
-    tableType: Number,
-    tableList: {
-      type: Array,
-      default() { return [] }
-    }
+    rows: [Array, String],
+    regularInfo: Object,
+    tableType: Number
   },
   data() {
     return {
@@ -179,7 +171,7 @@ export default {
       },
       increaseList: [],
       errorState: 0, // 0.通过 1.小于系统时间 2.大于结束时间
-      regData: {},
+      regData: [],
       increaseColRules: [{ required: true, message: '请选择增量字段' }],
       regRules: {
         name: [
@@ -221,57 +213,25 @@ export default {
       modelName: state => state.dataAccess.modelName,
       modelType: state => state.dataAccess.modelType,
       modelId: state => state.dataAccess.modelId
-    })
+    }),
+    single() {
+      return typeof this.rows !== 'string' && this.rows.length === 1
+    }
   },
   watch: {
     show(newValue, oldValue) {
       // 获取增量字段
       if (newValue) {
-        let idList = []
-        if (this.single) {
-          idList.push(this.row.id)
+        // 判断是否新增, 有id为编辑, 先获取详情
+        if (this.regularInfo.id) {
+          this.handleGetRegularInfo()
         } else {
-          idList = this.tableList.map(item => item.id)
+          let idList = this.rows.map(item => item.id)
+          this.handleGetIncreaseList(idList)
         }
-        this.tableLoading = true
-        this.$server.dataAccess.getIncreaseFields(idList)
-          .then(res => {
-            if (res.code === 200) {
-              let increaseList = []
-              if (this.single) {
-                increaseList.push({
-                  id: this.row.id,
-                  name: this.row.name,
-                  extractType: 0,
-                  incrementalType: '',
-                  field: '',
-                  fieldList: res.data[this.row.id]
-                })
-              } else {
-                this.tableList.map(item => {
-                  increaseList.push({
-                    id: item.id,
-                    name: item.name,
-                    extractType: 0,
-                    incrementalType: '',
-                    field: '',
-                    fieldList: res.data[item.id]
-                  })
-                })
-              }
-              this.increaseList = increaseList
-              if (this.regularId) {
-                this.$nextTick(() => {
-                  this.handleGetRegularInfo(this.regularId)
-                })
-              }
-            } else {
-              this.$message.error(res.msg)
-            }
-          })
-          .finally(() => {
-            this.tableLoading = false
-          })
+      } else {
+        this.increaseList = []
+        this.regData = []
       }
     }
   },
@@ -293,15 +253,61 @@ export default {
         return date && date < moment().subtract(1, 'days')
       }
     },
-    handleGetRegularInfo(id) {
+    handleGetIncreaseList(idList) {
+      this.tableLoading = true
+      this.$server.dataAccess.getIncreaseFields(idList)
+        .then(res => {
+          if (res.code === 200) {
+            // 编辑状态
+            if (this.regData.length > 0) {
+              this.increaseList = this.regData.map(item => {
+                return {
+                  id: item.id,
+                  name: item.name,
+                  target: item.target,
+                  targetName: item.name,
+                  extractType: item.extractType,
+                  incrementalType: item.incrementalType,
+                  incrementalColumn: item.incrementalColumn,
+                  fieldList: res.data[item.target]
+                }
+              })
+            } else { // 新增状态
+              this.increaseList = this.rows.map(item => {
+                return {
+                  id: '',
+                  name: '',
+                  target: item.id,
+                  targetName: item.name,
+                  extractType: 0,
+                  incrementalType: '',
+                  incrementalColumn: undefined,
+                  fieldList: res.data[item.id]
+                }
+              })
+            }
+          } else {
+            this.$message.error(res.msg)
+          }
+        })
+        .finally(() => {
+          this.tableLoading = false
+        })
+    },
+    handleGetRegularInfo() {
       this.spinning = true
-      this.$server.dataAccess.getRegularInfo(id)
+      this.$server.dataAccess.getRegularInfo(this.regularInfo.id, this.regularInfo.groupId)
         .then(res => {
           if (res.code === 200) {
             this.regData = res.data
+            const form = {}
             for (const key in this.form) {
-              this.$set(this.form, key, this.regData[key])
+              // this.$set(this.form, key, this.regData[0][key])
+              form[key] = this.regData[0][key]
             }
+            this.$set(this, 'form', form)
+            const idList = res.data.map(item => item.target)
+            this.handleGetIncreaseList(idList)
           } else {
             this.$message.error(res.msg)
           }
@@ -360,7 +366,7 @@ export default {
     handleSelectExtractType(value, record) {
       // 初始值
       if (value === 1) {
-        record.field = record.fieldList[0].name
+        record.incrementalColumn = record.fieldList[0].name
         record.incrementalType = record.fieldList[0].incrementalType
       }
     },
@@ -369,7 +375,7 @@ export default {
       this.form.incrementalType = this.increaseList[0].fieldList.find(item => item.name === value).incrementalType
     },
     handleSelectIncreaseFieldBatch(value, record) {
-      record.field = value
+      record.incrementalColumn = value
       record.incrementalType = record.fieldList.find(item => item.name === value).incrementalType
     },
     resetForm() {
@@ -380,63 +386,61 @@ export default {
       this.$refs.form.clearValidate()
       this.$emit('close')
     },
-    async handleAddRegularInfo() {
+    async handleAsyncRegularInfo(type) {
       // 传参
-      if (this.tableType === 0) {
+      if (this.tableType === 0) { // 原表
         let paramList = []
         this.increaseList.map(item => {
           const obj = {
             ...this.form,
-            target: item.id,
+            target: item.target,
             sourceId: this.modelId
+          }
+          if (item.id) {
+            obj.id = item.id
           }
           // 批量时将form中的值替换成下面table的下拉框值
           if (!this.single) {
             obj.extractType = item.extractType
             obj.incrementalType = item.incrementalType
-            obj.incrementalColumn = item.field
+            obj.incrementalColumn = item.incrementalColumn
           }
           paramList.push(obj)
         })
-        return this.$server.dataAccess.addRegularInfo(paramList)
-          .finally(() => {
-            this.loading = false
-          })
-      } else if (this.tableType === 1) {
+        if (type === 'add') {
+          return this.$server.dataAccess.addRegularInfo(paramList)
+            .finally(() => {
+              this.loading = false
+            })
+        } else if (type === 'update') {
+          return this.$server.dataAccess.putRegularInfo(paramList)
+            .finally(() => {
+              this.loading = false
+            })
+        }
+      } else if (this.tableType === 1) { // 自定义表
         let paramList = []
         this.increaseList.map(item => {
           const obj = {
             ...this.form,
-            target: item.id
+            target: item.target
+          }
+          if (item.id) {
+            obj.id = item.id
           }
           paramList.push(obj)
         })
-        return this.$server.dataAccess.addCustomRegularInfo(paramList)
-          .finally(() => {
-            this.loading = false
-          })
-      }
-    },
-    async handleUpdateRegularInfo() {
-      if (this.tableType === 0) {
-        return this.$server.dataAccess.putRegularInfo({
-            ...this.form,
-            id: this.regData.id,
-            target: this.increaseList[0].id,
-            sourceId: this.modelId
-          })
-          .finally(() => {
-            this.loading = false
-          })
-      } else if (this.tableType === 1) {
-        return this.$server.dataAccess.putCustomRegularInfo({
-            ...this.form,
-            id: this.regData.id,
-            target: this.increaseList[0].id
-          })
-          .finally(() => {
-            this.loading = false
-          })
+        if (type === 'add') {
+          return this.$server.dataAccess.addCustomRegularInfo(paramList)
+            .finally(() => {
+              this.loading = false
+            })
+        } else if (type === 'update') {
+          return this.$server.dataAccess.putCustomRegularInfo(paramList)
+            .finally(() => {
+              this.loading = false
+            })
+        }
       }
     },
     handleOk() {
@@ -444,16 +448,16 @@ export default {
         if (ok) {
           this.loading = true
           let res
-          if (this.regularId) {
-            res = await this.handleUpdateRegularInfo()
+          if (this.regularInfo.id) {
+            res = await this.handleAsyncRegularInfo('update')
           } else {
-            res = await this.handleAddRegularInfo()
+            res = await this.handleAsyncRegularInfo('add')
           }
           if (res.code === 200) {
             this.$message.success('保存成功')
             if (this.single) {
               // 更新后重刷列表, 新增后直接插入(后端暂时支持这样)
-              if (this.regularId) {
+              if (this.regularInfo.id) {
                 this.$parent.$refs.extract.updateRows(res.data)
                 // this.$emit('updateRows', res.data)
               } else {
