@@ -13,15 +13,15 @@
         </a-col> -->
         <a-col>
           <a-button type="primary" class="select_button" @click="handleGetData" :loading="spinning">刷新数据</a-button>
-          <a-button v-if="tableType === 0" v-show="showExtractBtn" type="primary" style="margin-left:10px;" class="select_button" @click="showExtractLog">抽取记录</a-button>
+          <a-button v-if="tableType === 0" v-show="showExtractBtn" type="primary" style="margin-left:10px;" class="select_button" @click="showExtractLog">定时抽取记录</a-button>
           <a-button
-            v-permission:[$PERMISSION_CODE.OPERATOR.extract]="$PERMISSION_CODE.OBJECT.datasource"
+            v-permission:[$PERMISSION_CODE.OPERATOR.extract]="$PERMISSION_CODE.OBJECT.table"
             v-show="showExtractBtn"
             type="primary"
             class="select_button"
             style="margin-left:10px;"
             @click="handleExtract"
-            :loading="extractSping">全部抽取</a-button>
+            :loading="extractSping">立即抽取</a-button>
           <a-button
             v-if="tableType === 0"
             v-show="showExtractBtn"
@@ -29,7 +29,7 @@
             style="margin-left:10px;"
             @click="showSetting('batch')"
             class="select_button"
-            v-permission:[$PERMISSION_CODE.OPERATOR.schedule]="$PERMISSION_CODE.OBJECT.datasource"
+            v-permission:[$PERMISSION_CODE.OPERATOR.schedule]="$PERMISSION_CODE.OBJECT.table"
           >批量抽取设置</a-button>
         </a-col>
         <!-- <a-col>
@@ -221,7 +221,7 @@ export default {
         scopedSlots: { customRender: 'regular' }
       }
     ]
-    if (!checkActionPermission(this.$PERMISSION_CODE.OBJECT.datasource, this.$PERMISSION_CODE.OPERATOR.schedule)) {
+    if (!checkActionPermission(this.$PERMISSION_CODE.OBJECT.table, this.$PERMISSION_CODE.OPERATOR.schedule)) {
       columns.pop()
     }
     return {
