@@ -77,8 +77,9 @@ const list = [{
                     nameLocation: 'end',
                     nameGap: 5,
                     nameTextStyle: {
-                        color: '#fff', fontSize: '12',
-                        align: "right",
+                        color: '#fff',
+                        fontSize: '12',
+                        align: 'right',
                         padding: [30, 0, 0, 0]
                     },
                     axisLabel: {
@@ -97,7 +98,7 @@ const list = [{
                         lineStyle: {
                             width: 2,
                             type: 'solid',
-                            color: '#fff',
+                            color: '#fff'
                         }
                     },
                     axisTick: {
@@ -110,7 +111,7 @@ const list = [{
                     nameLocation: 'end',
                     nameTextStyle: {
                         color: '#fff',
-                        fontSize: 12,
+                        fontSize: 12
                         //   padding: [10, 0, 0, 0]
                     },
                     axisLabel: {
@@ -220,8 +221,9 @@ const list = [{
                     nameLocation: 'end',
                     nameGap: 20,
                     nameTextStyle: {
-                        color: '#fff', fontSize: '12',
-                        align: "right",
+                        color: '#fff',
+                        fontSize: '12',
+                        align: 'right',
                         padding: [30, 0, 0, 0]
                     },
                     axisLabel: {
@@ -353,9 +355,9 @@ const list = [{
                     position: 'bottom',
                     //   nameLocation: 'end',
                     nameTextStyle: {
-                        color: '#fff', fontSize: '12',
+                        color: '#fff', fontSize: '12'
                         //   align: "right",
-                        //   padding: [30, 0, 0, 0] 
+                        //   padding: [30, 0, 0, 0]
                     },
                     axisLabel: {
                         color: '#ffffff',

@@ -107,11 +107,11 @@
 
   import Screen from '@/views/screen' // 全屏
 
-  import { Icon } from 'ant-design-vue';
+  import { Icon } from 'ant-design-vue'
 
   const IconFont = Icon.createFromIconfontCN({
-     scriptUrl: '//at.alicdn.com/t/font_2276651_71nv5th6v94.js',
-  });//引入iconfont
+     scriptUrl: '//at.alicdn.com/t/font_2276651_71nv5th6v94.js'
+  })// 引入iconfont
   export default {
     name: 'Admin',
     data () {
@@ -175,9 +175,9 @@
             this.$store.dispatch('InitCanvasMaps', json.components)
             this.$store.dispatch('dataModel/setSelectedModelList', res.list)
           }
-          if(res.code === 500) {
-            console.log("500")
-            //初始化看板
+          if (res.code === 500) {
+            console.log('500')
+            // 初始化看板
             this.$store.dispatch('SetPageSettings', { width: 1920, height: 1080, backgroundColor: '#0d2a42', gridStep: 1, backgroundSrc: '', backgroundType: '1', opacity: 1 })
             this.$store.dispatch('InitCanvasMaps', [])
             this.$store.dispatch('dataModel/setSelectedModelList', [])
