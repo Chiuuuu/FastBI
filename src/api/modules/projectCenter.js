@@ -36,7 +36,7 @@ export default {
      * @returns
      */
     addUser(params) {
-        return $axios.post('/business/editRoleUser/projectRoleAddUser', params)
+        return $axios.post('/business/editRoleUser/projectUserAddRole', params)
     },
     /**
      * @description 删除用户
