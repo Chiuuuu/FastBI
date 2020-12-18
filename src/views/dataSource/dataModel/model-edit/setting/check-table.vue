@@ -10,9 +10,22 @@
     :okButtonProps="{
       props: { disabled: data.length > 0 ? false : true },
     }"
-    @ok="handleExport"
     @cancel="handleClose"
   >
+    <template #footer>
+      <a-button key="back" @click="handleClose">
+        取消
+      </a-button>
+      <a-button
+        v-permission:[$PERMISSION_CODE.OPERATOR.export]="$PERMISSION_CODE.OBJECT.datamodel"
+        key="submit"
+        type="primary"
+        :loading="confirmLoading"
+        @click="handleExport"
+      >
+        导出宽表
+      </a-button>
+    </template>
     <a-spin :spinning="loading">
       <a-empty v-if="data.length === 0" class="main-empty">
         <span slot="description">此宽表无数据</span>
@@ -27,14 +40,14 @@
                   <div class="hr" data-resize="true"></div>
                 </div>
               </th>
-              <template v-for="(item,index) in columns">
+              <template v-for="(item,index) in columnsList">
                 <th :key="item.title">
                   <div class="wrap">
                     <!-- <div class="menu-left">
                       <i class="u-icn u-icn-string"></i>
                     </div> -->
-                    <div class="txt" :title="item.title">
-                      <span class='txt-title'>{{item.title}}</span>
+                    <div class="txt" :title="item.name">
+                      <span class='txt-title'>{{item.name}}</span>
                       <span class='columns-type'>{{setColumnsType(columnsList[index])}}</span>
                     </div>
                   </div>
@@ -45,8 +58,8 @@
           <tbody>
             <tr v-for="(item,index) in data" :key="index">
               <td><div class="txt txt-order">{{index+1}}</div></td>
-              <td v-for="subitem in columnsList" :key="subitem.name">
-                <div class="txt" :title="item[subitem.name]">{{item[subitem.name]}}</div>
+              <td v-for="(subitem,subIndex) in item" :key="subIndex">
+                <div class="txt" :title="subitem">{{subitem}}</div>
               </td>
             </tr>
           </tbody>
@@ -119,9 +132,15 @@ export default {
       this.handleResetData()
 
       // 设置表头
-      this.handleFormatTableColumn()
+      // this.handleFormatTableColumn()
 
-      const result = await this.$server.dataModel.getWidthTableInfo(this.detailInfo)
+      const params = {
+        ...this.detailInfo,
+        pivotSchema: {
+          ...this.$parent.handleConcat() // 处理维度度量
+        }
+      }
+      const result = await this.$server.dataModel.getWidthTableInfo(params)
 
       if (result.code === 200) {
         this.columnsList = result.data.columnNameList
@@ -196,8 +215,9 @@ export default {
 }
 </script>
 <style lang="less" scoped>
+@deep: ~'>>>';
 .widthModal {
-  /deep/.ant-modal-body{
+  @{deep} .ant-modal-body{
     padding: 0;
   }
 }

@@ -1,36 +1,13 @@
 <template>
-  <a-modal width="764px" :title="single ? '定时设置' : '批量抽取设置'" :bodyStyle="bodyStyle" :visible="show" @cancel="handleClose" @ok="handleOk">
-    <!-- <a-form-model v-if="single" ref="form" :model="form"  :rules="rules" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
-      <a-form-model-item label="抽取方式" prop="extractType">
-        <a-radio-group style="width:100%" v-model="form.extractType">
-          <a-radio value="0">
-            <span>全量覆盖抽取</span>
-            <a-popover>
-              <template slot="content">
-                每次抽取，对数据库的全部数据进行抽取，并覆盖数据库全部已有的数据
-              </template>
-              <a-icon style="margin-left:10px" type="question-circle" theme="outlined" />
-            </a-popover>
-          </a-radio>
-          <a-radio value="1">
-            <span>增量抽取</span>
-            <a-popover>
-              <template slot="content">
-                每次抽取，根据增量字段判断数据库中的数据是否为新增数据，对数据库的新增数据进行抽取，并追加在数据库中
-              </template>
-              <a-icon style="margin-left:10px" type="question-circle" theme="outlined" />
-            </a-popover>
-          </a-radio>
-        </a-radio-group>
-      </a-form-model-item>
-      <a-form-model-item label="抽取依据字段" prop="id">
-        <a-select v-model="form.id" placeholder="请选择依据字段">
-          <a-select-option value="1">1</a-select-option>
-          <a-select-option value="2">2</a-select-option>
-          <a-select-option value="3">3</a-select-option>
-        </a-select>
-      </a-form-model-item>
-    </a-form-model> -->
+  <a-modal
+    width="764px"
+    :title="single ? '定时设置' : '批量抽取设置'"
+    :bodyStyle="bodyStyle"
+    :maskClosable="false"
+    :visible="show"
+    :zIndex="800"
+    @cancel="handleClose"
+    @ok="handleOk">
     <div style="margin-bottom:10px"><a-button type="primary" @click="setRegular">添加定时任务</a-button></div>
     <a-table
       rowKey='id'
@@ -99,7 +76,6 @@ export default {
     return {
       bodyStyle: { 'maxHeight': 'calc(100vh - 240px)', 'overflow-y': 'auto' },
       modalSpin: false,
-      showTable: false,
       regularForm: '',
       form: {
         extractType: undefined,
@@ -201,7 +177,6 @@ export default {
     },
     closeRegular() {
       this.visible2 = false
-      this.showTable = false
     },
     handleClose() {
       this.$emit('close')

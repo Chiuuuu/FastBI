@@ -6,7 +6,10 @@
         <a-dropdown :trigger="['click']" placement="bottomLeft">
           <a-icon type="plus-square" class="menu_icon" />
           <a-menu slot="overlay" class="drow_menu">
-            <a-menu-item v-on:click="addScreen">
+            <a-menu-item
+              v-on:click="addScreen"
+              v-permission:[$PERMISSION_CODE.OPERATOR.add]="$PERMISSION_CODE.OBJECT.screen"
+            >
               新建大屏
             </a-menu-item>
             <a-menu-item key="1" @click="addFolder">
@@ -15,12 +18,12 @@
           </a-menu>
         </a-dropdown>
       </div>
-      <div class="menu_search" v-if="folderList.length > 0">
+      <div class="menu_search">
         <a-input placeholder="搜索大屏目录" v-model="searchName" @change="menuSearch">
           <a-icon class="icon_search" slot="suffix" type="search" />
         </a-input>
       </div>
-      <div class="menu-wrap scrollbar screen-menu">
+      <div class="menu-wrap scrollbar screen-menu" v-if="folderList.length > 0">
         <div
           class="group"
           :class="handleIsFolder(folder) ? 'is-folder' : ''"
@@ -58,6 +61,9 @@
           </template>
         </div>
       </div>
+      <a-empty v-else style="margin-top: 50px; color: rgba(0, 0, 0, 0.65)">
+        <span slot="description">暂无数据大屏</span>
+      </a-empty>
     </div>
     <div class="right scrollbar">
       <div class="right-header" v-if="fileSelectId !== ''">
@@ -68,7 +74,11 @@
         <a-button class="btn_n2">
           刷新数据
         </a-button>
-        <a-button type="primary" class="btn_pr" @click="editScreen">
+        <a-button
+          type="primary"
+          class="btn_pr"
+          v-permission:[$PERMISSION_CODE.OPERATOR.edit]="$PERMISSION_CODE.OBJECT.screen"
+          @click="editScreen">
           编辑大屏
         </a-button>
       </div>
@@ -115,7 +125,7 @@ import { mapGetters, mapActions } from 'vuex' // 导入vuex
 import Screen from '@/views/screen' // 预览
 import { addResizeListener, removeResizeListener } from 'bin-ui/src/utils/resize-event'
 import debounce from 'lodash/debounce'
-import { menuSearchLoop } from '@/views/dataSource/dataModel/util'
+import { menuSearchLoop } from '@/utils/menuSearch'
 
 export default {
   components: {
@@ -138,6 +148,10 @@ export default {
       folderContenxtMenu: [
         {
           name: '新建大屏',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.add,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.screen
+          },
           onClick: this.handleScreen
         },
         {
@@ -156,6 +170,10 @@ export default {
         },
         {
           name: '删除',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.screen
+          },
           onClick: this.handleFileDelete
         }
       ],
@@ -263,7 +281,13 @@ export default {
     },
     // 右键删除文件
     handleFileDelete(event, item, { parent, file, index }) {
-      this.handleDelete(file.id)
+      this.$confirm({
+        title: '确认提示',
+        content: '确定删除该数据大屏?',
+        onOk: async () => {
+          this.handleDelete(file.id)
+        }
+      })
     },
     // 删除
     handleDelete(id) {

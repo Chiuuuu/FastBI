@@ -14,7 +14,7 @@
   >
     <a-form-model :model="form" :rules="rules" ref="resetNameForm" class="resetNameForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
       <a-form-model-item label="名称" prop="name">
-        <a-input v-model="form.name" />
+        <a-input v-model="form.name" placeholder="请输入文件夹名称" />
       </a-form-model-item>
     </a-form-model>
   </a-modal>
@@ -50,7 +50,7 @@ export default {
             type: 'string',
             min: 1,
             max: 20,
-            message: '长度在1~20内'
+            message: '请输入1-20个字的文件夹名称'
           }
         ]
       }
@@ -83,7 +83,8 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-/deep/ .resetNameForm .ant-form-explain {
+@deep: ~'>>>';
+@{deep} .resetNameForm .ant-form-explain {
   margin-left: 0;
 }
 </style>

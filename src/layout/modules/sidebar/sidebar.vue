@@ -4,6 +4,7 @@
       <img src="../../../assets/images/login/login_logo.png" />
     </div>
     <a-menu
+      class="menu-body scrollbar"
       :defaultOpenKeys="openKeys"
       :selectedKeys="selectedKeys"
       mode="inline"
@@ -20,7 +21,6 @@
           <a-menu-item
             v-for="subItem in item.children"
             :key="subItem.path"
-            :title="subItem.path"
             @click="selectMenu(subItem)"
             >{{ subItem.meta.title }}</a-menu-item
           >
@@ -31,10 +31,12 @@
 </template>
 <script>
 import ManageRoutes from '@/router/modules/layout'
-
+import { getRenderRouter } from '@/utils/permission'
+import isEqual from 'lodash/isEqual'
 export default {
   data() {
-    const menuData = this.getMenuData(ManageRoutes.children)
+    const renderRouter = getRenderRouter(this.$store.state.permission.routes)
+    const menuData = this.getMenuData(renderRouter.children)
     const path = this.$route.path
     const defaultOpenKeys = ['/' + path.split('/').splice(1).shift()]
     const defaultSelectedKeys = [this.$router.currentRoute.meta.sideBar || this.$router.currentRoute.name]

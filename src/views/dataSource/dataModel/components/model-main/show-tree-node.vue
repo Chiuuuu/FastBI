@@ -7,6 +7,7 @@
       >
         {{ nodeData.props[`${title}`] }}
       </h6>
+      <div v-if="nodeData.props.type === 2" class="union"></div>
       <span class="opt">
         <b class="num">{{joinLength}}</b>
       </span>
@@ -70,12 +71,23 @@ export default {
             box-shadow: 0 0 6px #4a91e3;
         }
         h6 {
+            position: relative;
+            z-index: 10;
             padding: 0 25px 0 10px;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
             background-color: #f1f0ff;
             text-align: center;
+        }
+        .union {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            display: block;
+            width: 100%;
+            height: 100%;
+            border: 1px solid #d9d9d9;
         }
         .opt {
             position: absolute;

@@ -1,11 +1,17 @@
 <template>
-  <div class="navbar">
-    <div class="sidebar-unfold-icon">
-      <!-- <img src="@/static/imgs/icon_expand.png" alt="" @click="sidebarUnfoldBtn" /> -->
-    </div>
+  <a-row class="navbar" type="flex" justify="end" align="middle">
+    <a-select
+      :value='selectProject'
+      style="min-width: 120px;margin-right:20px;"
+      @change="handleChangeProject">
+      <a-select-option
+        v-for="item in projectList"
+        :key="item.id"
+      >{{ item.name }}</a-select-option>
+    </a-select>
     <div class="user">
       <a-dropdown>
-        <span>admin<img src="@/assets/images/icon_head_portrait.png" alt=""/></span>
+        <span>{{userInfo.name}}<img src="@/assets/images/icon_head_portrait.png" alt=""/></span>
         <a-menu slot="overlay">
           <a-menu-item>
             <a href="javascript:;" @click="quitBtn">退出登录</a>
@@ -13,29 +19,49 @@
         </a-menu>
       </a-dropdown>
     </div>
-  </div>
+  </a-row>
 </template>
 <script>
+import { mapState } from 'vuex'
 export default {
+  inject: ['reload'],
   computed: {
     // 侧边栏展开收起
     sidebarUnfold() {
       return this.$store.state.common.sidebarUnfold
     },
-
-    username() {
-      return this.$store.state.common.username
-    }
+    ...mapState({
+      selectProject: state => state.user.selectProject,
+      projectList: state => state.user.projectList,
+      userInfo: state => state.user.info
+    })
   },
-
   methods: {
+    handleChangeProject(value) {
+      this.$confirm({
+        title: '确认提示',
+        content: '是否切换项目?',
+        onOk: async () => {
+          const result = await this.$server.user.actionSwitchProject(value)
+          if (result.code === 200) {
+            await this.$store.dispatch('user/changeRole')
+            // this.reload()
+            window.location.reload() // 重刷方法1,但是会闪白
+          } else {
+            this.$message.error(result.msg || '请求错误')
+          }
+        }
+      })
+    },
     // 退出登录按钮
     quitBtn() {
+      this.$store.dispatch('common/set_token', '')
+      window.sessionStorage.clear()
+      window.localStorage.clear()
+      this.$store.commit('user/CLEAR_PERMISSIONS')
       this.$router.push({
         path: '/login'
       })
-      this.$store.dispatch('common/set_token', '')
-      sessionStorage.clear()
     },
 
     // 点击收起展开侧边栏

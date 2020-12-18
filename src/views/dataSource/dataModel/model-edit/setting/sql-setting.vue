@@ -65,7 +65,7 @@ export default {
           },
           {
             max: 20,
-            message: '不得超过20个字符'
+            message: '请输入1-20个字符的试图名称'
           }
         ],
         cloneSql: [

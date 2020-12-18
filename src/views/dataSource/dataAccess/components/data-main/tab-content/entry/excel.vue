@@ -9,9 +9,9 @@
         :wrapper-col="{ span: 14 }"
       >
         <a-form-model-item label="数据源名称" prop="name">
-          <a-input v-model="form.name" />
+          <a-input v-model="form.name" @change="handleSetTableName" />
         </a-form-model-item>
-        <a-form-model-item :label="modelType + '文件'" required>
+        <a-form-model-item label="Excel文件" required>
           <div
             class="excel-list scrollbar"
             ref="files"
@@ -52,19 +52,20 @@
             :before-upload="beforeFileUpload"
             @change="handleFileChange"
           >
-            <a-button type="primary">
+            <a-button type="primary" :loading="loading">
               添加文件
             </a-button>
           </a-upload>
         </a-form-model-item>
       </a-form-model>
       <a-row class="preview-list">
-        <a-col :span="4">
+        <a-col :span="4" style="width: 150px">
           <div class="preview-tab">
             <div class="tab-title">Sheet子表</div>
             <ul>
               <li
                 class="preview-tab-item"
+                :title="sheet.name"
                 :class="{ 'active': currentSheetIndex === index }"
                 v-for="(sheet, index) in sheetList"
                 :key="index"
@@ -93,23 +94,6 @@
           <div class="sheet-table scrollbar">
             <template v-if="currentFieldList.length > 0">
               <a-spin :spinning="spinning">
-                <!-- <div class="sheet-head">
-                  <table>
-                    <thead>
-                      <tr style="border: none"><th v-for="item in currentColumns" :key="item.dataIndex"><div class="cell-item">{{ item.title }}</div></th></tr>
-                    </thead>
-                  </table>
-                </div>
-                <div class="sheet-body scrollbar">
-                  <table>
-                    <tbody>
-                      <tr v-for="(item, index) in currentFieldList" :key="item.key">
-                        <td><div class="cell-item">{{ index + 1 }}</div></td>
-                        <td v-for="col in currentColumns.slice(1)" :key="col.dataIndex"><div class="cell-item">{{ item[col.dataIndex] }}</div></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div> -->
                 <table>
                   <thead class="sheet-head">
                     <tr style="border: none"><th v-for="item in currentColumns" :key="item.dataIndex"><div class="cell-item">{{ item.title }}</div></th></tr>
@@ -130,9 +114,10 @@
     </div>
     <a-button
       type="primary"
-      class="btn_upload"
+      class="btn_sub"
       @click="handleSaveForm"
       :loading="loading"
+      v-permission:[btnPermission]="$PERMISSION_CODE.OBJECT.datasource"
     >
       保存
     </a-button>
@@ -147,6 +132,7 @@ export default {
   name: 'model-excel',
   data() {
     return {
+      btnPermission: [this.$PERMISSION_CODE.OPERATOR.edit, this.$PERMISSION_CODE.OPERATOR.add],
       loading: false,
       spinning: false,
       isDragenter: false,
@@ -211,22 +197,17 @@ export default {
     }
   },
   mounted() {
-    this.renderUploadForm()
-    // this.$refs.table.$el.querySelector('.ant-table-body').addEventListener('scroll', this.onScroll)
-
-    this.$EventBus.$on('setFormData', this.renderUploadForm)
+    this.$EventBus.$on('setFormData', this.handleSetFormData)
     this.$EventBus.$on('resetForm', this.handleResetForm)
   },
   beforeDestroy() {
     this.handleClearTable()
-    this.$EventBus.$off('setFormData', this.renderUploadForm)
+    this.$EventBus.$off('setFormData', this.handleSetFormData)
     this.$EventBus.$off('resetForm', this.handleResetForm)
   },
   methods: {
-    onScroll(e) {
-      console.log(e)
-    },
     handleChangeTab(sheet, index) {
+      if (this.loading) return
       this.currentSheetIndex = index
       this.renderCurrentTable(index)
     },
@@ -238,6 +219,12 @@ export default {
       this.databaseList = []
       this.handleClearTable()
     },
+    /**
+     * 设置表单名称
+     */
+    handleSetTableName() {
+      this.$emit('on-set-table-name', this.form.name)
+    },
     // 清空当前表格内容
     handleClearTable() {
       this.currentColumns = []
@@ -245,9 +232,8 @@ export default {
       this.deleteIdList = []
     },
     // 渲染表单
-    renderUploadForm() {
+    handleSetFormData() {
       if (this.modelType !== 'excel') return
-      console.log('渲染表单')
       this.handleResetForm()
       if (this.modelId) { // 有id就是编辑状态
         this.$set(this.form, 'name', this.modelName)
@@ -259,7 +245,6 @@ export default {
       this.$server.dataAccess.getModelFileList(this.modelId)
         .then(res => {
           this.fileInfoList = res.rows
-          console.log('this', this)
           const name = this.modelInfo ? this.modelInfo.databaseName : ''
 
           // 默认第一个
@@ -277,10 +262,10 @@ export default {
     },
     // 获取当前文件对应的数据库信息
     async handleGetDataBase(index) {
+      if (this.loading) return
       if (index < 0) {
         this.currentColumns = []
         this.currentFieldList = []
-        // this.deleteIdList = []
         this.$store.dispatch('dataAccess/setFirstFinished', false)
       } else {
         this.currentFileIndex = index
@@ -366,7 +351,9 @@ export default {
     },
     // 校验文件
     fileValidate(file) {
-      console.log(file)
+      if (this.currentFileList.length > 0) {
+        return this.$message.error('只支持上传一个文件')
+      }
       // 校验大小
       if (file.size > 1 * 1024 * 1024) return this.$message.error('文件大于1M, 无法上传')
 
@@ -549,7 +536,9 @@ export default {
       })
     },
     handleSaveForm() {
-      if (this.currentFieldList.length === 0) {
+      if (this.currentFileList.length > 1) {
+        return this.$message.error('只支持上传一个文件')
+      } else if (this.currentFieldList.length === 0) {
         return this.$message.error('请上传文件')
       }
       this.$refs.fileForm.validate((pass, obj) => {
@@ -560,7 +549,9 @@ export default {
             formData.append('fileList[' + index + ']', file)
           })
           this.deleteIdList.map((id, index) => {
-            formData.append('databasesIdList[' + index + ']', id)
+            if (!isNaN(id)) {
+              formData.append('databasesIdList[' + index + ']', id)
+            }
           })
           formData.append('databaseName', this.databaseName)
           formData.append('sourceSaveInput.name', this.form.name)
@@ -602,51 +593,5 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-.sheet-table {
-  margin-top: 20px;
-  width: 100%;
-  max-height: 460px;
-  overflow-x: auto;
-  border: 1px solid #e8e8e8;
-
-  table {
-    width: 100%;
-  }
-
-  .sheet-head {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-    max-height: 38px;
-  }
-
-  .sheet-body {
-    max-height: 412px;
-    display: block;
-    width: 100%;
-    overflow-y: auto;
-  }
-  tr {
-    display: table;
-    border-top: 1px solid #e8e8e8;
-    width: 100%;
-  }
-  th, td {
-    height: 22px;
-    padding: 8px;
-  }
-  .cell-item {
-    width: 200px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-}
-.btn_upload {
-  float: right;
-  width: 88px;
-  height: 30px;
-  margin-right: 4.16%;
-  margin-bottom: 20px;
-}
+@import './read-file-table';
 </style>

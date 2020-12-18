@@ -79,6 +79,7 @@
 </template>
 
 <script>
+import omit from 'lodash/omit'
 export default {
   beforeCreate() {
     this.form = this.$form.createForm(this)
@@ -97,8 +98,11 @@ export default {
         this.$server.login.actionLogin(params).then(res => {
           if (res.code === 200) {
             this.$store.dispatch('common/set_token', res.token)
+            const { query } = this.$route
+            const { redirect } = query
             this.$router.push({
-              path: '/screenManage/catalog'
+              path: (redirect && redirect !== '/login') ? redirect : '/',
+              query: (redirect && redirect !== '/login') ? omit(query, 'redirect') : ''
             })
           } else {
             this.$message.error(res.msg)

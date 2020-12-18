@@ -26,7 +26,7 @@ export default {
     }
   },
   methods: {
-    handleChangeComponet(componentName, row) {
+    handleChangeComponet(componentName, row, tabindex) {
       this.showWhat = componentName
       if (componentName === 'Main') {
         this.tabindex = '2'
@@ -36,6 +36,7 @@ export default {
     },
     handleMenuChangeComponet(componentName) {
       this.showWhat = componentName
+      this.tabindex = '1'
     }
   },
   beforeDestroy() {
