@@ -291,7 +291,8 @@ export default {
         }
         this.$store.dispatch('dataAccess/setModelInfo', result.data.properties)
         this.$store.dispatch('dataAccess/setModelName', result.data.name)
-      })
+      }) 
+      this.$store.commit('dataAccess/SET_PRIVILEGES', file.privileges || [])
       this.$store.dispatch('dataAccess/setModelId', file.id)
       this.$store.dispatch('dataAccess/setParentId', file.parentId)
       this.$store.dispatch('dataAccess/setFirstFinished', true)
