@@ -526,14 +526,14 @@
                                     :min="0" :max="90" @change="setSelfProperty"></a-input-number>
                   </gui-field>
                   <gui-field label="是否网格线">
-                    <a-switch v-model="selfConfig.yAxis.splitLine.show" default-checked @change="switchChange" size="small" />
+                    <a-switch v-model="selfConfig.xAxis.splitLine.show" default-checked @change="switchChange" size="small" />
                   </gui-field>
-                  <gui-field label="网格线颜色" v-if="selfConfig.yAxis.splitLine.show">
-                    <el-color-picker v-model="selfConfig.yAxis.splitLine.lineStyle.color"
+                  <gui-field label="网格线颜色" v-if="selfConfig.xAxis.splitLine.show">
+                    <el-color-picker v-model="selfConfig.xAxis.splitLine.lineStyle.color"
                                       show-alpha @change="setSelfProperty"></el-color-picker>
                   </gui-field>
                   <gui-field label="网格线线型">
-                    <a-select style="width: 90px" v-model="selfConfig.yAxis.splitLine.lineStyle.type" @change="setSelfProperty" placeholder="无" size="small">
+                    <a-select style="width: 90px" v-model="selfConfig.xAxis.splitLine.lineStyle.type" @change="setSelfProperty" placeholder="无" size="small">
                       <a-select-option value="solid">实线</a-select-option>
                       <a-select-option value="dotted">点状</a-select-option>
                       <a-select-option value="dashed">虚线</a-select-option>
@@ -579,14 +579,14 @@
                                       show-alpha @change="setSelfProperty"></el-color-picker>
                   </gui-field>
                   <gui-field label="是否网格线">
-                    <a-switch v-model="selfConfig.xAxis.splitLine.show" default-checked @change="switchChange" size="small" />
+                    <a-switch v-model="selfConfig.yAxis.splitLine.show" default-checked @change="switchChange" size="small" />
                   </gui-field>
-                  <gui-field label="网格线颜色" v-if="selfConfig.xAxis.splitLine.show">
-                    <el-color-picker v-model="selfConfig.xAxis.splitLine.lineStyle.color"
+                  <gui-field label="网格线颜色" v-if="selfConfig.yAxis.splitLine.show">
+                    <el-color-picker v-model="selfConfig.yAxis.splitLine.lineStyle.color"
                                       show-alpha @change="setSelfProperty"></el-color-picker>
                   </gui-field>
-                  <gui-field label="网格线线型" v-if="selfConfig.xAxis.splitLine.show">
-                    <a-select style="width: 90px" v-model="selfConfig.xAxis.splitLine.lineStyle.type" @change="setSelfProperty" placeholder="无" size="small">
+                  <gui-field label="网格线线型" v-if="selfConfig.yAxis.splitLine.show">
+                    <a-select style="width: 90px" v-model="selfConfig.yAxis.splitLine.lineStyle.type" @change="setSelfProperty" placeholder="无" size="small">
                       <a-select-option value="solid">实线</a-select-option>
                       <a-select-option value="dotted">点状</a-select-option>
                       <a-select-option value="dashed">虚线</a-select-option>
