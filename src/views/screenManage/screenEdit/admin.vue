@@ -176,7 +176,6 @@
             this.$store.dispatch('dataModel/setSelectedModelList', res.list)
           }
           if (res.code === 500) {
-            console.log('500')
             // 初始化看板
             this.$store.dispatch('SetPageSettings', { width: 1920, height: 1080, backgroundColor: '#0d2a42', gridStep: 1, backgroundSrc: '', backgroundType: '1', opacity: 1 })
             this.$store.dispatch('InitCanvasMaps', [])
