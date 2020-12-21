@@ -14,6 +14,7 @@ import './styles/index.styl'
 import server from '@/api/index'
 
 import permission from '@/directive/permission'
+import hasPermission from '@/directive/hasPermission'
 import PERMISSION_CODE from '@/config/permission'
 
 // element-ui 局部引用
@@ -27,6 +28,7 @@ Vue.use(BinUI)
 Vue.use(VCharts)
 Vue.use(Antd)
 Vue.use(permission)
+Vue.use(hasPermission)
 
 Vue.prototype.$server = server
 Vue.prototype.$EventBus = new Vue()

@@ -20,6 +20,24 @@ export function checkObejctPermission(value) {
     }
 }
 
+export function hasPermission(perssionArry, target) {
+    let checkType = true
+    checkType = perssionArry && Array.isArray(perssionArry)
+    if (!checkType) {
+        throw Error(`perrssionArry类型应该是数组`)
+    }
+    checkType = target && typeof target === 'number'
+    if (!checkType) {
+        throw Error(`target类型应该是数字`)
+    }
+    if (checkType) {
+        let hasPermission = perssionArry.includes(0) || perssionArry.includes(target)
+        return hasPermission
+    } else {
+        return false
+    }
+}
+
 /**
  * @export checkActionPermission 按钮权限校验
  * @example v-if="checkActionPermission('1', 1 || [1])"
@@ -35,12 +53,10 @@ export function checkActionPermission(obj, value) {
             // 当没有对应的对象权限的时候
             return checkActionPermission('00', value)
         }
-        
         if (actionPermissions.some(action => action === 0)) {
             // 优先判断是否有全部权限
             return true
         }
-    
         let hasPermission
         if (typeof value === 'number') {
             hasPermission = actionPermissions.includes(value)

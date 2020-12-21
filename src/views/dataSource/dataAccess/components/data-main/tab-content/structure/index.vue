@@ -16,7 +16,7 @@
           <a-button type="primary" class="select_button" @click="handleGetData" :loading="spinning">刷新数据</a-button>
           <a-button v-if="tableType === 0" v-show="showExtractBtn" type="primary" style="margin-left:10px;" class="select_button" @click="showExtractLog">定时抽取记录</a-button>
           <a-button
-            v-permission:[$PERMISSION_CODE.OPERATOR.extract]="$PERMISSION_CODE.OBJECT.datasource"
+            v-hasPermission:[$PERMISSION_CODE.OPERATOR.extract]="privileges"
             v-show="showExtractBtn"
             type="primary"
             class="select_button"
@@ -142,9 +142,8 @@ import RegularSetting from './regular'
 import ExtractSetting from './extract'
 import TableInfo from './table-info'
 import moment from 'moment'
-import { checkActionPermission } from '@/utils/permission'
+import { checkActionPermission, hasPermission } from '@/utils/permission'
 import debounce from 'lodash/debounce'
-
 const logColumns = [
   {
     title: '抽取任务名称',
@@ -363,9 +362,13 @@ export default {
           scopedSlots: { customRender: 'regular' }
         }
       ]
-      if (!this.privileges.includes(0) && !this.privileges.includes(this.$PERMISSION_CODE.OPERATOR.schedule)) {
+
+      if (!hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.schedule)) {
         columns.pop()
       }
+      // if (!this.privileges.includes(0) && !this.privileges.includes(this.$PERMISSION_CODE.OPERATOR.schedule)) {
+      //   columns.pop()
+      // }
       this.columns = columns
     },
     async handleGetData() {
