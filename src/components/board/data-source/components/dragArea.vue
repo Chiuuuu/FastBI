@@ -19,7 +19,9 @@
               </a-menu-item>
             </a-menu>
           </a-dropdown>
-          {{item.name}}
+          <a-tooltip :title="item.name">
+          <span ref="itemName" class="field-text">{{item.name}}</span>
+        </a-tooltip>
       </div>
     </div>
     <div class="empty"
@@ -138,8 +140,8 @@ export default {
       if (this.chartType === '2' && this.type === 'measures' && this.dragFile === this.type) {
         if (this.currentSelected.packageJson.name === 've-pie') {
           this.fileList[0] = dataFile
-          //如果是仪表盘，需要两个度量
-        } else if(this.fileList.length<2){
+          // 如果是仪表盘，需要两个度量
+        } else if (this.fileList.length < 2) {
           this.fileList.push(dataFile)
         }
         this.fileList = this.uniqueFun(this.fileList, 'name')
@@ -188,9 +190,9 @@ export default {
             this.$store.dispatch('SetApis', apis)
           }
         }
-        //如果是仪表盘，第二个度量是目标值（进度条最大值）,重置进度条范围
+        // 如果是仪表盘，第二个度量是目标值（进度条最大值）,重置进度条范围
         if (current.packageJson.chartType === 'v-gauge') {
-          current.packageJson.config.series.max = 100;
+          current.packageJson.config.series.max = 100
           console.log(current.packageJson.config)
           this.$store.dispatch('SetSelfProperty', current.packageJson.config)
         }
@@ -282,9 +284,9 @@ export default {
                 config.chartTitle.text = rows[0].value
                 this.$store.dispatch('SetSelfProperty', config)
               }
-              //如果是仪表盘，第二个度量是目标值（进度条最大值）
+              // 如果是仪表盘，第二个度量是目标值（进度条最大值）
               if (this.currentSelected.packageJson.chartType === 'v-gauge' && apiData.measures[1]) {
-                config.series.max = res.rows[0][apiData.measures[1].name];
+                config.series.max = res.rows[0][apiData.measures[1].name]
                 this.$store.dispatch('SetSelfProperty', config)
               }
               this.saveScreenData()
@@ -336,6 +338,8 @@ export default {
             this.$store.dispatch('SetSelfDataSource', apiData)
           }
           this.saveScreenData()
+        } else {
+          this.$message.error(res.msg)
         }
       })
     }

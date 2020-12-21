@@ -351,7 +351,7 @@ const list = [{
                     bottom: 'auto'
                 },
                 xAxis: {
-                    name: 'test',
+                    name: '',
                     position: 'bottom',
                     //   nameLocation: 'end',
                     nameTextStyle: {
