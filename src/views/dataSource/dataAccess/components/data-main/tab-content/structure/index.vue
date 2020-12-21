@@ -99,7 +99,7 @@
           :loading="modalSpin"
           :scroll="{ y: 300 }"
         >
-          <template #status="text, row">
+          <template #status="text">
             <span v-if="text === '0'">成功</span>
             <span v-else-if="text === '1'">失败</span>
             <div v-else-if="text === '2'">
@@ -250,11 +250,15 @@ export default {
         fixed: true,
         selectedRowKeys: this.selectedRowKeys,
         onSelect: (record, selected, selectedRows) => {
+          // eslint-disable-next-line vue/no-side-effects-in-computed-properties
           this.selectedRows = selectedRows
+          // eslint-disable-next-line vue/no-side-effects-in-computed-properties
           this.selectedRowKeys = selectedRows.map(item => item.id)
         },
         onSelectAll: (selected, selectedRows, changeRows) => {
+          // eslint-disable-next-line vue/no-side-effects-in-computed-properties
           this.selectedRows = selectedRows
+          // eslint-disable-next-line vue/no-side-effects-in-computed-properties
           this.selectedRowKeys = selectedRows.map(item => item.id)
         }
       }
@@ -300,7 +304,7 @@ export default {
         datasourceId: this.modelId
       })
       if (result.code === 200) {
-        this.databaseList = [].concat(result.data)
+        this.databaseList = [].concat(result.rows)
         if (this.databaseName) {
           this.database = this.databaseName
         } else {
