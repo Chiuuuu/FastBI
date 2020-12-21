@@ -7,7 +7,6 @@ const state = {
   modelId: 0, // 选中的菜单id
   menuList: [], // 左边菜单列表
   parentId: 0, // 文件夹id
-  databaseId: 0, // 选择的默认表id
   databaseName: '', // 数据库名称
   modelSelectType: '', // new: 新添加 add: 右键添加
   readRows: [], // 读表数据

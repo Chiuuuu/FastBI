@@ -1,6 +1,6 @@
 <template>
   <div class="dv-images" style="width: 100%;height:100%;" :style="backgroundStyle" ref="wrap">
-    <img v-if="config.imageUrl" :src="config.imageUrl" alt="">
+    <img v-if="background.backgroundSrc" :src="background.backgroundSrc" alt="">
     <a-icon v-else type="file-image" style="font-size:40px;" />
   </div>
 </template>
