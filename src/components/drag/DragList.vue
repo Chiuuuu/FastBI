@@ -26,7 +26,8 @@
             <!-- <div class="img" :class="component.name"></div> -->
             <div class="front">
               <!-- <b-icon :name="component.icon"></b-icon> -->
-              <a-icon :type="component.icon"></a-icon>
+              <a-icon v-if="component.icon" :type="component.icon"></a-icon>
+              <icon-font v-if="component.iconFont" :type="component.iconFont" />
               <span> {{ component.title }}</span>
             </div>
           </div>
@@ -38,6 +39,11 @@
 
 <script>
   import { mapActions } from 'vuex' // 导入vuex
+  import { Icon } from "ant-design-vue";
+
+  const IconFont = Icon.createFromIconfontCN({
+    scriptUrl: "//at.alicdn.com/t/font_2276651_71nv5th6v94.js",
+  }); //引入iconfont
   export default {
     name: 'DragList',
     props: {
@@ -102,6 +108,7 @@
         this.$store.dispatch('AddCanvasMap', nodeInfo)
         this.saveScreenData()
       }
-    }
+    },
+    components: {    IconFont  },
   }
 </script>

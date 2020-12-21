@@ -17,6 +17,7 @@
             @mouseleave="handleNoHover(transform)">
             <div class="item" v-if="coverageExpand">
               <a-icon v-if="transform.packageJson.icon" :type="transform.packageJson.icon" />
+              <icon-font v-if="transform.packageJson.iconFont" :type="transform.packageJson.iconFont" />
               <a-tooltip v-if="transform.packageJson.config.title.content.length > 7">
                 <template slot="title">
                   {{transform.packageJson.config.title.content}}
@@ -29,7 +30,8 @@
               <!-- <span v-else> {{ transform.packageJson.title }}</span> -->
             </div>
             <div v-else flex="main:center" style="padding:5px 0;">
-              <a-icon :type="transform.packageJson.icon" />
+              <a-icon v-if="transform.packageJson.icon" :type="transform.packageJson.icon" />
+               <icon-font v-if="transform.packageJson.iconFont" :type="transform.packageJson.iconFont" />
             </div>
         </div>
       </template>
@@ -105,6 +107,11 @@
 
   import Screen from '@/views/screen' // 全屏
 
+  import { Icon } from 'ant-design-vue'
+
+  const IconFont = Icon.createFromIconfontCN({
+     scriptUrl: '//at.alicdn.com/t/font_2276651_71nv5th6v94.js'
+  })// 引入iconfont
   export default {
     name: 'Admin',
     data () {
@@ -167,6 +174,12 @@
             this.$store.dispatch('SetPageSettings', json.setting)
             this.$store.dispatch('InitCanvasMaps', json.components)
             this.$store.dispatch('dataModel/setSelectedModelList', res.list)
+          }
+          if (res.code === 500) {
+            // 初始化看板
+            this.$store.dispatch('SetPageSettings', { width: 1920, height: 1080, backgroundColor: '#0d2a42', gridStep: 1, backgroundSrc: '', backgroundType: '1', opacity: 1 })
+            this.$store.dispatch('InitCanvasMaps', [])
+            this.$store.dispatch('dataModel/setSelectedModelList', [])
           }
         })
       },
@@ -237,7 +250,7 @@
         return isFull
       }
     },
-    components: { ChartsFactory, DragItem, DragList, Board, ChartText, ChartImage, ChartTables, Screen },
+    components: { ChartsFactory, DragItem, DragList, Board, ChartText, ChartImage, ChartTables, Screen, IconFont },
     beforeDestroy () {
       off(document, 'keyup', this.handleKeyup)
       this.$EventBus.$off('context/menu/delete', this.deleteDialogShow)
