@@ -510,24 +510,34 @@ export default {
       this.handleMeasures()
     },
     // 复制维度度量
-    handleCopyField(event, handler, vm) {
+    async handleCopyField(event, handler, vm) {
       const role = vm.itemData.role
-      const newField = {
+      let newField = {
         ...vm.itemData,
         id: '',
         expr: `${vm.itemData.tableName},${vm.itemData.tableNo}`,
         tableNo: 0,
         tableName: '自定义' + (role === 1 ? '维度' : '度量')
       }
-      newField.alias = this.handleAddCustomField(role === 1 ? this.cacheDimensions : this.cacheMeasures, newField, newField.alias)
-      if (role === 1) {
-        this.cacheDimensions.push(newField)
-        this.handleDimensions()
-      } else if (role === 2) {
-        this.cacheMeasures.push(newField)
-        this.handleMeasures()
+
+      const result = await this.$server.dataModel.getCopyField(newField)
+      if (result.code === 200) {
+        newField = {
+          ...newField,
+          ...result.data
+        }
+        newField.alias = this.handleAddCustomField(role === 1 ? this.cacheDimensions : this.cacheMeasures, newField, newField.alias)
+        if (role === 1) {
+          this.cacheDimensions.push(newField)
+          this.handleDimensions()
+        } else if (role === 2) {
+          this.cacheMeasures.push(newField)
+          this.handleMeasures()
+        } else {
+          this.$message.error('无法复制字段, 请刷新重试')
+        }
       } else {
-        this.$message.error('无法复制字段, 请刷新重试')
+        this.$message.error(result.msg || '请求错误')
       }
     },
     /** 复制字段时候添加 */

@@ -38,6 +38,7 @@
                       <a-select-option
                         v-for="item in dimensions"
                         :key="item.alias"
+                        :value="item.id"
                       >
                         {{ item.alias }}
                       </a-select-option>
@@ -55,10 +56,12 @@
                       :default-active-first-option="false"
                       :show-arrow="false"
                       :filter-option="filterOption"
+                      @change="handleSelect"
                     >
                       <a-select-option
                         v-for="item in measures"
                         :key="item.alias"
+                        :value="item.id"
                       >
                         {{ item.alias }}
                       </a-select-option>

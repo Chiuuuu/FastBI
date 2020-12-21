@@ -182,5 +182,13 @@ export default {
    */
   getTableDetailInfo(params) {
     return $axios.post(`/model/table/getDataSourceTableDataList`, params)
+  },
+  /**
+   * @description 获取复制字段的id
+   * @param {Object} params 请求参数
+   * @returns
+   */
+  getCopyField(params) {
+    return $axios.post(`/model/pivotschema/getCopyField`, params)
   }
 }
