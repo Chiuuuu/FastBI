@@ -351,11 +351,15 @@ export class Parse {
 
     let matchStr = ''
     if (token.specialAlias) {
-      const matchs = token.value.match(
-        /^(([)([_a-zA-Z0-9\u4E00-\u9FA5\uF900-\uFA2D]+)(]))/
-      )
+      // const matchs = token.value.match(
+      //   /^(([)([_a-zA-Z0-9\u4E00-\u9FA5\uF900-\uFA2D]+)(]))/
+      // )
+      // if (matchs) {
+      //   matchStr = matchs[1].substring(1, matchs[1].length - 1)
+      // }
+      const matchs = token.value.match(/(\[)(.+)(\])/)
       if (matchs) {
-        matchStr = matchs[1].substring(1, matchs[1].length - 1)
+        matchStr = matchs[2]
       }
     }
 

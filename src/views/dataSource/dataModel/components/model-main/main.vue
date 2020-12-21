@@ -55,7 +55,7 @@
                       <div class="u-bitem" v-for="item in value" :key="item.id">
                         <div class="txt">
                           <div class="icon"><img src="@/assets/images/icon_dimension.png" /></div>
-                          <div class="name" :class="{ 'line-through': !itemData.visible }">{{item.alias}}</div>
+                          <div class="name" :class="{ 'line-through': !item.visible }">{{item.alias}}</div>
                         </div>
                       </div>
                     </a-collapse-panel>
@@ -77,7 +77,7 @@
                       <div class="u-bitem" v-for="item in value" :key="item.id">
                         <div class="txt">
                           <div class="icon"><img src="@/assets/images/icon_measure.png" /></div>
-                          <div class="name" :class="{ 'line-through': !itemData.visible }">{{item.alias}}</div>
+                          <div class="name" :class="{ 'line-through': !item.visible }">{{item.alias}}</div>
                         </div>
                       </div>
                     </a-collapse-panel>

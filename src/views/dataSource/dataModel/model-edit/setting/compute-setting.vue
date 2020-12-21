@@ -11,49 +11,63 @@
     <div class="mod">
       <div class="modal_l">
         <div class="set">
-          <a-form
-            :form="form"
+          <a-form-model
+            :model="form"
+            :rules="rules"
             :label-col="{ span: 3 }"
             :wrapper-col="{ span: 20 }"
           >
-            <a-form-item label="名称">
-              <a-input
-                v-decorator="[
-                  'note',
-                  {
-                    rules: [
-                      {
-                        required: true,
-                        message: 'Please input your note!'
-                      }
-                    ]
-                  }
-                ]"
-              />
-            </a-form-item>
-            <a-form-item label="表达式">
+            <a-form-model-item label="名称" prop="name">
+              <a-input v-model="form.name" />
+            </a-form-model-item>
+            <a-form-model-item label="表达式">
               <div class="modal_dropdown">
                 <a-dropdown v-model="visible1" :trigger="['click']">
                   <div class="dropdown">插入维度</div>
                   <a-menu slot="overlay" @click="handleSelectDimensions">
-                    <a-input placeholder="搜索" @input="handleSearchDimensions"></a-input>
-                    <a-menu-item v-for="item in dimensionResult" :key="item.value">
-                      {{ item.name }}
-                    </a-menu-item>
+                    <a-select
+                      :open="visible1"
+                      show-search
+                      placeholder="请输入关键词搜索"
+                      style="width: 150%"
+                      :default-active-first-option="false"
+                      :show-arrow="false"
+                      :filter-option="filterOption"
+                      @change="handleSelect"
+                    >
+                      <a-select-option
+                        v-for="item in dimensions"
+                        :key="item.alias"
+                      >
+                        {{ item.alias }}
+                      </a-select-option>
+                    </a-select>
                   </a-menu>
                 </a-dropdown>
                 <a-dropdown v-model="visible2" :trigger="['click']">
                   <div class="dropdown">插入度量</div>
                   <a-menu slot="overlay" @click="handleSelectMeasures">
-                    <a-input placeholder="搜索" @input="handleSearchMeasures"></a-input>
-                    <a-menu-item v-for="item in measureResult" :key="item.value">
-                      {{ item.name }}
-                    </a-menu-item>
+                    <a-select
+                      :open="visible2"
+                      show-search
+                      placeholder="请输入关键词搜索"
+                      style="width: 150%"
+                      :default-active-first-option="false"
+                      :show-arrow="false"
+                      :filter-option="filterOption"
+                    >
+                      <a-select-option
+                        v-for="item in measures"
+                        :key="item.alias"
+                      >
+                        {{ item.alias }}
+                      </a-select-option>
+                    </a-select>
                   </a-menu>
                 </a-dropdown>
               </div>
-            </a-form-item>
-          </a-form>
+            </a-form-model-item>
+          </a-form-model>
         </div>
         <div class="u-txtwrap u-code-input">
           <span class="u-errtip" :title="errorMessage">{{ errorMessage }}</span>
@@ -205,38 +219,27 @@ export default {
       activeIndex: 0,
       textareaValue: '',
       errorMessage: '',
-      form: this.$form.createForm(this, {
-        name: 'coordinated'
-      }),
+      form: {
+        name: ''
+      },
+      rules: {
+        name: [
+          { required: true, message: '请输入名称' },
+          {
+            type: 'string',
+            min: 1,
+            max: 20,
+            message: '请输入1-20字符的名称'
+          }
+        ]
+      },
       visible1: false,
       visible2: false,
-      dimensions: [
-        {
-          name: '地区',
-          value: '地区'
-        },
-        {
-          name: '地区经理',
-          value: '地区经理'
-        }
-      ],
+      dimensions: '',
+      measures: '',
       dimensionResult: [],
-      measures: [
-        {
-          name: '利润',
-          value: '利润'
-        },
-        {
-          name: '折扣',
-          value: '折扣'
-        }
-      ],
       measureResult: []
     }
-  },
-  created () {
-    this.dimensionResult = this.dimensions
-    this.measureResult = this.measures
   },
   mounted () {
     this.debounceFn = debounce(this.check, 1500)
@@ -247,12 +250,41 @@ export default {
     }
   },
   watch: {
+    isShow: {
+      immediate: true,
+      handler(value) {
+        if (value) {
+          this.dimensions = this.getDM([...this.$parent.detailInfo.pivotSchema.dimensions, ...this.$parent.cacheDimensions])
+          this.measures = this.getDM([...this.$parent.detailInfo.pivotSchema.measures, ...this.$parent.cacheMeasures])
+        } else {
+          this.dimensions = ''
+          this.measures = ''
+        }
+      }
+    },
     textareaValue(val) {
+      if (!val) {
+        this.errorMessage = ''
+      }
       this.$refs['js-expshow'].innerHTML = ''
       this.getExpshow(val)
     }
   },
   methods: {
+    /**
+     * 获取维度度量
+    */
+    getDM(list) {
+      if (list && list.length) {
+        return list.filter(item => {
+          return item.visible
+        })
+      }
+      return list
+    },
+    handleSelect(value, option) {
+      debugger
+    },
     preventDefault(e) {
       e.preventDefault()
       return false
