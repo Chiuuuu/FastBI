@@ -257,9 +257,11 @@
     },
     // 跳转编辑的时候如果token失效回到登录页，再次进来就重定向回目录页
     beforeRouteEnter (to, from, next) {     
-      if(from.name == 'login' && to.name == 'screenEdit'){
+      if (from.name == 'login' && to.name == 'screenEdit') {
         next('/screenManage/catalog')
-      }   
+      }  else {
+        next();
+      }
     }
   }
 </script>
