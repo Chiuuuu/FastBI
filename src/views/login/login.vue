@@ -91,7 +91,6 @@ export default {
         if (err) {
           return
         }
-        console.log('Received values of form: ', values)
         let params = {
           ...values
         }
