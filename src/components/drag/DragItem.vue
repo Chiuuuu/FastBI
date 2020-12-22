@@ -1,6 +1,6 @@
 <template>
   <div class="dv-transform" :class="{'selected':isSelected}" :style="contentStyles" ref="dvTransform"
-      @mousedown="handleMoveStart">
+      @mousedown="handleMoveStart" @touchstart="handleMoveStart">
     <div class="navigator-line" v-show="isSelected">
       <div class="navigator-line-left" :style="lineLeft"></div>
       <div class="navigator-line-top" :style="lineTop"></div>
@@ -205,9 +205,11 @@
         }
         if (!this.isSelected || this.contextMenuInfo.isShow) return
         // 计算鼠标的相对位置
+        // 兼容移动端touch事件
+        let e = event.targetTouches? event.targetTouches[0] : event
         const distance = {
-          x: event.clientX,
-          y: event.clientY
+          x: e.clientX,
+          y: e.clientY
         }
         // 缓存鼠标点击位置，会事实更新
         this.dragData.dragX = distance.x
@@ -218,13 +220,17 @@
 
         this.dragData.dragging = true
         on(window, 'mousemove', this.handleMoveMove)
+        on(window, 'touchmove', this.handleMoveMove)
         on(window, 'mouseup', this.handleMoveEnd)
+        on(window, 'touchend', this.handleMoveEnd)
       },
       handleMoveMove (event) {
         if (!this.dragData.dragging) return false
+        // 兼容移动端touch事件
+        let e = event.targetTouches? event.targetTouches[0] : event
         const distance = {
-          x: event.clientX,
-          y: event.clientY
+          x: e.clientX,
+          y: e.clientY
         }
         // 鼠标走的像素数需要换算成缩放画布的实际移动数
         const diffDistance = {
@@ -241,7 +247,9 @@
         this.dragData.dragging = false
         this.setBaseProperty()
         off(window, 'mousemove', this.handleMoveMove)
+        off(window, 'touchmove', this.handleMoveMove)
         off(window, 'mouseup', this.handleMoveEnd)
+        off(window, 'touchend', this.handleMoveEnd)
       },
       // 鼠标拖动缩放事件函数
       handleResizeMoveStart (event) {
