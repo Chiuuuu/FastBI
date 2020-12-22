@@ -327,7 +327,8 @@ export default {
           dataIndex: 'name',
           ellipsis: true,
           width: 200,
-          key: 'name'
+          key: 'name',
+          scopedSlots: { customRender: 'name' }
         },
         {
           title: '是否设置过字段',
