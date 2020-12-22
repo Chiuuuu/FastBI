@@ -202,7 +202,7 @@ export default {
   },
   data() {
     return {
-      hasBtnPermission: false,
+      // hasBtnPermission: false,
       columns: [],
       data: [],
       databaseList: [],
@@ -265,13 +265,10 @@ export default {
     },
     currentData() {
       return this.data.filter(item => item.name.toLowerCase().indexOf(this.tableKeyword.toLowerCase()) > -1)
-    }
-  },
-  watch: {
-    privileges(newValue, oldValue) {
-      if (newValue && newValue.length > 0) {
-        this.hasBtnPermission = hasPermission(newValue, this.$PERMISSION_CODE.OPERATOR.extract)
-      }
+    },
+    hasBtnPermission() {
+      if (!this.privileges || this.privileges.length < 1) return true
+      return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.extract)
     }
   },
   filters: {
