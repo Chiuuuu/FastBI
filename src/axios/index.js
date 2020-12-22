@@ -30,6 +30,7 @@ const errorHandle = {
     store.dispatch('common/set_token', '')
     window.sessionStorage.clear()
     window.localStorage.clear()
+    store.commit('user/CLEAR_PERMISSIONS')
     router.replace({
       path: '/login',
       query: {
