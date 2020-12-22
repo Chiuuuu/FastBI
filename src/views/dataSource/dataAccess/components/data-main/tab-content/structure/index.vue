@@ -16,7 +16,7 @@
           <a-button type="primary" class="select_button" @click="handleGetData" :loading="spinning">刷新数据</a-button>
           <a-button v-if="tableType === 0" v-show="showExtractBtn" type="primary" style="margin-left:10px;" class="select_button" @click="showExtractLog">定时抽取记录</a-button>
           <a-button
-            v-hasPermission:[$PERMISSION_CODE.OPERATOR.extract]="privileges"
+            v-if="hasBtnPermission"
             v-show="showExtractBtn"
             type="primary"
             class="select_button"
@@ -202,6 +202,7 @@ export default {
   },
   data() {
     return {
+      hasBtnPermission: false,
       columns: [],
       data: [],
       databaseList: [],
@@ -264,6 +265,13 @@ export default {
     },
     currentData() {
       return this.data.filter(item => item.name.toLowerCase().indexOf(this.tableKeyword.toLowerCase()) > -1)
+    }
+  },
+  watch: {
+    privileges(newValue, oldValue) {
+      if (newValue && newValue.length > 0) {
+        this.hasBtnPermission = hasPermission(newValue, this.$PERMISSION_CODE.OPERATOR.extract)
+      }
     }
   },
   filters: {
