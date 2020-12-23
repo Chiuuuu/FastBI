@@ -100,7 +100,7 @@
           <span>数据模型详情</span>
           <div class="detail_btn">
             <a-button v-on:click="openModal('check-table')" :disabled="disableByDetailInfo">查看宽表</a-button>
-            <a-button v-on:click="openModal('batch-setting')">批量编辑字段</a-button>
+            <a-button v-on:click="openModal('batch-setting')" :disabled="disableByDetailInfo">批量编辑字段</a-button>
           </div>
         </div>
         <div class="detail_main">
@@ -728,6 +728,10 @@ export default {
       if (this.modalName === 'batch-setting') {
         this.doWithBatchSetting(data)
       }
+
+      if (this.modalName === 'compute-setting') {
+        this.doWithComputeSetting(data)
+      }
       this.close()
     },
     doWithSqlSetting(data) {
@@ -780,6 +784,15 @@ export default {
         this.handleDimensions()
         this.handleMeasures()
       }
+    },
+    doWithComputeSetting(data) {
+      if (this.computeType === '维度') {
+        this.cacheDimensions.push(data)
+      } else {
+        this.cacheMeasures.push(data)
+      }
+      this.handleDimensions()
+      this.handleMeasures()
     },
     handleChangeTableName(list, tableNo, name) {
       if (list && list.length) {
