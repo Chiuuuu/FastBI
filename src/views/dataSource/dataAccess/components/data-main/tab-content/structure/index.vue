@@ -415,6 +415,9 @@ export default {
       this.logData = []
     },
     async showExtractLog() {
+      if (this.data.length < 1) {
+        return this.$message.error('当前数据库暂无数据')
+      }
       this.visible1 = true
       this.modalSpin = true
       this.$server.dataAccess.getExtractLogList(this.data[0].id)
@@ -498,6 +501,9 @@ export default {
         this.clickRows = this.selectedRows
         this.visible2 = true
       } else if (type === 'batchList') {
+        if (this.data.length < 1) {
+          return this.$message.error('当前数据库暂无数据')
+        }
         this.clickRows = this.data[0].databaseId
         this.visible = true
       }

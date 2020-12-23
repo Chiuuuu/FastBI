@@ -474,6 +474,8 @@ export default {
       this.$store.dispatch('dataAccess/setModelId', 0)
       this.$store.dispatch('dataAccess/setModelInfo', {})
       this.$store.dispatch('dataAccess/setModelName', '')
+      this.$store.commit('dataAccess/SET_DATABASENAME', '')
+      this.$store.commit('dataAccess/SET_PRIVILEGES', [])
       this.$EventBus.$emit('resetForm')
       this.$emit('on-menuChange-componet', 'Main')
       this.$EventBus.$emit('set-tab-index', '1')
