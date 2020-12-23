@@ -23,8 +23,8 @@
         </template>
       </div>
     </div>
-    <template v-else>
-      <a-empty style="margin-top:50px;color:#000" v-if="type !=='sql'" description="数据源未进行数据抽取，请先抽取数据"></a-empty>
+    <template v-else-if="keywords.length > 0">
+      <a-empty style="margin-top:50px;color:#000" v-if="type !=='sql'" :description="description"></a-empty>
     </template>
     <render-table-info
       :isShow="isRenderTable"
@@ -54,6 +54,10 @@ export default {
       type: String,
       default: ''
     },
+    keywords: {
+      type: String,
+      default: ''
+    },
     list: {
       type: Array,
       default: () => []
@@ -65,6 +69,15 @@ export default {
       loading: true,
       modalData: {},
       isRenderTable: false
+    }
+  },
+  computed: {
+    description() {
+      if (this.keywords.length === 0) {
+        return '数据源未进行数据抽取，请先抽取数据'
+      } else {
+        return '暂无数据'
+      }
     }
   },
   watch: {

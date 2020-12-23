@@ -12,7 +12,7 @@
         <thead>
           <tr>
             <th>序号</th>
-            <th v-for="(item, index) in columns" :key="index">
+            <th v-for="(item, index) in columns" :key="index" :title="item['COLUMN_NAME']">
               {{ item['COLUMN_NAME'] }}
               <span class="type">{{ item['TYPE_NAME'] | formatType }}</span>
             </th>
@@ -21,10 +21,11 @@
         <tbody>
           <tr v-for="(item, index) in tableData" :key="index">
             <td>{{ index + 1 }}</td>
-            <td v-for="(col, i) in columns" :key="i">{{ item[col['COLUMN_NAME']] }}</td>
+            <td v-for="(col, i) in columns" :key="i" :title="item[col['COLUMN_NAME']]">{{ item[col['COLUMN_NAME']] }}</td>
           </tr>
         </tbody>
       </table>
+      <a-empty class="table-empty" v-if="tableData.length === 0"></a-empty>
     </a-spin>
   </a-modal>
 </template>
@@ -117,5 +118,12 @@ export default {
       color: #9c9c9c;
       font-weight: normal;
     }
+  }
+  .table-empty {
+    padding: 20px 0;
+    margin: 0;
+    border-right: 1px solid #e8e8e8;
+    border-left: 1px solid #e8e8e8;
+    border-bottom: 1px solid #e8e8e8;
   }
 </style>

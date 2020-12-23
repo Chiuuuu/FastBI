@@ -26,7 +26,12 @@
               :scroll="{ x: 1200, y: 'calc(100vh - 350px)' }"
             >
             <template slot="alias" slot-scope="text, record, index">
-              <a-input style="width:100%;height:32px" :value="text" @blur.stop.prevent="handleAliasBlur($event, record, index, 'alias')" @change.stop.prevent="handleChangeValue($event, record, index, 'alias')"/>
+              <a-input
+                style="width:100%;height:32px"
+                :value="text"
+                :maxLength="20"
+                @blur.stop.prevent="handleAliasBlur($event, record, index, 'alias')"
+                @change.stop.prevent="handleChangeValue($event, record, index, 'alias')"/>
             </template>
             <template slot="convertType" slot-scope="text, record">
               <field-select
@@ -49,7 +54,7 @@
               />
             </template>
             <template slot="description" slot-scope="text, record, index">
-              <a-input style="width:100%;height:32px" :value="text" :maxLength="100" @change.stop.prevent="handleChangeValue($event, record, index, 'description')"/>
+              <a-input style="width:100%;height:32px" :value="text" :maxLength="200" @change.stop.prevent="handleChangeValue($event, record, index, 'description')"/>
             </template>
             <template slot="comment" slot-scope="comment">
               {{ comment }}

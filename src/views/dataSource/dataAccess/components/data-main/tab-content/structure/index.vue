@@ -7,7 +7,7 @@
       </a-radio-group>
       <a-row type="flex" justify="end" align="middle">
         <a-col :span="6" style="margin-right:auto">
-          <a-input :value="tableKeyword" @change="handleGetTableKeyword" placeholder="请输入关键词" class="search_input">
+          <a-input :value="tableKeyword" @change="handleGetTableKeyword" placeholder="请输入表名" class="search_input">
             <a-icon slot="prefix" type="search" />
           </a-input>
         </a-col>
