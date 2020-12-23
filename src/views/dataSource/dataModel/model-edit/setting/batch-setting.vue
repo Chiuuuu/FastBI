@@ -42,7 +42,7 @@
                 :text="(text || record.dataType) | formatField"
                 :select-data="record"
                 :contextmenus="fieldContenxtMenu"
-                :isDimension="record.role === 1"
+                :isDimension="record.role === 1 || record.role === 4"
               />
             </template>
             <template #role="text, record">
@@ -50,11 +50,11 @@
                 :text="text | formatRole"
                 :select-data="record"
                 :contextmenus="[{
-                  name: '转换为' + (text === 1 ? '度量' : '维度'),
-                  roleType: text === 1 ? 2 : 1,
+                  name: '转换为' + ((text === 1 || text === 4)? '度量' : '维度'),
+                  roleType: handleReverRole(text),
                   onClick: switchRoleType
                 }]"
-                :isDimension="record.role === 1"
+                :isDimension="record.role === 1 || record.role === 4"
               />
             </template>
             <template #description="text, record">
@@ -90,7 +90,11 @@
       </a-button>
       <a-button type="primary" @click="handleSave"> 保存 </a-button>
     </div>
-    <a-modal :visible="showSetting" @cancel="handleCancelModal" @ok="handleBatchSetting">
+    <a-modal
+      :visible="showSetting"
+      :afterClose="handleAfterClose"
+      @cancel="handleCancelModal"
+      @ok="handleBatchSetting">
       <template v-if="setType === 'dataType'">
         <a-form-model :model="modalForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
           <a-form-model-item label="字段类型" required>
@@ -283,7 +287,7 @@ export default {
       return value
     },
     formatRole(value) {
-      if (value === 1) {
+      if (value === 1 || value === 4) {
         return '维度'
       } else {
         return '度量'
@@ -328,12 +332,26 @@ export default {
         this.$message.error('存在同名字段, 请重新命名')
       }
     },
+    handleAfterClose() {
+      this.modalForm = this.$options.data().modalForm
+    },
     handleClose() {
       this.$emit('close')
     },
     switchFieldType(e, item, vm) {
       let dataType = item.dataType
       vm.selectData.dataType = dataType
+    },
+    handleReverRole(value) {
+      if (value === 1) {
+        return 2
+      } else if (value === 2) {
+        return 1
+      } else if (value === 4) {
+        return 5
+      } else if (value === 5) {
+        return 4
+      }
     },
     switchRoleType(e, item, vm) {
       let roleType = item.roleType
@@ -344,7 +362,6 @@ export default {
       this.setType = type
     },
     handleCancelModal() {
-      this.modalForm = this.$options.data().modalForm
       this.showSetting = false
     },
     handleBatchSetting() {
@@ -356,6 +373,16 @@ export default {
       this.selectedRows.forEach(item => {
         if (this.setType === 'visible') {
           item[this.setType] = (value === 'true')
+        } else if (this.setType === 'role') {
+          if (item.role === 1 && value === 2) {
+            item[this.setType] = 2
+          } else if (item.role === 2 && value === 1) {
+            item[this.setType] = 1
+          } else if (item.role === 4 && value === 2) {
+            item[this.setType] = 5
+          } else if (item.role === 5 && value === 1) {
+            item[this.setType] = 4
+          }
         } else {
           item[this.setType] = value
         }
