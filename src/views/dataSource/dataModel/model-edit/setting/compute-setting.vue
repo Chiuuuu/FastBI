@@ -4,7 +4,9 @@
     :visible="isShow"
     :title="'新建计算字段（' + computeType + '）'"
     width="1000px"
+    :confirmLoading="confirmLoading"
     destroyOnClose
+    :afterClose="handleAfterClose"
     @ok="handleSave"
     @cancel="handleClose"
   >
@@ -12,6 +14,7 @@
       <div class="modal_l">
         <div class="set">
           <a-form-model
+            ref="form"
             :model="form"
             :rules="rules"
             :label-col="{ span: 3 }"
@@ -22,51 +25,35 @@
             </a-form-model-item>
             <a-form-model-item label="表达式">
               <div class="modal_dropdown">
-                <a-dropdown v-model="visible1" :trigger="['click']">
+                <a-dropdown v-model="dimensionsVisible" :trigger="['click']">
                   <div class="dropdown">插入维度</div>
-                  <a-menu slot="overlay" @click="handleSelectDimensions">
-                    <a-select
-                      :open="visible1"
-                      show-search
-                      placeholder="请输入关键词搜索"
-                      style="width: 150%"
-                      :default-active-first-option="false"
-                      :show-arrow="false"
-                      :filter-option="filterOption"
-                      @change="handleSelect"
-                    >
-                      <a-select-option
-                        v-for="item in dimensions"
-                        :key="item.alias"
-                        :value="item.id"
-                      >
+                  <div slot="overlay" class="dropOverlay">
+                    <a-input allowClear placeholder="请输入关键词" @change="handleSearch($event, 'dimensions')"></a-input>
+                    <a-menu>
+                      <a-menu-item
+                        v-for="item in (searchDimensions || dimensions)"
+                        :key="item.id"
+                        @click="handleSelect(item, 'dimensions')"
+                        >
                         {{ item.alias }}
-                      </a-select-option>
-                    </a-select>
-                  </a-menu>
+                      </a-menu-item>
+                    </a-menu>
+                  </div>
                 </a-dropdown>
-                <a-dropdown v-model="visible2" :trigger="['click']">
+                <a-dropdown v-model="measuresVisible" :trigger="['click']">
                   <div class="dropdown">插入度量</div>
-                  <a-menu slot="overlay" @click="handleSelectMeasures">
-                    <a-select
-                      :open="visible2"
-                      show-search
-                      placeholder="请输入关键词搜索"
-                      style="width: 150%"
-                      :default-active-first-option="false"
-                      :show-arrow="false"
-                      :filter-option="filterOption"
-                      @change="handleSelect"
-                    >
-                      <a-select-option
-                        v-for="item in measures"
-                        :key="item.alias"
-                        :value="item.id"
-                      >
+                  <div slot="overlay" class="dropOverlay">
+                    <a-input allowClear placeholder="请输入关键词" @change="handleSearch($event, 'measures')"></a-input>
+                    <a-menu>
+                      <a-menu-item
+                        v-for="item in (searchMeasures || measures)"
+                        :key="item.id"
+                        @click="handleSelect(item, 'measures')"
+                        >
                         {{ item.alias }}
-                      </a-select-option>
-                    </a-select>
-                  </a-menu>
+                      </a-menu-item>
+                    </a-menu>
+                  </div>
                 </a-dropdown>
               </div>
             </a-form-model-item>
@@ -233,15 +220,17 @@ export default {
             min: 1,
             max: 20,
             message: '请输入1-20字符的名称'
-          }
+          },
+          { validator: this.validateName, trigger: ['change', 'blur'] }
         ]
       },
-      visible1: false,
-      visible2: false,
+      confirmLoading: false,
+      dimensionsVisible: false,
+      measuresVisible: false,
       dimensions: '',
+      searchDimensions: '',
       measures: '',
-      dimensionResult: [],
-      measureResult: []
+      searchMeasures: ''
     }
   },
   mounted () {
@@ -250,6 +239,12 @@ export default {
   computed: {
     explain() {
       return this.expression[this.activeIndex].example.replace(/\n/gm, '<br/>')
+    },
+    sourceDimensions() {
+      return [...this.$parent.detailInfo.pivotSchema.dimensions, ...this.$parent.cacheDimensions]
+    },
+    sourceMeasures() {
+      return [...this.$parent.detailInfo.pivotSchema.measures, ...this.$parent.cacheMeasures]
     }
   },
   watch: {
@@ -257,8 +252,9 @@ export default {
       immediate: true,
       handler(value) {
         if (value) {
-          this.dimensions = this.getDM([...this.$parent.detailInfo.pivotSchema.dimensions, ...this.$parent.cacheDimensions])
-          this.measures = this.getDM([...this.$parent.detailInfo.pivotSchema.measures, ...this.$parent.cacheMeasures])
+          this.errorMessage = ''
+          this.dimensions = this.getDM(this.sourceDimensions)
+          this.measures = this.getDM(this.sourceMeasures)
         } else {
           this.dimensions = ''
           this.measures = ''
@@ -267,26 +263,43 @@ export default {
     },
     textareaValue(val) {
       if (!val) {
-        this.errorMessage = ''
+        this.errorMessage = '表达式不能为空'
       }
       this.$refs['js-expshow'].innerHTML = ''
       this.getExpshow(val)
     }
   },
   methods: {
+    validateName(rule, value, callback) {
+      const arry = [...this.sourceDimensions, ...this.sourceMeasures]
+      const item = arry.filter(item => item.alias === value).pop()
+      if (item) {
+        callback(new Error('名称已存在'))
+      } else {
+        callback()
+      }
+    },
     /**
      * 获取维度度量
     */
     getDM(list) {
       if (list && list.length) {
         return list.filter(item => {
-          return item.visible
+          return item.visible && item.role !== 4 && item.role !== 5
+          // return item.visible
         })
       }
       return list
     },
-    handleSelect(value, option) {
-      debugger
+    handleSelect(item, type) {
+      if (item) {
+        this[`${type}Visible`] = false
+        this.$nextTick(() => {
+          this.insertText(this.$refs['js-textarea'], `[${item.alias}]`)
+        })
+      } else {
+        this.$message.error('获取失败')
+      }
     },
     preventDefault(e) {
       e.preventDefault()
@@ -307,48 +320,91 @@ export default {
       this.getActiveIndex(value)
       this.handleSelectExpression(this.expression[this.activeIndex])
     },
+    /**
+     * 维度度量关键词搜索
+     */
+    handleSearch: debounce(function(event, type) {
+      const value = event.target.value
+      const list = type === 'dimensions' ? this.dimensions : this.measures
+      const result = value ? this.filterSearch(list, value) : ''
+      if (type === 'dimensions') {
+        this.searchDimensions = result
+      } else {
+        this.searchMeasures = result
+      }
+    }, 500),
+    /**
+     * 过滤返回关键词搜索
+     */
+    filterSearch(list, value) {
+      if (list && list.length) {
+        return list.filter(item => item.alias.toLowerCase().indexOf(value.toLowerCase()) >= 0)
+      }
+      return list
+    },
     filterOption(value, option) {
       return option.componentOptions.children[0].text.toLowerCase().indexOf(value.toLowerCase()) >= 0
     },
-    handleSelectDimensions(menu) {
-      if (menu.key) {
-        // this.textareaValue += menu.key
-        this.insertText(this.$refs['js-textarea'], menu.key)
-        this.visible1 = false
+    // 暂时使用的方法，把原生表达式的[]替换掉
+    reverse(str) {
+      const pairList = [...this.sourceDimensions, ...this.sourceMeasures]
+      const map = new Map()
+      const matchArry = str.match(/(\[)(.*?)(\])/g)
+      if (matchArry) {
+        matchArry.forEach(value => {
+          const matchStr = value.match(/(\[)(.+)(\])/)
+          const key = matchStr[2] ? matchStr[2] : ''
+          const item = pairList.filter(item => {
+            return item.alias === key
+          }).pop()
+          if (key && item && !map.has(item)) {
+            map.set(key, `$$${item.id}`)
+          }
+        })
       }
-    },
-    handleSearchDimensions(e) {
-      const value = e.target.value
-      if (value === '') {
-        this.dimensionResult = this.dimensions
-      } else {
-        this.dimensionResult = this.dimensions.filter(item => item.value.toLowerCase().indexOf(value.toLowerCase()) > -1)
-      }
-      console.log('搜索结果', this.dimensionResult)
-    },
-    handleSelectMeasures(menu) {
-      if (menu.key) {
-        // this.textareaValue += menu.key
-        this.insertText(this.$refs['js-textarea'], menu.key)
-        this.visible2 = false
-      }
-    },
-    handleSearchMeasures(e) {
-      const value = e.target.value
-      if (value === '') {
-        this.measureResult = this.measures
-      } else {
-        this.measureResult = this.measures.filter(item => item.value.toLowerCase().indexOf(value.toLowerCase()) > -1)
-      }
-      console.log('搜索结果', this.measureResult)
+      map.forEach((value, key) => {
+        const t = new RegExp('(\\[)(' + key + ')(\\])', 'g')
+        str = str.replace(t, () => `${value}`)
+      })
+      return str
     },
     handleSave() {
-      this.handleClose()
+      this.$refs.form.validate(async (ok) => {
+        if (ok) {
+          if (!this.textareaValue) {
+            this.errorMessage = '表达式不能为空'
+            return false
+          } else {
+            this.errorMessage = ''
+            const params = {
+              name: this.form.name,
+              datamodelId: this.$parent.model === 'add' ? this.$parent.addModelId : this.$parent.modelId,
+              role: this.computeType === '维度' ? 4 : 5,
+              raw_expr: this.textareaValue,
+              expr: this.reverse(this.textareaValue)
+            }
+            this.confirmLoading = true
+            const result = await this.$server.dataModel.addCustomizModelPivotschema(params).finally(() => {
+              this.confirmLoading = false
+            })
+
+            if (result.code === 200) {
+              this.$emit('success', result.data)
+            } else {
+              this.$message.error(result.msg || '请求错误')
+            }
+          }
+        } else {
+          return false
+        }
+      })
     },
     handleClose() {
-      this.textareaValue = ''
-      this.errorMessage = ''
       this.$emit('close')
+    },
+    handleAfterClose() {
+      this.textareaValue = ''
+      this.form = this.$options.data().form
     },
     /**
      * 编辑器展示
@@ -383,7 +439,7 @@ export default {
     */
     check(str) {
       try {
-        const parse = new Parse(str)
+        const parse = new Parse(str, [...this.sourceDimensions, ...this.sourceMeasures])
         const ast = parse.parseAST()
         console.log('语法树', ast)
         const verify = new Verify()

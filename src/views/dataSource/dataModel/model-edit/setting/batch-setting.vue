@@ -1,6 +1,6 @@
 <template>
   <a-drawer
-    title="字段重命名"
+    title="批量编辑字段"
     width="80%"
     :visible="isShow"
     :body-style="{ paddingBottom: '80px' }"
@@ -23,7 +23,7 @@
         <a-collapse-panel
           v-for="(value, name) in cacheTables"
           :key="name"
-          :header="value[0].tableName">
+          :header="handleGetPanelName(value[0].tableName)">
           <a-table
             :row-selection="rowSelection"
             :columns="column"
@@ -287,6 +287,12 @@ export default {
     }
   },
   methods: {
+    handleGetPanelName(name) {
+      if (['自定义维度', '自定义度量', '自定义表'].indexOf(name) > -1) {
+        return '自定义表'
+      }
+      return name
+    },
     handleSelect(value, record, index) {
       const has = Object.keys(this.cacheTables).some(item => (item === record.tableNo) || (item === `${record.tableNo}`))
       if (has) {
