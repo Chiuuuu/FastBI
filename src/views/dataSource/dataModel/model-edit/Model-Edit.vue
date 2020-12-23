@@ -472,9 +472,22 @@ export default {
     // 转换维度度量
     handleSwitchRole(type, vm) {
       let tableName = vm.itemData.tableName
-      const role = vm.itemData.role === 1 ? 2 : 1
+
+      // 1,4 表示维度 2,5表示度量
+      // 1,2 为一组相互对调
+      // 4,5 为一组相互对调
+      let role
+      if (vm.itemData.role === 1) {
+        role = 2
+      } else if (vm.itemData.role === 2) {
+        role = 1
+      } else if (vm.itemData.role === 4) {
+        role = 5
+      } else if (vm.itemData.role === 5) {
+        role = 4
+      }
       if (vm.itemData.tableNo === 0) {
-        tableName = vm.itemData.role === 1 ? '自定义度量' : '自定义维度'
+        tableName = (role === 1 || role === 4) ? '自定义维度' : '自定义度量'
       }
       const data = {
         ...vm.itemData,
@@ -514,12 +527,14 @@ export default {
     // 复制维度度量
     async handleCopyField(event, handler, vm) {
       const role = vm.itemData.role
+      const isDimension = role === 1 || role === 4
+      const isMeasures = role === 2 || role === 5
       let newField = {
         ...vm.itemData,
         id: '',
         expr: `${vm.itemData.tableName},${vm.itemData.tableNo}`,
         tableNo: 0,
-        tableName: '自定义' + (role === 1 ? '维度' : '度量')
+        tableName: '自定义' + (isDimension ? '维度' : '度量')
       }
 
       const result = await this.$server.dataModel.getCopyField(newField)
@@ -529,10 +544,10 @@ export default {
           ...result.data
         }
         newField.alias = this.handleAddCustomField([...this.cacheDimensions, ...this.cacheMeasures], newField, newField.alias)
-        if (role === 1) {
+        if (isDimension) {
           this.cacheDimensions.push(newField)
           this.handleDimensions()
-        } else if (role === 2) {
+        } else if (isMeasures) {
           this.cacheMeasures.push(newField)
           this.handleMeasures()
         } else {
@@ -783,8 +798,12 @@ export default {
             }
           })
         })
-        this.cacheDimensions = [].concat(cacheDimensions)
-        this.cacheMeasures = [].concat(cacheMeasures)
+
+        this.cacheDimensions = []
+        this.cacheMeasures = []
+        // 将自定义维度度量剥离处理
+        this.detailInfo.pivotSchema.dimensions = this.handlePeelCustom(cacheDimensions, this.cacheDimensions)
+        this.detailInfo.pivotSchema.measures = this.handlePeelCustom(cacheMeasures, this.cacheMeasures)
         this.handleDimensions()
         this.handleMeasures()
       }
