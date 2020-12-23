@@ -776,11 +776,15 @@ export default {
         Object.keys(data).forEach(item => {
           const list = data[item]
           list.forEach(field => {
-            field.role === 1 ? cacheDimensions.push(field) : cacheMeasures.push(field)
+            if (field.role === 1 || field.role === 4) {
+              cacheDimensions.push(field)
+            } else if (field.role === 2 || field.role === 5) {
+              cacheMeasures.push(field)
+            }
           })
         })
-        this.detailInfo.pivotSchema.dimensions = [].concat(cacheDimensions)
-        this.detailInfo.pivotSchema.measures = [].concat(cacheMeasures)
+        this.cacheDimensions = [].concat(cacheDimensions)
+        this.cacheMeasures = [].concat(cacheMeasures)
         this.handleDimensions()
         this.handleMeasures()
       }
