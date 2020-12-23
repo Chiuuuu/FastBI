@@ -31,7 +31,11 @@
             rowKey="id"
             bordered>
             <template #alias="text, record">
-              <a-input v-model="record.alias" @change="handleCheckName" style="width: 156px height: 32px" />
+              <a-input
+                v-model="record.alias"
+                :maxLength="20"
+                @change="handleCheckName"
+                style="width: 156px height: 32px" />
             </template>
             <template #dataType="text, record">
               <field-select
@@ -54,7 +58,7 @@
               />
             </template>
             <template #description="text, record">
-              <a-input v-model="record.description" style="width: 156px height: 32px" />
+              <a-input v-model="record.description" :maxLength="200" style="width: 156px height: 32px" />
             </template>
             <template #comment="text, record">
               <a-input v-model="record.comment" style="width: 100px height: 32px" />

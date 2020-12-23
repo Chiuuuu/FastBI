@@ -152,10 +152,7 @@ export default {
               this.$message.success('删除成功')
               for (let i = 0; i < this.regData.length; i++) {
                 const item = this.regData[i]
-                if (row.groupId === '0' && item.id === id) {
-                  this.regData.splice(i, 1)
-                  break
-                } else if (row.groupId === '0' && item.id === id) {
+                if (item.id === row.id) {
                   this.regData.splice(i, 1)
                   break
                 }
