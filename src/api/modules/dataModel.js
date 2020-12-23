@@ -190,5 +190,17 @@ export default {
    */
   getCopyField(params) {
     return $axios.post(`/model/pivotschema/getCopyField`, params)
+  },
+  /**
+   * @description
+   * @param {Object} params 请求参数
+   * @param {String} params.name 字段名称
+   * @param {Number} params.role 字段角色，4：计算维度，5：计算度量
+   * @param {String | Number} params.datamodelId 数据模型ID
+   * @param {String} params.expr 经过处理的表达式
+   * @param {String} params.raw_expr 原生的表达式
+   */
+  addCustomizModelPivotschema(params) {
+    return $axios.post(`/model/pivotschema/getCustomizModelPivotschema`, params)
   }
 }

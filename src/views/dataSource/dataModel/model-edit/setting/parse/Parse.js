@@ -21,8 +21,9 @@ export class Parse {
     '/': 20,
     '%': 20
   }
-  constructor(tokenStream) {
+  constructor(tokenStream, dm) {
     this.tokenStream = new TokenStream(tokenStream, true)
+    this.pairList = dm || []
     // this.tokenStream = tokenStream;
   }
   isSpace(ch) {
@@ -344,34 +345,35 @@ export class Parse {
   }
 
   parseAlias(token) {
-    const alias = {
-      助攻数: 5577,
-      进球数: 6666
-    }
-
     let matchStr = ''
     if (token.specialAlias) {
-      // const matchs = token.value.match(
-      //   /^(([)([_a-zA-Z0-9\u4E00-\u9FA5\uF900-\uFA2D]+)(]))/
-      // )
-      // if (matchs) {
-      //   matchStr = matchs[1].substring(1, matchs[1].length - 1)
-      // }
       const matchs = token.value.match(/(\[)(.+)(\])/)
       if (matchs) {
         matchStr = matchs[2]
       }
     }
 
-    if (alias[token.value] || alias[matchStr]) {
+    const item = this.pairList.filter(item => {
+      return item.alias === matchStr
+    }).pop()
+
+    if (item) {
       return {
         type: 'alias',
-        value: token.specialAlias
-          ? this.identifyNum(alias[matchStr])
-          : this.identifyNum(alias[token.value]),
-        name: token.specialAlias ? matchStr : token.value
+        value: '$$' + item.id,
+        name: matchStr
       }
     }
+
+    // if (alias[token.value] || alias[matchStr]) {
+    //   return {
+    //     type: 'alias',
+    //     value: token.specialAlias
+    //       ? this.identifyNum(alias[matchStr])
+    //       : this.identifyNum(alias[token.value]),
+    //     name: token.specialAlias ? matchStr : token.value
+    //   }
+    // }
 
     throw Error(`未知名称: ${token.specialAlias ? matchStr : token.value}`)
   }
