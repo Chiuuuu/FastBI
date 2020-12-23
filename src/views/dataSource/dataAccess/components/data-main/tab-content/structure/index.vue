@@ -7,7 +7,7 @@
       </a-radio-group>
       <a-row type="flex" justify="end" align="middle">
         <a-col :span="6" style="margin-right:auto">
-          <a-input :value="tableKeyword" @change="handleGetTableKeyword" placeholder="请输入关键词" class="search_input">
+          <a-input :value="tableKeyword" @change="handleGetTableKeyword" placeholder="请输入表名" class="search_input">
             <a-icon slot="prefix" type="search" />
           </a-input>
         </a-col>
@@ -202,7 +202,7 @@ export default {
   },
   data() {
     return {
-      hasBtnPermission: false,
+      // hasBtnPermission: false,
       columns: [],
       data: [],
       databaseList: [],
@@ -265,13 +265,10 @@ export default {
     },
     currentData() {
       return this.data.filter(item => item.name.toLowerCase().indexOf(this.tableKeyword.toLowerCase()) > -1)
-    }
-  },
-  watch: {
-    privileges(newValue, oldValue) {
-      if (newValue && newValue.length > 0) {
-        this.hasBtnPermission = hasPermission(newValue, this.$PERMISSION_CODE.OPERATOR.extract)
-      }
+    },
+    hasBtnPermission() {
+      if (!this.privileges || this.privileges.length < 1) return true
+      return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.extract)
     }
   },
   filters: {
@@ -330,7 +327,8 @@ export default {
           dataIndex: 'name',
           ellipsis: true,
           width: 200,
-          key: 'name'
+          key: 'name',
+          scopedSlots: { customRender: 'name' }
         },
         {
           title: '是否设置过字段',
