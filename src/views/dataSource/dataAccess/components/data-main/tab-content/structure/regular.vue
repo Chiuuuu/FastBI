@@ -265,7 +265,7 @@ export default {
                   id: item.id,
                   name: item.name,
                   target: item.target,
-                  targetName: item.name,
+                  targetName: item.tableName,
                   extractType: item.extractType,
                   incrementalType: item.incrementalType,
                   incrementalColumn: item.incrementalColumn,

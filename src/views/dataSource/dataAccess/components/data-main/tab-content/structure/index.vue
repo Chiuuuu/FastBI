@@ -56,11 +56,12 @@
       <a-table
         rowKey='id'
         :row-selection="rowSelection"
+        :pagination="pagination"
         :columns="tableColumns"
-        :data-source="currentData"
+        :data-source="data"
         :loading="spinning"
-        :pagination="false"
-        :scroll="{ y: 'calc(100vh - 400px)', x: 960 }"
+        :scroll="{ y: 'calc(100vh - 440px)', x: 960 }"
+        @change="handleChangeTable"
       >
         <span slot="name" slot-scope="text, record">
           <a @click="handleCheckTable($event, record.id)">{{ text }}</a>
@@ -205,6 +206,11 @@ export default {
       // hasBtnPermission: false,
       columns: [],
       data: [],
+      pagination: {
+        current: 1,
+        pageSize: 30,
+        total: 0
+      },
       databaseList: [],
       database: '',
       tableKeyword: '',
@@ -263,9 +269,6 @@ export default {
         }
       }
     },
-    currentData() {
-      return this.data.filter(item => item.name.toLowerCase().indexOf(this.tableKeyword.toLowerCase()) > -1)
-    },
     hasBtnPermission() {
       if (!this.privileges || this.privileges.length < 1) return true
       return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.extract)
@@ -297,6 +300,7 @@ export default {
       this.tableKeyword = e.target.value.trim()
       this.selectedRowKeys = []
       this.selectedRows = []
+      this.handleGetData()
     }, 400),
     handleChangeDatabase(value) {
       this.database = value
@@ -377,7 +381,10 @@ export default {
       // }
       this.columns = columns
     },
-    async handleGetData() {
+    handleChangeTable(pagination) {
+      this.handleGetData(pagination)
+    },
+    async handleGetData(pagination) {
       if (!this.modelType) return
       this.handleColumns()
       this.spinning = true
@@ -391,16 +398,23 @@ export default {
       if (['excel', 'csv'].indexOf(this.modelType) > -1) {
         databaseName = this.databaseName
       }
-      const dabaseInfoResult = await this.$server.dataAccess.getTableList({
+      const params = {
         databaseName,
+        keyword: this.tableKeyword,
         sourceId: this.modelId,
-        tableType: this.tableType
-      }).finally(() => {
-        this.spinning = false
-      })
+        tableType: this.tableType,
+        pageSize: this.pagination.pageSize,
+        current: pagination ? pagination.current : this.$options.data().pagination.current
+      }
+      const dabaseInfoResult = await this.$server.dataAccess.getTableList(params)
+        .finally(() => {
+          this.spinning = false
+        })
       if (dabaseInfoResult.code === 200) {
         this.data = [].concat(dabaseInfoResult.rows)
         this.$store.dispatch('dataAccess/setReadRows', this.data)
+        this.pagination.total = dabaseInfoResult.total
+        this.pagination.current = params.current
       } else {
         this.data = []
         this.$message.error(dabaseInfoResult.msg)
