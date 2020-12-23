@@ -96,7 +96,7 @@
                               @dragend="dragsend(item2, $event)"
                               @contextmenu.prevent="showMore(item2)">
                             <img src="@/assets/images/icon_measure.png" />
-                            {{ item2.name }}
+                            {{ item2.alias }}
                             <a-dropdown :trigger="['click', 'contextmenu']" v-if="!measuresChecked.includes(item2.id)" v-model="item2.showMore">
                               <a-icon class="icon-more" type="caret-down" />
                               <a-menu slot="overlay" @click="changeItem(item2, 1)">
