@@ -484,31 +484,32 @@ export default {
       let index
       if (type === 'dimensions') {
         // 维度 转去 度量
-        if (vm.itemData.tableNo === 0 && !vm.itemData.id) {
+        index = this.getTargetIndex(vm.itemData.tableNo === 0 ? this.cacheDimensions : this.detailInfo.pivotSchema.dimensions, vm.itemData.alias)
+        if (vm.itemData.tableNo === 0) {
           // 如果是自定义
-          index = this.cacheDimensions.findIndex(item => item.alias === vm.itemData.alias)
           this.cacheMeasures.push(data)
           this.cacheDimensions.splice(index, 1)
         } else {
-          index = this.detailInfo.pivotSchema.dimensions.findIndex(item => item.alias === vm.itemData.alias)
           this.detailInfo.pivotSchema.dimensions.splice(index, 1)
           this.detailInfo.pivotSchema.measures.push(data)
         }
       } else {
         // 度量 转去 维度
-        if (vm.itemData.tableNo === 0 && !vm.itemData.id) {
+        index = this.getTargetIndex(vm.itemData.tableNo === 0 ? this.cacheMeasures : this.detailInfo.pivotSchema.measures, vm.itemData.alias)
+        if (vm.itemData.tableNo === 0) {
           // 如果是自定义
-          index = this.cacheMeasures.findIndex(item => item.alias === vm.itemData.alias)
           this.cacheDimensions.push(data)
           this.cacheMeasures.splice(index, 1)
         } else {
-          index = this.detailInfo.pivotSchema.measures.findIndex(item => item.alias === vm.itemData.alias)
           this.detailInfo.pivotSchema.measures.splice(index, 1)
           this.detailInfo.pivotSchema.dimensions.push(data)
         }
       }
       this.handleDimensions()
       this.handleMeasures()
+    },
+    getTargetIndex(list, target) {
+      return list.findIndex(item => item.alias === target)
     },
     // 复制维度度量
     async handleCopyField(event, handler, vm) {
@@ -527,7 +528,7 @@ export default {
           ...newField,
           ...result.data
         }
-        newField.alias = this.handleAddCustomField(role === 1 ? this.cacheDimensions : this.cacheMeasures, newField, newField.alias)
+        newField.alias = this.handleAddCustomField([...this.cacheDimensions, ...this.cacheMeasures], newField, newField.alias)
         if (role === 1) {
           this.cacheDimensions.push(newField)
           this.handleDimensions()
