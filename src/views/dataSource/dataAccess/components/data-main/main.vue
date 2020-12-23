@@ -102,6 +102,7 @@ export default {
         console.log('去刷新')
         this.$refs.structure.tableType = 0
         this.$refs.structure.handleGetData()
+        this.$refs.structure.handleGetDatabase()
       }
     },
     /**
