@@ -76,6 +76,7 @@
     watch: {
       screenId: {
         handler(val) {
+          if(val)
           this.getScreenData()
         },
         deep: true,
