@@ -64,8 +64,8 @@ export default {
       },
       rules: {
         name: [
-          { required: true, message: '请输入表名称' }
-          // { min: 1, max: 20, message: '请输入1-20个字符的表名称' }
+          { required: true, message: '请输入表名称' },
+          { min: 1, max: 20, message: '请输入1-30个字符的表名称' }
         ]
       },
       unionList: []
