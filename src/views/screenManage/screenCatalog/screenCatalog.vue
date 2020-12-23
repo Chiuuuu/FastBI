@@ -489,6 +489,9 @@ export default {
       }
       return isFull
     }
+  },
+  destroyed(){
+    this.$store.dispatch('SetScreenId', '')
   }
 }
 </script>
