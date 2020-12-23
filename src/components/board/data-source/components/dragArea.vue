@@ -19,8 +19,8 @@
               </a-menu-item>
             </a-menu>
           </a-dropdown>
-          <a-tooltip :title="item.name">
-          <span ref="itemName" class="field-text">{{item.name}}</span>
+          <a-tooltip :title="item.alias">
+          <span ref="itemName" class="field-text">{{item.alias}}</span>
         </a-tooltip>
       </div>
     </div>
@@ -116,7 +116,7 @@ export default {
       if (this.type === 'dimensions' && this.dragFile === this.type) {
         // 维度暂时只能拉入一个字段
         this.fileList[0] = dataFile
-        this.fileList = this.uniqueFun(this.fileList, 'name')
+        this.fileList = this.uniqueFun(this.fileList, 'alias')
         this.getData()
       }
       // 度量
@@ -127,13 +127,13 @@ export default {
         } else {
           this.fileList.push(dataFile)
         }
-        this.fileList = this.uniqueFun(this.fileList, 'name')
+        this.fileList = this.uniqueFun(this.fileList, 'alias')
         this.getData()
       }
       // 表格
       if (this.type === 'tableList') {
         this.fileList.push(dataFile)
-        this.fileList = this.uniqueFun(this.fileList, 'name')
+        this.fileList = this.uniqueFun(this.fileList, 'alias')
         this.getData()
       }
       // 仪表盘/环形图
@@ -144,7 +144,7 @@ export default {
         } else if (this.fileList.length < 2) {
           this.fileList.push(dataFile)
         }
-        this.fileList = this.uniqueFun(this.fileList, 'name')
+        this.fileList = this.uniqueFun(this.fileList, 'alias')
         this.getData()
       }
       this.isdrag = false
@@ -248,9 +248,9 @@ export default {
             // let apiData = this.currentSelected.packageJson.api_data
             for (let item of this.fileList) {
               columns.push({
-                title: item.name,
-                dataIndex: item.name,
-                key: item.name
+                title: item.alias,
+                dataIndex: item.alias,
+                key: item.alias
               })
             }
             let rows = res.rows
@@ -267,11 +267,11 @@ export default {
             if (this.chartType === '2') {
               let columns = ['type', 'value'] // 维度固定
               for (let m of apiData.measures) {
-                columns.push(m.name) // 默认columns第二项起为指标
+                columns.push(m.alias) // 默认columns第二项起为指标
               }
               let rows = [{
-                type: apiData.measures[0].name,
-                value: res.rows[0] ? res.rows[0][apiData.measures[0].name] : 0
+                type: apiData.measures[0].alias,
+                value: res.rows[0] ? res.rows[0][apiData.measures[0].alias] : 0
               }]
               apiData.source = {
                 columns,
@@ -286,7 +286,7 @@ export default {
               }
               // 如果是仪表盘，第二个度量是目标值（进度条最大值）
               if (this.currentSelected.packageJson.chartType === 'v-gauge' && apiData.measures[1]) {
-                config.series.max = res.rows[0][apiData.measures[1].name]
+                config.series.max = res.rows[0][apiData.measures[1].alias]
                 this.$store.dispatch('SetSelfProperty', config)
               }
               this.saveScreenData()
@@ -294,12 +294,12 @@ export default {
             }
 
             let columns = []
-            let dimensionKeys = apiData.dimensions[0].name // 维度key
+            let dimensionKeys = apiData.dimensions[0].alias // 维度key
             columns[0] = dimensionKeys // 默认columns第一项为维度
             let measureKeys = [] // 度量key
             for (let m of apiData.measures) {
-              measureKeys.push(m.name)
-              columns.push(m.name) // 默认columns第二项起为指标
+              measureKeys.push(m.alias)
+              columns.push(m.alias) // 默认columns第二项起为指标
             }
             let rows = []
             let level1 = []
