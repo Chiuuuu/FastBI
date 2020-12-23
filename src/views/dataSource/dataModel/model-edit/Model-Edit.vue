@@ -33,6 +33,7 @@
         </div>
         <edit-left
           ref="editLeftRef"
+          :keywords="tableSearch"
           :list="tableSearchList"
           @on-left-drag-leave="handleLeftDragLeave"
         ></edit-left>
