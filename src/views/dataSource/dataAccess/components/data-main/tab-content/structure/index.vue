@@ -13,7 +13,7 @@
         </a-col>
         <a-col :span="13">
           <a-row type="flex" justify="end" align="middle">
-          <a-button type="primary" class="select_button" @click="handleGetData" :loading="spinning">刷新数据</a-button>
+          <a-button type="primary" class="select_button" @click="() => handleGetData()" :loading="spinning">刷新数据</a-button>
           <a-button v-if="tableType === 0" v-show="showExtractBtn" type="primary" style="margin-left:10px;" class="select_button" @click="showExtractLog">定时抽取记录</a-button>
           <a-button
             v-if="hasBtnPermission"
