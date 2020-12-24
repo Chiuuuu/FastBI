@@ -490,8 +490,14 @@ export default {
       return isFull
     }
   },
-  destroyed(){
-    this.$store.dispatch('SetScreenId', '')
+  // 跳出大屏模块清除screenId
+  beforeRouteLeave (to, from, next) {
+    if (to.name != 'screenEdit'){
+      this.$store.dispatch('SetScreenId', '')
+      next()
+    } else {
+      next()
+    }
   }
 }
 </script>
