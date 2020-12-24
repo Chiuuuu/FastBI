@@ -193,6 +193,7 @@ export default {
   },
   data() {
     return {
+      cacheValidata: true, // 临时添加一个去校验判断
       expression,
       searchExpression: '',
       activeIndex: 0,
@@ -430,14 +431,17 @@ export default {
     */
     check(str) {
       try {
+        this.cacheValidata = true
         const parse = new Parse(str, [...this.sourceDimensions, ...this.sourceMeasures])
         const ast = parse.parseAST()
         console.log('语法树', ast)
         const verify = new Verify()
         const result = verify.validate(ast)
-        if (result) this.errorMessage = ''
         console.log('结果', result)
+        // if (result) this.errorMessage = ''
+        if (this.cacheValidata) this.errorMessage = ''
       } catch (error) {
+        this.cacheValidata = false
         console.log(error.message)
         this.errorMessage = error.message
       }
