@@ -180,7 +180,13 @@ export default {
     },
     async handleExport() {
       this.confirmLoading = true
-      const result = await this.$server.dataModel.actionDownloadfile(this.detailInfo).finally(() => {
+      const params = {
+        ...this.detailInfo,
+        pivotSchema: {
+          ...this.$parent.handleConcat() // 处理维度度量
+        }
+      }
+      const result = await this.$server.dataModel.actionDownloadfile(params).finally(() => {
         this.confirmLoading = false
       })
 
