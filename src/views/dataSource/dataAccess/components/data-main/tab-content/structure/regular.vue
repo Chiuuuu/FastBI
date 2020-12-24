@@ -105,7 +105,11 @@
         <template #extractType="list, record, index">
           <a-select style="width: 150px" v-model="record.extractType" placeholder="请选择方式" @change="handleSelectExtractType($event, record)">
             <a-select-option :value="0">全量更新</a-select-option>
-            <a-select-option :value="1" :disabled="tableType === 1">增量更新</a-select-option>
+            <a-select-option
+              :value="1"
+              :disabled="tableType === 1 ||
+              (record.fieldList && record.fieldList.length === 0)"
+            >增量更新</a-select-option>
           </a-select>
         </template>
         <template #fieldList="list, record, index">
@@ -455,12 +459,11 @@ export default {
           }
           if (res.code === 200) {
             this.$message.success('保存成功')
-            if (this.single) {
-              // 更新后重刷列表, 新增后直接插入(后端暂时支持这样)
-              if (this.regularInfo.id) {
-                this.$parent.$refs.extract.updateRows(res.data)
-                // this.$emit('updateRows', res.data)
-              } else {
+            if (this.regularInfo.id) {
+              this.$parent.$refs.extract.updateRows(res.data)
+              // this.$emit('updateRows', res.data)
+            } else {
+              if (this.single) {
                 this.$parent.$refs.extract.regData.push(res.data)
               }
             }

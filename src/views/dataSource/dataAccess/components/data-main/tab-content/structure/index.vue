@@ -14,7 +14,15 @@
         <a-col :span="13">
           <a-row type="flex" justify="end" align="middle">
           <a-button type="primary" class="select_button" @click="() => handleGetData()" :loading="spinning">刷新数据</a-button>
-          <a-button v-if="tableType === 0" v-show="showExtractBtn" type="primary" style="margin-left:10px;" class="select_button" @click="showExtractLog">定时抽取记录</a-button>
+          <a-button
+            v-if="tableType === 0"
+            v-show="showExtractBtn"
+            type="primary"
+            style="margin-left:10px;"
+            class="select_button"
+            @click="showExtractLog"
+            v-permission:[$PERMISSION_CODE.OPERATOR.schedule]="$PERMISSION_CODE.OBJECT.datasource"
+          >定时抽取记录</a-button>
           <a-button
             v-if="hasBtnPermission"
             v-show="showExtractBtn"
@@ -57,7 +65,7 @@
         rowKey='id'
         :row-selection="rowSelection"
         :pagination="pagination"
-        :columns="tableColumns"
+        :columns="columns"
         :data-source="data"
         :loading="spinning"
         :scroll="{ y: 'calc(100vh - 440px)', x: 960 }"
@@ -244,13 +252,6 @@ export default {
       privileges: state => state.dataAccess.privileges,
       showExtractBtn: state => [ 'mysql', 'oracle', 'hive' ].indexOf(state.dataAccess.modelType) > -1
     }),
-    tableColumns() {
-      if (!checkActionPermission(this.$PERMISSION_CODE.OBJECT.datasource, this.$PERMISSION_CODE.OPERATOR.schedule)) {
-        return this.columns
-      } else {
-        return this.tableType === 0 ? this.columns : this.columns.slice(0, -1)
-      }
-    },
     rowSelection() {
       return {
         fixed: true,
@@ -270,8 +271,11 @@ export default {
       }
     },
     hasBtnPermission() {
-      if (!this.privileges || this.privileges.length < 1) return true
-      return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.extract)
+      if (!this.privileges || this.privileges.length < 1) {
+        return checkActionPermission(this.$PERMISSION_CODE.OBJECT.datasource, this.$PERMISSION_CODE.OPERATOR.schedule)
+      } else {
+        return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.extract)
+      }
     }
   },
   filters: {
@@ -374,11 +378,10 @@ export default {
       ]
 
       if (!hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.schedule)) {
-        columns.pop()
+        if (!checkActionPermission(this.$PERMISSION_CODE.OBJECT.datasource, this.$PERMISSION_CODE.OPERATOR.schedule)) {
+          columns.pop()
+        }
       }
-      // if (!this.privileges.includes(0) && !this.privileges.includes(this.$PERMISSION_CODE.OPERATOR.schedule)) {
-      //   columns.pop()
-      // }
       this.columns = columns
     },
     handleChangeTable(pagination) {
