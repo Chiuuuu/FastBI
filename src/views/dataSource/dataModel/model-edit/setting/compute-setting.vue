@@ -77,27 +77,15 @@
       </div>
       <div class="modal_r">
         <div class="bar">
-          <a-select
-            show-search
-            placeholder="请输入关键词搜索"
+          <a-input
+            allowClear
             style="width: 140px"
-            option-filter-prop="children"
-            :default-active-first-option="false"
-            :show-arrow="false"
-            :filter-option="filterOption"
-            :not-found-content="null"
-            @change="change"
-          >
-            <a-select-option
-              v-for="express in expression"
-              :key="express.id"
-            >
-              {{ express.name }}
-            </a-select-option>
-          </a-select>
+            placeholder="请输入关键词"
+            @change="handleSearch($event, 'expression')"
+          ></a-input>
           <ul class="list">
             <li
-              v-for="(express, index) in expression"
+              v-for="(express, index) in (searchExpression || expression)"
               class="list-item"
               :class="activeIndex === index ? 'active':''"
               :key="express.id"
@@ -206,6 +194,7 @@ export default {
   data() {
     return {
       expression,
+      searchExpression: '',
       activeIndex: 0,
       textareaValue: '',
       errorMessage: '',
@@ -234,7 +223,7 @@ export default {
     }
   },
   mounted () {
-    this.debounceFn = debounce(this.check, 1500)
+    this.debounceFn = debounce(this.check, 500)
   },
   computed: {
     explain() {
@@ -325,20 +314,20 @@ export default {
      */
     handleSearch: debounce(function(event, type) {
       const value = event.target.value
-      const list = type === 'dimensions' ? this.dimensions : this.measures
-      const result = value ? this.filterSearch(list, value) : ''
       if (type === 'dimensions') {
-        this.searchDimensions = result
-      } else {
-        this.searchMeasures = result
+        this.searchDimensions = value ? this.filterSearch(this.dimensions, value, 'alias') : ''
+      } else if (type === 'measures') {
+        this.searchMeasures = value ? this.filterSearch(this.measures, value, 'alias') : ''
+      } else if (type === 'expression') {
+        this.searchExpression = value ? this.filterSearch(this.expression, value, 'name') : ''
       }
     }, 500),
     /**
      * 过滤返回关键词搜索
      */
-    filterSearch(list, value) {
+    filterSearch(list, value, key) {
       if (list && list.length) {
-        return list.filter(item => item.alias.toLowerCase().indexOf(value.toLowerCase()) >= 0)
+        return list.filter(item => item[key].toLowerCase().indexOf(value.toLowerCase()) >= 0)
       }
       return list
     },
@@ -349,7 +338,7 @@ export default {
     reverse(str) {
       const pairList = [...this.sourceDimensions, ...this.sourceMeasures]
       const map = new Map()
-      const matchArry = str.match(/(\[)(.*?)(\])/g)
+      const matchArry = str.match(/(\[)(.+)(\])/g)
       if (matchArry) {
         matchArry.forEach(value => {
           const matchStr = value.match(/(\[)(.+)(\])/)
@@ -373,6 +362,8 @@ export default {
         if (ok) {
           if (!this.textareaValue) {
             this.errorMessage = '表达式不能为空'
+            return false
+          } else if (this.errorMessage) {
             return false
           } else {
             this.errorMessage = ''
