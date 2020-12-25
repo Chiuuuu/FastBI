@@ -463,13 +463,13 @@ export default {
       let result
       if (this.tableType === 0) {
         const rows = this.selectedRows.map(item => {
-          let databaseName = this.formInfo ? this.formInfo.databaseName : ''
-          // sql, oracle的数据库名称在formInfo里, excel的在dabaseName里
-          if (['excel', 'csv'].indexOf(this.modelType) > -1) {
-            databaseName = this.databaseName
-          }
+          // let databaseName = this.formInfo ? this.formInfo.databaseName : ''
+          // // sql, oracle的数据库名称在formInfo里, excel的在dabaseName里
+          // if (['excel', 'csv'].indexOf(this.modelType) > -1) {
+          //   databaseName = this.databaseName
+          // }
           const _item = {
-            databaseName,
+            databaseName: this.database,
             sourceId: this.modelId,
             sourceName: this.modelName,
             tableId: item.id,

@@ -353,6 +353,7 @@ export default {
             this.$store.dispatch('dataAccess/setFirstFinished', true)
             this.$store.dispatch('dataAccess/setModelInfo', formInfo)
             this.$store.dispatch('dataAccess/setModelName', this.form.name)
+            this.$store.dispatch('dataAccess/setDatabaseName', this.form.databaseName)
             this.$store.dispatch('dataAccess/setModelId', result.data.id)
             this.$store.commit('dataAccess/SET_PRIVILEGES', result.data.privileges)
             // this.$store.dispatch('dataAccess/setParentId', 0)
