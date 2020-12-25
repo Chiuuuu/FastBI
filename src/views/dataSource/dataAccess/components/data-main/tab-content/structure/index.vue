@@ -15,16 +15,15 @@
           <a-row type="flex" justify="end" align="middle">
           <a-button type="primary" class="select_button" @click="() => handleGetData()" :loading="spinning">刷新数据</a-button>
           <a-button
-            v-if="tableType === 0"
+            v-if="tableType === 0 && hasBtnPermissionSchedule"
             v-show="showExtractBtn"
             type="primary"
             style="margin-left:10px;"
             class="select_button"
             @click="showExtractLog"
-            v-permission:[$PERMISSION_CODE.OPERATOR.schedule]="$PERMISSION_CODE.OBJECT.datasource"
           >定时抽取记录</a-button>
           <a-button
-            v-if="hasBtnPermission"
+            v-if="hasBtnPermissionExtract"
             v-show="showExtractBtn"
             type="primary"
             class="select_button"
@@ -32,22 +31,20 @@
             @click="handleExtract"
             :loading="extractSping">立即抽取</a-button>
           <a-button
-            v-if="tableType === 0"
+            v-if="tableType === 0 && hasBtnPermissionSchedule"
             v-show="showExtractBtn"
             type="primary"
             style="margin-left:10px;"
             @click="showSetting('batch')"
             class="select_button"
-            v-permission:[$PERMISSION_CODE.OPERATOR.schedule]="$PERMISSION_CODE.OBJECT.datasource"
           >批量抽取</a-button>
           <a-button
-            v-if="tableType === 0"
+            v-if="tableType === 0 && hasBtnPermissionSchedule"
             v-show="showExtractBtn"
             type="primary"
             style="margin-left:10px;"
             @click="showSetting('batchList')"
             class="select_button"
-            v-permission:[$PERMISSION_CODE.OPERATOR.schedule]="$PERMISSION_CODE.OBJECT.datasource"
           >批量任务列表</a-button>
           </a-row>
         </a-col>
@@ -92,9 +89,8 @@
         </span>
         <span slot="regular" slot-scope="row">
           <a
-            v-if="showExtractBtn"
+            v-if="hasBtnPermissionSchedule"
             v-on:click="showSetting('single', row)"
-            v-permission:[$PERMISSION_CODE.OPERATOR.schedule]="$PERMISSION_CODE.OBJECT.datasource"
             >定时设置</a>
           <span v-else>-</span>
         </span>
@@ -250,7 +246,7 @@ export default {
       modelName: state => state.dataAccess.modelName,
       modelType: state => state.dataAccess.modelType,
       privileges: state => state.dataAccess.privileges,
-      showExtractBtn: state => [ 'mysql', 'oracle', 'hive' ].indexOf(state.dataAccess.modelType) > -1
+      showExtractBtn: state => [ 'mysql', 'oracle' ].indexOf(state.dataAccess.modelType) > -1
     }),
     rowSelection() {
       return {
@@ -270,12 +266,22 @@ export default {
         }
       }
     },
-    hasBtnPermission() {
-      if (!this.privileges || this.privileges.length < 1) {
-        return checkActionPermission(this.$PERMISSION_CODE.OBJECT.datasource, this.$PERMISSION_CODE.OPERATOR.schedule)
-      } else {
-        return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.extract)
-      }
+    hasBtnPermissionExtract() {
+      // if (!this.privileges || this.privileges.length < 1) {
+      //   return checkActionPermission(this.$PERMISSION_CODE.OBJECT.datasource, this.$PERMISSION_CODE.OPERATOR.extract)
+      // } else {
+      //   return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.extract)
+      // }
+      return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.extract)
+    },
+    hasBtnPermissionSchedule() {
+      // if (!hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.schedule)) {
+        // if (!checkActionPermission(this.$PERMISSION_CODE.OBJECT.datasource, this.$PERMISSION_CODE.OPERATOR.schedule)) {
+          // return false
+        // }
+      // }
+      // return true
+      return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.schedule)
     }
   },
   filters: {
@@ -377,10 +383,8 @@ export default {
         }
       ]
 
-      if (!hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.schedule)) {
-        if (!checkActionPermission(this.$PERMISSION_CODE.OBJECT.datasource, this.$PERMISSION_CODE.OPERATOR.schedule)) {
-          columns.pop()
-        }
+      if (!this.hasBtnPermissionSchedule) {
+        columns.pop()
       }
       this.columns = columns
     },

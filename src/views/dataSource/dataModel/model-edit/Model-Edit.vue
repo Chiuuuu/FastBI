@@ -1,17 +1,26 @@
 <template>
   <div class="Model-Edit">
     <div class="left">
-      <!-- <div class="menu_title">
+      <div class="menu_title">
         <span>数据接入</span>
       </div>
-      <div class="selector">
-        <a-select default-value="银行账户" style="width: 94%;">
+      <!-- 临时方案, 不写class了 -->
+      <div
+        :title="datasourceName"
+        style="width: calc(100% - 30px);
+        color: #01040f;
+        margin: 0 15px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;">{{ datasourceName }}</div>
+      <!-- <div class="selector"> -->
+        <!-- <a-select default-value="银行账户" style="width: 94%;">
           <a-select-option value="SQL Server">
             SQL Server
           </a-select-option>
-        </a-select>
-      </div>
-      <a-divider /> -->
+        </a-select> -->
+      <!-- </div> -->
+      <a-divider />
       <div class="menu_search">
         <span class="search_span">数据库</span>
       </div>
@@ -243,6 +252,7 @@ export default {
       modelForm: this.$form.createForm(this, { name: 'modelForm' }),
       spinning: false,
       detailInfo: '',
+      datasourceName: '',
       isDatabase: false, // 是否是SQL数据源, 控制自定义SQL渲染
       tableSearch: '', // 表搜索关键字
       searchList: [],
@@ -393,6 +403,7 @@ export default {
         const baseBalck = [4, 5] // 黑名单
         const type = result.data.type
         this.isDatabase = !baseBalck.some(item => item === type)
+        this.datasourceName = result.data.name
       } else {
         this.$message.error(result.msg)
       }

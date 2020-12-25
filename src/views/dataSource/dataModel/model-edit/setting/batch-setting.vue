@@ -18,7 +18,7 @@
         @click="handleShowSetting($event, 'visible')">设置是否可见</a-button>
     </div>
     <div v-if="Object.keys(cacheTables).length > 0"
-         class="drawer-menu">
+         class="drawer-menu draw-menu-batch scrollbar">
       <a-collapse style="width: 100%">
         <a-collapse-panel
           v-for="(value, name) in cacheTables"
@@ -28,6 +28,8 @@
             :row-selection="rowSelection"
             :columns="column"
             :data-source="value"
+            :scroll="{ y: 320 }"
+            :pagination="false"
             rowKey="id"
             bordered>
             <template #alias="text, record">

@@ -290,8 +290,9 @@ export default {
             this.$store.dispatch('dataAccess/setFirstFinished', true)
             this.$store.dispatch('dataAccess/setModelInfo', this.form)
             this.$store.dispatch('dataAccess/setModelName', this.form.name)
-            this.$store.dispatch('dataAccess/setModelId', result.data)
-            this.$store.dispatch('dataAccess/setParentId', 0)
+            this.$store.dispatch('dataAccess/setModelId', result.data.id)
+            this.$store.commit('dataAccess/SET_PRIVILEGES', result.data.privileges)
+            // this.$store.dispatch('dataAccess/setParentId', 0)
           } else {
             this.$message.error(result.msg)
           }

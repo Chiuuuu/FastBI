@@ -573,8 +573,9 @@ export default {
                 this.$store.dispatch('dataAccess/getMenuList')
                 this.$store.dispatch('dataAccess/setFirstFinished', true)
                 this.$store.dispatch('dataAccess/setModelName', this.form.name)
-                this.$store.dispatch('dataAccess/setParentId', 0)
-                this.$store.dispatch('dataAccess/setModelId', result.data.sourceId)
+                // this.$store.dispatch('dataAccess/setParentId', 0)
+                this.$store.dispatch('dataAccess/setModelId', result.data.datasource.id)
+                this.$store.commit('dataAccess/SET_PRIVILEGES', result.data.datasource.privileges)
                 this.fileInfoList = result.data.sourceDatabases
                 // 保存后清空列表
                 this.fileList = []
