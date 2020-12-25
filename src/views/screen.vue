@@ -126,6 +126,31 @@
           range = 0.4
         }
         this.range = range
+      },
+      // 刷新大屏
+      refreshData() {
+        if (!this.screenId) {
+          this.$message.error('暂无数据可刷新，请先添加数据')
+          return
+        }
+        let params = {
+          id: this.screenId
+        }
+        this.$server.screenManage.actionRefreshScreen({ params }).then(res => {
+          if (res.code === 200) {
+            let screenDataList = res.data.screenDataList
+            for (let item of screenDataList) {
+              for (let item2 of this.canvasMap) {
+                if (item2.id === item.id) {
+                  item2.packageJson.api_data.source.rows = item.value
+                }
+              }
+            }
+            this.$message.success('刷新成功')
+          } else {
+            res.msg && this.$message.error(res.msg)
+          }
+        })
       }
     }
   }
