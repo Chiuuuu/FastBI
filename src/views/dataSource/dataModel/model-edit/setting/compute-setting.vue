@@ -339,7 +339,7 @@ export default {
     reverse(str) {
       const pairList = [...this.sourceDimensions, ...this.sourceMeasures]
       const map = new Map()
-      const matchArry = str.match(/(\[)(.+)(\])/g)
+      const matchArry = str.match(/(\[)(.*?)(\])/g)
       if (matchArry) {
         matchArry.forEach(value => {
           const matchStr = value.match(/(\[)(.+)(\])/)
