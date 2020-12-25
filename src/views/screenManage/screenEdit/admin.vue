@@ -78,7 +78,7 @@
       </template>
     </board>
 
-    <screen v-if="isScreen" :canvasMap="canvasMap"></screen>
+    <screen v-if="isScreen"></screen>
     <b-modal v-model="deleteDialog" :styles="{top: '300px',width:'350px'}"
             class-name="delete-dialog" @on-ok="deleteOne">
       <div class="delete-dialog-inner">
@@ -216,6 +216,7 @@
       hideContextMenu () {
         this.$store.dispatch('ToggleContextMenu')
       },
+      // del键删除选择的控件
       handleKeyup (event) {
         let e = event || window.event
         let k = e.keyCode || e.which

@@ -115,6 +115,7 @@ export default {
       // 打开全屏
       openScreen () {
         this.$store.dispatch('SetIsScreen', true)
+        // 位置在screen.vue,对应画板元素
         this.$nextTick(() => {
           var docElm = document.querySelector('.dv-screen')
           if (docElm) {
@@ -152,6 +153,8 @@ export default {
             this.refresh = true // 刷新按钮
             this.saveScreenData()
             this.$message.success('刷新成功')
+          } else {
+            res.msg && this.$message.error(res.msg)
           }
         })
       }

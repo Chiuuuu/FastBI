@@ -71,7 +71,7 @@
         <a-button class="btn_n1" @click="openScreen">
           全屏
         </a-button>
-        <a-button class="btn_n2">
+        <a-button class="btn_n2" @click="$refs.screen.refreshData()">
           刷新数据
         </a-button>
         <a-button
@@ -83,7 +83,7 @@
         </a-button>
       </div>
       <div class="contain" ref="contain">
-        <screen v-if="fileSelectId" :key="componentKey"></screen>
+        <screen v-if="fileSelectId" ref="screen" :key="componentKey"></screen>
         <div class="empty" v-else>
           <img src="@/assets/images/icon_empty_state.png" class="empty_img" />
           <p class="empty_word"> 暂无内容 ， 请先添加大屏目录数据或者选择一个大屏目录 ~</p>
@@ -178,7 +178,7 @@ export default {
         }
       ],
       searchName: '', // 搜索名称
-      componentKey: 0
+      componentKey: 0 // 通过改变key实现子组件强制更新,数值在0,1之间变化
     }
   },
   watch: {
@@ -239,6 +239,7 @@ export default {
         if (res.code === 200) {
           let rows = res.data
           this.folderList = rows
+          // 没有选择文件的时候默认选择第一个文件 
           if (!this.fileSelectId && this.folderList.length > 0) {
             if (this.folderList[0].children.length > 0) {
               this.fileSelectId = this.folderList[0].children[0].id
@@ -248,7 +249,7 @@ export default {
         }
       })
     },
-    // 搜索
+    // 搜索文件
     menuSearch: debounce(function(event) {
       const value = event.target.value
       if (value !== '') {
@@ -267,7 +268,7 @@ export default {
       console.log('搜索结果', this.folderList)
     },
     /**
-     * 是否为文件夹
+     * 是否为文件夹 fileType|1:文件;0:文件夹
      */
     handleIsFolder(item) {
       return item.fileType === 0
