@@ -554,7 +554,8 @@ export default {
           ...newField,
           ...result.data
         }
-        newField.alias = this.handleAddCustomField([...this.cacheDimensions, ...this.cacheMeasures], newField, newField.alias)
+        const arry = [...this.detailInfo.pivotSchema.dimensions, ...this.detailInfo.pivotSchema.measures, ...this.cacheDimensions, ...this.cacheMeasures]
+        newField.alias = this.handleAddCustomField(arry, newField, newField.alias)
         if (isDimension) {
           this.cacheDimensions.push(newField)
           this.handleDimensions()
@@ -570,9 +571,7 @@ export default {
     },
     /** 复制字段时候添加 */
     handleAddCustomField(list, field, source, hasNumber = 1) {
-      const hasArry = list.filter(item => item.tableNo === 0)
-      if (hasArry && hasArry.length) {
-        list = hasArry
+      if (list && list.length) {
         let len = list.length
         let hasFind = true
         while (len >= 0 && hasFind) {
