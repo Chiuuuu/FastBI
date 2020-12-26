@@ -435,7 +435,8 @@ export default {
         const parse = new Parse(str, [...this.sourceDimensions, ...this.sourceMeasures])
         const ast = parse.parseAST()
         console.log('语法树', ast)
-        const verify = new Verify()
+        const type = this.computeType === '维度' ? 'dimessions' : 'measures'
+        const verify = new Verify(type)
         const result = verify.validate(ast)
         console.log('结果', result)
         // if (result) this.errorMessage = ''

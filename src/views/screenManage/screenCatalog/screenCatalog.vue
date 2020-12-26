@@ -493,7 +493,7 @@ export default {
   },
   // 跳出大屏模块清除screenId
   beforeRouteLeave (to, from, next) {
-    if (to.name != 'screenEdit'){
+    if (to.name !== 'screenEdit') {
       this.$store.dispatch('SetScreenId', '')
       next()
     } else {

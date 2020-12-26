@@ -76,8 +76,9 @@
     watch: {
       screenId: {
         handler(val) {
-          if(val)
-          this.getScreenData()
+          if (val) {
+            this.getScreenData()
+          }
         },
         deep: true,
         immediate: true
@@ -104,8 +105,8 @@
             // 页面canvasMaps
             this.$store.dispatch('InitCanvasMaps', json.components)
           }
-          if(res.code === 500) {
-            //初始化看板
+          if (res.code === 500) {
+            // 初始化看板
             this.$store.dispatch('SetPageSettings', { width: 1920, height: 1080, backgroundColor: '#0d2a42', gridStep: 1, backgroundSrc: '', backgroundType: '1', opacity: 1 })
             this.$store.dispatch('InitCanvasMaps', [])
           }
