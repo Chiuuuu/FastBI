@@ -12,7 +12,6 @@ export class Verify {
       // case "dateLit":
       case 'string':
       case 'float':
-      case 'dateLit':
       case 'integer':
       case 'boolean':
       case 'fname':
