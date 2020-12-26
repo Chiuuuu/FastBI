@@ -243,12 +243,10 @@ export class Parse {
     }
 
     if (parse.type === 'alias') {
-      parse.value = parse.name
-      const alias = this.parseAlias(parse)
+      parse.specialAlias = true
       return {
-        ...alias,
-        type: 'neg',
-        value: -alias.value
+        ...parse,
+        type: 'neg'
       }
     }
 
@@ -360,7 +358,7 @@ export class Parse {
     if (item) {
       return {
         type: 'alias',
-        value: '$$' + item.id,
+        value: item,
         name: matchStr
       }
     }
