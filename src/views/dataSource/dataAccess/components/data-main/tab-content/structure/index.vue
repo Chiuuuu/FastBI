@@ -383,7 +383,7 @@ export default {
         }
       ]
 
-      if (!this.hasBtnPermissionSchedule) {
+      if (!this.hasBtnPermissionSchedule || ['excel', 'csv'].indexOf(this.modelType) > -1) {
         columns.pop()
       }
       this.columns = columns
