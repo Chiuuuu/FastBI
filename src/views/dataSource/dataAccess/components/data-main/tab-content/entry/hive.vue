@@ -47,14 +47,14 @@
       }]">
       <a-input v-model.number="form.namescape" />
     </a-form-model-item>
-    <a-form-model-item label="认证方式" prop="authMethod">
+    <!-- <a-form-model-item label="认证方式" prop="authMethod">
       <a-select v-model="form.authMethod" @change="handleChangeMethod">
         <a-select-option :value="0">无</a-select-option>
-        <!-- <a-select-option :value="1">kerberos</a-select-option> -->
+        <a-select-option :value="1">kerberos</a-select-option>
         <a-select-option :value="2">用户名</a-select-option>
         <a-select-option :value="3">用户名密码</a-select-option>
       </a-select>
-    </a-form-model-item>
+    </a-form-model-item> -->
     <template v-if="form.authMethod === 1">
       <a-form-model-item label="服务器principal" prop="server" :rules="[
       {
@@ -174,7 +174,7 @@ export default {
         password: '', // 密码
         databaseName: '', // 数据库名称
         linkMode: 1, // 连接模式
-        authMethod: 0 // 认证方式
+        authMethod: 3 // 认证方式
       },
       rules: {
         name: [
