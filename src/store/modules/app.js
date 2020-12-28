@@ -2,9 +2,11 @@ import router from '../../router'
 import screenManage from '../../api/modules/screenManage'
 import { message } from 'ant-design-vue'
 
+let orginPageSettings = { width: 1920, height: 1080, backgroundColor: '#0d2a42', gridStep: 1, backgroundSrc: '', backgroundType: '1', opacity: 1, refresh: { frequency: '', isRefresh: false }}
 const app = {
     state: {
-        pageSettings: { width: 1920, height: 1080, backgroundColor: '#0d2a42', gridStep: 1, backgroundSrc: '', backgroundType: '1', opacity: 1 },
+        orginPageSettings,
+        pageSettings: orginPageSettings,
         // 状态数据
         canvasRange: 0, // 画布缩放
         optionsExpand: true, // 参数面板打开关闭
@@ -84,7 +86,7 @@ const app = {
           }
           let params = {}
           if (!state.screenId) {
-            commit('SET_PAGE_SETTING', { width: 1920, height: 1080, backgroundColor: '#0d2a42', gridStep: 1, backgroundSrc: '', backgroundType: '1', opacity: 1, refresh: { frequency: '', isRefresh: false } })
+            commit('SET_PAGE_SETTING', this.orginPageSettings)
             params = {
               id: -1,
               name: obj && obj.name ? obj.name : router.history.current.query.name,

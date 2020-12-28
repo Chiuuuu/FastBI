@@ -61,7 +61,7 @@
       }
     },
     computed: {
-      ...mapGetters(['canvasMap', 'pageSettings', 'screenId']),
+      ...mapGetters(['canvasMap', 'pageSettings', 'screenId', 'orginPageSettings']),
       // 画布面板的样式
       canvasPanelStyle () {
         return {
@@ -97,6 +97,9 @@
     methods: {
       // 获取大屏数据
       getScreenData() {
+        // 获取页面配置之前先重置
+        this.$store.dispatch('SetPageSettings', this.orginPageSettings)
+        this.$store.dispatch('InitCanvasMaps', [])
         this.$server.screenManage.getScreenDetailById(this.screenId).then(res => {
           if (res.code === 200) {
             let json = res.data ? res.data.setting : {}
@@ -104,11 +107,6 @@
             this.$store.dispatch('SetPageSettings', json.setting)
             // 页面canvasMaps
             this.$store.dispatch('InitCanvasMaps', json.components)
-          }
-          if (res.code === 500) {
-            // 初始化看板
-            this.$store.dispatch('SetPageSettings', { width: 1920, height: 1080, backgroundColor: '#0d2a42', gridStep: 1, backgroundSrc: '', backgroundType: '1', opacity: 1 })
-            this.$store.dispatch('InitCanvasMaps', [])
           }
         })
       },
