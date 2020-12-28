@@ -83,6 +83,7 @@ export default {
   methods: {
       ...mapActions(['saveScreenData']),
       goBack() {
+        this.saveScreenData()
         this.$router.go(-1)
       },
       onfocus() {

@@ -1,96 +1,67 @@
+/**
+ * @description 是否整数
+ * @param {Object} item
+ * @returns
+ */
+function isInteger(item) {
+  return item.dataType === 'BIGINT'
+}
+
+/**
+ * @description 是否小数
+ * @param {Object} item
+ * @returns
+ */
+function isFloat(item) {
+  return item.dataType === 'DOUBLE'
+}
 export class Methods {
-  constructor() {
-    this.name = null
+  constructor(dmType) {
+    this.dmType = dmType || 'measures'
   }
-  getMethod(name) {
-    this.name = name
-    return this[name]
+  common(arg, methodName) {
+    if (this.methods.dmType === 'dimessions') {
+      throw new Error(`该字段不能用于维度`)
+    }
+    const { type, value } = arg
+
+    if (!['integer', 'float', 'alias', 'neg'].includes(type)) {
+      throw new Error(`方法${methodName}参数：只能用数字类型, ${value}是${type}`)
+    }
+
+    if (['integer', 'float', 'neg'].includes(type) && value === true) {
+      return arg
+    }
+
+    if (type === 'alias') {
+      if (isInteger(value)) {
+        return {
+          type: 'integer',
+          value: true
+        }
+      } else if (isFloat(value)) {
+        return {
+          type: 'float',
+          value: true
+        }
+      } else {
+        throw new Error(`方法${methodName}参数：只能用数字类型`)
+      }
+    }
+
+    return {
+      type,
+      value: true
+    }
   }
   MIN(arg) {
-    if (typeof arg === 'number') {
-      return arg
-    }
-
-    const { type, value } = arg
-
-    if (!['integer', 'float', 'alias', 'neg'].includes(type)) {
-      throw new Error(`方法MIN参数：只能用数字类型, ${value}是${type}`)
-    }
-
-    if (type === 'alias') {
-      const listMap = {
-        助攻数: [1, 2, 3, 4, 5],
-        进球数: [11, 2, 3, 4, 10]
-      }
-      let list = []
-      list = list.concat(listMap[arg.name])
-      return Math.min(...list)
-    }
-
-    return value
+    return this.methods.common.call(this, arg, 'MIN')
   }
   MAX(arg) {
-    // 优先判断
-    if (typeof arg === 'number') {
-      return arg
-    }
-
-    const { type, value } = arg
-
-    if (!['integer', 'float', 'alias', 'neg'].includes(type)) {
-      throw new Error(`方法MAX参数：只能用数字类型, ${value}是${type}`)
-    }
-
-    if (type === 'alias') {
-      const listMap = {
-        助攻数: [1, 2, 3, 4, 5],
-        进球数: [11, 2, 3, 4, 10]
-      }
-      let list = []
-      list = list.concat(listMap[arg.name])
-      return Math.max(...list)
-    }
-
-    return value
-  }
-  // 最小值比较
-  MINIMUM(...args) {
-    const list = args.map(arg => {
-      if (typeof arg === 'number') {
-        return arg
-      }
-      const { type, value } = arg
-      if (!['integer', 'float', 'alias', 'neg'].includes(type)) {
-        throw new Error(`方法MINIMUM参数：只能用数字类型, ${value}是${type}`)
-      }
-      return value
-    })
-    return Math.min(...list)
+    return this.methods.common.call(this, arg, 'MAX')
   }
   // 求和聚合
   SUM(arg) {
-    if (typeof arg === 'number') {
-      return arg
-    }
-
-    const { type, value } = arg
-
-    if (!['integer', 'float', 'alias', 'neg'].includes(type)) {
-      throw new Error(`方法SUM参数：只能用数字类型, ${value}是${type}`)
-    }
-
-    if (type === 'alias') {
-      const listMap = {
-        助攻数: [1, 2, 3, 4, 5],
-        进球数: [11, 2, 3, 4, 10]
-      }
-      let list = []
-      list = list.concat(listMap[arg.name])
-      return list.reduce((pre, current) => {
-        return pre + current
-      }, 0)
-    }
-
-    return value
+    return this.methods.common.call(this, arg, 'SUM')
   }
 }

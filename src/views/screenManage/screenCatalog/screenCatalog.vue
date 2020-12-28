@@ -181,18 +181,6 @@ export default {
       componentKey: 0 // 通过改变key实现子组件强制更新,数值在0,1之间变化
     }
   },
-  watch: {
-    screenId: {
-      handler(val) {},
-      deep: true,
-      immediate: true
-    },
-    fileName: {
-      handler(val) {},
-      deep: true,
-      immediate: true
-    }
-  },
   computed: {
     ...mapGetters(['pageSettings', 'canvasRange', 'screenId', 'fileName', 'isScreen', 'parentId']),
     fileSelectId: {
@@ -243,7 +231,7 @@ export default {
           if (!this.fileSelectId && this.folderList.length > 0) {
             if (this.folderList[0].children.length > 0) {
               this.fileSelectId = this.folderList[0].children[0].id
-              this.$store.dispatch('SetFileName', this.folderList[0].children[0].name)
+              this.fileSelectName = this.folderList[0].children[0].name
             }
           }
         }
@@ -299,8 +287,8 @@ export default {
         if (res.code === 200) {
           this.$message.success('删除成功')
           this.getList()
-          this.$store.dispatch('SetScreenId', '')
-          this.$store.dispatch('SetFileName', '')
+          this.fileSelectId = ''
+          this.fileSelectName = ''
           this.$store.dispatch('SetParentId', '')
         }
       })
@@ -345,8 +333,7 @@ export default {
     handleFileSelect(file) {
       if (this.fileSelectId === file.id) return
       this.fileSelectId = file.id
-      this.$store.dispatch('SetScreenId', file.id)
-      this.$store.dispatch('SetFileName', file.name)
+      this.fileSelectName = file.name
       this.$store.dispatch('SetParentId', file.parentId)
     },
     // 点击新建大屏
@@ -360,10 +347,11 @@ export default {
         if (err) {
           return
         }
-        this.$store.dispatch('SetScreenId', '')
+        this.fileSelectId = ''
+
         if (this.isAdd === 1) { // 新增
           this.saveScreenData({ ...values, isAdd: 1 })
-          this.$store.dispatch('SetFileName', values.name)
+          this.fileSelectName = values.name
           // this.$router.push({
           //   name: 'screenEdit',
           //   query: {
@@ -429,8 +417,8 @@ export default {
               this.$message.success(res.msg)
               this.getList()
               // 新建文件夹后 返回空页面 不显示大屏
-              this.$store.dispatch('SetScreenId', '')
-              this.$store.dispatch('SetFileName', '')
+              this.fileSelectId = ''
+              this.fileSelectName = ''
             } else {
               this.$message.error(res.msg)
             }
@@ -493,8 +481,8 @@ export default {
   },
   // 跳出大屏模块清除screenId
   beforeRouteLeave (to, from, next) {
-    if (to.name != 'screenEdit'){
-      this.$store.dispatch('SetScreenId', '')
+    if (to.name !== 'screenEdit') {
+      this.fileSelectId = ''
       next()
     } else {
       next()

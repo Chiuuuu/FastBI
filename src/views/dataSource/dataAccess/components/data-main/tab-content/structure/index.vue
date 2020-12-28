@@ -246,7 +246,7 @@ export default {
       modelName: state => state.dataAccess.modelName,
       modelType: state => state.dataAccess.modelType,
       privileges: state => state.dataAccess.privileges,
-      showExtractBtn: state => [ 'mysql', 'oracle' ].indexOf(state.dataAccess.modelType) > -1
+      showExtractBtn: state => [ 'mysql', 'oracle', 'hive' ].indexOf(state.dataAccess.modelType) > -1
     }),
     rowSelection() {
       return {
@@ -383,7 +383,7 @@ export default {
         }
       ]
 
-      if (!this.hasBtnPermissionSchedule) {
+      if (!this.hasBtnPermissionSchedule || ['excel', 'csv'].indexOf(this.modelType) > -1) {
         columns.pop()
       }
       this.columns = columns
