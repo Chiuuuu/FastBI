@@ -114,12 +114,14 @@ export default {
       if (activeKey === '2') {
         console.log('数据结构请求')
         this.$nextTick(() => {
+          this.$refs.structure.tableKeyword = ''
           this.$refs.structure.handleGetData()
           this.$refs.structure.handleGetDatabase()
         })
       } else if (activeKey === '3') {
         console.log('操作记录请求')
         this.$nextTick(() => {
+          this.$refs.record.form.keyword = ''
           this.$refs.record.handleGetData()
         })
       }
