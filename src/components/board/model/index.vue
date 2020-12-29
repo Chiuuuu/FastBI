@@ -247,7 +247,7 @@ export default {
   mounted() {
     // 初始化模型列表和选中的模型（退出全屏后组件重置而且不再执行watch的操作，需要重新赋值）
     this.disableItem = this.selectedModelList
-    this.modelId = this.selectedModelList.length > 0? this.selectedModelList[0].modelid : ''
+    this.modelId = this.selectedModelList.length > 0 ? this.selectedModelList[0].modelid : ''
     this.getModelList()
   },
   methods: {

@@ -83,6 +83,10 @@ export default {
   methods: {
       ...mapActions(['saveScreenData']),
       goBack() {
+        // 选了背景图片又没有上传图片的，默认选回背景颜色
+        if (!this.pageSettings.backgroundSrc && this.pageSettings.backgroundType === '2') {
+          this.$store.dispatch('SetPageSettings', Object.assign({}, this.pageSettings, { backgroundType: '1' }))
+        }
         this.saveScreenData()
         this.$router.go(-1)
       },
