@@ -227,7 +227,7 @@ export default {
         if (res.code === 200) {
           let rows = res.data
           this.folderList = rows
-          // 没有选择文件的时候默认选择第一个文件 
+          // 没有选择文件的时候默认选择第一个文件
           if (!this.fileSelectId && this.folderList.length > 0) {
             if (this.folderList[0].children.length > 0) {
               this.fileSelectId = this.folderList[0].children[0].id

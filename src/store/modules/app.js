@@ -2,7 +2,7 @@ import router from '../../router'
 import screenManage from '../../api/modules/screenManage'
 import { message } from 'ant-design-vue'
 
-let orginPageSettings = { width: 1920, height: 1080, backgroundColor: '#0d2a42', gridStep: 1, backgroundSrc: '', backgroundType: '1', opacity: 1, refresh: { frequency: '', isRefresh: false }}
+let orginPageSettings = { width: 1920, height: 1080, backgroundColor: '#0d2a42', gridStep: 1, backgroundSrc: '', backgroundType: '1', opacity: 1, refresh: { frequency: '', isRefresh: false } }
 const app = {
     state: {
         orginPageSettings,
@@ -124,7 +124,7 @@ const app = {
             //   obj.callback()
             // }
           }).catch((err) => { // 需要捕获错误 否则无法传递给commit
-            res.msg && message.error(err)
+            err && message.error(err)
             commit('SET_SCREEN_ID', '')
           })
         }
