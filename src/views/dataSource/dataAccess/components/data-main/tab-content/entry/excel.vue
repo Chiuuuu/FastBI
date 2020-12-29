@@ -196,6 +196,11 @@ export default {
       return this.currentDataBase.tableList || []
     }
   },
+  watch: {
+    modelName(newValue, oldValue) {
+      this.form.name = newValue
+    }
+  },
   mounted() {
     this.$EventBus.$on('setFormData', this.handleSetFormData)
     this.$EventBus.$on('resetForm', this.handleResetForm)

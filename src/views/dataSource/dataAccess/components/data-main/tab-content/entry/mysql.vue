@@ -154,6 +154,11 @@ export default {
       tabChangeAble: state => state.dataAccess.firstFinished // 是否完成第一部分
     })
   },
+  watch: {
+    modelName(newValue, oldValue) {
+      this.form.name = newValue
+    }
+  },
   created() {
     this.$EventBus.$on('setFormData', this.handleSetFormData)
     this.$EventBus.$on('resetForm', this.handleResetForm)

@@ -309,6 +309,9 @@ export default {
 
       if (result.code === 200) {
         this.handleGetMenuList()
+        if (this.resetName.item.id === this.fileSelectId) {
+          this.$store.commit('dataModel/SET_MODELNAME', form.name)
+        }
         this.$message.success('修改成功')
       } else {
         this.$message.error(result.msg)
@@ -330,6 +333,7 @@ export default {
           if (result.code === 200) {
             this.handleGetMenuList()
             this.$store.dispatch('dataModel/setModelId', -1)
+            this.$store.commit('dataModel/SET_MODELNAME', '')
             this.$message.success('删除成功')
           } else {
             this.$message.error(result.msg)
@@ -379,7 +383,10 @@ export default {
             this.$message.success('删除成功')
             this.handleGetMenuList()
             const isSame = file.id === this.fileSelectId
-            if (isSame) this.$store.dispatch('dataModel/setModelId', -1)
+            if (isSame) {
+              this.$store.dispatch('dataModel/setModelId', -1)
+              this.$store.commit('dataModel/SET_MODELNAME', '')
+            }
           } else {
             this.$message.error(result.msg)
           }

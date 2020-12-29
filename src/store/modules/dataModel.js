@@ -2,6 +2,7 @@ import dataAccessApi from '../../api/modules/common'
 const state = {
   parentId: '',
   modelId: -1, // 选中的菜单id
+  modelName: '', // 模型名称
   addModelId: -1, // 新建的模型id
   menuList: [],
   databaseId: '', // 数据库id
@@ -16,6 +17,9 @@ const mutations = {
   },
   SET_MODELID(state, id) {
     state.modelId = id
+  },
+  SET_MODELNAME(state, name) {
+    state.modelName = name
   },
   SET_ADD_MODELID(state, id) {
     state.addModelId = id
