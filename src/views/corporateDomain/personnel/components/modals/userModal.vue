@@ -141,6 +141,7 @@ export default {
           this.editPsw = true
         }
       } else {
+        this.form = this.$options.data().form
         if (this.$refs.form) this.$refs.form.resetFields()
       }
     }
