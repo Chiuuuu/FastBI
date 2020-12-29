@@ -309,24 +309,23 @@ export default {
               return
             }
 
-            let columns = []
-            let dimensionKeys = []
-            for (let m of apiData.dimensions) {
-              dimensionKeys.push(m.alias)
+             let columns = []
+            let dimensionKeys = apiData.dimensions[0].alias // 维度key
+            columns[0] = dimensionKeys // 默认columns第一项为维度
+            let measureKeys = [] // 度量key
+            for (let m of apiData.measures) {
+              measureKeys.push(m.alias)
               columns.push(m.alias) // 默认columns第二项起为指标
             }
-            console.log(columns)
-
             let rows = []
             let level1 = []
             let level2 = []
             res.rows.map((item, index) => {
               let obj = {}
-              for (let item2 of dimensionKeys) {
+              obj[dimensionKeys] = item[dimensionKeys]
+              for (let item2 of measureKeys) {
                 obj[item2] = item[item2]
               }
-              obj[apiData.measures[0].alias] = item[apiData.measures[0].alias]
-
               if (obj[dimensionKeys]) {
                 rows.push(obj)
               }
