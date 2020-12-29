@@ -6,7 +6,7 @@
     <template v-else>
       <a-spin class="main-box" :spinning="spinning">
         <div class="header">
-          <span class="data_con">{{detailInfo.name}}</span>
+          <span class="data_con">{{modelName}}</span>
           <div class="data_btn">
               <a-button
                 v-permission:[$PERMISSION_CODE.OPERATOR.edit]="$PERMISSION_CODE.OBJECT.datamodel"
@@ -119,6 +119,7 @@ export default {
   computed: {
     ...mapState({
       modelId: state => state.dataModel.modelId,
+      modelName: state => state.dataModel.modelName,
       datasourceId: state => state.dataModel.datasourceId
     })
   },
@@ -143,6 +144,7 @@ export default {
       if (result.code === 200) {
         this.$message.success('获取数据成功')
         this.detailInfo = result.data
+        this.$store.commit('dataModel/SET_MODELNAME', result.data.name)
         this.handleDetailWithRoot()
         this.handleDimensions()
         this.handleMeasures()

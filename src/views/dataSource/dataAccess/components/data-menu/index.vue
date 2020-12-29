@@ -555,6 +555,9 @@ export default {
       })
       if (result.code === 200) {
         this.handleGetMenuList()
+        if (this.resetName.item.id === this.fileSelectId) {
+          this.$store.commit('dataAccess/SET_MODELNAME', values.name)
+        }
         this.$message.success('修改成功')
       } else {
         this.$message.error(result.msg)

@@ -51,6 +51,7 @@
         :data-source="listData"
         :loading="loading"
         :pagination="pagination"
+        :scroll="{ x: 1420 }"
         @change="handleTableChange"
       >
         <template #adminName="text, record">
@@ -161,10 +162,12 @@ const listColumn = [
   },
   {
     title: '用户数',
+    width: 100,
     dataIndex: 'userCount'
   },
   {
     title: '大屏数量',
+    width: 100,
     dataIndex: 'screenCount'
   },
   {
