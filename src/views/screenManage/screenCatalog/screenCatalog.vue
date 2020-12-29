@@ -77,7 +77,7 @@
         <a-button
           type="primary"
           class="btn_pr"
-          v-permission:[$PERMISSION_CODE.OPERATOR.edit]="$PERMISSION_CODE.OBJECT.screen"
+          v-if="hasEditPermission"
           @click="editScreen">
           编辑大屏
         </a-button>
@@ -124,6 +124,7 @@ import MenuFolder from '@/components/dataSource/menu-group/folder'
 import { mapGetters, mapActions } from 'vuex' // 导入vuex
 import Screen from '@/views/screen' // 预览
 import { addResizeListener, removeResizeListener } from 'bin-ui/src/utils/resize-event'
+import { hasPermission } from '@/utils/permission'
 import debounce from 'lodash/debounce'
 import { menuSearchLoop } from '@/utils/menuSearch'
 
@@ -201,6 +202,9 @@ export default {
     },
     menuList() {
       return this.searchValue ? this.searchList : this.tableList
+    },
+    hasEditPermission() {
+      return hasPermission(this.$store.state.app.privileges, this.$PERMISSION_CODE.OPERATOR.edit)
     }
   },
   mounted() {
@@ -290,6 +294,7 @@ export default {
           this.fileSelectId = ''
           this.fileSelectName = ''
           this.$store.dispatch('SetParentId', '')
+          this.$store.dispatch('SetPrivileges', [])
         }
       })
     },

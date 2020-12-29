@@ -9,7 +9,7 @@
           <span class="data_con">{{modelName}}</span>
           <div class="data_btn">
               <a-button
-                v-permission:[$PERMISSION_CODE.OPERATOR.edit]="$PERMISSION_CODE.OBJECT.datamodel"
+                v-if="hasEditPermission"
                 type="primary"
                 v-on:click="edit">编辑模型</a-button>
               <a-button @click="handleGetData">刷新数据</a-button>
@@ -95,6 +95,7 @@
 <script>
 import TreeNode from './show-tree-node'
 import { Node, conversionTree } from '../../util'
+import { hasPermission } from '@/utils/permission'
 import { mapState } from 'vuex'
 import groupBy from 'lodash/groupBy'
 import keys from 'lodash/keys'
@@ -120,8 +121,12 @@ export default {
     ...mapState({
       modelId: state => state.dataModel.modelId,
       modelName: state => state.dataModel.modelName,
+      privileges: state => state.dataModel.privileges,
       datasourceId: state => state.dataModel.datasourceId
-    })
+    }),
+    hasEditPermission() {
+      return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.edit)
+    }
   },
   methods: {
     /**
@@ -145,6 +150,7 @@ export default {
         this.$message.success('获取数据成功')
         this.detailInfo = result.data
         this.$store.commit('dataModel/SET_MODELNAME', result.data.name)
+        this.$store.commit('dataModel/SET_PRIVILEGES', result.data.privileges || [])
         this.handleDetailWithRoot()
         this.handleDimensions()
         this.handleMeasures()

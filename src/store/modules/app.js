@@ -16,7 +16,8 @@ const app = {
         screenId: '', // 大屏id
         fileName: '',
         parentId: '', // 大屏父id
-        screenDataModels: []
+        screenDataModels: [],
+        privileges: []
     },
     mutations: {
         SET_CANVAS_RANGE: (state, val) => {
@@ -46,9 +47,15 @@ const app = {
         },
         SET_PARENT_ID(state, id) {
           state.parentId = id
+        },
+        SET_PRIVILEGES(state, privileges) {
+          state.privileges = privileges
         }
     },
     actions: {
+        SetPrivileges: ({ commit }, privileges) => {
+            commit('SET_PRIVILEGES', privileges)
+        },
         SetCanvasRange: ({ commit }, val) => {
             commit('SET_CANVAS_RANGE', val)
         },
