@@ -86,7 +86,7 @@ const app = {
           }
           let params = {}
           if (!state.screenId) {
-            commit('SET_PAGE_SETTING', this.orginPageSettings)
+            commit('SET_PAGE_SETTING', state.orginPageSettings)
             params = {
               id: -1,
               name: obj && obj.name ? obj.name : router.history.current.query.name,
