@@ -212,10 +212,10 @@ export default {
       }
     },
     // 求和
-    sum(arr,key){
-      return arr.reduce((pre,current) => {
+    sum(arr, key) {
+      return arr.reduce((pre, current) => {
           return pre + current[key]
-      }, 0 ) || 0
+      }, 0) || 0
     },
     // 根据维度度量获取数据
     getData() {
