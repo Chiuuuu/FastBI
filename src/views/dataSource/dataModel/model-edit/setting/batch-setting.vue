@@ -374,7 +374,7 @@ export default {
       let value = this.modalForm[this.setType]
       this.selectedRows.forEach(item => {
         if (this.setType === 'visible') {
-          item[this.setType] = (value === 'true')
+          item[this.setType] = (value === true)
         } else if (this.setType === 'role') {
           if (item.role === 1 && value === 2) {
             item[this.setType] = 2
