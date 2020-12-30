@@ -61,7 +61,7 @@
     @click="handleSaveForm"
     :disabled="!connectStatus"
     :loading="saveBtn"
-    v-hasPermission:[$PERMISSION_CODE.OPERATOR.edit]="privileges"
+    v-if="hasPermission"
     >
     保存
     </a-button>
@@ -70,6 +70,7 @@
 <script>
 import { mapState } from 'vuex'
 import { validateIP } from '../util'
+import { hasPermission } from '@/utils/permission'
 export default {
   name: 'model-mysql',
   data() {
@@ -153,7 +154,10 @@ export default {
       modelSelectType: state => state.dataAccess.modelSelectType,
       privileges: state => state.dataAccess.privileges,
       tabChangeAble: state => state.dataAccess.firstFinished // 是否完成第一部分
-    })
+    }),
+    hasPermission() {
+      return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.edit)
+    }
   },
   watch: {
     modelName(newValue, oldValue) {
