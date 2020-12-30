@@ -2,7 +2,7 @@
   <div class="middle">
     <div class="title">角色权限</div>
     <a-tabs class="tabs scrollbar" @change="handleChangeTab">
-        <a-tab-pane forceRender style="padding-left: 16px" key="1" tab="数据大屏">
+        <a-tab-pane forceRender style="padding-left: 16px" :key="1" tab="数据大屏">
             <a-spin :spinning="spinning1">
                 <role-limit
                 v-on="$listeners"
@@ -11,7 +11,7 @@
                 />
             </a-spin>
         </a-tab-pane>
-        <a-tab-pane forceRender style="padding-left: 16px" key="2" tab="数据模型">
+        <a-tab-pane forceRender style="padding-left: 16px" :key="2" tab="数据模型">
             <a-spin :spinning="spinning2">
                 <role-limit
                 v-on="$listeners"
@@ -20,7 +20,7 @@
                 />
             </a-spin>
         </a-tab-pane>
-        <a-tab-pane forceRender style="padding-left: 16px" key="3" tab="数据接入">
+        <a-tab-pane forceRender style="padding-left: 16px" :key="3" tab="数据接入">
             <a-spin :spinning="spinning3">
                 <role-limit
                 v-on="$listeners"
@@ -71,7 +71,7 @@ export default {
             spinning1: false,
             spinning2: false,
             spinning3: false,
-            currentTab: '1',
+            currentTab: 1,
             modulePermission: {},
             moduleList: {},
             treeList: {}
@@ -106,6 +106,34 @@ export default {
                         this.$set(this.moduleList, i, [].concat(result.data.header))
                         this.$set(this.treeList, i, [].concat(result.data.folder))
                         this.$emit('setBasePrivilege', this.modulePermission[i].permissions, i + '')
+                        // 初始化时先记录勾选过的对象
+                        if (this.status === 'edit') {
+                            const folder = result.data.folder
+                            if (Array.isArray(folder)) {
+                                const list = []
+                                const addItem = (item) => {
+                                    if (item.permissions.length > 0) {
+                                        list.push({
+                                            id: item.id,
+                                            permissions: item.permissions,
+                                            name: item.title
+                                        })
+                                    }
+                                }
+                                folder.map(item => {
+                                    if (item.children && item.children.length > 0) {
+                                        item.children.map(leaf => {
+                                            addItem(leaf)
+                                        })
+                                    } else {
+                                        if (item.permissions.length > 0) {
+                                            addItem(item)
+                                        }
+                                    }
+                                })
+                                this.$emit('getChangeItem', i, list)
+                            }
+                        }
                     }
                 } else {
                     this.$message.error(result.msg || '请求错误')
