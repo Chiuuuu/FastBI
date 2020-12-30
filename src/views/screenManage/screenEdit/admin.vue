@@ -126,7 +126,7 @@
       }
     },
     computed: {
-      ...mapGetters(['canvasMap', 'currentSelected', 'isScreen', 'coverageExpand', 'pageSettings']),
+      ...mapGetters(['canvasMap', 'currentSelected', 'isScreen', 'coverageExpand', 'pageSettings', 'orginPageSettings']),
       coverageMaps () {
         if (this.canvasMap.length > 0) {
           let maps = [...this.canvasMap]
@@ -174,12 +174,7 @@
             this.$store.dispatch('SetPageSettings', json.setting)
             this.$store.dispatch('InitCanvasMaps', json.components)
             this.$store.dispatch('dataModel/setSelectedModelList', res.list)
-          }
-          if (res.code === 500) {
-            // 初始化看板
-            this.$store.dispatch('SetPageSettings', { width: 1920, height: 1080, backgroundColor: '#0d2a42', gridStep: 1, backgroundSrc: '', backgroundType: '1', opacity: 1 })
-            this.$store.dispatch('InitCanvasMaps', [])
-            this.$store.dispatch('dataModel/setSelectedModelList', [])
+            this.$store.dispatch('SetPrivileges', res.data.privileges || [])
           }
         })
       },

@@ -31,7 +31,9 @@ const getters = {
 
     modelFile: state => state.options.modelFile,
 
-    selectedModelList: state => state.dataModel.selectedModelList // 选中的数据模型列表
+    selectedModelList: state => state.dataModel.selectedModelList, // 选中的数据模型列表
+
+    orginPageSettings: state => state.app.orginPageSettings
 }
 
 export default getters

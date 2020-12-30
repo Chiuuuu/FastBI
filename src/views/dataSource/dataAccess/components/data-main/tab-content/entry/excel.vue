@@ -117,7 +117,7 @@
       class="btn_sub"
       @click="handleSaveForm"
       :loading="loading"
-      v-permission:[btnPermission]="$PERMISSION_CODE.OBJECT.datasource"
+      v-if="hasPermission"
     >
       保存
     </a-button>
@@ -127,7 +127,7 @@
 <script>
 import { mapState } from 'vuex'
 import { MapSheet } from '../util'
-
+import { hasPermission } from '@/utils/permission'
 export default {
   name: 'model-excel',
   data() {
@@ -181,6 +181,7 @@ export default {
       modelInfo: state => state.dataAccess.modelInfo,
       modelFileList: state => state.dataAccess.modelFileList,
       modelType: state => state.dataAccess.modelType,
+      privileges: state => state.dataAccess.privileges,
       databaseName: state => state.dataAccess.databaseName
     }),
     currentFileList() {
@@ -194,6 +195,14 @@ export default {
     },
     tableList() { // sheet表格数据
       return this.currentDataBase.tableList || []
+    },
+    hasPermission() {
+      return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.edit)
+    }
+  },
+  watch: {
+    modelName(newValue, oldValue) {
+      this.form.name = newValue
     }
   },
   mounted() {

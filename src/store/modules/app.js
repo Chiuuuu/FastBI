@@ -2,9 +2,11 @@ import router from '../../router'
 import screenManage from '../../api/modules/screenManage'
 import { message } from 'ant-design-vue'
 
+let orginPageSettings = { width: 1920, height: 1080, backgroundColor: '#0d2a42', gridStep: 1, backgroundSrc: '', backgroundType: '1', opacity: 1, refresh: { frequency: '', isRefresh: false } }
 const app = {
     state: {
-        pageSettings: { width: 1920, height: 1080, backgroundColor: '#0d2a42', gridStep: 1, backgroundSrc: '', backgroundType: '1', opacity: 1 },
+        orginPageSettings,
+        pageSettings: orginPageSettings,
         // 状态数据
         canvasRange: 0, // 画布缩放
         optionsExpand: true, // 参数面板打开关闭
@@ -14,7 +16,8 @@ const app = {
         screenId: '', // 大屏id
         fileName: '',
         parentId: '', // 大屏父id
-        screenDataModels: []
+        screenDataModels: [],
+        privileges: []
     },
     mutations: {
         SET_CANVAS_RANGE: (state, val) => {
@@ -44,9 +47,15 @@ const app = {
         },
         SET_PARENT_ID(state, id) {
           state.parentId = id
+        },
+        SET_PRIVILEGES(state, privileges) {
+          state.privileges = privileges
         }
     },
     actions: {
+        SetPrivileges: ({ commit }, privileges) => {
+            commit('SET_PRIVILEGES', privileges)
+        },
         SetCanvasRange: ({ commit }, val) => {
             commit('SET_CANVAS_RANGE', val)
         },
@@ -84,7 +93,7 @@ const app = {
           }
           let params = {}
           if (!state.screenId) {
-            commit('SET_PAGE_SETTING', { width: 1920, height: 1080, backgroundColor: '#0d2a42', gridStep: 1, backgroundSrc: '', backgroundType: '1', opacity: 1, refresh: { frequency: '', isRefresh: false } })
+            commit('SET_PAGE_SETTING', state.orginPageSettings)
             params = {
               id: -1,
               name: obj && obj.name ? obj.name : router.history.current.query.name,
@@ -122,7 +131,7 @@ const app = {
             //   obj.callback()
             // }
           }).catch((err) => { // 需要捕获错误 否则无法传递给commit
-            res.msg && message.error(err)
+            err && message.error(err)
             commit('SET_SCREEN_ID', '')
           })
         }

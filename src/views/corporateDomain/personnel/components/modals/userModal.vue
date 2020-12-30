@@ -115,18 +115,9 @@ export default {
     show(newValue) {
       if (newValue) {
         // 获取项目列表
+        this.getProjectList()
         if (this.modalType === 'edit') {
           this.spinning = true
-          // 初始化项目和岗位列表
-          if (this.modalData.projects) {
-            this.projectList = this.modalData.projects.map(item => {
-              return {
-                ...item,
-                projectId: item.id,
-                projectName: item.name
-              }
-            })
-          }
           this.form.username = this.modalData.username
           this.form.name = this.modalData.name
           this.form.phone = this.modalData.phone
@@ -148,9 +139,9 @@ export default {
           }
         } else {
           this.editPsw = true
-          this.getProjectList()
         }
       } else {
+        this.form = this.$options.data().form
         if (this.$refs.form) this.$refs.form.resetFields()
       }
     }

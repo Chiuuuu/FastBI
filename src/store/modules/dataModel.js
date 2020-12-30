@@ -2,11 +2,13 @@ import dataAccessApi from '../../api/modules/common'
 const state = {
   parentId: '',
   modelId: -1, // 选中的菜单id
+  modelName: '', // 模型名称
   addModelId: -1, // 新建的模型id
   menuList: [],
   databaseId: '', // 数据库id
   datasource: null, // 数据源
   datasourceId: '',
+  privileges: [],
   selectedModelList: [] // 选中的数据模型
 }
 
@@ -16,6 +18,9 @@ const mutations = {
   },
   SET_MODELID(state, id) {
     state.modelId = id
+  },
+  SET_MODELNAME(state, name) {
+    state.modelName = name
   },
   SET_ADD_MODELID(state, id) {
     state.addModelId = id
@@ -34,6 +39,9 @@ const mutations = {
   },
   SET_SELECTEDMODELlIST(state, list) {
     state.selectedModelList = list
+  },
+  SET_PRIVILEGES(state, privileges) {
+    state.privileges = privileges
   }
 }
 

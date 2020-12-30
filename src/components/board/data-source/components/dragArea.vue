@@ -114,8 +114,15 @@ export default {
       }
       dataFile.showMore = false // 是否点击显示更多
       if (this.type === 'dimensions' && this.dragFile === this.type) {
+        // 嵌套饼图有两个维度
+        if (this.currentSelected.packageJson.chartType === 'v-multiPie') {
+          if (this.fileList.length < 2) {
+            this.fileList.push(dataFile)
+        }
+        } else {
         // 维度暂时只能拉入一个字段
         this.fileList[0] = dataFile
+        }
         this.fileList = this.uniqueFun(this.fileList, 'alias')
         this.getData()
       }
@@ -204,6 +211,12 @@ export default {
         }
       }
     },
+    // 求和
+    sum(arr, key) {
+      return arr.reduce((pre, current) => {
+          return pre + current[key]
+      }, 0) || 0
+    },
     // 根据维度度量获取数据
     getData() {
       // 维度
@@ -269,9 +282,11 @@ export default {
               for (let m of apiData.measures) {
                 columns.push(m.alias) // 默认columns第二项起为指标
               }
+              // 对返回的数据列进行求和
+              let total = this.sum(res.rows, apiData.measures[0].alias)
               let rows = [{
                 type: apiData.measures[0].alias,
-                value: res.rows[0] ? res.rows[0][apiData.measures[0].alias] : 0
+                value: total
               }]
               apiData.source = {
                 columns,
@@ -286,14 +301,15 @@ export default {
               }
               // 如果是仪表盘，第二个度量是目标值（进度条最大值）
               if (this.currentSelected.packageJson.chartType === 'v-gauge' && apiData.measures[1]) {
-                config.series.max = res.rows[0][apiData.measures[1].alias]
+                let goalTotal = this.sum(res.rows, apiData.measures[1].alias)
+                config.series.max = goalTotal
                 this.$store.dispatch('SetSelfProperty', config)
               }
               this.saveScreenData()
               return
             }
 
-            let columns = []
+             let columns = []
             let dimensionKeys = apiData.dimensions[0].alias // 维度key
             columns[0] = dimensionKeys // 默认columns第一项为维度
             let measureKeys = [] // 度量key

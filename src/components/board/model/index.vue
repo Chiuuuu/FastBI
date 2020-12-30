@@ -176,7 +176,7 @@ export default {
       modelKey: ['0', '1', '2', '3', '4', '5', '6', '7'],
       dimensionsKey: ['0', '1', '2', '3'], // 默认展开
       measuresKey: ['0', '1', '2', '3'],
-      model: false,
+      model: true,
       modelList: [], // 数据模型列表
       dimensions: [], // 维度列表
       measures: [], // 度量列表
@@ -245,6 +245,9 @@ export default {
     }
   },
   mounted() {
+    // 初始化模型列表和选中的模型（退出全屏后组件重置而且不再执行watch的操作，需要重新赋值）
+    this.disableItem = this.selectedModelList
+    this.modelId = this.selectedModelList.length > 0 ? this.selectedModelList[0].modelid : ''
     this.getModelList()
   },
   methods: {
@@ -282,10 +285,10 @@ export default {
         // this.getPivoSchemaList(item.id)
         this.add = true // 点击模型
         this.saveModal(item.id)
-        this.disableItem.push(item)
         // this.modelId = item.id
         item.modelname = item.name
         item.modelid = item.id
+        this.disableItem.push(item)
         this.$store.dispatch('dataModel/setSelectedModelList', this.disableItem)
       }
     },
@@ -294,6 +297,7 @@ export default {
       this.$server.screenManage.getScreenDetailById(this.screenId).then(res => {
         if (res.code === 200) {
           this.$store.dispatch('dataModel/setSelectedModelList', res.list)
+          this.$store.dispatch('SetPrivileges', res.data.privileges || [])
         }
       })
     },
