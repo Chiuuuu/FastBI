@@ -117,7 +117,7 @@
       class="btn_sub"
       @click="handleSaveForm"
       :loading="loading"
-      v-hasPermission:[$PERMISSION_CODE.OPERATOR.edit]="privileges"
+      v-if="hasPermission"
     >
       保存
     </a-button>
@@ -127,7 +127,7 @@
 <script>
 import { mapState } from 'vuex'
 import { MapSheet } from '../util'
-
+import { hasPermission } from '@/utils/permission'
 export default {
   name: 'model-excel',
   data() {
@@ -195,6 +195,9 @@ export default {
     },
     tableList() { // sheet表格数据
       return this.currentDataBase.tableList || []
+    },
+    hasPermission() {
+      return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.edit)
     }
   },
   watch: {

@@ -72,7 +72,7 @@
     @click="handleSaveForm"
     :disabled="!connectStatus"
     :loading="saveBtn"
-    v-hasPermission:[$PERMISSION_CODE.OPERATOR.edit]="privileges"
+    v-if="hasPermission"
     >
     保存
     </a-button>
