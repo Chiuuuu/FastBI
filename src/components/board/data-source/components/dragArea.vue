@@ -114,11 +114,9 @@ export default {
       }
       dataFile.showMore = false // 是否点击显示更多
       if (this.type === 'dimensions' && this.dragFile === this.type) {
-        // 嵌套饼图有两个维度
+        // 嵌套饼图可以有多个维度
         if (this.currentSelected.packageJson.chartType === 'v-multiPie') {
-          if (this.fileList.length < 2) {
             this.fileList.push(dataFile)
-        }
         } else {
         // 维度暂时只能拉入一个字段
         this.fileList[0] = dataFile
@@ -211,11 +209,30 @@ export default {
         }
       }
     },
-    // 求和
-    sum(arr, key) {
+    // 求和(arr:原数组|key:需要求和的字段)
+    sum(arr, key){
       return arr.reduce((pre, current) => {
-          return pre + current[key]
-      }, 0) || 0
+          return current[key] ? pre + current[key] : pre
+      }, 0 ) || 0
+    },
+    // 分类汇总(arr:原数组|keyValue:分类的字段|countValue:分类后需要求和的字段)
+    summary(arr, keyValue, countValue){
+      let container = [];
+      arr.forEach(item => {
+        // 两个维度的返回结果有可能是null,null的不汇总
+        if (!item[keyValue]) return
+        container[item[keyValue]] = container[item[keyValue]] || []
+        container[item[keyValue]].push(item)
+      })
+      let summaryList = []
+      Object.keys(container).forEach(key => {
+          let total = this.sum(container[key], countValue);
+          summaryList.push({
+            name: key,
+            value: total
+          })
+      })
+      return summaryList
     },
     // 根据维度度量获取数据
     getData() {
@@ -276,6 +293,7 @@ export default {
             }
             this.$store.dispatch('SetSelfDataSource', apiData)
           } else {
+            
             // 仪表盘/环形图 只显示度量
             if (this.chartType === '2') {
               let columns = ['type', 'value'] // 维度固定
@@ -309,48 +327,66 @@ export default {
               return
             }
 
-             let columns = []
-            let dimensionKeys = apiData.dimensions[0].alias // 维度key
-            columns[0] = dimensionKeys // 默认columns第一项为维度
+            let columns = []
+            let rows = []
+            let dimensionKeys = [] // 度量key
+            for (let m of apiData.dimensions) {
+              dimensionKeys.push(m.alias)
+              columns.push(m.alias) // 默认columns第二项起为指标
+            }
+
             let measureKeys = [] // 度量key
             for (let m of apiData.measures) {
               measureKeys.push(m.alias)
               columns.push(m.alias) // 默认columns第二项起为指标
             }
-            let rows = []
-            let level1 = []
-            let level2 = []
+            
+            // 嵌套饼图设置apis
+            if (this.currentSelected.packageJson.chartType === 'v-multiPie') {
+              // name是各维度数据拼接，value是分类汇总过的数值
+              columns = ['name', 'value']
+              let result = res.rows
+              let level = []
+              // 一个维度是一层饼
+              dimensionKeys.forEach(item => {
+                // 根据当前维度分类得到的列表
+                let list = this.summary(result, item, measureKeys[0])// 嵌套饼图度量只有一个，直接取第一个数
+                rows = rows.concat(list) // 把所有维度分类出来的数组进行拼接（v-charts配置格式要求）
+
+                level.push(list.map(obj => obj.name)) // 按维度分层
+              })
+              res.rows.map((item, index) => {
+            })
+
+              let apis = {
+                level
+              }
+              console.log(apis)
+              this.$store.dispatch('SetApis', apis)
+            } 
+            else {
             res.rows.map((item, index) => {
               let obj = {}
+              for (let item2 of dimensionKeys) {
+                obj[item2] = item[item2]
+              }
               obj[dimensionKeys] = item[dimensionKeys]
               for (let item2 of measureKeys) {
                 obj[item2] = item[item2]
               }
-              if (obj[dimensionKeys]) {
+              // if (obj[dimensionKeys]) {
                 rows.push(obj)
-              }
+              // }
             })
+            console.log(columns)
+            console.log(rows)
+            }
+
             apiData.source = {
               columns,
               rows
             }
             console.log(apiData)
-            // 嵌套饼图设置apis
-            if (this.currentSelected.packageJson.chartType === 'v-multiPie') {
-              console.log(columns)
-              rows.map((item, index) => {
-                if (index < 2) {
-                  level1.push(item[columns[0]])
-                } else {
-                  level2.push(item[columns[0]])
-                }
-              })
-              let apis = {
-                level: [level1, level2]
-              }
-              console.log(apis)
-              this.$store.dispatch('SetApis', apis)
-            }
             this.$store.dispatch('SetSelfDataSource', apiData)
           }
           this.saveScreenData()
