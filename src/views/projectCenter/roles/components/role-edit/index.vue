@@ -46,7 +46,6 @@ export default {
   },
   data() {
     return {
-      currentTab: '1',
       spinning: false,
       loading: false,
       form: {
@@ -113,16 +112,32 @@ export default {
       })
     },
     getChangeItem(role, item) {
-      const list = this[role]
-      const target = list.find(t => t.id === item.id)
-      if (target) {
-        target.permissions = item.permissions
-      } else {
-        list.push({
-          id: item.id,
-          permissions: item.permissions,
-          name: item.title
-        })
+      switch (role) {
+        case 1:
+          role = 'screen'
+          break
+        case 2:
+          role = 'dataModel'
+          break
+        case 3:
+          role = 'dataSource'
+          break
+      }
+      // 初始化时, 把有勾选的对象都插入进去(后台约定)
+      if (Array.isArray(item)) {
+        this[role] = this[role].concat(item)
+      } else { // 改变单个对象时, 把对象修改或者插入
+        const list = this[role]
+        const target = list.find(t => t.id === item.id)
+        if (target) {
+          target.permissions = item.permissions
+        } else {
+          list.push({
+            id: item.id,
+            permissions: item.permissions,
+            name: item.title
+          })
+        }
       }
     },
     getBasePrivilege(permissions, type) {
