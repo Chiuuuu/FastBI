@@ -1,7 +1,6 @@
 import { hasPermission } from '@/utils/permission'
 function checkPermission(el, binding) {
     const { arg, value } = binding
-
     if (arg && value) {
         const isPermission = hasPermission(value, arg)
         if (!isPermission) {

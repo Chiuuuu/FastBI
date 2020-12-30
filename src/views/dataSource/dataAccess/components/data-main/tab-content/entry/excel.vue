@@ -117,7 +117,7 @@
       class="btn_sub"
       @click="handleSaveForm"
       :loading="loading"
-      v-permission:[btnPermission]="$PERMISSION_CODE.OBJECT.datasource"
+      v-hasPermission:[$PERMISSION_CODE.OPERATOR.edit]="privileges"
     >
       保存
     </a-button>
@@ -181,6 +181,7 @@ export default {
       modelInfo: state => state.dataAccess.modelInfo,
       modelFileList: state => state.dataAccess.modelFileList,
       modelType: state => state.dataAccess.modelType,
+      privileges: state => state.dataAccess.privileges,
       databaseName: state => state.dataAccess.databaseName
     }),
     currentFileList() {

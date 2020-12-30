@@ -61,7 +61,7 @@
     @click="handleSaveForm"
     :disabled="!connectStatus"
     :loading="saveBtn"
-    v-permission:[btnPermission]="$PERMISSION_CODE.OBJECT.datasource"
+    v-hasPermission:[$PERMISSION_CODE.OPERATOR.edit]="privileges"
     >
     保存
     </a-button>
@@ -151,6 +151,7 @@ export default {
       tableList: state => state.dataAccess.menuList,
       modelType: state => state.dataAccess.modelType, // 数据类型
       modelSelectType: state => state.dataAccess.modelSelectType,
+      privileges: state => state.dataAccess.privileges,
       tabChangeAble: state => state.dataAccess.firstFinished // 是否完成第一部分
     })
   },

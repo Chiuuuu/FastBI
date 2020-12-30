@@ -124,7 +124,7 @@
       class="btn_sub"
       @click="handleSaveForm"
       :loading="loading"
-      v-permission:[btnPermission]="$PERMISSION_CODE.OBJECT.datasource"
+      v-hasPermission:[$PERMISSION_CODE.OPERATOR.edit]="privileges"
     >
       保存
     </a-button>
@@ -469,7 +469,6 @@ export default {
       // 写入表头信息
       let index = this.currentFileIndex
       let table = this.databaseList[index]
-      // debugger
       // 判断是否处理过表格信息(处理之后的是Array类型), 没有则调接口获取信息并处理
       if (!Array.isArray(table)) {
         const formData = new FormData()

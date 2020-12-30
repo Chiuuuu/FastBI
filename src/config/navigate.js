@@ -1025,7 +1025,7 @@ const list = [{
                 click: chartClick
             },
             view: { width: 400, height: 400, x: 760, y: 340 }
-        },
+        }
         // {
         //     title: '嵌套饼图',
         //     name: 've-pie',
