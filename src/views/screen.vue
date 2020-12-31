@@ -1,5 +1,5 @@
 <template>
-  <div class="dv-screen" :style="wrapStyle" ref="dvScreen">
+  <div class="dv-screen" allowfullscreen="true" :style="wrapStyle" ref="dvScreen">
     <div :style="canvasPanelStyle">
       <b-scrollbar style="height:100%;">
         <div class="canvas-panel"  >

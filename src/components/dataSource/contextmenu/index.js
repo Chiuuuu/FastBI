@@ -7,6 +7,16 @@ var instance = ''
 var ContextMenu = function(options) {
   var defaultOpitons = options || {}
 
+  if (defaultOpitons.styleObj) {
+    // 判断当前页面点击高度, 防止穿模
+    const clientHeight = document.body.clientHeight // 页面高
+    const bodyHeight = defaultOpitons.menus.length * 32 // 列表高
+    let top = defaultOpitons.styleObj.top.slice(0, -2) // 点击位置
+    if (clientHeight - top < bodyHeight) {
+      defaultOpitons.styleObj.top = top - bodyHeight + 'px'
+    }
+  }
+
   let mark = document.createElement('div')
   mark.className = 'm-window mask-transparent'
   mark.style.zIndex = '1001'
