@@ -57,7 +57,8 @@
     },
     data () {
       return {
-        wrapStyle: {}
+        wrapStyle: {},
+        range: ''
       }
     },
     computed: {
@@ -118,8 +119,8 @@
           width: wrap.clientWidth + 'px',
           height: (wrap.clientHeight - 30) + 'px'
         }
-        // 计算缩放比例
-        let range = ((wrap.clientWidth) / this.pageSettings.width)
+        // 计算缩放比例(当前元素占位跟1920默认长度的比例,也就是大小画板的比例)
+        let range =  wrap.clientWidth / 1920
         range = Math.round(range * 100) / 100
         if (range < 0.4) {
           range = 0.4

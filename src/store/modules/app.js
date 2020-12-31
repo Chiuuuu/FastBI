@@ -8,7 +8,7 @@ const app = {
         orginPageSettings,
         pageSettings: orginPageSettings,
         // 状态数据
-        canvasRange: 0, // 画布缩放
+        canvasRange: 0.5, // 画布缩放
         optionsExpand: true, // 参数面板打开关闭
         modelExpand: true, // 8-14数据模型面板
         coverageExpand: false, // 图层面板打开关闭
