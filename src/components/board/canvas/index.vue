@@ -31,7 +31,7 @@
       return {
         wrapStyle: {},
         screenStyle: {},
-        range: 0
+        range: 0.5
       }
     },
     mounted () {
@@ -52,12 +52,12 @@
           height: (wrap.clientHeight - 30) + 'px'
         }
         // 计算缩放比例
-        let range = ((wrap.clientWidth - 100) / this.pageSettings.width)
-        range = Math.round(range * 100) / 100
-        if (range < 0.3) {
-          range = 0.3
-        }
-        this.range = range
+        // let range = ((this.pageSettings.width) / 1920)
+        // range = Math.round(range * 100) / 100
+        // if (range < 0.3) {
+        //   range = 0.3
+        // }
+        // this.range = range  
       },
       // transform点击事件
       cancelSelected () {
@@ -75,6 +75,8 @@
     watch: {
       range (val) {
         this.screenStyle = {
+          // width: (this.pageSettings.width * wrap.clientWidth / 1920) * val + 120 + 'px',
+          // height: (this.pageSettings.height * (contain.clientHeight - 100) / 1080) * val + 120 + 'px',
           width: `${this.pageSettings.width * val + 120}px`,
           height: `${this.pageSettings.height * val + 120}px`
         }

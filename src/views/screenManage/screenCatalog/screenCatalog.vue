@@ -221,7 +221,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['saveScreenData']),
+    ...mapActions(['saveScreenData', 'SetCanvasRange']),
     // 获取文件夹列表
     getList() {
       let params = {
@@ -389,6 +389,8 @@ export default {
         this.$message.error(' 请先添加大屏目录数据或者选择一个大屏目录')
         return
       }
+      // 编辑大屏默认缩放是0.5
+      this.SetCanvasRange(0.5)
       this.$router.push({ name: 'screenEdit',
       query: {
         id: this.fileSelectId,
