@@ -1,6 +1,6 @@
 <template>
   <div class="m-overlay m-overlay-shadow" :style="styleObj">
-    <div class="m-ctxMenu">
+    <div class="m-ctxMenu" ref="ctxMenuRef">
       <ul>
         <li
           class="z-clickable"
@@ -39,19 +39,21 @@ export default {
         return []
       }
     },
-    styleObj: {
-      type: Object,
-      default: function() {
-        return {}
-      }
+    target: {
+      type: [MouseEvent, Object],
+      default: () => {}
     },
     remove: {
+      type: Function
+    },
+    customStyle: {
       type: Function
     }
   },
   data() {
     return {
-      renderMenus: []
+      renderMenus: [],
+      styleObj: {}
     }
   },
   watch: {
@@ -80,12 +82,37 @@ export default {
             if (hasPermission) return item
           })
         } else {
-          new Error('数据不存在或者不是一个数组')
+          throw new Error('数据不存在或者不是一个数组')
         }
-      },
+      }
     }
   },
+  mounted() {
+    this.$nextTick(() => {
+      this.doWithPosition()
+    })
+  },
   methods: {
+    doWithPosition() {
+      // 是否启用自定义设置，可以根据特殊情况自定义
+      if (this.customStyle) {
+        this.styleObj = this.customStyle()
+        return
+      }
+      // 浏览器可视区域的高度(兼容处理)
+      const clientHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
+      // 获取列表高度
+      const ctxMenuDomHeight = this.$refs.ctxMenuRef.offsetHeight
+      // 点击目标的位置
+      const targetY = this.target.clientY
+      // 是否超过底部
+      const isMoreThanBottom = targetY + ctxMenuDomHeight - clientHeight > 0
+      const top = isMoreThanBottom ? targetY - ctxMenuDomHeight : targetY
+      this.styleObj = {
+        left: this.target.clientX + 'px',
+        top: top + 'px'
+      }
+    },
     hasChildren(item) {
       return item['children'] && item.children.length
     },

@@ -119,10 +119,7 @@ export default {
           }
           return item
         }),
-        styleObj: {
-          left: e.clientX + 'px',
-          top: e.clientY + 'px'
-        },
+        target: e,
         handleMarkCancel: function() {
           removeClass(that.$refs.file, 'file-active')
         }
