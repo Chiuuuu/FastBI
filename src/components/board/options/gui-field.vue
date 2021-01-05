@@ -1,6 +1,6 @@
 <template>
-  <div class="gui-field">
-    <div class="gui-field-name">{{label?label:'&nbsp;&nbsp;'}}</div>
+  <div :class="['gui-field', {'has-padding': hasPadding}]">
+    <div class="gui-field-name" :style="width? 'width:'+ width : ''">{{label?label:'&nbsp;&nbsp;'}}</div>
     <div class="gui-field-container">
       <slot></slot>
     </div>
@@ -10,7 +10,9 @@
 <script>
   export default {
     props: {
-      label: String
+      label: String,
+      hasPadding: Boolean,
+      width: String
     }
   }
 </script>
