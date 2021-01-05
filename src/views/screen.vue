@@ -108,7 +108,7 @@
             this.$store.dispatch('SetPageSettings', json.setting)
             // 页面canvasMaps
             this.$store.dispatch('InitCanvasMaps', json.components)
-            this.$store.dispatch('SetPrivileges', res.data.privileges || [])
+            this.$store.commit('common/SET_PRIVILEGES', res.data.privileges || [])
           }
         })
       },

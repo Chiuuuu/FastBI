@@ -121,7 +121,7 @@ export default {
     ...mapState({
       modelId: state => state.dataModel.modelId,
       modelName: state => state.dataModel.modelName,
-      privileges: state => state.dataModel.privileges,
+      privileges: state => state.common.privileges,
       datasourceId: state => state.dataModel.datasourceId
     }),
     hasEditPermission() {
@@ -150,7 +150,7 @@ export default {
         this.$message.success('获取数据成功')
         this.detailInfo = result.data
         this.$store.commit('dataModel/SET_MODELNAME', result.data.name)
-        this.$store.commit('dataModel/SET_PRIVILEGES', result.data.privileges || [])
+        this.$store.commit('common/SET_PRIVILEGES', result.data.privileges || [])
         this.handleDetailWithRoot()
         this.handleDimensions()
         this.handleMeasures()

@@ -416,6 +416,7 @@ export default {
       if (result.code === 200) {
         this.detailInfo = result.data
         this.$store.dispatch('dataModel/setAddModelId', result.data.id)
+        this.$store.commit('common/SET_PRIVILEGES', [0]) // 新增赋予所有权限
         this.$nextTick(() => {
           this.handleGetDatabase()
         })
@@ -680,6 +681,7 @@ export default {
         // 将自定义维度度量剥离处理
         this.detailInfo.pivotSchema.dimensions = this.handlePeelCustom(this.detailInfo.pivotSchema.dimensions, this.cacheDimensions)
         this.detailInfo.pivotSchema.measures = this.handlePeelCustom(this.detailInfo.pivotSchema.measures, this.cacheMeasures)
+        this.$store.commit('common/SET_PRIVILEGES', result.data.privileges || [])
 
         this.handleDimensions()
         this.handleMeasures()
