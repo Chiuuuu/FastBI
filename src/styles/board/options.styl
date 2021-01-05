@@ -119,19 +119,41 @@
     transform: translate3d(0, 0, 0)
   }
 }
+
+.h-padding{
+  padding: 6px 13px;
+}
 // 页面设置
 .page-config, .block-config {
+  .ant-collapse-content > .ant-collapse-content-box {
+    @extend .h-padding;
+  }
+  
+  .f-flex1 {
+   flex: 1;
+  }
+
+  .f-clear-width {
+    width: auto;
+  }
+
   .gui-field {
     display: flex;
     justify-content: space-between;
-    padding: 6px 13px;
     min-height: 24px;
     color: $color-text-info;
     font-size: 12px;
+    padding: 6px 0px;
+
+    &.has-padding {
+      @extend .h-padding;
+  }
+
     .gui-field-name {
       padding-right: 5px;
       line-height: 28px;
       flex: 0  0 auto;
+      width: 65px;
     }
     .gui-field-container {
       min-height: 24px;
@@ -153,6 +175,9 @@
         }
         &:first-child {
           margin-right: 5px;
+        }
+        &:last-child {
+          margin: 0px;
         }
       }
     }
@@ -239,7 +264,7 @@
 // 数据样式
 .data-source{
   .empty{
-    width:230px;
+    width:225px;
     height:32px;
     border:1px solid rgba(229,229,229,1);
     border-radius:4px;
@@ -249,7 +274,7 @@
   }
   .field{
     position: relative;
-    width:230px;
+    width:225px;
     height:32px;
     background:rgba(98,124,255,0.1);
     border:1px solid #627CFF;

@@ -9,8 +9,7 @@ const state = {
   parentId: 0, // 文件夹id
   databaseName: '', // 数据库名称
   modelSelectType: '', // new: 新添加 add: 右键添加
-  readRows: [], // 读表数据
-  privileges: [] // 权限列表
+  readRows: [] // 读表数据
 }
 
 const mutations = {
@@ -43,9 +42,6 @@ const mutations = {
   },
   SET_DATABASENAME(state, name) {
     state.databaseName = name
-  },
-  SET_PRIVILEGES(state, privileges) {
-    state.privileges = privileges
   }
 }
 

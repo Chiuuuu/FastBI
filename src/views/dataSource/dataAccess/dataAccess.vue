@@ -43,7 +43,6 @@ export default {
     this.$store.dispatch('dataAccess/setModelType', '')
     this.$store.dispatch('dataAccess/setModelId', 0)
     this.$store.dispatch('dataAccess/setFirstFinished', false)
-    this.$store.commit('dataAccess/SET_PRIVILEGES', [])
   }
 }
 </script>

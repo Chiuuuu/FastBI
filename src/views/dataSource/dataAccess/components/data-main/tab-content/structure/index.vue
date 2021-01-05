@@ -245,7 +245,7 @@ export default {
       modelInfo: state => state.dataAccess.modelInfo,
       modelName: state => state.dataAccess.modelName,
       modelType: state => state.dataAccess.modelType,
-      privileges: state => state.dataAccess.privileges,
+      privileges: state => state.common.privileges,
       showExtractBtn: state => [ 'mysql', 'oracle', 'hive' ].indexOf(state.dataAccess.modelType) > -1
     }),
     rowSelection() {
@@ -267,20 +267,9 @@ export default {
       }
     },
     hasBtnPermissionExtract() {
-      // if (!this.privileges || this.privileges.length < 1) {
-      //   return checkActionPermission(this.$PERMISSION_CODE.OBJECT.datasource, this.$PERMISSION_CODE.OPERATOR.extract)
-      // } else {
-      //   return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.extract)
-      // }
       return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.extract)
     },
     hasBtnPermissionSchedule() {
-      // if (!hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.schedule)) {
-        // if (!checkActionPermission(this.$PERMISSION_CODE.OBJECT.datasource, this.$PERMISSION_CODE.OPERATOR.schedule)) {
-          // return false
-        // }
-      // }
-      // return true
       return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.schedule)
     }
   },

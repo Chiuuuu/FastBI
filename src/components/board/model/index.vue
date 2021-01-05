@@ -297,7 +297,7 @@ export default {
       this.$server.screenManage.getScreenDetailById(this.screenId).then(res => {
         if (res.code === 200) {
           this.$store.dispatch('dataModel/setSelectedModelList', res.list)
-          this.$store.dispatch('SetPrivileges', res.data.privileges || [])
+          this.$store.commit('common/SET_PRIVILEGES', res.data.privileges || [])
         }
       })
     },

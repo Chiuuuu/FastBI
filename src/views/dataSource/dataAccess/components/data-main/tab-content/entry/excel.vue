@@ -181,7 +181,7 @@ export default {
       modelInfo: state => state.dataAccess.modelInfo,
       modelFileList: state => state.dataAccess.modelFileList,
       modelType: state => state.dataAccess.modelType,
-      privileges: state => state.dataAccess.privileges,
+      privileges: state => state.common.privileges,
       databaseName: state => state.dataAccess.databaseName
     }),
     currentFileList() {
@@ -584,7 +584,7 @@ export default {
                 this.$store.dispatch('dataAccess/setModelName', this.form.name)
                 // this.$store.dispatch('dataAccess/setParentId', 0)
                 this.$store.dispatch('dataAccess/setModelId', result.data.datasource.id)
-                this.$store.commit('dataAccess/SET_PRIVILEGES', result.data.datasource.privileges)
+                this.$store.commit('common/SET_PRIVILEGES', result.data.datasource.privileges)
                 this.fileInfoList = result.data.sourceDatabases
                 // 保存后清空列表
                 this.fileList = []
