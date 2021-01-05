@@ -12,25 +12,25 @@
       </a-collapse-panel>
       <a-collapse-panel key="sort" header="排序">
         <div style="display: flex;">
-          <a-select v-model="sortData.fileid" placeholder="选择字段" style="width: 120px;margin-right:10px"
+          <a-select v-model="sortData.fileid" placeholder="选择字段" class="f-flex1" style="margin-right:10px"
                     @change="sortFileChange">
             <a-select-option v-for="item in sortList" :value="item.id" :key="item.id">
               {{item.name}}
             </a-select-option>
           </a-select>
-          <a-select v-model="sortData.asc" style="width: 110px" @change="ascChange">
+          <a-select v-model="sortData.asc" class="f-flex1" @change="ascChange">
             <a-select-option v-for="(item,index) in ascList" :key="index" :value="item.value">{{item.name}}</a-select-option>
           </a-select>
         </div>
       </a-collapse-panel>
       <a-collapse-panel key="refresh" header="定时刷新">
         <a-switch slot="extra" v-if="activeKey.includes('refresh')" v-model="refresh.isRefresh" default-checked @change="refreshChange" size="small" />
-        <div style="display: flex;">
-          <a-input-number v-model="refresh.frequency" :min="1" @change="frequencyChange" style="width: 110px;margin-right:10px" />
-          <a-select v-model="refresh.unit" placeholder="请选择"  @change="unitChange" style="width: 110px">
+          <div style="display: flex;">
+          <a-input-number v-model="refresh.frequency" :min="1" @change="frequencyChange" class="f-flex1" style="margin-right:10px" />
+          <a-select v-model="refresh.unit" placeholder="请选择"  @change="unitChange" class="f-flex1">
             <a-select-option v-for="(item,index) in refreshList" :key="index" :value="item.value">{{item.name}}</a-select-option>
           </a-select>
-        </div>
+          </div>
       </a-collapse-panel>
       <!-- <a-collapse-panel key="filter" header="数据筛选">
         <div class="empty">拖入字段</div>

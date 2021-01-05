@@ -287,7 +287,7 @@ const list = [{
                             barBorderRadius: [0]
                         }
                     },
-                    barWidth: 'auto' // 可选
+                    barWidth: '20%' // 可选
                 },
                 color: DEFAULT_COLORS
             },
@@ -413,13 +413,16 @@ const list = [{
                         show: false,
                         color: '#fff',
                         fontSize: 12,
-                        position: 'inside'
+                        position: 'inside',
+                        // offset: [0, 1]
                     },
-                    barWidth: 'auto' // 可选
+                    barWidth: '20%', // 可选
+                    barGap: '40%',
+                    barCategoryGap: "40%"
                 },
                 color: DEFAULT_COLORS
             },
-            view: { width: 500, height: 400, x: 710, y: 340 }
+            view: { width: 500, height: 450, x: 710, y: 340 }
         },
         {
             title: '饼图',
