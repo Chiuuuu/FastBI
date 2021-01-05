@@ -204,7 +204,7 @@ export default {
       return this.searchValue ? this.searchList : this.tableList
     },
     hasEditPermission() {
-      return hasPermission(this.$store.state.app.privileges, this.$PERMISSION_CODE.OPERATOR.edit)
+      return hasPermission(this.$store.state.common.privileges, this.$PERMISSION_CODE.OPERATOR.edit)
     }
   },
   mounted() {
@@ -294,7 +294,7 @@ export default {
           this.fileSelectId = ''
           this.fileSelectName = ''
           this.$store.dispatch('SetParentId', '')
-          this.$store.dispatch('SetPrivileges', [])
+          this.$store.commit('common/SET_PRIVILEGES', [])
         }
       })
     },

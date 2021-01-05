@@ -27,7 +27,6 @@ export default {
   beforeDestroy() {
     this.$store.dispatch('dataModel/setModelId', -1)
     this.$store.commit('dataModel/SET_MODELNAME', '')
-    this.$store.commit('dataModel/SET_PRIVILEGES', [])
   },
   methods: {
     handleEmitMainGetData(id) {

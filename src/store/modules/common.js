@@ -5,7 +5,8 @@ const state = {
     sidebarUnfold: false, // 侧边栏是否收起(true收起，false展开)
     navMenuActive: '1-1', // 导航菜单高亮
     adminToken: tokenInfo ? tokenInfo.token : '', // token
-    username: ''
+    username: '',
+    privileges: [] // 当前模块权限列表
 }
 
 const mutations = {
@@ -26,7 +27,12 @@ const mutations = {
 
     // 设置用户名
     set_username(state, data) {
-      state.username = data
+        state.username = data
+    },
+
+    // 设置当前模块权限
+    SET_PRIVILEGES(state, privileges) {
+        state.privileges = privileges
     }
 }
 

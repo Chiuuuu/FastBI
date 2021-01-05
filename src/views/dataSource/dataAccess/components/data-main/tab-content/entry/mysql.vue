@@ -152,7 +152,7 @@ export default {
       tableList: state => state.dataAccess.menuList,
       modelType: state => state.dataAccess.modelType, // 数据类型
       modelSelectType: state => state.dataAccess.modelSelectType,
-      privileges: state => state.dataAccess.privileges,
+      privileges: state => state.common.privileges,
       tabChangeAble: state => state.dataAccess.firstFinished // 是否完成第一部分
     }),
     hasPermission() {
@@ -302,7 +302,7 @@ export default {
             this.$store.dispatch('dataAccess/setModelName', this.form.name)
             this.$store.dispatch('dataAccess/setDatabaseName', this.form.databaseName)
             this.$store.dispatch('dataAccess/setModelId', result.data.id)
-            this.$store.commit('dataAccess/SET_PRIVILEGES', result.data.privileges)
+            this.$store.commit('common/SET_PRIVILEGES', result.data.privileges)
             // this.$store.dispatch('dataAccess/setParentId', 0)
           } else {
             this.$message.error(result.msg)
