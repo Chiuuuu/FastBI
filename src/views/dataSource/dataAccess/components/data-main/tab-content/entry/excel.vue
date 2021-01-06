@@ -9,7 +9,7 @@
         :wrapper-col="{ span: 14 }"
       >
         <a-form-model-item label="数据源名称" prop="name">
-          <a-input v-model="form.name" @change="handleSetTableName" />
+          <a-input placeholder="请输入数据源名称" v-model="form.name" @change="handleSetTableName" />
         </a-form-model-item>
         <a-form-model-item label="Excel文件" required>
           <div

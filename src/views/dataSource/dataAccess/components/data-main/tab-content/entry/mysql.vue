@@ -12,21 +12,22 @@
   >
     <a-form-model-item label="数据源名称" prop="name">
       <a-input
+        placeholder="请输入数据源名称"
         v-model="form.name"
         @change="handleSetTableName"
       />
     </a-form-model-item>
     <a-form-model-item label="服务器" prop="ip">
-      <a-input v-model="form.ip" />
+      <a-input placeholder="请输入服务器" v-model="form.ip" />
     </a-form-model-item>
     <a-form-model-item label="端口" prop="port">
-      <a-input v-model.number="form.port" />
+      <a-input placeholder="请输入端口" v-model.number="form.port" />
     </a-form-model-item>
     <a-form-model-item label="用户名" prop="user">
-      <a-input v-model="form.user" />
+      <a-input placeholder="请输入用户名" v-model="form.user" />
     </a-form-model-item>
     <a-form-model-item label="密码" prop="password">
-      <a-input-password v-model="form.password" autocomplete />
+      <a-input-password placeholder="请输入密码" v-model="form.password" autocomplete />
     </a-form-model-item>
     <a-form-model-item :wrapper-col="{ span: 14 }">
       <a-button

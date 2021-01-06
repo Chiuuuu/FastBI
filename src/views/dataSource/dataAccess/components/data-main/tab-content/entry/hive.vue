@@ -12,6 +12,7 @@
   >
     <a-form-model-item label="数据源名称" prop="name">
       <a-input
+        placeholder="请输入数据源名称"
         v-model="form.name"
         @change="handleSetTableName"
       />
@@ -27,28 +28,28 @@
       </a-select>
     </a-form-model-item>
     <a-form-model-item label="服务器" prop="ip">
-      <a-input v-model="form.ip" />
+      <a-input placeholder="请输入服务器" v-model="form.ip" />
     </a-form-model-item>
     <a-form-model-item label="端口" prop="port" v-if="form.linkMode === 1" :rules="[
       { required: true, message: '请输入端口号' },
       { type: 'integer', message: '请输入数字', min: 0 }
     ]">
-      <a-input v-model.number="form.port" />
+      <a-input placeholder="请输入端口" v-model.number="form.port" />
     </a-form-model-item>
     <a-form-model-item label="HiveServer2 IP" prop="hiveserver">
-      <a-input v-model="form.hiveserver" />
+      <a-input placeholder="请输入HiveServer2 IP" v-model="form.hiveserver" />
     </a-form-model-item>
     <a-form-model-item label="hdfs端口" prop="hdfsPort">
-      <a-input v-model.number="form.hdfsPort" />
+      <a-input placeholder="请输入hdfs端口" v-model.number="form.hdfsPort" />
     </a-form-model-item>
     <a-form-model-item label="命名空间" prop="namescape" v-if="form.linkMode === 2" :rules="[{
         required: true,
         message: '请输入命名空间'
       }]">
-      <a-input v-model.number="form.namescape" />
+      <a-input placeholder="请输入命名空间" v-model.number="form.namescape" />
     </a-form-model-item>
     <!-- <a-form-model-item label="认证方式" prop="authMethod">
-      <a-select v-model="form.authMethod" @change="handleChangeMethod">
+      <a-select placeholder="请选择认证方式" v-model="form.authMethod" @change="handleChangeMethod">
         <a-select-option :value="0">无</a-select-option>
         <a-select-option :value="1">kerberos</a-select-option>
         <a-select-option :value="2">用户名</a-select-option>
@@ -67,7 +68,7 @@
         min: 1,
         message: '长度为1~100'
       }]">
-        <a-input v-model="form.server" />
+        <a-input placeholder="请输入服务器principal" v-model="form.server" />
       </a-form-model-item>
       <a-form-model-item label="客户端principal" prop="client" :rules="[
         {
@@ -80,10 +81,10 @@
           min: 1,
           message: '长度为1~100'
         }]">
-        <a-input v-model="form.client" />
+        <a-input placeholder="请输入客户端principal" v-model="form.client" />
       </a-form-model-item>
       <a-form-model-item label="keytab文件" required>
-        <a-input-search disabled v-model="filename">
+        <a-input-search placeholder="请上传keytab文件" disabled v-model="filename">
           <a-button slot="enterButton" @click.native="$refs.uploader.click()">上传</a-button>
         </a-input-search>
         <input ref="uploader" class="unvisible" type="file" @change="handleUploadFile">
@@ -93,7 +94,7 @@
       required: true,
       message: '请输入用户名'
     }]">
-      <a-input v-model="form.user" />
+      <a-input placeholder="请输入用户名" v-model="form.user" />
     </a-form-model-item>
     <a-form-model-item v-if="form.authMethod === 3" label="密码" prop="password" :rules="[
       {
@@ -101,7 +102,7 @@
         message: '请输入密码'
       }
     ]">
-      <a-input-password v-model="form.password" />
+      <a-input-password placeholder="请输入密码" v-model="form.password" />
     </a-form-model-item>
     <a-form-model-item class="form-not-required" label="默认组" prop="databaseName" v-if="connectStatus">
       <a-select

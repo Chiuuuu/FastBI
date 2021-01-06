@@ -9,7 +9,7 @@
         :wrapper-col="{ span: 14 }"
       >
         <a-form-model-item label="数据源名称" prop="name">
-          <a-input v-model="form.name" />
+          <a-input placeholder="请输入数据源名称" v-model="form.name" />
         </a-form-model-item>
         <a-form-model-item :label="modelType + '文件'" required>
           <div
@@ -57,7 +57,7 @@
             </a-button>
           </a-upload>
         </a-form-model-item>
-        <a-form-model-item label="文件分隔符" prop="delimiter">
+        <a-form-model-item class="form-not-required" label="文件分隔符" prop="delimiter">
           <a-radio-group style="width:100%" v-model="form.delimiter" @change="changeDelimiter">
             <a-radio value="0">逗号</a-radio>
             <a-radio value="1">分号</a-radio>
