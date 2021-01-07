@@ -5,55 +5,56 @@
         <a-radio-button :value="0">原始表</a-radio-button>
         <a-radio-button :value="1">自定义表</a-radio-button>
       </a-radio-group>
-      <a-row type="flex" justify="end" align="middle">
-        <a-col :span="6" style="margin-right:auto">
-          <a-input :value="tableKeyword" @change="handleGetTableKeyword" placeholder="请输入表名" class="search_input">
+      <a-row type="flex" align="middle">
+        <a-col :span="6" style="padding-left:20px">
+          <a-input :value="tableKeyword" @change="handleGetTableKeyword" placeholder="请输入表名">
             <a-icon slot="prefix" type="search" />
           </a-input>
         </a-col>
-        <a-col :span="13">
-          <a-row type="flex" justify="end" align="middle">
-          <a-button type="primary" class="select_button" @click="() => handleGetData()" :loading="spinning">刷新数据</a-button>
-          <a-button
-            v-if="tableType === 0 && hasBtnPermissionSchedule"
-            v-show="showExtractBtn"
-            type="primary"
-            style="margin-left:10px;"
-            class="select_button"
-            @click="showExtractLog"
-          >定时抽取记录</a-button>
-          <a-button
-            v-if="hasBtnPermissionExtract"
-            v-show="showExtractBtn"
-            type="primary"
-            class="select_button"
-            style="margin-left:10px;"
-            @click="handleExtract"
-            :loading="extractSping">立即抽取</a-button>
-          <a-button
-            v-if="tableType === 0 && hasBtnPermissionSchedule"
-            v-show="showExtractBtn"
-            type="primary"
-            style="margin-left:10px;"
-            @click="showSetting('batch')"
-            class="select_button"
-          >批量抽取</a-button>
-          <a-button
-            v-if="tableType === 0 && hasBtnPermissionSchedule"
-            v-show="showExtractBtn"
-            type="primary"
-            style="margin-left:10px;"
-            @click="showSetting('batchList')"
-            class="select_button"
-          >批量任务列表</a-button>
-          </a-row>
-        </a-col>
-        <a-col v-show="tableType === 0" :span="4" style="margin-left:10px">
-          <a-select style="width: 100%;" :value="database" @change="handleChangeDatabase">
+        <a-col :span="4" style="padding-left:10px">
+          <a-select v-show="tableType === 0" style="width: 100%;" :value="database" @change="handleChangeDatabase">
             <a-select-option v-for="item in databaseList" :key="item.name" :value="item.name">
               {{ item.name }}
             </a-select-option>
           </a-select>
+        </a-col>
+        <a-col :span="14">
+          <a-row type="flex" justify="end" align="middle">
+            <a-button type="primary" class="select_button" @click="() => handleGetData()" :loading="spinning">刷新数据</a-button>
+            <a-button
+              v-if="hasBtnPermissionExtract"
+              v-show="showExtractBtn"
+              type="primary"
+              class="select_button"
+              style="margin-left:10px;"
+              @click="handleExtract"
+              :loading="extractSping">立即抽取</a-button>
+            <a-button
+              v-if="tableType === 0 && hasBtnPermissionSchedule"
+              v-show="showExtractBtn"
+              type="primary"
+              style="margin-left:10px;"
+              @click="showSetting('batch')"
+              class="select_button"
+            >批量定时抽取</a-button>
+            <a-dropdown
+              v-if="tableType === 0 && hasBtnPermissionSchedule"
+              v-show="showExtractBtn"
+              :trigger="['click']">
+              <a-button type="primary" style="margin-left:10px;">更多<a-icon type="down" /></a-button>
+              <a-menu slot="overlay">
+                <a-menu-item>
+                  <span @click="showExtractLog">同步库表结构</span>
+                </a-menu-item>
+                <a-menu-item>
+                  <span @click="showExtractLog">定时抽取记录</span>
+                </a-menu-item>
+                <a-menu-item>
+                  <span @click="showSetting('batchList')">批量任务列表</span>
+                </a-menu-item>
+              </a-menu>
+            </a-dropdown>
+          </a-row>
         </a-col>
       </a-row>
     </div>

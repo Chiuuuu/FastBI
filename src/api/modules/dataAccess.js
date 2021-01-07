@@ -44,7 +44,7 @@ export default {
      * @returns
      */
     getTableInfo(id) {
-        return $axios.get(`datasource/table/read/${id}`)
+        return $axios.get(`/datasource/table/read/${id}`)
     },
     /**
      * @description 保存数据信息
