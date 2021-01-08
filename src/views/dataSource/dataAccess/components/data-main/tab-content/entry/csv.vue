@@ -580,6 +580,15 @@ export default {
                 // this.$store.dispatch('dataAccess/setParentId', 0)
                 // 保存后清空列表
                 this.fileList = []
+                this.deleteIdList = []
+                // 刷新文件id(替换成数据库生成的真实id)
+                const databases = result.data.databaseList
+                this.fileInfoList.map(item => {
+                  const target = result.data.databaseList.find(data => data.name === item.name)
+                  if (target) {
+                    item.id = target.id
+                  }
+                })
               } else {
                 this.$message.error(result.msg)
               }

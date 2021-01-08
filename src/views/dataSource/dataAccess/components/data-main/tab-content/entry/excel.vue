@@ -455,7 +455,6 @@ export default {
         const name = fileInfo.name
         fileInfo.name = name.slice(0, name.lastIndexOf('.'))
         this.fileInfoList.push(fileInfo)
-        console.log('name:', name, fileInfo.name)
 
         const currentIndex = this.currentFileList.length - 1
         const database = new MapSheet(result.rows[0].mapSheet)
@@ -589,6 +588,14 @@ export default {
                 // 保存后清空列表
                 this.fileList = []
                 this.deleteIdList = []
+                // 刷新文件id(替换成数据库生成的真实id)
+                const databases = result.data.sourceDatabases
+                this.fileInfoList.map(item => {
+                  const target = databases.find(data => data.name === item.name)
+                  if (target) {
+                    item.id = target.id
+                  }
+                })
               } else {
                 this.$message.error(result.msg)
               }
