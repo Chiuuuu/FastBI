@@ -238,10 +238,6 @@ export default {
         })
       if (res.code === 200) {
         this.projectList = res.rows
-        // 添加用户时, 初始选中默认项目
-        if (this.modalType === 'add') {
-          this.form.projects = ['1']
-        }
       } else {
         this.projectList = []
         this.$message.error('获取项目列表失败')
