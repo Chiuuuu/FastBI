@@ -115,10 +115,18 @@ export default {
     async handleGetRegularList() {
       this.modalSpin = true
       let isString = typeof this.rows === 'string'
-      const res = await this.$server.dataAccess.getRegularList(isString ? this.rows : this.rows[0].databaseId, +isString)
-        .finally(() => {
-          this.modalSpin = false
-        })
+      let res
+      if (isString) {
+        res = await this.$server.dataAccess.getRegularList(this.rows, 1)
+          .finally(() => {
+            this.modalSpin = false
+          })
+      } else {
+        res = await this.$server.dataAccess.getRegularList(this.rows[0].databaseId, this.rows[0].id)
+          .finally(() => {
+            this.modalSpin = false
+          })
+      }
       if (res.code === 200) {
         this.regData = res.rows
       } else {

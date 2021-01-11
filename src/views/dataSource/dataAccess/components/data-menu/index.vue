@@ -3,13 +3,11 @@
     <div class="menu_title">
       <span class="m-t-s">数据接入</span>
       <a-dropdown :trigger="['click']" placement="bottomLeft">
-        <a class="ant-dropdown-link">
+        <a v-permission:[$PERMISSION_CODE.OPERATOR.add]="$PERMISSION_CODE.OBJECT.datasource" class="ant-dropdown-link">
           <a-icon type="plus-square" class="menu_icon" />
         </a>
         <a-menu slot="overlay" class="drow_menu">
-          <a-menu-item
-          v-permission:[$PERMISSION_CODE.OPERATOR.add]="$PERMISSION_CODE.OBJECT.datasource"
-          v-on:click="showModal">
+          <a-menu-item v-on:click="showModal">
             添加连接
           </a-menu-item>
           <a-menu-item key="1" @click="handleAddNewFolder">
@@ -187,17 +185,22 @@ export default {
       fileContenxtMenu: [
         {
           name: '移动到',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit
+          },
           onClick: this.handleFilemoveFile
         },
         {
           name: '重命名',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit
+          },
           onClick: this.handleFileResetName
         },
         {
           name: '删除',
           permission: {
-            OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove,
-            OBJECT: this.$PERMISSION_CODE.OBJECT.datasource
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit
           },
           onClick: this.handleFileDelete
         }

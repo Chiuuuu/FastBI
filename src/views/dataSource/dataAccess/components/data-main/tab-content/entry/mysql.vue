@@ -51,7 +51,7 @@
         type="primary"
         style="width:88px;height:30px;margin-left:150px"
         @click="handleConnect"
-        v-permission:[btnPermission]="$PERMISSION_CODE.OBJECT.datasource"
+        v-if="hasPermission"
       >
         连接
       </a-button>
@@ -92,7 +92,6 @@ export default {
   name: 'model-mysql',
   data() {
     return {
-      btnPermission: [this.$PERMISSION_CODE.OPERATOR.edit, this.$PERMISSION_CODE.OPERATOR.add],
       labelCol: {
         xs: { span: 4 },
         sm: { span: 3 },

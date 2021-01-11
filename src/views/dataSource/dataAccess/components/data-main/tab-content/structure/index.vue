@@ -37,19 +37,20 @@
               @click="showSetting('batch')"
               class="select_button"
             >批量定时抽取</a-button>
-            <a-dropdown
-              v-if="tableType === 0 && hasBtnPermissionSchedule"
-              v-show="showExtractBtn"
-              :trigger="['click']">
+            <a-dropdown :trigger="['click']">
               <a-button type="primary" style="margin-left:10px;">更多<a-icon type="down" /></a-button>
               <a-menu slot="overlay">
                 <a-menu-item>
-                  <span @click="showExtractLog">同步库表结构</span>
+                  <span @click="handleSyncTable">同步库表结构</span>
                 </a-menu-item>
-                <a-menu-item>
+                <a-menu-item
+                  v-if="tableType === 0 && hasBtnPermissionSchedule"
+                  v-show="showExtractBtn">
                   <span @click="showExtractLog">定时抽取记录</span>
                 </a-menu-item>
-                <a-menu-item>
+                <a-menu-item
+                  v-if="tableType === 0 && hasBtnPermissionSchedule"
+                  v-show="showExtractBtn">
                   <span @click="showSetting('batchList')">批量任务列表</span>
                 </a-menu-item>
               </a-menu>
@@ -294,6 +295,11 @@ export default {
       }
     },
     handleTableTypeChange(event) {
+      this.handleGetData()
+    },
+    // 同步库库表结构
+    handleSyncTable() {
+      this.$message.success('库表同步成功')
       this.handleGetData()
     },
     handleGetTableKeyword: debounce(function(e) {

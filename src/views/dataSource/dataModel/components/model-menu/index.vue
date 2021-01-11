@@ -192,21 +192,22 @@ export default {
       fileContenxtMenu: [
         {
           name: '移动到',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit
+          },
           onClick: this.handleFilemove
         },
         {
           name: '重命名',
           permission: {
-            OPERATOR: this.$PERMISSION_CODE.OPERATOR.rename,
-            OBJECT: this.$PERMISSION_CODE.OBJECT.datamodel
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit
           },
           onClick: this.handleFileResetName
         },
         {
           name: '删除',
           permission: {
-            OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove,
-            OBJECT: this.$PERMISSION_CODE.OBJECT.datamodel
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit
           },
           onClick: this.handleFileDelete
         }
