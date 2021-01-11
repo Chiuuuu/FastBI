@@ -192,7 +192,7 @@
       />
       <div class="submit_btn">
         <!-- <a-button :disabled="!detailInfo">保存并新建报告</a-button> -->
-        <a-button v-if="hasBtnPermissionSave" type="primary" @click="handleSave" :disabled="!detailInfo">保 存</a-button>
+        <a-button type="primary" @click="handleSave" :disabled="!detailInfo">保 存</a-button>
         <a-button v-on:click="exit">退 出</a-button>
       </div>
     </div>
@@ -321,9 +321,6 @@ export default {
       }
 
       return this.detailInfo.config.tables && this.detailInfo.config.tables.length === 0
-    },
-    hasBtnPermissionSave() {
-      return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.edit)
     }
   },
   mounted() {
