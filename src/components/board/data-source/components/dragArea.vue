@@ -1,38 +1,38 @@
 <template>
-  <div class="dragArea"
-       :class="{'dragable-vaild':type===dragFile || isdrag && type==='tableList'}"
-       @drop.stop.prevent="handleDropOnFilesWD($event)"
-       @dragover.stop.prevent
-       @dragenter="dragenter"
-       @dragleave="dragleave">
+  <div
+    class="dragArea"
+    :class="{'dragable-vaild':type===dragFile || isdrag && type==='tableList'}"
+    @drop.stop.prevent="handleDropOnFilesWD($event)"
+    @dragover.stop.prevent
+    @dragenter="dragenter"
+    @dragleave="dragleave"
+  >
     <div v-if="fileList.length>0">
       <div
-          class="field"
-          v-for="(item, index) in fileList"
-          :key="index"
-          @contextmenu.prevent="showMore(item)">
-          <a-dropdown :trigger="['click', 'contextmenu']" v-model="item.showMore">
-            <a-icon class="icon-more" type="caret-down" />
-            <a-menu slot="overlay" @click="deleteFile(item, index)">
-              <a-menu-item key="3">
-                移除
-              </a-menu-item>
-            </a-menu>
-          </a-dropdown>
-          <a-tooltip :title="item.alias">
+        class="field"
+        v-for="(item, index) in fileList"
+        :key="index"
+        @contextmenu.prevent="showMore(item)"
+      >
+        <a-dropdown :trigger="['click', 'contextmenu']" v-model="item.showMore">
+          <a-icon class="icon-more" type="caret-down" />
+          <a-menu slot="overlay" @click="deleteFile(item, index)">
+            <a-menu-item key="3">移除</a-menu-item>
+          </a-menu>
+        </a-dropdown>
+        <a-tooltip :title="item.alias">
           <span ref="itemName" class="field-text">{{item.alias}}</span>
         </a-tooltip>
       </div>
     </div>
-    <div class="empty"
-      :class="{field:isdrag && type===dragFile}"
-      >{{emptyText[type]}}</div>
+    <div class="empty" :class="{field:isdrag && type===dragFile}">{{emptyText[type]}}</div>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import { deepClone } from '@/utils/deepClone'
+import { sum, summary } from '@/utils/summaryList'
 import navigateList from '@/config/navigate' // 导航条菜单
 
 export default {
@@ -42,8 +42,10 @@ export default {
       default: ''
     } // 区域类型 维度/度量
   },
-  data() {
+  data () {
     return {
+      current: {},
+      selected: {},
       emptyText: {
         'dimensions': '拖入维度',
         'measures': '拖入度量',
@@ -56,32 +58,32 @@ export default {
     }
   },
   watch: {
-    currentSelected: {
+    currSelected: {
       handler (val) {
         if (val) {
           // 当前选中的图表显示维度度量的数据
           this.fileList = []
           // 维度度量都需要
           if (this.chartType === '1') {
-            if (this.type === 'dimensions' && val.packageJson.api_data.dimensions) { // 维度
-              this.fileList = deepClone(val.packageJson.api_data.dimensions)
+            if (this.type === 'dimensions' && val.setting.api_data.dimensions) { // 维度
+              this.fileList = deepClone(val.setting.api_data.dimensions)
             }
-            if (this.type === 'measures' && val.packageJson.api_data.measures) { // 度量
-              this.fileList = deepClone(val.packageJson.api_data.measures)
+            if (this.type === 'measures' && val.setting.api_data.measures) { // 度量
+              this.fileList = deepClone(val.setting.api_data.measures)
             }
           }
 
           // 只需要度量
           if (this.chartType === '2') {
-            if (this.type === 'measures' && val.packageJson.api_data.measures) {
-              this.fileList = deepClone(val.packageJson.api_data.measures)
+            if (this.type === 'measures' && val.setting.api_data.measures) {
+              this.fileList = deepClone(val.setting.api_data.measures)
             }
           }
 
           // 表格不区分维度跟度量
           if (this.chartType === '3') {
-            if (this.type === 'tableList' && val.packageJson.api_data.tableList) {
-              this.fileList = deepClone(val.packageJson.api_data.tableList)
+            if (this.type === 'tableList' && val.setting.api_data.tableList) {
+              this.fileList = deepClone(val.setting.api_data.tableList)
             }
           }
         }
@@ -91,35 +93,29 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['dragFile', 'currentSelected', 'optionsTabsType', 'dataModel']),
+    ...mapGetters(['dragFile', 'currentSelected', 'currSelected', 'optionsTabsType', 'dataModel', 'canvasMap']),
     chartType () {
-      return this.currentSelected ? this.currentSelected.packageJson.type : ''
+      return this.currSelected ? this.currSelected.setting.type : ''
     }
   },
-  mounted() {
-    this.current = deepClone(this.currentSelected)
-  },
   methods: {
-    ...mapActions(['saveScreenData']),
+    ...mapActions(['saveScreenData', 'updateChartData']),
     // 将拖动的维度到所选择的放置目标节点中
-    handleDropOnFilesWD(event) {
+    handleDropOnFilesWD (event) {
       // h5 api
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
-      let apiData = deepClone(this.currentSelected.packageJson.api_data)
-      console.log(apiData)
-      console.log(dataFile)
-      if (apiData.modelId && apiData.modelId !== dataFile.datamodelId) {
+      if (this.currSelected.datamodelId && this.currSelected.datamodelId !== '0' && this.currSelected.datamodelId !== dataFile.datamodelId) {
         this.$message.error('一个图表只能拖入一个数据模型的字段')
         return false
       }
       dataFile.showMore = false // 是否点击显示更多
       if (this.type === 'dimensions' && this.dragFile === this.type) {
         // 嵌套饼图可以有多个维度
-        if (this.currentSelected.packageJson.chartType === 'v-multiPie') {
-            this.fileList.push(dataFile)
+        if (this.currSelected.setting.chartType === 'v-multiPie') {
+          this.fileList.push(dataFile)
         } else {
-        // 维度暂时只能拉入一个字段
-        this.fileList[0] = dataFile
+          // 维度暂时只能拉入一个字段
+          this.fileList[0] = dataFile
         }
         this.fileList = this.uniqueFun(this.fileList, 'alias')
         this.getData()
@@ -127,7 +123,7 @@ export default {
       // 度量
       if (this.type === 'measures' && this.dragFile === this.type && this.chartType === '1') {
         // 饼图类型只能拉入一个度量
-        if (this.currentSelected.packageJson.name === 've-pie') {
+        if (this.currSelected.setting.name === 've-pie') {
           this.fileList[0] = dataFile
         } else {
           this.fileList.push(dataFile)
@@ -143,7 +139,7 @@ export default {
       }
       // 仪表盘/环形图
       if (this.chartType === '2' && this.type === 'measures' && this.dragFile === this.type) {
-        if (this.currentSelected.packageJson.name === 've-pie') {
+        if (this.currSelected.setting.name === 've-pie') {
           this.fileList[0] = dataFile
           // 如果是仪表盘，需要两个度量
         } else if (this.fileList.length < 2) {
@@ -155,37 +151,37 @@ export default {
       this.isdrag = false
     },
     // 对象数组去重,type表示对象里面的一个属性
-    uniqueFun(arr, type) {
+    uniqueFun (arr, type) {
       const res = new Map()
       return arr.filter((a) => !res.has(a[type]) && res.set(a[type], 1))
     },
     // 当可拖动的元素进入可放置的目标时
-    dragenter(event) {
+    dragenter (event) {
       event.preventDefault()
       this.isdrag = true
     },
     // 当拖动元素离开可放置目标节点
-    dragleave(event) {
+    dragleave (event) {
       event.preventDefault()
       this.isdrag = false
     },
     // 点击右键显示更多
-    showMore(item) {
+    showMore (item) {
       item.showMore = true
     },
     // 删除当前维度或者度量
-    deleteFile(item, index) {
+    deleteFile (item, index) {
       this.fileList.splice(index, 1)
       this.getData()
-      let current = deepClone(this.currentSelected)
+      let current = deepClone(this.currSelected)
       // 维度度量删除完以后重置该图表数据
       if (this.chartType === '1' || this.chartType === '2') {
-        if (current.packageJson.api_data.dimensions.length === 0 && current.packageJson.api_data.measures.length === 0) {
+        if (current.setting.api_data.dimensions.length === 0 && current.setting.api_data.measures.length === 0) {
           // 清空modelid
-          current.packageJson.api_data.modelId = ''
-          this.$store.dispatch('SetSelfDataSource', current.packageJson.api_data)
+          //   current.packageJson.api_data.modelId = ''
+          this.$store.dispatch('SetSelfDataSource', current.setting.api_data)
           // 嵌套饼图apis恢复原始状态
-          if (current.packageJson.chartType === 'v-multiPie') {
+          if (current.setting.chartType === 'v-multiPie') {
             let apis = {
               level: [
                 ['1/1', '1/2', '1/3'],
@@ -196,86 +192,75 @@ export default {
           }
         }
         // 如果是仪表盘，第二个度量是目标值（进度条最大值）,重置进度条范围
-        if (current.packageJson.chartType === 'v-gauge') {
-          current.packageJson.config.series.max = 100
-          console.log(current.packageJson.config)
-          this.$store.dispatch('SetSelfProperty', current.packageJson.config)
+        if (current.setting.chartType === 'v-gauge') {
+          current.setting.config.series.max = 100
+          this.$store.dispatch('SetSelfProperty', current.setting.config)
         }
       }
       if (this.chartType === '3') {
-        if (current.packageJson.api_data.tableList.length === 0) {
-          current.packageJson.api_data.modelId = ''
-          this.$store.dispatch('SetSelfDataSource', current.packageJson.api_data)
+        if (current.setting.api_data.tableList.length === 0) {
+          // current.setting.api_data.modelId = ''
+          this.$store.dispatch('SetSelfDataSource', current.setting.api_data)
         }
       }
     },
-    // 求和(arr:原数组|key:需要求和的字段)
-    sum(arr, key){
-      return arr.reduce((pre, current) => {
-          return current[key] ? pre + current[key] : pre
-      }, 0 ) || 0
-    },
-    // 分类汇总(arr:原数组|keyValue:分类的字段|countValue:分类后需要求和的字段)
-    summary(arr, keyValue, countValue){
-      let container = [];
-      arr.forEach(item => {
-        // 两个维度的返回结果有可能是null,null的不汇总
-        if (!item[keyValue]) return
-        container[item[keyValue]] = container[item[keyValue]] || []
-        container[item[keyValue]].push(item)
-      })
-      let summaryList = []
-      Object.keys(container).forEach(key => {
-          let total = this.sum(container[key], countValue);
-          summaryList.push({
-            name: key,
-            value: total
-          })
-      })
-      return summaryList
-    },
     // 根据维度度量获取数据
-    getData() {
+    getData () {
+      let selected = this.canvasMap.find(item => item.id === this.currentSelected)
+      // console.log(this.canvasMap)
+      // console.log(this.currentSelected)
+      // console.log('当前',selected)
       // 维度
       if (this.type === 'dimensions') {
-        this.currentSelected.packageJson.api_data.dimensions = this.fileList
+        selected.setting.api_data.dimensions = this.fileList
       }
       // 度量
       if (this.type === 'measures') {
-        this.currentSelected.packageJson.api_data.measures = this.fileList
+        selected.setting.api_data.measures = this.fileList
       }
       // 表格
       if (this.type === 'tableList') {
-        this.currentSelected.packageJson.api_data.tableList = this.fileList
+        selected.setting.api_data.tableList = this.fileList
       }
-      let apiData = deepClone(this.currentSelected.packageJson.api_data)
-      if ((!apiData.modelId || apiData.modelId === '') && this.fileList.length > 0) {
+
+      if ((!selected.datamodelId || selected.datamodelId === '0') && this.fileList.length > 0) {
         // modelId 赋值
-        apiData.modelId = this.fileList[0].datamodelId
-        // this.currentSelected.packageJson.api_data.modelId = this.fileList[0].datamodelId
+        selected.datamodelId = this.fileList[0].datamodelId
+        // apiData.datamodelId = this.fileList[0].datamodelId
+        // apiData.modelId = this.fileList[0].datamodelId
+        // this.currSelected.setting.api_data.modelId = this.fileList[0].datamodelId
       }
+      this.updateChartData()
+
+      let data = this.currSelected.setting.api_data
       if (this.chartType === '1') {
-        if (!apiData.dimensions.length || !apiData.measures.length) {
-          this.saveScreenData()
+        if (!data.dimensions.length && !data.measures.length) {
+          selected.datamodelId = 0
+          this.updateChartData()
+          return
+        }
+        if (!data.dimensions.length || !data.measures.length) {
           return
         }
       }
       if (this.chartType === '2') {
-        if (!apiData.measures.length) {
-          this.saveScreenData()
+        if (!data.measures.length) {
+          selected.datamodelId = 0
+          this.updateChartData()
           return
         }
       }
-      let params = {
-        setting: {
-          ...this.currentSelected
-        }
-      }
+
+
+      let params = selected
+      console.log(JSON.stringify(params))
+      //   return
+
+      let apiData = deepClone(this.currSelected.setting.api_data)
       this.$server.screenManage.getData(params).then(res => {
         if (res.code === 200) {
           if (this.type === 'tableList') {
             let columns = []
-            // let apiData = this.currentSelected.packageJson.api_data
             for (let item of this.fileList) {
               columns.push({
                 title: item.alias,
@@ -293,7 +278,7 @@ export default {
             }
             this.$store.dispatch('SetSelfDataSource', apiData)
           } else {
-            
+
             // 仪表盘/环形图 只显示度量
             if (this.chartType === '2') {
               let columns = ['type', 'value'] // 维度固定
@@ -301,7 +286,7 @@ export default {
                 columns.push(m.alias) // 默认columns第二项起为指标
               }
               // 对返回的数据列进行求和
-              let total = this.sum(res.rows, apiData.measures[0].alias)
+              let total = sum(res.rows, apiData.measures[0].alias)
               let rows = [{
                 type: apiData.measures[0].alias,
                 value: total
@@ -312,18 +297,18 @@ export default {
               }
               // 保存apidata数据
               this.$store.dispatch('SetSelfDataSource', apiData)
-              let config = deepClone(this.currentSelected.packageJson.config)
-              if (this.currentSelected.packageJson.chartType === 'v-multiPie') {
+              let config = deepClone(this.currSelected.setting.config)
+              if (this.currSelected.setting.chartType === 'v-multiPie') {
                 config.chartTitle.text = rows[0].value
                 this.$store.dispatch('SetSelfProperty', config)
               }
               // 如果是仪表盘，第二个度量是目标值（进度条最大值）
-              if (this.currentSelected.packageJson.chartType === 'v-gauge' && apiData.measures[1]) {
-                let goalTotal = this.sum(res.rows, apiData.measures[1].alias)
+              if (this.currSelected.setting.chartType === 'v-gauge' && apiData.measures[1]) {
+                let goalTotal = sum(res.rows, apiData.measures[1].alias)
                 config.series.max = goalTotal
                 this.$store.dispatch('SetSelfProperty', config)
               }
-              this.saveScreenData()
+              this.updateChartData()
               return
             }
 
@@ -340,9 +325,9 @@ export default {
               measureKeys.push(m.alias)
               columns.push(m.alias) // 默认columns第二项起为指标
             }
-            
+
             // 嵌套饼图设置apis
-            if (this.currentSelected.packageJson.chartType === 'v-multiPie') {
+            if (this.currSelected.setting.chartType === 'v-multiPie') {
               // name是各维度数据拼接，value是分类汇总过的数值
               columns = ['name', 'value']
               let result = res.rows
@@ -350,36 +335,34 @@ export default {
               // 一个维度是一层饼
               dimensionKeys.forEach(item => {
                 // 根据当前维度分类得到的列表
-                let list = this.summary(result, item, measureKeys[0])// 嵌套饼图度量只有一个，直接取第一个数
+                let list = summary(result, item, measureKeys[0])// 嵌套饼图度量只有一个，直接取第一个数
                 rows = rows.concat(list) // 把所有维度分类出来的数组进行拼接（v-charts配置格式要求）
 
                 level.push(list.map(obj => obj.name)) // 按维度分层
               })
-              res.rows.map((item, index) => {
-            })
 
               let apis = {
                 level
               }
               console.log(apis)
               this.$store.dispatch('SetApis', apis)
-            } 
+            }
             else {
-            res.rows.map((item, index) => {
-              let obj = {}
-              for (let item2 of dimensionKeys) {
-                obj[item2] = item[item2]
-              }
-              obj[dimensionKeys] = item[dimensionKeys]
-              for (let item2 of measureKeys) {
-                obj[item2] = item[item2]
-              }
-              // if (obj[dimensionKeys]) {
+              res.rows.map((item, index) => {
+                let obj = {}
+                for (let item2 of dimensionKeys) {
+                  obj[item2] = item[item2]
+                }
+                obj[dimensionKeys] = item[dimensionKeys]
+                for (let item2 of measureKeys) {
+                  obj[item2] = item[item2]
+                }
+                // if (obj[dimensionKeys]) {
                 rows.push(obj)
-              // }
-            })
-            console.log(columns)
-            console.log(rows)
+                // }
+              })
+              console.log(columns)
+              console.log(rows)
             }
 
             apiData.source = {
@@ -389,7 +372,7 @@ export default {
             console.log(apiData)
             this.$store.dispatch('SetSelfDataSource', apiData)
           }
-          this.saveScreenData()
+          this.updateChartData()
         } else {
           this.$message.error(res.msg)
         }
@@ -400,5 +383,4 @@ export default {
 </script>
 
 <style>
-
 </style>

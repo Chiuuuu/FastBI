@@ -40,11 +40,11 @@
 
     },
     methods: {
-      ...mapActions(['saveScreenData']),
+      ...mapActions(['saveScreenData', 'updateChartData']),
       // 实时保存文本
       textChange() {
         this.$store.dispatch('SetSelfProperty', this.selfConfig)
-        this.saveScreenData()
+        this.updateChartData()
       }
     },
     computed: {

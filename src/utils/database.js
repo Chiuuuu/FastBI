@@ -15,7 +15,7 @@ const database = {
     },
     canvasMaps: [{
             id: 'v-histogram',
-            packageJson: {
+            setting: {
                 title: '柱状图',
                 chartType: 'v-histogram',
                 name: 've-histogram',
@@ -132,7 +132,7 @@ const database = {
         },
         {
             id: 'v-line',
-            packageJson: {
+            setting: {
                 title: '折线图',
                 chartType: 'v-line',
                 name: 've-line',
@@ -249,7 +249,7 @@ const database = {
         },
         {
             id: 'v-bar',
-            packageJson: {
+            setting: {
                 title: '条形图',
                 chartType: 'v-bar',
                 name: 've-bar',
@@ -366,7 +366,7 @@ const database = {
         },
         {
             id: 'v-pie',
-            packageJson: {
+            setting: {
                 title: '饼图',
                 chartType: 'v-pie',
                 name: 've-pie',
@@ -487,7 +487,7 @@ const database = {
         },
         {
             id: 'v-map',
-            packageJson: {
+            setting: {
                 title: '地图',
                 chartType: 'v-map',
                 name: 've-map',
@@ -661,7 +661,7 @@ const database = {
         },
         {
             id: 'v-radar',
-            packageJson: {
+            setting: {
                 title: '雷达图',
                 chartType: 'v-radar',
                 name: 've-radar',
@@ -793,7 +793,7 @@ const database = {
         },
         {
           id: 'v-gauge',
-          packageJson: {
+          setting: {
             title: '仪表盘',
             chartType: 'v-gauge',
             name: 've-gauge',
@@ -902,7 +902,7 @@ const database = {
         },
         {
           id: 'v-ring',
-          packageJson: {
+          setting: {
             title: '环形图',
             name: 've-ring',
             chartType: 'v-ring',
@@ -999,7 +999,7 @@ const database = {
         },
         {
             id: 'v-text',
-            packageJson: {
+            setting: {
                 title: '文本',
                 chartType: 'v-text',
                 name: 've-text',
@@ -1030,7 +1030,7 @@ const database = {
         },
         {
             id: 'v-image',
-            packageJson: {
+            setting: {
                 title: '图片',
                 chartType: 'v-image',
                 name: 've-image',
@@ -1054,7 +1054,7 @@ const database = {
         },
         {
             id: 'v-tables',
-            packageJson: {
+            setting: {
                 title: '表格',
                 chartType: 'v-tables',
                 name: 've-tables',

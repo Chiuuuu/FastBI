@@ -15,13 +15,13 @@
       }
     },
     created () {
-      this.transformData = { ...this.item.packageJson.view }
+      this.transformData = { ...this.item.setting.view }
     },
     watch: {
       item: {
         handler (val) {
           if (val) {
-            this.transformData = { ...val.packageJson.view }
+            this.transformData = { ...val.setting.view }
           }
         },
         deep: true

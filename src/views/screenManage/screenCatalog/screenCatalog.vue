@@ -9,12 +9,8 @@
             <a-menu-item
               v-on:click="addScreen"
               v-permission:[$PERMISSION_CODE.OPERATOR.add]="$PERMISSION_CODE.OBJECT.screen"
-            >
-              新建大屏
-            </a-menu-item>
-            <a-menu-item key="1" @click="addFolder">
-              新建文件夹
-            </a-menu-item>
+            >新建大屏</a-menu-item>
+            <a-menu-item key="1" @click="addFolder">新建文件夹</a-menu-item>
           </a-menu>
         </a-dropdown>
       </div>
@@ -31,17 +27,13 @@
           :key="folder.id"
         >
           <template v-if="handleIsFolder(folder)">
-            <menu-folder
-              :folder="folder"
-              :index="index"
-              :contextmenus="folderContenxtMenu"
-            >
+            <menu-folder :folder="folder" :index="index" :contextmenus="folderContenxtMenu">
               <template v-slot:file="slotProps">
                 <menu-file
                   :file="slotProps.file"
                   :index="slotProps.index"
                   :parent="folder"
-                  :isSelect='fileSelectId === slotProps.file.id'
+                  :isSelect="fileSelectId === slotProps.file.id"
                   :contextmenus="fileContenxtMenu"
                   @fileSelect="handleFileSelect"
                 ></menu-file>
@@ -53,7 +45,7 @@
               <menu-file
                 :file="folder"
                 :index="index"
-                :isSelect='fileSelectId === folder.id'
+                :isSelect="fileSelectId === folder.id"
                 :contextmenus="fileContenxtMenu"
                 @fileSelect="handleFileSelect"
               ></menu-file>
@@ -68,25 +60,15 @@
     <div class="right scrollbar">
       <div class="right-header" v-if="fileSelectId !== ''">
         <span class="nav_title">{{fileSelectName}}</span>
-        <a-button class="btn_n1" @click="openScreen">
-          全屏
-        </a-button>
-        <a-button class="btn_n2" @click="$refs.screen.refreshData()">
-          刷新数据
-        </a-button>
-        <a-button
-          type="primary"
-          class="btn_pr"
-          v-if="hasEditPermission"
-          @click="editScreen">
-          编辑大屏
-        </a-button>
+        <a-button class="btn_n1" @click="openScreen">全屏</a-button>
+        <a-button class="btn_n2" @click="$refs.screen.refreshData()">刷新数据</a-button>
+        <a-button type="primary" class="btn_pr" v-if="hasEditPermission" @click="editScreen">编辑大屏</a-button>
       </div>
       <div class="contain" ref="contain">
         <screen v-if="fileSelectId" ref="screen" :key="componentKey"></screen>
         <div class="empty" v-else>
           <img src="@/assets/images/icon_empty_state.png" class="empty_img" />
-          <p class="empty_word"> 暂无内容 ， 请先添加大屏目录数据或者选择一个大屏目录 ~</p>
+          <p class="empty_word">暂无内容 ， 请先添加大屏目录数据或者选择一个大屏目录 ~</p>
         </div>
       </div>
     </div>
@@ -94,25 +76,36 @@
     <a-modal v-model="screenVisible" :title="isAdd===1?'新建大屏':'重命名大屏'" @ok="handleOk">
       <a-form :form="screenForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
         <a-form-item label="名称">
-          <a-input class="mod_input"
-           v-decorator="['name', { rules: [{ required: true, message: '请输入大屏名称'}] }]"
-           placeholder="请输入大屏名称"
-           :maxLength="20" />
+          <a-input
+            class="mod_input"
+            v-decorator="['name', { rules: [{ required: true, message: '请输入大屏名称'}] }]"
+            placeholder="请输入大屏名称"
+            :maxLength="20"
+          />
         </a-form-item>
         <a-form-item label="保存目录" v-if="isAdd !== 2">
           <a-select
             v-decorator="['parentId', { rules: [{ required: true, message: '请选择大屏目录' }] }]"
             placeholder="选择大屏目录"
-            style="width:310px">
-            <a-select-option v-for="(item, index) in folderList" :key="index" :value="item.id">
-              {{item.name}}
-            </a-select-option>
+            style="width:310px"
+          >
+            <a-select-option
+              v-for="(item, index) in folderList"
+              :key="index"
+              :value="item.id"
+            >{{item.name}}</a-select-option>
           </a-select>
         </a-form-item>
       </a-form>
     </a-modal>
 
-    <new-folder ref="newFolderForm" :title="folderTitle" :visible="folderVisible" @cancel="hideFolder" @create="creatFolder"></new-folder>
+    <new-folder
+      ref="newFolderForm"
+      :title="folderTitle"
+      :visible="folderVisible"
+      @cancel="hideFolder"
+      @create="creatFolder"
+    ></new-folder>
   </div>
 </template>
 
@@ -135,7 +128,7 @@ export default {
     MenuFolder,
     Screen
   },
-  data() {
+  data () {
     return {
       current: ['mail'],
       openKeys: ['sub1'],
@@ -200,14 +193,14 @@ export default {
         this.$store.dispatch('SetFileName', value)
       }
     },
-    menuList() {
+    menuList () {
       return this.searchValue ? this.searchList : this.tableList
     },
-    hasEditPermission() {
+    hasEditPermission () {
       return hasPermission(this.$store.state.common.privileges, this.$PERMISSION_CODE.OPERATOR.edit)
     }
   },
-  mounted() {
+  mounted () {
     this.getList()
     this.$on('fileSelect', this.handleFileSelect)
 
@@ -221,9 +214,9 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['saveScreenData', 'SetCanvasRange']),
+    ...mapActions(['addScreenData', 'saveScreenData', 'SetCanvasRange']),
     // 获取文件夹列表
-    getList() {
+    getList () {
       let params = {
         type: 3
       }
@@ -242,7 +235,7 @@ export default {
       })
     },
     // 搜索文件
-    menuSearch: debounce(function(event) {
+    menuSearch: debounce(function (event) {
       const value = event.target.value
       if (value !== '') {
         this.handleGetSearchList(value)
@@ -250,7 +243,7 @@ export default {
         this.getList()
       }
     }, 400),
-    handleGetSearchList(value) {
+    handleGetSearchList (value) {
       let result = []
       this.folderList.map(item => {
         const newItem = menuSearchLoop(item, value)
@@ -262,18 +255,18 @@ export default {
     /**
      * 是否为文件夹 fileType|1:文件;0:文件夹
      */
-    handleIsFolder(item) {
+    handleIsFolder (item) {
       return item.fileType === 0
     },
     // 右键删除文件夹
-    handleFolderDelete(event, item, { folder }) {
+    handleFolderDelete (event, item, { folder }) {
       if (folder.children && folder.children.length > 0) {
         return this.$message.error('文件夹下存在数据大屏不可删除')
       }
       this.handleDelete(folder.id)
     },
     // 右键删除文件
-    handleFileDelete(event, item, { parent, file, index }) {
+    handleFileDelete (event, item, { parent, file, index }) {
       this.$confirm({
         title: '确认提示',
         content: '确定删除该数据大屏?',
@@ -283,7 +276,7 @@ export default {
       })
     },
     // 删除
-    handleDelete(id) {
+    handleDelete (id) {
       let params = {
         id
       }
@@ -299,7 +292,7 @@ export default {
       })
     },
     // 重命名文件夹
-    handleResetFolder(event, item, { folder }) {
+    handleResetFolder (event, item, { folder }) {
       this.isAdd = 2
       this.id = folder.id
       this.folderVisible = true
@@ -311,11 +304,19 @@ export default {
       })
     },
     // 重命名大屏
-    handleResetFile(event, item, { parent, file, index }) {
+    handleResetFile (event, item, { parent, file, index }) {
       this.isAdd = 2
       this.id = file.id
       this.screenVisible = true
       this.pid = parent.id
+
+      // 获取需要改名字的大屏的配置信息(因为可能会跟当前选中的大屏不是同一个)
+      this.$server.screenManage.getScreenDetailById(this.id).then(res => {
+        if (res.code === 200) {
+          this.setting = res.data.setting
+        }
+      })
+
       // dom渲染以后才能给form赋值
       this.$nextTick(() => {
         this.screenForm.setFieldsValue({
@@ -324,7 +325,7 @@ export default {
       })
     },
     // 在文件夹底下新建大屏
-    handleScreen(event, item, { folder }) {
+    handleScreen (event, item, { folder }) {
       this.isAdd = 1
       this.screenVisible = true
       // dom渲染以后才能给form赋值
@@ -335,77 +336,81 @@ export default {
       })
     },
     // 选择左侧菜单
-    handleFileSelect(file) {
+    handleFileSelect (file) {
       if (this.fileSelectId === file.id) return
       this.fileSelectId = file.id
       this.fileSelectName = file.name
       this.$store.dispatch('SetParentId', file.parentId)
     },
     // 点击新建大屏
-    addScreen() {
+    addScreen () {
       this.isAdd = 1
       this.screenVisible = true
     },
     // 新建/编辑大屏名称
-    handleOk(e) {
+    handleOk (e) {
       this.screenForm.validateFields((err, values) => {
         if (err) {
           return
         }
         this.fileSelectId = ''
-
         if (this.isAdd === 1) { // 新增
-          this.saveScreenData({ ...values, isAdd: 1 })
+          this.addScreenData({ ...values })
           this.fileSelectName = values.name
-          // this.$router.push({
-          //   name: 'screenEdit',
-          //   query: {
-          //     ...values
-          //   }
-          // })
+          // 新建默认赋予所有权限
+          this.$store.commit('common/SET_PRIVILEGES', [0])
         } else { // 编辑
           let params = {
             fileType: 1,
             id: this.id,
             parentId: this.pid,
+            setting: this.setting,
             ...values
           }
-          this.$server.common.putMenuFolderName('/screen/catalog', params).then(res => {
-            if (res.code === 200) {
-              this.$message.success(res.msg)
-              this.getList()
-            } else {
-              this.$message.error(res.msg)
+          this.saveScreenData({ ...params }).then(res => {
+            console.log(res)
+            if (res) {
+              this.$server.common.putMenuFolderName('/screen/catalog', params).then(res => {
+                if (res.code === 200) {
+                  // this.$message.success(res.msg)
+                  this.getList()
+                } else {
+                  this.$message.error(res.msg)
+                }
+              })
             }
           })
+          // this.$server.common.putMenuFolderName('/screen/catalog', params)
         }
         this.screenForm.resetFields()
         this.screenVisible = false
       })
     },
     // 编辑大屏
-    editScreen() {
+    editScreen () {
       if (!this.screenId) {
         this.$message.error(' 请先添加大屏目录数据或者选择一个大屏目录')
         return
       }
       // 编辑大屏默认缩放是0.5
       this.SetCanvasRange(0.5)
-      this.$router.push({ name: 'screenEdit',
-      query: {
-        id: this.fileSelectId,
-        name: this.fileSelectName,
-        parentId: this.parentId
-      } })
+      this.$router.push({
+        name: 'screenEdit',
+        query: {
+          id: this.fileSelectId,
+          name: this.fileSelectName,
+          parentId: this.parentId
+        }
+      })
     },
     // 点击新建文件夹
-    addFolder() {
+    addFolder () {
       this.isAdd = 1
       this.folderVisible = true
       this.folderTitle = '新建文件夹'
     },
     // 创建文件夹
-    creatFolder() {
+    creatFolder () {
       const form = this.$refs.newFolderForm.form
       form.validateFields((err, values) => {
         if (err) {
@@ -450,7 +455,7 @@ export default {
       })
     },
     // 关闭新建文件夹弹窗
-    hideFolder() {
+    hideFolder () {
       this.folderVisible = false
     },
     // 打开全屏
@@ -464,18 +469,18 @@ export default {
           if (docElm.requestFullscreen) { // W3C
             docElm.requestFullscreen()
           } else if (docElm.mozRequestFullScreen) { // FireFox
-              docElm.mozRequestFullScreen()
+            docElm.mozRequestFullScreen()
           } else if (docElm.webkitRequestFullScreen) { // Chrome等
-              docElm.webkitRequestFullScreen()
+            docElm.webkitRequestFullScreen()
           } else if (docElm.msRequestFullscreen) { // IE11
-              docElm.msRequestFullscreen()
+            docElm.msRequestFullscreen()
           }
         }
       })
     },
-     /**
-     * 是否全屏并按键ESC键的方法
-     */
+    /**
+    * 是否全屏并按键ESC键的方法
+    */
     checkFull () {
       // document.fullscreenEnabled 谷歌浏览器一直返回true
       // let isFull = document.fullscreenEnabled || window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled
