@@ -44,7 +44,7 @@ export default {
   methods: {
     onCheck(value) {
       this.options.permissions = value
-      this.$emit('setBasePrivilege', value, this.injectRoleTab)
+      this.$emit('setBasePrivilege', value, this.injectRoleTab + '')
     }
   }
   // watch: {
