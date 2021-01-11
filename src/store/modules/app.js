@@ -83,7 +83,9 @@ const app = {
             commit('SET_PAGE_SETTING', state.orginPageSettings)
             let params = {
                 name: obj && obj.name ? obj.name : router.history.current.query.name,
-                parentId: obj && obj.parentId ? obj.parentId : router.history.current.query.parentId,
+                // parentId: obj && obj.parentId ? obj.parentId : router.history.current.query.parentId,
+                // 没有选目录默认在外面
+                parentId: obj && obj.parentId ? obj.parentId : '0',
                 isSaved: 1,
                 setting: state.pageSettings
             }
@@ -191,6 +193,7 @@ const app = {
                 dispatch("UpdCanvasMap", { index, newData: res.data })
             })
         },
+        // 获取大屏详情
         async getScreenDetail ({ dispatch, commit }, id) {
             return screenManage
                 .getScreenDetailById(id)

@@ -19,7 +19,12 @@
           <a-icon class="icon_search" slot="suffix" type="search" />
         </a-input>
       </div>
-      <div class="menu-wrap scrollbar screen-menu" v-if="folderList.length > 0">
+      <div
+        class="menu-wrap scrollbar screen-menu"
+        v-if="folderList.length > 0"
+        @dragover.stop.prevent
+        @drop.stop.prevent="handleWrapDrop"
+      >
         <div
           class="group"
           :class="handleIsFolder(folder) ? 'is-folder' : ''"
@@ -27,7 +32,12 @@
           :key="folder.id"
         >
           <template v-if="handleIsFolder(folder)">
-            <menu-folder :folder="folder" :index="index" :contextmenus="folderContenxtMenu">
+            <menu-folder
+              :folder="folder"
+              :index="index"
+              :contextmenus="folderContenxtMenu"
+              @fileDrop="handleFileDrop"
+            >
               <template v-slot:file="slotProps">
                 <menu-file
                   :file="slotProps.file"
@@ -36,6 +46,7 @@
                   :isSelect="fileSelectId === slotProps.file.id"
                   :contextmenus="fileContenxtMenu"
                   @fileSelect="handleFileSelect"
+                  @fileDrag="handleFileDrag"
                 ></menu-file>
               </template>
             </menu-folder>
@@ -48,6 +59,7 @@
                 :isSelect="fileSelectId === folder.id"
                 :contextmenus="fileContenxtMenu"
                 @fileSelect="handleFileSelect"
+                @fileDrag="handleFileDrag"
               ></menu-file>
             </ul>
           </template>
@@ -73,9 +85,13 @@
       </div>
     </div>
 
-    <a-modal v-model="screenVisible" :title="isAdd===1?'新建大屏':'重命名大屏'" @ok="handleOk">
+    <a-modal
+      v-model="screenVisible"
+      :title="isAdd===1?'新建大屏': isAdd===2?'重命名大屏': '选择文件夹'"
+      @ok="handleOk"
+    >
       <a-form :form="screenForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
-        <a-form-item label="名称">
+        <a-form-item label="名称" v-if="isAdd !== 3">
           <a-input
             class="mod_input"
             v-decorator="['name', { rules: [{ required: true, message: '请输入大屏名称'}] }]"
@@ -84,13 +100,9 @@
           />
         </a-form-item>
         <a-form-item label="保存目录" v-if="isAdd !== 2">
-          <a-select
-            v-decorator="['parentId', { rules: [{ required: true, message: '请选择大屏目录' }] }]"
-            placeholder="选择大屏目录"
-            style="width:310px"
-          >
+          <a-select v-decorator="['parentId']" placeholder="选择大屏目录" allowClear style="width:310px">
             <a-select-option
-              v-for="(item, index) in folderList"
+              v-for="(item, index) in folderSelectList"
               :key="index"
               :value="item.id"
             >{{item.name}}</a-select-option>
@@ -118,6 +130,7 @@ import { mapGetters, mapActions } from 'vuex' // 导入vuex
 import Screen from '@/views/screen' // 预览
 import { addResizeListener, removeResizeListener } from 'bin-ui/src/utils/resize-event'
 import { hasPermission } from '@/utils/permission'
+import { deepClone } from '@/utils/deepClone'
 import debounce from 'lodash/debounce'
 import { menuSearchLoop } from '@/utils/menuSearch'
 
@@ -159,8 +172,24 @@ export default {
       ],
       fileContenxtMenu: [
         {
+          name: '移动至',
+          //   permission: {
+          //     OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove,
+          //     OBJECT: this.$PERMISSION_CODE.OBJECT.screen
+          //   },
+          onClick: this.handleFilemoveFile
+        },
+        {
           name: '重命名',
           onClick: this.handleResetFile
+        },
+        {
+          name: '复制',
+          //   permission: {
+          //     OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove,
+          //     OBJECT: this.$PERMISSION_CODE.OBJECT.screen
+          //   },
+          onClick: this.copyScreen
         },
         {
           name: '删除',
@@ -177,6 +206,10 @@ export default {
   },
   computed: {
     ...mapGetters(['pageSettings', 'canvasRange', 'screenId', 'fileName', 'isScreen', 'parentId']),
+    folderSelectList () {
+      return this.folderList.filter(item => item.fileType === 0)
+      //   .concat({ name: '清空' })
+    },
     fileSelectId: {
       get () {
         return this.screenId
@@ -223,6 +256,7 @@ export default {
       this.$server.screenManage.getFolderList({ params }).then(res => {
         if (res.code === 200) {
           let rows = res.data
+          // 大屏文件保存不需要文件夹
           this.folderList = rows
           // 没有选择文件的时候默认选择第一个文件
           if (!this.fileSelectId && this.folderList.length > 0) {
@@ -252,11 +286,56 @@ export default {
       this.folderList = result
       console.log('搜索结果', this.folderList)
     },
-    /**
-     * 是否为文件夹 fileType|1:文件;0:文件夹
-     */
+    // 是否为文件夹 fileType|1:文件;0:文件夹
     handleIsFolder (item) {
       return item.fileType === 0
+    },
+    // 移动文件夹
+    handleFilemoveFile (event, index, { parent, file }) {
+      this.isAdd = 3
+      this.id = file.id
+      this.screenVisible = true
+      this.name = file.name
+    },
+    // 选择移动文件夹弹窗确认
+    async handleFileMoveCreate (parentId) {
+      let params = {
+        fileType: 1,
+        id: this.id,
+        name: this.name,
+        parentId
+      }
+      const result = await this.$server.common.putMenuFolderName('/screen/catalog', params)
+      if (result.code === 200) {
+        this.getList()
+        this.$message.success('移动成功')
+      } else {
+        this.$message.error(result.msg)
+      }
+
+      this.screenVisible = false
+    },
+    // 拖动左侧菜单
+    handleFileDrag (file) {
+      this.dragFile = file
+      this.id = file.id
+      this.name = file.name
+    },
+    // 拖动后投放到目标文件夹
+    async handleFileDrop (folder) {
+      if (!this.dragFile || this.dragFile.parentId === folder.id) return
+      this.handleFileMoveCreate(folder.id)
+    },
+    // 放到最外层目录
+    handleWrapDrop (e) {
+      const className = e.toElement.className
+      if (className.indexOf('menu-wrap') > -1 && this.dragFile.parentId !== 0) {
+        this.handleFileMoveCreate('0')
+      }
+    },
+    // 大屏复制
+    copyScreen (event, item, { parent, file, index }) {
+      this.getList()
     },
     // 右键删除文件夹
     handleFolderDelete (event, item, { folder }) {
@@ -275,7 +354,7 @@ export default {
         }
       })
     },
-    // 删除
+    // 删除大屏
     handleDelete (id) {
       let params = {
         id
@@ -359,7 +438,13 @@ export default {
           this.fileSelectName = values.name
           // 新建默认赋予所有权限
           this.$store.commit('common/SET_PRIVILEGES', [0])
-        } else { // 编辑
+        }
+        // 移动大屏
+        else if (this.isAdd === 3) {
+          // 没有选文件夹保存在外面
+          this.handleFileMoveCreate(values.parentId || '0')
+        }
+        else { // 编辑
           let params = {
             fileType: 1,
             id: this.id,
