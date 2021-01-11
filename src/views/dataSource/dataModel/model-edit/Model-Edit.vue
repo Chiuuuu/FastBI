@@ -192,7 +192,7 @@
       />
       <div class="submit_btn">
         <!-- <a-button :disabled="!detailInfo">保存并新建报告</a-button> -->
-        <a-button type="primary" @click="handleSave" :disabled="!detailInfo">保 存</a-button>
+        <a-button v-if="hasBtnPermissionSave" type="primary" @click="handleSave" :disabled="!detailInfo">保 存</a-button>
         <a-button v-on:click="exit">退 出</a-button>
       </div>
     </div>
@@ -296,6 +296,7 @@ export default {
       addModelId: state => state.dataModel.addModelId, // 新增的模型id
       parentId: state => state.dataModel.parentId, // 选中的文件夹id
       datasource: state => state.dataModel.datasource, // 数据源
+      privileges: state => state.common.privileges,
       datasourceId: state => state.dataModel.datasourceId // 数据源
     }),
     model() {
@@ -321,6 +322,9 @@ export default {
       }
 
       return this.detailInfo.config.tables && this.detailInfo.config.tables.length === 0
+    },
+    hasBtnPermissionSave() {
+      return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.edit)
     }
   },
   mounted() {
@@ -678,7 +682,6 @@ export default {
       if (result.code === 200) {
         this.$message.success('获取数据成功')
         this.detailInfo = result.data
-
         // 将自定义维度度量剥离处理
         this.detailInfo.pivotSchema.dimensions = this.handlePeelCustom(this.detailInfo.pivotSchema.dimensions, this.cacheDimensions)
         this.detailInfo.pivotSchema.measures = this.handlePeelCustom(this.detailInfo.pivotSchema.measures, this.cacheMeasures)
