@@ -275,8 +275,7 @@ export default {
     getDM(list) {
       if (list && list.length) {
         return list.filter(item => {
-          return item.visible && item.role !== 4 && item.role !== 5
-          // return item.visible
+          return item.visible && item.produceType === 0
         })
       }
       return list
@@ -371,7 +370,7 @@ export default {
             const params = {
               name: this.form.name,
               datamodelId: this.$parent.model === 'add' ? this.$parent.addModelId : this.$parent.modelId,
-              role: this.computeType === '维度' ? 4 : 5,
+              role: this.computeType === '维度' ? 1 : 2,
               raw_expr: this.textareaValue,
               expr: this.reverse(this.textareaValue)
             }
