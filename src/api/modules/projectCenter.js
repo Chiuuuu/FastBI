@@ -99,6 +99,13 @@ export default {
         return $axios.get('/business/editRoleUser/listForProjectRoleUsers/' + roleId)
     },
     /**
+     * @description 获取文件夹权限
+     * @returns
+     */
+    getFolderHeader() {
+        return $axios.get('/user/RoleResourcePrivilege/getFolderHeader')
+    },
+    /**
      * @description 获取权限树
      * @param {Number | String} roleId 角色id
      * @param {Number} type 类型

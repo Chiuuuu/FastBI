@@ -1,5 +1,5 @@
 <template>
-  <div class="m-overlay m-overlay-shadow" :style="styleObj">
+  <div v-if="renderMenus.length > 0" class="m-overlay m-overlay-shadow" :style="styleObj">
     <div class="m-ctxMenu" ref="ctxMenuRef">
       <ul>
         <li
@@ -97,6 +97,9 @@ export default {
       // 是否启用自定义设置，可以根据特殊情况自定义
       if (this.customStyle) {
         this.styleObj = this.customStyle()
+        return
+      } else if (!this.$refs.ctxMenuRef) { // 如果没渲染则直接返回
+        this.styleObj = {}
         return
       }
       // 浏览器可视区域的高度(兼容处理)
