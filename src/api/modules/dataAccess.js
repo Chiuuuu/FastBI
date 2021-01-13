@@ -72,6 +72,23 @@ export default {
         return $axios.post('/datasource/field/save/field', params)
     },
     /**
+     * @description 根据数据源id数据库id同步库表结构
+     * @param {String} datasourceId 数据源id
+     * @param {String} databaseId 数据库id
+     * @returns
+     */
+    actionSyncTable(datasourceId, databaseId) {
+        return $axios.get(`/datasource/table/sync/tables/${datasourceId}/${databaseId}`)
+    },
+    /**
+     * @description 验证表结构状态
+     * @param {Array} ids 数据源id
+     * @returns
+     */
+    actionVerifyTable(ids) {
+        return $axios.post('/datasource/table/verify/table', ids)
+    },
+    /**
      * @description 全部抽取
      * @param {String} url  请求地址
      * @param {Object} [params={}] 请求参数

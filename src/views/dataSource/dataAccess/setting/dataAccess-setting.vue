@@ -349,6 +349,7 @@ export default {
         databaseName,
         sourceId: this.modelId,
         sourceName: this.modelName,
+        databaseId: this.fieldInfo.databaseId,
         tableId: this.fieldInfo.id,
         tableName: this.fieldInfo.name
       }).finally(() => {
