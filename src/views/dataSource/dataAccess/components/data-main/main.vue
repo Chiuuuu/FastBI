@@ -99,27 +99,21 @@ export default {
     },
     handleTT() {
       if (this.defaultTab === '2') {
-        console.log('去刷新')
         this.$refs.structure.tableType = 0
         this.$refs.structure.handleGetData()
-        this.$refs.structure.handleGetDatabase()
       }
     },
     /**
      * 选项卡
     */
     handleChangeTab(activeKey) {
-      console.log('tab', activeKey)
       // this.$emit('on-change-componet')
       if (activeKey === '2') {
-        console.log('数据结构请求')
         this.$nextTick(() => {
           this.$refs.structure.tableKeyword = ''
           this.$refs.structure.handleGetData()
-          this.$refs.structure.handleGetDatabase()
         })
       } else if (activeKey === '3') {
-        console.log('操作记录请求')
         this.$nextTick(() => {
           this.$refs.record.form.keyword = ''
           this.$refs.record.handleGetData()
