@@ -3,16 +3,16 @@
     <div class="menu_title">
       <span class="m-t-s">数据模型</span>
       <a-dropdown :trigger="['click']" placement="bottomLeft">
-        <a class="ant-dropdown-link">
+        <a v-if="hasPermissionSourceAdd || hasPermissionFolderAdd" class="ant-dropdown-link">
           <a-icon type="plus-square" class="menu_icon" />
         </a>
         <a-menu slot="overlay" class="drow_menu">
           <a-menu-item
-            v-permission:[$PERMISSION_CODE.OPERATOR.add]="$PERMISSION_CODE.OBJECT.datamodel"
+            v-if="hasPermissionSourceAdd"
             v-on:click="showModal">
             新建模型
           </a-menu-item>
-          <a-menu-item @click="handleAddNewFolder">
+          <a-menu-item v-if="hasPermissionFolderAdd" @click="handleAddNewFolder">
             新建文件夹
           </a-menu-item>
         </a-menu>
@@ -141,6 +141,7 @@ import ResetNameModal from '@/views/dataSource/dataAccess/components/data-main/d
 import MoveFileModal from '@/views/dataSource/dataAccess/components/data-main/data-menu/moveFile'
 import MenuFile from '@/components/dataSource/menu-group/file'
 import MenuFolder from '@/components/dataSource/menu-group/folder'
+import { checkActionPermission, hasPermission } from '@/utils/permission'
 import { menuSearchLoop } from '@/utils/menuSearch'
 import debounce from 'lodash/debounce'
 export default {
@@ -182,10 +183,18 @@ export default {
         },
         {
           name: '重命名',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.modelFolder
+          },
           onClick: this.handleFolderResetName
         },
         {
           name: '删除',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.modelFolder
+          },
           onClick: this.handleFolderDelete
         }
       ],
@@ -234,6 +243,12 @@ export default {
       set (value) {
         this.$store.commit('dataModel/SET_MODELID', value)
       }
+    },
+    hasPermissionFolderAdd() {
+      return checkActionPermission(this.$PERMISSION_CODE.OBJECT.modelFolder, this.$PERMISSION_CODE.OPERATOR.add)
+    },
+    hasPermissionSourceAdd() {
+      return checkActionPermission(this.$PERMISSION_CODE.OBJECT.datamodel, this.$PERMISSION_CODE.OPERATOR.add)
     }
   },
   created() {

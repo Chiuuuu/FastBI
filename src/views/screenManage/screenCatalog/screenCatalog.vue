@@ -4,15 +4,15 @@
       <div class="menu_title">
         <span>大屏目录</span>
         <a-dropdown :trigger="['click']" placement="bottomLeft">
-          <a-icon type="plus-square" class="menu_icon" />
+          <a-icon v-if="hasPermissionSourceAdd || hasPermissionFolderAdd" type="plus-square" class="menu_icon" />
           <a-menu slot="overlay" class="drow_menu">
             <a-menu-item
               v-on:click="addScreen"
-              v-permission:[$PERMISSION_CODE.OPERATOR.add]="$PERMISSION_CODE.OBJECT.screen"
+              v-if="hasPermissionSourceAdd"
             >
               新建大屏
             </a-menu-item>
-            <a-menu-item key="1" @click="addFolder">
+            <a-menu-item v-if="hasPermissionFolderAdd" key="1" @click="addFolder">
               新建文件夹
             </a-menu-item>
           </a-menu>
@@ -124,7 +124,7 @@ import MenuFolder from '@/components/dataSource/menu-group/folder'
 import { mapGetters, mapActions } from 'vuex' // 导入vuex
 import Screen from '@/views/screen' // 预览
 import { addResizeListener, removeResizeListener } from 'bin-ui/src/utils/resize-event'
-import { hasPermission } from '@/utils/permission'
+import { checkActionPermission, hasPermission } from '@/utils/permission'
 import debounce from 'lodash/debounce'
 import { menuSearchLoop } from '@/utils/menuSearch'
 
@@ -157,10 +157,18 @@ export default {
         },
         {
           name: '重命名',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.screenFolder
+          },
           onClick: this.handleResetFolder
         },
         {
           name: '删除',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.screenFolder
+          },
           onClick: this.handleFolderDelete
         }
       ],
@@ -205,6 +213,12 @@ export default {
     },
     hasEditPermission() {
       return hasPermission(this.$store.state.common.privileges, this.$PERMISSION_CODE.OPERATOR.edit)
+    },
+    hasPermissionFolderAdd() {
+      return checkActionPermission(this.$PERMISSION_CODE.OBJECT.screenFolder, this.$PERMISSION_CODE.OPERATOR.add)
+    },
+    hasPermissionSourceAdd() {
+      return checkActionPermission(this.$PERMISSION_CODE.OBJECT.screen, this.$PERMISSION_CODE.OPERATOR.add)
     }
   },
   mounted() {

@@ -3,14 +3,14 @@
     <div class="menu_title">
       <span class="m-t-s">数据接入</span>
       <a-dropdown :trigger="['click']" placement="bottomLeft">
-        <a v-permission:[$PERMISSION_CODE.OPERATOR.add]="$PERMISSION_CODE.OBJECT.datasource" class="ant-dropdown-link">
+        <a v-if="hasPermissionSourceAdd || hasPermissionFolderAdd" class="ant-dropdown-link">
           <a-icon type="plus-square" class="menu_icon" />
         </a>
         <a-menu slot="overlay" class="drow_menu">
-          <a-menu-item v-on:click="showModal">
+          <a-menu-item v-if="hasPermissionSourceAdd" v-on:click="showModal">
             添加连接
           </a-menu-item>
-          <a-menu-item key="1" @click="handleAddNewFolder">
+          <a-menu-item v-if="hasPermissionFolderAdd" key="1" @click="handleAddNewFolder">
             新建文件夹
           </a-menu-item>
         </a-menu>
@@ -118,6 +118,7 @@ import ResetNameModal from '../data-main/data-menu/resetName'
 import MoveFileModal from '../data-main/data-menu/moveFile'
 import { mapState } from 'vuex'
 import { menuSearchLoop } from '@/utils/menuSearch'
+import { checkActionPermission, hasPermission } from '@/utils/permission'
 import { fetchTableInfo, fetchDeleteMenuById } from '../../../../../api/dataAccess/api'
 import MenuFile from '@/components/dataSource/menu-group/file'
 import MenuFolder from '@/components/dataSource/menu-group/folder'
@@ -175,10 +176,18 @@ export default {
         },
         {
           name: '重命名',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.sourceFolder
+          },
           onClick: this.handleFolderResetName
         },
         {
           name: '删除',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.sourceFolder
+          },
           onClick: this.handleFolderDelete
         }
       ],
@@ -228,6 +237,12 @@ export default {
       set (value) {
         this.$store.commit('dataAccess/SET_MODELID', value)
       }
+    },
+    hasPermissionFolderAdd() {
+      return checkActionPermission(this.$PERMISSION_CODE.OBJECT.sourceFolder, this.$PERMISSION_CODE.OPERATOR.add)
+    },
+    hasPermissionSourceAdd() {
+      return checkActionPermission(this.$PERMISSION_CODE.OBJECT.datasource, this.$PERMISSION_CODE.OPERATOR.add)
     }
   },
   mounted() {
