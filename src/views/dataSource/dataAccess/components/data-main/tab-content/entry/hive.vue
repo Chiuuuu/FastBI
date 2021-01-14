@@ -292,7 +292,7 @@ export default {
           this.connectBtn = true
           const result = await this.$server.dataAccess.actionConnect({
             name: this.form.name,
-            type: 3,
+            type: 5,
             property: {
               ip: this.form.ip,
               port: this.form.port,
@@ -360,7 +360,7 @@ export default {
               password: this.form.password,
               databaseName: this.form.databaseName
             },
-            type: 3
+            type: 5
           }
           const result = await this.$server.dataAccess.saveTableInfo('/datasource/save', params)
             .finally(() => {

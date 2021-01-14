@@ -563,7 +563,7 @@ export default {
           })
           formData.append('databaseName', this.databaseName)
           formData.append('sourceSaveInput.name', this.form.name)
-          formData.append('sourceSaveInput.type', 4)
+          formData.append('sourceSaveInput.type', 11)
           formData.append('sourceSaveInput.parentId', this.parentId || 0)
           formData.append('sourceSaveInput.id', this.modelId || 0)
           if (this.deleteIdList.length > 0 || this.fileList.length > 0) {
