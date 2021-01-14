@@ -20,7 +20,7 @@
         </a-col>
         <a-col :span="14">
           <a-row type="flex" justify="end" align="middle">
-            <a-button type="primary" class="select_button" @click="() => handleGetData()" :loading="spinning">刷新数据</a-button>
+            <a-button type="primary" class="select_button" @click="() => handleGetTableList()" :loading="spinning">刷新数据</a-button>
             <a-button
               v-if="hasBtnPermissionExtract"
               v-show="showExtractBtn"
@@ -28,7 +28,7 @@
               class="select_button"
               style="margin-left:10px;"
               @click="handleExtract"
-              :loading="extractSping">立即抽取</a-button>
+              :loading="verifying || extractSping">立即抽取</a-button>
             <a-button
               v-if="tableType === 0 && hasBtnPermissionSchedule"
               v-show="showExtractBtn"
@@ -36,8 +36,9 @@
               style="margin-left:10px;"
               @click="showSetting('batch')"
               class="select_button"
+              :loading="verifying"
             >批量定时抽取</a-button>
-            <a-dropdown :trigger="['click']">
+            <a-dropdown v-if="['excel', 'csv'].indexOf(modelType) === -1" :trigger="['click']">
               <a-button type="primary" style="margin-left:10px;">更多<a-icon type="down" /></a-button>
               <a-menu slot="overlay">
                 <a-menu-item>
@@ -126,13 +127,14 @@
         ref="extract"
         :show="visible"
         :rows="clickRows"
-        @close="visible = false"
+        @close="closeRegularList"
         @setRegular="setRegular" />
       <regular-setting
         ref="regular"
         :show="visible2"
         :rows="clickRows"
         :table-type="tableType"
+        :has-large-data="hasLargeData"
         :regular-info="regularInfo"
         @close="closeRegular" />
       <table-info
@@ -219,6 +221,9 @@ export default {
       },
       databaseList: [],
       database: '',
+      databaseId: '',
+      verifying: false,
+      hasLargeData: false, // 所选表是否含有大量数据
       tableKeyword: '',
       logColumns,
       logData: [],
@@ -229,7 +234,7 @@ export default {
       visible2: false, // 添加定时任务弹窗
       visible3: false, // 查看表信息
       extractForm: '',
-      spinning: true,
+      spinning: false,
       selectedRows: [],
       selectedRowKeys: [],
       extractSping: false,
@@ -295,25 +300,35 @@ export default {
       }
     },
     handleTableTypeChange(event) {
-      this.handleGetData()
+      this.handleGetTableList()
     },
     // 同步库库表结构
-    handleSyncTable() {
-      this.$message.success('库表同步成功')
-      this.handleGetData()
+    async handleSyncTable() {
+      this.spinning = true
+      const result = await this.$server.dataAccess.actionSyncTable(this.modelId, this.databaseId)
+        .finally(() => {
+          this.spinning = false
+        })
+
+      if (result.code === 200) {
+        this.$message.success('同步库表成功')
+        this.handleGetTableList()
+      } else {
+        this.$message.error(result.msg)
+      }
     },
     handleGetTableKeyword: debounce(function(e) {
       this.tableKeyword = e.target.value.trim()
       this.selectedRowKeys = []
       this.selectedRows = []
-      this.handleGetData()
+      this.handleGetTableList()
     }, 400),
     handleChangeDatabase(value) {
       this.database = value
       this.$store.commit('dataAccess/SET_DATABASENAME', value)
-      this.handleGetData()
+      this.handleGetTableList()
     },
-    async handleGetDatabase() {
+    async handleGetTableListbase() {
       const result = await this.$server.dataAccess.getDatabaseList({
         datasourceId: this.modelId
       })
@@ -385,10 +400,14 @@ export default {
       this.columns = columns
     },
     handleChangeTable(pagination) {
-      this.handleGetData(pagination)
+      this.handleGetTableList(pagination)
     },
     async handleGetData(pagination) {
       if (!this.modelType) return
+      await this.handleGetTableListbase()
+      this.handleGetTableList()
+    },
+    async handleGetTableList(pagination) {
       this.handleColumns()
       this.spinning = true
       let databaseName
@@ -401,8 +420,13 @@ export default {
       if (['excel', 'csv'].indexOf(this.modelType) > -1) {
         databaseName = this.databaseName
       }
+
+      // 获取数据库id
+      const database = this.databaseList.find(item => item.name === databaseName)
+      this.databaseId = database ? database.id : ''
       const params = {
         databaseName,
+        databaseId: this.databaseId,
         keyword: this.tableKeyword,
         sourceId: this.modelId,
         tableType: this.tableType,
@@ -431,6 +455,57 @@ export default {
       this.visible1 = false
       this.logData = []
     },
+    /**
+      52017, "远程对应的原数据表不存在或已经被删"
+      52018, "远程对应的原表字段不存在或已经被删"
+      52019, "远程对应的原表字段已发生改变"
+      52020, "远程对应的库表结构没有改变"
+      52021, "远程对应的表字段较多,是宽表"
+      52022, "远程对应的表的数据量较大"
+     */
+    handleTableInfo(infoList) {
+      const deleteList = []
+      const largeList = []
+      let normalCnt = 0
+      infoList.map(item => {
+        const codeList = Object.keys(item.codeMsgMap)
+        if (codeList.includes('52017') || codeList.includes('52018') || codeList.includes('52019')) {
+          deleteList.push(item)
+        } else if (codeList.includes('52022')) {
+          largeList.push(item)
+        } else if (codeList.includes('52020')) {
+          normalCnt++
+        }
+      })
+      if (deleteList.length > 0) { // 有表被删除, 直接拦截操作
+        this.$message.error(h => h('div', { style: { textAlign: 'left' } }, deleteList.map(item => {
+          return h('div', {}, [
+            '表',
+            h('span', {}, item.tableName),
+            ':' + Object.values(item.codeMsgMap).join('、')
+          ])
+        })), 5)
+        return 'hasDelete'
+      } else if (largeList.length > 0) { // 有大数据表, 则定时任务需至少间隔2小时
+        this.hasLargeData = true
+        return 'hasLarge'
+      } else if (infoList.length === normalCnt) { // 正常情况
+        return 'normal'
+      }
+    },
+    async handleVerifyTable(ids) {
+      this.verifying = true
+      const result = await this.$server.dataAccess.actionVerifyTable(ids)
+        .finally(() => {
+          this.verifying = false
+        })
+      if (result.code === 200) {
+        return this.handleTableInfo(result.data)
+      } else {
+        this.$message.error(result.msg)
+        return 'error'
+      }
+    },
     async showExtractLog() {
       if (this.data.length < 1) {
         return this.$message.error('当前数据库暂无数据')
@@ -455,57 +530,57 @@ export default {
       } else if (this.selectedRows.length > 10) {
         return this.$message.error('一次抽取最多只能选择10个')
       }
-      // 源表抽取
-      let result
-      if (this.tableType === 0) {
-        const rows = this.selectedRows.map(item => {
-          // let databaseName = this.formInfo ? this.formInfo.databaseName : ''
-          // // sql, oracle的数据库名称在formInfo里, excel的在dabaseName里
-          // if (['excel', 'csv'].indexOf(this.modelType) > -1) {
-          //   databaseName = this.databaseName
-          // }
-          const _item = {
-            databaseName: this.database,
-            sourceId: this.modelId,
-            sourceName: this.modelName,
-            tableId: item.id,
-            tableName: item.name
-          }
-          return _item
-        })
-        this.extractSping = true
-        result = await this.$server.dataAccess.actionExtract('/datasource/extract', {
-          rows: rows,
-          tableList: this.data
-        }).finally(() => {
-          this.extractSping = false
-          this.handleGetData()
-        })
-      } else if (this.tableType === 1) { // 自定义表抽取
-        this.extractSping = true
-        result = await this.$server.dataAccess.actionCustomExtract(this.selectedRows.map(item => item.id)).finally(() => {
-          this.extractSping = false
-          this.handleGetData()
-        })
-      }
-      if (result.code === 200) {
-        if (result.data) {
-          if (result.data.length && result.data.length < this.selectedRows.length) {
-            this.$message.info(`抽取任务已下达 \n ${result.msg}`, 5)
-          } else if (result.data.length && result.data.length === this.selectedRows.length) {
-            this.$message.error('所选表格不是orc格式, 无法抽取')
+      const code = await this.handleVerifyTable(this.selectedRows.map(item => item.id))
+      if (code !== 'hasDelete') {
+        // 源表抽取
+        let result
+        if (this.tableType === 0) {
+          const rows = this.selectedRows.map(item => {
+            const _item = {
+              databaseName: this.database,
+              sourceId: this.modelId,
+              sourceName: this.modelName,
+              tableId: item.id,
+              tableName: item.name
+            }
+            return _item
+          })
+          this.extractSping = true
+          result = await this.$server.dataAccess.actionExtract('/datasource/extract', {
+            rows: rows,
+            tableList: this.data
+          }).finally(() => {
+            this.extractSping = false
+            this.handleGetTableList()
+          })
+        } else if (this.tableType === 1) { // 自定义表抽取
+          this.extractSping = true
+          result = await this.$server.dataAccess.actionCustomExtract(this.selectedRows.map(item => item.id)).finally(() => {
+            this.extractSping = false
+            this.handleGetTableList()
+          })
+        }
+        if (result.code === 200) {
+          if (result.data) {
+            if (result.data.length && result.data.length < this.selectedRows.length) {
+              this.$message.info(`抽取任务已下达 \n ${result.msg}`, 5)
+            } else if (result.data.length && result.data.length === this.selectedRows.length) {
+              this.$message.error('所选表格不是orc格式, 无法抽取')
+            }
+          } else {
+            this.$message.success('抽取任务已下达')
           }
         } else {
-          this.$message.success('抽取任务已下达')
+          this.$message.error(result.msg)
         }
-      } else {
-        this.$message.error(result.msg)
       }
     },
-    setting(row) {
+    async setting(row) {
+      const code = await this.handleVerifyTable(new Array(row.id))
+      if (code === 'hasDelete' || code === 'error') return
       this.$emit('on-change-componet', 'Setting', row)
     },
-    showSetting(type, row) {
+    async showSetting(type, row) {
       if (type === 'single') {
         this.clickRows = new Array(row)
         this.visible = true
@@ -515,6 +590,8 @@ export default {
         } else if (this.selectedRows.length > 10) {
           return this.$message.error('最多只能选择10项')
         }
+        const code = await this.handleVerifyTable(this.selectedRows.map(item => item.id))
+        if (code === 'hasDelete' || code === 'error') return
         this.clickRows = this.selectedRows
         this.visible2 = true
       } else if (type === 'batchList') {
@@ -527,9 +604,16 @@ export default {
     },
     closeRegular() {
       this.visible2 = false
+      this.hasLargeData = false
       this.regularInfo = {}
     },
-    setRegular(data) {
+    closeRegularList() {
+      this.visible = false
+      this.hasLargeData = false
+    },
+    async setRegular(data) {
+      const code = await this.handleVerifyTable(this.clickRows.map(item => item.id))
+      if (code === 'hasDelete' || code === 'error') return
       if (data) {
         this.regularInfo = data
       } else {

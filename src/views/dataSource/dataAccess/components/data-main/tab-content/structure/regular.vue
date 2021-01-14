@@ -152,6 +152,10 @@ export default {
       type: Boolean,
       default: false
     },
+    hasLargeData: {
+      type: Boolean,
+      default: false
+    },
     rows: [Array, String],
     regularInfo: Object,
     tableType: Number
@@ -326,6 +330,10 @@ export default {
           callback(new Error('间隔不得小于30分钟'))
         } else if (this.form.frequency === 0 && (value * 1) >= 60) {
           callback(new Error('间隔不得大于或等于60分钟'))
+        } else if (this.hasLargeData && this.form.frequency === 0) {
+          callback(new Error('当前所选表数据量较大, 间隔需大于或等于2小时'))
+        } else if (this.hasLargeData && this.form.frequency === 1 && (value * 1) < 2) {
+          callback(new Error('当前所选表数据量较大, 间隔需大于或等于2小时'))
         } else if (this.form.frequency === 1 && (value * 1) >= 24) {
           callback(new Error('间隔不得大于或等于24小时'))
         } else if (this.form.frequency === 2 && (value * 1) >= 365) {
