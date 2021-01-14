@@ -20,7 +20,7 @@ export default {
             }
         },
         {
-            path: 'edit',
+            path: 'edit/:screenId/:did',
             name: 'screenEdit',
             component: ScreenEditView,
             meta: {

@@ -108,27 +108,9 @@ export default {
       this.saveScreenData({ ...params }).then(res => {
         console.log(res)
         if (res) {
-          this.$server.common.putMenuFolderName('/screen/catalog', params).then(res => {
-            if (res.code === 200) {
-              // this.$message.success(res.msg)
-              this.getList()
-            } else {
-              this.$message.error(res.msg)
-            }
-          })
+          this.$store.dispatch('SetFileName', this.screenName)
         }
       })
-      // this.$server.common.putMenuFolderName('/screen/catalog', params).then(res => {
-      //   if (res.code === 200) {
-      //     this.screenName = res.data
-      //     this.$store.dispatch('SetFileName', this.screenName)
-      //     this.saveScreenData()
-      //     console.log('修改大屏名称')
-      //   } else {
-      //     this.$message.error(res.msg)
-      //     return false
-      //   }
-      // })
     },
     // 打开全屏
     openScreen () {

@@ -220,6 +220,8 @@ export default {
       }
       // 表格
       if (this.type === 'tableList') {
+        // 不区分默认都放在维度
+        selected.setting.api_data.dimensions = this.fileList
         selected.setting.api_data.tableList = this.fileList
       }
 
@@ -253,7 +255,7 @@ export default {
 
 
       let params = selected
-      console.log(JSON.stringify(params))
+      //   console.log(JSON.stringify(params))
       //   return
 
       let apiData = deepClone(this.currSelected.setting.api_data)

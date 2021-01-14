@@ -402,3 +402,58 @@
   height 104px;
   }
 
+  .f-flexcolumn{
+      display: flex;
+      flex-direction: column; 
+  }
+  .pick-checkbox-box{
+      overflow-x: hidden;
+      overflow-y: scroll;
+      height: 200px;
+      margin: 10px 0; 
+
+       &.hasborder{
+           border-top: 1px solid #cccccc;
+           border-left: 1px solid #cccccc;
+       }
+
+      .pick-input{
+          width: 150px;
+      }
+
+      .pick-property{
+          padding:0 3px;
+          width: 200px;
+          display:flex;
+          justify-content:space-between
+          font-size:14px;
+
+          .pick-del{
+            cursor:pointer
+          }
+      }
+      .pick-condition-box{
+              display: flex;
+              margin:10px 20px 10px 0;
+
+              .pick-select{
+                width:200px;
+                &.has-margin{
+                    margin-right:10px;
+                }
+              }
+
+              &.justify-between{
+                  justify-content: space-between
+              }
+       }
+   }
+
+
+.pagination{
+    height:30px;
+    display:flex;
+    display-direction:row-reverse;
+    width:100%
+    background:rgb(51,51,51)
+}

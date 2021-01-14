@@ -1242,42 +1242,42 @@ const list = [{
             }
             ],
             rows: [{
-                key: '1',
+                // key: '1',
                 date: '1/1',
                 user1: 1393,
                 user2: '1093',
                 rate: '10%'
             },
             {
-                key: '2',
+                // key: '2',
                 date: '1/2',
                 user1: 2341,
                 user2: '2312',
                 rate: '12%'
             },
             {
-                key: '3',
+                // key: '3',
                 date: '1/3',
                 user1: 2378,
                 user2: '2555',
                 rate: '34%'
             },
             {
-                key: '4',
+                // key: '4',
                 date: '1/4',
                 user1: 3256,
                 user2: '5488',
                 rate: '45%'
             },
             {
-                key: '5',
+                // key: '5',
                 date: '1/5',
                 user1: 3452,
                 user2: '3210',
                 rate: '33%'
             },
             {
-                key: '6',
+                // key: '6',
                 date: '1/6',
                 user1: 1234,
                 user2: '3321',
@@ -1310,7 +1310,7 @@ const list = [{
             header: {
                 show: true,
                 textStyle: {
-                    color: '#000',
+                    color: '#fff',
                     fontSize: 20,
                     fontWeight: 'bold',
                     textAlign: 'left'
@@ -1319,7 +1319,7 @@ const list = [{
             },
             table: {
                 textStyle: {
-                    color: '#000',
+                    color: '#fff',
                     fontSize: 20,
                     fontWeight: 'bold',
                     textAlign: 'left'

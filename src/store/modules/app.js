@@ -189,9 +189,7 @@ const app = {
                 isPublish: 1,
                 setting: chart.setting
             }
-            screenManage.updateChart(params).then((res) => {
-                dispatch("UpdCanvasMap", { index, newData: res.data })
-            })
+            screenManage.updateChart(params)
         },
         // 获取大屏详情
         async getScreenDetail ({ dispatch, commit }, id) {

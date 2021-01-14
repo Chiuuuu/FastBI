@@ -335,7 +335,9 @@ export default {
     },
     // 大屏复制
     copyScreen (event, item, { parent, file, index }) {
-      this.getList()
+      this.$server.screenManage.copyScreen(file.id).then(res => {
+        this.getList()
+      })
     },
     // 右键删除文件夹
     handleFolderDelete (event, item, { folder }) {
@@ -434,6 +436,8 @@ export default {
         }
         this.fileSelectId = ''
         if (this.isAdd === 1) { // 新增
+          // 新建大屏清空模型列表
+          this.$store.dispatch("dataModel/setSelectedModelList", [])
           this.addScreenData({ ...values })
           this.fileSelectName = values.name
           // 新建默认赋予所有权限
@@ -453,16 +457,8 @@ export default {
             ...values
           }
           this.saveScreenData({ ...params }).then(res => {
-            console.log(res)
             if (res) {
-              this.$server.common.putMenuFolderName('/screen/catalog', params).then(res => {
-                if (res.code === 200) {
-                  // this.$message.success(res.msg)
-                  this.getList()
-                } else {
-                  this.$message.error(res.msg)
-                }
-              })
+              this.getList()
             }
           })
           // this.$server.common.putMenuFolderName('/screen/catalog', params)
@@ -481,10 +477,9 @@ export default {
       this.SetCanvasRange(0.5)
       this.$router.push({
         name: 'screenEdit',
-        query: {
+        params: {
           id: this.fileSelectId,
-          name: this.fileSelectName,
-          parentId: this.parentId
+          did: '0'
         }
       })
     },

@@ -21,10 +21,12 @@
 
               <!-- 表格 -->
               <chart-tables
+                ref="tables"
                 v-else-if="transform.setting.name === 've-tables'"
                 :config="transform.setting.config"
                 :api-data="transform.setting.api_data"
                 :background="transform.setting.background"
+                :chartSize="transform.setting.view"
               ></chart-tables>
               <charts-factory
                 v-else
@@ -88,7 +90,7 @@ export default {
             ? this.pageSettings.backgroundColor
             : `url(${this.pageSettings.backgroundSrc}) 0% 0% / 100% 100% no-repeat`,
       }
-    },
+    }
   },
   watch: {
     screenId: {
@@ -113,6 +115,9 @@ export default {
   },
   methods: {
     ...mapActions(["getScreenDetail", 'handleRefreshData']),
+    getTableSize (transform) {
+      return { x: transform.setting.view.width, y: transform.setting.view.height }
+    },
     // 获取大屏数据
     getScreenData () {
       // 获取页面配置之前先重置

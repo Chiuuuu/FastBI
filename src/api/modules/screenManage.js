@@ -53,6 +53,14 @@ const screenManage = {
         return $axios.post('/screen/bigscreen/addScreen', params)
     },
     /**
+ * @description 复制大屏
+ * @param {*} params
+ * @returns
+ */
+    copyScreen (screenId) {
+        return $axios.get(`/screen/bigscreen/copyScreen/${screenId}`)
+    },
+    /**
      * @description 保存大屏new
      * @param {*} params
      * @returns

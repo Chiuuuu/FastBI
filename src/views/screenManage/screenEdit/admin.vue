@@ -69,6 +69,7 @@
               :config="transform.setting.config"
               :api-data="transform.setting.api_data"
               :background="transform.setting.background"
+              :chartSize="transform.setting.view"
             ></chart-tables>
 
             <charts-factory
@@ -142,6 +143,7 @@ export default {
     ...mapGetters([
       "canvasMap",
       "currentSelected",
+      "currSelected",
       "isScreen",
       "coverageExpand",
       "pageSettings",
@@ -165,8 +167,8 @@ export default {
     // 拉取页面canvasMaps
     // 先清空数据
     this.$store.dispatch("InitCanvasMaps", [])
-    if (this.$route.query.id) {
-      this.$store.dispatch('SetScreenId', this.$route.query.id)
+    if (this.$route.params.id) {
+      this.$store.dispatch('SetScreenId', this.$route.params.id)
       this.getScreenData()
     }
   },
@@ -186,28 +188,7 @@ export default {
     ...mapActions(["saveScreenData", "deleteChartData", "getScreenDetail"]),
     // 获取大屏数据
     getScreenData () {
-      // this.$server.screenManage
-      //   .getScreenDetailById(this.$route.query.id)
-      //   .then((res) => {
-      //     if (res.code === 200) {
-      //       this.screenData = res.data
-      //       console.log(this.screenData, "screenData")
-      //       this.$store.dispatch(
-      //         "SetPageSettings",
-      //         res.data ? res.data.setting : {}
-      //       )
-      //       this.$store.dispatch("InitCanvasMaps", {
-      //         maps: res.data ? res.data.screenGraphs : [],
-      //         idList: res.data ? res.data.setting.idList : [],
-      //       })
-      //       this.$store.dispatch("dataModel/setSelectedModelList", res.list)
-      //       this.$store.commit(
-      //         "common/SET_PRIVILEGES",
-      //         res.data.privileges || []
-      //       )
-      //     }
-      //   })
-      this.getScreenDetail(this.$route.query.id)
+      this.getScreenDetail(this.$route.params.id)
     },
     // 悬停事件
     handleHover (item) {

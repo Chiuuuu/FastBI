@@ -10,6 +10,9 @@
       <a-collapse-panel key="tableList" header="列" v-if="chartType === '3'">
         <drag-area type="tableList" ref="table"></drag-area>
       </a-collapse-panel>
+      <a-collapse-panel key="pick" header="数据筛选">
+        <drag-pick type="pick"></drag-pick>
+      </a-collapse-panel>
       <a-collapse-panel key="sort" header="排序">
         <div style="display: flex;">
           <a-select
@@ -72,14 +75,16 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import DragArea from './components/dragArea'
+import DragPick from './components/dragPick'
 import { deepClone } from '../../../utils/deepClone'
 export default {
   components: {
-    DragArea
+    DragArea,
+    DragPick
   },
   data () {
     return {
-      activeKey: ['dimensions', 'measures', 'filter', 'sort', 'tips', 'tableList', 'refresh'], // 所有面板默认打开
+      activeKey: ['dimensions', 'measures', 'filter', 'sort', 'tips', 'tableList', 'refresh', 'pick'], // 所有面板默认打开
       fileObj: {
         dimensions: [],
         measures: []
