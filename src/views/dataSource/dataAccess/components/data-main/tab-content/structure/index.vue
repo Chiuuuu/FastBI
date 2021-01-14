@@ -135,6 +135,7 @@
         :rows="clickRows"
         :table-type="tableType"
         :has-large-data="hasLargeData"
+        :has-change-data="hasChangeData"
         :regular-info="regularInfo"
         @close="closeRegular" />
       <table-info
@@ -224,6 +225,7 @@ export default {
       databaseId: '',
       verifying: false,
       hasLargeData: false, // 所选表是否含有大量数据
+      hasChangeData: false, // 所选表是否有字段变动
       tableKeyword: '',
       logColumns,
       logData: [],
@@ -464,12 +466,15 @@ export default {
       52022, "远程对应的表的数据量较大"
      */
     handleTableInfo(infoList) {
+      const changeList = []
       const deleteList = []
       const largeList = []
       let normalCnt = 0
       infoList.map(item => {
         const codeList = Object.keys(item.codeMsgMap)
-        if (codeList.includes('52017') || codeList.includes('52018') || codeList.includes('52019')) {
+        if (codeList.includes('52018') || codeList.includes('52019')) {
+          changeList.push(item)
+        } else if (codeList.includes('52017')) {
           deleteList.push(item)
         } else if (codeList.includes('52022')) {
           largeList.push(item)
@@ -477,12 +482,16 @@ export default {
           normalCnt++
         }
       })
-      if (deleteList.length > 0) { // 有表被删除, 直接拦截操作
-        this.$message.error(h => h('div', { style: { textAlign: 'left' } }, deleteList.map(item => {
-          return h('div', {}, [
+      if (changeList.length > 0) {
+        this.hasChangeData = true
+        return 'hasChange'
+      } else if (deleteList.length > 0) { // 有表被删除, 直接拦截操作
+        this.$message.error(h => h('span', { style: { textAlign: 'left' } }, deleteList.map(item => {
+          return h('span', {}, [
             '表',
             h('span', {}, item.tableName),
-            ':' + Object.values(item.codeMsgMap).join('、')
+            ':' + Object.values(item.codeMsgMap).join('、'),
+            h('br')
           ])
         })), 5)
         return 'hasDelete'
@@ -531,48 +540,50 @@ export default {
         return this.$message.error('一次抽取最多只能选择10个')
       }
       const code = await this.handleVerifyTable(this.selectedRows.map(item => item.id))
-      if (code !== 'hasDelete') {
-        // 源表抽取
-        let result
-        if (this.tableType === 0) {
-          const rows = this.selectedRows.map(item => {
-            const _item = {
-              databaseName: this.database,
-              sourceId: this.modelId,
-              sourceName: this.modelName,
-              tableId: item.id,
-              tableName: item.name
-            }
-            return _item
-          })
-          this.extractSping = true
-          result = await this.$server.dataAccess.actionExtract('/datasource/extract', {
-            rows: rows,
-            tableList: this.data
-          }).finally(() => {
-            this.extractSping = false
-            this.handleGetTableList()
-          })
-        } else if (this.tableType === 1) { // 自定义表抽取
-          this.extractSping = true
-          result = await this.$server.dataAccess.actionCustomExtract(this.selectedRows.map(item => item.id)).finally(() => {
-            this.extractSping = false
-            this.handleGetTableList()
-          })
-        }
-        if (result.code === 200) {
-          if (result.data) {
-            if (result.data.length && result.data.length < this.selectedRows.length) {
-              this.$message.info(`抽取任务已下达 \n ${result.msg}`, 5)
-            } else if (result.data.length && result.data.length === this.selectedRows.length) {
-              this.$message.error('所选表格不是orc格式, 无法抽取')
-            }
-          } else {
-            this.$message.success('抽取任务已下达')
+      if (code === 'hasDelete') return
+      // 源表抽取
+      let result
+      if (this.tableType === 0) {
+        const rows = this.selectedRows.map(item => {
+          const _item = {
+            databaseName: this.database,
+            sourceId: this.modelId,
+            sourceName: this.modelName,
+            tableId: item.id,
+            tableName: item.name
           }
-        } else {
-          this.$message.error(result.msg)
+          return _item
+        })
+        this.extractSping = true
+        result = await this.$server.dataAccess.actionExtract('/datasource/extract', {
+          rows: rows,
+          tableList: this.data
+        }).finally(() => {
+          this.extractSping = false
+          this.handleGetTableList()
+        })
+      } else if (this.tableType === 1) { // 自定义表抽取
+        this.extractSping = true
+        result = await this.$server.dataAccess.actionCustomExtract(this.selectedRows.map(item => item.id)).finally(() => {
+          this.extractSping = false
+          this.handleGetTableList()
+        })
+      }
+      if (result.code === 200) {
+        if (result.data) {
+          if (result.data.length && result.data.length > 0 && result.data.length < this.selectedRows.length) {
+            return this.$message.info(`抽取任务已下达 \n ${result.msg}`, 5)
+          } else if (result.data.length && result.data.length > 0 && result.data.length === this.selectedRows.length) {
+            return this.$message.error('所选表格不是orc格式, 无法抽取')
+          }
         }
+        if (this.hasLargeData) {
+          this.$message.success('抽取任务已下达，前抽取的表数据量较多，耗时会更长，请您耐心等待')
+        } else {
+          this.$message.success('抽取任务已下达')
+        }
+      } else {
+        this.$message.error(result.msg)
       }
     },
     async setting(row) {
@@ -605,14 +616,17 @@ export default {
     closeRegular() {
       this.visible2 = false
       this.hasLargeData = false
+      this.hasChangeData = false
       this.regularInfo = {}
     },
     closeRegularList() {
       this.visible = false
       this.hasLargeData = false
+      this.hasChangeData = false
     },
     async setRegular(data) {
       const code = await this.handleVerifyTable(this.clickRows.map(item => item.id))
+      if (this.$refs.extract) this.$refs.extract.modalSpin = false
       if (code === 'hasDelete' || code === 'error') return
       if (data) {
         this.regularInfo = data
