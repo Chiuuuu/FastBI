@@ -8,7 +8,9 @@
     :visible="show"
     @cancel="handleClose"
     @ok="handleOk">
-    <div v-if="typeof rows !== 'string'" style="margin-bottom:10px"><a-button type="primary" @click="setRegular">添加定时任务</a-button></div>
+    <div v-if="typeof rows !== 'string'" style="margin-bottom:10px">
+      <a-button type="primary" :loading="modalSpin" @click="setRegular">添加定时任务</a-button>
+    </div>
     <a-table
       rowKey='id'
       size="small"
@@ -110,6 +112,7 @@ export default {
   },
   methods: {
     setRegular() {
+      this.modalSpin = true
       this.$emit('setRegular')
     },
     async handleGetRegularList() {
@@ -142,6 +145,7 @@ export default {
     },
     handleRegular(row, type) {
       if (type === 'edit') {
+        this.modalSpin = true
         this.$emit('setRegular', row)
       } else if (type === 'delete') {
         this.$confirm({

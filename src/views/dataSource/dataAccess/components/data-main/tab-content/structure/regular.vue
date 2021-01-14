@@ -152,7 +152,11 @@ export default {
       type: Boolean,
       default: false
     },
-    hasLargeData: {
+    hasLargeData: { // 有大数据量的表
+      type: Boolean,
+      default: false
+    },
+    hasChangeData: { // 字段有变动的表
       type: Boolean,
       default: false
     },
@@ -236,6 +240,11 @@ export default {
         } else {
           let idList = this.rows.map(item => item.id)
           this.handleGetIncreaseList(idList)
+        }
+
+        // 判断是否为大数据量的表
+        if (this.hasLargeData) {
+          this.$message.info('当前选择抽取的表数据量过多，请延长间隔时间，推荐您至少6小时抽取一次')
         }
       } else {
         this.increaseList = []
