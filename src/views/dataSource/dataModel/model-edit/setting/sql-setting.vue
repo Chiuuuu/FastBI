@@ -67,7 +67,7 @@ export default {
           },
           {
             max: 20,
-            message: '请输入1-20个字符的试图名称'
+            message: '请输入1-20个字符的视图名称'
           }
         ],
         cloneSql: [

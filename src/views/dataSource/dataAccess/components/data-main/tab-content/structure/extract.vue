@@ -122,7 +122,7 @@ export default {
             this.modalSpin = false
           })
       } else {
-        res = await this.$server.dataAccess.getRegularList(this.rows[0].databaseId, this.rows[0].id)
+        res = await this.$server.dataAccess.getRegularList(this.rows[0].id, 0)
           .finally(() => {
             this.modalSpin = false
           })
