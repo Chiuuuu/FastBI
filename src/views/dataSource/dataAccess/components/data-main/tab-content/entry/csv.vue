@@ -558,7 +558,7 @@ export default {
           })
           formData.append('delimiter', this.queryDelimiter)
           formData.append('sourceSaveInput.name', this.form.name)
-          formData.append('sourceSaveInput.type', 5)
+          formData.append('sourceSaveInput.type', 12)
           formData.append('sourceSaveInput.parentId', this.parentId || 0)
           formData.append('sourceSaveInput.id', this.modelId || 0)
           if (this.deleteIdList.length > 0 || this.fileList.length > 0) {
