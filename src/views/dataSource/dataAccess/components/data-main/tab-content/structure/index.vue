@@ -134,7 +134,7 @@
         :show="visible2"
         :rows="clickRows"
         :table-type="tableType"
-        :has-large-data="hasLargeData"
+        :large-data="largeDataList"
         :has-change-data="hasChangeData"
         :regular-info="regularInfo"
         @close="closeRegular" />
@@ -224,7 +224,7 @@ export default {
       database: '',
       databaseId: '',
       verifying: false,
-      hasLargeData: false, // 所选表是否含有大量数据
+      largeDataList: [], // 所选表是否含有大量数据
       hasChangeData: false, // 所选表是否有字段变动
       tableKeyword: '',
       logColumns,
@@ -496,7 +496,7 @@ export default {
         })), 5)
         return 'hasDelete'
       } else if (largeList.length > 0) { // 有大数据表, 则定时任务需至少间隔2小时
-        this.hasLargeData = true
+        this.largeDataList = largeList
         return 'hasLarge'
       } else if (infoList.length === normalCnt) { // 正常情况
         return 'normal'
@@ -577,7 +577,7 @@ export default {
             return this.$message.error('所选表格不是orc格式, 无法抽取')
           }
         }
-        if (this.hasLargeData) {
+        if (this.largeDataList.length > 0) {
           this.$message.success('抽取任务已下达，前抽取的表数据量较多，耗时会更长，请您耐心等待')
         } else {
           this.$message.success('抽取任务已下达')
@@ -587,8 +587,10 @@ export default {
       }
     },
     async setting(row) {
-      const code = await this.handleVerifyTable(new Array(row.id))
-      if (code === 'hasDelete' || code === 'error') return
+      if (this.showExtractBtn) {
+        const code = await this.handleVerifyTable(new Array(row.id))
+        if (code === 'hasDelete' || code === 'error') return
+      }
       this.$emit('on-change-componet', 'Setting', row)
     },
     async showSetting(type, row) {
@@ -615,13 +617,13 @@ export default {
     },
     closeRegular() {
       this.visible2 = false
-      this.hasLargeData = false
+      this.largeDataList = []
       this.hasChangeData = false
       this.regularInfo = {}
     },
     closeRegularList() {
       this.visible = false
-      this.hasLargeData = false
+      this.largeDataList = []
       this.hasChangeData = false
     },
     async setRegular(data) {

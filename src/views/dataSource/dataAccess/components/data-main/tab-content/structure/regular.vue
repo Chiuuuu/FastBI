@@ -28,7 +28,7 @@
                   <a-icon style="margin-left:10px" type="question-circle" theme="outlined" />
                 </a-popover>
               </a-radio>
-              <a-radio :value="1" :disabled="tableType === 1">
+              <a-radio :value="1" :disabled="tableType === 1 || largeData.length > 0">
                 <span>增量抽取</span>
                 <a-popover>
                   <template slot="content">
@@ -108,7 +108,8 @@
             <a-select-option
               :value="1"
               :disabled="tableType === 1 ||
-              (record.fieldList && record.fieldList.length === 0)"
+              (record.fieldList && record.fieldList.length === 0) ||
+              isLargeData(record.target)"
             >增量更新</a-select-option>
           </a-select>
         </template>
@@ -152,17 +153,14 @@ export default {
       type: Boolean,
       default: false
     },
-    hasLargeData: { // 有大数据量的表
-      type: Boolean,
-      default: false
-    },
     hasChangeData: { // 字段有变动的表
       type: Boolean,
       default: false
     },
+    largeData: Array, // 有大数据量的表
     rows: [Array, String],
     regularInfo: Object,
-    tableType: Number
+    tableType: Number // 0 原表, 1 自定义表
   },
   data() {
     return {
@@ -243,7 +241,7 @@ export default {
         }
 
         // 判断是否为大数据量的表
-        if (this.hasLargeData) {
+        if (this.largeData.length > 0) {
           this.$message.info('当前选择抽取的表数据量过多，请延长间隔时间，推荐您至少6小时抽取一次')
         }
       } else {
@@ -258,6 +256,9 @@ export default {
     }
   },
   methods: {
+    isLargeData(id) {
+      return this.largeData.some(item => item.tableId === id)
+    },
     disabledStartDate(date) {
       return date && date < moment().subtract(1, 'days')
     },
@@ -339,9 +340,9 @@ export default {
           callback(new Error('间隔不得小于30分钟'))
         } else if (this.form.frequency === 0 && (value * 1) >= 60) {
           callback(new Error('间隔不得大于或等于60分钟'))
-        } else if (this.hasLargeData && this.form.frequency === 0) {
+        } else if (this.largeData.length > 0 && this.form.frequency === 0) {
           callback(new Error('当前所选表数据量较大, 间隔需大于或等于2小时'))
-        } else if (this.hasLargeData && this.form.frequency === 1 && (value * 1) < 2) {
+        } else if (this.largeData.length > 0 && this.form.frequency === 1 && (value * 1) < 2) {
           callback(new Error('当前所选表数据量较大, 间隔需大于或等于2小时'))
         } else if (this.form.frequency === 1 && (value * 1) >= 24) {
           callback(new Error('间隔不得大于或等于24小时'))
