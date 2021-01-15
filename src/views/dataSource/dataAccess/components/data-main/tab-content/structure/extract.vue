@@ -8,7 +8,7 @@
     :visible="show"
     @cancel="handleClose"
     @ok="handleOk">
-    <div v-if="typeof rows !== 'string'" style="margin-bottom:10px">
+    <div v-if="single" style="margin-bottom:10px">
       <a-button type="primary" :loading="modalSpin" @click="setRegular">添加定时任务</a-button>
     </div>
     <a-table
@@ -67,7 +67,8 @@ export default {
       type: Boolean,
       default: false
     },
-    rows: [Array, String],
+    rows: [Array],
+    databaseId: [String],
     formData: [Object, String]
   },
   data() {
@@ -97,7 +98,7 @@ export default {
       modelId: state => state.dataAccess.modelId
     }),
     single() {
-      return typeof this.rows !== 'string' && this.rows.length === 1
+      return this.rows.length === 1
     },
     regularData() {
       return this.selectedRows.length > 0 ? this.selectedRows : this.data
@@ -117,10 +118,9 @@ export default {
     },
     async handleGetRegularList() {
       this.modalSpin = true
-      let isString = typeof this.rows === 'string'
       let res
-      if (isString) {
-        res = await this.$server.dataAccess.getRegularList(this.rows, 1)
+      if (!this.single) {
+        res = await this.$server.dataAccess.getRegularList(this.databaseId, 1)
           .finally(() => {
             this.modalSpin = false
           })

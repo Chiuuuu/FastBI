@@ -158,8 +158,8 @@ export default {
       default: false
     },
     largeData: Array, // 有大数据量的表
-    rows: [Array, String],
-    regularInfo: Object,
+    regData: Array, // 有大数据量的表
+    rows: [Array],
     tableType: Number // 0 原表, 1 自定义表
   },
   data() {
@@ -181,7 +181,6 @@ export default {
       },
       increaseList: [],
       errorState: 0, // 0.通过 1.小于系统时间 2.大于结束时间
-      regData: [],
       increaseColRules: [{ required: true, message: '请选择增量字段' }],
       regRules: {
         name: [
@@ -225,7 +224,7 @@ export default {
       modelId: state => state.dataAccess.modelId
     }),
     single() {
-      return typeof this.rows !== 'string' && this.rows.length === 1
+      return this.rows.length === 1
     }
   },
   watch: {
@@ -233,7 +232,7 @@ export default {
       // 获取增量字段
       if (newValue) {
         // 判断是否新增, 有id为编辑, 先获取详情
-        if (this.regularInfo.id) {
+        if (this.regData.length > 0) {
           this.handleGetRegularInfo()
         } else {
           let idList = this.rows.map(item => item.id)
@@ -246,7 +245,6 @@ export default {
         }
       } else {
         this.increaseList = []
-        this.regData = []
       }
     }
   },
@@ -313,26 +311,14 @@ export default {
         })
     },
     handleGetRegularInfo() {
-      this.spinning = true
-      this.$server.dataAccess.getRegularInfo(this.regularInfo.id, this.regularInfo.groupId)
-        .then(res => {
-          if (res.code === 200) {
-            this.regData = res.data
-            const form = {}
-            for (const key in this.form) {
-              // this.$set(this.form, key, this.regData[0][key])
-              form[key] = this.regData[0][key]
-            }
-            this.$set(this, 'form', form)
-            const idList = res.data.map(item => item.target)
-            this.handleGetIncreaseList(idList)
-          } else {
-            this.$message.error(res.msg)
-          }
-        })
-        .finally(() => {
-          this.spinning = false
-        })
+      const form = {}
+      for (const key in this.form) {
+        // this.$set(this.form, key, this.regData[0][key])
+        form[key] = this.regData[0][key]
+      }
+      this.$set(this, 'form', form)
+      const idList = this.regData.map(item => item.target)
+      this.handleGetIncreaseList(idList)
     },
     intervalValidator(rule, value, callback) {
       if (/^[1-9]\d*$/.test(value)) {
@@ -470,14 +456,14 @@ export default {
         if (ok) {
           this.loading = true
           let res
-          if (this.regularInfo.id) {
+          if (this.regData.length > 0) {
             res = await this.handleAsyncRegularInfo('update')
           } else {
             res = await this.handleAsyncRegularInfo('add')
           }
           if (res.code === 200) {
             this.$message.success('保存成功')
-            if (this.regularInfo.id) {
+            if (this.regData.length > 0) {
               this.$parent.$refs.extract.updateRows(res.data)
               // this.$emit('updateRows', res.data)
             } else {
