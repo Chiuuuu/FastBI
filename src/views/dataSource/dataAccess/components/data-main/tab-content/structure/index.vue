@@ -127,6 +127,7 @@
         ref="extract"
         :show="visible"
         :rows="clickRows"
+        :database-id="databaseId"
         @close="closeRegularList"
         @setRegular="setRegular" />
       <regular-setting
@@ -134,9 +135,9 @@
         :show="visible2"
         :rows="clickRows"
         :table-type="tableType"
+        :reg-data="regData"
         :large-data="largeDataList"
         :has-change-data="hasChangeData"
-        :regular-info="regularInfo"
         @close="closeRegular" />
       <table-info
         :table-id="checkTableId"
@@ -224,6 +225,7 @@ export default {
       database: '',
       databaseId: '',
       verifying: false,
+      regData: [], // 定时任务详情
       largeDataList: [], // 所选表是否含有大量数据
       hasChangeData: false, // 所选表是否有字段变动
       tableKeyword: '',
@@ -242,7 +244,6 @@ export default {
       extractSping: false,
       modalSpin: false,
       clickRows: [],
-      regularInfo: {},
       checkTableId: '' // 查看数据的表id
     }
   },
@@ -449,7 +450,9 @@ export default {
         this.$message.error(dabaseInfoResult.msg)
       }
     },
-    handleCheckTable(e, id) {
+    async handleCheckTable(e, id) {
+      const code = await this.handleVerifyTable(new Array(id))
+      if (code === 'hasDelete') return
       this.checkTableId = id
       this.visible3 = true
     },
@@ -611,30 +614,56 @@ export default {
         if (this.data.length < 1) {
           return this.$message.error('当前数据库暂无数据')
         }
-        this.clickRows = this.data[0].databaseId
+        this.clickRows = []
         this.visible = true
       }
     },
     closeRegular() {
       this.visible2 = false
+      this.regData = []
       this.largeDataList = []
       this.hasChangeData = false
-      this.regularInfo = {}
     },
     closeRegularList() {
       this.visible = false
       this.largeDataList = []
       this.hasChangeData = false
+      this.clickRows = []
+    },
+    // 获取定时任务详情(编辑用)
+    async handleGetRegularInfo(data) {
+      if (this.$refs.extract.modalSpin) this.$refs.extract.modalSpin = true
+      const res = await this.$server.dataAccess.getRegularInfo(data.id, data.groupId)
+          .catch(() => {
+            if (this.$refs.extract.modalSpin) this.$refs.extract.modalSpin = false
+          })
+      if (res.code === 200) {
+        // 校验当前表
+        const code = await this.handleVerifyTable(res.data.map(item => item.target))
+          .finally(() => {
+            if (this.$refs.extract.modalSpin) this.$refs.extract.modalSpin = false
+          })
+        if (code === 'hasDelete' || code === 'error') {
+          return code
+        } else {
+          this.regData = res.data
+        }
+      } else {
+        this.$message.error(res.msg)
+        if (this.$refs.extract.modalSpin) this.$refs.extract.modalSpin = false
+      }
     },
     async setRegular(data) {
-      const code = await this.handleVerifyTable(this.clickRows.map(item => item.id))
-      if (this.$refs.extract) this.$refs.extract.modalSpin = false
-      if (code === 'hasDelete' || code === 'error') return
+      // 有data, 则是编辑状态
+      let code
       if (data) {
-        this.regularInfo = data
+        code = await this.handleGetRegularInfo(data)
       } else {
-        this.regularInfo = {}
+        this.regData = []
+        code = await this.handleVerifyTable(this.clickRows.map(item => item.id))
+        if (this.$refs.extract) this.$refs.extract.modalSpin = false
       }
+      if (code === 'hasDelete' || code === 'error') return
       this.visible2 = true
     }
   }
