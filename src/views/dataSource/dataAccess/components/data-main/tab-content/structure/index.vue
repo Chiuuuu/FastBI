@@ -222,8 +222,8 @@ export default {
         total: 0
       },
       databaseList: [],
-      database: '',
-      databaseId: '',
+      database: '', // 当前数据库名
+      databaseId: '', // 当前数据库id
       verifying: false,
       regData: [], // 定时任务详情
       largeDataList: [], // 所选表是否含有大量数据
@@ -331,7 +331,7 @@ export default {
       this.$store.commit('dataAccess/SET_DATABASENAME', value)
       this.handleGetTableList()
     },
-    async handleGetTableListbase() {
+    async handleGetDatabaseList() {
       const result = await this.$server.dataAccess.getDatabaseList({
         datasourceId: this.modelId
       })
@@ -407,7 +407,7 @@ export default {
     },
     async handleGetData(pagination) {
       if (!this.modelType) return
-      await this.handleGetTableListbase()
+      await this.handleGetDatabaseList()
       this.handleGetTableList()
     },
     async handleGetTableList(pagination) {
@@ -451,8 +451,9 @@ export default {
       }
     },
     async handleCheckTable(e, id) {
-      const code = await this.handleVerifyTable(new Array(id))
-      if (code === 'hasDelete') return
+      // 先不做表校验
+      // const code = await this.handleVerifyTable(new Array(id))
+      // if (code === 'hasDelete') return
       this.checkTableId = id
       this.visible3 = true
     },
@@ -461,6 +462,7 @@ export default {
       this.logData = []
     },
     /**
+      52009, "在线获取当前数据表的数据失败"
       52017, "远程对应的原数据表不存在或已经被删"
       52018, "远程对应的原表字段不存在或已经被删"
       52019, "远程对应的原表字段已发生改变"
@@ -485,7 +487,7 @@ export default {
           normalCnt++
         }
       })
-      if (changeList.length > 0) {
+      if (changeList.length > 0) { // 表字段发生变化
         this.hasChangeData = true
         return 'hasChange'
       } else if (deleteList.length > 0) { // 有表被删除, 直接拦截操作
@@ -505,6 +507,7 @@ export default {
         return 'normal'
       }
     },
+    // 校验当前表数据变动
     async handleVerifyTable(ids) {
       this.verifying = true
       const result = await this.$server.dataAccess.actionVerifyTable(ids)
@@ -518,6 +521,7 @@ export default {
         return 'error'
       }
     },
+    // 抽取记录
     async showExtractLog() {
       if (this.data.length < 1) {
         return this.$message.error('当前数据库暂无数据')
@@ -543,7 +547,7 @@ export default {
         return this.$message.error('一次抽取最多只能选择10个')
       }
       const code = await this.handleVerifyTable(this.selectedRows.map(item => item.id))
-      if (code === 'hasDelete') return
+      if (code === 'hasDelete' || code === 'error') return
       // 源表抽取
       let result
       if (this.tableType === 0) {
@@ -589,18 +593,44 @@ export default {
         this.$message.error(result.msg)
       }
     },
+    // 字段设置
     async setting(row) {
-      if (this.showExtractBtn) {
-        const code = await this.handleVerifyTable(new Array(row.id))
-        if (code === 'hasDelete' || code === 'error') return
+      // if (this.showExtractBtn) {
+      //   const code = await this.handleVerifyTable(new Array(row.id))
+      //   if (code === 'hasDelete' || code === 'error') return
+      // }
+
+      if (!this.showExtractBtn) {
+        this.$emit('on-change-componet', 'Setting', row)
+      } else {
+        // 先调一次接口校验表是否存在再跳转页面(上面的校验接口频繁调用会锁表)
+        let databaseName = this.formInfo ? this.formInfo.databaseName : ''
+        // sql, oracle的数据库名称在formInfo里, excel的在dabaseName里
+        if (['excel', 'csv'].indexOf(this.modelType) > -1) {
+          databaseName = this.databaseName
+        }
+        const result = await this.$server.dataAccess.getTableFieldDetail({
+          databaseName,
+          sourceName: this.modelName,
+          sourceId: row.datasourceId,
+          databaseId: row.databaseId,
+          tableId: row.id,
+          tableName: row.name
+        })
+        if (result.code === 200) {
+          this.$emit('on-change-componet', 'Setting', row)
+        } else {
+          this.$message.error(result.msg)
+        }
       }
-      this.$emit('on-change-componet', 'Setting', row)
     },
+    // 显示定时任务
     async showSetting(type, row) {
+      // 点击单张表的定时设置
       if (type === 'single') {
         this.clickRows = new Array(row)
         this.visible = true
-      } else if (type === 'batch') {
+      } else if (type === 'batch') { // 点击批量抽取按钮
         if (this.selectedRows.length < 2) {
           return this.$message.error('请选择至少2项')
         } else if (this.selectedRows.length > 10) {
@@ -610,7 +640,7 @@ export default {
         if (code === 'hasDelete' || code === 'error') return
         this.clickRows = this.selectedRows
         this.visible2 = true
-      } else if (type === 'batchList') {
+      } else if (type === 'batchList') { // 查看批量抽取记录
         if (this.data.length < 1) {
           return this.$message.error('当前数据库暂无数据')
         }
@@ -618,12 +648,14 @@ export default {
         this.visible = true
       }
     },
+    // 关闭定时任务详情窗口
     closeRegular() {
       this.visible2 = false
       this.regData = []
       this.largeDataList = []
       this.hasChangeData = false
     },
+    // 关闭定时任务列表窗口
     closeRegularList() {
       this.visible = false
       this.largeDataList = []
