@@ -26,11 +26,15 @@
         ></board-options>
       </div>
       <!-- 右侧数据模型列表 -->
-      <board-model :config="config.model" v-if="config.model" @on-toggle="ToggleModelExpand">
+      <board-model
+        :config="config.model"
+        v-if="config.model"
+        @on-toggle="ToggleModelExpand"
+      >
         <slot name="model"></slot>
       </board-model>
     </div>
-    <!-- <pation></pation> -->
+    <pation></pation>
     <!--右键菜单-->
     <context-menu></context-menu>
   </div>
@@ -45,13 +49,13 @@ import BoardOptions from './options/index' // 右侧栏(页面配置)
 import CanvasMain from './canvas' // 中间画板
 import ContextMenu from './context-menu/index' // 右键菜单
 import BoardModel from './model/index' // 8-14 新增数据模型
-// import Pation from './pation/index' // 分页栏
+import Pation from './pation/index' // 分页栏
 import { mapGetters, mapActions } from 'vuex'
 
 const prefixCls = 'board'
 export default {
   name: 'Board',
-  data () {
+  data() {
     return {
       prefixCls: prefixCls,
       config: config
@@ -59,7 +63,7 @@ export default {
   },
   computed: {
     ...mapGetters(['optionsExpand', 'coverageExpand', 'modelExpand']),
-    centerStyle () {
+    centerStyle() {
       return {
         left: this.coverageExpand ? this.config.coverage.style.width : '50px',
         // right: this.optionsExpand ? this.config.options.style.width : '0'
@@ -69,7 +73,7 @@ export default {
   },
   watch: {
     // 检测图层面板是否打开
-    coverageExpand (val) {
+    coverageExpand(val) {
       if (val) {
         this.config.coverage.style.width = '180px'
         this.config.coverage.style.flex = '0 0 180px'
@@ -80,10 +84,21 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['ToggleOptionsExpand', 'ToggleCoverageExpand', 'ToggleModelExpand'])
+    ...mapActions([
+      'ToggleOptionsExpand',
+      'ToggleCoverageExpand',
+      'ToggleModelExpand'
+    ])
   },
   // 8-14 添加配置侧栏
-  components: { ContextMenu, CanvasMain, BoardCoverage, BoardHeader, BoardModel, BoardOptions }
-
+  components: {
+    ContextMenu,
+    CanvasMain,
+    BoardCoverage,
+    BoardHeader,
+    BoardModel,
+    BoardOptions,
+    Pation
+  }
 }
 </script>

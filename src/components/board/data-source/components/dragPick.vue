@@ -1,13 +1,15 @@
 <template>
   <div
     class="dragArea"
-    :class="{'dragable-vaild':type===dragFile || isdrag && type==='tableList'}"
+    :class="{
+      'dragable-vaild': type === dragFile || (isdrag && type === 'tableList')
+    }"
     @drop.stop.prevent="handleDropOnFilesWD($event)"
     @dragover.stop.prevent
     @dragenter="dragenter"
     @dragleave="dragleave"
   >
-    <div v-if="fileList.length>0">
+    <div v-if="fileList.length > 0">
       <div
         class="field"
         v-for="(item, index) in fileList"
@@ -21,88 +23,122 @@
           </a-menu>
         </a-dropdown>
         <a-tooltip :title="item.alias">
-          <span ref="itemName" class="field-text" @click="showSelect(item)">{{item.alias}}</span>
+          <span ref="itemName" class="field-text" @click="showSelect(item)">{{
+            item.alias
+          }}</span>
         </a-tooltip>
       </div>
     </div>
-    <div class="empty" :class="{field:isdrag}">拖入字段</div>
+    <div class="empty" :class="{ field: isdrag }">拖入字段</div>
 
     <a-modal v-model="screenVisible" title="数据筛选" @ok="handleOk">
-      <div v-if="currentFile.file==='dimensions'">
+      <div v-if="currentFile.file === 'dimensions'">
         <a-radio-group v-model="currentFile.operation">
           <a-radio :value="'list'">列表</a-radio>
           <a-radio :value="'manual'">手动</a-radio>
         </a-radio-group>
-        <div class="pick-checkbox-box hasborder" v-show="currentFile.operation==='list'">
-          <input type="text" class="ant-input pick-input" v-model="listValue" placeholder="请输入搜索内容" />
-          <button class="ant-btn ant-btn-primary" @click="search">查询</button>
-          <br />
-          <a-checkbox :checked="checkAll" @change="onCheckAllChange">全选</a-checkbox>
-          <a-checkbox-group
-            class="f-flexcolumn"
-            v-model="currentFile.checkedList"
-            :options="currentFile.originList"
-            @change="onChange"
-          />
+        <div
+          class="pick-checkbox-box hasborder"
+          v-show="currentFile.operation === 'list'"
+        >
+          <b-scrollbar style="height:100%;">
+            <input
+              type="text"
+              class="ant-input pick-input"
+              v-model="listValue"
+              placeholder="请输入搜索内容"
+            />
+            <button class="ant-btn ant-btn-primary" @click="search">
+              查询
+            </button>
+            <br />
+            <a-checkbox :checked="checkAll" @change="onCheckAllChange"
+              >全选</a-checkbox
+            >
+            <a-checkbox-group
+              class="f-flexcolumn"
+              v-model="currentFile.checkedList"
+              :options="currentFile.originList"
+              @change="onChange"
+            />
+          </b-scrollbar>
         </div>
         <!--手动筛选-->
-        <div class="pick-checkbox-box" v-show="currentFile.operation==='manual'">
-          <input
-            type="text"
-            class="ant-input pick-input"
-            v-model="manualValue"
-            placeholder="请输入搜索内容"
-          />
-          <button class="ant-btn ant-btn-primary" @click="addManualProperty">添加</button>
-          <div class="pick-property" v-for="(item,index) in currentFile.manualList" :key="item">
-            <span>{{item}}</span>
-            <span class="pick-del" @click="deleteManualProperty(index)">删除</span>
-          </div>
+        <div
+          class="pick-checkbox-box"
+          v-show="currentFile.operation === 'manual'"
+        >
+          <b-scrollbar style="height:100%;">
+            <input
+              type="text"
+              class="ant-input pick-input"
+              v-model="manualValue"
+              placeholder="请输入搜索内容"
+            />
+            <button class="ant-btn ant-btn-primary" @click="addManualProperty">
+              添加
+            </button>
+            <div
+              class="pick-property"
+              v-for="(item, index) in currentFile.manualList"
+              :key="item"
+            >
+              <span>{{ item }}</span>
+              <span class="pick-del" @click="deleteManualProperty(index)"
+                >删除</span
+              >
+            </div>
+          </b-scrollbar>
         </div>
       </div>
       <!--拖动的是度量-->
       <div v-else>
         <div class="pick-checkbox-box">
-          <button class="ant-btn ant-btn-primary" @click="addCondition">添加条件</button>
-          <br />
-          <div
-            :class="['pick-condition-box',{'justify-between':item.condition==='范围'}]"
-            v-for="(item,index) in currentFile.conditionList"
-            :key="index"
-          >
-            <a-select
-              :class="['pick-select',{'has-margin':item.condition!=='范围'}]"
-              v-model="item.condition"
-              @change="changeCondition(item)"
+          <b-scrollbar style="height:100%;">
+            <button class="ant-btn ant-btn-primary" @click="addCondition">
+              添加条件
+            </button>
+            <br />
+            <div
+              :class="['pick-condition-box']"
+              v-for="(item, index) in currentFile.conditionList"
+              :key="index"
             >
-              <a-select-option
-                v-for="condition in currentFile.conditionOptions"
-                :key="condition"
-                :value="condition"
-              >{{condition}}</a-select-option>
-            </a-select>
-            <a-input-number
-              v-model="item.firKey"
-              size="default"
-              placeholder="请输入数值"
-              class="f-clear-width"
-              style="text-overflow: clip;"
-            ></a-input-number>
-            <span v-show="item.condition==='范围'">-</span>
-            <a-input-number
-              v-show="item.condition==='范围'"
-              v-model="item.secKey"
-              size="default"
-              placeholder="请输入数值"
-              class="f-clear-width"
-              style="text-overflow: clip;"
-            ></a-input-number>
-          </div>
+              <a-select
+                :class="['pick-select', 'has-margin']"
+                v-model="item.condition"
+                @change="changeCondition(item)"
+              >
+                <a-select-option
+                  v-for="option in conditionOptions"
+                  :key="option.label"
+                  :value="option.op"
+                  >{{ option.label }}</a-select-option
+                >
+              </a-select>
+              <a-input-number
+                v-model="item.firstValue"
+                size="default"
+                placeholder="请输入数值"
+                class="inputnumber"
+                style="text-overflow: clip;"
+              ></a-input-number>
+              <span class="symbol" v-show="item.condition === 'range'">-</span>
+              <a-input-number
+                v-show="item.condition === 'range'"
+                v-model="item.secondValue"
+                size="default"
+                placeholder="请输入数值"
+                class="inputnumber"
+                style="text-overflow: clip;"
+              ></a-input-number>
+            </div>
+          </b-scrollbar>
         </div>
       </div>
-      <a-radio-group v-model="currentFile.selectType">
-        <a-radio :value="'include'">只显示{{dragFile}}</a-radio>
-        <a-radio :value="'exclude'">排除</a-radio>
+      <a-radio-group v-model="currentFile.type">
+        <a-radio :value="1">只显示{{ dragFile }}</a-radio>
+        <a-radio :value="2">排除</a-radio>
       </a-radio-group>
     </a-modal>
   </div>
@@ -113,6 +149,7 @@ import { mapGetters, mapActions } from 'vuex'
 import { deepClone } from '@/utils/deepClone'
 import { sum, summary } from '@/utils/summaryList'
 import navigateList from '@/config/navigate' // 导航条菜单
+import _ from 'lodash'
 
 export default {
   props: {
@@ -121,17 +158,24 @@ export default {
       default: ''
     } // 区域类型 维度/度量
   },
-  data () {
+  data() {
     return {
+      isExist: false,
       screenVisible: false, // 弹窗显示
-      plainOptions: ['Apple', 'Pear', 'Orange', 'a', 'b', 'c', 'd'], // 多选列表
       listValue: '', // 列表模糊查询输入值
       manualValue: '', // 手动输入值
-      conditionOptions: ['范围', '大于', '小于', '大于等于', '小于等于', '等于', '不等于'],// 条件选项
+      conditionOptions: [
+        { label: '范围', op: 'range' },
+        { label: '大于', op: 'more' },
+        { label: '小于', op: 'less' },
+        { label: '大于等于', op: 'moreOrEqual' },
+        { label: '小于等于', op: 'lessOrEqual' },
+        { label: '等于', op: 'equal' },
+        { label: '不等于', op: 'notEqual' }
+      ], // 条件选项
       checkAll: false, // 是否全选标识
-      currentFile: {}, //当前选中的维度/度量数据
+      currentFile: {}, // 当前选中的维度/度量数据
       current: {},
-      selected: {},
       isdrag: false, // 是否拖拽中
       fileList: [], // 维度字段数组
       isVaild: false //
@@ -139,11 +183,12 @@ export default {
   },
   watch: {
     currSelected: {
-      handler (val) {
+      handler(val) {
         if (val) {
+          this.fileList = []
           // 当前选中的图表数据筛选的数据
-          if (val.setting.api_data.pickDatas) {
-            this.fileList = deepClone(val.setting.api_data.pickDatas)
+          if (val.setting.api_data.options) {
+            this.fileList = deepClone(val.setting.api_data.options.fileList)
           }
         }
       },
@@ -152,15 +197,23 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['dragFile', 'currentSelected', 'currSelected', 'optionsTabsType', 'dataModel', 'canvasMap']),
-    chartType () {
+    ...mapGetters([
+      'dragFile',
+      'currentSelected',
+      'currSelected',
+      'optionsTabsType',
+      'dataModel',
+      'canvasMap'
+    ]),
+    chartType() {
       return this.currSelected ? this.currSelected.setting.type : ''
     }
   },
   methods: {
     ...mapActions(['saveScreenData', 'updateChartData']),
     // 将拖动的维度到所选择的放置目标节点中
-    async handleDropOnFilesWD (event) {
+    async handleDropOnFilesWD(event) {
+      this.isExist = false
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
 
       // 验重
@@ -175,18 +228,23 @@ export default {
       if (dataFile.file === 'dimensions') {
         // 获取维度对应字段列表
         let params = { datamodelId: dataFile.modelId, dimensions: [dataFile] }
-        //  let res = await fn(dataFile)
-        dataFile.originList = this.plainOptions // 维度全字段列表
-        dataFile.checkedList = [] // 勾选的字段列表
-        dataFile.manualList = [] //手动输入列表
-        dataFile.operation = 'list' // 列表/手动,'list'/'manual'
+        // console.log(JSON.stringify(params))
+        let res = await this.$server.screenManage.getDataPick(params)
+        if (res.code === 200) {
+          // 拆维度列表
+          dataFile.originList = res.rows.map(item => Object.values(item)[0]) // 维度全字段列表
+          dataFile.checkedList = [] // 勾选的字段列表
+          dataFile.manualList = [] // 手动输入列表
+          dataFile.operation = 'list' // 列表/手动,'list'/'manual'
+        } else {
+          res.msg && this.$message.error(res.msg)
+        }
       }
       // 对应的是度量
       else {
         dataFile.conditionList = [] // 条件行
       }
-      dataFile.selectType = '' // 只显示、排除,'include'/'exclude'
-
+      dataFile.type = 1 // 只显示、排除,'include'/'exclude'
 
       // 显示弹窗
       this.currentFile = dataFile
@@ -194,27 +252,29 @@ export default {
       this.isdrag = false
     },
     // 对象数组去重,type表示对象里面的一个属性
-    uniqueFun (arr, type) {
+    uniqueFun(arr, type) {
       const res = new Map()
-      return arr.filter((a) => !res.has(a[type]) && res.set(a[type], 1))
+      return arr.filter(a => !res.has(a[type]) && res.set(a[type], 1))
     },
     // 当可拖动的元素进入可放置的目标时
-    dragenter (event) {
+    dragenter(event) {
       event.preventDefault()
       this.isdrag = true
     },
     // 当拖动元素离开可放置目标节点
-    dragleave (event) {
+    dragleave(event) {
       event.preventDefault()
       this.isdrag = false
     },
     // 点击右键显示更多
-    showMore (item) {
+    showMore(item) {
       item.showMore = true
     },
     // 列表模糊查询
-    search () {
-      if (!this.listValue) { return }
+    search() {
+      if (!this.listValue) {
+        return
+      }
       this.currentFile.originList.forEach(item => {
         if (item.indexOf(this.listValue) > -1) {
           this.currentFile.checkedList.push(item)
@@ -222,129 +282,189 @@ export default {
       })
     },
     // 点击再次打开数据筛选弹窗
-    showSelect (item) {
+    showSelect(item) {
+      this.isExist = true
       this.currentFile = item
-      this.onChange()
+      if (item.file === 'dimensions') {
+        this.onChange()
+      }
       this.screenVisible = true
     },
     // 多选框变化的时候重新判断全选
-    onChange () {
-      this.checkAll = this.currentFile.checkedList.length === this.currentFile.originList.length; // 判断是否全选
+    onChange() {
+      this.checkAll =
+        this.currentFile.checkedList.length ===
+        this.currentFile.originList.length // 判断是否全选
     },
     // 点击全选
-    onCheckAllChange (e) {
+    onCheckAllChange(e) {
       this.checkAll = e.target.checked
-      this.currentFile.checkedList = e.target.checked ? this.currentFile.originList : []
+      this.currentFile.checkedList = e.target.checked
+        ? this.currentFile.originList
+        : []
     },
     // 手动，添加字段
-    addManualProperty () {
+    addManualProperty() {
       // 本身不存在就添加进去
-      if (this.manualValue && this.currentFile.manualList.indexOf(this.manualValue) == -1) {
+      if (
+        this.manualValue &&
+        this.currentFile.manualList.indexOf(this.manualValue) === -1
+      ) {
         this.currentFile.manualList.push(this.manualValue)
       } else {
         this.$message.error(`${this.manualValue}已存在`)
       }
     },
-    deleteManualProperty (index) {
+    deleteManualProperty(index) {
       this.currentFile.manualList.splice(index, 1)
     },
     // 度量添加条件
-    addCondition () {
-      this.currentFile.conditionList.push({
-        condition: '范围', // 条件选择
-        firKey: '', // 
-        secKey: '',
-      })
+    addCondition() {
+      if (this.currentFile.conditionList.length < 5) {
+        this.currentFile.conditionList.push({
+          condition: 'range', // 条件选择，显示
+          action: '', // 条件选择，实际
+          firstValue: '',
+          secondValue: ''
+        })
+      } else {
+        this.$message.error('限制只能添加5个')
+      }
     },
-    changeCondition (item, value) {
+    changeCondition(item, value) {
       // 只有范围有两个输入框
       if (value !== '范围') {
-        item.secKey = ''
+        delete item.secondValue
       }
     },
-    handleOk () {
-      this.fileList.push(this.currentFile)
+    async handleOk() {
+      // 关闭弹窗
       this.screenVisible = false
+      let apiData = deepClone(this.currSelected.setting.api_data)
 
-      let dataList = [] // 筛选出来的有效列表
-      // 列表
-      if (this.currentFile.operation === 'list') {
-        // 默认是当前选中的列表
-        let dataList = this.currentFile.checkedList
-      }
-      // 手动
-      else {
-        // 只有完全匹配才可筛选
-        this.currentFile.manualList.forEach(item => {
-          if (this.currentFile.originList.indexOf(item) > -1) {
-            dataList.push(item)
+      let dimensionsLimitList = []
+      let measuresLimitList = []
+      // 处理维度筛选信息
+      if (this.currentFile.file === 'dimensions') {
+        // 获取筛选列表
+        this.currentFile.value =
+          this.currentFile.operation === 'list'
+            ? this.currentFile.checkedList
+            : this.currentFile.manualList
+        if (this.isExist) {
+          let file = this.fileList.find(
+            item => item.alias === this.currentFile.alias
+          )
+          file = this.currentFile
+        } else {
+          this.fileList.push(this.currentFile)
+        }
+
+        // 构造dataDimensionsLimit列表
+        this.fileList.forEach(item => {
+          if (item.file === 'dimensions') {
+            let { pivotschemaId, type, dataType, value } = item
+            dimensionsLimitList.push({ pivotschemaId, type, dataType, value })
           }
         })
       }
-      // 如果是排除，就取补集
-      if (this.currentFile.selectType === 'exclude') {
-        dataList = Array.minus(Array.union(this.currentFile.originList, dataList), Array.intersect(this.currentFile.originList, dataList));
+      // 处理度量筛选数据
+      else {
+        // 如果是排除的，action取补集符号
+        this.currentFile.conditionList.forEach(item => {
+          switch (item.condition) {
+            case 'range':
+              item.action = item.condition
+              break
+            case 'more':
+              item.action =
+                this.currentFile.type === 1 ? item.condition : 'lessOrEqual'
+              break
+            case 'less':
+              item.action =
+                this.currentFile.type === 1 ? item.condition : 'moreOrEqual'
+              break
+            case 'moreOrEqual':
+              item.action =
+                this.currentFile.type === 1 ? item.condition : 'less'
+              break
+            case 'lessOrEqual':
+              item.action =
+                this.currentFile.type === 1 ? item.condition : 'more'
+              break
+            case 'equal':
+              item.action =
+                this.currentFile.type === 1 ? item.condition : 'notEqual'
+              break
+            case 'notEqual':
+              item.action =
+                this.currentFile.type === 1 ? item.condition : 'equal'
+              break
+          }
+        })
+
+        if (this.isExist) {
+          let file = this.fileList.find(
+            item => item.alias === this.currentFile.alias
+          )
+          file = this.currentFile
+        } else {
+          this.fileList.push(this.currentFile)
+        }
+        // 构造dataDimensionsLimit列表
+        this.fileList.forEach(item => {
+          if (item.file === 'measures') {
+            let { pivotschemaId, type, dataType, conditionList } = item
+            measuresLimitList.push({
+              pivotschemaId,
+              type,
+              dataType,
+              value: conditionList
+            })
+          }
+        })
       }
 
-      // 刷新图表数据
-      this.getData(dataList)
+      let options = {
+        fileList: this.fileList,
+        dimensionsLimit: dimensionsLimitList,
+        measuresLimit: measuresLimitList
+      }
+      apiData.options = options
+      this.$store.dispatch('SetSelfDataSource', apiData)
+
+      await this.updateChartData()
+      this.getData()
     },
     // 删除当前维度或者度量
-    deleteFile (item, index) {
+    async deleteFile(item, index) {
       this.fileList.splice(index, 1)
+      let apiData = deepClone(this.currSelected.setting.api_data)
+      apiData.options.fileList = this.fileList
+      if (item.file === 'dimensions') {
+        _.pullAllBy(apiData.options.dimensionsLimit, [item], 'pivotschemaId')
+      } else {
+        _.pullAllBy(apiData.options.measuresLimit, [item], 'pivotschemaId')
+      }
+      this.$store.dispatch('SetSelfDataSource', apiData)
+      await this.updateChartData()
       this.getData()
-      let current = deepClone(this.currSelected)
-      // 维度度量删除完以后重置该图表数据
-      if (this.chartType === '1' || this.chartType === '2') {
-        if (current.setting.api_data.dimensions.length === 0 && current.setting.api_data.measures.length === 0) {
-          // 清空modelid
-          //   current.packageJson.api_data.modelId = ''
-          this.$store.dispatch('SetSelfDataSource', current.setting.api_data)
-          // 嵌套饼图apis恢复原始状态
-          if (current.setting.chartType === 'v-multiPie') {
-            let apis = {
-              level: [
-                ['1/1', '1/2', '1/3'],
-                ['1/4', '1/5']
-              ]
-            }
-            this.$store.dispatch('SetApis', apis)
-          }
-        }
-        // 如果是仪表盘，第二个度量是目标值（进度条最大值）,重置进度条范围
-        if (current.setting.chartType === 'v-gauge') {
-          current.setting.config.series.max = 100
-          this.$store.dispatch('SetSelfProperty', current.setting.config)
-        }
-      }
-      if (this.chartType === '3') {
-        if (current.setting.api_data.tableList.length === 0) {
-          // current.setting.api_data.modelId = ''
-          this.$store.dispatch('SetSelfDataSource', current.setting.api_data)
-        }
-      }
-    },
-    // 筛选列表
-    pick (resList, dataList) {
-      let list = []
-      if (dataList.length === 0) { return resList }
-      resList.forEach(item => {
-        if (dataList.indexOf(item[this.currentFile.alias]) > -1) {
-          list.push(item)
-        }
-      })
-      return list
     },
     // 根据维度度量获取数据
-    getData (dataList) {
-      let selected = this.canvasMap.find(item => item.id === this.currentSelected)
-
+    getData() {
       let apiData = deepClone(this.currSelected.setting.api_data)
-      this.$server.screenManage.getData(selected).then(res => {
+      //   console.log(JSON.stringify(this.currSelected))
+      this.$server.screenManage.getData(this.currSelected).then(res => {
         if (res.code === 200) {
-          //筛选列表
-          let showDataList = this.pick(res.rows, dataList)
-
+          // 查不到数据
+          if (res.rows.length === 0) {
+            // 清空数据
+            apiData.source.columns = []
+            this.$store.dispatch('SetSelfDataSource', apiData)
+            // 重新渲染
+            this.updateChartData()
+            return
+          }
           if (this.type === 'tableList') {
             let columns = []
             for (let item of this.fileList) {
@@ -354,7 +474,7 @@ export default {
                 key: item.alias
               })
             }
-            let rows = showDataList
+            let rows = res.rows
             if (rows.length > 10) {
               rows.length = 10
             }
@@ -364,7 +484,6 @@ export default {
             }
             this.$store.dispatch('SetSelfDataSource', apiData)
           } else {
-
             // 仪表盘/环形图 只显示度量
             if (this.chartType === '2') {
               let columns = ['type', 'value'] // 维度固定
@@ -372,11 +491,13 @@ export default {
                 columns.push(m.alias) // 默认columns第二项起为指标
               }
               // 对返回的数据列进行求和
-              let total = sum(showDataList, apiData.measures[0].alias)
-              let rows = [{
-                type: apiData.measures[0].alias,
-                value: total
-              }]
+              let total = sum(res.rows, apiData.measures[0].alias)
+              let rows = [
+                {
+                  type: apiData.measures[0].alias,
+                  value: total
+                }
+              ]
               apiData.source = {
                 columns,
                 rows
@@ -389,8 +510,11 @@ export default {
                 this.$store.dispatch('SetSelfProperty', config)
               }
               // 如果是仪表盘，第二个度量是目标值（进度条最大值）
-              if (this.currSelected.setting.chartType === 'v-gauge' && apiData.measures[1]) {
-                let goalTotal = sum(showDataList, apiData.measures[1].alias)
+              if (
+                this.currSelected.setting.chartType === 'v-gauge' &&
+                apiData.measures[1]
+              ) {
+                let goalTotal = sum(res.rows, apiData.measures[1].alias)
                 config.series.max = goalTotal
                 this.$store.dispatch('SetSelfProperty', config)
               }
@@ -416,12 +540,12 @@ export default {
             if (this.currSelected.setting.chartType === 'v-multiPie') {
               // name是各维度数据拼接，value是分类汇总过的数值
               columns = ['name', 'value']
-              let result = showDataList
+              let result = res.rows
               let level = []
               // 一个维度是一层饼
               dimensionKeys.forEach(item => {
                 // 根据当前维度分类得到的列表
-                let list = summary(result, item, measureKeys[0])// 嵌套饼图度量只有一个，直接取第一个数
+                let list = summary(result, item, measureKeys[0]) // 嵌套饼图度量只有一个，直接取第一个数
                 rows = rows.concat(list) // 把所有维度分类出来的数组进行拼接（v-charts配置格式要求）
 
                 level.push(list.map(obj => obj.name)) // 按维度分层
@@ -432,9 +556,8 @@ export default {
               }
               console.log(apis)
               this.$store.dispatch('SetApis', apis)
-            }
-            else {
-              showDataList.map((item, index) => {
+            } else {
+              res.rows.map((item, index) => {
                 let obj = {}
                 for (let item2 of dimensionKeys) {
                   obj[item2] = item[item2]
@@ -458,14 +581,7 @@ export default {
             console.log(apiData)
             this.$store.dispatch('SetSelfDataSource', apiData)
           }
-
-          let file = this.fileList.find(item => item.alias === this.currentFile.alias)
-          file = this.currentFile
-          if (file.file === 'dimensions')
-            selected.setting.dataLimit.pickDatas.dimensions = this.fileList
-          if (file.file === 'measures')
-            selected.setting.dataLimit.pickDatas.measures = this.fileList
-          //   this.updateChartData()
+          this.updateChartData()
         } else {
           this.$message.error(res.msg)
         }
@@ -475,5 +591,4 @@ export default {
 }
 </script>
 
-<style>
-</style>
+<style></style>

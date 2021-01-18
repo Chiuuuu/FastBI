@@ -2,9 +2,17 @@
   <div class="data-source">
     <a-collapse v-model="activeKey" :bordered="false">
       <a-collapse-panel key="dimensions" header="维度" v-if="chartType === '1'">
-        <drag-area type="dimensions" :fileList="fileObj.dimensions" ref="child"></drag-area>
+        <drag-area
+          type="dimensions"
+          :fileList="fileObj.dimensions"
+          ref="child"
+        ></drag-area>
       </a-collapse-panel>
-      <a-collapse-panel key="measures" header="度量" v-if="chartType === '1' || chartType === '2'">
+      <a-collapse-panel
+        key="measures"
+        header="度量"
+        v-if="chartType === '1' || chartType === '2'"
+      >
         <drag-area type="measures" :fileList="fileObj.measures"></drag-area>
       </a-collapse-panel>
       <a-collapse-panel key="tableList" header="列" v-if="chartType === '3'">
@@ -22,14 +30,20 @@
             style="margin-right:10px"
             @change="sortFileChange"
           >
-            <a-select-option v-for="item in sortList" :value="item.id" :key="item.id">{{item.name}}</a-select-option>
+            <a-select-option
+              v-for="item in sortList"
+              :value="item.id"
+              :key="item.id"
+              >{{ item.name }}</a-select-option
+            >
           </a-select>
           <a-select v-model="sortData.asc" class="f-flex1" @change="ascChange">
             <a-select-option
-              v-for="(item,index) in ascList"
+              v-for="(item, index) in ascList"
               :key="index"
               :value="item.value"
-            >{{item.name}}</a-select-option>
+              >{{ item.name }}</a-select-option
+            >
           </a-select>
         </div>
       </a-collapse-panel>
@@ -50,12 +64,18 @@
             class="f-flex1"
             style="margin-right:10px"
           />
-          <a-select v-model="refresh.unit" placeholder="请选择" @change="unitChange" class="f-flex1">
+          <a-select
+            v-model="refresh.unit"
+            placeholder="请选择"
+            @change="unitChange"
+            class="f-flex1"
+          >
             <a-select-option
-              v-for="(item,index) in refreshList"
+              v-for="(item, index) in refreshList"
               :key="index"
               :value="item.value"
-            >{{item.name}}</a-select-option>
+              >{{ item.name }}</a-select-option
+            >
           </a-select>
         </div>
       </a-collapse-panel>
@@ -82,9 +102,18 @@ export default {
     DragArea,
     DragPick
   },
-  data () {
+  data() {
     return {
-      activeKey: ['dimensions', 'measures', 'filter', 'sort', 'tips', 'tableList', 'refresh', 'pick'], // 所有面板默认打开
+      activeKey: [
+        'dimensions',
+        'measures',
+        'filter',
+        'sort',
+        'tips',
+        'tableList',
+        'refresh',
+        'pick'
+      ], // 所有面板默认打开
       fileObj: {
         dimensions: [],
         measures: []
@@ -114,11 +143,9 @@ export default {
   },
   watch: {
     currSelected: {
-      handler (val) {
+      handler(val) {
         if (val.setting.api_data) {
-          this.sortList = [
-            { name: '选择字段', id: '' }
-          ]
+          this.sortList = [{ name: '选择字段', id: '' }]
           this.sortData = {}
           let apiData = deepClone(val.setting.api_data)
           this.apiData = apiData
@@ -153,14 +180,14 @@ export default {
   },
   computed: {
     ...mapGetters(['currSelected']),
-    chartType () {
+    chartType() {
       return this.currSelected ? this.currSelected.setting.type : ''
     }
   },
   methods: {
     ...mapActions(['saveScreenData', 'handleRefreshData']),
     // 排序筛选字段选择
-    sortFileChange (val) {
+    sortFileChange(val) {
       if (val === '') {
         this.sortData.asc = ''
       }
@@ -178,7 +205,7 @@ export default {
       }
     },
     // 排序类型 升序 降序
-    ascChange () {
+    ascChange() {
       if (this.sortData.pivotschemaId) {
         this.apiData.options.sort.asc = this.sortData.asc
         this.$store.dispatch('SetSelfDataSource', this.apiData)
@@ -190,7 +217,7 @@ export default {
       }
     },
     // 定时刷新开关
-    refreshChange (checked, event) {
+    refreshChange(checked, event) {
       // 阻止默认事件，取消收起
       event.stopPropagation()
       this.refresh.isRefresh = checked
@@ -204,7 +231,7 @@ export default {
       this.setTimer()
     },
     // 刷新频率设置
-    frequencyChange (val) {
+    frequencyChange(val) {
       if (this.refresh.isRefresh) {
         if (this.refresh.unit === 'min' && this.refresh.frequency > 1440) {
           this.$message.error('时间设置不超过1天, 请重新设置')
@@ -223,7 +250,7 @@ export default {
       }
     },
     // 刷新单位设置
-    unitChange (val) {
+    unitChange(val) {
       if (this.refresh.isRefresh) {
         if (this.refresh.frequency > 1440 && this.refresh.unit === 'min') {
           this.$message.error('时间设置不超过1天, 请重新设置')
@@ -241,18 +268,22 @@ export default {
         this.setTimer()
       }
     },
-    reset () {
+    reset() {
       this.refresh.frequency = 1
       this.refresh.unit = undefined
     },
     // 单个图表的定时器设置
-    setTimer () {
+    setTimer() {
       if (this.timer) {
         clearInterval(this.timer)
         this.timer = null
       } else {
         // 所有条件都满足才开始倒计时刷新
-        if (this.refresh.isRefresh && this.refresh.unit && this.refresh.frequency > 0) {
+        if (
+          this.refresh.isRefresh &&
+          this.refresh.unit &&
+          this.refresh.frequency > 0
+        ) {
           let count = 0
           if (this.refresh.unit === 'min') {
             count = this.refresh.frequency * 60 * 1000
@@ -266,7 +297,7 @@ export default {
       }
     },
     // 刷新大屏
-    refreshData () {
+    refreshData() {
       let params = {
         id: this.screenId
       }
@@ -278,12 +309,16 @@ export default {
             let newData = dataItem[item]
             let chart = this.canvasMap.find(chart => chart.id + '' === item)
             let apidata = chart.setting.api_data
-            if (apidata.refresh.isRefresh && apidata.refresh.unit && apidata.refresh.frequency > 0) {
+            if (
+              apidata.refresh.isRefresh &&
+              apidata.refresh.unit &&
+              apidata.refresh.frequency > 0
+            ) {
               this.handleRefreshData({ chart, newData })
             }
           })
           this.$server.screenManage.saveAllChart(this.canvasMap)
-          this.$message.success("刷新成功")
+          this.$message.success('刷新成功')
         }
       })
     }
@@ -291,5 +326,4 @@ export default {
 }
 </script>
 
-<style>
-</style>
+<style></style>

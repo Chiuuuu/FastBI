@@ -1,13 +1,15 @@
 <template>
   <div
     class="dragArea"
-    :class="{'dragable-vaild':type===dragFile || isdrag && type==='tableList'}"
+    :class="{
+      'dragable-vaild': type === dragFile || (isdrag && type === 'tableList')
+    }"
     @drop.stop.prevent="handleDropOnFilesWD($event)"
     @dragover.stop.prevent
     @dragenter="dragenter"
     @dragleave="dragleave"
   >
-    <div v-if="fileList.length>0">
+    <div v-if="fileList.length > 0">
       <div
         class="field"
         v-for="(item, index) in fileList"
@@ -21,11 +23,13 @@
           </a-menu>
         </a-dropdown>
         <a-tooltip :title="item.alias">
-          <span ref="itemName" class="field-text">{{item.alias}}</span>
+          <span ref="itemName" class="field-text">{{ item.alias }}</span>
         </a-tooltip>
       </div>
     </div>
-    <div class="empty" :class="{field:isdrag && type===dragFile}">{{emptyText[type]}}</div>
+    <div class="empty" :class="{ field: isdrag && type === dragFile }">
+      {{ emptyText[type] }}
+    </div>
   </div>
 </template>
 
@@ -42,15 +46,15 @@ export default {
       default: ''
     } // 区域类型 维度/度量
   },
-  data () {
+  data() {
     return {
       current: {},
       selected: {},
       emptyText: {
-        'dimensions': '拖入维度',
-        'measures': '拖入度量',
-        'filter': '拖入字段',
-        'tableList': '拖入字段'
+        dimensions: '拖入维度',
+        measures: '拖入度量',
+        filter: '拖入字段',
+        tableList: '拖入字段'
       },
       isdrag: false, // 是否拖拽中
       fileList: [], // 维度字段数组
@@ -59,16 +63,18 @@ export default {
   },
   watch: {
     currSelected: {
-      handler (val) {
+      handler(val) {
         if (val) {
           // 当前选中的图表显示维度度量的数据
           this.fileList = []
           // 维度度量都需要
           if (this.chartType === '1') {
-            if (this.type === 'dimensions' && val.setting.api_data.dimensions) { // 维度
+            if (this.type === 'dimensions' && val.setting.api_data.dimensions) {
+              // 维度
               this.fileList = deepClone(val.setting.api_data.dimensions)
             }
-            if (this.type === 'measures' && val.setting.api_data.measures) { // 度量
+            if (this.type === 'measures' && val.setting.api_data.measures) {
+              // 度量
               this.fileList = deepClone(val.setting.api_data.measures)
             }
           }
@@ -93,18 +99,29 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['dragFile', 'currentSelected', 'currSelected', 'optionsTabsType', 'dataModel', 'canvasMap']),
-    chartType () {
+    ...mapGetters([
+      'dragFile',
+      'currentSelected',
+      'currSelected',
+      'optionsTabsType',
+      'dataModel',
+      'canvasMap'
+    ]),
+    chartType() {
       return this.currSelected ? this.currSelected.setting.type : ''
     }
   },
   methods: {
     ...mapActions(['saveScreenData', 'updateChartData']),
     // 将拖动的维度到所选择的放置目标节点中
-    handleDropOnFilesWD (event) {
+    handleDropOnFilesWD(event) {
       // h5 api
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
-      if (this.currSelected.datamodelId && this.currSelected.datamodelId !== '0' && this.currSelected.datamodelId !== dataFile.datamodelId) {
+      if (
+        this.currSelected.datamodelId &&
+        this.currSelected.datamodelId !== '0' &&
+        this.currSelected.datamodelId !== dataFile.datamodelId
+      ) {
         this.$message.error('一个图表只能拖入一个数据模型的字段')
         return false
       }
@@ -121,7 +138,11 @@ export default {
         this.getData()
       }
       // 度量
-      if (this.type === 'measures' && this.dragFile === this.type && this.chartType === '1') {
+      if (
+        this.type === 'measures' &&
+        this.dragFile === this.type &&
+        this.chartType === '1'
+      ) {
         // 饼图类型只能拉入一个度量
         if (this.currSelected.setting.name === 've-pie') {
           this.fileList[0] = dataFile
@@ -138,7 +159,11 @@ export default {
         this.getData()
       }
       // 仪表盘/环形图
-      if (this.chartType === '2' && this.type === 'measures' && this.dragFile === this.type) {
+      if (
+        this.chartType === '2' &&
+        this.type === 'measures' &&
+        this.dragFile === this.type
+      ) {
         if (this.currSelected.setting.name === 've-pie') {
           this.fileList[0] = dataFile
           // 如果是仪表盘，需要两个度量
@@ -151,42 +176,42 @@ export default {
       this.isdrag = false
     },
     // 对象数组去重,type表示对象里面的一个属性
-    uniqueFun (arr, type) {
+    uniqueFun(arr, type) {
       const res = new Map()
-      return arr.filter((a) => !res.has(a[type]) && res.set(a[type], 1))
+      return arr.filter(a => !res.has(a[type]) && res.set(a[type], 1))
     },
     // 当可拖动的元素进入可放置的目标时
-    dragenter (event) {
+    dragenter(event) {
       event.preventDefault()
       this.isdrag = true
     },
     // 当拖动元素离开可放置目标节点
-    dragleave (event) {
+    dragleave(event) {
       event.preventDefault()
       this.isdrag = false
     },
     // 点击右键显示更多
-    showMore (item) {
+    showMore(item) {
       item.showMore = true
     },
     // 删除当前维度或者度量
-    deleteFile (item, index) {
+    deleteFile(item, index) {
       this.fileList.splice(index, 1)
       this.getData()
       let current = deepClone(this.currSelected)
       // 维度度量删除完以后重置该图表数据
       if (this.chartType === '1' || this.chartType === '2') {
-        if (current.setting.api_data.dimensions.length === 0 && current.setting.api_data.measures.length === 0) {
+        if (
+          current.setting.api_data.dimensions.length === 0 &&
+          current.setting.api_data.measures.length === 0
+        ) {
           // 清空modelid
           //   current.packageJson.api_data.modelId = ''
           this.$store.dispatch('SetSelfDataSource', current.setting.api_data)
           // 嵌套饼图apis恢复原始状态
           if (current.setting.chartType === 'v-multiPie') {
             let apis = {
-              level: [
-                ['1/1', '1/2', '1/3'],
-                ['1/4', '1/5']
-              ]
+              level: [['1/1', '1/2', '1/3'], ['1/4', '1/5']]
             }
             this.$store.dispatch('SetApis', apis)
           }
@@ -205,8 +230,10 @@ export default {
       }
     },
     // 根据维度度量获取数据
-    getData () {
-      let selected = this.canvasMap.find(item => item.id === this.currentSelected)
+    getData() {
+      let selected = this.canvasMap.find(
+        item => item.id === this.currentSelected
+      )
       // console.log(this.canvasMap)
       // console.log(this.currentSelected)
       // console.log('当前',selected)
@@ -225,7 +252,10 @@ export default {
         selected.setting.api_data.tableList = this.fileList
       }
 
-      if ((!selected.datamodelId || selected.datamodelId === '0') && this.fileList.length > 0) {
+      if (
+        (!selected.datamodelId || selected.datamodelId === '0') &&
+        this.fileList.length > 0
+      ) {
         // modelId 赋值
         selected.datamodelId = this.fileList[0].datamodelId
         // apiData.datamodelId = this.fileList[0].datamodelId
@@ -253,7 +283,6 @@ export default {
         }
       }
 
-
       let params = selected
       //   console.log(JSON.stringify(params))
       //   return
@@ -280,7 +309,6 @@ export default {
             }
             this.$store.dispatch('SetSelfDataSource', apiData)
           } else {
-
             // 仪表盘/环形图 只显示度量
             if (this.chartType === '2') {
               let columns = ['type', 'value'] // 维度固定
@@ -289,10 +317,12 @@ export default {
               }
               // 对返回的数据列进行求和
               let total = sum(res.rows, apiData.measures[0].alias)
-              let rows = [{
-                type: apiData.measures[0].alias,
-                value: total
-              }]
+              let rows = [
+                {
+                  type: apiData.measures[0].alias,
+                  value: total
+                }
+              ]
               apiData.source = {
                 columns,
                 rows
@@ -305,7 +335,10 @@ export default {
                 this.$store.dispatch('SetSelfProperty', config)
               }
               // 如果是仪表盘，第二个度量是目标值（进度条最大值）
-              if (this.currSelected.setting.chartType === 'v-gauge' && apiData.measures[1]) {
+              if (
+                this.currSelected.setting.chartType === 'v-gauge' &&
+                apiData.measures[1]
+              ) {
                 let goalTotal = sum(res.rows, apiData.measures[1].alias)
                 config.series.max = goalTotal
                 this.$store.dispatch('SetSelfProperty', config)
@@ -337,7 +370,7 @@ export default {
               // 一个维度是一层饼
               dimensionKeys.forEach(item => {
                 // 根据当前维度分类得到的列表
-                let list = summary(result, item, measureKeys[0])// 嵌套饼图度量只有一个，直接取第一个数
+                let list = summary(result, item, measureKeys[0]) // 嵌套饼图度量只有一个，直接取第一个数
                 rows = rows.concat(list) // 把所有维度分类出来的数组进行拼接（v-charts配置格式要求）
 
                 level.push(list.map(obj => obj.name)) // 按维度分层
@@ -348,8 +381,7 @@ export default {
               }
               console.log(apis)
               this.$store.dispatch('SetApis', apis)
-            }
-            else {
+            } else {
               res.rows.map((item, index) => {
                 let obj = {}
                 for (let item2 of dimensionKeys) {
@@ -384,5 +416,4 @@ export default {
 }
 </script>
 
-<style>
-</style>
+<style></style>

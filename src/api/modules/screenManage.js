@@ -142,6 +142,14 @@ const screenManage = {
         return $axios.post('/screen/graph/getData', params)
     },
     /**
+     * @description 根据数据筛选数据列表
+     * @param {*} params
+     * @returns
+     */
+    getDataPick (params) {
+        return $axios.post('/screen/graph/getLimitData', params)
+    },
+    /**
      *
      * @description 上传图片
      * @param {*} params

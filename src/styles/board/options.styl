@@ -65,6 +65,7 @@
     height: calc(100% - 50px);
     padding-bottom: 20px;
     overflow-y: scroll;
+    overflow-x: hidden;
   }
   .expand-hover {
     position: absolute;
@@ -407,10 +408,10 @@
       flex-direction: column; 
   }
   .pick-checkbox-box{
-      overflow-x: hidden;
-      overflow-y: scroll;
+      overflow: hidden;
       height: 200px;
       margin: 10px 0; 
+      .bin-scrollbar__wrap{overflow-x:hidden;}
 
        &.hasborder{
            border-top: 1px solid #cccccc;
@@ -443,17 +444,43 @@
                 }
               }
 
-              &.justify-between{
-                  justify-content: space-between
+              .inputnumber{
+                  width: 100px;
+              }
+
+              .ant-input-number-input:placeholder-shown{
+                  text-overflow: clip;
+              }
+
+              .symbol{
+                margin: 0 5px;
               }
        }
    }
 
 
 .pagination{
-    height:30px;
+    height:80px;
     display:flex;
-    display-direction:row-reverse;
+    flex-direction:row-reverse;
     width:100%
-    background:rgb(51,51,51)
+    background:rgb(51,51,51);
+    color:black
+
+    .page{
+        display: inline-block;
+        width: 100px;
+        height: 30px;
+        line-height:30px;
+        margin:15px 5px;
+        text-align:center;
+        background:rgb(236,149,36);
+        cursor:pointer;
+    }
+
+    .page-icon{
+       margin:15px 5px;
+       font-size: '20px';
+       color: 'white'
+    }
 }
