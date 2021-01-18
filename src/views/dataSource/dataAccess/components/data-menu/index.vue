@@ -69,6 +69,7 @@
             >
               <template v-slot:file="slotProps">
                 <menu-file
+                  icon="dataSource"
                   :file="slotProps.file"
                   :index="slotProps.index"
                   :parent="folder"
@@ -83,6 +84,7 @@
           <template v-else>
             <ul class="items">
               <menu-file
+                icon="dataSource"
                 :file="folder"
                 :index="index"
                 :isSelect='fileSelectId === folder.id'
