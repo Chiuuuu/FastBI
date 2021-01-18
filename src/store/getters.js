@@ -11,7 +11,11 @@ const getters = {
 
     canvasMap: state => state.canvasMaps.canvasMap, // 画布映射数组
 
+    canvasMapIdList: state => state.canvasMaps.canvasMap.length > 0 ? state.canvasMaps.canvasMap.map(item => item.id) : [], // 画板图层id顺序列表
+
     currentSelected: state => state.canvasMaps.singleSelected, // 当前选中的组件
+
+    currSelected: state => state.canvasMaps.canvasMap.find(item => item.id === state.canvasMaps.singleSelected), // 当前选中的组件
 
     contextMenuInfo: state => state.canvasMaps.contextMenuInfo, // 右键菜单信息
 
