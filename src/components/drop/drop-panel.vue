@@ -17,7 +17,7 @@
       ...mapGetters(['canvasMap', 'pageSettings', 'screenId'])
     },
     methods: {
-      ...mapActions(['saveScreenData']),
+      ...mapActions(['addChartData'], ['saveScreenData']),
       // 元素drop
       handleDropOnCanvas: function (event) {
         // 获取节点数据
@@ -34,10 +34,8 @@
         //   position: 'absolute',
         //   left: offsetX + 'px',
         //   top: offsetY + 'px'
-        // }
-
-        this.$store.dispatch('AddCanvasMap', nodeInfo)
-        this.saveScreenData()
+        // }  
+        this.addChartData(nodeInfo)
       }
     }
   }

@@ -46,8 +46,8 @@ export function copyCanvasMap(map) {
     let newMap = deepClone(map) // 深拷贝一个对象并修改默认信息，
     newMap.id = 'node-' + ((new Date()).getTime()) // 修改生成的id
         // 修改复制出来的位置信息
-    newMap.packageJson.view.x += 20
-    newMap.packageJson.view.y += 20
+    newMap.setting.view.x += 20
+    newMap.setting.view.y += 20
     return api.addCanvasMap(newMap)
 }
 

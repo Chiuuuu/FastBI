@@ -62,7 +62,7 @@
     mounted() {
     },
     methods: {
-      ...mapActions(['saveScreenData']),
+      ...mapActions(['addChartData','saveScreenData']),
       // 拖拽图表添加到大屏
       handleDragStart (component, event) {
         component.api_data.dimensions = []
@@ -80,7 +80,7 @@
           // 唯一标识
           // id: 'node-' + ((new Date()).getTime()),
           id: (new Date()).getTime(),
-          packageJson: { ...component }
+          setting: { ...component }
         }
         event.dataTransfer.setData('node', JSON.stringify(nodeInfo))
         this.$print('drag nodeInfo', 'success')
@@ -102,11 +102,11 @@
         let nodeInfo = {
           // 唯一标识
           // id: 'node-' + ((new Date()).getTime()),
-          id: (new Date()).getTime(),
-          packageJson: { ...component }
+          // id: (new Date()).getTime(),
+          id: '',
+          setting: { ...component }
         }
-        this.$store.dispatch('AddCanvasMap', nodeInfo)
-        this.saveScreenData()
+        this.addChartData(nodeInfo)
       }
     },
     components: {    IconFont  },

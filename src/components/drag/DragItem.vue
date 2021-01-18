@@ -90,13 +90,13 @@
       }
     },
     created () {
-      this.transformData = { ...this.item.packageJson.view }
+      this.transformData = { ...this.item.setting.view }
     },
     watch: {
       item: {
         handler (val) {
           if (val) {
-            this.transformData = { ...val.packageJson.view }
+            this.transformData = { ...val.setting.view }
           }
         },
         deep: true
@@ -188,7 +188,7 @@
       }
     },
     methods: {
-      ...mapActions(['saveScreenData']),
+      ...mapActions(['saveScreenData', 'updateChartData']),
       // 悬停事件
       handleHover () {
         this.comHover = true
@@ -200,7 +200,7 @@
       handleMoveStart (event) {
         if (!this.isSelected) {
           this.isSelected = true
-          this.$store.dispatch('SingleSelected', this.item)
+          this.$store.dispatch('SingleSelected', this.item.id)
           this.$store.dispatch('ToggleContextMenu')
         }
         if (!this.isSelected || this.contextMenuInfo.isShow) return
@@ -346,8 +346,9 @@
         this.$store.dispatch('SetBaseProperty', this.transformData)
       },
       setBaseProperty () {
-        this.saveScreenData()
-        setBaseProperty(this.currentSelected)
+        // this.saveScreenData()
+        this.updateChartData()
+        // setBaseProperty(this.currentSelected)
       }
     }
   }
