@@ -5,16 +5,17 @@
       <!-- <a-input placeholder="请输入大屏标题" v-model="fileName" style="border:none;background:none;color:#fff;" /> -->
       <!-- <i class="el-icon-arrow-left" style="margin-left:20px;font-size:22px;cursor: pointer;margin-top:8px"></i> -->
       <!-- <span v-if="config.title">{{ config.title.text }}</span> -->
-      <span v-if="!isFocus">{{screenName}}</span>
+      <span v-if="!isFocus">{{ screenName }}</span>
       <input
         class="header-title-text"
         :maxLength="20"
         :autofocus="isFocus"
-        :class="isFocus?'focus':'nofocus'"
+        :class="isFocus ? 'focus' : 'nofocus'"
         type="text"
         v-model="screenName"
         @focus="onfocus"
         @blur="onBlur"
+        style="background:rgba(255,255,255,0.2)"
       />
     </div>
     <div class="control" flex-box="1">
@@ -58,7 +59,7 @@ export default {
       required: true
     }
   },
-  data () {
+  data() {
     return {
       screenName: '', // 大屏名称
       isFocus: false, // 大屏名称是否聚焦
@@ -66,32 +67,47 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['isScreen', 'pageSettings', 'canvasMap', 'screenId', 'fileName', 'parentId'])
+    ...mapGetters([
+      'isScreen',
+      'pageSettings',
+      'canvasMap',
+      'screenId',
+      'fileName',
+      'parentId'
+    ])
   },
   watch: {
-    '$attrs' (val) {
+    $attrs(val) {
       this.screenData = val
     }
   },
-  mounted () {
-    this.screenName = this.screenData ? this.screenData.name : this.$route.query.name
-    // this.screenName = this.fileName
+  mounted() {
+    // this.screenName = this.screenData
+    //   ? this.screenData.name
+    //   : this.$route.query.name
+    this.screenName = this.fileName
     // this.screenName = this.$route.query.name
   },
   methods: {
     ...mapActions(['saveScreenData', 'updateChartData', 'handleRefreshData']),
-    goBack () {
+    goBack() {
       // 选了背景图片又没有上传图片的，默认选回背景颜色
-      if (!this.pageSettings.backgroundSrc && this.pageSettings.backgroundType === '2') {
-        this.$store.dispatch('SetPageSettings', Object.assign({}, this.pageSettings, { backgroundType: '1' }))
+      if (
+        !this.pageSettings.backgroundSrc &&
+        this.pageSettings.backgroundType === '2'
+      ) {
+        this.$store.dispatch(
+          'SetPageSettings',
+          Object.assign({}, this.pageSettings, { backgroundType: '1' })
+        )
       }
       this.saveScreenData()
       this.$router.go(-1)
     },
-    onfocus () {
+    onfocus() {
       this.isFocus = true
     },
-    onBlur () {
+    onBlur() {
       if (this.screenName === '') {
         this.screenName = this.fileName
         return
@@ -113,26 +129,30 @@ export default {
       })
     },
     // 打开全屏
-    openScreen () {
+    openScreen() {
       this.$store.dispatch('SetIsScreen', true)
       // 位置在screen.vue,对应画板元素
       this.$nextTick(() => {
         var docElm = document.querySelector('.dv-screen')
         if (docElm) {
-          if (docElm.requestFullscreen) { // W3C
+          if (docElm.requestFullscreen) {
+            // W3C
             docElm.requestFullscreen()
-          } else if (docElm.mozRequestFullScreen) { // FireFox
+          } else if (docElm.mozRequestFullScreen) {
+            // FireFox
             docElm.mozRequestFullScreen()
-          } else if (docElm.webkitRequestFullScreen) { // Chrome等
+          } else if (docElm.webkitRequestFullScreen) {
+            // Chrome等
             docElm.webkitRequestFullScreen()
-          } else if (docElm.msRequestFullscreen) { // IE11
+          } else if (docElm.msRequestFullscreen) {
+            // IE11
             docElm.msRequestFullscreen()
           }
         }
       })
     },
     // 刷新大屏
-    refreshData () {
+    refreshData() {
       if (!this.screenId) {
         this.$message.error('暂无数据可刷新，请先添加数据')
         return

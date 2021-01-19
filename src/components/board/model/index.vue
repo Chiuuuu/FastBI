@@ -3,8 +3,15 @@
   <div class="board-model" :style="config.style">
     <div style="height:100%">
       <div class="model-header" v-show="config.title.enable">
-        <a-icon class="model-back" v-if="!model" type="arrow-left" @click="model=true" />
-        <span class="model-span" v-if="modelExpand">{{ config.title.text }}</span>
+        <a-icon
+          class="model-back"
+          v-if="!model"
+          type="arrow-left"
+          @click="model = true"
+        />
+        <span class="model-span" v-if="modelExpand">{{
+          config.title.text
+        }}</span>
         <a-icon
           class="model-icon"
           :type="modelExpand ? 'menu-unfold' : 'menu-fold'"
@@ -20,15 +27,20 @@
                 v-for="item in disableItem"
                 :value="item.modelid"
                 :key="item.modelid"
-              >{{item.modelname}}</a-select-option>
+                >{{ item.modelname }}</a-select-option
+              >
               <a-select-option value="添加数据模型">
                 <span @click="modelAdd">添加数据模型</span>
-                <a-icon type="rollback" style="margin-left:130px" @click="modelAdd" />
+                <a-icon
+                  type="rollback"
+                  style="margin-left:130px"
+                  @click="modelAdd"
+                />
               </a-select-option>
             </a-select>
           </div>
           <div class="operation_search">
-            {{searchValue}}
+            {{ searchValue }}
             <a-select
               show-search
               :value="searchValue"
@@ -42,7 +54,9 @@
               @change="handleChange"
             >
               <template>
-                <a-select-option v-for="d in searchResult" :key="d.id">{{ d.name }}</a-select-option>
+                <a-select-option v-for="d in searchResult" :key="d.id">{{
+                  d.name
+                }}</a-select-option>
               </template>
             </a-select>
             <!-- <a-input-search placeholder="请输入关键字搜索" style="width:90%" @change="searchChange" /> -->
@@ -72,7 +86,7 @@
                       <li
                         v-for="(item2, index2) in item"
                         class="filelist"
-                        :class="item2.id===searchSelected?'active':''"
+                        :class="item2.id === searchSelected ? 'active' : ''"
                         :key="index2 + '_'"
                         draggable="true"
                         @click="fileClick(item2.id)"
@@ -121,7 +135,7 @@
                       <li
                         v-for="(item2, index2) in item"
                         class="filelist"
-                        :class="item2.id===searchSelected?'active':''"
+                        :class="item2.id === searchSelected ? 'active' : ''"
                         :key="index2 + '_'"
                         draggable="true"
                         @click="fileClick(item2.id)"
@@ -164,7 +178,11 @@
           <div class="model-main scrollbar">
             <a-collapse v-model="modelKey" :bordered="false">
               <template #expandIcon="props">
-                <a-icon type="folder" :rotate="props.isActive ? 0 : 0" style="font-size:16px" />
+                <a-icon
+                  type="folder"
+                  :rotate="props.isActive ? 0 : 0"
+                  style="font-size:16px"
+                />
               </template>
               <template v-for="(item, index) in modelList">
                 <a-collapse-panel
@@ -172,7 +190,7 @@
                   :key="String(index)"
                   :header="item.name"
                   :style="customStyle"
-                  :class="disableId.includes(item.id)?'disable':''"
+                  :class="disableId.includes(item.id) ? 'disable' : ''"
                   @click.native="modelHandle(item)"
                 >
                   <div style="margin-left:25px;cursor: pointer;">
@@ -180,8 +198,10 @@
                       @click="modelHandle(item2)"
                       v-for="item2 in item.children"
                       :key="item2.id"
-                      :class="disableId.includes(item2.id)?'disable':''"
-                    >{{item2.name}}</p>
+                      :class="disableId.includes(item2.id) ? 'disable' : ''"
+                    >
+                      {{ item2.name }}
+                    </p>
                   </div>
                 </a-collapse-panel>
               </template>
@@ -208,7 +228,7 @@ export default {
       required: true
     }
   },
-  data () {
+  data() {
     return {
       customStyle:
         'background: #ffffff;border-radius: 4px;border: 0;overflow: hidden;color:red !important;',
@@ -231,11 +251,18 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['modelExpand', 'dataModel', 'screenId', 'selectedModelList', 'currentSelected', 'currSelected'])
+    ...mapGetters([
+      'modelExpand',
+      'dataModel',
+      'screenId',
+      'selectedModelList',
+      'currentSelected',
+      'currSelected'
+    ])
   },
   watch: {
     selectedModelList: {
-      handler (val) {
+      handler(val) {
         if (val.length > 0) {
           if (!this.add) {
             this.modelId = val[0].modelid
@@ -253,7 +280,7 @@ export default {
       deep: true
     },
     currSelected: {
-      handler (val) {
+      handler(val) {
         if (val) {
           if (val.setting.api_data) {
             this.apiData = deepClone(val.setting.api_data)
@@ -277,21 +304,22 @@ export default {
       },
       deep: true
     },
-    modelId (val) {
+    modelId(val) {
       if (val) {
         this.getPivoSchemaList(val)
       }
     }
   },
-  mounted () {
+  mounted() {
     // 初始化模型列表和选中的模型（退出全屏后组件重置而且不再执行watch的操作，需要重新赋值）
     this.disableItem = this.selectedModelList
-    this.modelId = this.selectedModelList.length > 0 ? this.selectedModelList[0].modelid : ''
+    this.modelId =
+      this.selectedModelList.length > 0 ? this.selectedModelList[0].modelid : ''
     this.getModelList()
   },
   methods: {
     // 数据模型搜索
-    modelSearch: debounce(function (event) {
+    modelSearch: debounce(function(event) {
       const value = event.target.value
       if (value !== '') {
         this.handleGetSearchList(value)
@@ -299,7 +327,7 @@ export default {
         this.getModelList()
       }
     }, 400),
-    handleGetSearchList (value) {
+    handleGetSearchList(value) {
       let result = []
       this.modelList.map(item => {
         const newItem = menuSearchLoop(item, value)
@@ -309,15 +337,15 @@ export default {
       console.log('搜索结果', this.modelList)
     },
     // 点击展开收起
-    toCollapse () {
+    toCollapse() {
       this.$emit('on-toggle', this.modelExpand)
     },
     // 添加数据模型
-    modelAdd () {
+    modelAdd() {
       this.model = !this.model
     },
     // 点击选中模型
-    modelHandle (item) {
+    modelHandle(item) {
       if (item.fileType !== 0 && !this.disableId.includes(item.id)) {
         this.model = !this.model
         this.$store.dispatch('SetDataModel', item)
@@ -331,17 +359,17 @@ export default {
         this.$store.dispatch('dataModel/setSelectedModelList', this.disableItem)
       }
     },
-    // 获取大屏数据
-    getScreenData () {
-      this.$server.screenManage.getScreenDetailById(this.screenId).then(res => {
-        if (res.code === 200) {
-          this.$store.dispatch('dataModel/setSelectedModelList', res.list)
-          this.$store.commit('common/SET_PRIVILEGES', res.data.privileges || [])
-        }
-      })
-    },
+    // // 获取大屏数据
+    // getScreenData () {
+    //   this.$server.screenManage.getScreenDetailById(this.screenId).then(res => {
+    //     if (res.code === 200) {
+    //       this.$store.dispatch('dataModel/setSelectedModelList', res.list)
+    //       this.$store.commit('common/SET_PRIVILEGES', res.data.privileges || [])
+    //     }
+    //   })
+    // },
     // 保存选中的模型
-    saveModal (id) {
+    saveModal(id) {
       let params = {
         datamodelId: id,
         screenId: this.screenId
@@ -353,24 +381,24 @@ export default {
       })
     },
     // 拖动开始 type 拖拽的字段类型维度或者度量
-    dragstart (item, type, event) {
+    dragstart(item, type, event) {
       item.modelId = this.modelId
       item.file = type
       event.dataTransfer.setData('dataFile', JSON.stringify(item))
       this.$store.dispatch('SetDragFile', type)
     },
     // 拖动结束
-    dragsend () {
+    dragsend() {
       this.$store.dispatch('SetDragFile', '')
     },
     // 点击维度度量 取消选中效果
-    fileClick (id) {
+    fileClick(id) {
       if (id === this.searchSelected) {
         this.searchSelected = ''
       }
     },
     // 数据模型列表
-    getModelList () {
+    getModelList() {
       this.$server.screenManage.getCatalogList().then(res => {
         if (res.code === 200) {
           res.data.map(item => {
@@ -384,7 +412,7 @@ export default {
       })
     },
     // 维度度量搜索
-    handleSearch (value) {
+    handleSearch(value) {
       if (value) {
         let result = []
         this.searchList.map(item => {
@@ -393,9 +421,7 @@ export default {
           }
         })
         if (result.length === 0) {
-          result = [
-            { name: '没有符合的搜索结果', id: 11 }
-          ]
+          result = [{ name: '没有符合的搜索结果', id: 11 }]
         }
         this.searchResult = result
       } else {
@@ -403,15 +429,15 @@ export default {
       }
     },
     // 选择搜索的维度度量
-    handleChange (value) {
+    handleChange(value) {
       this.searchSelected = value
     },
     // 右键显示更多
-    showMore (item) {
+    showMore(item) {
       item.showMore = true
     },
     // 转为维度或者度量
-    changeItem (item, num) {
+    changeItem(item, num) {
       let params = {
         datamodelId: item.datamodelId,
         pivotschemaId: item.pivotschemaId,
@@ -425,31 +451,33 @@ export default {
       })
     },
     // 维度、度量列表
-    getPivoSchemaList (id, type = 1) {
-      this.$server.screenManage.getPivoSchemaList(id, this.screenId, type).then(res => {
-        if (res.code === 200) {
-          res.data.dimensions.map(item => {
-            item.showMore = false
-          })
-          res.data.measures.map(item => {
-            item.showMore = false
-          })
-          let dimensions = res.data.dimensions
-          let measures = res.data.measures
-          this.dimensions = this.transData(dimensions)
-          this.measures = this.transData(measures)
-          this.searchList = [
-            ...dimensions,
-            ...measures
-          ]
-        }
-      })
+    getPivoSchemaList(id, type = 1) {
+      this.$server.screenManage
+        .getPivoSchemaList(id, this.screenId, type)
+        .then(res => {
+          if (res.code === 200) {
+            res.data.dimensions.map(item => {
+              item.showMore = false
+            })
+            res.data.measures.map(item => {
+              item.showMore = false
+            })
+            let dimensions = res.data.dimensions
+            let measures = res.data.measures
+            this.dimensions = this.transData(dimensions)
+            this.measures = this.transData(measures)
+            this.searchList = [...dimensions, ...measures]
+          }
+        })
     },
-    transData (data) {
+    transData(data) {
       const result = Object.values(
         data.reduce((obj, cur) => {
           if (obj[cur.tableNo]) {
-            Object.prototype.toString.call(obj[cur.tableNo]) === '[object Array]' ? obj[cur.tableNo].push(cur) : (obj[cur.tableNo] = [obj[cur.tableNo], cur])
+            Object.prototype.toString.call(obj[cur.tableNo]) ===
+            '[object Array]'
+              ? obj[cur.tableNo].push(cur)
+              : (obj[cur.tableNo] = [obj[cur.tableNo], cur])
           } else {
             obj[cur.tableNo] = [cur]
           }
