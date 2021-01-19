@@ -26,7 +26,8 @@ const app = {
     screenId: '', // 大屏id
     fileName: '',
     parentId: '', // 大屏父id
-    screenDataModels: []
+    screenDataModels: [],
+    pageList: []
   },
   mutations: {
     SET_CANVAS_RANGE: (state, val) => {
@@ -57,6 +58,9 @@ const app = {
     },
     SET_PARENT_ID(state, id) {
       state.parentId = id
+    },
+    SET_PAGE_LIST(state, pages) {
+      state.pageList = pages
     }
   },
   actions: {
@@ -87,6 +91,9 @@ const app = {
     SetParentId({ commit }, id) {
       commit('SET_PARENT_ID', id)
     },
+    SetPageList({ commit }, pages) {
+      commit('SET_PAGE_LIST', pages)
+    },
     // 新建大屏
     async addScreenData({ commit, state }, obj) {
       commit('SET_PAGE_SETTING', state.orginPageSettings)
@@ -106,9 +113,7 @@ const app = {
             res.msg && message.success(res.msg)
             router.push({
               name: 'screenEdit',
-              query: {
-                ...obj
-              }
+              query: { id: obj.id }
             })
           } else {
             res.msg && message.error(res.msg)
@@ -157,6 +162,7 @@ const app = {
     // 新增图表
     async addChartData({ dispatch, state }, obj) {
       let params = {
+        tabId: obj.tabId,
         name: obj.setting.config.title.content || '文本',
         screenId: state.screenId,
         datamodelId: 0,
@@ -217,8 +223,8 @@ const app = {
       return screenManage.updateChart(params)
     },
     // 获取大屏详情
-    async getScreenDetail({ dispatch, commit }, id) {
-      return screenManage.getScreenDetailById(id).then(res => {
+    async getScreenDetail({ dispatch, commit }, { id, tabId }) {
+      return screenManage.getScreenDetailById(id, tabId).then(res => {
         if (res.code === 200) {
           this.screenData = res.data
           console.log(this.screenData, 'screenData')

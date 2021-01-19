@@ -260,7 +260,8 @@ export default {
       'screenId',
       'fileName',
       'isScreen',
-      'parentId'
+      'parentId',
+      'pageList'
     ]),
     folderSelectList() {
       return this.folderList.filter(item => item.fileType === 0)
@@ -552,9 +553,9 @@ export default {
       this.SetCanvasRange(0.5)
       this.$router.push({
         name: 'screenEdit',
-        params: {
+        query: {
           id: this.fileSelectId,
-          did: '0'
+          tabId: this.pageList[0].id
         }
       })
     },

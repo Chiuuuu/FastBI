@@ -460,6 +460,7 @@ export default {
           if (res.rows.length === 0) {
             // 清空数据
             apiData.source.columns = []
+            apiData.source.rows = []
             this.$store.dispatch('SetSelfDataSource', apiData)
             // 重新渲染
             this.updateChartData()

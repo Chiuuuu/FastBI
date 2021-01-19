@@ -1,5 +1,10 @@
 <template>
-  <div class="dv-screen" allowfullscreen="true" :style="wrapStyle" ref="dvScreen">
+  <div
+    class="dv-screen"
+    allowfullscreen="true"
+    :style="wrapStyle"
+    ref="dvScreen"
+  >
     <div :style="canvasPanelStyle">
       <b-scrollbar style="height:100%">
         <div class="canvas-panel">
@@ -47,112 +52,111 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex"
-import { getPageSettings } from "../api/app/app-request"
-import { getCanvasMaps } from "../api/canvasMaps/canvas-maps-request"
-import ChartsFactory from "../components/charts/charts-factory"
-import PreviewBox from "../components/preview/preview-box"
-import ChartText from "@/components/tools/Text"
-import ChartImage from "@/components/tools/Image"
-import ChartTables from "@/components/tools/Tables"
+import { mapGetters, mapActions } from 'vuex'
+import { getPageSettings } from '../api/app/app-request'
+import { getCanvasMaps } from '../api/canvasMaps/canvas-maps-request'
+import ChartsFactory from '../components/charts/charts-factory'
+import PreviewBox from '../components/preview/preview-box'
+import ChartText from '@/components/tools/Text'
+import ChartImage from '@/components/tools/Image'
+import ChartTables from '@/components/tools/Tables'
 
 import {
   addResizeListener,
-  removeResizeListener,
-} from "bin-ui/src/utils/resize-event"
+  removeResizeListener
+} from 'bin-ui/src/utils/resize-event'
 
 export default {
-  name: "screen",
+  name: 'screen',
   components: { ChartsFactory, PreviewBox, ChartText, ChartImage, ChartTables },
   props: {},
-  data () {
+  data() {
     return {
       wrapStyle: {},
-      range: "",
+      range: ''
     }
   },
   computed: {
     ...mapGetters([
-      "canvasMap",
-      "pageSettings",
-      "screenId",
-      "orginPageSettings",
+      'canvasMap',
+      'pageSettings',
+      'screenId',
+      'orginPageSettings'
     ]),
     // 画布面板的样式
-    canvasPanelStyle () {
+    canvasPanelStyle() {
       return {
         width: `${this.pageSettings.width}px`,
         height: `${this.pageSettings.height}px`,
         transform: `scale(${this.range}) translate3d(0px, 0px, 0)`,
-        transformOrigin: "0 0",
+        transformOrigin: '0 0',
         background:
-          this.pageSettings.backgroundType === "1"
+          this.pageSettings.backgroundType === '1'
             ? this.pageSettings.backgroundColor
-            : `url(${this.pageSettings.backgroundSrc}) 0% 0% / 100% 100% no-repeat`,
+            : `url(${
+                this.pageSettings.backgroundSrc
+              }) 0% 0% / 100% 100% no-repeat`
       }
     }
   },
   watch: {
     screenId: {
-      handler (val) {
+      handler(val) {
         if (val) {
           this.getScreenData()
         }
       },
       deep: true,
-      immediate: true,
-    },
+      immediate: true
+    }
   },
-  created () {
+  created() {
     // this.getScreenData()
   },
-  mounted () {
+  mounted() {
     this.$nextTick(this._calcStyle)
     addResizeListener(this.$refs.dvScreen, this._calcStyle)
   },
-  beforeDestroy () {
+  beforeDestroy() {
     removeResizeListener(this.$refs.dvScreen, this._calcStyle)
   },
   methods: {
-    ...mapActions(["getScreenDetail", 'handleRefreshData']),
-    getTableSize (transform) {
-      return { x: transform.setting.view.width, y: transform.setting.view.height }
+    ...mapActions(['getScreenDetail', 'handleRefreshData']),
+    getTableSize(transform) {
+      return {
+        x: transform.setting.view.width,
+        y: transform.setting.view.height
+      }
     },
     // 获取大屏数据
-    getScreenData () {
+    getScreenData() {
       // 获取页面配置之前先重置
-      this.$store.dispatch("SetPageSettings", this.orginPageSettings)
-      this.$store.dispatch("InitCanvasMaps", [])
-      this.getScreenDetail(this.screenId);
-      // this.$server.screenManage
-      //   .getScreenDetailById(this.screenId)
-      //   .then((res) => {
-      //     if (res.code === 200) {
-      //       // 页面配置信息
-      //       this.$store.dispatch(
-      //         "SetPageSettings",
-      //         res.data ? res.data.setting : {}
-      //       )
-
-      //       this.$store.commit(
-      //         "common/SET_PRIVILEGES",
-      //         res.data ? res.data.privileges : []
-      //       )
-      //       // 页面canvasMapss
-      //       this.$store.dispatch("InitCanvasMaps", {
-      //         maps: res.data ? res.data.screenGraphs : [],
-      //         idList: res.data ? res.data.setting.idList : [],
-      //       })
-      //     }
-      //   })
+      this.$store.dispatch('SetPageSettings', this.orginPageSettings)
+      this.$store.dispatch('InitCanvasMaps', [])
+      // 先获取大屏对应的页签信息
+      this.$server.screenManage.getScreenTabs(this.screenId).then(res => {
+        if (res.code === 200) {
+          let pages = res.rows.map(item =>
+            Object.assign(item, { showDropDown: false, isFocus: false })
+          )
+          this.$store.dispatch('SetPageList', pages)
+          // 默认显示大屏第一个页签的数据
+          this.getScreenDetail({
+            id: this.screenId,
+            tabId: pages[0].id
+          })
+        } else {
+          res.msg && this.$message.error(res.msg)
+        }
+      })
     },
-    _calcStyle () {
+    _calcStyle() {
       const wrap = this.$refs.dvScreen
       if (!wrap) return
       // 计算wrap样式
       this.wrapStyle = {
-        width: wrap.clientWidth + "px",
-        height: wrap.clientHeight - 30 + "px",
+        width: wrap.clientWidth + 'px',
+        height: wrap.clientHeight - 30 + 'px'
       }
       // 计算缩放比例(当前元素占位跟画板默认长度的比例,也就是大小画板的比例)
       let range = wrap.clientWidth / this.orginPageSettings.width
@@ -163,15 +167,15 @@ export default {
       this.range = range
     },
     // 刷新大屏
-    refreshData () {
+    refreshData() {
       if (!this.screenId) {
-        this.$message.error("暂无数据可刷新，请先添加数据")
+        this.$message.error('暂无数据可刷新，请先添加数据')
         return
       }
       let params = {
-        id: this.screenId,
+        id: this.screenId
       }
-      this.$server.screenManage.actionRefreshScreen({ params }).then((res) => {
+      this.$server.screenManage.actionRefreshScreen({ params }).then(res => {
         if (res.code === 200) {
           let dataItem = res.data
           let keys = Object.keys(dataItem)
@@ -181,12 +185,12 @@ export default {
             this.handleRefreshData({ chart, newData })
           })
           this.$server.screenManage.saveAllChart(this.canvasMap)
-          this.$message.success("刷新成功")
+          this.$message.success('刷新成功')
         } else {
           res.msg && this.$message.error(res.msg)
         }
       })
-    },
-  },
+    }
+  }
 }
 </script>
