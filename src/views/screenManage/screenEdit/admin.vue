@@ -179,6 +179,11 @@ export default {
       }
     }
   },
+  beforeRouteUpdate(to, from, next) {
+    // 切换页签重新跳转的时候请求tab页的数据
+    next()
+    this.getScreenData()
+  },
   created() {
     // 拉取页面配置信息
     // getPageSettings().then(res => {
@@ -190,13 +195,10 @@ export default {
     this.$store.dispatch('InitCanvasMaps', [])
     if (this.$route.query.id) {
       this.$store.dispatch('SetScreenId', this.$route.query.id)
-      this.getScreenData()
+      this.getScreenTabs().then(res => {
+        this.getScreenData()
+      })
     }
-    // if (this.$route.query.did) {
-    //   this.$server.screenManage
-    //     .getScreenTab(this.$route.query.did)
-    //     .then(res => {})
-    // }
   },
   mounted() {
     on(document, 'keyup', this.handleKeyup)
@@ -212,9 +214,29 @@ export default {
   },
   methods: {
     ...mapActions(['saveScreenData', 'deleteChartData', 'getScreenDetail']),
+    // 获取大屏页签
+    async getScreenTabs() {
+      this.$server.screenManage
+        .getScreenTabs(this.$route.query.id)
+        .then(res => {
+          if (res.code === 200) {
+            let pages = res.rows.map(item =>
+              Object.assign(item, { showDropDown: false, isFocus: false })
+            )
+            this.$store.dispatch('SetPageList', pages)
+            // 默认显示大屏第一个页签的数据
+            return true
+          } else {
+            res.msg && this.$message.error(res.msg)
+          }
+        })
+    },
     // 获取大屏数据
     getScreenData() {
-      this.getScreenDetail(this.$route.params.id)
+      this.getScreenDetail({
+        id: this.$route.query.id,
+        tabId: this.$route.query.tabId
+      })
     },
     // 悬停事件
     handleHover(item) {

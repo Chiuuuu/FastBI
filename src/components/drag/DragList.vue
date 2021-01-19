@@ -1,18 +1,36 @@
 <template>
   <div class="drag-list-menu">
-    <div class="list-group" :class="{'hovered':category.hovered}"
-        v-for="category in dragList"
-        :key="category.type"
+    <div
+      class="list-group"
+      :class="{ hovered: category.hovered }"
+      v-for="category in dragList"
+      :key="category.type"
     >
-      <div class="list-group-header" flex="dir:top"
-          @mouseenter="category.hovered=true" @mouseleave="category.hovered=false">
+      <div
+        class="list-group-header"
+        flex="dir:top"
+        @mouseenter="category.hovered = true"
+        @mouseleave="category.hovered = false"
+      >
         <!-- <b-icon v-if="category.icon" :name="category.icon" size="18"></b-icon> -->
-        <a-icon  v-if="category.icon" :type="category.icon" style="font-size:18px;" />
+        <a-icon
+          v-if="category.icon"
+          :type="category.icon"
+          style="font-size:18px;"
+        />
         <span>{{ category.title }}</span>
       </div>
-      <div class="list-group-body" flex v-show="category.hovered" @mouseenter="category.hovered=true" @mouseleave="category.hovered=false">
+      <div
+        class="list-group-body"
+        flex
+        v-show="category.hovered"
+        @mouseenter="category.hovered = true"
+        @mouseleave="category.hovered = false"
+      >
         <!-- 列表左侧 -->
-        <div class="left"><span>{{ category.title }}</span></div>
+        <div class="left">
+          <span>{{ category.title }}</span>
+        </div>
         <div class="right">
           <div
             class="list-item"
@@ -38,77 +56,76 @@
 </template>
 
 <script>
-  import { mapActions } from 'vuex' // 导入vuex
-  import { Icon } from "ant-design-vue";
+import { mapActions } from 'vuex' // 导入vuex
+import { Icon } from 'ant-design-vue'
 
-  const IconFont = Icon.createFromIconfontCN({
-    scriptUrl: "//at.alicdn.com/t/font_2276651_71nv5th6v94.js",
-  }); //引入iconfont
-  export default {
-    name: 'DragList',
-    props: {
-      dragList: {
-        type: Array,
-        default () {
-          return []
-        }
+const IconFont = Icon.createFromIconfontCN({
+  scriptUrl: '//at.alicdn.com/t/font_2276651_71nv5th6v94.js'
+}) //引入iconfont
+export default {
+  name: 'DragList',
+  props: {
+    dragList: {
+      type: Array,
+      default() {
+        return []
       }
-    },
-    data () {
-      return {
-        hovered: false
+    }
+  },
+  data() {
+    return {
+      hovered: false
+    }
+  },
+  mounted() {},
+  methods: {
+    ...mapActions(['addChartData', 'saveScreenData']),
+    // 拖拽图表添加到大屏
+    handleDragStart(component, event) {
+      component.api_data.dimensions = []
+      component.api_data.measures = []
+      component.api_data.tableList = []
+      component.api_data.options = null
+      component.api_data.refresh = {}
+      component.api_data.modelId = ''
+      if (component.chartType === 'v-ring') {
+        component.config.chartTitle.text = '70%'
       }
-    },
-    mounted() {
-    },
-    methods: {
-      ...mapActions(['addChartData','saveScreenData']),
-      // 拖拽图表添加到大屏
-      handleDragStart (component, event) {
-        component.api_data.dimensions = []
-        component.api_data.measures = []
-        component.api_data.tableList = []
-        component.api_data.options = null
-        component.api_data.refresh = {}
-        component.api_data.modelId = ''
-        if (component.chartType === 'v-ring') {
-          component.config.chartTitle.text = '70%'
-        }
-        this.$print('drag start:' + component.name, 'primary')
-        // 拖拽的节点数据
-        let nodeInfo = {
-          // 唯一标识
-          // id: 'node-' + ((new Date()).getTime()),
-          id: (new Date()).getTime(),
-          setting: { ...component }
-        }
-        event.dataTransfer.setData('node', JSON.stringify(nodeInfo))
-        this.$print('drag nodeInfo', 'success')
-        this.$print(nodeInfo)
-      },
-      // 点击图表添加到大屏
-      handleAdd(component) {
-        console.log(component)
-        component.api_data.dimensions = []
-        component.api_data.measures = []
-        component.api_data.tableList = []
-        component.api_data.options = null
-        component.api_data.refresh = {}
-        component.api_data.modelId = ''
-        if (component.chartType === 'v-ring') {
-          component.config.chartTitle.text = '70%'
-        }
-        // 拖拽的节点数据
-        let nodeInfo = {
-          // 唯一标识
-          // id: 'node-' + ((new Date()).getTime()),
-          // id: (new Date()).getTime(),
-          id: '',
-          setting: { ...component }
-        }
-        this.addChartData(nodeInfo)
+      this.$print('drag start:' + component.name, 'primary')
+      // 拖拽的节点数据
+      let nodeInfo = {
+        // 唯一标识
+        // id: 'node-' + ((new Date()).getTime()),
+        id: new Date().getTime(),
+        setting: { ...component }
       }
+      event.dataTransfer.setData('node', JSON.stringify(nodeInfo))
+      this.$print('drag nodeInfo', 'success')
+      this.$print(nodeInfo)
     },
-    components: {    IconFont  },
-  }
+    // 点击图表添加到大屏
+    handleAdd(component) {
+      console.log(component)
+      component.api_data.dimensions = []
+      component.api_data.measures = []
+      component.api_data.tableList = []
+      component.api_data.options = null
+      component.api_data.refresh = {}
+      component.api_data.modelId = ''
+      if (component.chartType === 'v-ring') {
+        component.config.chartTitle.text = '70%'
+      }
+      // 拖拽的节点数据
+      let nodeInfo = {
+        // 唯一标识
+        // id: 'node-' + ((new Date()).getTime()),
+        // id: (new Date()).getTime(),
+        tabId: this.$route.query.tabId,
+        setting: { ...component }
+      }
+      this.addChartData(nodeInfo)
+    }
+  },
+  components: { IconFont }
+}
 </script>

@@ -10,7 +10,7 @@
           :class="[
             'page',
             {
-              'current-select': $route.query.did === page.id
+              'current-select': $route.query.tabId === page.id
             }
           ]"
           draggable
@@ -56,24 +56,23 @@ import { mapActions, mapGetters } from 'vuex'
 export default {
   data() {
     return {
-      pages: [],
       showName: '',
       dragItem: null
     }
   },
-  created() {
-    this.getTabsData()
-  },
-  beforeDestroy() {},
   methods: {
     ...mapActions(['SetCanvasRange']),
     // 页签跳转
     toOtherPage(id) {
+      // 当前页已经选中不需要跳转
+      if (id === this.$route.query.tabId) {
+        return
+      }
       this.$router.replace({
         name: 'screenEdit',
         query: {
           id: this.screenId,
-          did: id
+          tabId: id
         }
       })
     },
@@ -82,10 +81,7 @@ export default {
         if (res.code === 200) {
           this.pages = res.rows.map(item =>
             Object.assign(item, { showDropDown: false, isFocus: false })
-          ) // 从目录页进来取默认选中第一页
-          if (this.$route.query.did === 0) {
-            this.toOtherPage(this.pages[0].id)
-          }
+          )
         } else {
           res.msg && this.$message.error(res.msg)
         }
@@ -94,14 +90,17 @@ export default {
     addPage() {
       // 页面最多10个
       if (this.pages.length < 10) {
-        // 获取新页签名称，如果页面上有页面X的格式，新建页面名字默认是页面x+1
-        let noList = this.pages.map(item => {
+        // 获取页面上是页面X的格式的序号
+        let noList = []
+        this.pages.forEach(item => {
           if (/页面\d/.test(item.name)) {
-            return parseInt(item.name.replace(/[^0-9]/gi, ''))
+            noList.push(parseInt(item.name.replace(/[^0-9]/gi, '')))
           }
         })
+        // 去页面x最大的数字作为新页面的名称
         let no = noList.length === 0 ? 1 : Math.max(...noList) + 1
         let name = `页面${no}`
+
         let params = {
           name: name,
           orderNo: this.pages.length + 1,
@@ -109,6 +108,7 @@ export default {
         }
         this.$server.screenManage.addScreenTab(params).then(res => {
           if (res.code === 200) {
+            // 新增tab成功跳转到新tab
             this.toOtherPage(res.data)
             this.getTabsData()
           }
@@ -131,8 +131,10 @@ export default {
       page.showDropDown = false
       this.$refs.input[index].select()
     },
+    // 失去焦点的时候重命名
     onBlur(page) {
-      if (!this.showName) {
+      // 如果修改名称没有值，名称不变化
+      if (!this.showName || this.showName === page.name) {
         page.isFocus = false
         return
       }
@@ -160,13 +162,14 @@ export default {
           const res = await this.$server.screenManage.deleteScreenTab(page.id)
           if (res.code === 200) {
             // 如果删除的是当前选中的页签，跳转到上一个页签,如果是第一页就跳转到第二页
-            if (this.$route.query.did === page.id) {
+            if (this.$route.query.tabId === page.id) {
               this.toOtherPage(
                 index === 0 ? this.pages[1].id : this.pages[index - 1].id
               )
               this.getTabsData()
               return
             }
+            // 删除的不是选中的直接删除不跳转
             this.pages.splice(index, 1)
           } else {
             res.msg && this.$message.error(result.msg)
@@ -211,12 +214,15 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-      'pageSettings',
-      'canvasRange',
-      'contextMenuInfo',
-      'screenId'
-    ])
+    ...mapGetters(['screenId', 'pageList']),
+    pages: {
+      get() {
+        return this.pageList
+      },
+      set(value) {
+        this.$store.dispatch('SetPageList', value)
+      }
+    }
   }
 }
 </script>
