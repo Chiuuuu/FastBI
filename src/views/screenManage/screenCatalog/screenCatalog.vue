@@ -552,9 +552,9 @@ export default {
       this.SetCanvasRange(0.5)
       this.$router.push({
         name: 'screenEdit',
-        params: {
+        query: {
           id: this.fileSelectId,
-          did: '0'
+          did: 0
         }
       })
     },

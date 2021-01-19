@@ -106,9 +106,7 @@ const app = {
             res.msg && message.success(res.msg)
             router.push({
               name: 'screenEdit',
-              query: {
-                ...obj
-              }
+              query: { id: obj.id, did: 0 }
             })
           } else {
             res.msg && message.error(res.msg)
