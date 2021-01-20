@@ -61,6 +61,14 @@ const screenManage = {
     return $axios.post('/screen/bigscreen/editScreenTab', params)
   },
   /**
+   * @description 复制大屏tab页签
+   * @param {*} params
+   * @returns
+   */
+  copyScreenTab(params) {
+    return $axios.post('/screen/bigscreen/copyScreenTab', params)
+  },
+  /**
    * @description 删除大屏tab页签
    * @param {*} params
    * @returns

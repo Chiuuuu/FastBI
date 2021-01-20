@@ -51,6 +51,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
+import { on, off } from 'bin-ui/src/utils/dom'
 export default {
   name: 'BoardHeader',
   props: {
@@ -85,6 +86,16 @@ export default {
     // this.screenName = this.screenData
     //   ? this.screenData.name
     //   : this.$route.query.name
+    on(window, 'beforeunload', () => {
+      sessionStorage.setItem('fileName', this.fileName)
+    })
+    if (sessionStorage.getItem('fileName')) {
+      this.$store.dispatch('SetFileName', sessionStorage.getItem('fileName'))
+      sessionStorage.removeItem('fileName')
+      off(window, 'beforeunload', () => {
+        sessionStorage.setItem('fileName', this.fileName)
+      })
+    }
     this.screenName = this.fileName
     // this.screenName = this.$route.query.name
   },

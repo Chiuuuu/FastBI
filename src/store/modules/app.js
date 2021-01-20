@@ -97,6 +97,7 @@ const app = {
     // 新建大屏
     async addScreenData({ commit, state }, obj) {
       commit('SET_PAGE_SETTING', state.orginPageSettings)
+      commit('SET_PAGE_LIST', [])
       let params = {
         name: obj && obj.name ? obj.name : router.history.current.query.name,
         // parentId: obj && obj.parentId ? obj.parentId : router.history.current.query.parentId,
@@ -113,7 +114,7 @@ const app = {
             res.msg && message.success(res.msg)
             router.push({
               name: 'screenEdit',
-              query: { id: obj.id }
+              query: { id: res.id }
             })
           } else {
             res.msg && message.error(res.msg)

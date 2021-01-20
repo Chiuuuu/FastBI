@@ -2,7 +2,7 @@
   <div class="pagination">
     <div
       v-for="(page, index) in pages"
-      :key="page.name"
+      :key="page.id"
       @click="toOtherPage(page.id)"
     >
       <a-dropdown :trigger="['contextmenu']" v-model="page.showDropDown">
@@ -29,7 +29,7 @@
           />
         </div>
         <a-menu slot="overlay">
-          <a-menu-item key="1" @click="copyTab(page)">复制</a-menu-item>
+          <a-menu-item key="1" @click="copyTab(page, index)">复制</a-menu-item>
           <a-menu-item key="2" @click="renameTab(page, index)"
             >重命名</a-menu-item
           >
@@ -77,15 +77,18 @@ export default {
       })
     },
     getTabsData() {
-      this.$server.screenManage.getScreenTabs(this.screenId).then(res => {
-        if (res.code === 200) {
-          this.pages = res.rows.map(item =>
-            Object.assign(item, { showDropDown: false, isFocus: false })
-          )
-        } else {
-          res.msg && this.$message.error(res.msg)
-        }
-      })
+      return this.$server.screenManage
+        .getScreenTabs(this.screenId)
+        .then(res => {
+          if (res.code === 200) {
+            this.pages = res.rows.map(item =>
+              Object.assign(item, { showDropDown: false, isFocus: false })
+            )
+            return true
+          } else {
+            res.msg && this.$message.error(res.msg)
+          }
+        })
     },
     addPage() {
       // 页面最多10个
@@ -117,12 +120,35 @@ export default {
         this.$message.error('最多只能添加10个页签')
       }
     },
-    copyTab(page) {
-      let params = {
-        name: `page.name${1}`,
-        orderNo: page.orderNo,
-        screenId: this.screenId,
-        id: page.id
+    // 格式化复制页签名称
+    getCopyName(name, i) {
+      let copyName = `${name}(${i})`
+      // 如果复制后缀出现重名，序号往上叠加
+      if (this.pages.some(item => item.name === copyName)) {
+        return this.getCopyName(name, i + 1)
+      }
+      return copyName
+    },
+    copyTab(page, index) {
+      page.showDropDown = false
+      // 页面最多10个
+      if (this.pages.length < 10) {
+        let copyName = this.getCopyName(page.name, 1)
+        let params = {
+          name: copyName,
+          orderNo: page.orderNo,
+          screenId: this.screenId,
+          id: page.id
+        }
+        this.$server.screenManage.copyScreenTab(params).then(res => {
+          if (res.code === 200) {
+            this.getTabsData().then(res => {
+              this.saveOrder()
+            })
+          }
+        })
+      } else {
+        this.$message.error('最多只能添加10个页签')
       }
     },
     renameTab(page, index) {
@@ -133,6 +159,10 @@ export default {
     },
     // 失去焦点的时候重命名
     onBlur(page) {
+      // 防止碰到透明input触发调接口
+      if (!page.isFocus) {
+        return
+      }
       // 如果修改名称没有值，名称不变化
       if (!this.showName || this.showName === page.name) {
         page.isFocus = false
@@ -177,6 +207,18 @@ export default {
         }
       })
     },
+    saveOrder() {
+      // 修改页签的orderNo
+      this.pages.forEach((item, index) => {
+        item.orderNo = index + 1
+      })
+
+      this.$server.screenManage.orderScreenTab(this.pages).then(res => {
+        if (res.code != 200) {
+          res.msg && this.$message.error(res.msg)
+        }
+      })
+    },
     // 开始拖拽
     handleDragStart(e, item) {
       this.dragItem = item
@@ -194,23 +236,14 @@ export default {
       if (item === this.dragItem) {
         return
       }
-      // 交换位置
+      // 把拖拽的块挤进来
       const newItems = [...this.pages]
       const src = newItems.indexOf(this.dragItem)
       const dst = newItems.indexOf(item)
       newItems.splice(dst, 0, ...newItems.splice(src, 1))
       this.pages = newItems
-      // 修改页签的orderNo
-      this.pages.forEach((item, index) => {
-        item.orderNo = index + 1
-      })
 
-      console.log(JSON.stringify(this.pages))
-      this.$server.screenManage.orderScreenTab(this.pages).then(res => {
-        if (res.code != 200) {
-          res.msg && this.$message.error(res.msg)
-        }
-      })
+      this.saveOrder()
     }
   },
   computed: {

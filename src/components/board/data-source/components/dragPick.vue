@@ -217,7 +217,7 @@ export default {
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
 
       // 验重
-      if (this.fileList.includes(item => item.alias === dataFile.alias)) {
+      if (this.fileList.includes(dataFile)) {
         this.$message.error(`${dataFile.alias}已存在`)
         return
       }

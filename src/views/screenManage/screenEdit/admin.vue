@@ -139,7 +139,6 @@ import ChartsFactory from '@/components/charts/charts-factory'
 import ChartText from '@/components/tools/Text' // 文本模块
 import ChartImage from '@/components/tools/Image' // 图片模块
 import ChartTables from '@/components/tools/Tables' // 表格模块
-
 import Screen from '@/views/screen' // 全屏
 
 import { Icon } from 'ant-design-vue'
@@ -168,7 +167,8 @@ export default {
       'isScreen',
       'coverageExpand',
       'pageSettings',
-      'orginPageSettings'
+      'orginPageSettings',
+      'pageList'
     ]),
     coverageMaps() {
       if (this.canvasMap.length > 0) {
@@ -225,6 +225,17 @@ export default {
             )
             this.$store.dispatch('SetPageList', pages)
             // 默认显示大屏第一个页签的数据
+            // 新建的大屏取第一个默认页的tabId
+            if (!this.$route.query.tabId) {
+              this.$router.replace({
+                name: 'screenEdit',
+                query: {
+                  id: this.$route.query.id,
+                  tabId: this.pageList[0].id
+                }
+              })
+              return
+            }
             return true
           } else {
             res.msg && this.$message.error(res.msg)
