@@ -25,59 +25,57 @@
         size="middle"
       >-->
       <div
-        class="chart-table"
+        class="chart-table scroller"
         ref="charttable"
+        @scroll="getScrollLeft"
         :style="{
           width: showTableSize.tableX + 'px',
           height: showTableSize.tableY + 'px'
         }"
       >
-        <b-scrollbar
-          style="height:100%;"
-          :barWrapStyle="{ background: 'white' }"
+        <table
+          v-show="showHeader"
+          class="table-content table-header"
+          ref="tableheader"
+          :style="{ width: tableWidth + 'px' }"
+        >
+          <thead>
+            <tr>
+              <th
+                :style="HeaderStyle"
+                class="data"
+                v-for="(column, index) in columns"
+                :key="index"
+              >
+                {{ column.title }}
+              </th>
+            </tr>
+          </thead>
+        </table>
+        <div
+          class="tbody"
+          :style="{
+            width: bodyWidth + 'px',
+            height: bodyHeight + 'px'
+          }"
         >
           <table
-            class="table-content table-header"
-            ref="tableheader"
+            class="table-content table-body scrollbar"
+            ref="tablebody"
             :style="{ width: tableWidth + 'px' }"
           >
-            <thead>
-              <tr>
-                <th
-                  :style="HeaderStyle"
-                  class="data"
-                  v-for="(column, index) in columns"
-                  :key="index"
-                >
-                  {{ column.title }}
-                </th>
-              </tr>
-            </thead>
-          </table>
-          <div class="tbody" :style="{ height: bodyHeight + 'px' }">
-            <b-scrollbar
-              style="height:100%;"
-              :barWrapStyle="{ background: 'white' }"
-            >
-              <table
-                class="table-content table-body scrollbar"
-                ref="tablebody"
-                :style="{ width: tableWidth + 'px' }"
+            <tr v-for="(row, index) in tableData" :key="index">
+              <td
+                :style="customRow(index)"
+                class="data data-body"
+                v-for="(value, key) in row"
+                :key="key"
               >
-                <tr v-for="(row, index) in tableData" :key="index">
-                  <td
-                    :style="customRow(index)"
-                    class="data data-body"
-                    v-for="(value, key) in row"
-                    :key="key"
-                  >
-                    {{ value }}
-                  </td>
-                </tr>
-              </table>
-            </b-scrollbar>
-          </div>
-        </b-scrollbar>
+                {{ value }}
+              </td>
+            </tr>
+          </table>
+        </div>
       </div>
       <!-- <span slot="index" slot-scope="text, record, index" v-if="config.index.show">
           {{index + 1}}
@@ -125,12 +123,13 @@ export default {
       backgroundStyle: {},
       showTableSize: {},
       tableWidth: '',
-      bodyHeight: ''
+      bodyHeight: '',
+      bodyWidth: ''
     }
   },
   watch: {
     config: {
-      handler(val) {
+      handler(val, oldval) {
         if (val) {
           this.showHeader = val.header.show
           this._calcStyle()
@@ -215,14 +214,15 @@ export default {
       this.width = width + 'px'
       this.height = height + 'px'
 
-      //   this.tableWidth = this.chartSize.height - title.offsetHeight
-      // 计算表格宽度(比较表头表格)
-      this.tableWidth =
-        Math.max(
-          this.$refs.tableheader.clientWidth,
-          this.$refs.tablebody.clientWidth
-        ) + 50
-      // 计算显示尺寸(比较表的尺寸和缩放框的大小)
+      // 控制每一列最小长度200
+      let minWidth = this.columns.length * 200
+      // 计算表格宽度(表头表格宽度一致)
+      this.tableWidth = Math.max(
+        this.$refs.tableheader.clientWidth,
+        this.$refs.tablebody.clientWidth,
+        minWidth
+      )
+      // 计算显示尺寸-charttable(比较表的尺寸和缩放框的大小)
       this.showTableSize = {
         tableX: Math.min(this.tableWidth, this.chartSize.width),
         tableY: Math.min(
@@ -230,9 +230,12 @@ export default {
           this.chartSize.height - title.offsetHeight
         )
       }
+      // 计算表格（不含表头）高度
       this.bodyHeight =
         this.showTableSize.tableY - this.$refs.tableheader.clientHeight
-      //   this.tableHeight = { x: Math.min(this.tableWidth, this.chartSize.width), y: Math.min(this.$refs.charttable.clientHeight, this.chartSize.height) }
+    },
+    getScrollLeft(e) {
+      this.bodyWidth = e.target.scrollLeft + this.showTableSize.tableX
     },
     // 设置表头样式
     customHeaderRow() {
