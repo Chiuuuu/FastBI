@@ -100,10 +100,10 @@
         <span class="d-s" :title="detailInfo.description">描述： {{detailInfo.description}}</span>
         <a-icon type="edit" v-on:click="openModal('describe-setting')" class="d-s-icon"/>
       </div>
+      <p class="tips"><a-icon theme="filled" type="exclamation-circle" style="margin-right: 2px;" />下方表显示红色表示表在数据源已被删除，请您删除此表。表显示黄色表示表中列字段发生了变动，请您重新构建表关联关系。</p>
       <div class="draw_board scrollbar">
         <edit-right-top ref='rightTopRef' :detailInfo="detailInfo"></edit-right-top>
       </div>
-      <a-divider />
       <div class="detail scrollbar">
         <div class="detail_header">
           <span>数据模型详情</span>
@@ -335,7 +335,6 @@ export default {
       this.handleGetData(this.$route.query.modelId)
       this.$store.dispatch('dataModel/setModelId', this.$route.query.modelId)
     }
-    this.$EventBus.$on('deleteBelongCustom', this.handleDeleteCustomDimMea)
     this.$EventBus.$on('tableUnion', this.handleTableUnion)
   },
   beforeDestroy() {
@@ -481,30 +480,15 @@ export default {
       this.unionNode = node
       this.openModal('union-setting')
     },
-    // 删除表时, 删除和表关联的自定义维度度量
-    handleDeleteCustomDimMea(ownProps) {
-      // this.customDimensions = this.customDimensions.filter(item => item.modelTableId !== ownProps.id)
-      // this.customMeasures = this.customMeasures.filter(item => item.modelTableId !== ownProps.id)
-    },
     // 转换维度度量
     handleSwitchRole(type, vm) {
       let tableName = vm.itemData.tableName
-
-      // 1,4 表示维度 2,5表示度量
-      // 1,2 为一组相互对调
-      // 4,5 为一组相互对调
-      let role
-      if (vm.itemData.role === 1) {
-        role = 2
-      } else if (vm.itemData.role === 2) {
-        role = 1
-      } else if (vm.itemData.role === 4) {
-        role = 5
-      } else if (vm.itemData.role === 5) {
-        role = 4
+      const role = vm.itemData.role === 1 ? 2 : 1
+      if (vm.itemData.tableNo === 0) {
+        tableName = role === 1 ? '自定义维度' : '自定义度量'
       }
       if (vm.itemData.tableNo === 0) {
-        tableName = (role === 1 || role === 4) ? '自定义维度' : '自定义度量'
+        tableName = role === 1 ? '自定义维度' : '自定义度量'
       }
       const data = {
         ...vm.itemData,
@@ -544,12 +528,13 @@ export default {
     // 复制维度度量
     async handleCopyField(event, handler, vm) {
       const role = vm.itemData.role
-      const isDimension = role === 1 || role === 4
-      const isMeasures = role === 2 || role === 5
+      const isDimension = role === 1
+      const isMeasures = role === 2
       let newField = {
         ...vm.itemData,
         id: '',
-        expr: `${vm.itemData.tableName},${vm.itemData.tableNo}`,
+        expr: vm.itemData.produceType === 0 ? `$$${vm.itemData.id}` : vm.itemData.expr,
+        raw_expr: vm.itemData.produceType === 0 ? `[${vm.itemData.alias}]` : vm.itemData.raw_expr,
         tableNo: 0,
         tableName: '自定义' + (isDimension ? '维度' : '度量')
       }
@@ -558,7 +543,8 @@ export default {
       if (result.code === 200) {
         newField = {
           ...newField,
-          ...result.data
+          ...result.data,
+          status: 0
         }
         const arry = [...this.detailInfo.pivotSchema.dimensions, ...this.detailInfo.pivotSchema.measures, ...this.cacheDimensions, ...this.cacheMeasures]
         newField.alias = this.handleAddCustomField(arry, newField, newField.alias)
@@ -807,9 +793,9 @@ export default {
         Object.keys(data).forEach(item => {
           const list = data[item]
           list.forEach(field => {
-            if (field.role === 1 || field.role === 4) {
+            if (field.role === 1) {
               cacheDimensions.push(field)
-            } else if (field.role === 2 || field.role === 5) {
+            } else if (field.role === 2) {
               cacheMeasures.push(field)
             }
           })

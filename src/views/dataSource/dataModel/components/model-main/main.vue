@@ -19,6 +19,7 @@
           <div class="description">
               <span class="d-s" :title="detailInfo.description">描述：{{detailInfo.description}}</span>
           </div>
+          <!-- <p class="tips"><a-icon theme="filled" type="exclamation-circle" style="margin-right: 2px;" />下方表显示红色表示表在数据源已被删除，请您删除此表。表显示黄色表示表中列字段发生了变动，请您重新构建表关联关系。</p> -->
           <div class="draw_board scrollbar">
             <div class="m-dml-map m-map">
               <a-empty v-if="tablesEmpty" class="main-empty">
@@ -34,7 +35,6 @@
               </template>
             </div>
           </div>
-          <a-divider />
           <div class="detail">
             <div class="detail_header">
               <span>数据模型详情</span>

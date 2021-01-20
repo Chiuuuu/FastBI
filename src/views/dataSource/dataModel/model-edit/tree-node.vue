@@ -2,7 +2,7 @@
   <div class="box">
     <div class="item table-item" ref="itemRef">
       <h6
-        class="dragable"
+        :class="['dragable', { 'table-red': nodeData.props.status === 2, 'table-yellow': nodeData.props.status === 1}]"
         :draggable="isDrag"
         @mouseleave.stop="handleMouseLeave"
         @mousedown.stop="handleMouseDown"
@@ -12,7 +12,6 @@
         @dragend.stop="handleDragEnd"
         @dragover.prevent.stop
         @drop.stop="handleDrop($event, nodeData, dataIndex)"
-        style="border-color: rgb(8, 140, 237);"
       >
         {{ nodeData.props.name }}
       </h6>
@@ -89,7 +88,9 @@
 <script>
 import { Utils, Node } from '../util'
 import findIndex from 'lodash/findIndex'
+import pullAllBy from 'lodash/pullAllBy'
 import TreeNodePoporverRow from './tree-node-popover-row'
+import { message } from 'ant-design-vue'
 export default {
   name: 'tree-node',
   inject: ['nodeStatus'],
@@ -108,6 +109,10 @@ export default {
       type: [String, Object]
     },
     errorTables: {
+      type: Array,
+      default: () => []
+    },
+    deleteTables: {
       type: Array,
       default: () => []
     }
@@ -243,7 +248,7 @@ export default {
           // 循环递归删除tables的数据
           this.loopDelete(node, this.detailInfo.config.tables)
 
-          // 需要前端自行删除渲染节点的数据
+          // 需要前端自行删除树形节点其所在父节点中所在的数据
           if (node.parent) {
             // 有根节点的情况
             const index = node.parent.children.indexOf(node)
@@ -254,15 +259,17 @@ export default {
             // 无根节点的情况
             return this.root.handleClearRenderTables()
           }
-
           // 更新维度度量
           await this.root.handleUpdate({
-            tables: this.detailInfo.config.tables.map((item, index) => {
-              item.datamodelId = this.modelId
-              item.tableNo = index + 1
-              return item
-            })
+            tables: this.detailInfo.config.tables
           })
+          // await this.root.handleUpdate({
+          //   tables: this.detailInfo.config.tables.map((item, index) => {
+          //     item.datamodelId = this.modelId
+          //     item.tableNo = index + 1
+          //     return item
+          //   })
+          // })
         }
       })
     },
@@ -271,7 +278,11 @@ export default {
       const index = findIndex(list, ownProps)
       const errorIndex = this.errorTables.indexOf(ownProps.tableNo)
       list.splice(index, 1)
-      this.$EventBus.$emit('deleteBelongCustom', ownProps)
+      const deletePivotSchema = this.deletePivotSchema(ownProps)
+      ownProps['pivotSchema'] = deletePivotSchema
+      // 处理自定义维度度量
+      this.doWithCustomPivotShema(ownProps)
+      this.deleteTables.push(ownProps)
       if (errorIndex > -1) {
         this.errorTables.splice(errorIndex, 1)
       }
@@ -281,6 +292,59 @@ export default {
         })
       }
     },
+    // 删除对应的维度度量
+    deletePivotSchema(deleteTarget) {
+      const deleteDimensionsByTarget = this.detailInfo.pivotSchema.dimensions.filter(item => item.tableNo === Number(deleteTarget.tableNo))
+      const deleteMeasuresByTarget = this.detailInfo.pivotSchema.measures.filter(item => item.tableNo === Number(deleteTarget.tableNo))
+
+      pullAllBy(this.detailInfo.pivotSchema.dimensions, [{
+        tableNo: Number(deleteTarget.tableNo)
+      }], 'tableNo')
+      pullAllBy(this.detailInfo.pivotSchema.measures, [{
+        tableNo: Number(deleteTarget.tableNo)
+      }], 'tableNo')
+
+      return {
+        dimensions: deleteDimensionsByTarget,
+        measures: deleteMeasuresByTarget
+      }
+    },
+    doWithCustomPivotShema(deleteTarget) {
+      this.root.$parent.cacheDimensions.forEach(dimension => {
+        const matchs = dimension.expr.match(/(?<=\$\$)(\d)+/g)
+      })
+      this.root.$parent.cacheMeasures.forEach(measure => {
+        const matchs = measure.expr.match(/(?<=\$\$)(\d)+/g)
+        matchs.forEach(match => {
+          const filterDimension = deleteTarget.pivotSchema.dimensions.filter(item => item.id === match).pop()
+          const filterMeasure = deleteTarget.pivotSchema.measures.filter(item => item.id === match).pop()
+          if (filterDimension || filterMeasure) {
+            measure.status = 1
+            if (filterDimension) {
+              const t = new RegExp('(\\[)(' + filterDimension.name + ')(\\])', 'g')
+              measure.raw_expr = measure.raw_expr.replace(t, '<此位置字段丢失>')
+            }
+            if (filterMeasure) {
+              const t = new RegExp('(\\[)(' + filterMeasure.name + ')(\\])', 'g')
+              measure.raw_expr = measure.raw_expr.replace(t, '<此位置字段丢失>')
+            }
+          }
+        })
+      })
+    },
+    hasExists(match) {
+      let isExists = true
+      const dIndex = this.detailInfo.pivotSchema.dimensions.findIndex(item => item.id === match)
+      const mIndex = this.detailInfo.pivotSchema.measures.findIndex(item => item.id === match)
+      if (dIndex === -1 || mIndex === -1) {
+        isExists = false
+      }
+      return {
+        isExists,
+        dIndex,
+        mIndex
+      }
+    },
     handleMouseDown() {
       this.isDrag = true
     },
@@ -288,7 +352,6 @@ export default {
       this.isDrag = false
     },
     handleDragStart(event, item, index) {
-      console.log('node--drag-start')
       this.nodeStatus.dragNode = item
       this.nodeStatus.dragType = 'node'
     },
@@ -300,7 +363,6 @@ export default {
       this.root.handleMapDragEnter(event, this)
     },
     handleDragLeave(event) {
-      console.log('node-leave', event.target.className)
       this.handleRemoveItemHigtLight()
     },
     handleItemHigtLight() {
@@ -310,58 +372,59 @@ export default {
       Utils.removeClass(this.$refs.itemRef, 'z-on')
     },
     handleDragEnd() {
-      console.log('node-end')
       this.root.handleMapRemoveClass()
     },
     async handleDrop(event, current, index) {
-      console.log('node-drop')
       this.handleRemoveItemHigtLight()
       let dragNode = this.nodeStatus.dragNode
       const tables = this.detailInfo.config.tables
       if (this.nodeStatus.dragType === 'menu') {
-        dragNode.setTableId()
-        dragNode.setTableNo(tables.length + 1)
-        await this.root.getJoin(current, dragNode)
-        tables.push(dragNode.getProps())
-        current.add(dragNode)
+        // 如果是从左侧菜单拖拉进来就是新增
+        dragNode.tableNo = tables.length + 1
+        const getNode = await this.root.getJoin(current, dragNode)
+        const renderNode = new Node(getNode)
+        current.add(renderNode)
         await this.root.handleUpdate({
-          tables: this.detailInfo.config.tables.map((item, index) => {
-            item.datamodelId = this.modelId
-            return item
-          })
+          tables: this.detailInfo.config.tables
         })
       }
 
       if (this.nodeStatus.dragType === 'node') {
+        // 如果是拖动的是树形节点
         if (current.props.tableNo === dragNode.props.tableNo) {
-          console.log('同一个元素')
+          // 同一个元素
           return
         }
 
         const dragNodeId = dragNode.props.tableNo
 
         if (dragNode.parent && dragNode.parent.props.tableNo === current.props.tableNo) {
-          console.log('相同父节点')
+          // 相同父节点
           return
         }
 
         if (this.lootBeforeParent(dragNodeId, current)) return
 
+        // 拖拽节点设置
         let node = new Node(dragNode.getProps())
         node.setParent(current)
         node.setChildren(dragNode.children)
-        await this.root.getJoin(current, node)
+
+        // 获取新的属性值
+        const getNode = await this.root.getJoin(current, node.getProps(), 0)
+        // 设置属性值
+        node.setProps(getNode)
+        // 当前拖放的节点添加更新之后的节点
         current.add(node)
+
+        // 替换tables的内容
         const index = findIndex(tables, function(item) {
           return node.getProps().tableNo === item.tableNo
         })
         tables.splice(index, 1, node.getProps())
         this.parentDeleteNode(event, dragNode)
         await this.root.handleUpdate({
-          tables: this.detailInfo.config.tables.map(item => {
-            item.datamodelId = this.modelId
-            return item
-          })
+          tables: this.detailInfo.config.tables
         })
       }
     },
@@ -370,6 +433,7 @@ export default {
       if (node.parent.props.tableNo === parentId) return true
       return this.lootBeforeParent(parentId, node.parent)
     },
+    // 遍历删除节点
     parentDeleteNode(event, node) {
       const children = node.parent.children
       const index = children.indexOf(node)
@@ -391,8 +455,6 @@ export default {
       if (this.handleGetConditionLength(node)) {
         this.popoverForm = [].concat(this.nodeData.props.join.conditions)
       }
-      // console.log('left', node.parent.getProps().name)
-      // console.log('right', node.getProps().name)
       const leftNodeProps = node.parent.getProps()
       const rightNodeProps = node.getProps()
 
@@ -402,8 +464,6 @@ export default {
     },
     async handleGetLRTableList(leftTableId, rightTableId) {
       const result = await this.$server.dataModel.getDataSourceFieldDataInfoList(leftTableId, rightTableId)
-      console.log(result)
-
       if (result.code === 200) {
         this.popoverLeftList = [].concat(result.data.left)
         this.popoverRightList = [].concat(result.data.right)

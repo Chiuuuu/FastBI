@@ -93,7 +93,7 @@ export default {
   },
   methods: {
     handleDrop() {
-      const nodeData = this.nodeStatus.dragNode.getProps()
+      const nodeData = this.nodeStatus.dragNode
       const data = {
         tableId: nodeData.id,
         name: nodeData.name,
@@ -101,11 +101,6 @@ export default {
         type: nodeData.type
       }
       this.unionList.push(data)
-      // if (this.unionList.some(item => (item.tableId || item.id) === nodeData.id)) {
-      //   this.$message.error('相同的表无需合并')
-      // } else {
-      //   this.unionList.push(nodeData)
-      // }
     },
     handleSave() {
       this.$refs.form.validate(async (ok) => {
