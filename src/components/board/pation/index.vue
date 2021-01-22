@@ -196,7 +196,9 @@ export default {
               this.toOtherPage(
                 index === 0 ? this.pages[1].id : this.pages[index - 1].id
               )
-              this.getTabsData()
+              this.getTabsData().then(res => {
+                this.saveOrder()
+              })
               return
             }
             // 删除的不是选中的直接删除不跳转

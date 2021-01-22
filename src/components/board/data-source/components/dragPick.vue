@@ -305,11 +305,11 @@ export default {
     },
     // 手动，添加字段
     addManualProperty() {
+      if (!this.manualValue) {
+        return
+      }
       // 本身不存在就添加进去
-      if (
-        this.manualValue &&
-        this.currentFile.manualList.indexOf(this.manualValue) === -1
-      ) {
+      if (this.currentFile.manualList.indexOf(this.manualValue) === -1) {
         this.currentFile.manualList.push(this.manualValue)
       } else {
         this.$message.error(`${this.manualValue}已存在`)
@@ -462,20 +462,20 @@ export default {
             apiData.source.columns = []
             apiData.source.rows = []
             this.$store.dispatch('SetSelfDataSource', apiData)
-            // 重新渲染
             this.updateChartData()
             return
           }
-          if (this.type === 'tableList') {
+          let rows = res.rows
+          if (this.currSelected.setting.chartType === 'v-tables') {
             let columns = []
-            for (let item of this.fileList) {
+            let keys = Object.keys(rows[0])
+            for (let alias of keys) {
               columns.push({
-                title: item.alias,
-                dataIndex: item.alias,
-                key: item.alias
+                title: alias,
+                dataIndex: alias,
+                key: alias
               })
             }
-            let rows = res.rows
             if (rows.length > 10) {
               rows.length = 10
             }

@@ -1,10 +1,5 @@
 <template>
-  <div
-    class="dv-screen"
-    allowfullscreen="true"
-    :style="wrapStyle"
-    ref="dvScreen"
-  >
+  <div class="dv-screen" :style="wrapStyle" ref="dvScreen">
     <div :style="canvasPanelStyle">
       <b-scrollbar style="height:100%">
         <div class="canvas-panel">
@@ -178,12 +173,15 @@ export default {
       this.$server.screenManage.actionRefreshScreen({ params }).then(res => {
         if (res.code === 200) {
           let dataItem = res.data
-          let keys = Object.keys(dataItem)
-          keys.forEach(item => {
-            let newData = dataItem[item]
-            let chart = this.canvasMap.find(chart => chart.id + '' === item)
-            this.handleRefreshData({ chart, newData })
-          })
+          let ids = Object.keys(dataItem)
+          for (let id of ids) {
+            let keys = Object.keys(dataItem[id])
+            for (let item of keys) {
+              let newData = dataItem[item]
+              let chart = this.canvasMap.find(chart => chart.id + '' === id)
+              this.handleRefreshData({ chart, newData })
+            }
+          }
           this.$server.screenManage.saveAllChart(this.canvasMap)
           this.$message.success('刷新成功')
         } else {

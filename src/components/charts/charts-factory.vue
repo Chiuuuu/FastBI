@@ -14,6 +14,7 @@
       <span>{{ config.title.content }}</span>
     </div>
     <component
+      v-if="this.chartData.columns.length > 0"
       v-bind:is="typeName"
       :events="chartEvents"
       :data="chartData"

@@ -44,8 +44,12 @@
             <!-- <div class="img" :class="component.name"></div> -->
             <div class="front">
               <!-- <b-icon :name="component.icon"></b-icon> -->
-              <a-icon v-if="component.icon" :type="component.icon"></a-icon>
-              <icon-font v-if="component.iconFont" :type="component.iconFont" />
+              <!-- <a-icon v-if="component.icon" :type="component.icon"></a-icon> -->
+              <!-- <icon-font v-if="component.iconFont" :type="component.iconFont" /> -->
+              <img
+                style="width:18px;heigth:18px;"
+                :src="require(`@/assets/images/chart/${component.icon}`)"
+              />
               <span> {{ component.title }}</span>
             </div>
           </div>

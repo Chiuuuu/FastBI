@@ -136,7 +136,7 @@ export default {
         }
         for (let item of this.columns) {
           // 是否自动换行
-          item.ellipsis = val.table.ellipsis
+          //   item.ellipsis = val.table.ellipsis
         }
       },
       deep: true,
@@ -149,14 +149,13 @@ export default {
           if (val.tableList.length > 0 && val.source && val.source.columns) {
             for (let item of val.source.columns) {
               // 表格样式
-              item.customHeaderCell = this.customHeaderRow
-
+              //   item.customHeaderCell = this.customHeaderRow
               // 是否自动换行
-              if (!this.config.ellipsis) {
-                item.ellipsis = true
-              } else {
-                item.ellipsis = false
-              }
+              //   if (!this.config.ellipsis) {
+              //     item.ellipsis = true
+              //   } else {
+              //     item.ellipsis = false
+              //   }
             }
             this.columns = val.source.columns
             this.tableData = val.source.rows
@@ -237,10 +236,10 @@ export default {
     getScrollLeft(e) {
       this.bodyWidth = e.target.scrollLeft + this.showTableSize.tableX
     },
-    // 设置表头样式
-    customHeaderRow() {
-      return this.HeaderStyle
-    },
+    // // 设置表头样式
+    // customHeaderRow() {
+    //   return this.HeaderStyle
+    // },
     // 设置表体样式
     customRow(index) {
       if (index % 2 === 1) {
