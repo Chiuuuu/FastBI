@@ -85,6 +85,46 @@ const screenManage = {
     return $axios.post(`/screen/bigscreen/updateScreenTabOrder`, params)
   },
   /**
+   * @description 获取分享短链接
+   * @param {*} params
+   * @returns
+   */
+  getScreenLink(screenId) {
+    return $axios.get(`/screen/bigscreen/getShortUrl/${screenId}`)
+  },
+  /**
+   * @description 查看发布信息
+   * @param {*} params
+   * @returns
+   */
+  showScreenRelease(screenId) {
+    return $axios.get(`/screen/bigscreen/getScreenShare/${screenId}`)
+  },
+  /**
+   * @description 发布大屏
+   * @param {*} params
+   * @returns
+   */
+  releaseScreen(params) {
+    return $axios.post('/screen/bigscreen/shareScreen', params)
+  },
+  /**
+   * @description 重新发布大屏
+   * @param {*} params
+   * @returns
+   */
+  reShareScreen(params) {
+    return $axios.post('/screen/bigscreen/reShareScreen', params)
+  },
+  /**
+   * @description 撤销发布大屏
+   * @param {*} screenId
+   * @returns
+   */
+  delShareScreen(screenId) {
+    return $axios.delete(`/screen/bigscreen/removeScreenShare/${screenId}`)
+  },
+  /**
    * @description 保存大屏
    * @param {*} params
    * @returns
