@@ -671,6 +671,11 @@ export default {
         // 将自定义维度度量剥离处理
         this.detailInfo.pivotSchema.dimensions = this.handlePeelCustom(this.detailInfo.pivotSchema.dimensions, this.cacheDimensions)
         this.detailInfo.pivotSchema.measures = this.handlePeelCustom(this.detailInfo.pivotSchema.measures, this.cacheMeasures)
+
+        // 校验缺失字段
+        this.doWithMissing(this.cacheDimensions, result.data.pivotSchema)
+        this.doWithMissing(this.cacheMeasures, result.data.pivotSchema)
+
         this.$store.commit('common/SET_PRIVILEGES', result.data.privileges || [])
 
         this.handleDimensions()
@@ -681,6 +686,24 @@ export default {
       } else {
         this.$message.error(result.msg)
       }
+    },
+    // 替换为缺失文案
+    doWithMissing(list, pivotSchema) {
+      list.forEach(filed => {
+        const matchs = filed.raw_expr.match(/(\[)(.*?)(\])/g)
+        if (matchs) {
+          matchs.forEach(value => {
+            const matchStr = value.match(/(\[)(.+)(\])/)
+            const key = matchStr[2] ? matchStr[2] : ''
+            const pairList = [...pivotSchema.dimensions, ...pivotSchema.measures]
+            const missing = pairList.filter(item => item.alias === key).pop()
+            if (!missing) {
+              filed.status = 1
+              filed.raw_expr = filed.raw_expr.replace(value, '<此位置字段丢失>')
+            }
+          })
+        }
+      })
     },
     handlePeelCustom(list, cache) {
       if (list && list.length) {

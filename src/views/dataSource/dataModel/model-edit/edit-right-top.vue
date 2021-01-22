@@ -17,7 +17,6 @@
         :data-index="index"
         :detailInfo="detailInfo"
         :errorTables="errorTables"
-        :deleteTables="deleteTables"
       ></tree-node>
     </template>
   </div>
@@ -39,7 +38,6 @@ export default {
       isTree: true,
       info: '',
       renderTables: [], // 用来渲染树组件
-      deleteTables: [], // 删除的节点
       errorTables: [] // 接受错误的tableNo
     }
   },
