@@ -21,7 +21,7 @@ const list = [
         title: '折线图',
         name: 've-line',
         chartType: 'v-line',
-        icon: 'line-chart',
+        icon: 'icon_line_chart.png',
         type: '1',
         modelId: '',
         api_data: {
@@ -160,7 +160,7 @@ const list = [
         title: '柱状图',
         chartType: 'v-histogram',
         name: 've-histogram',
-        icon: 'bar-chart',
+        icon: 'icon_histogram.png',
         type: '1',
         modelId: '',
         api_data: {
@@ -301,7 +301,7 @@ const list = [
         title: '条形图',
         chartType: 'v-bar',
         name: 've-bar',
-        icon: 'menu',
+        icon: 'icon_.png',
         type: '1',
         modelId: '',
         api_data: {
@@ -434,7 +434,7 @@ const list = [
         title: '饼图',
         name: 've-pie',
         chartType: 'v-pie',
-        icon: 'pie-chart',
+        icon: '饼图.png',
         type: '1',
         modelId: '',
         api_data: {
@@ -544,7 +544,7 @@ const list = [
         title: '雷达图',
         name: 've-radar',
         chartType: 'v-radar',
-        icon: 'radar-chart',
+        icon: 'icon_radar_map.png',
         type: '1',
         modelId: '',
         api_data: {
@@ -654,8 +654,7 @@ const list = [
         title: '仪表盘',
         name: 've-gauge',
         chartType: 'v-gauge',
-        icon: null,
-        iconFont: 'icon-gauge',
+        icon: '图表-雷达图.png',
         type: '2',
         modelId: '',
         api_data: {
@@ -936,8 +935,7 @@ const list = [
         title: '环形图',
         name: 've-pie',
         chartType: 'v-ring',
-        icon: null,
-        iconFont: 'icon-Ring-Chart',
+        icon: 'CHART-环形图.png',
         type: '2',
         modelId: '',
         api_data: {
@@ -1042,8 +1040,8 @@ const list = [
         title: '嵌套饼图',
         name: 've-pie',
         chartType: 'v-multiPie',
-        icon: null,
-        iconFont: 'icon-Pie-chart',
+        icon: 'icon_pie_chart.png',
+        // iconFont: 'icon-Pie-chart',
         type: '1',
         modelId: '',
         api_data: {
@@ -1167,7 +1165,7 @@ const list = [
         title: '文本',
         name: 've-text',
         chartType: 'v-text',
-        icon: 'edit',
+        icon: 'icon_pie_chart.png',
         api_data: {},
         apis: {},
         modelId: '',
@@ -1196,7 +1194,7 @@ const list = [
         title: '图片',
         name: 've-image',
         chartType: 'v-image',
-        icon: 'picture',
+        icon: 'icon_pie_chart.png',
         modelId: '',
         api_data: {},
         apis: {},
@@ -1220,7 +1218,7 @@ const list = [
         title: '表格',
         name: 've-tables',
         chartType: 'v-tables',
-        icon: 'table',
+        icon: 'icon_pie_chart.png',
         type: '3',
         modelId: '',
         api_data: {

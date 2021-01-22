@@ -18,7 +18,11 @@
       <a-collapse-panel key="tableList" header="列" v-if="chartType === '3'">
         <drag-area type="tableList" ref="table"></drag-area>
       </a-collapse-panel>
-      <a-collapse-panel key="pick" header="数据筛选">
+      <a-collapse-panel
+        key="pick"
+        header="数据筛选"
+        v-if="chartType === '1' || chartType === '2' || chartType === '3'"
+      >
         <drag-pick type="pick"></drag-pick>
       </a-collapse-panel>
       <a-collapse-panel key="sort" header="排序">
@@ -304,19 +308,22 @@ export default {
       this.$server.screenManage.actionRefreshScreen({ params }).then(res => {
         if (res.code === 200) {
           let dataItem = res.data
-          let keys = Object.keys(dataItem)
-          keys.forEach(item => {
-            let newData = dataItem[item]
-            let chart = this.canvasMap.find(chart => chart.id + '' === item)
-            let apidata = chart.setting.api_data
-            if (
-              apidata.refresh.isRefresh &&
-              apidata.refresh.unit &&
-              apidata.refresh.frequency > 0
-            ) {
-              this.handleRefreshData({ chart, newData })
+          let ids = Object.keys(dataItem)
+          for (let id of ids) {
+            let keys = Object.keys(dataItem[id])
+            for (let item of keys) {
+              let newData = dataItem[item]
+              let chart = this.canvasMap.find(chart => chart.id + '' === id)
+              let apidata = chart.setting.api_data
+              if (
+                apidata.refresh.isRefresh &&
+                apidata.refresh.unit &&
+                apidata.refresh.frequency > 0
+              ) {
+                this.handleRefreshData({ chart, newData })
+              }
             }
-          })
+          }
           this.$server.screenManage.saveAllChart(this.canvasMap)
           this.$message.success('刷新成功')
         }
