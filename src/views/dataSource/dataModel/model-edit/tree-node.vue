@@ -111,10 +111,6 @@ export default {
     errorTables: {
       type: Array,
       default: () => []
-    },
-    deleteTables: {
-      type: Array,
-      default: () => []
     }
   },
   components: {
@@ -261,15 +257,11 @@ export default {
           }
           // 更新维度度量
           await this.root.handleUpdate({
-            tables: this.detailInfo.config.tables
+            tables: this.detailInfo.config.tables.map((item, index) => {
+              item.tableNo = index + 1
+              return item
+            })
           })
-          // await this.root.handleUpdate({
-          //   tables: this.detailInfo.config.tables.map((item, index) => {
-          //     item.datamodelId = this.modelId
-          //     item.tableNo = index + 1
-          //     return item
-          //   })
-          // })
         }
       })
     },
@@ -282,7 +274,6 @@ export default {
       ownProps['pivotSchema'] = deletePivotSchema
       // 处理自定义维度度量
       this.doWithCustomPivotShema(ownProps)
-      this.deleteTables.push(ownProps)
       if (errorIndex > -1) {
         this.errorTables.splice(errorIndex, 1)
       }
@@ -310,27 +301,48 @@ export default {
       }
     },
     doWithCustomPivotShema(deleteTarget) {
-      this.root.$parent.cacheDimensions.forEach(dimension => {
-        const matchs = dimension.expr.match(/(?<=\$\$)(\d)+/g)
+      this.doWithMissing(this.root.$parent.cacheDimensions, deleteTarget)
+      this.doWithMissing(this.root.$parent.cacheMeasures, deleteTarget)
+    },
+    // 处理缺失字段
+    doWithMissing(list, deleteTarget) {
+      list.forEach(filed => {
+        const matchs = filed.expr.match(/(?<=\$\$)(\d)+/g)
+        if (matchs) {
+          matchs.forEach(match => {
+            // 获取根据删除的表的维度度量跟表达式里的id进行筛选
+            const filterDimension = deleteTarget.pivotSchema.dimensions.filter(item => item.id === match).pop()
+            const filterMeasure = deleteTarget.pivotSchema.measures.filter(item => item.id === match).pop()
+
+            // 如果存在说明状态是缺失
+            if (filterDimension || filterMeasure) {
+              // 改变状态
+              filed.status = 1
+              // 缺失文案替换
+              if (filterDimension) {
+                filed.raw_expr = this.replaceWithMissing(filed.raw_expr, filterDimension.alias)
+              }
+              if (filterMeasure) {
+                filed.raw_expr = this.replaceWithMissing(filed.raw_expr, filterMeasure.alias)
+              }
+            }
+          })
+        }
       })
-      this.root.$parent.cacheMeasures.forEach(measure => {
-        const matchs = measure.expr.match(/(?<=\$\$)(\d)+/g)
-        matchs.forEach(match => {
-          const filterDimension = deleteTarget.pivotSchema.dimensions.filter(item => item.id === match).pop()
-          const filterMeasure = deleteTarget.pivotSchema.measures.filter(item => item.id === match).pop()
-          if (filterDimension || filterMeasure) {
-            measure.status = 1
-            if (filterDimension) {
-              const t = new RegExp('(\\[)(' + filterDimension.name + ')(\\])', 'g')
-              measure.raw_expr = measure.raw_expr.replace(t, '<此位置字段丢失>')
-            }
-            if (filterMeasure) {
-              const t = new RegExp('(\\[)(' + filterMeasure.name + ')(\\])', 'g')
-              measure.raw_expr = measure.raw_expr.replace(t, '<此位置字段丢失>')
-            }
+    },
+    // 替换为缺失文案
+    replaceWithMissing(rawExpr, alias) {
+      const matchArry = rawExpr.match(/(\[)(.*?)(\])/g)
+      if (matchArry) {
+        matchArry.forEach(value => {
+          const matchStr = value.match(/(\[)(.+)(\])/)
+          const key = matchStr[2] ? matchStr[2] : ''
+          if (key && key === alias) {
+            rawExpr = rawExpr.replace(value, '<此位置字段丢失>')
           }
         })
-      })
+      }
+      return rawExpr
     },
     hasExists(match) {
       let isExists = true
@@ -492,10 +504,7 @@ export default {
         margin-bottom: 5px;
         width: 150px;
         height: 36px;
-        border: 1px solid #dedede;
         color: #666;
-        border-radius: 2px;
-        background: #f1f1f1;
         &:hover {
           .caret-down {
             display: block;
@@ -531,7 +540,17 @@ export default {
             cursor: -ms-grab;
             cursor: -o-grab;
             background-color: #f1f0ff;
+            border: 1px solid #dedede;
+            border-radius: 2px;
             text-align: center;
+            &.table-yellow {
+              background-color: #ffc34f1a;
+              border: 1px solid #FFC34F;
+            }
+            &.table-red {
+              background-color: #FFC6C6;
+              border: 1px solid #FF0000;
+            }
         }
         .union {
             position: absolute;
