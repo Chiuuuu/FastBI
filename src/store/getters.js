@@ -45,7 +45,9 @@ const getters = {
 
   orginPageSettings: state => state.app.orginPageSettings,
 
-  pageList: state => state.app.pageList // 页签列表
+  pageList: state => state.app.pageList, // 页签列表
+
+  isPublish: state => state.app.isPublish
 }
 
 export default getters

@@ -17,6 +17,7 @@
         :data-index="index"
         :detailInfo="detailInfo"
         :errorTables="errorTables"
+        :deleteTables="deleteTables"
       ></tree-node>
     </template>
   </div>
@@ -38,6 +39,7 @@ export default {
       isTree: true,
       info: '',
       renderTables: [], // 用来渲染树组件
+      deleteTables: [], // 删除的节点
       errorTables: [] // 接受错误的tableNo
     }
   },
@@ -107,7 +109,6 @@ export default {
       this.handleMapAddClass()
     },
     handleMapDrop(event) {
-      console.log('right-wrap-drop', event.target.className)
       if (this.nodeStatus.dragType === 'node') return
       Utils.removeClass(this.$refs.mapRef, 'map-hover')
       this.handleDealWithNode()
@@ -116,8 +117,7 @@ export default {
       const tables = this.detailInfo.config.tables
       let len = tables.length
       let node = this.nodeStatus.dragNode
-      node.setTableId()
-      node.setTableNo(tables.length + 1)
+      node.tableNo = tables.length + 1
       if (len === 0) {
         this.generateRoot(node)
       } else {
@@ -125,15 +125,16 @@ export default {
       }
     },
     async generateRoot(node) {
-      console.log(node, node.getProps())
-      this.detailInfo.config.tables.push(node.getProps())
-      await this.handleUpdate({
-        tables: new Array(Object.assign(node.getProps(), {
-          leftTableId: 0,
-          datamodelId: this.modelId
-        }))
+      const getNode = await this.handleGetSingleTableInfo({
+        tableId: node.tableId,
+        datamodelId: this.modelId
       })
-      this.renderTables.push(node)
+
+      const renderNode = new Node(getNode)
+      await this.handleUpdate({
+        tables: [renderNode.getProps()]
+      })
+      this.renderTables.push(renderNode)
     },
     async loopCurrentAddNode(arry, node, key) {
       let current = arry[0]
@@ -143,54 +144,46 @@ export default {
 
       if (current.hasOwnProperty(key)) {
         if (current[key].length === 0) {
-          console.log('获取节点', current, node)
-          await this.getJoin(current, node)
-          current.add(node)
-          this.detailInfo.config.tables.push(node.getProps())
+          const getNode = await this.getJoin(current, node)
+          const renderNode = new Node(getNode)
+          current.add(renderNode)
           await this.handleUpdate({
-            tables: this.detailInfo.config.tables.map(item => {
-              item.datamodelId = this.modelId
-              return item
-            })
+            tables: this.detailInfo.config.tables
           })
-          // new Array(Object.assign(node.getProps(), {
-          //     leftTableId: node.getProps().tableNo,
-          //     tableId: current.getProps().id,
-          //     datamodelId: this.modelId
-          //   }))
-          console.log(this.detailInfo.config.tables)
         } else {
           this.loopCurrentAddNode(current[key], node, key)
         }
       }
     },
-    async getJoin(left, right) {
-      const result = await this.$server.dataModel.getBetweenJoin({
+    /**
+     *@param left 左边数据
+     *@param right 右边数据
+     *@param type 类型：1 表示新增 0表示节点拖动
+     */
+    async getJoin(left, right, type = 1) {
+      const result = await this.$server.dataModel.getSingleTableInfoWithJoin({
         databaseId: this.databaseId,
         datamodelId: this.detailInfo.id,
+        isAddTable: type,
         left: left.getProps(),
-        right: Object.assign(right.getProps(), {
+        right: Object.assign(right, {
           leftTableId: left.getProps().tableNo,
           datamodelId: this.detailInfo.id
         })
       })
       if (result.code === 200) {
-        right.setJoin(result.data)
-        right.setDataModelId(this.detailInfo.id)
+        if (type === 1) {
+          // 如果是新增才处理维度度量
+          this.detailInfo.config.tables.push(result.data.table)
+        }
+        return result.data.table
       } else {
         this.$message.error(result.msg)
       }
     },
     async handleUpdate(params) {
-      // if (params.tables.length < 1) {
-      //   return this.handleClearRenderTables()
-      // }
-      const result = await this.$server.dataModel.getPivotschemaByTables(params)
-      // const result = await this.$server.dataModel.putModelDetail({
-      //   dataConnectionId: this.$route.query.datasourceId,
-      //   dataModelId: this.modelId,
-      //   config: this.detailInfo.config
-      // })
+      // const result = await this.$server.dataModel.getPivotschemaByTables(params)
+      const result = await this.$server.dataModel.getDataModelTableInfoAndPivotshchemaInfo(params)
 
       if (result.code === 200) {
         this.detailInfo.config = result.data.config
@@ -200,6 +193,22 @@ export default {
       } else {
         this.$message.error(result.msg)
       }
+    },
+    async handleGetSingleTableInfo(params) {
+      const result = await this.$server.dataModel.getSingleTableInfo(params)
+      if (result && result.code === 200) {
+        this.doWithResult(result.data.table, result.data.dimensions, result.data.measures)
+        return result.data.table
+      } else {
+        this.$message.error(result.msg || '请求错误')
+      }
+    },
+    doWithResult(table, dimensions = [], measures = []) {
+      this.detailInfo.config.tables.push(table)
+      this.detailInfo.pivotSchema.dimensions = [...this.detailInfo.pivotSchema.dimensions, ...dimensions]
+      this.detailInfo.pivotSchema.measures = [...this.detailInfo.pivotSchema.measures, ...measures]
+      this.$parent.handleDimensions()
+      this.$parent.handleMeasures()
     }
   }
 }
@@ -208,7 +217,7 @@ export default {
 .m-map {
     position: relative;
     box-sizing: border-box;
-    padding: 21px;
+    padding: 14px 21px;
     height: 100%;
     width: 100%;
     -webkit-user-select: none;
