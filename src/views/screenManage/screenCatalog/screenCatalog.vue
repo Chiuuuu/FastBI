@@ -84,8 +84,37 @@
     </div>
     <div class="right scrollbar">
       <div class="right-header" v-if="fileSelectId !== ''">
-        <span class="nav_title">{{ fileSelectName }}</span>
+        <span class="nav_title"
+          >{{ fileSelectName
+          }}{{
+            !isPublish ? '未发布' : releaseObj.valid ? '已过期' : '已发布'
+          }}</span
+        >
         <a-button class="btn_n1" @click="openScreen">全屏</a-button>
+        <a-button class="btn_n1" @click="release"
+          ><span>发布</span>
+          <a-dropdown
+            v-if="isPublish"
+            :trigger="['click']"
+            placement="bottomCenter"
+            v-model="releaceMore"
+          >
+            <a-icon class="icon-more" type="caret-down" />
+            <a-menu slot="overlay" class="drow_menu">
+              <a-menu-item v-on:click="showShare" v-if="hasPermissionSourceAdd">
+                查看分享
+              </a-menu-item>
+              <a-menu-item
+                v-if="hasPermissionFolderAdd"
+                key="1"
+                @click="cancelReleace"
+              >
+                撤销分享
+              </a-menu-item>
+            </a-menu>
+          </a-dropdown></a-button
+        >
+
         <a-button class="btn_n2" @click="$refs.screen.refreshData()"
           >刷新数据</a-button
         >
@@ -149,6 +178,70 @@
       </a-form>
     </a-modal>
 
+    <a-modal
+      v-model="releaseVisible"
+      :title="isPublish ? '查看分享' : '发布分享'"
+    >
+      <template slot="footer">
+        <a-button key="cancel" @click="releaseVisible = false">
+          取消
+        </a-button>
+        <a-button key="submit" type="primary" @click="releaceConfirm">
+          {{ isPublish ? '重新发布' : '发布' }}
+        </a-button>
+        <a-button key="back" v-if="isPublish" @click="releaseVisible = false">
+          确定
+        </a-button>
+      </template>
+      <div class="releace-box" @click="showCode = false">
+        <div class="releace-line">
+          <span class="errortext" v-if="releaseObj.valid"
+            >当前资源已过期，请点击下方按钮重新发布</span
+          >
+        </div>
+        <div class="releace-line">
+          <span class="label">*分享链接：</span
+          ><span class="text" ref="linkUrl">{{ releaseObj.url }}</span>
+        </div>
+        <div class="indent">
+          <span class="indent-text" @click="copyLink">复制链接</span
+          ><a-icon
+            type="qrcode"
+            class="qrcode"
+            :style="{ fontSize: '20px' }"
+            @click.stop="showCode = true"
+          />
+        </div>
+        <div class="releace-line" v-show="showLimitWarn">
+          <span class="errortext">请输入6位数字+字母</span>
+        </div>
+        <div class="releace-line">
+          <span class="label">分享密码：</span
+          ><a-input
+            v-if="!isPublish"
+            v-model="releaseObj.password"
+            class="mod_input"
+            placeholder="请输入6位分享密码（数字+字母）"
+            allowClear
+            :maxLength="6"
+            @change="handlePassword"
+          />
+          <span v-else>{{ releaseObj.password }}</span>
+        </div>
+        <div class="releace-line">
+          <span class="label">*分享时效：</span>
+          <a-radio-group v-if="!isPublish" v-model="releaseObj.expired">
+            <a-radio :value="1">7天</a-radio>
+            <a-radio :value="2">30天</a-radio>
+            <a-radio :value="3">永久</a-radio>
+          </a-radio-group>
+          <span v-else>{{ expiredLabel }}</span>
+        </div>
+        <div class="code-show" v-show="showCode">
+          <a-icon type="qrcode" :style="{ fontSize: '250px' }" />
+        </div>
+      </div>
+    </a-modal>
     <new-folder
       ref="newFolderForm"
       :title="folderTitle"
@@ -189,8 +282,13 @@ export default {
       screenVisible: false, // 新建大屏弹窗
       isAdd: 1, // 1新增 2编辑 3删除
       folderVisible: false, // 新建文件夹弹窗
+      releaseVisible: false, // 发布分享弹窗
       folderTitle: '',
       screenForm: this.$form.createForm(this), // 新建大屏弹窗
+      releaseObj: {}, // 新建大屏弹窗
+      showLimitWarn: false, // 发布大屏验证密码
+      showCode: false, // 二维码大图框
+      releaceMore: false, // 大屏已发布的发布按钮有下拉框
       customStyle:
         'background: #ffffff;border: 0;overflow: hidden;color:#3B3C43;',
       folderContenxtMenu: [
@@ -253,6 +351,15 @@ export default {
       componentKey: 0 // 通过改变key实现子组件强制更新,数值在0,1之间变化
     }
   },
+  watch: {
+    isPublish(val) {
+      debugger
+      // 状态是已发布的提前获取分享信息，显示状态用
+      if (val) {
+        this.getShareData()
+      }
+    }
+  },
   computed: {
     ...mapGetters([
       'pageSettings',
@@ -261,7 +368,8 @@ export default {
       'fileName',
       'isScreen',
       'parentId',
-      'pageList'
+      'pageList',
+      'isPublish'
     ]),
     folderSelectList() {
       return this.folderList.filter(item => item.fileType === 0)
@@ -303,6 +411,19 @@ export default {
         this.$PERMISSION_CODE.OBJECT.screen,
         this.$PERMISSION_CODE.OPERATOR.add
       )
+    },
+    expiredLabel() {
+      switch (this.releaseObj.expired) {
+        case 1:
+          return '7天'
+          break
+        case 2:
+          return '30天'
+          break
+        default:
+          return '永久'
+          break
+      }
     }
   },
   mounted() {
@@ -658,6 +779,115 @@ export default {
         isFull = false
       }
       return isFull
+    },
+    // 发布
+    release() {
+      if (!this.isPublish) {
+        this.$server.screenManage.getScreenLink(this.screenId).then(res => {
+          this.releaseObj = { url: res.data, expired: 1, password: '' }
+          this.releaseVisible = true
+        })
+      } else {
+        this.releaceMore = true
+      }
+    },
+    // 获取分享信息
+    getShareData() {
+      return this.$server.screenManage
+        .showScreenRelease(this.screenId)
+        .then(res => {
+          this.releaseObj = res.data
+          return true
+        })
+    },
+    // 查看分享
+    showShare() {
+      this.releaceMore = false
+      this.releaseVisible = true
+    },
+    copyLink() {
+      let input = document.createElement('input') // 直接构建input
+      input.value = this.$refs.linkUrl.innerText // 设置内容
+      document.body.appendChild(input) // 添加临时实例
+      input.select() // 选择实例内容
+      document.execCommand('Copy') // 执行复制
+      document.body.removeChild(input) // 删除临时实例
+      this.$message.info('复制成功')
+    },
+    // 验证密码
+    handlePassword() {
+      this.releaseObj.password = this.releaseObj.password.replace(/[\W]/g, '')
+      this.showLimitWarn = false
+      if (this.releaseObj.password.length === 6) {
+        // 验证密码
+        if (
+          /^\d*$/.test(this.releaseObj.password) ||
+          /^[a-z]*$/i.test(this.releaseObj.password)
+        ) {
+          this.showLimitWarn = true
+        }
+        return
+      }
+    },
+    // 确认发布
+    releaceConfirm() {
+      // 密码验证不通过
+      if (this.showLimitWarn) {
+        return
+      }
+      // 密码长度不够
+      if (
+        this.releaseObj.password.length > 0 &&
+        this.releaseObj.password.length < 6
+      ) {
+        this.showLimitWarn = true
+        return
+      }
+      this.releaseVisible = false
+      let url = this.releaseObj.url
+      let params = {
+        url: url.substring(url.lastIndexOf('/') + 1, url.length),
+        screenId: this.screenId,
+        password: this.releaseObj.password,
+        expired: this.releaseObj.expired,
+        isValid: true
+      }
+      // 未发布
+      if (!this.isPublish) {
+        this.$server.screenManage.releaseScreen(params).then(res => {
+          if (res.code === 200) {
+            this.$message.success('发布成功')
+            // 状态改为已发布
+            this.$store.dispatch('SetIsPublish', true)
+          }
+        })
+      }
+      // 重新发布
+      else {
+        params.id = this.releaseObj.id
+        this.$server.screenManage.reShareScreen(params).then(res => {
+          if (res.code === 200) {
+            this.$message.success('发布成功')
+            this.releaseObj.valid = true
+          }
+        })
+      }
+    },
+    cancelReleace() {
+      this.$confirm({
+        title: '确认撤销',
+        content: `是否确认撤销分享?`,
+        onOk: async () => {
+          const res = await this.$server.screenManage.delShareScreen(
+            this.screenId
+          )
+          if (res.code === 200) {
+            this.$message.success('撤销成功')
+            // 状态改为未发布
+            this.$store.dispatch('SetIsPublish', false)
+          }
+        }
+      })
     }
   },
   // 跳出大屏模块清除screenId

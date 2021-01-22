@@ -27,7 +27,8 @@ const app = {
     fileName: '',
     parentId: '', // 大屏父id
     screenDataModels: [],
-    pageList: []
+    pageList: [],
+    isPublish: false // 大屏是否已发布
   },
   mutations: {
     SET_CANVAS_RANGE: (state, val) => {
@@ -61,6 +62,9 @@ const app = {
     },
     SET_PAGE_LIST(state, pages) {
       state.pageList = pages
+    },
+    SET_IS_PUBLISH(state, isPublish) {
+      state.isPublish = isPublish
     }
   },
   actions: {
@@ -93,6 +97,9 @@ const app = {
     },
     SetPageList({ commit }, pages) {
       commit('SET_PAGE_LIST', pages)
+    },
+    SetIsPublish({ commit }, isPublish) {
+      commit('SET_IS_PUBLISH', isPublish)
     },
     // 新建大屏
     async addScreenData({ commit, state }, obj) {
@@ -236,6 +243,7 @@ const app = {
           })
           dispatch('dataModel/setSelectedModelList', res.list)
           commit('common/SET_PRIVILEGES', res.data.privileges || [])
+          commit('SET_IS_PUBLISH', res.data.isPublish)
           return true
         }
       })
