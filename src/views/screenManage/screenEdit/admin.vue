@@ -21,13 +21,17 @@
           @mouseleave="handleNoHover(transform)"
         >
           <div class="item" v-if="coverageExpand">
-            <a-icon
+            <!-- <a-icon
               v-if="transform.setting.icon"
               :type="transform.setting.icon"
             />
             <icon-font
               v-if="transform.setting.iconFont"
               :type="transform.setting.iconFont"
+            /> -->
+            <img
+              style="width:18px;heigth:18px;"
+              :src="require(`@/assets/images/chart/${transform.setting.icon}`)"
             />
             <a-tooltip v-if="transform.setting.config.title.content.length > 7">
               <template slot="title">{{
@@ -41,13 +45,17 @@
             <!-- <span v-else> {{ transform.setting.title }}</span> -->
           </div>
           <div v-else flex="main:center" style="padding:5px 0">
-            <a-icon
+            <!-- <a-icon
               v-if="transform.setting.icon"
               :type="transform.setting.icon"
             />
             <icon-font
               v-if="transform.setting.iconFont"
               :type="transform.setting.iconFont"
+            /> -->
+            <img
+              style="width:18px;heigth:18px;"
+              :src="require(`@/assets/images/chart/${transform.setting.icon}`)"
             />
           </div>
         </div>

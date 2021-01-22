@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>分享大屏</title>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <link rel="stylesheet/less" href="./screen.less" />
+    <script src="//cdnjs.cloudflare.com/ajax/libs/less.js/2.5.3/less.min.js"></script>
+    <script type="text/javascript" src="./screenData.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <div class="dv-screen" ref="dvScreen">
+        <div class="canvas" :style="canvasPanelStyle">
+          <div class="canvas-panel">
+            <template v-for="transform in canvasMap">
+              <div class="preview-box" :style="contentStyles(transform)">
+                <div class="preview-wrap" :style="dvWrapperStyles(transform)">
+                  <!-- 文本 -->
+                  <!-- <chart-text
+                    v-if="transform.setting.name === 've-text'"
+                    :config="transform.setting.config"
+                    :background="transform.setting.background"
+                  ></chart-text> -->
+
+                  <!-- 图片 -->
+                  <!-- <chart-image
+                  v-else-if="transform.setting.name === 've-image'"
+                  :config="transform.setting.config"
+                  :background="transform.setting.background"
+                ></chart-image> -->
+
+                  <!-- 表格 -->
+                  <!-- <chart-tables
+                  ref="tables"
+                  v-else-if="transform.setting.name === 've-tables'"
+                  :config="transform.setting.config"
+                  :api-data="transform.setting.api_data"
+                  :background="transform.setting.background"
+                  :chartSize="transform.setting.view"
+                ></chart-tables> -->
+                  <!-- <charts-factory
+                  v-else
+                  :type-name="transform.setting.name"
+                  :chart-type="transform.setting.chartType"
+                  :type="transform.setting.type"
+                  :config="transform.setting.config"
+                  :api-data="transform.setting.api_data"
+                  :apis="transform.setting.apis"
+                  :background="transform.setting.background"
+                ></charts-factory> -->
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+      <div class="pagination">
+        <div
+          v-for="(page, index) in tabList"
+          :key="page.id"
+          @click="toOtherPage(page.id)"
+        >
+          <div :class="['page',{'current-select': tabSelect === page.id}]">
+            {{ page.name }}
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      new Vue({
+        el: '#app',
+        data: {
+          screenData: {},
+          canvasMap: [],
+          pageSettings: '',
+          tabList: [],
+          tabSelect: '' //选中的tab
+        },
+        mounted() {
+          console.log(111)
+        },
+        created() {
+          this.screenData = screenData
+          this.pageSettings = this.screenData.setting
+          this.tabList = this.screenData.screenTabList
+          this.tabSelect = this.tabList[0].id // 默认显示第一页的内容
+          this.canvasMap = this.screenData.screenGraphs
+        },
+        computed: {
+          // 画布面板的样式
+          canvasPanelStyle() {
+            return {
+              width: `${this.pageSettings.width}px`,
+              height: `${this.pageSettings.height}px`,
+              transform: `scale(0.5) translate3d(0px, 0px, 0)`,
+              background:
+                this.pageSettings.backgroundType === '1'
+                  ? this.pageSettings.backgroundColor
+                  : `url(${
+                      this.pageSettings.backgroundSrc
+                    }) 0% 0% / 100% 100% no-repeat`
+            }
+          }
+        },
+        methods: {
+          contentStyles(transformData) {
+            return {
+              width: transformData.width + 'px',
+              height: transformData.height + 'px',
+              transform: `translate3d(${transformData.x}px,${
+                transformData.y
+              }px,0)`
+            }
+          },
+          dvWrapperStyles(transformData) {
+            return {
+              transform: 'translateZ(0)',
+              width: transformData.width + 'px',
+              height: transformData.height + 'px',
+              padding: '10px 0'
+            }
+          },
+          toOtherPage(id) {
+            this.tabSelect = id
+          }
+        },
+        compont: {}
+      })
+    </script>
+  </body>
+</html>
