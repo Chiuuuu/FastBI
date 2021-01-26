@@ -171,19 +171,32 @@ export default {
       let params = {
         id: this.screenId
       }
+      console.log(params)
       this.$server.screenManage.actionRefreshScreen({ params }).then(res => {
         if (res.code === 200) {
           let dataItem = res.data
           let ids = Object.keys(dataItem)
+          if (ids.length === 0) {
+            return
+          }
+          let updateList = []
           for (let id of ids) {
-            let keys = Object.keys(dataItem[id])
-            for (let item of keys) {
-              let newData = dataItem[item]
-              let chart = this.canvasMap.find(chart => chart.id + '' === id)
+            let newData = dataItem[id].graphData
+            let chart = this.canvasMap.find(chart => chart.id + '' === id)
+            // 找到chart的表示当前页，直接更新在界面
+            if (chart) {
               this.handleRefreshData({ chart, newData })
             }
+            // 其他页的也要更新
+            else {
+              this.handleRefreshData({ chart: dataItem[id], newData })
+              delete dataItem[id].graphData
+              updateList.push(dataItem[id])
+            }
           }
-          this.$server.screenManage.saveAllChart(this.canvasMap)
+          updateList = updateList.concat(this.canvasMap)
+          //   console.log(JSON.stringify(updateList))
+          this.$server.screenManage.saveAllChart(updateList)
           this.$message.success('刷新成功')
         } else {
           res.msg && this.$message.error(res.msg)

@@ -214,13 +214,8 @@ export default {
       this.height = height + 'px'
 
       // 控制每一列最小长度200
-      let minWidth = this.columns.length * 200
       // 计算表格宽度(表头表格宽度一致)
-      this.tableWidth = Math.max(
-        this.$refs.tableheader.clientWidth,
-        this.$refs.tablebody.clientWidth,
-        minWidth
-      )
+      this.tableWidth = this.columns.length * 200
       // 计算显示尺寸-charttable(比较表的尺寸和缩放框的大小)
       this.showTableSize = {
         tableX: Math.min(this.tableWidth, this.chartSize.width),

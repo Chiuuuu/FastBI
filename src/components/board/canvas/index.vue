@@ -43,7 +43,7 @@ export default {
     return {
       wrapStyle: {},
       screenStyle: {},
-      range: 0.5
+      range: 0.55
     }
   },
   mounted() {
@@ -93,6 +93,7 @@ export default {
           width: `${this.pageSettings.width * val + 120}px`,
           height: `${this.pageSettings.height * val + 120}px`
         }
+        this.SetCanvasRange(val)
       },
       deep: true,
       immediate: true
