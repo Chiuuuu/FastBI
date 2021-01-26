@@ -91,7 +91,20 @@
         <a-form :form="modelForm" :label-col="{ span: 3 }" :wrapper-col="{ span: 12 }">
           <a-form-item label="数据模型名称">
             <a-input
-              v-decorator="['name', { rules: [{ required: true, message: '请输入名称!' }] }]"
+              v-decorator="['name', {
+                rules: [
+                  {
+                    required: true,
+                    message: '请填写名称'
+                  },
+                  {
+                    type: 'string',
+                    min: 1,
+                    max: 20,
+                    message: '请输入1-20个字的名称'
+                  }
+                ]
+              }]"
             />
           </a-form-item>
         </a-form>
