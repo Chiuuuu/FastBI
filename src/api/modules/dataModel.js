@@ -176,15 +176,7 @@ export default {
     return $axios.post(`/model/table/getDataSourceTableDataList`, params)
   },
   /**
-   * @description 获取复制字段的id
-   * @param {Object} params 请求参数
-   * @returns
-   */
-  getCopyField(params) {
-    return $axios.post(`/model/pivotschema/getCopyField`, params)
-  },
-  /**
-   * @description 新建计算维度度量
+   * @description 新建计算维度度量/获取复制字段
    * @param {Object} params 请求参数
    * @param {String} params.name 字段名称
    * @param {Number} params.role 字段角色，4：计算维度，5：计算度量
