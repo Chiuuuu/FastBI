@@ -545,19 +545,15 @@ export default {
       const isMeasures = role === 2
       let newField = {
         ...vm.itemData,
-        id: '',
+        datamodelId: this.model === 'add' ? this.addModelId : this.modelId,
         expr: vm.itemData.produceType === 0 ? `$$${vm.itemData.id}` : vm.itemData.expr,
-        raw_expr: vm.itemData.produceType === 0 ? `[${vm.itemData.alias}]` : vm.itemData.raw_expr,
-        tableNo: 0,
-        tableName: '自定义' + (isDimension ? '维度' : '度量')
+        raw_expr: vm.itemData.produceType === 0 ? `[${vm.itemData.alias}]` : vm.itemData.raw_expr
       }
-
-      const result = await this.$server.dataModel.getCopyField(newField)
+      const result = await this.$server.dataModel.addCustomizModelPivotschema(newField)
       if (result.code === 200) {
         newField = {
           ...newField,
-          ...result.data,
-          status: 0
+          ...result.data
         }
         const arry = [...this.detailInfo.pivotSchema.dimensions, ...this.detailInfo.pivotSchema.measures, ...this.cacheDimensions, ...this.cacheMeasures]
         newField.alias = this.handleAddCustomField(arry, newField, newField.alias)
