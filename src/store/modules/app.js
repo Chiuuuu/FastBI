@@ -18,7 +18,7 @@ const app = {
     orginPageSettings,
     pageSettings: orginPageSettings,
     // 状态数据
-    canvasRange: 0.5, // 画布缩放
+    canvasRange: 0.55, // 画布缩放
     optionsExpand: true, // 参数面板打开关闭
     modelExpand: true, // 8-14数据模型面板
     coverageExpand: false, // 图层面板打开关闭
@@ -264,7 +264,11 @@ const app = {
         ]
         chart.setting.api_data.source.rows = rows
 
-        if (chart.setting.chartType === 'v-gauge') {
+        // 仪表盘
+        if (
+          chart.setting.chartType === 'v-gauge' &&
+          chart.setting.api_data.measures[1]
+        ) {
           let goalTotal = sum(newData, Object.keys(newData[0])[1])
           chart.setting.config.series.max = goalTotal
         }

@@ -14,7 +14,7 @@
       <span>{{ config.title.content }}</span>
     </div>
     <component
-      v-if="this.chartData.columns.length > 0"
+      v-if="chartData.columns && chartData.columns.length > 0"
       v-bind:is="typeName"
       :events="chartEvents"
       :data="chartData"
@@ -122,6 +122,9 @@ export default {
           // 只有度量的情况
           if (this.type === '2') {
             if (val.measures && val.measures.length > 0) {
+              if (!val.source) {
+                return
+              }
               this.chartData = val.source
               if (this.chartType === 'v-ring') {
                 this.chartExtend.chartTitle.text = val.source.rows
@@ -143,6 +146,9 @@ export default {
               val.measures.length > 0 &&
               val.source
             ) {
+              if (!val.source) {
+                return
+              }
               this.chartData = val.source
               return
             }

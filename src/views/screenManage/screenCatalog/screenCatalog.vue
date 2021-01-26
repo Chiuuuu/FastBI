@@ -87,7 +87,7 @@
         <span class="nav_title"
           >{{ fileSelectName
           }}{{
-            !isPublish ? '未发布' : releaseObj.valid ? '已过期' : '已发布'
+            !isPublish ? '未发布' : releaseObj.valid ? '已发布' : '已过期'
           }}</span
         >
         <a-button class="btn_n1" @click="openScreen">全屏</a-button>
@@ -195,16 +195,17 @@
       </template>
       <div class="releace-box" @click="showCode = false">
         <div class="releace-line">
-          <span class="errortext" v-if="releaseObj.valid"
+          <span class="errortext" v-if="!releaseObj.valid"
             >当前资源已过期，请点击下方按钮重新发布</span
           >
         </div>
         <div class="releace-line">
           <span class="label">*分享链接：</span
-          ><span class="text" ref="linkUrl">{{ releaseObj.url }}</span>
+          ><span class="text">{{ releaseObj.url }}</span>
         </div>
         <div class="indent">
-          <span class="indent-text" @click="copyLink">复制链接</span
+          <span class="indent-text" @click="copyLink(releaseObj.url)"
+            >复制链接</span
           ><a-icon
             type="qrcode"
             class="qrcode"
@@ -353,7 +354,6 @@ export default {
   },
   watch: {
     isPublish(val) {
-      debugger
       // 状态是已发布的提前获取分享信息，显示状态用
       if (val) {
         this.getShareData()
@@ -416,13 +416,10 @@ export default {
       switch (this.releaseObj.expired) {
         case 1:
           return '7天'
-          break
         case 2:
           return '30天'
-          break
         default:
           return '永久'
-          break
       }
     }
   },
@@ -670,8 +667,8 @@ export default {
         this.$message.error(' 请先添加大屏目录数据或者选择一个大屏目录')
         return
       }
-      // 编辑大屏默认缩放是0.5
-      this.SetCanvasRange(0.5)
+      // 编辑大屏默认缩放是0.55
+      this.SetCanvasRange(0.55)
       this.$router.push({
         name: 'screenEdit',
         query: {
@@ -805,14 +802,18 @@ export default {
       this.releaceMore = false
       this.releaseVisible = true
     },
-    copyLink() {
+    copyLink(url) {
       let input = document.createElement('input') // 直接构建input
-      input.value = this.$refs.linkUrl.innerText // 设置内容
+      input.value = url // 设置内容
       document.body.appendChild(input) // 添加临时实例
       input.select() // 选择实例内容
-      document.execCommand('Copy') // 执行复制
+      const textResult = document.execCommand('Copy') // 执行复制
       document.body.removeChild(input) // 删除临时实例
-      this.$message.info('复制成功')
+      if (textResult) {
+        this.$message.info('复制成功')
+      } else {
+        this.$message.err('复制失败')
+      }
     },
     // 验证密码
     handlePassword() {
@@ -826,7 +827,6 @@ export default {
         ) {
           this.showLimitWarn = true
         }
-        return
       }
     },
     // 确认发布
