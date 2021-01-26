@@ -272,6 +272,7 @@ export default {
     // 获取当前文件对应的数据库信息
     async handleGetDataBase(index) {
       if (this.loading) return
+      this.currentSheetIndex = 0
       if (index < 0) {
         this.currentColumns = []
         this.currentFieldList = []
