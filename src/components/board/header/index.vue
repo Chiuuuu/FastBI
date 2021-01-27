@@ -121,6 +121,11 @@ export default {
     onBlur() {
       if (this.screenName === '') {
         this.screenName = this.fileName
+        this.isFocus = false
+        return
+      }
+      if (this.screenName === this.fileName) {
+        this.isFocus = false
         return
       }
       this.isFocus = false

@@ -266,17 +266,24 @@ export default {
 
       let data = this.currSelected.setting.api_data
       if (this.chartType === '1') {
-        if (!data.dimensions.length && !data.measures.length) {
+        if (data.dimensions.length === 0 && data.measures.length === 0) {
           selected.datamodelId = 0
           this.updateChartData()
           return
         }
-        if (!data.dimensions.length || !data.measures.length) {
+        if (data.dimensions.length === 0 || data.measures.length === 0) {
           return
         }
       }
       if (this.chartType === '2') {
-        if (!data.measures.length) {
+        if (data.measures.length === 0) {
+          selected.datamodelId = 0
+          this.updateChartData()
+          return
+        }
+      }
+      if (this.chartType === '3') {
+        if (data.tableList.length === 0) {
           selected.datamodelId = 0
           this.updateChartData()
           return

@@ -158,7 +158,17 @@ export default {
               //   }
             }
             this.columns = val.source.columns
-            this.tableData = val.source.rows
+            let rows = val.source.rows
+            let newRows = []
+            // 给列数据key重新排序
+            for (let row of rows) {
+              let newObj = {}
+              for (let col of this.columns) {
+                newObj[col.title] = row[col.title]
+              }
+              newRows.push(newObj)
+            }
+            this.tableData = newRows
             this._calcStyle()
             return
           }
@@ -174,7 +184,10 @@ export default {
       handler(val) {
         if (val) {
           this.backgroundStyle = {
-            backgroundColor: val.backgroundColor,
+            background:
+              val.backgroundType === '1'
+                ? val.backgroundColor
+                : `url(${val.backgroundSrc}) 0% 0% / 100% 100% no-repeat`,
             borderColor: val.borderColor,
             borderWidth: val.borderWidth + 'px',
             borderStyle: val.borderStyle,
@@ -245,7 +258,7 @@ export default {
           'text-align': this.config.table.textStyle.textAlign,
           'font-size': this.config.table.textStyle.fontSize + 'px',
           'font-weight': this.config.table.textStyle.fontWeight,
-          background: this.config.table.oddBackgroundColor,
+          backgroundColor: this.config.table.oddBackgroundColor,
           'white-space': this.config.table.ellipsis ? 'normal' : 'nowrap'
           //   }
         }
@@ -256,7 +269,7 @@ export default {
           'text-align': this.config.table.textStyle.textAlign,
           'font-size': this.config.table.textStyle.fontSize + 'px',
           'font-weight': this.config.table.textStyle.fontWeight,
-          background: this.config.table.evenBackgroundColor,
+          backgroundColor: this.config.table.evenBackgroundColor,
           'white-space': this.config.table.ellipsis ? 'normal' : 'nowrap'
           //   }
         }
