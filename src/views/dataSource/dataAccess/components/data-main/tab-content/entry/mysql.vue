@@ -25,7 +25,7 @@
             <span>用户名：您用于登录数据库的用户名。</span><br>
             <span>密码：您用于登录数据库的用户名的密码。</span><br>
             <span>默认连接数据库：您可以选择默认的连接库作为访问的第一个展示库。</span><br><br>
-            <span>注意：</span><br>
+            <span><span style="color: #f00">注意</span>：</span><br>
             <span>若您需要访问到您的数据库，您需要将产品的服务器IP与访问的数据库IP网络打通，以确保能连接上（可以咨询您的系统运维人员/数据库管理员）。</span><br>
             <span>MYSQL数据库暂时支持5.7等常用版本。</span>
           </div>
@@ -34,7 +34,7 @@
       </a-popover>
     </a-form-model-item>
     <a-form-model-item label="服务器" prop="ip">
-      <a-input placeholder="请输入服务器" v-model="form.ip" />
+      <a-input placeholder="请输入服务器ip地址" v-model="form.ip" />
     </a-form-model-item>
     <a-form-model-item label="端口" prop="port">
       <a-input placeholder="请输入端口" v-model.number="form.port" />
