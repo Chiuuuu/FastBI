@@ -186,16 +186,14 @@ export default {
             // 找到chart的表示当前页，直接更新在界面
             if (chart) {
               this.handleRefreshData({ chart, newData })
-            }
-            // 其他页的也要更新
-            else {
+            } else {
+              // 其他页的也要更新
               this.handleRefreshData({ chart: dataItem[id], newData })
               delete dataItem[id].graphData
               updateList.push(dataItem[id])
             }
           }
           updateList = updateList.concat(this.canvasMap)
-          //   console.log(JSON.stringify(updateList))
           this.$server.screenManage.saveAllChart(updateList)
           this.$message.success('刷新成功')
         } else {

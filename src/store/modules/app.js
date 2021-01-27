@@ -142,9 +142,8 @@ const app = {
         params.id = id
         params.newName = name
         params.setting = setting
-      }
-      // 普通保存
-      else {
+      } else {
+        // 普通保存
         // 保存图层排序列表，图层操作，新增，删除顺序会变，所以这三个操作要调这个接口
         state.pageSettings.idList = rootGetters.canvasMapIdList
 
@@ -272,9 +271,8 @@ const app = {
           let goalTotal = sum(newData, Object.keys(newData[0])[1])
           chart.setting.config.series.max = goalTotal
         }
-      }
-      // 嵌套饼图设置apis
-      else if (chart.setting.chartType === 'v-multiPie') {
+      } else if (chart.setting.chartType === 'v-multiPie') {
+        // 嵌套饼图设置apis
         let rows = []
         let dimensionKeys = chart.setting.apiData.dimensions.map(
           item => item.alias

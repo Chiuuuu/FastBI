@@ -233,6 +233,14 @@ const screenManage = {
     return $axios.post('/screen/graph/getData', params)
   },
   /**
+   * @description 度量原始数据类型是否数值类型
+   * @param {*} params
+   * @returns
+   */
+  getMeasureCheck(pivotschemaId) {
+    return $axios.get(`/screen/graph/measureCheck/${pivotschemaId}`)
+  },
+  /**
    * @description 根据数据筛选数据列表
    * @param {*} params
    * @returns
