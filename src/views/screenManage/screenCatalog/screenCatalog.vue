@@ -85,7 +85,7 @@
     <div class="right scrollbar">
       <div class="right-header" v-if="fileSelectId !== ''">
         <span class="nav_title">{{ fileSelectName }} </span>
-        <img
+        <!-- <img
           style="width:18px;heigth:18px;"
           :src="
             require(`@/assets/images/chart/${
@@ -96,12 +96,27 @@
                 : 'timeout.png'
             }`)
           "
+        /> -->
+        <img
+          v-show="isPublish === 0"
+          style="width:18px;heigth:18px;"
+          src="@/assets/images/chart/notpublish.png"
+        />
+        <img
+          v-show="isPublish === 1 && releaseObj.valid"
+          style="width:18px;heigth:18px;"
+          src="@/assets/images/chart/published.png"
+        />
+        <img
+          v-show="isPublish === 1 && !releaseObj.valid"
+          style="width:18px;heigth:18px;"
+          src="@/assets/images/chart/timeout.png"
         />
         <a-button class="btn_n1" @click="openScreen">全屏</a-button>
         <a-button class="btn_n1" @click="release"
           ><span>发布</span>
           <a-dropdown
-            v-if="isPublish === 1"
+            v-show="isPublish === 1"
             :trigger="['click']"
             placement="bottomCenter"
             v-model="releaceMore"
@@ -365,6 +380,7 @@ export default {
   },
   watch: {
     isPublish(val) {
+      debugger
       // 状态是已发布的提前获取分享信息，显示状态
       if (val === 1) {
         this.getShareData()
@@ -881,7 +897,7 @@ export default {
           if (res.code === 200) {
             this.$message.success('发布成功')
             // 状态改为已发布
-            this.$store.dispatch('SetIsPublish', true)
+            this.$store.dispatch('SetIsPublish', 1)
           }
         })
       } else {
@@ -906,7 +922,7 @@ export default {
           if (res.code === 200) {
             this.$message.success('撤销成功')
             // 状态改为未发布
-            this.$store.dispatch('SetIsPublish', false)
+            this.$store.dispatch('SetIsPublish', 0)
           }
         }
       })

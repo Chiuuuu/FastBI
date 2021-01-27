@@ -28,7 +28,7 @@ const app = {
     parentId: '', // 大屏父id
     screenDataModels: [],
     pageList: [],
-    isPublish: false // 大屏是否已发布
+    isPublish: '' // 大屏是否已发布
   },
   mutations: {
     SET_CANVAS_RANGE: (state, val) => {
