@@ -5,7 +5,11 @@
       :key="page.id"
       @click="toOtherPage(page.id)"
     >
-      <a-dropdown :trigger="['contextmenu']" v-model="page.showDropDown">
+      <a-dropdown
+        :trigger="['contextmenu']"
+        v-model="page.showDropDown"
+        placement="topCenter"
+      >
         <div
           :class="[
             'page',
@@ -191,6 +195,7 @@ export default {
         onOk: async () => {
           const res = await this.$server.screenManage.deleteScreenTab(page.id)
           if (res.code === 200) {
+            this.$message.success('删除成功')
             // 如果删除的是当前选中的页签，跳转到上一个页签,如果是第一页就跳转到第二页
             if (this.$route.query.tabId === page.id) {
               this.toOtherPage(

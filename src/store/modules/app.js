@@ -154,7 +154,7 @@ const app = {
         .saveScreenNew(params)
         .then(res => {
           if (res.code === 200) {
-            res.msg && message.success(res.msg)
+            // res.msg && message.success(res.msg)
             return true
           } else {
             res.msg && message.error(res.msg)

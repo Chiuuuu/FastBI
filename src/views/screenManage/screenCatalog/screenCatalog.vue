@@ -357,14 +357,14 @@ export default {
           name: '重命名',
           onClick: this.handleResetFile
         },
-        {
-          name: '复制',
-          //   permission: {
-          //     OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove,
-          //     OBJECT: this.$PERMISSION_CODE.OBJECT.screen
-          //   },
-          onClick: this.copyScreen
-        },
+        // {
+        //   name: '复制',
+        //   //   permission: {
+        //   //     OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove,
+        //   //     OBJECT: this.$PERMISSION_CODE.OBJECT.screen
+        //   //   },
+        //   onClick: this.copyScreen
+        // },
         {
           name: '删除',
           permission: {
@@ -380,7 +380,6 @@ export default {
   },
   watch: {
     isPublish(val) {
-      debugger
       // 状态是已发布的提前获取分享信息，显示状态
       if (val === 1) {
         this.getShareData()
@@ -486,6 +485,7 @@ export default {
             if (this.folderList[0].children.length > 0) {
               this.fileSelectId = this.folderList[0].children[0].id
               this.fileSelectName = this.folderList[0].children[0].name
+              return
             }
             this.fileSelectId = this.folderList[0].id
             this.fileSelectName = this.folderList[0].name
