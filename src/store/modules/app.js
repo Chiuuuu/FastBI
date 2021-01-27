@@ -207,11 +207,14 @@ const app = {
         datamodelId: chart.datamodelId || 0
       }
       screenManage.deleteChart(params).then(res => {
-        dispatch('DelCanvasMap', chart.id)
-        dispatch('SingleSelected', null)
-        dispatch('HideContextMenu')
-        // 保存图层顺序
-        dispatch('saveScreenData')
+        if (res.code === 200) {
+          dispatch('DelCanvasMap', chart.id)
+          dispatch('SingleSelected', null)
+          dispatch('HideContextMenu')
+          // 保存图层顺序
+          dispatch('saveScreenData')
+          message.success('删除成功')
+        }
       })
     },
     // 保存图表

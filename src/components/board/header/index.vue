@@ -113,6 +113,7 @@ export default {
         )
       }
       this.saveScreenData()
+      this.$message.success('保存成功')
       this.$router.go(-1)
     },
     onfocus() {
@@ -138,8 +139,8 @@ export default {
       }
 
       this.saveScreenData({ ...params }).then(res => {
-        console.log(res)
         if (res) {
+          this.$message.success('重命名成功')
           this.$store.dispatch('SetFileName', this.screenName)
         }
       })
