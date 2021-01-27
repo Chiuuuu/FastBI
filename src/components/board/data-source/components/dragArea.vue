@@ -284,9 +284,6 @@ export default {
       }
 
       let params = selected
-      //   console.log(JSON.stringify(params))
-      //   return
-
       let apiData = deepClone(this.currSelected.setting.api_data)
       this.$server.screenManage.getData(params).then(res => {
         if (res.code === 200) {

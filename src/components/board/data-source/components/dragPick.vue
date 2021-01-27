@@ -31,7 +31,22 @@
     </div>
     <div class="empty" :class="{ field: isdrag }">拖入字段</div>
 
-    <a-modal v-model="screenVisible" title="数据筛选" @ok="handleOk">
+    <a-modal v-model="screenVisible" title="数据筛选">
+      <template slot="footer">
+        <a-button key="cancel" @click="screenVisible = false">
+          取消
+        </a-button>
+        <a-button
+          key="submit"
+          type="primary"
+          :style="{
+            background: isNoSelectData ? 'grey' : '#617BFF'
+          }"
+          @click="handleOk"
+        >
+          确定
+        </a-button>
+      </template>
       <div v-if="currentFile.file === 'dimensions'">
         <a-radio-group v-model="currentFile.operation">
           <a-radio :value="'list'">列表</a-radio>
@@ -58,7 +73,7 @@
             <a-checkbox-group
               class="f-flexcolumn"
               v-model="currentFile.checkedList"
-              :options="currentFile.originList"
+              :options="currentFile.searchList"
               @change="onChange"
             />
           </b-scrollbar>
@@ -132,6 +147,11 @@
                 class="inputnumber"
                 style="text-overflow: clip;"
               ></a-input-number>
+              <a-icon
+                @click="delectCondition(index)"
+                class="icon"
+                type="close"
+              />
             </div>
           </b-scrollbar>
         </div>
@@ -207,6 +227,19 @@ export default {
     ]),
     chartType() {
       return this.currSelected ? this.currSelected.setting.type : ''
+    },
+    isNoSelectData() {
+      if (
+        Object.keys(this.currentFile).length > 0 &&
+        this.currentFile.file === 'dimensions' &&
+        ((this.currentFile.operation === 'list' &&
+          this.currentFile.checkedList.length === 0) ||
+          (this.currentFile.operation === 'manual' &&
+            this.currentFile.manualList.length === 0))
+      ) {
+        return true
+      }
+      return false
     }
   },
   methods: {
@@ -215,10 +248,12 @@ export default {
     async handleDropOnFilesWD(event) {
       this.isExist = false
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
+      console.log('tt', dataFile)
 
       // 验重
-      if (this.fileList.includes(dataFile)) {
+      if (this.fileList.some(item => dataFile.alias === item.alias)) {
         this.$message.error(`${dataFile.alias}已存在`)
+        this.isdrag = false
         return
       }
 
@@ -228,21 +263,28 @@ export default {
       if (dataFile.file === 'dimensions') {
         // 获取维度对应字段列表
         let params = { datamodelId: dataFile.modelId, dimensions: [dataFile] }
-        // console.log(JSON.stringify(params))
         let res = await this.$server.screenManage.getDataPick(params)
         if (res.code === 200) {
           // 拆维度列表
           dataFile.originList = res.rows.map(item => Object.values(item)[0]) // 维度全字段列表
+          dataFile.searchList = dataFile.originList
           dataFile.checkedList = [] // 勾选的字段列表
           dataFile.manualList = [] // 手动输入列表
           dataFile.operation = 'list' // 列表/手动,'list'/'manual'
         } else {
           res.msg && this.$message.error(res.msg)
+          return
         }
-      }
-      // 对应的是度量
-      else {
-        dataFile.conditionList = [] // 条件行
+      } else {
+        // 对应的是度量
+        let { pivotschemaId } = dataFile
+        let res = await this.$server.screenManage.getMeasureCheck(pivotschemaId)
+        if (res.code === 200 && res.data) {
+          dataFile.conditionList = [] // 条件行
+        } else {
+          this.$message.error('当前字段为文本类型，无法进行数值区间筛选')
+          return
+        }
       }
       dataFile.type = 1 // 只显示、排除,'include'/'exclude'
 
@@ -273,19 +315,29 @@ export default {
     // 列表模糊查询
     search() {
       if (!this.listValue) {
+        this.currentFile.searchList = this.currentFile.originList
         return
       }
-      this.currentFile.originList.forEach(item => {
-        if (item.indexOf(this.listValue) > -1) {
-          this.currentFile.checkedList.push(item)
-        }
-      })
+      this.currentFile.searchList = this.currentFile.originList.filter(
+        item => item.indexOf(this.listValue) > -1
+      )
     },
     // 点击再次打开数据筛选弹窗
-    showSelect(item) {
+    async showSelect(item) {
       this.isExist = true
       this.currentFile = item
+      this.listValue = '' // 列表模糊查询输入值
+      this.manualValue = '' // 手动输入值
       if (item.file === 'dimensions') {
+        let params = {
+          datamodelId: this.currentFile.modelId,
+          dimensions: [this.currentFile]
+        }
+        let res = await this.$server.screenManage.getDataPick(params)
+        this.currentFile.originList = res.rows.map(
+          item => Object.values(item)[0]
+        ) // 维度全字段列表
+        this.currentFile.searchList = this.currentFile.originList
         this.onChange()
       }
       this.screenVisible = true
@@ -337,9 +389,16 @@ export default {
         delete item.secondValue
       }
     },
+    delectCondition(index) {
+      this.currentFile.conditionList.splice(index, 1)
+    },
     async handleOk() {
-      // 关闭弹窗
-      this.screenVisible = false
+      if (
+        this.currentFile.checkedList.length === 0 ||
+        this.currentFile.manualList.length === 0
+      ) {
+        return
+      }
       let apiData = deepClone(this.currSelected.setting.api_data)
 
       let dimensionsLimitList = []
@@ -351,6 +410,8 @@ export default {
           this.currentFile.operation === 'list'
             ? this.currentFile.checkedList
             : this.currentFile.manualList
+        delete this.currentFile.originList // 不上传，再点击的时候重新获取
+        delete this.currentFile.searchList // 不上传，模糊查询用的
         if (this.isExist) {
           let file = this.fileList.find(
             item => item.alias === this.currentFile.alias
@@ -359,19 +420,28 @@ export default {
         } else {
           this.fileList.push(this.currentFile)
         }
-
-        // 构造dataDimensionsLimit列表
-        this.fileList.forEach(item => {
-          if (item.file === 'dimensions') {
-            let { pivotschemaId, type, dataType, value } = item
-            dimensionsLimitList.push({ pivotschemaId, type, dataType, value })
-          }
-        })
-      }
-      // 处理度量筛选数据
-      else {
+      } else {
+        if (
+          this.currentFile.conditionList.some(
+            item =>
+              !item.firstValue ||
+              (item.condition === 'range' && !item.secondValue)
+          )
+        ) {
+          this.$message.error('请输入筛选数值')
+          return
+        }
+        // 处理度量筛选数据
         // 如果是排除的，action取补集符号
         this.currentFile.conditionList.forEach(item => {
+          if (!item.firstValue) {
+            this.$message.error('请输入筛选数值')
+            return
+          }
+          if (item.condition === 'range' && !item.secondValue) {
+            this.$message.error('请输入范围第二个筛选数值')
+            return
+          }
           switch (item.condition) {
             case 'range':
               item.action = item.condition
@@ -411,19 +481,26 @@ export default {
         } else {
           this.fileList.push(this.currentFile)
         }
-        // 构造dataDimensionsLimit列表
-        this.fileList.forEach(item => {
-          if (item.file === 'measures') {
-            let { pivotschemaId, type, dataType, conditionList } = item
-            measuresLimitList.push({
-              pivotschemaId,
-              type,
-              dataType,
-              value: conditionList
-            })
-          }
-        })
       }
+
+      // 关闭弹窗
+      this.screenVisible = false
+
+      // 构造dataDimensionsLimit,dataDimensionsLimit列表
+      this.fileList.forEach(item => {
+        if (item.file === 'dimensions') {
+          let { pivotschemaId, type, dataType, value } = item
+          dimensionsLimitList.push({ pivotschemaId, type, dataType, value })
+        } else {
+          let { pivotschemaId, type, dataType, conditionList } = item
+          measuresLimitList.push({
+            pivotschemaId,
+            type,
+            dataType,
+            value: conditionList
+          })
+        }
+      })
 
       let options = {
         fileList: this.fileList,
@@ -453,7 +530,6 @@ export default {
     // 根据维度度量获取数据
     getData() {
       let apiData = deepClone(this.currSelected.setting.api_data)
-      //   console.log(JSON.stringify(this.currSelected))
       this.$server.screenManage.getData(this.currSelected).then(res => {
         if (res.code === 200) {
           // 查不到数据
