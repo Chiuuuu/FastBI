@@ -84,17 +84,24 @@
     </div>
     <div class="right scrollbar">
       <div class="right-header" v-if="fileSelectId !== ''">
-        <span class="nav_title"
-          >{{ fileSelectName
-          }}{{
-            !isPublish ? '未发布' : releaseObj.valid ? '已发布' : '已过期'
-          }}</span
-        >
+        <span class="nav_title">{{ fileSelectName }} </span>
+        <img
+          style="width:18px;heigth:18px;"
+          :src="
+            require(`@/assets/images/chart/${
+              isPublish === 0
+                ? 'notpublish.png'
+                : releaseObj.valid
+                ? 'published.png'
+                : 'timeout.png'
+            }`)
+          "
+        />
         <a-button class="btn_n1" @click="openScreen">全屏</a-button>
         <a-button class="btn_n1" @click="release"
           ><span>发布</span>
           <a-dropdown
-            v-if="isPublish"
+            v-if="isPublish === 1"
             :trigger="['click']"
             placement="bottomCenter"
             v-model="releaceMore"
@@ -180,22 +187,26 @@
 
     <a-modal
       v-model="releaseVisible"
-      :title="isPublish ? '查看分享' : '发布分享'"
+      :title="isPublish === 1 ? '查看分享' : '发布分享'"
     >
       <template slot="footer">
         <a-button key="cancel" @click="releaseVisible = false">
           取消
         </a-button>
         <a-button key="submit" type="primary" @click="releaceConfirm">
-          {{ isPublish ? '重新发布' : '发布' }}
+          {{ isPublish === 1 ? '重新发布' : '发布' }}
         </a-button>
-        <a-button key="back" v-if="isPublish" @click="releaseVisible = false">
+        <a-button
+          key="back"
+          v-if="isPublish === 1"
+          @click="releaseVisible = false"
+        >
           确定
         </a-button>
       </template>
       <div class="releace-box" @click="showCode = false">
         <div class="releace-line">
-          <span class="errortext" v-if="!releaseObj.valid"
+          <span class="errortext" v-if="isPublish === 1 && !releaseObj.valid"
             >当前资源已过期，请点击下方按钮重新发布</span
           >
         </div>
@@ -219,7 +230,7 @@
         <div class="releace-line">
           <span class="label">分享密码：</span
           ><a-input
-            v-if="!isPublish"
+            v-if="isPublish === 0"
             v-model="releaseObj.password"
             class="mod_input"
             placeholder="请输入6位分享密码（数字+字母）"
@@ -231,7 +242,7 @@
         </div>
         <div class="releace-line">
           <span class="label">*分享时效：</span>
-          <a-radio-group v-if="!isPublish" v-model="releaseObj.expired">
+          <a-radio-group v-if="isPublish === 0" v-model="releaseObj.expired">
             <a-radio :value="1">7天</a-radio>
             <a-radio :value="2">30天</a-radio>
             <a-radio :value="3">永久</a-radio>
@@ -354,9 +365,15 @@ export default {
   },
   watch: {
     isPublish(val) {
-      // 状态是已发布的提前获取分享信息，显示状态用
-      if (val) {
+      // 状态是已发布的提前获取分享信息，显示状态
+      if (val === 1) {
         this.getShareData()
+      }
+    },
+    fileSelectId(val) {
+      // 切换大屏清空是否发布
+      if (val) {
+        this.$store.dispatch('SetIsPublish', '')
       }
     }
   },
@@ -454,6 +471,8 @@ export default {
               this.fileSelectId = this.folderList[0].children[0].id
               this.fileSelectName = this.folderList[0].children[0].name
             }
+            this.fileSelectId = this.folderList[0].id
+            this.fileSelectName = this.folderList[0].name
           }
         }
       })
@@ -583,13 +602,7 @@ export default {
       this.id = file.id
       this.screenVisible = true
       this.pid = parent.id
-
-      // 获取需要改名字的大屏的配置信息(因为可能会跟当前选中的大屏不是同一个)
-      this.$server.screenManage.getScreenDetailById(this.id).then(res => {
-        if (res.code === 200) {
-          this.setting = res.data.setting
-        }
-      })
+      this.screenName = file.name
 
       // dom渲染以后才能给form赋值
       this.$nextTick(() => {
@@ -627,7 +640,7 @@ export default {
         if (err) {
           return
         }
-        this.fileSelectId = ''
+        // this.fileSelectId = ''
         if (this.isAdd === 1) {
           // 新增
           // 新建大屏清空模型列表
@@ -636,25 +649,35 @@ export default {
           this.fileSelectName = values.name
           // 新建默认赋予所有权限
           this.$store.commit('common/SET_PRIVILEGES', [0])
-        }
-        // 移动大屏
-        else if (this.isAdd === 3) {
+        } else if (this.isAdd === 3) {
+          // 移动大屏
           // 没有选文件夹保存在外面
           this.handleFileMoveCreate(values.parentId || '0')
         } else {
-          // 编辑
-          let params = {
-            fileType: 1,
-            id: this.id,
-            parentId: this.pid,
-            setting: this.setting,
-            ...values
+          if (values.name !== this.screenName) {
+            // 获取需要改名字的大屏的配置信息(因为可能会跟当前选中的大屏不是同一个)
+            this.$server.screenManage
+              .getScreenDetailById(this.id, this.pageList[0].id)
+              .then(res => {
+                if (res.code === 200) {
+                  this.setting = res.data.setting
+                  this.$store.dispatch('SetIsPublish', res.data.isPublish)
+                  // 编辑
+                  let params = {
+                    fileType: 1,
+                    id: this.id,
+                    parentId: this.pid,
+                    setting: this.setting,
+                    ...values
+                  }
+                  this.saveScreenData({ ...params }).then(res => {
+                    if (res) {
+                      this.getList()
+                    }
+                  })
+                }
+              })
           }
-          this.saveScreenData({ ...params }).then(res => {
-            if (res) {
-              this.getList()
-            }
-          })
           // this.$server.common.putMenuFolderName('/screen/catalog', params)
         }
         this.screenForm.resetFields()
@@ -726,7 +749,7 @@ export default {
                 this.$message.success(res.msg)
                 this.getList()
               } else {
-                this.$message.error(res.data.msg)
+                this.$message.error(res.msg)
               }
             })
         }
@@ -779,7 +802,7 @@ export default {
     },
     // 发布
     release() {
-      if (!this.isPublish) {
+      if (this.isPublish === 0) {
         this.$server.screenManage.getScreenLink(this.screenId).then(res => {
           this.releaseObj = { url: res.data, expired: 1, password: '' }
           this.releaseVisible = true
@@ -850,10 +873,10 @@ export default {
         screenId: this.screenId,
         password: this.releaseObj.password,
         expired: this.releaseObj.expired,
-        isValid: true
+        valid: true
       }
       // 未发布
-      if (!this.isPublish) {
+      if (this.isPublish === 0) {
         this.$server.screenManage.releaseScreen(params).then(res => {
           if (res.code === 200) {
             this.$message.success('发布成功')
@@ -861,9 +884,8 @@ export default {
             this.$store.dispatch('SetIsPublish', true)
           }
         })
-      }
-      // 重新发布
-      else {
+      } else {
+        // 重新发布
         params.id = this.releaseObj.id
         this.$server.screenManage.reShareScreen(params).then(res => {
           if (res.code === 200) {
