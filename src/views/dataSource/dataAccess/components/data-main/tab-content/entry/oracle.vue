@@ -26,7 +26,7 @@
             <span>密码：您用于登录数据库的用户名的密码。</span><br>
             <span>连接方式：通常为您数据库的实例名称或者服务名称。</span><br>
             <span>所属组：默认展示您账号下的库，可选择其他所属组账号进行查询展示。</span><br><br>
-            <span>注意：</span><br>
+            <span><span style="color: #f00">注意</span>：</span><br>
             <span>若您需要访问到您的数据库，您需要将产品的服务器IP与访问的数据库IP网络打通，以确保能连接上（可以咨询您的系统运维人员/数据库管理员）。</span><br>
             <span>Oracle数据库暂时支持10和11等常用大版本。</span>
           </div>
@@ -35,7 +35,7 @@
       </a-popover>
     </a-form-model-item>
     <a-form-model-item label="服务器" prop="ip">
-      <a-input placeholder="请输入服务器" v-model="form.ip" />
+      <a-input placeholder="请输入服务器ip地址" v-model="form.ip" />
     </a-form-model-item>
     <a-form-model-item label="端口" prop="port">
       <a-input placeholder="请输入端口" v-model.number="form.port" />

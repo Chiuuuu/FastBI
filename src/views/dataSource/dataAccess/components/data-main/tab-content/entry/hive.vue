@@ -28,7 +28,7 @@
             <span>用户名：您用于登录数据库的用户名。</span><br>
             <span>密码：您用于登录数据库的用户名的密码。</span><br>
             <span>默认组：默认展示默认组下的库，可选择其他默认组进行查询展示。</span><br><br>
-            <span>注意：</span><br>
+            <span><span style="color: #f00">注意</span>：</span><br>
             <span>若您需要访问到您的数据库，您需要将产品的服务器IP与访问的数据库IP网络打通，以确保能连接上（可以咨询您的系统运维人员/数据库管理员）。</span><br>
             <span>hive数据库暂时支持2.1.0常用版本。</span>
           </div>
@@ -47,7 +47,7 @@
       </a-select>
     </a-form-model-item>
     <a-form-model-item label="服务器" prop="ip">
-      <a-input placeholder="请输入服务器" v-model="form.ip" />
+      <a-input placeholder="请输入服务器ip地址" v-model="form.ip" />
     </a-form-model-item>
     <a-form-model-item label="端口" prop="port" v-if="form.linkMode === 1" :rules="[
       { required: true, message: '请输入端口号' },
