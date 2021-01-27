@@ -28,7 +28,8 @@
               class="select_button"
               style="margin-left:10px;"
               @click="handleExtract"
-              :loading="verifying || extractSping">立即抽取</a-button>
+              :disabled="verifying"
+              :loading="extractSping">立即抽取</a-button>
             <a-button
               v-if="tableType === 0 && hasBtnPermissionSchedule"
               v-show="showExtractBtn"
@@ -36,7 +37,7 @@
               style="margin-left:10px;"
               @click="showSetting('batch')"
               class="select_button"
-              :loading="verifying"
+              :disabled="verifying"
             >批量定时抽取</a-button>
             <a-dropdown v-if="['excel', 'csv'].indexOf(modelType) === -1" :trigger="['click']">
               <a-button type="primary" style="margin-left:10px;">更多<a-icon type="down" /></a-button>
