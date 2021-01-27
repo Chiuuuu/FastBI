@@ -25,6 +25,7 @@
       </b-scrollbar>
     </div>
     <edit-slider v-model="range"></edit-slider>
+    <pation></pation>
   </div>
 </template>
 
@@ -34,6 +35,7 @@ import {
   removeResizeListener
 } from 'bin-ui/src/utils/resize-event'
 import EditSlider from './components/edit-slider'
+import Pation from '../pation/index' // 分页栏
 import DropPanel from '../../drop/drop-panel'
 import { mapActions, mapGetters } from 'vuex'
 
@@ -88,9 +90,6 @@ export default {
     range: {
       handler(val) {
         this.screenStyle = {
-          // width: (this.pageSettings.width * wrap.clientWidth / 1920) * val + 120 + 'px',
-          // height: (this.pageSettings.height * (contain.clientHeight - 100) / 1080) * val + 120 + 'px',
-          width: `${this.pageSettings.width * val + 120}px`,
           height: `${this.pageSettings.height * val + 120}px`
         }
         this.SetCanvasRange(val)
@@ -113,7 +112,7 @@ export default {
       return {
         width: `${this.pageSettings.width}px`,
         height: `${this.pageSettings.height}px`,
-        transform: `scale(${this.canvasRange}) translate3d(0px, 0px, 0)`,
+        transform: `scale(${this.canvasRange}) translate3d(-50%, -50%, 0)`,
         background:
           this.pageSettings.backgroundType === '1'
             ? this.pageSettings.backgroundColor
@@ -125,6 +124,6 @@ export default {
       }
     }
   },
-  components: { DropPanel, EditSlider }
+  components: { DropPanel, EditSlider, Pation }
 }
 </script>

@@ -34,7 +34,6 @@
         <slot name="model"></slot>
       </board-model>
     </div>
-    <pation></pation>
     <!--右键菜单-->
     <context-menu></context-menu>
   </div>
@@ -49,7 +48,6 @@ import BoardOptions from './options/index' // 右侧栏(页面配置)
 import CanvasMain from './canvas' // 中间画板
 import ContextMenu from './context-menu/index' // 右键菜单
 import BoardModel from './model/index' // 8-14 新增数据模型
-import Pation from './pation/index' // 分页栏
 import { mapGetters, mapActions } from 'vuex'
 
 const prefixCls = 'board'
@@ -97,8 +95,7 @@ export default {
     BoardCoverage,
     BoardHeader,
     BoardModel,
-    BoardOptions,
-    Pation
+    BoardOptions
   }
 }
 </script>

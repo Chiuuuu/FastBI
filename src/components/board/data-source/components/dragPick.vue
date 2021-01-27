@@ -393,10 +393,7 @@ export default {
       this.currentFile.conditionList.splice(index, 1)
     },
     async handleOk() {
-      if (
-        this.currentFile.checkedList.length === 0 ||
-        this.currentFile.manualList.length === 0
-      ) {
+      if (this.isNoSelectData) {
         return
       }
       let apiData = deepClone(this.currSelected.setting.api_data)
@@ -530,6 +527,23 @@ export default {
     // 根据维度度量获取数据
     getData() {
       let apiData = deepClone(this.currSelected.setting.api_data)
+      let type = this.currSelected.setting.type
+      if (type === '1') {
+        if (apiData.dimensions.length === 0 || apiData.measures.length === 0) {
+          return
+        }
+      }
+      if (type === '2') {
+        if (apiData.measures.length === 0) {
+          return
+        }
+      }
+      if (type === '3') {
+        if (apiData.tableList.length === 0) {
+          return
+        }
+      }
+
       this.$server.screenManage.getData(this.currSelected).then(res => {
         if (res.code === 200) {
           // 查不到数据
