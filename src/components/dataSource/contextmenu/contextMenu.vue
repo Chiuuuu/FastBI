@@ -66,7 +66,7 @@ export default {
             if (item['permission']) {
               const { OBJECT, OPERATOR } = item.permission
 
-              const { file } = this.vm
+              const file = this.vm.file || this.vm.folder
               if (file && file.privileges) {
                 // 根据接口返回的权限判断
                 if (file.privileges.includes(0)) {
