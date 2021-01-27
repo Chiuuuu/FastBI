@@ -45,7 +45,7 @@ export default {
     return {
       wrapStyle: {},
       screenStyle: {},
-      range: 0.55
+      range: 0.65
     }
   },
   mounted() {
@@ -63,7 +63,7 @@ export default {
       // 计算wrap样式
       this.wrapStyle = {
         width: wrap.clientWidth + 'px',
-        height: wrap.clientHeight - 30 + 'px'
+        height: wrap.clientHeight - 61 + 'px'
       }
       // 计算缩放比例
       // let range = ((this.pageSettings.width) / 1920)
@@ -90,6 +90,7 @@ export default {
     range: {
       handler(val) {
         this.screenStyle = {
+          width: `${this.pageSettings.width * val + 120}px`,
           height: `${this.pageSettings.height * val + 120}px`
         }
         this.SetCanvasRange(val)
