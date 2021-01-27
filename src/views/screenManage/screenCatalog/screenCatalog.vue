@@ -688,6 +688,7 @@ export default {
                   }
                   this.saveScreenData({ ...params }).then(res => {
                     if (res) {
+                      this.$message.success('重命名成功')
                       this.getList()
                     }
                   })
@@ -706,8 +707,8 @@ export default {
         this.$message.error(' 请先添加大屏目录数据或者选择一个大屏目录')
         return
       }
-      // 编辑大屏默认缩放是0.55
-      this.SetCanvasRange(0.55)
+      // 编辑大屏默认缩放是0.65
+      this.SetCanvasRange(0.65)
       this.$router.push({
         name: 'screenEdit',
         query: {
