@@ -156,9 +156,6 @@ const app = {
           if (res.code === 200) {
             // res.msg && message.success(res.msg)
             return true
-          } else {
-            res.msg && message.error(res.msg)
-            return false
           }
         })
         .catch(err => {
@@ -238,6 +235,7 @@ const app = {
         if (res.code === 200) {
           this.screenData = res.data
           console.log(this.screenData, 'screenData')
+          dispatch('SetFileName', res.data ? res.data.name : '')
           dispatch('SetPageSettings', res.data ? res.data.setting : {})
           dispatch('InitCanvasMaps', {
             maps: res.data ? res.data.screenGraphs : [],

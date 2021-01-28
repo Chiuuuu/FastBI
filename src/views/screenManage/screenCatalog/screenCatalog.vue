@@ -85,18 +85,6 @@
     <div class="right scrollbar">
       <div class="right-header" v-if="fileSelectId !== ''">
         <span class="nav_title">{{ fileSelectName }} </span>
-        <!-- <img
-          style="width:18px;heigth:18px;"
-          :src="
-            require(`@/assets/images/chart/${
-              isPublish === 0
-                ? 'notpublish.png'
-                : releaseObj.valid
-                ? 'published.png'
-                : 'timeout.png'
-            }`)
-          "
-        /> -->
         <img
           v-show="isPublish === 0"
           style="width:18px;heigth:18px;"
@@ -113,7 +101,7 @@
           src="@/assets/images/chart/timeout.png"
         />
         <a-button class="btn_n1" @click="openScreen">全屏</a-button>
-        <a-button class="btn_n1" @click="release"
+        <a-button v-if="hasEditPermission" class="btn_n1" @click="release"
           ><span>发布</span>
           <a-dropdown
             v-show="isPublish === 1"
@@ -123,19 +111,15 @@
           >
             <a-icon class="icon-more" type="caret-down" />
             <a-menu slot="overlay" class="drow_menu">
-              <a-menu-item v-on:click="showShare" v-if="hasPermissionSourceAdd">
+              <a-menu-item v-on:click="showShare">
                 查看分享
               </a-menu-item>
-              <a-menu-item
-                v-if="hasPermissionFolderAdd"
-                key="1"
-                @click="cancelReleace"
-              >
+              <a-menu-item key="1" @click="cancelReleace">
                 撤销分享
               </a-menu-item>
             </a-menu>
-          </a-dropdown></a-button
-        >
+          </a-dropdown>
+        </a-button>
 
         <a-button class="btn_n2" @click="$refs.screen.refreshData()"
           >刷新数据</a-button
@@ -686,6 +670,7 @@ export default {
                   this.saveScreenData({ ...params }).then(res => {
                     if (res) {
                       this.$message.success('重命名成功')
+                      this.fileSelectName = values.name
                       this.getList()
                       if (this.isPublish === 1) {
                         this.getShareData()
