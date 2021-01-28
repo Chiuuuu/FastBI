@@ -617,7 +617,6 @@ export default {
       this.isAdd = 2
       this.id = file.id
       this.screenVisible = true
-      this.pid = parent.id
       this.screenName = file.name
 
       // dom渲染以后才能给form赋值
@@ -680,9 +679,7 @@ export default {
                   this.$store.dispatch('SetIsPublish', res.data.isPublish)
                   // 编辑
                   let params = {
-                    fileType: 1,
                     id: this.id,
-                    parentId: this.pid,
                     setting: this.setting,
                     ...values
                   }
@@ -690,6 +687,9 @@ export default {
                     if (res) {
                       this.$message.success('重命名成功')
                       this.getList()
+                      if (this.isPublish === 1) {
+                        this.getShareData()
+                      }
                     }
                   })
                 }

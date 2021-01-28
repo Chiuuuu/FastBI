@@ -52,21 +52,21 @@
           <a-radio :value="'list'">列表</a-radio>
           <a-radio :value="'manual'">手动</a-radio>
         </a-radio-group>
+        <br />
+        <input
+          type="text"
+          class="ant-input pick-input"
+          v-model="listValue"
+          placeholder="请输入搜索内容"
+        />
+        <button class="ant-btn ant-btn-primary pick-btn" @click="search">
+          查询
+        </button>
         <div
           class="pick-checkbox-box hasborder"
           v-show="currentFile.operation === 'list'"
         >
           <b-scrollbar style="height:100%;">
-            <input
-              type="text"
-              class="ant-input pick-input"
-              v-model="listValue"
-              placeholder="请输入搜索内容"
-            />
-            <button class="ant-btn ant-btn-primary" @click="search">
-              查询
-            </button>
-            <br />
             <a-checkbox :checked="checkAll" @change="onCheckAllChange"
               >全选</a-checkbox
             >
@@ -207,7 +207,10 @@ export default {
         if (val) {
           this.fileList = []
           // 当前选中的图表数据筛选的数据
-          if (val.setting.api_data.options) {
+          if (
+            val.setting.api_data.options &&
+            val.setting.api_data.options.fileList
+          ) {
             this.fileList = deepClone(val.setting.api_data.options.fileList)
           }
         }
@@ -273,6 +276,7 @@ export default {
           dataFile.operation = 'list' // 列表/手动,'list'/'manual'
         } else {
           res.msg && this.$message.error(res.msg)
+          this.isdrag = false
           return
         }
       } else {
@@ -283,6 +287,7 @@ export default {
           dataFile.conditionList = [] // 条件行
         } else {
           this.$message.error('当前字段为文本类型，无法进行数值区间筛选')
+          this.isdrag = false
           return
         }
       }
