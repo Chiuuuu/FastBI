@@ -1,5 +1,5 @@
 <template>
-  <div class="tab-panel">
+  <a-spin class="tab-panel" :spinning="verifying">
     <div class="search_bar">
       <a-radio-group class="search_radio" v-model="tableType" @change="handleTableTypeChange">
         <a-radio-button :value="0">原始表</a-radio-button>
@@ -28,7 +28,6 @@
               class="select_button"
               style="margin-left:10px;"
               @click="handleExtract"
-              :disabled="verifying"
               :loading="extractSping">立即抽取</a-button>
             <a-button
               v-if="tableType === 0 && hasBtnPermissionSchedule"
@@ -37,7 +36,6 @@
               style="margin-left:10px;"
               @click="showSetting('batch')"
               class="select_button"
-              :disabled="verifying"
             >批量定时抽取</a-button>
             <a-dropdown v-if="['excel', 'csv'].indexOf(modelType) === -1" :trigger="['click']">
               <a-button type="primary" style="margin-left:10px;">更多<a-icon type="down" /></a-button>
@@ -146,7 +144,7 @@
         @close="visible3 = false"
       />
     </div>
-  </div>
+  </a-spin>
 </template>
 <script>
 import { mapState } from 'vuex'

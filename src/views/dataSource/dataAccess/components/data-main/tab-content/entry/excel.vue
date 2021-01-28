@@ -46,6 +46,7 @@
             </a-empty>
           </div>
           <a-upload
+            accept=".xlsx, .xls"
             name="file"
             :headers="{ 'content-type': 'multipart/form-data' }"
             :showUploadList="false"
