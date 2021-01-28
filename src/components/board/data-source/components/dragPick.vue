@@ -48,19 +48,43 @@
         </a-button>
       </template>
       <div v-if="currentFile.file === 'dimensions'">
-        <a-radio-group v-model="currentFile.operation">
+        <a-radio-group
+          v-model="currentFile.operation"
+          @change="isEmpty = false"
+        >
           <a-radio :value="'list'">列表</a-radio>
           <a-radio :value="'manual'">手动</a-radio>
         </a-radio-group>
         <br />
         <input
+          v-show="currentFile.operation === 'list'"
           type="text"
-          class="ant-input pick-input"
+          :class="['ant-input', 'pick-input', { redborder: isEmpty }]"
           v-model="listValue"
           placeholder="请输入搜索内容"
+          @input="isEmpty = false"
         />
-        <button class="ant-btn ant-btn-primary pick-btn" @click="search">
+        <button
+          v-show="currentFile.operation === 'list'"
+          class="ant-btn ant-btn-primary pick-btn"
+          @click="search"
+        >
           查询
+        </button>
+        <input
+          v-show="currentFile.operation === 'manual'"
+          type="text"
+          :class="['ant-input', 'pick-input', { redborder: isEmpty }]"
+          v-model="manualValue"
+          placeholder="请输入搜索内容"
+          @input="isEmpty = false"
+        />
+        <button
+          v-show="currentFile.operation === 'manual'"
+          class="ant-btn ant-btn-primary"
+          @click="addManualProperty"
+        >
+          添加
         </button>
         <div
           class="pick-checkbox-box hasborder"
@@ -84,35 +108,31 @@
           v-show="currentFile.operation === 'manual'"
         >
           <b-scrollbar style="height:100%;">
-            <input
-              type="text"
-              class="ant-input pick-input"
-              v-model="manualValue"
-              placeholder="请输入搜索内容"
-            />
-            <button class="ant-btn ant-btn-primary" @click="addManualProperty">
-              添加
-            </button>
             <div
               class="pick-property"
               v-for="(item, index) in currentFile.manualList"
               :key="item"
             >
               <span>{{ item }}</span>
-              <span class="pick-del" @click="deleteManualProperty(index)"
+              <icon-font
+                class="pick-del"
+                @click="deleteManualProperty(index)"
+                type="icon-guanbi"
+              />
+              <!-- <span class="pick-del" @click="deleteManualProperty(index)"
                 >删除</span
-              >
+              > -->
             </div>
           </b-scrollbar>
         </div>
       </div>
       <!--拖动的是度量-->
       <div v-else>
-        <div class="pick-checkbox-box">
+        <button class="ant-btn ant-btn-primary" @click="addCondition">
+          添加条件
+        </button>
+        <div class="pick-checkbox-box" style="margin:0;padding:0">
           <b-scrollbar style="height:100%;">
-            <button class="ant-btn ant-btn-primary" @click="addCondition">
-              添加条件
-            </button>
             <br />
             <div
               :class="['pick-condition-box']"
@@ -147,11 +167,16 @@
                 class="inputnumber"
                 style="text-overflow: clip;"
               ></a-input-number>
-              <a-icon
+              <icon-font
+                @click="delectCondition(index)"
+                class="icon"
+                type="icon-guanbi"
+              />
+              <!-- <a-icon
                 @click="delectCondition(index)"
                 class="icon"
                 type="close"
-              />
+              /> -->
             </div>
           </b-scrollbar>
         </div>
@@ -170,7 +195,10 @@ import { deepClone } from '@/utils/deepClone'
 import { sum, summary } from '@/utils/summaryList'
 import navigateList from '@/config/navigate' // 导航条菜单
 import _ from 'lodash'
-
+import { Icon } from 'ant-design-vue'
+const IconFont = Icon.createFromIconfontCN({
+  scriptUrl: '//at.alicdn.com/t/font_2276651_kjhn0ldks1j.js'
+}) //引入iconfont
 export default {
   props: {
     type: {
@@ -198,8 +226,12 @@ export default {
       current: {},
       isdrag: false, // 是否拖拽中
       fileList: [], // 维度字段数组
-      isVaild: false //
+      isVaild: false, //
+      isEmpty: false // 控制输入框边框样式，空输入变红
     }
+  },
+  components: {
+    IconFont
   },
   watch: {
     currSelected: {
@@ -321,6 +353,7 @@ export default {
     search() {
       if (!this.listValue) {
         this.currentFile.searchList = this.currentFile.originList
+        this.isEmpty = true
         return
       }
       this.currentFile.searchList = this.currentFile.originList.filter(
@@ -363,6 +396,7 @@ export default {
     // 手动，添加字段
     addManualProperty() {
       if (!this.manualValue) {
+        this.isEmpty = true
         return
       }
       // 本身不存在就添加进去

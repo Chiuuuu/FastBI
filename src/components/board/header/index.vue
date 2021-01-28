@@ -5,7 +5,7 @@
       <!-- <a-input placeholder="请输入大屏标题" v-model="fileName" style="border:none;background:none;color:#fff;" /> -->
       <!-- <i class="el-icon-arrow-left" style="margin-left:20px;font-size:22px;cursor: pointer;margin-top:8px"></i> -->
       <!-- <span v-if="config.title">{{ config.title.text }}</span> -->
-      <span v-if="!isFocus">{{ screenName }}</span>
+      <span v-if="!isFocus">{{ fileName }}</span>
       <input
         class="header-title-text"
         :maxLength="20"
@@ -82,23 +82,7 @@ export default {
       this.screenData = val
     }
   },
-  mounted() {
-    // this.screenName = this.screenData
-    //   ? this.screenData.name
-    //   : this.$route.query.name
-    on(window, 'beforeunload', () => {
-      sessionStorage.setItem('fileName', this.fileName)
-    })
-    if (sessionStorage.getItem('fileName')) {
-      this.$store.dispatch('SetFileName', sessionStorage.getItem('fileName'))
-      sessionStorage.removeItem('fileName')
-      off(window, 'beforeunload', () => {
-        sessionStorage.setItem('fileName', this.fileName)
-      })
-    }
-    this.screenName = this.fileName
-    // this.screenName = this.$route.query.name
-  },
+  mounted() {},
   methods: {
     ...mapActions(['saveScreenData', 'updateChartData', 'handleRefreshData']),
     goBack() {
@@ -118,6 +102,7 @@ export default {
     },
     onfocus() {
       this.isFocus = true
+      this.screenName = this.fileName
     },
     onBlur() {
       if (this.screenName === '') {
@@ -177,7 +162,6 @@ export default {
       let params = {
         id: this.screenId
       }
-      console.log(params)
       this.$server.screenManage.actionRefreshScreen({ params }).then(res => {
         if (res.code === 200) {
           let dataItem = res.data
