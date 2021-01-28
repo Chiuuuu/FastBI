@@ -282,20 +282,35 @@ export default {
     currSelected: {
       handler(val) {
         if (val) {
-          if (val.setting.api_data) {
-            this.apiData = deepClone(val.setting.api_data)
-            if (this.apiData.modelId) {
-              this.modelId = this.apiData.modelId
-            }
+          //   if (val.setting.api_data) {
+          //     this.apiData = deepClone(val.setting.api_data)
+          //     if (this.apiData.modelId) {
+          //       this.modelId = this.apiData.modelId
+          //     }
+          //     this.dimensionsChecked = []
+          //     if (this.apiData.dimensions.length > 0) {
+          //       this.apiData.dimensions.map(item => {
+          //         this.dimensionsChecked.push(item.id)
+          //       })
+          //     }
+          //     this.measuresChecked = []
+          //     if (this.apiData.measures.length > 0) {
+          //       this.apiData.measures.map(item => {
+          //         this.measuresChecked.push(item.id)
+          //       })
+          //     }
+          //   }
+          if (val.datamodelId !== '0') {
+            this.modelId = val.datamodelId
             this.dimensionsChecked = []
-            if (this.apiData.dimensions.length > 0) {
-              this.apiData.dimensions.map(item => {
+            if (val.setting.api_data.dimensions.length > 0) {
+              val.setting.api_data.dimensions.map(item => {
                 this.dimensionsChecked.push(item.id)
               })
             }
             this.measuresChecked = []
-            if (this.apiData.measures.length > 0) {
-              this.apiData.measures.map(item => {
+            if (val.setting.api_data.measures.length > 0) {
+              val.setting.api_data.measures.map(item => {
                 this.measuresChecked.push(item.id)
               })
             }
@@ -359,15 +374,6 @@ export default {
         this.$store.dispatch('dataModel/setSelectedModelList', this.disableItem)
       }
     },
-    // // 获取大屏数据
-    // getScreenData () {
-    //   this.$server.screenManage.getScreenDetailById(this.screenId).then(res => {
-    //     if (res.code === 200) {
-    //       this.$store.dispatch('dataModel/setSelectedModelList', res.list)
-    //       this.$store.commit('common/SET_PRIVILEGES', res.data.privileges || [])
-    //     }
-    //   })
-    // },
     // 保存选中的模型
     saveModal(id) {
       let params = {
