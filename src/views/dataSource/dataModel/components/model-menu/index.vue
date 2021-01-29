@@ -196,7 +196,7 @@ export default {
         {
           name: '删除',
           permission: {
-            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit,
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove,
             OBJECT: this.$PERMISSION_CODE.OBJECT.modelFolder
           },
           onClick: this.handleFolderDelete
@@ -220,7 +220,7 @@ export default {
         {
           name: '删除',
           permission: {
-            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove
           },
           onClick: this.handleFileDelete
         }

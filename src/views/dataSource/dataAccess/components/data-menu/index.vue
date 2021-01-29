@@ -211,7 +211,7 @@ export default {
         {
           name: '删除',
           permission: {
-            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove
           },
           onClick: this.handleFileDelete
         }
