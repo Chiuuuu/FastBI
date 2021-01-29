@@ -22,7 +22,7 @@
           <a-row type="flex" justify="end" align="middle">
             <a-button type="primary" class="select_button" @click="() => handleGetTableList()" :loading="spinning">刷新数据</a-button>
             <a-button
-              v-if="hasBtnPermissionExtract"
+              v-if="hasBtnPermissionEdit"
               v-show="showExtractBtn"
               type="primary"
               class="select_button"
@@ -276,6 +276,9 @@ export default {
         }
       }
     },
+    hasBtnPermissionEdit() {
+      return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.edit)
+    },
     hasBtnPermissionExtract() {
       return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.extract)
     },
@@ -399,6 +402,9 @@ export default {
 
       if (!this.hasBtnPermissionSchedule || ['excel', 'csv'].indexOf(this.modelType) > -1) {
         columns.pop()
+      }
+      if (!this.hasBtnPermissionEdit) {
+        columns.splice(5, 1)
       }
       this.columns = columns
     },
