@@ -116,7 +116,7 @@ export default {
     removeResizeListener(this.$refs.dvScreen, this._calcStyle)
   },
   methods: {
-    ...mapActions(['getScreenDetail', 'handleRefreshData']),
+    ...mapActions(['getScreenDetail', 'refreshScreen']),
     getTableSize(transform) {
       return {
         x: transform.setting.view.width,
@@ -167,38 +167,7 @@ export default {
         this.$message.error('暂无数据可刷新，请先添加数据')
         return
       }
-      let params = {
-        id: this.screenId
-      }
-      this.$server.screenManage.actionRefreshScreen({ params }).then(res => {
-        if (res.code === 200) {
-          let dataItem = res.data
-          let ids = Object.keys(dataItem)
-          if (ids.length === 0) {
-            return
-          }
-          let updateList = []
-          for (let id of ids) {
-            let newData = dataItem[id].graphData
-            let chart = this.canvasMap.find(chart => chart.id + '' === id)
-            // 找到chart的表示当前页，直接更新在界面
-            if (chart) {
-              this.handleRefreshData({ chart, newData })
-            }
-            // 其他页的也要更新
-            else {
-              this.handleRefreshData({ chart: dataItem[id], newData })
-              delete dataItem[id].graphData
-              updateList.push(dataItem[id])
-            }
-          }
-          updateList = updateList.concat(this.canvasMap)
-          this.$server.screenManage.saveAllChart(updateList)
-          this.$message.success('刷新成功')
-        } else {
-          res.msg && this.$message.error(res.msg)
-        }
-      })
+      this.refreshScreen({ charSeted: false, globalSeted: false })
     }
   }
 }
