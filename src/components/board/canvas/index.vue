@@ -65,6 +65,13 @@ export default {
         width: wrap.clientWidth + 'px',
         height: wrap.clientHeight - 61 + 'px'
       }
+      this.screenStyle = {
+        width: `${this.pageSettings.width * this.range + 120}px`,
+        height: `${Math.max(
+          this.pageSettings.height * this.range + 120,
+          wrap.clientHeight - 61
+        )}px`
+      }
       // 计算缩放比例
       // let range = ((this.pageSettings.width) / 1920)
       // range = Math.round(range * 100) / 100
@@ -87,16 +94,16 @@ export default {
     }
   },
   watch: {
-    range: {
-      handler(val) {
-        this.screenStyle = {
-          width: `${this.pageSettings.width * val + 120}px`,
-          height: `${this.pageSettings.height * val + 120}px`
-        }
-        this.SetCanvasRange(val)
-      },
-      deep: true,
-      immediate: true
+    range(val) {
+      const wrap = this.$refs.canvasMain
+      this.screenStyle = {
+        width: `${this.pageSettings.width * val + 120}px`,
+        height: `${Math.max(
+          this.pageSettings.height * val + 120,
+          wrap.clientHeight - 61
+        )}px`
+      }
+      this.SetCanvasRange(val)
     }
     // pageSettings: {
     //   handler(val) {

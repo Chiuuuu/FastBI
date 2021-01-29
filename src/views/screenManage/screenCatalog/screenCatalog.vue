@@ -3,12 +3,12 @@
     <div class="left">
       <div class="menu_title">
         <span>大屏目录</span>
-        <a-dropdown :trigger="['click']" placement="bottomLeft">
-          <a-icon
-            v-if="hasPermissionSourceAdd || hasPermissionFolderAdd"
-            type="plus-square"
-            class="menu_icon"
-          />
+        <a-dropdown
+          v-if="hasPermissionSourceAdd || hasPermissionFolderAdd"
+          :trigger="['click']"
+          placement="bottomLeft"
+        >
+          <a-icon type="plus-square" class="menu_icon" />
           <a-menu slot="overlay" class="drow_menu">
             <a-menu-item v-on:click="addScreen" v-if="hasPermissionSourceAdd">
               新建大屏
@@ -101,7 +101,7 @@
           src="@/assets/images/chart/timeout.png"
         />
         <a-button class="btn_n1" @click="openScreen">全屏</a-button>
-        <a-button v-if="hasEditPermission" class="btn_n1" @click="release"
+        <a-button v-if="hasPublishPermission" class="btn_n1" @click="release"
           ><span>发布</span>
           <a-dropdown
             v-show="isPublish === 1"
@@ -322,7 +322,7 @@ export default {
         {
           name: '删除',
           permission: {
-            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit,
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove,
             OBJECT: this.$PERMISSION_CODE.OBJECT.screenFolder
           },
           onClick: this.handleFolderDelete
@@ -331,20 +331,24 @@ export default {
       fileContenxtMenu: [
         {
           name: '移动至',
-          //   permission: {
-          //     OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove,
-          //     OBJECT: this.$PERMISSION_CODE.OBJECT.screen
-          //   },
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.move,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.screen
+          },
           onClick: this.handleFilemoveFile
         },
         {
           name: '重命名',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.rename,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.screen
+          },
           onClick: this.handleResetFile
         },
         // {
         //   name: '复制',
         //   //   permission: {
-        //   //     OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove,
+        //   //     OPERATOR: this.$PERMISSION_CODE.OPERATOR.duplicate,
         //   //     OBJECT: this.$PERMISSION_CODE.OBJECT.screen
         //   //   },
         //   onClick: this.copyScreen
@@ -414,6 +418,12 @@ export default {
       return hasPermission(
         this.$store.state.common.privileges,
         this.$PERMISSION_CODE.OPERATOR.edit
+      )
+    },
+    hasPublishPermission() {
+      return hasPermission(
+        this.$store.state.common.privileges,
+        this.$PERMISSION_CODE.OPERATOR.publish
       )
     },
     hasPermissionFolderAdd() {

@@ -302,43 +302,7 @@ export default {
     },
     // 刷新大屏
     refreshData() {
-      let params = {
-        id: this.screenId
-      }
-      this.$server.screenManage.actionRefreshScreen({ params }).then(res => {
-        if (res.code === 200) {
-          let dataItem = res.data
-          let ids = Object.keys(dataItem)
-          if (ids.length === 0) {
-            return
-          }
-          let updateList = []
-          for (let id of ids) {
-            let newData = dataItem[id].graphData
-            let chart = this.canvasMap.find(chart => chart.id + '' === id)
-            let apidata = chart.setting.api_data
-            if (
-              apidata.refresh.isRefresh &&
-              apidata.refresh.unit &&
-              apidata.refresh.frequency > 0
-            ) {
-              // 找到chart的表示当前页，直接更新在界面
-              if (chart) {
-                this.handleRefreshData({ chart, newData })
-              }
-              // 其他页的也要更新
-              else {
-                this.handleRefreshData({ chart: dataItem[id], newData })
-                delete dataItem[id].graphData
-                updateList.push(dataItem[id])
-              }
-            }
-          }
-          updateList = updateList.concat(this.canvasMap)
-          this.$server.screenManage.saveAllChart(updateList)
-          this.$message.success('刷新成功')
-        }
-      })
+      this.refreshScreen({ charSeted: true, globalSeted: false })
     }
   }
 }
