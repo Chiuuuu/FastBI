@@ -468,7 +468,7 @@ export default {
               // this.$emit('updateRows', res.data)
             } else {
               if (this.single) {
-                this.$parent.$refs.extract.regData.push(res.data)
+                this.$emit('insertData', res.data)
               }
             }
             this.handleClose()
