@@ -1,7 +1,9 @@
 import router from '../../router'
 import screenManage from '../../api/modules/screenManage'
 import { message } from 'ant-design-vue'
-import { sum, summary } from '@/utils/summaryList'
+import { Loading } from 'element-ui'
+import { handleRefreshData } from '@/utils/handleRefreshData'
+import { messages } from 'bin-ui'
 
 let orginPageSettings = {
   width: 1920,
@@ -248,46 +250,69 @@ const app = {
         }
       })
     },
-    // 处理刷新大屏的数据
-    async handleRefreshData({ dispatch, commit }, { chart, newData }) {
+    //刷新大屏
+    async refreshScreen({ state, rootGetters }, { charSeted, globalSeted }) {
+      // 全局配置，信息不完整不处理
       if (
-        chart.setting.chartType === 'v-ring' ||
-        chart.setting.chartType === 'v-gauge'
+        globalSeted &&
+        (!globalSettings.unit || globalSettings.frequency <= 0)
       ) {
-        let key = Object.keys(newData[0])[0]
-        let total = sum(newData, key)
-        let rows = [
-          {
-            type: key,
-            value: total
-          }
-        ]
-        chart.setting.api_data.source.rows = rows
-
-        // 仪表盘
-        if (
-          chart.setting.chartType === 'v-gauge' &&
-          chart.setting.api_data.measures[1]
-        ) {
-          let goalTotal = sum(newData, Object.keys(newData[0])[1])
-          chart.setting.config.series.max = goalTotal
-        }
-      } else if (chart.setting.chartType === 'v-multiPie') {
-        // 嵌套饼图设置apis
-        let rows = []
-        let dimensionKeys = chart.setting.apiData.dimensions.map(
-          item => item.alias
-        )
-        dimensionKeys.forEach(item => {
-          // 根据当前维度分类得到的列表
-          let list = summary(newData, item, chart.setting.apiData.measures[0]) // 嵌套饼图度量只有一个，直接取第一个数
-          rows = rows.concat(list) // 把所有维度分类出来的数组进行拼接（v-charts配置格式要求）
-        })
-
-        chart.setting.api_data.source.rows = rows
-      } else {
-        chart.setting.api_data.source.rows = newData
+        return
       }
+      let params = {
+        id: state.screenId
+      }
+      let loadingInstance = Loading.service({
+        lock: true,
+        text: '加载中...',
+        target: 'body'
+      })
+      screenManage
+        .actionRefreshScreen({ params })
+        .then(res => {
+          if (res.code === 200) {
+            let dataItem = res.data
+            let ids = Object.keys(dataItem)
+            if (ids.length === 0) {
+              return
+            }
+            let updateList = []
+            for (let id of ids) {
+              let newData = dataItem[id].graphData
+              let chart = rootGetters.canvasMap.find(
+                chart => chart.id + '' === id
+              )
+              // 单个图表有设置定时器的时候，满足控制条件才处理
+              let apidata = chart.setting.api_data
+              if (
+                charSeted &&
+                (!apidata.refresh.isRefresh ||
+                  !apidata.refresh.unit ||
+                  apidata.refresh.frequency <= 0)
+              ) {
+                return
+              }
+
+              // 找到chart的表示当前页，直接更新在界面
+              if (chart) {
+                handleRefreshData({ chart, newData })
+              } else {
+                // 其他页的也要更新
+                handleRefreshData({ chart: dataItem[id], newData })
+                delete dataItem[id].graphData
+                updateList.push(dataItem[id])
+              }
+            }
+            updateList = updateList.concat(rootGetters.canvasMap)
+            screenManage.saveAllChart(updateList)
+            message.success(res.msg)
+          } else {
+            res.msg && message.error(res.msg)
+          }
+        })
+        .finally(() => {
+          loadingInstance.close()
+        })
     }
   }
 }

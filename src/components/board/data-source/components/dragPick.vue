@@ -76,7 +76,7 @@
           type="text"
           :class="['ant-input', 'pick-input', { redborder: isEmpty }]"
           v-model="manualValue"
-          placeholder="请输入搜索内容"
+          placeholder="请输入内容"
           @input="isEmpty = false"
         />
         <button

@@ -1819,7 +1819,7 @@ export default {
     this.timer = null
   },
   methods: {
-    ...mapActions(['saveScreenData', 'updateChartData', 'handleRefreshData']),
+    ...mapActions(['saveScreenData', 'updateChartData', 'refreshScreen']),
     tabsTypeChange(num) {
       this.tabsType = num
       this.$store.dispatch('SetTabsType', num)
@@ -2089,38 +2089,7 @@ export default {
     },
     // 刷新大屏
     refreshData() {
-      let params = {
-        id: this.screenId
-      }
-      this.$server.screenManage.actionRefreshScreen({ params }).then(res => {
-        if (res.code === 200) {
-          let dataItem = res.data
-          let ids = Object.keys(dataItem)
-          if (ids.length === 0) {
-            return
-          }
-          let updateList = []
-          for (let id of ids) {
-            let newData = dataItem[id].graphData
-            let chart = this.canvasMap.find(chart => chart.id + '' === id)
-            if (this.globalSettings.unit && this.globalSettings.frequency > 0) {
-              // 找到chart的表示当前页，直接更新在界面
-              if (chart) {
-                this.handleRefreshData({ chart, newData })
-              }
-              // 其他页的也要更新
-              else {
-                this.handleRefreshData({ chart: dataItem[id], newData })
-                delete dataItem[id].graphData
-                updateList.push(dataItem[id])
-              }
-            }
-          }
-          updateList = updateList.concat(this.canvasMap)
-          this.$server.screenManage.saveAllChart(updateList)
-          this.$message.success('刷新成功')
-        }
-      })
+      this.refreshScreen({ charSeted: false, globalSeted: true })
     }
   },
   watch: {
