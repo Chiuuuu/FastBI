@@ -8,7 +8,11 @@
   >
     <template slot="custom" slot-scope="item" style="color: #f00;width: 100%">
       <a-row>
-        <a-col span="14">{{item.title}}</a-col>
+        <a-col span="14">
+          <a-icon style="margin-right:8px" v-if="item.fileType === 0" type="folder" />
+          <a-icon style="margin-right:8px" v-else type="file" />
+          <span>{{item.title}}</span>
+        </a-col>
         <a-col v-if="item.fileType === 0" :span="injectActionList.length * 2">
           <a-checkbox-group :value="item.permissions" style="width:100%">
             <a-row>
