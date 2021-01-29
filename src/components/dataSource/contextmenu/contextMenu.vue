@@ -1,5 +1,9 @@
 <template>
-  <div v-if="renderMenus.length > 0" class="m-overlay m-overlay-shadow" :style="styleObj">
+  <div
+    v-if="renderMenus.length > 0"
+    class="m-overlay m-overlay-shadow"
+    :style="styleObj"
+  >
     <div class="m-ctxMenu" ref="ctxMenuRef">
       <ul>
         <li
@@ -8,7 +12,10 @@
           :key="item.name"
           @click="handleItemClick($event, item)"
         >
-          <span>{{ item.name }} <a-icon type="right" class="icon-cart" v-if="hasChildren(item)"/></span>
+          <span
+            >{{ item.name }}
+            <a-icon type="right" class="icon-cart" v-if="hasChildren(item)"
+          /></span>
           <ul class="sub" v-if="hasChildren(item)">
             <li
               class="z-clickable"
@@ -98,12 +105,16 @@ export default {
       if (this.customStyle) {
         this.styleObj = this.customStyle()
         return
-      } else if (!this.$refs.ctxMenuRef) { // 如果没渲染则直接返回
+      } else if (!this.$refs.ctxMenuRef) {
+        // 如果没渲染则直接返回
         this.styleObj = {}
         return
       }
       // 浏览器可视区域的高度(兼容处理)
-      const clientHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
+      const clientHeight =
+        window.innerHeight ||
+        document.documentElement.clientHeight ||
+        document.body.clientHeight
       // 获取列表高度
       const ctxMenuDomHeight = this.$refs.ctxMenuRef.offsetHeight
       // 点击目标的位置
@@ -146,7 +157,7 @@ export default {
   border: 1px solid #ccc;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16);
   border-radius: 2px;
-  ul{
+  ul {
     margin: 0;
   }
   li {
