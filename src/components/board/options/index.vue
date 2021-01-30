@@ -2037,7 +2037,7 @@ export default {
           用户: []
         }
         // 堆叠了把数值显示在右边防止挤在一起
-        this.selfConfig.series.label.position = 'right'
+        this.selfConfig.series.label.position = 'insideBottom'
       } else {
         this.apis.stack = {}
         this.selfConfig.series.label.position = 'top'
