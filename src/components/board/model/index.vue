@@ -7,7 +7,7 @@
           class="model-back"
           v-if="!model"
           type="arrow-left"
-          @click="model = true"
+          @click="back"
         />
         <span class="model-span" v-if="modelExpand">{{
           config.title.text
@@ -266,10 +266,10 @@ export default {
         if (val.length > 0) {
           if (!this.add) {
             this.modelId = val[0].modelid
-            this.getPivoSchemaList(val[0].modelid)
-            // this.dimensions = this.transData(val[0].dimensions)
-            // this.measures = this.transData(val[0].measures)
             this.model = true
+          }
+          if (this.modelId) {
+            this.getPivoSchemaList(this.modelId)
           }
           this.disableItem = val
           val.map(item => {
@@ -300,7 +300,7 @@ export default {
           //       })
           //     }
           //   }
-          if (val.datamodelId !== '0') {
+          if (val.datamodelId !== '0' && val.datamodelId !== 0) {
             this.modelId = val.datamodelId
             this.dimensionsChecked = []
             if (val.setting.api_data.dimensions.length > 0) {
@@ -320,17 +320,17 @@ export default {
       deep: true
     },
     modelId(val) {
-      if (val) {
+      if (val && this.screenId) {
         this.getPivoSchemaList(val)
       }
     }
   },
   mounted() {
+    this.$store.dispatch('dataModel/setSelectedModelList', [])
     // 初始化模型列表和选中的模型（退出全屏后组件重置而且不再执行watch的操作，需要重新赋值）
     this.disableItem = this.selectedModelList
     this.modelId =
       this.selectedModelList.length > 0 ? this.selectedModelList[0].modelid : ''
-    this.getModelList()
   },
   methods: {
     // 数据模型搜索
@@ -357,7 +357,27 @@ export default {
     },
     // 添加数据模型
     modelAdd() {
-      this.model = !this.model
+      if (this.modelList.length > 0) {
+        this.model = !this.model
+        return
+      }
+      this.getModelList().then(res => {
+        if (res) {
+          this.model = !this.model
+        }
+      })
+    },
+    back() {
+      if (
+        this.currSelected &&
+        this.currSelected.datamodelId !== '0' &&
+        this.currSelected.datamodelId !== 0
+      ) {
+        this.modelId = this.currSelected.datamodelId
+      } else {
+        this.modelId = this.selectedModelList[0].modelid
+      }
+      this.model = true
     },
     // 点击选中模型
     modelHandle(item) {
@@ -404,14 +424,15 @@ export default {
       }
     },
     // 数据模型列表
-    getModelList() {
-      this.$server.screenManage.getCatalogList().then(res => {
+    async getModelList() {
+      return this.$server.screenManage.getCatalogList().then(res => {
         if (res.code === 200) {
           res.data.map(item => {
             item.selected = false
             item.showMore = false
           })
           this.modelList = res.data
+          return true
           // this.modelList = res.data.folders
           // this.modelList = this.modelList.concat(res.data.items)
         }
