@@ -159,6 +159,7 @@ const app = {
             // res.msg && message.success(res.msg)
             return true
           }
+          res.msg && message.error(res.msg)
         })
         .catch(err => {
           // 需要捕获错误 否则无法传递给commit
