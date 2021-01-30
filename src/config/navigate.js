@@ -341,7 +341,7 @@ const list = [
               fontSize: 20
             }
           },
-          grid: { left: 20, top: 60, right: 80, bottom: 30 },
+          grid: { left: 50, top: 60, right: 50, bottom: 50 },
           legend: {
             show: true,
             textStyle: {
@@ -358,12 +358,12 @@ const list = [
           xAxis: {
             name: '',
             position: 'bottom',
-            //   nameLocation: 'end',
+            nameLocation: 'middle',
             nameTextStyle: {
               color: '#fff',
-              fontSize: '12'
+              fontSize: '12',
               //   align: "right",
-              //   padding: [30, 0, 0, 0]
+              padding: [30, 0, 0, 0]
             },
             axisLabel: {
               color: '#ffffff',
@@ -390,11 +390,11 @@ const list = [
           yAxis: {
             name: '单位:个',
             position: 'left',
-            nameLocation: 'end',
+            // nameLocation: 'middle',
             nameTextStyle: {
               color: '#fff',
-              fontSize: 12
-              // padding: [0, 0, 0, -30]
+              fontSize: 12,
+              padding: [0, 0, 30, 0]
             },
             axisLabel: {
               color: '#ffffff',
