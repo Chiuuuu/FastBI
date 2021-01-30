@@ -600,30 +600,46 @@ export default {
         const map = new Map()
         list.forEach(element => {
           if (element.tableNo !== 0) {
-            if (map.has(element.alias)) {
-              let value = map.get(element.alias)
-              let alias = element.alias
-              if (value === 1 && map.get('tableName') !== element.tableName) {
-                // 不同表名同字段
-                alias = `${alias}(${element.tableName})`
-              } else if (value > 1 && map.get('tableName') === element.tableName) {
-                // 同表名同字段且已经存在过(value > 1)
-                alias = `${alias}(${element.tableName})(${value})`
-              } else {
-                // 同表名同字段
-                alias = `${alias}(${value})`
-              }
-              value++
-              map.set(element.alias, value)
-              element.alias = alias
-            } else {
-              map.set(element.alias, 1)
-              map.set('tableName', element.tableName)
-            }
+            this.changeAlias(map, element.alias, element)
           }
         })
       }
       return list
+    },
+    changeAlias(map, alias, element) {
+      if (map.has(alias)) {
+        const target = map.get(alias)
+        let value = target.value
+        if (value === 1 && target.tableName !== element.tableName) {
+          // 不同表名同字段
+          alias = `${element.alias}(${element.tableName})`
+        } else if (value > 1 && target.tableName === element.tableName) {
+          // 同表名同字段且已经存在过(value > 1)
+          alias = `${element.alias}(${element.tableName})(${value})`
+        } else {
+          // 同表名同字段
+          alias = `${element.alias}(${value})`
+        }
+        if (map.has(alias)) {
+          value++
+          map.set(alias, {
+            value,
+            tableName: element.tableName
+          })
+          this.changeAlias(map, alias, element)
+        } else {
+          map.set(alias, {
+            value: 1,
+            tableName: element.tableName
+          })
+          element.alias = alias
+        }
+      } else {
+        map.set(element.alias, {
+          value: 1,
+          tableName: element.tableName
+        })
+      }
     },
     /**
      * 合并维度数据
