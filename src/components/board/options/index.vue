@@ -2036,8 +2036,11 @@ export default {
         this.apis.stack = {
           用户: []
         }
+        // 堆叠了把数值显示在右边防止挤在一起
+        this.selfConfig.series.label.position = 'right'
       } else {
         this.apis.stack = {}
+        this.selfConfig.series.label.position = 'top'
       }
       // 圆形柱状图
       if (val && type === 'radius') {
