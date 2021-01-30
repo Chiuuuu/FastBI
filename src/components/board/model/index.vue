@@ -268,9 +268,9 @@ export default {
             this.modelId = val[0].modelid
             this.model = true
           }
-          if (this.modelId) {
-            this.getPivoSchemaList(this.modelId)
-          }
+          //   if (this.modelId) {
+          //     this.getPivoSchemaList(this.modelId)
+          //   }
           this.disableItem = val
           val.map(item => {
             this.disableId.push(item.modelid)
@@ -282,24 +282,6 @@ export default {
     currSelected: {
       handler(val) {
         if (val) {
-          //   if (val.setting.api_data) {
-          //     this.apiData = deepClone(val.setting.api_data)
-          //     if (this.apiData.modelId) {
-          //       this.modelId = this.apiData.modelId
-          //     }
-          //     this.dimensionsChecked = []
-          //     if (this.apiData.dimensions.length > 0) {
-          //       this.apiData.dimensions.map(item => {
-          //         this.dimensionsChecked.push(item.id)
-          //       })
-          //     }
-          //     this.measuresChecked = []
-          //     if (this.apiData.measures.length > 0) {
-          //       this.apiData.measures.map(item => {
-          //         this.measuresChecked.push(item.id)
-          //       })
-          //     }
-          //   }
           if (val.datamodelId !== '0' && val.datamodelId !== 0) {
             this.modelId = val.datamodelId
             this.dimensionsChecked = []
@@ -320,7 +302,7 @@ export default {
       deep: true
     },
     modelId(val) {
-      if (val && this.screenId) {
+      if (val && this.selectedModelList.length > 0) {
         this.getPivoSchemaList(val)
       }
     }
@@ -384,10 +366,8 @@ export default {
       if (item.fileType !== 0 && !this.disableId.includes(item.id)) {
         this.model = !this.model
         this.$store.dispatch('SetDataModel', item)
-        // this.getPivoSchemaList(item.id)
         this.add = true // 点击模型
         this.saveModal(item.id)
-        // this.modelId = item.id
         item.modelname = item.name
         item.modelid = item.id
         this.disableItem.push(item)

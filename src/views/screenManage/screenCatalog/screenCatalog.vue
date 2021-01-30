@@ -210,37 +210,40 @@
           >
         </div>
         <div class="releace-line">
-          <span class="label">*分享链接：</span
+          <span class="label"
+            ><span style="color:#FF0000">*</span>分享链接：</span
           ><span class="text">{{ releaseObj.url }}</span>
         </div>
         <div class="indent">
           <span class="indent-text" @click="copyLink(releaseObj.url)"
             >复制链接</span
-          ><a-icon
+          >
+          <!-- <a-icon
             type="qrcode"
             class="qrcode"
             :style="{ fontSize: '20px' }"
             @click.stop="showCode = true"
+          /> -->
+        </div>
+        <div class="releace-line">
+          <span class="label">分享密码：</span
+          ><input
+            v-if="isPublish === 0"
+            v-model="releaseObj.password"
+            :class="['mod_input', 'ant-input', { borderred: showLimitWarn }]"
+            placeholder="请输入6位分享密码（数字+字母）"
+            maxlength="6"
+            @input="handlePassword"
           />
+          <span v-else>{{ releaseObj.password }}</span>
         </div>
         <div class="releace-line" v-show="showLimitWarn">
           <span class="errortext">请输入6位数字+字母</span>
         </div>
         <div class="releace-line">
-          <span class="label">分享密码：</span
-          ><a-input
-            v-if="isPublish === 0"
-            v-model="releaseObj.password"
-            class="mod_input"
-            placeholder="请输入6位分享密码（数字+字母）"
-            allowClear
-            :maxLength="6"
-            @change="handlePassword"
-          />
-          <span v-else>{{ releaseObj.password }}</span>
-        </div>
-        <div class="releace-line">
-          <span class="label">*分享时效：</span>
+          <span class="label"
+            ><span style="color:#FF0000">*</span>分享时效：</span
+          >
           <a-radio-group v-if="isPublish === 0" v-model="releaseObj.expired">
             <a-radio :value="1">7天</a-radio>
             <a-radio :value="2">30天</a-radio>
