@@ -249,7 +249,8 @@
           <span v-else>{{ expiredLabel }}</span>
         </div>
         <div class="code-show" v-show="showCode">
-          <a-icon type="qrcode" :style="{ fontSize: '250px' }" />
+          <!-- <a-icon type="qrcode" :style="{ fontSize: '250px' }" /> -->
+          <vue-qr :size="250" :text="releaseObj.url" :margin="0"></vue-qr>
         </div>
       </div>
     </a-modal>
@@ -277,13 +278,15 @@ import {
 import { checkActionPermission, hasPermission } from '@/utils/permission'
 import debounce from 'lodash/debounce'
 import { menuSearchLoop } from '@/utils/menuSearch'
+import vueQr from 'vue-qr'
 
 export default {
   components: {
     NewFolder,
     MenuFile,
     MenuFolder,
-    Screen
+    Screen,
+    vueQr
   },
   data() {
     return {
@@ -476,16 +479,24 @@ export default {
           this.folderList = rows
           // 没有选择文件的时候默认选择第一个文件
           if (!this.fileSelectId && this.folderList.length > 0) {
-            if (this.folderList[0].children.length > 0) {
-              this.fileSelectId = this.folderList[0].children[0].id
-              this.fileSelectName = this.folderList[0].children[0].name
-              return
-            }
-            this.fileSelectId = this.folderList[0].id
-            this.fileSelectName = this.folderList[0].name
+            this.getFirstScreen(this.folderList, 0)
           }
         }
       })
+    },
+    // 获取目录的第一个大屏
+    getFirstScreen(list, index) {
+      if (list[index].fileType === 1) {
+        this.fileSelectId = this.folderList[index].id
+        this.fileSelectName = this.folderList[index].name
+        return
+      }
+      if (list[index].children.length > 0) {
+        this.fileSelectId = this.folderList[index].children[0].id
+        this.fileSelectName = this.folderList[index].children[0].name
+        return
+      }
+      this.getFirstScreen(list, index + 1)
     },
     // 搜索文件
     menuSearch: debounce(function(event) {

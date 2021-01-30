@@ -282,19 +282,20 @@ const app = {
               let chart = rootGetters.canvasMap.find(
                 chart => chart.id + '' === id
               )
-              // 单个图表有设置定时器的时候，满足控制条件才处理
-              let apidata = chart.setting.api_data
-              if (
-                charSeted &&
-                (!apidata.refresh.isRefresh ||
-                  !apidata.refresh.unit ||
-                  apidata.refresh.frequency <= 0)
-              ) {
-                return
-              }
 
-              // 找到chart的表示当前页，直接更新在界面
+              // 找到chart的表示当前页
               if (chart) {
+                // 单个图表有设置定时器的时候，满足控制条件才处理
+                let apidata = chart.setting.api_data
+                if (
+                  charSeted &&
+                  (!apidata.refresh.isRefresh ||
+                    !apidata.refresh.unit ||
+                    apidata.refresh.frequency <= 0)
+                ) {
+                  return
+                }
+                // 更新界面
                 handleRefreshData({ chart, newData })
               } else {
                 // 其他页的也要更新
