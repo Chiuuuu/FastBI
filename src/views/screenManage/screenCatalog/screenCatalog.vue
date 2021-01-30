@@ -345,14 +345,14 @@ export default {
           },
           onClick: this.handleResetFile
         },
-        // {
-        //   name: '复制',
-        //   //   permission: {
-        //   //     OPERATOR: this.$PERMISSION_CODE.OPERATOR.duplicate,
-        //   //     OBJECT: this.$PERMISSION_CODE.OBJECT.screen
-        //   //   },
-        //   onClick: this.copyScreen
-        // },
+        {
+          name: '复制',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.duplicate,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.screen
+          },
+          onClick: this.copyScreen
+        },
         {
           name: '删除',
           permission: {
@@ -558,7 +558,12 @@ export default {
     // 大屏复制
     copyScreen(event, item, { parent, file, index }) {
       this.$server.screenManage.copyScreen(file.id).then(res => {
-        this.getList()
+        if (res.code === 200) {
+          this.getList()
+          this.$message.success(res.msg)
+        } else {
+          this.$message.error(res.msg)
+        }
       })
     },
     // 右键删除文件夹

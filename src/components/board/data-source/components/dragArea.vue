@@ -260,7 +260,9 @@ export default {
         selected.datamodelId = this.fileList[0].datamodelId
         // apiData.datamodelId = this.fileList[0].datamodelId
         // apiData.modelId = this.fileList[0].datamodelId
-        // this.currSelected.setting.api_data.modelId = this.fileList[0].datamodelId
+        selected.setting.api_data.modelId = parseInt(
+          this.fileList[0].datamodelId
+        )
       }
       this.updateChartData()
 
@@ -268,6 +270,7 @@ export default {
       if (this.chartType === '1') {
         if (data.dimensions.length === 0 && data.measures.length === 0) {
           selected.datamodelId = 0
+          selected.setting.api_data.modelId = 0
           this.updateChartData()
           return
         }
@@ -278,6 +281,7 @@ export default {
       if (this.chartType === '2') {
         if (data.measures.length === 0) {
           selected.datamodelId = 0
+          selected.setting.api_data.modelId = 0
           this.updateChartData()
           return
         }
@@ -285,6 +289,7 @@ export default {
       if (this.chartType === '3') {
         if (data.tableList.length === 0) {
           selected.datamodelId = 0
+          selected.setting.api_data.modelId = 0
           this.updateChartData()
           return
         }
