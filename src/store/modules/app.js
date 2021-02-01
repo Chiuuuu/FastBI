@@ -247,12 +247,20 @@ const app = {
           dispatch('dataModel/setSelectedModelList', res.list)
           commit('common/SET_PRIVILEGES', res.data.privileges || [])
           commit('SET_IS_PUBLISH', res.data.isPublish)
+          dispatch('refreshScreen', {
+            charSeted: false,
+            globalSettings: false,
+            needLoading: false
+          })
           return true
         }
       })
     },
     // 刷新大屏
-    async refreshScreen({ state, rootGetters }, { charSeted, globalSettings }) {
+    async refreshScreen(
+      { state, rootGetters },
+      { charSeted, globalSettings, needLoading }
+    ) {
       // 全局配置，信息不完整不处理
       if (
         globalSettings &&
@@ -263,11 +271,14 @@ const app = {
       let params = {
         id: state.screenId
       }
-      let loadingInstance = Loading.service({
-        lock: true,
-        text: '加载中...',
-        target: 'body'
-      })
+      let loadingInstance = null
+      if (needLoading) {
+        loadingInstance = Loading.service({
+          lock: true,
+          text: '加载中...',
+          target: 'body'
+        })
+      }
       screenManage
         .actionRefreshScreen({ params })
         .then(res => {
@@ -319,7 +330,9 @@ const app = {
           }
         })
         .finally(() => {
-          loadingInstance.close()
+          if (needLoading) {
+            loadingInstance.close()
+          }
         })
     }
   }

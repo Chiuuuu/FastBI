@@ -182,8 +182,16 @@ input::-webkit-input-placeholder {
     .errortext {
       color: red;
     }
-    .borderred{
+    .has-error{
         border-color:red;
+        &:hover{
+             border-color:red;
+             box-shadow: none;
+        }
+        &:focus{
+            border-color:red;
+            box-shadow: none;
+        }
     }
   }
   .indent {

@@ -2092,7 +2092,11 @@ export default {
     },
     // 刷新大屏
     refreshData() {
-      this.refreshScreen({ charSeted: false, globalSettings: true })
+      this.refreshScreen({
+        charSeted: false,
+        globalSettings: true,
+        needLoading: false
+      })
     }
   },
   watch: {
