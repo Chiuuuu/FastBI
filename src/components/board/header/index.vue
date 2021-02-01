@@ -159,7 +159,7 @@ export default {
         this.$message.error('暂无数据可刷新，请先添加数据')
         return
       }
-      this.refreshScreen({ charSeted: false, globalSeted: false })
+      this.refreshScreen({ charSeted: false, globalSettings: false })
     }
   }
 }

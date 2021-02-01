@@ -24,6 +24,7 @@ const list = [
         icon: 'icon_line_chart.png',
         type: '1',
         modelId: '',
+        isEmpty: false,
         api_data: {
           dimensions: [],
           measures: [],
@@ -163,6 +164,7 @@ const list = [
         icon: 'icon_histogram.png',
         type: '1',
         modelId: '',
+        isEmpty: false,
         api_data: {
           columns: ['日期', '访问用户', '下单用户', '下单率'],
           rows: [
@@ -304,6 +306,7 @@ const list = [
         icon: 'icon_.png',
         type: '1',
         modelId: '',
+        isEmpty: false,
         api_data: {
           columns: ['日期', '访问用户', '下单用户', '下单率'],
           rows: [
@@ -437,6 +440,7 @@ const list = [
         icon: '饼图.png',
         type: '1',
         modelId: '',
+        isEmpty: false,
         api_data: {
           columns: ['日期', '访问用户'],
           rows: [
@@ -547,6 +551,7 @@ const list = [
         icon: 'icon_radar_map.png',
         type: '1',
         modelId: '',
+        isEmpty: false,
         api_data: {
           columns: ['日期', '访问用户', '下单用户', '下单率', '日期'],
           rows: [
@@ -657,6 +662,7 @@ const list = [
         icon: '图表-雷达图.png',
         type: '2',
         modelId: '',
+        isEmpty: false,
         api_data: {
           columns: ['type', 'value'],
           rows: [{ type: 'speed', value: 60 }],
@@ -1044,6 +1050,7 @@ const list = [
         // iconFont: 'icon-Pie-chart',
         type: '1',
         modelId: '',
+        isEmpty: false,
         api_data: {
           columns: ['日期', '访问用户'],
           rows: [
@@ -1221,6 +1228,7 @@ const list = [
         icon: 'icon_time.png',
         type: '3',
         modelId: '',
+        isEmpty: false,
         api_data: {
           columns: [
             {

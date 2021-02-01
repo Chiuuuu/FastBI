@@ -251,11 +251,11 @@ const app = {
         }
       })
     },
-    //刷新大屏
-    async refreshScreen({ state, rootGetters }, { charSeted, globalSeted }) {
+    // 刷新大屏
+    async refreshScreen({ state, rootGetters }, { charSeted, globalSettings }) {
       // 全局配置，信息不完整不处理
       if (
-        globalSeted &&
+        globalSettings &&
         (!globalSettings.unit || globalSettings.frequency <= 0)
       ) {
         return
@@ -279,10 +279,16 @@ const app = {
             }
             let updateList = []
             for (let id of ids) {
-              let newData = dataItem[id].graphData
               let chart = rootGetters.canvasMap.find(
                 chart => chart.id + '' === id
               )
+              // 图表模型被删掉
+              if (dataItem[id] === 'IsChanged') {
+                chart.setting.isEmpty = true
+                continue
+              }
+              chart.setting.isEmpty = false
+              let newData = dataItem[id].graphData
 
               // 找到chart的表示当前页
               if (chart) {
@@ -307,7 +313,7 @@ const app = {
             }
             updateList = updateList.concat(rootGetters.canvasMap)
             screenManage.saveAllChart(updateList)
-            message.success(res.msg)
+            message.success('刷新成功')
           } else {
             res.msg && message.error(res.msg)
           }
