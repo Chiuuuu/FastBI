@@ -22,7 +22,7 @@
           <a-row type="flex" justify="end" align="middle">
             <a-button type="primary" class="select_button" @click="() => handleGetTableList()" :loading="spinning">刷新数据</a-button>
             <a-button
-              v-if="hasBtnPermissionEdit"
+              v-if="hasBtnPermissionEdit || hasBtnPermissionSchedule"
               v-show="showExtractBtn"
               type="primary"
               class="select_button"
@@ -90,11 +90,7 @@
           <a v-on:click="setting(row)">{{row.set ? '字段编辑' : '字段设置' }}</a>
         </span>
         <span slot="regular" slot-scope="row">
-          <a
-            v-if="hasBtnPermissionSchedule"
-            v-on:click="showSetting('single', row)"
-            >定时设置</a>
-          <span v-else>-</span>
+          <a v-on:click="showSetting('single', row)">定时设置</a>
         </span>
       </a-table>
       <a-modal width="920px" title="定时抽取记录" :bodyStyle="bodyStyle" :visible="visible1" @cancel="handleCloseExtractLog">
