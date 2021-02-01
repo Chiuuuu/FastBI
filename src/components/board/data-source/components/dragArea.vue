@@ -234,9 +234,6 @@ export default {
       let selected = this.canvasMap.find(
         item => item.id === this.currentSelected
       )
-      // console.log(this.canvasMap)
-      // console.log(this.currentSelected)
-      // console.log('当前',selected)
       // 维度
       if (this.type === 'dimensions') {
         selected.setting.api_data.dimensions = this.fileList
@@ -298,6 +295,13 @@ export default {
       let params = selected
       let apiData = deepClone(this.currSelected.setting.api_data)
       this.$server.screenManage.getData(params).then(res => {
+        selected.setting.isEmpty = false
+        // 数据源被删掉
+        if (res.code === 500 && res.msg === 'IsChanged') {
+          selected.setting.isEmpty = true
+          this.updateChartData()
+          return
+        }
         if (res.code === 200) {
           if (this.type === 'tableList') {
             let columns = []

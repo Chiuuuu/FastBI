@@ -198,7 +198,7 @@ import _ from 'lodash'
 import { Icon } from 'ant-design-vue'
 const IconFont = Icon.createFromIconfontCN({
   scriptUrl: '//at.alicdn.com/t/font_2276651_kjhn0ldks1j.js'
-}) //引入iconfont
+}) // 引入iconfont
 export default {
   props: {
     type: {
@@ -299,6 +299,12 @@ export default {
         // 获取维度对应字段列表
         let params = { datamodelId: dataFile.modelId, dimensions: [dataFile] }
         let res = await this.$server.screenManage.getDataPick(params)
+        // 模型数据被删
+        if (res.code === 500 && res.msg === 'IsChanged') {
+          this.$message.error('模型数据不存在')
+          this.isdrag = false
+          return
+        }
         if (res.code === 200) {
           // 拆维度列表
           dataFile.originList = res.rows.map(item => Object.values(item)[0]) // 维度全字段列表
@@ -583,7 +589,17 @@ export default {
         }
       }
 
+      let selected = this.canvasMap.find(
+        item => item.id === this.currentSelected
+      )
       this.$server.screenManage.getData(this.currSelected).then(res => {
+        selected.setting.isEmpty = false
+        // 数据源被删掉
+        if (res.code === 500 && res.msg === 'IsChanged') {
+          selected.setting.isEmpty = true
+          this.updateChartData()
+          return
+        }
         if (res.code === 200) {
           // 查不到数据
           if (res.rows.length === 0) {

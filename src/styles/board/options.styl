@@ -125,11 +125,7 @@
   padding: 6px 13px;
 }
 // 页面设置
-.page-config, .block-config {
-  .ant-collapse-content > .ant-collapse-content-box {
-    @extend .h-padding;
-  }
-  
+.page-config, .block-config {  
   .f-flex1 {
    flex: 1;
   }
@@ -306,6 +302,9 @@
     right: 10px;
     top: 8px;
     cursor: pointer;
+  }
+    .ant-collapse-content > .ant-collapse-content-box {
+    @extend .h-padding;
   }
 }
 

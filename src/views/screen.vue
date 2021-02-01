@@ -5,9 +5,14 @@
         <div class="canvas-panel">
           <template v-for="transform in canvasMap">
             <preview-box :key="transform.id" :item="transform">
+              <!--数据模型不存在-->
+              <chart-nodata
+                v-if="transform.setting.isEmpty"
+                :config="transform.setting.config"
+              ></chart-nodata>
               <!-- 文本 -->
               <chart-text
-                v-if="transform.setting.name === 've-text'"
+                v-else-if="transform.setting.name === 've-text'"
                 :config="transform.setting.config"
                 :background="transform.setting.background"
               ></chart-text>
@@ -55,6 +60,7 @@ import PreviewBox from '../components/preview/preview-box'
 import ChartText from '@/components/tools/Text'
 import ChartImage from '@/components/tools/Image'
 import ChartTables from '@/components/tools/Tables'
+import ChartNodata from '@/components/tools/Nodata'
 
 import {
   addResizeListener,
@@ -63,7 +69,14 @@ import {
 
 export default {
   name: 'screen',
-  components: { ChartsFactory, PreviewBox, ChartText, ChartImage, ChartTables },
+  components: {
+    ChartsFactory,
+    PreviewBox,
+    ChartText,
+    ChartImage,
+    ChartTables,
+    ChartNodata
+  },
   props: {},
   data() {
     return {
@@ -167,7 +180,7 @@ export default {
         this.$message.error('暂无数据可刷新，请先添加数据')
         return
       }
-      this.refreshScreen({ charSeted: false, globalSeted: false })
+      this.refreshScreen({ charSeted: false, globalSettings: false })
     }
   }
 }

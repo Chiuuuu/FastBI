@@ -75,9 +75,14 @@
             @mouseenter.native="handleHover(transform)"
             @mouseleave.native="handleNoHover(transform)"
           >
+            <!--数据模型不存在-->
+            <chart-nodata
+              v-if="transform.setting.isEmpty"
+              :config="transform.setting.config"
+            ></chart-nodata>
             <!-- 文本 -->
             <chart-text
-              v-if="transform.setting.name === 've-text'"
+              v-else-if="transform.setting.name === 've-text'"
               ref="veText"
               :id="transform.id"
               :canEdit.sync="transform.setting.canEdit"
@@ -147,6 +152,7 @@ import ChartsFactory from '@/components/charts/charts-factory'
 import ChartText from '@/components/tools/Text' // 文本模块
 import ChartImage from '@/components/tools/Image' // 图片模块
 import ChartTables from '@/components/tools/Tables' // 表格模块
+import ChartNodata from '@/components/tools/Nodata'
 import Screen from '@/views/screen' // 全屏
 
 import { Icon } from 'ant-design-vue'
@@ -331,6 +337,7 @@ export default {
     ChartText,
     ChartImage,
     ChartTables,
+    ChartNodata,
     Screen,
     IconFont
   },

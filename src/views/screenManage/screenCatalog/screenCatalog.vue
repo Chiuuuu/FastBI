@@ -848,8 +848,12 @@ export default {
       return this.$server.screenManage
         .showScreenRelease(this.screenId)
         .then(res => {
-          this.releaseObj = res.data
-          return true
+          if (res.code === 200) {
+            this.releaseObj = res.data
+            return true
+          } else {
+            this.$message.error(res.msg)
+          }
         })
     },
     // 查看分享
