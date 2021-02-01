@@ -464,8 +464,7 @@ export default {
           if (res.code === 200) {
             this.$message.success('保存成功')
             if (this.regData.length > 0) {
-              this.$parent.$refs.extract.updateRows(res.data)
-              // this.$emit('updateRows', res.data)
+              this.$emit('updateData', res.data)
             } else {
               if (this.single) {
                 this.$emit('insertData', res.data)
