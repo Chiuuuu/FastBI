@@ -382,6 +382,7 @@ export default {
     fileSelectId(val) {
       // 切换大屏清空是否发布
       if (val) {
+        this.showLimitWarn = ''
         this.$store.dispatch('SetIsPublish', '')
       }
     }
