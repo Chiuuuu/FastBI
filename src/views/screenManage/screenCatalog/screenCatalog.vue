@@ -230,7 +230,7 @@
           ><input
             v-if="isPublish === 0"
             v-model="releaseObj.password"
-            :class="['mod_input', 'ant-input', { borderred: showLimitWarn }]"
+            :class="['mod_input', { 'has-error': showLimitWarn }, 'ant-input']"
             placeholder="请输入6位分享密码（数字+字母）"
             maxlength="6"
             @input="handlePassword"
@@ -338,32 +338,28 @@ export default {
         {
           name: '移动至',
           permission: {
-            OPERATOR: this.$PERMISSION_CODE.OPERATOR.move,
-            OBJECT: this.$PERMISSION_CODE.OBJECT.screen
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit
           },
           onClick: this.handleFilemoveFile
         },
         {
           name: '重命名',
           permission: {
-            OPERATOR: this.$PERMISSION_CODE.OPERATOR.rename,
-            OBJECT: this.$PERMISSION_CODE.OBJECT.screen
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit
           },
           onClick: this.handleResetFile
         },
         {
           name: '复制',
           permission: {
-            OPERATOR: this.$PERMISSION_CODE.OPERATOR.duplicate,
-            OBJECT: this.$PERMISSION_CODE.OBJECT.screen
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit
           },
           onClick: this.copyScreen
         },
         {
           name: '删除',
           permission: {
-            OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove,
-            OBJECT: this.$PERMISSION_CODE.OBJECT.screen
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove
           },
           onClick: this.handleFileDelete
         }

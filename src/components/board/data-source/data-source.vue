@@ -302,7 +302,11 @@ export default {
     },
     // 刷新大屏
     refreshData() {
-      this.refreshScreen({ charSeted: true, globalSettings: false })
+      this.refreshScreen({
+        charSeted: true,
+        globalSettings: false,
+        needLoading: false
+      })
     }
   }
 }
