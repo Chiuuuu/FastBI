@@ -549,7 +549,7 @@ export default {
         dimensionsLimit: dimensionsLimitList,
         measuresLimit: measuresLimitList
       }
-      apiData.options = options
+      apiData.options = { ...apiData.options, ...options }
       this.$store.dispatch('SetSelfDataSource', apiData)
 
       await this.updateChartData()

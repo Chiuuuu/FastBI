@@ -95,7 +95,9 @@
                         @contextmenu.prevent="showMore(item2)"
                       >
                         <img src="@/assets/images/icon_dimension.png" />
-                        {{ item2.alias }}
+                        <span :class="{ colorred: item2.status !== 0 }">{{
+                          item2.alias
+                        }}</span>
                         <a-dropdown
                           :trigger="['click', 'contextmenu']"
                           v-if="!dimensionsChecked.includes(item2.id)"
@@ -144,7 +146,9 @@
                         @contextmenu.prevent="showMore(item2)"
                       >
                         <img src="@/assets/images/icon_measure.png" />
-                        {{ item2.alias }}
+                        <span :class="{ colorred: item2.status !== 0 }">{{
+                          item2.alias
+                        }}</span>
                         <a-dropdown
                           :trigger="['click', 'contextmenu']"
                           v-if="!measuresChecked.includes(item2.id)"
