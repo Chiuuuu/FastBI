@@ -287,6 +287,7 @@ import { checkActionPermission, hasPermission } from '@/utils/permission'
 import debounce from 'lodash/debounce'
 import { menuSearchLoop } from '@/utils/menuSearch'
 import vueQr from 'vue-qr'
+import { Loading } from 'element-ui'
 
 export default {
   components: {
@@ -566,14 +567,24 @@ export default {
     },
     // 大屏复制
     copyScreen(event, item, { parent, file, index }) {
-      this.$server.screenManage.copyScreen(file.id).then(res => {
-        if (res.code === 200) {
-          this.getList()
-          this.$message.success(res.msg)
-        } else {
-          this.$message.error(res.msg)
-        }
+      let loadingInstance = Loading.service({
+        lock: true,
+        text: '加载中...',
+        target: document.querySelector('.screen-manage')
       })
+      this.$server.screenManage
+        .copyScreen(file.id)
+        .then(res => {
+          if (res.code === 200) {
+            this.getList()
+            this.$message.success(res.msg)
+          } else {
+            this.$message.error(res.msg)
+          }
+        })
+        .finally(() => {
+          loadingInstance.close()
+        })
     },
     // 右键删除文件夹
     handleFolderDelete(event, item, { folder }) {
