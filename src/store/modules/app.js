@@ -20,7 +20,7 @@ const app = {
     orginPageSettings,
     pageSettings: orginPageSettings,
     // 状态数据
-    canvasRange: 0.55, // 画布缩放
+    canvasRange: 0.65, // 画布缩放
     optionsExpand: true, // 参数面板打开关闭
     modelExpand: true, // 8-14数据模型面板
     coverageExpand: false, // 图层面板打开关闭
@@ -30,6 +30,7 @@ const app = {
     parentId: '', // 大屏父id
     screenDataModels: [],
     pageList: [],
+    currentPageId: '',
     isPublish: '' // 大屏是否已发布
   },
   mutations: {
@@ -65,6 +66,9 @@ const app = {
     SET_PAGE_LIST(state, pages) {
       state.pageList = pages
     },
+    SET_PAGE_ID(state, page) {
+      state.currentPageId = page
+    },
     SET_IS_PUBLISH(state, isPublish) {
       state.isPublish = isPublish
     }
@@ -99,6 +103,9 @@ const app = {
     },
     SetPageList({ commit }, pages) {
       commit('SET_PAGE_LIST', pages)
+    },
+    SetPageId({ commit }, page) {
+      commit('SET_PAGE_ID', page)
     },
     SetIsPublish({ commit }, isPublish) {
       commit('SET_IS_PUBLISH', isPublish)
@@ -233,11 +240,10 @@ const app = {
       return screenManage.updateChart(params)
     },
     // 获取大屏详情
-    async getScreenDetail({ dispatch, commit }, { id, tabId }) {
+    async getScreenDetail({ dispatch, commit }, { id, tabId, needRefresh }) {
       return screenManage.getScreenDetailById(id, tabId).then(res => {
         if (res.code === 200) {
           this.screenData = res.data
-          console.log(this.screenData, 'screenData')
           dispatch('SetFileName', res.data ? res.data.name : '')
           dispatch('SetPageSettings', res.data ? res.data.setting : {})
           dispatch('InitCanvasMaps', {
@@ -247,11 +253,13 @@ const app = {
           dispatch('dataModel/setSelectedModelList', res.list)
           commit('common/SET_PRIVILEGES', res.data.privileges || [])
           commit('SET_IS_PUBLISH', res.data.isPublish)
-          dispatch('refreshScreen', {
-            charSeted: false,
-            globalSettings: false,
-            needLoading: false
-          })
+          if (needRefresh) {
+            return dispatch('refreshScreen', {
+              charSeted: false,
+              globalSettings: false,
+              needLoading: false
+            })
+          }
           return true
         }
       })
@@ -268,25 +276,27 @@ const app = {
       ) {
         return
       }
+      // 有loading的是手动刷新，refreshCache设为true
       let params = {
-        id: state.screenId
+        tabId: state.currentPageId,
+        refreshCache: needLoading ? true : false
       }
       let loadingInstance = null
       if (needLoading) {
         loadingInstance = Loading.service({
           lock: true,
           text: '加载中...',
-          target: 'body'
+          target: document.querySelector('.screen-manage')
         })
       }
-      screenManage
+      return screenManage
         .actionRefreshScreen({ params })
         .then(res => {
           if (res.code === 200) {
             let dataItem = res.data
             let ids = Object.keys(dataItem)
             if (ids.length === 0) {
-              return
+              return false
             }
             let updateList = []
             for (let id of ids) {
@@ -312,22 +322,24 @@ const app = {
                     !apidata.refresh.unit ||
                     apidata.refresh.frequency <= 0)
                 ) {
-                  return
+                  return false
                 }
                 // 更新界面
                 handleRefreshData({ chart, newData })
-              } else {
-                // 其他页的也要更新
-                handleRefreshData({ chart: dataItem[id], newData })
-                delete dataItem[id].graphData
-                updateList.push(dataItem[id])
+                updateList.push(chart)
               }
+              //   else {
+              //     // 其他页的也要更新
+              //     handleRefreshData({ chart: dataItem[id], newData })
+              //     delete dataItem[id].graphData
+              //     updateList.push(dataItem[id])
+              //   }
             }
-            updateList = updateList.concat(rootGetters.canvasMap)
             screenManage.saveAllChart(updateList)
             if (needLoading) {
               message.success('刷新成功')
             }
+            return true
           } else {
             res.msg && message.error(res.msg)
           }

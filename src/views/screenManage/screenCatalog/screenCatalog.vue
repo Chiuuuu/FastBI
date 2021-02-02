@@ -133,7 +133,12 @@
         >
       </div>
       <div class="contain" ref="contain">
-        <screen v-if="fileSelectId" ref="screen" :key="componentKey"></screen>
+        <screen
+          v-if="fileSelectId"
+          ref="screen"
+          :key="componentKey"
+          @getShareData="getShareData"
+        ></screen>
         <div class="empty" v-else>
           <img src="@/assets/images/icon_empty_state.png" class="empty_img" />
           <p class="empty_word">
@@ -369,17 +374,10 @@ export default {
     }
   },
   watch: {
-    isPublish(val) {
-      // 状态是已发布的提前获取分享信息，显示状态
-      if (val === 1) {
-        this.getShareData()
-      }
-    },
     fileSelectId(val) {
       // 切换大屏清空是否发布
       if (val) {
         this.showLimitWarn = ''
-        this.$store.dispatch('SetIsPublish', '')
       }
     }
   },
@@ -699,7 +697,7 @@ export default {
                       this.fileSelectName = values.name
                       this.getList()
                       if (this.isPublish === 1) {
-                        this.getShareData()
+                        this.$refs.screen.getShareData()
                       }
                     }
                   })
@@ -720,6 +718,7 @@ export default {
       }
       // 编辑大屏默认缩放是0.65
       this.SetCanvasRange(0.65)
+      this.$store.dispatch('dataModel/setSelectedModelList', [])
       this.$router.push({
         name: 'screenEdit',
         query: {
@@ -840,17 +839,9 @@ export default {
       }
     },
     // 获取分享信息
-    getShareData() {
-      return this.$server.screenManage
-        .showScreenRelease(this.screenId)
-        .then(res => {
-          if (res.code === 200) {
-            this.releaseObj = res.data
-            return true
-          } else {
-            this.$message.error(res.msg)
-          }
-        })
+    getShareData(sharedata) {
+      this.releaseObj = sharedata
+      return true
     },
     // 查看分享
     showShare() {
