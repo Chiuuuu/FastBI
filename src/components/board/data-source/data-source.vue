@@ -154,13 +154,13 @@ export default {
           let apiData = deepClone(val.setting.api_data)
           this.apiData = apiData
           // 选中的维度度量组合成排序列表
-          if (apiData.dimensions) {
+          if (apiData.dimensions && this.sortList.length === 1) {
             this.sortList = this.sortList.concat(apiData.dimensions)
           }
-          if (apiData.measures) {
+          if (apiData.measures && this.sortList.length === 1) {
             this.sortList = this.sortList.concat(apiData.measures)
           }
-          if (val.setting.name === 've-tables') {
+          if (val.setting.name === 've-tables' && this.sortList.length === 1) {
             this.sortList = this.sortList.concat(apiData.tableList)
           }
           // 回显排序信息
@@ -197,10 +197,11 @@ export default {
       }
       let data = this.sortList.filter(item => item.id === val)
       data[0].asc = this.sortData.asc
+
       let options = {
         sort: data[0]
       }
-      this.apiData.options = options
+      this.apiData.options = { ...this.apiData.options, ...options }
       this.$store.dispatch('SetSelfDataSource', this.apiData)
       if (this.currSelected.setting.name === 've-tables') {
         this.$refs.table.getData()
