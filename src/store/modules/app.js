@@ -293,16 +293,17 @@ const app = {
               let chart = rootGetters.canvasMap.find(
                 chart => chart.id + '' === id
               )
-              // 图表模型被删掉
-              if (dataItem[id] === 'IsChanged') {
-                chart.setting.isEmpty = true
-                continue
-              }
-              chart.setting.isEmpty = false
               let newData = dataItem[id].graphData
 
               // 找到chart的表示当前页
               if (chart) {
+                // 图表模型被删掉
+                if (dataItem[id] === 'IsChanged') {
+                  chart.setting.isEmpty = true
+                  continue
+                }
+                chart.setting.isEmpty = false
+
                 // 单个图表有设置定时器的时候，满足控制条件才处理
                 let apidata = chart.setting.api_data
                 if (
@@ -324,7 +325,9 @@ const app = {
             }
             updateList = updateList.concat(rootGetters.canvasMap)
             screenManage.saveAllChart(updateList)
-            message.success('刷新成功')
+            if (needLoading) {
+              message.success('刷新成功')
+            }
           } else {
             res.msg && message.error(res.msg)
           }
