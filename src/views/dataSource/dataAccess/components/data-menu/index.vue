@@ -2,8 +2,8 @@
   <div class="menu" id="menuRef">
     <div class="menu_title">
       <span class="m-t-s">数据接入</span>
-      <a-dropdown :trigger="['click']" placement="bottomLeft">
-        <a v-if="hasPermissionSourceAdd || hasPermissionFolderAdd" class="ant-dropdown-link">
+      <a-dropdown v-if="hasPermissionSourceAdd || hasPermissionFolderAdd" :trigger="['click']" placement="bottomLeft">
+        <a class="ant-dropdown-link">
           <a-icon type="plus-square" class="menu_icon" />
         </a>
         <a-menu slot="overlay" class="drow_menu">
