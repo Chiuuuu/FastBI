@@ -61,6 +61,7 @@ import ChartText from '@/components/tools/Text'
 import ChartImage from '@/components/tools/Image'
 import ChartTables from '@/components/tools/Tables'
 import ChartNodata from '@/components/tools/Nodata'
+import { Loading } from 'element-ui'
 
 import {
   addResizeListener,
@@ -89,7 +90,8 @@ export default {
       'canvasMap',
       'pageSettings',
       'screenId',
-      'orginPageSettings'
+      'orginPageSettings',
+      'isPublish'
     ]),
     // 画布面板的样式
     canvasPanelStyle() {
@@ -141,6 +143,11 @@ export default {
       // 获取页面配置之前先重置
       this.$store.dispatch('SetPageSettings', this.orginPageSettings)
       this.$store.dispatch('InitCanvasMaps', [])
+      let loadingInstance = Loading.service({
+        lock: true,
+        text: '加载中...',
+        target: document.querySelector('.screen-manage')
+      })
       // 先获取大屏对应的页签信息
       this.$server.screenManage.getScreenTabs(this.screenId).then(res => {
         if (res.code === 200) {
@@ -148,15 +155,37 @@ export default {
             Object.assign(item, { showDropDown: false, isFocus: false })
           )
           this.$store.dispatch('SetPageList', pages)
+          this.$store.dispatch('SetPageId', pages[0].id)
           // 默认显示大屏第一个页签的数据
           this.getScreenDetail({
             id: this.screenId,
-            tabId: pages[0].id
+            tabId: pages[0].id,
+            needRefresh: true
+          }).then(res => {
+            loadingInstance.close()
+            if (res && this.isPublish === 1) {
+              this.getShareData()
+            }
           })
         } else {
           res.msg && this.$message.error(res.msg)
+          loadingInstance.close()
         }
       })
+    },
+    // 获取分享信息
+    getShareData() {
+      return this.$server.screenManage
+        .showScreenRelease(this.screenId)
+        .then(res => {
+          if (res.code === 200) {
+            this.$emit('getShareData', res.data)
+            // this.releaseObj = res.data
+            return true
+          } else {
+            this.$message.error(res.msg)
+          }
+        })
     },
     _calcStyle() {
       const wrap = this.$refs.dvScreen
