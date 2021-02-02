@@ -65,13 +65,14 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['SetCanvasRange']),
+    ...mapActions(['SetCanvasRange', 'SetPageId']),
     // 页签跳转
     toOtherPage(id) {
       // 当前页已经选中不需要跳转
       if (id === this.$route.query.tabId) {
         return
       }
+      this.SetPageId(id)
       this.$router.replace({
         name: 'screenEdit',
         query: {
