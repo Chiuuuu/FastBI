@@ -17,7 +17,7 @@
         取消
       </a-button>
       <a-button
-        v-permission:[$PERMISSION_CODE.OPERATOR.export]="$PERMISSION_CODE.OBJECT.datamodel"
+        v-if="hasEditPermission"
         key="submit"
         type="primary"
         :loading="confirmLoading"
@@ -70,6 +70,7 @@
 </template>
 
 <script>
+import { hasPermission } from '@/utils/permission'
 export default {
   name: 'checkTable',
   props: {
@@ -79,6 +80,11 @@ export default {
       default: () => {
         return {}
       }
+    }
+  },
+  computed: {
+    hasEditPermission() {
+      return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.edit)
     }
   },
   data() {
