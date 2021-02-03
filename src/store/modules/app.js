@@ -298,7 +298,6 @@ const app = {
             if (ids.length === 0) {
               return false
             }
-            let updateList = []
             for (let id of ids) {
               let chart = rootGetters.canvasMap.find(
                 chart => chart.id + '' === id
@@ -326,7 +325,6 @@ const app = {
                 }
                 // 更新界面
                 handleRefreshData({ chart, newData })
-                updateList.push(chart)
               }
               //   else {
               //     // 其他页的也要更新
@@ -335,7 +333,7 @@ const app = {
               //     updateList.push(dataItem[id])
               //   }
             }
-            screenManage.saveAllChart(updateList)
+            screenManage.saveAllChart(rootGetters.canvasMap)
             if (needLoading) {
               message.success('刷新成功')
             }

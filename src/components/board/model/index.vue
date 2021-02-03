@@ -88,14 +88,14 @@
                         class="filelist"
                         :class="item2.id === searchSelected ? 'active' : ''"
                         :key="index2 + '_'"
-                        draggable="true"
+                        :draggable="item2.status === 0"
                         @click="fileClick(item2.id)"
                         @dragstart="dragstart(item2, 'dimensions', $event)"
                         @dragend="dragsend(item2, $event)"
                         @contextmenu.prevent="showMore(item2)"
                       >
                         <img src="@/assets/images/icon_dimension.png" />
-                        <span :class="{ colorred: item2.status !== 0 }">{{
+                        <span :class="{ 'line-through': item2.status !== 0 }">{{
                           item2.alias
                         }}</span>
                         <a-dropdown
@@ -146,7 +146,7 @@
                         @contextmenu.prevent="showMore(item2)"
                       >
                         <img src="@/assets/images/icon_measure.png" />
-                        <span :class="{ colorred: item2.status !== 0 }">{{
+                        <span :class="{ 'line-through': item2.status !== 0 }">{{
                           item2.alias
                         }}</span>
                         <a-dropdown

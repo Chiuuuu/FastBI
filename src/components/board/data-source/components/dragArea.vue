@@ -268,6 +268,7 @@ export default {
         if (data.dimensions.length === 0 && data.measures.length === 0) {
           selected.datamodelId = 0
           selected.setting.api_data.modelId = 0
+          selected.setting.isEmpty = false
           this.updateChartData()
           return
         }
@@ -279,6 +280,7 @@ export default {
         if (data.measures.length === 0) {
           selected.datamodelId = 0
           selected.setting.api_data.modelId = 0
+          selected.setting.isEmpty = false
           this.updateChartData()
           return
         }
@@ -287,6 +289,7 @@ export default {
         if (data.tableList.length === 0) {
           selected.datamodelId = 0
           selected.setting.api_data.modelId = 0
+          selected.setting.isEmpty = false
           this.updateChartData()
           return
         }
