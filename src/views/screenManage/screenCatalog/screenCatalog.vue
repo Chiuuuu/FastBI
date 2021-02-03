@@ -485,6 +485,9 @@ export default {
     },
     // 获取目录的第一个大屏
     getFirstScreen(list, index) {
+      if (!list[index]) {
+        return
+      }
       if (list[index].fileType === 1) {
         this.fileSelectId = this.folderList[index].id
         this.fileSelectName = this.folderList[index].name
