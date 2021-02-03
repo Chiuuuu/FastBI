@@ -11,7 +11,7 @@
   >
     <div v-if="fileList.length > 0">
       <div
-        class="field"
+        :class="['field', { error: item.status === 1 }]"
         v-for="(item, index) in fileList"
         :key="index"
         @contextmenu.prevent="showMore(item)"
@@ -577,14 +577,26 @@ export default {
         if (apiData.dimensions.length === 0 || apiData.measures.length === 0) {
           return
         }
+        if (
+          apiData.dimensions.some(item => item.status === 1) ||
+          apiData.measures.some(item => item.status === 1)
+        ) {
+          return
+        }
       }
       if (type === '2') {
         if (apiData.measures.length === 0) {
           return
         }
+        if (apiData.measures.some(item => item.status === 1)) {
+          return
+        }
       }
       if (type === '3') {
         if (apiData.tableList.length === 0) {
+          return
+        }
+        if (apiData.tableList.some(item => item.status === 1)) {
           return
         }
       }

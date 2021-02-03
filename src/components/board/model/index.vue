@@ -86,16 +86,19 @@
                       <li
                         v-for="(item2, index2) in item"
                         class="filelist"
-                        :class="item2.id === searchSelected ? 'active' : ''"
+                        :class="[
+                          { active: item2.id === searchSelected },
+                          { error: item2.status === 1 }
+                        ]"
                         :key="index2 + '_'"
                         :draggable="item2.status === 0"
-                        @click="fileClick(item2.id)"
+                        @click="fileClick(item2.id, item2.status)"
                         @dragstart="dragstart(item2, 'dimensions', $event)"
                         @dragend="dragsend(item2, $event)"
                         @contextmenu.prevent="showMore(item2)"
                       >
                         <img src="@/assets/images/icon_dimension.png" />
-                        <span :class="{ 'line-through': item2.status !== 0 }">{{
+                        <span :class="{ error: item2.status !== 0 }">{{
                           item2.alias
                         }}</span>
                         <a-dropdown
@@ -137,16 +140,19 @@
                       <li
                         v-for="(item2, index2) in item"
                         class="filelist"
-                        :class="item2.id === searchSelected ? 'active' : ''"
+                        :class="[
+                          { active: item2.id === searchSelected },
+                          { error: item2.status === 1 }
+                        ]"
                         :key="index2 + '_'"
-                        draggable="true"
-                        @click="fileClick(item2.id)"
+                        :draggable="item2.status === 0"
+                        @click="fileClick(item2.id, item2.status)"
                         @dragstart="dragstart(item2, 'measures', $event)"
                         @dragend="dragsend(item2, $event)"
                         @contextmenu.prevent="showMore(item2)"
                       >
                         <img src="@/assets/images/icon_measure.png" />
-                        <span :class="{ 'line-through': item2.status !== 0 }">{{
+                        <span :class="{ error: item2.status !== 0 }">{{
                           item2.alias
                         }}</span>
                         <a-dropdown
@@ -261,7 +267,8 @@ export default {
       'screenId',
       'selectedModelList',
       'currentSelected',
-      'currSelected'
+      'currSelected',
+      'canvasMap'
     ])
   },
   watch: {
@@ -400,7 +407,7 @@ export default {
       this.$store.dispatch('SetDragFile', '')
     },
     // 点击维度度量 取消选中效果
-    fileClick(id) {
+    fileClick(id, status) {
       if (id === this.searchSelected) {
         this.searchSelected = ''
       }
@@ -476,6 +483,33 @@ export default {
             this.dimensions = this.transData(dimensions)
             this.measures = this.transData(measures)
             this.searchList = [...dimensions, ...measures]
+
+            // 获取被删除的数据(status===1)
+            let selected = this.canvasMap.find(
+              item => item.id === this.currentSelected
+            )
+            let delDimensions = dimensions.filter(item => item.status === 1)
+            let delMeasures = measures.filter(item => item.status === 1)
+            delDimensions.forEach(item => {
+              let dimension = selected.setting.api_data.dimensions.find(
+                di => (di.alias = item.alias)
+              )
+              let tableDimension = selected.setting.api_data.tableList.find(
+                di => (di.alias = item.alias)
+              )
+              dimension.status = item.status
+              tableDimension.status = item.status
+            })
+            delMeasures.forEach(item => {
+              let measure = selected.setting.api_data.measures.find(
+                me => (me.alias = item.alias)
+              )
+              let tableMeasure = selected.setting.api_data.tableList.find(
+                di => (di.alias = item.alias)
+              )
+              measure.status = item.status
+              tableMeasure.status = item.status
+            })
           }
         })
     },

@@ -250,9 +250,9 @@
             ><span style="color:#FF0000">*</span>分享时效：</span
           >
           <a-radio-group v-if="isPublish === 0" v-model="releaseObj.expired">
-            <a-radio :value="1">7天</a-radio>
-            <a-radio :value="2">30天</a-radio>
-            <a-radio :value="3">永久</a-radio>
+            <a-radio :value="7">7天</a-radio>
+            <a-radio :value="30">30天</a-radio>
+            <a-radio :value="0">永久</a-radio>
           </a-radio-group>
           <span v-else>{{ expiredLabel }}</span>
         </div>
@@ -442,9 +442,9 @@ export default {
     },
     expiredLabel() {
       switch (this.releaseObj.expired) {
-        case 1:
+        case 7:
           return '7天'
-        case 2:
+        case 30:
           return '30天'
         default:
           return '永久'
@@ -845,7 +845,7 @@ export default {
     release() {
       if (this.isPublish === 0) {
         this.$server.screenManage.getScreenLink(this.screenId).then(res => {
-          this.releaseObj = { url: res.data, expired: 1, password: '' }
+          this.releaseObj = { url: res.data, expired: 7, password: '' }
           this.releaseVisible = true
         })
       } else {
@@ -855,7 +855,6 @@ export default {
     // 获取分享信息
     getShareData(sharedata) {
       this.releaseObj = sharedata
-      return true
     },
     // 查看分享
     showShare() {
@@ -919,6 +918,7 @@ export default {
             this.$message.success('发布成功')
             // 状态改为已发布
             this.$store.dispatch('SetIsPublish', 1)
+            this.$refs.screen.getShareData()
           }
         })
       } else {

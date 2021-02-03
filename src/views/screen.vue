@@ -162,10 +162,13 @@ export default {
             tabId: pages[0].id,
             needRefresh: true
           }).then(res => {
-            loadingInstance.close()
             if (res && this.isPublish === 1) {
-              this.getShareData()
+              this.getShareData().finally(() => {
+                loadingInstance.close()
+              })
+              return
             }
+            loadingInstance.close()
           })
         } else {
           res.msg && this.$message.error(res.msg)
@@ -184,6 +187,7 @@ export default {
             return true
           } else {
             this.$message.error(res.msg)
+            return false
           }
         })
     },

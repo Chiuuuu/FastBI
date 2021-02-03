@@ -274,12 +274,12 @@ const app = {
         globalSettings &&
         (!globalSettings.unit || globalSettings.frequency <= 0)
       ) {
-        return
+        return false
       }
       // 有loading的是手动刷新，refreshCache设为true
       let params = {
         tabId: state.currentPageId,
-        refreshCache: needLoading ? true : false
+        refreshCache: needLoading
       }
       let loadingInstance = null
       if (needLoading) {
@@ -296,7 +296,7 @@ const app = {
             let dataItem = res.data
             let ids = Object.keys(dataItem)
             if (ids.length === 0) {
-              return false
+              return true
             }
             for (let id of ids) {
               let chart = rootGetters.canvasMap.find(
