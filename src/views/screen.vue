@@ -162,13 +162,10 @@ export default {
             tabId: pages[0].id,
             needRefresh: true
           }).then(res => {
-            if (res && this.isPublish === 1) {
-              this.getShareData().finally(() => {
-                loadingInstance.close()
-              })
-              return
-            }
             loadingInstance.close()
+            if (res && this.isPublish === 1) {
+              this.getShareData()
+            }
           })
         } else {
           res.msg && this.$message.error(res.msg)

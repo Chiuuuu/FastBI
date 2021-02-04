@@ -30,6 +30,7 @@
         :config="config.model"
         v-if="config.model"
         @on-toggle="ToggleModelExpand"
+        @getErrorData="getErrorData"
       >
         <slot name="model"></slot>
       </board-model>
@@ -56,7 +57,13 @@ export default {
   data() {
     return {
       prefixCls: prefixCls,
-      config: config
+      config: config,
+      errorData: ''
+    }
+  },
+  provide() {
+    return {
+      errorFile: this.errorData
     }
   },
   computed: {
@@ -86,7 +93,10 @@ export default {
       'ToggleOptionsExpand',
       'ToggleCoverageExpand',
       'ToggleModelExpand'
-    ])
+    ]),
+    getErrorData(error) {
+      this.errorData = error
+    }
   },
   // 8-14 添加配置侧栏
   components: {

@@ -61,6 +61,7 @@ export default {
       isVaild: false //
     }
   },
+  inject: ['errorFile'],
   watch: {
     currSelected: {
       handler(val) {
@@ -90,6 +91,66 @@ export default {
           if (this.chartType === '3') {
             if (this.type === 'tableList' && val.setting.api_data.tableList) {
               this.fileList = deepClone(val.setting.api_data.tableList)
+            }
+          }
+        }
+      },
+      deep: true,
+      immediate: true
+    },
+    errorFile: {
+      handler(val) {
+        if (val) {
+          // 维度度量都需要
+          if (this.chartType === '1') {
+            if (this.type === 'dimensions' && this.fileList) {
+              // 维度
+              this.fileList.forEach(file => {
+                let dimension = val.dimensions.find(
+                  item => item.alias === file.alias
+                )
+                if (dimension && dimension.status === 1) {
+                  item.status = dimension.status
+                }
+              })
+            }
+            if (this.type === 'measures' && this.fileList) {
+              // 度量
+              this.fileList.forEach(file => {
+                let measure = val.measures.find(
+                  item => item.alias === file.alias
+                )
+                if (measure && measure.status === 1) {
+                  item.status = measure.status
+                }
+              })
+            }
+          }
+
+          // 只需要度量
+          if (this.chartType === '2') {
+            if (this.type === 'measures' && this.fileList) {
+              this.fileList.forEach(file => {
+                let measure = val.measures.find(
+                  item => item.alias === file.alias
+                )
+                if (measure && measure.status === 1) {
+                  item.status = measure.status
+                }
+              })
+            }
+          }
+
+          // 表格不区分维度跟度量
+          if (this.chartType === '3') {
+            if (this.type === 'tableList' && this.fileList) {
+              let list = val.dimensions.concat(val.measures)
+              this.fileList.forEach(file => {
+                let li = list.find(item => item.alias === file.alias)
+                if (li && li.status === 1) {
+                  item.status = li.status
+                }
+              })
             }
           }
         }

@@ -37,6 +37,8 @@ export function handleRefreshData({ chart, newData }) {
 
     chart.setting.api_data.source.rows = rows
   } else {
-    chart.setting.api_data.source.rows = newData
+    if (chart.setting.api_data.source) {
+      chart.setting.api_data.source.rows = newData
+    }
   }
 }

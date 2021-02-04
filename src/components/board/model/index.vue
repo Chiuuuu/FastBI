@@ -229,6 +229,7 @@ import { mapGetters, mapActions } from 'vuex'
 import { deepClone } from '@/utils/deepClone'
 import debounce from 'lodash/debounce'
 import { menuSearchLoop } from '@/utils/menuSearch'
+import { Loading } from 'element-ui'
 
 export default {
   name: 'BoardModel',
@@ -468,6 +469,12 @@ export default {
     },
     // 维度、度量列表
     getPivoSchemaList(id, type = 1) {
+      let loadingInstance = Loading.service({
+        lock: true,
+        text: '加载中...',
+        target: 'body',
+        background: 'rgb(255, 255, 255, 0.6)'
+      })
       this.$server.screenManage
         .getPivoSchemaList(id, this.screenId, type)
         .then(res => {
@@ -485,32 +492,14 @@ export default {
             this.searchList = [...dimensions, ...measures]
 
             // 获取被删除的数据(status===1)
-            let selected = this.canvasMap.find(
-              item => item.id === this.currentSelected
-            )
-            let delDimensions = dimensions.filter(item => item.status === 1)
-            let delMeasures = measures.filter(item => item.status === 1)
-            delDimensions.forEach(item => {
-              let dimension = selected.setting.api_data.dimensions.find(
-                di => (di.alias = item.alias)
-              )
-              let tableDimension = selected.setting.api_data.tableList.find(
-                di => (di.alias = item.alias)
-              )
-              dimension.status = item.status
-              tableDimension.status = item.status
-            })
-            delMeasures.forEach(item => {
-              let measure = selected.setting.api_data.measures.find(
-                me => (me.alias = item.alias)
-              )
-              let tableMeasure = selected.setting.api_data.tableList.find(
-                di => (di.alias = item.alias)
-              )
-              measure.status = item.status
-              tableMeasure.status = item.status
+            this.$emit('getErrorData', {
+              dimensions: dimensions.filter(item => item.status === 1),
+              measures: measures.filter(item => item.status === 1)
             })
           }
+        })
+        .finally(() => {
+          loadingInstance.close()
         })
     },
     transData(data) {
