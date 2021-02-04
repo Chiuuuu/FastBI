@@ -230,6 +230,7 @@ export default {
       isEmpty: false // 控制输入框边框样式，空输入变红
     }
   },
+  inject: ['errorFile'],
   components: {
     IconFont
   },
@@ -244,6 +245,23 @@ export default {
             val.setting.api_data.options.fileList
           ) {
             this.fileList = deepClone(val.setting.api_data.options.fileList)
+          }
+        }
+      },
+      deep: true,
+      immediate: true
+    },
+    errorFile: {
+      handler(val) {
+        if (val) {
+          if (this.fileList) {
+            let list = val.dimensions.concat(val.measures)
+            this.fileList.forEach(file => {
+              let li = list.find(item => item.alias === file.alias)
+              if (li && li.status === 1) {
+                item.status = li.status
+              }
+            })
           }
         }
       },
