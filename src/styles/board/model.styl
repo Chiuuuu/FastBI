@@ -3,7 +3,7 @@
 // 8-14 数据模型侧栏
 .board-model {
   position: absolute; // 控制位置
-  height: 100%;
+  // height: 100%;
   top: 40px;
   right: 0;
   bottom: 0;
@@ -77,9 +77,9 @@
       }
     .operation_main {
       // overflow-y: scroll;
-      height:730px;
+      height:800px;
       .operation {
-        height:40%;
+        height:34%;
         border-bottom: 1px solid #EFEFEF;
         .header {
           display flex;
@@ -128,6 +128,10 @@
                 display: block;
               }
             }
+            &.error {
+              background-color: #f5b8b8 !important;
+            color: #e33131 !important; 
+        }
           }
           .active{
             background: #617BFF;
@@ -135,7 +139,7 @@
           }
         }
         .mea_main{
-          height: calc(100% - 70px);
+          height: calc(100% - 36px);
         }
       }
     }

@@ -8,7 +8,9 @@
     :visible="show"
     @cancel="handleClose"
     @ok="handleOk">
-    <div v-if="typeof rows !== 'string'" style="margin-bottom:10px"><a-button type="primary" @click="setRegular">添加定时任务</a-button></div>
+    <div v-if="single" style="margin-bottom:10px">
+      <a-button type="primary" :loading="modalSpin" @click="setRegular">添加定时任务</a-button>
+    </div>
     <a-table
       rowKey='id'
       size="small"
@@ -65,7 +67,8 @@ export default {
       type: Boolean,
       default: false
     },
-    rows: [Array, String],
+    rows: [Array],
+    databaseId: [String],
     formData: [Object, String]
   },
   data() {
@@ -95,7 +98,7 @@ export default {
       modelId: state => state.dataAccess.modelId
     }),
     single() {
-      return typeof this.rows !== 'string' && this.rows.length === 1
+      return this.rows.length === 1
     },
     regularData() {
       return this.selectedRows.length > 0 ? this.selectedRows : this.data
@@ -110,15 +113,23 @@ export default {
   },
   methods: {
     setRegular() {
+      this.modalSpin = true
       this.$emit('setRegular')
     },
     async handleGetRegularList() {
       this.modalSpin = true
-      let isString = typeof this.rows === 'string'
-      const res = await this.$server.dataAccess.getRegularList(isString ? this.rows : this.rows[0].databaseId, +isString)
-        .finally(() => {
-          this.modalSpin = false
-        })
+      let res
+      if (!this.single) {
+        res = await this.$server.dataAccess.getRegularList(this.databaseId, 1)
+          .finally(() => {
+            this.modalSpin = false
+          })
+      } else {
+        res = await this.$server.dataAccess.getRegularList(this.rows[0].id, 0)
+          .finally(() => {
+            this.modalSpin = false
+          })
+      }
       if (res.code === 200) {
         this.regData = res.rows
       } else {
@@ -134,6 +145,7 @@ export default {
     },
     handleRegular(row, type) {
       if (type === 'edit') {
+        this.modalSpin = true
         this.$emit('setRegular', row)
       } else if (type === 'delete') {
         this.$confirm({

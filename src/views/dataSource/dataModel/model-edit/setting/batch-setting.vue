@@ -8,7 +8,7 @@
   >
     <div class="drawer-btn">
       <a-button style="width: 110px"
-        :disabled="!selectDrawer"
+        :disabled="!fieldSetable"
         @click="handleShowSetting($event, 'dataType')">设置字段类型</a-button>
       <a-button style="width: 110px"
         :disabled="!selectDrawer"
@@ -24,54 +24,15 @@
           v-for="(value, name) in cacheTables"
           :key="name"
           :header="handleGetPanelName(value[0].tableName)">
-          <a-table
-            :row-selection="rowSelection"
-            :columns="column"
-            :data-source="value"
-            :scroll="{ y: 320 }"
-            :pagination="false"
-            rowKey="id"
-            bordered>
-            <template #alias="text, record">
-              <a-input
-                v-model="record.alias"
-                :maxLength="20"
-                @change="handleCheckName"
-                style="width: 156px height: 32px" />
-            </template>
-            <template #dataType="text, record">
-              <field-select
-                :text="(text || record.dataType) | formatField"
-                :select-data="record"
-                :contextmenus="fieldContenxtMenu"
-                :isDimension="record.role === 1 || record.role === 4"
-              />
-            </template>
-            <template #role="text, record">
-              <field-select
-                :text="text | formatRole"
-                :select-data="record"
-                :contextmenus="[{
-                  name: '转换为' + ((text === 1 || text === 4)? '度量' : '维度'),
-                  roleType: handleReverRole(text),
-                  onClick: switchRoleType
-                }]"
-                :isDimension="record.role === 1 || record.role === 4"
-              />
-            </template>
-            <template #description="text, record">
-              <a-input v-model="record.description" :maxLength="200" style="width: 156px height: 32px" />
-            </template>
-            <template #comment="text, record">
-              <a-input v-model="record.comment" style="width: 100px height: 32px" />
-            </template>
-            <template #visible="text, record, index">
-              <a-select :value="`${record.visible}`" @change="(value) => handleSelect(value, record, index)">
-                <a-select-option value="true">是</a-select-option>
-                <a-select-option value="false">否</a-select-option>
-              </a-select>
-            </template>
-          </a-table>
+          <BatchSettingItem
+            :tableData="value"
+            @deleteSelectAllRows="handleDeleteSelectAllRows"
+            @onSelectAllRows="handleSelectAllRows"
+            @deleteSelectRow="handleDeleteSelectRow"
+            @onSelectRow="handleSelectRows"
+            @checkName="handleCheckName"
+            @change-visible="handleSelect"
+          ></BatchSettingItem>
         </a-collapse-panel>
       </a-collapse>
     </div>
@@ -143,65 +104,14 @@
 </template>
 
 <script>
-import FieldSelect from '@/components/dataSource/field-select/select'
+import BatchSettingItem from './batch-setting-item'
 import cloneDeep from 'lodash/cloneDeep'
 import debounce from 'lodash/debounce'
-const column = [
-  {
-    title: '原名',
-    dataIndex: 'name'
-  },
-  {
-    title: '别名',
-    dataIndex: 'alias',
-    width: 150,
-    scopedSlots: {
-      customRender: 'alias'
-    }
-  },
-  {
-    title: '字段类型',
-    dataIndex: 'dataType',
-    scopedSlots: {
-      customRender: 'dataType'
-    }
-  },
-  {
-    title: '字段属性',
-    dataIndex: 'role',
-    scopedSlots: {
-      customRender: 'role'
-    }
-  },
-  {
-    title: '字段说明',
-    dataIndex: 'description',
-    width: 150,
-    scopedSlots: {
-      customRender: 'description'
-    }
-  },
-  {
-    title: '注释',
-    dataIndex: 'comment',
-    width: 100,
-    scopedSlots: {
-      customRender: 'comment'
-    }
-  },
-  {
-    title: '是否可见',
-    dataIndex: 'visible',
-    scopedSlots: {
-      customRender: 'visible'
-    }
-  }
-]
-
+import pullAllBy from 'lodash/pullAllBy'
 export default {
   name: 'batchSetting',
   components: {
-    FieldSelect
+    BatchSettingItem
   },
   props: {
     isShow: Boolean,
@@ -209,7 +119,6 @@ export default {
   },
   data() {
     return {
-      column,
       selectedRows: [],
       showSetting: false,
       setType: '',
@@ -219,44 +128,16 @@ export default {
         role: 1,
         visible: true
       },
-      validatePass: true,
-      fieldContenxtMenu: [
-        {
-          name: '转换为整数',
-          dataType: 'BIGINT',
-          onClick: this.switchFieldType
-        },
-        {
-          name: '转换为小数',
-          dataType: 'DOUBLE',
-          onClick: this.switchFieldType
-        },
-        {
-          name: '转换为字符串',
-          dataType: 'VARCHAR',
-          onClick: this.switchFieldType
-        },
-        {
-          name: '转换为日期',
-          dataType: 'DATE',
-          onClick: this.switchFieldType
-        },
-        {
-          name: '转换为日期时间',
-          dataType: 'TIMESTAMP',
-          onClick: this.switchFieldType
-        }
-      ],
-      rowSelection: {
-        onChange: (selectedRowKeys, selectedRows) => {
-          this.selectedRows = [].concat(selectedRows)
-        }
-      }
+      validatePass: true
     }
   },
   computed: {
     selectDrawer() {
       return this.selectedRows.length > 0
+    },
+    fieldSetable() {
+      // 相同的字段属性(维度度量)才能批量设置字段类型
+      return this.selectDrawer && !this.selectedRows.some((item, index, list) => list[0].role !== item.role)
     }
   },
   watch: {
@@ -267,41 +148,28 @@ export default {
       }
     }
   },
-  filters: {
-    formatField(value) {
-      switch (value) {
-        case 'BIGINT':
-          value = '整数'
-          break
-        case 'TIMESTAMP':
-          value = '日期时间'
-          break
-        case 'DATE':
-          value = '日期'
-          break
-        case 'DOUBLE':
-          value = '小数'
-          break
-        case 'VARCHAR':
-          value = '字符串'
-          break
-      }
-      return value
-    },
-    formatRole(value) {
-      if (value === 1 || value === 4) {
-        return '维度'
-      } else {
-        return '度量'
-      }
-    }
-  },
   methods: {
     handleGetPanelName(name) {
       if (['自定义维度', '自定义度量', '自定义表'].indexOf(name) > -1) {
         return '自定义表'
       }
       return name
+    },
+    // 全选
+    handleSelectAllRows(rows) {
+      this.selectedRows = this.selectedRows.concat(rows)
+    },
+    // 取消全选
+    handleDeleteSelectAllRows(rows) {
+      pullAllBy(this.selectedRows, rows, 'id')
+    },
+    // 选择单个
+    handleSelectRows(record) {
+      this.selectedRows.push(record)
+    },
+    // 取消单个
+    handleDeleteSelectRow(record) {
+      pullAllBy(this.selectedRows, [record], 'id')
     },
     handleSelect(value, record, index) {
       const has = Object.keys(this.cacheTables).some(item => (item === record.tableNo) || (item === `${record.tableNo}`))
@@ -329,6 +197,7 @@ export default {
     }, 500),
     handleSave() {
       if (this.validatePass) {
+        this.selectedRows = []
         this.$emit('success', this.cacheTables)
       } else {
         this.$message.error('存在同名字段, 请重新命名')
@@ -338,26 +207,8 @@ export default {
       this.modalForm = this.$options.data().modalForm
     },
     handleClose() {
+      this.selectedRows = []
       this.$emit('close')
-    },
-    switchFieldType(e, item, vm) {
-      let dataType = item.dataType
-      vm.selectData.dataType = dataType
-    },
-    handleReverRole(value) {
-      if (value === 1) {
-        return 2
-      } else if (value === 2) {
-        return 1
-      } else if (value === 4) {
-        return 5
-      } else if (value === 5) {
-        return 4
-      }
-    },
-    switchRoleType(e, item, vm) {
-      let roleType = item.roleType
-      vm.selectData.role = roleType
     },
     handleShowSetting(e, type) {
       this.showSetting = true
@@ -373,21 +224,13 @@ export default {
     saveBatchFiled() {
       let value = this.modalForm[this.setType]
       this.selectedRows.forEach(item => {
-        if (this.setType === 'visible') {
-          item[this.setType] = (value === true)
-        } else if (this.setType === 'role') {
-          if (item.role === 1 && value === 2) {
-            item[this.setType] = 2
-          } else if (item.role === 2 && value === 1) {
-            item[this.setType] = 1
-          } else if (item.role === 4 && value === 2) {
-            item[this.setType] = 5
-          } else if (item.role === 5 && value === 1) {
-            item[this.setType] = 4
-          }
-        } else {
-          item[this.setType] = value
-        }
+        Object.keys(this.cacheTables).forEach(key => {
+          this.cacheTables[key].forEach(table => {
+            if (item.id === table.id) {
+              table[this.setType] = value
+            }
+          })
+        })
       })
     }
   }

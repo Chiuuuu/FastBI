@@ -275,8 +275,7 @@ export default {
     getDM(list) {
       if (list && list.length) {
         return list.filter(item => {
-          return item.visible && item.role !== 4 && item.role !== 5
-          // return item.visible
+          return item.visible && item.produceType === 0
         })
       }
       return list
@@ -338,7 +337,6 @@ export default {
     // 暂时使用的方法，把原生表达式的[]替换掉
     reverse(str) {
       const pairList = [...this.sourceDimensions, ...this.sourceMeasures]
-      const map = new Map()
       const matchArry = str.match(/(\[)(.*?)(\])/g)
       if (matchArry) {
         matchArry.forEach(value => {
@@ -347,15 +345,12 @@ export default {
           const item = pairList.filter(item => {
             return item.alias === key
           }).pop()
-          if (key && item && !map.has(item)) {
-            map.set(key, `$$${item.id}`)
+          if (key && item) {
+            // 要用三个$才能变成2个$
+            str = str.replace(value, '$$$' + item.id)
           }
         })
       }
-      map.forEach((value, key) => {
-        const t = new RegExp('(\\[)(' + key + ')(\\])', 'g')
-        str = str.replace(t, () => `${value}`)
-      })
       return str
     },
     handleSave() {
@@ -371,7 +366,7 @@ export default {
             const params = {
               name: this.form.name,
               datamodelId: this.$parent.model === 'add' ? this.$parent.addModelId : this.$parent.modelId,
-              role: this.computeType === '维度' ? 4 : 5,
+              role: this.computeType === '维度' ? 1 : 2,
               raw_expr: this.textareaValue,
               expr: this.reverse(this.textareaValue)
             }

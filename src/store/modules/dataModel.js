@@ -8,7 +8,6 @@ const state = {
   databaseId: '', // 数据库id
   datasource: null, // 数据源
   datasourceId: '',
-  privileges: [],
   selectedModelList: [] // 选中的数据模型
 }
 
@@ -39,9 +38,6 @@ const mutations = {
   },
   SET_SELECTEDMODELlIST(state, list) {
     state.selectedModelList = list
-  },
-  SET_PRIVILEGES(state, privileges) {
-    state.privileges = privileges
   }
 }
 

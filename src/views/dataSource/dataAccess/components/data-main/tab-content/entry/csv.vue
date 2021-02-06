@@ -9,7 +9,7 @@
         :wrapper-col="{ span: 14 }"
       >
         <a-form-model-item label="数据源名称" prop="name">
-          <a-input v-model="form.name" />
+          <a-input placeholder="请输入数据源名称" v-model="form.name" />
         </a-form-model-item>
         <a-form-model-item :label="modelType + '文件'" required>
           <div
@@ -46,6 +46,7 @@
             </a-empty>
           </div>
           <a-upload
+            accept=".csv"
             name="file"
             :headers="{ 'content-type': 'multipart/form-data' }"
             :showUploadList="false"
@@ -57,7 +58,7 @@
             </a-button>
           </a-upload>
         </a-form-model-item>
-        <a-form-model-item label="文件分隔符" prop="delimiter">
+        <a-form-model-item class="form-not-required" label="文件分隔符" prop="delimiter">
           <a-radio-group style="width:100%" v-model="form.delimiter" @change="changeDelimiter">
             <a-radio value="0">逗号</a-radio>
             <a-radio value="1">分号</a-radio>
@@ -558,7 +559,7 @@ export default {
           })
           formData.append('delimiter', this.queryDelimiter)
           formData.append('sourceSaveInput.name', this.form.name)
-          formData.append('sourceSaveInput.type', 5)
+          formData.append('sourceSaveInput.type', 12)
           formData.append('sourceSaveInput.parentId', this.parentId || 0)
           formData.append('sourceSaveInput.id', this.modelId || 0)
           if (this.deleteIdList.length > 0 || this.fileList.length > 0) {
@@ -576,10 +577,19 @@ export default {
                 this.$store.dispatch('dataAccess/setFirstFinished', true)
                 this.$store.dispatch('dataAccess/setModelName', this.form.name)
                 this.$store.dispatch('dataAccess/setModelId', result.data.datasource.id)
-                this.$store.commit('dataAccess/SET_PRIVILEGES', result.data.datasource.privileges)
+                this.$store.commit('common/SET_PRIVILEGES', result.data.datasource.privileges)
                 // this.$store.dispatch('dataAccess/setParentId', 0)
                 // 保存后清空列表
                 this.fileList = []
+                this.deleteIdList = []
+                // 刷新文件id(替换成数据库生成的真实id)
+                const databases = result.data.databaseList
+                this.fileInfoList.map(item => {
+                  const target = result.data.databaseList.find(data => data.name === item.name)
+                  if (target) {
+                    item.id = target.id
+                  }
+                })
               } else {
                 this.$message.error(result.msg)
               }

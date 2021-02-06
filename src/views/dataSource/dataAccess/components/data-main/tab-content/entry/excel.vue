@@ -9,7 +9,7 @@
         :wrapper-col="{ span: 14 }"
       >
         <a-form-model-item label="数据源名称" prop="name">
-          <a-input v-model="form.name" @change="handleSetTableName" />
+          <a-input placeholder="请输入数据源名称" v-model="form.name" @change="handleSetTableName" />
         </a-form-model-item>
         <a-form-model-item label="Excel文件" required>
           <div
@@ -46,6 +46,7 @@
             </a-empty>
           </div>
           <a-upload
+            accept=".xlsx, .xls"
             name="file"
             :headers="{ 'content-type': 'multipart/form-data' }"
             :showUploadList="false"
@@ -181,7 +182,7 @@ export default {
       modelInfo: state => state.dataAccess.modelInfo,
       modelFileList: state => state.dataAccess.modelFileList,
       modelType: state => state.dataAccess.modelType,
-      privileges: state => state.dataAccess.privileges,
+      privileges: state => state.common.privileges,
       databaseName: state => state.dataAccess.databaseName
     }),
     currentFileList() {
@@ -272,6 +273,7 @@ export default {
     // 获取当前文件对应的数据库信息
     async handleGetDataBase(index) {
       if (this.loading) return
+      this.currentSheetIndex = 0
       if (index < 0) {
         this.currentColumns = []
         this.currentFieldList = []
@@ -455,7 +457,6 @@ export default {
         const name = fileInfo.name
         fileInfo.name = name.slice(0, name.lastIndexOf('.'))
         this.fileInfoList.push(fileInfo)
-        console.log('name:', name, fileInfo.name)
 
         const currentIndex = this.currentFileList.length - 1
         const database = new MapSheet(result.rows[0].mapSheet)
@@ -564,7 +565,7 @@ export default {
           })
           formData.append('databaseName', this.databaseName)
           formData.append('sourceSaveInput.name', this.form.name)
-          formData.append('sourceSaveInput.type', 4)
+          formData.append('sourceSaveInput.type', 11)
           formData.append('sourceSaveInput.parentId', this.parentId || 0)
           formData.append('sourceSaveInput.id', this.modelId || 0)
           if (this.deleteIdList.length > 0 || this.fileList.length > 0) {
@@ -584,11 +585,19 @@ export default {
                 this.$store.dispatch('dataAccess/setModelName', this.form.name)
                 // this.$store.dispatch('dataAccess/setParentId', 0)
                 this.$store.dispatch('dataAccess/setModelId', result.data.datasource.id)
-                this.$store.commit('dataAccess/SET_PRIVILEGES', result.data.datasource.privileges)
+                this.$store.commit('common/SET_PRIVILEGES', result.data.datasource.privileges)
                 this.fileInfoList = result.data.sourceDatabases
                 // 保存后清空列表
                 this.fileList = []
                 this.deleteIdList = []
+                // 刷新文件id(替换成数据库生成的真实id)
+                const databases = result.data.sourceDatabases
+                this.fileInfoList.map(item => {
+                  const target = databases.find(data => data.name === item.name)
+                  if (target) {
+                    item.id = target.id
+                  }
+                })
               } else {
                 this.$message.error(result.msg)
               }

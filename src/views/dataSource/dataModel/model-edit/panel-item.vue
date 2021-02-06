@@ -1,5 +1,8 @@
 <template>
-  <div class="u-bitem edit" :class="[className]" ref="file">
+  <div
+    class="u-bitem edit"
+    :class="[className, itemData.tableNo === 0 && itemData.status === 1 ? 'error' : '' ]"
+    ref="file">
     <div class="txt">
       <div class="icon"><img :src="imgURI" /></div>
       <div class="name" :class="{ 'line-through': !itemData.visible }">{{ itemData.alias }}</div>
@@ -72,10 +75,6 @@ export default {
       e.stopPropagation()
       const that = this
       addClass(this.$refs.file, 'file-active')
-      const styleObj = {
-        left: this.className === 'dimensions' ? `${e.clientX}px` : `${e.clientX - 180}px`,
-        top: `${e.clientY - (that.contextmenus.length + 1) * 28}px`
-      }
        function addEvent(target) {
             target.$$fun = function () {
                 Array.prototype.push.call(arguments, that)
@@ -94,7 +93,12 @@ export default {
             }
             return item
         }),
-        styleObj,
+        customStyle: () => {
+          return {
+            left: this.className === 'dimensions' ? `${e.clientX}px` : `${e.clientX - 180}px`,
+            top: `${e.clientY - (that.contextmenus.length + 1) * 28}px`
+          }
+        },
         handleMarkCancel: function() {
           removeClass(that.$refs.file, 'file-active')
         }

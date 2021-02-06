@@ -40,7 +40,6 @@
         }
         .description {
             padding-left: 20px;
-            margin-bottom: 20px;
             margin-top: 10px;
             border-bottom: 1px solid #e8e8e8;
             .d-s{
@@ -57,6 +56,14 @@
                 line-height: 20px;
             }
         }
+        .tips {
+            color: #ff0000;
+            padding: 14px 21px 0;
+            margin: 0;
+            i {
+                color: #FFC34F;
+            }
+        }
         .detail_header {
             margin-left: 21px;
             height: 50px;
@@ -70,6 +77,14 @@
             display: flex;
             justify-content: space-around;
             height: calc(100% - 50px);
+
+            .line-through {
+                text-decoration: line-through;
+                color: #bbb 
+                &:hover {
+                    color: #bbb    
+                }
+            }
             
             .dim_title, .mea_title {
                 height: 38px    
@@ -85,6 +100,7 @@
                 width: 50%;
                 height: 100%;
                 background: rgba(248, 248, 248, 1);
+                border-bottom: 1px solid #e8e8e8;
                 .dim_span {
                     font-size:14px;
                     font-family:Microsoft YaHei;
@@ -99,6 +115,7 @@
                 width: 50%;
                 height: 100%;
                 background: rgba(248, 248, 248, 1);
+                border-bottom: 1px solid #e8e8e8;
                 .mea_span {
                     font-size:14px;
                     font-family:Microsoft YaHei;
@@ -121,14 +138,12 @@
 .draw_board {
     height: calc(50% - 60px);
     overflow: auto;
-    // margin-right: 20px;
-    border-top: 10px solid #f6f6f6;
-    border-bottom: 10px solid #f6f6f6;
+    border-bottom: 1px solid #efefef;
 }
 .m-map {
     position: relative;
     box-sizing: border-box;
-    padding: 21px;
+    padding: 14px 21px;
     height: 100%;
     width: 100%;
     -webkit-user-select: none;
@@ -153,6 +168,7 @@
 .detail {
     height: calc(50% - 60px);
     width: 100%;
+    margin-top: 14px;
 }
 
 .ant-collapse-borderless > .ant-collapse-item > .ant-collapse-content > .ant-collapse-content-box {

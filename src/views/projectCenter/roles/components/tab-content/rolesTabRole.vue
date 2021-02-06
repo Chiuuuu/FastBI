@@ -42,6 +42,7 @@ export default {
             getProvideActionList: () => this.actionList,
             getProvideTreeData: () => this.treeData,
             getCurrentRoleTab: () => this.currentTab,
+            getFolderHeader: () => this.folderHeader,
             status: this.status
         }
     },
@@ -74,7 +75,8 @@ export default {
             currentTab: 1,
             modulePermission: {},
             moduleList: {},
-            treeList: {}
+            treeList: {},
+            folderHeader: []
         }
     },
     mounted() {
@@ -84,13 +86,29 @@ export default {
         this.$EventBus.$on('roleFileSelect', this.handleGetData)
     },
     beforeDestroy() {
+        this.handleReset()
         this.$EventBus.$off('roleFileSelect', this.handleGetData)
     },
     methods: {
         handleChangeTab(activeKey) {
             this.currentTab = activeKey
         },
+        handleGetFolderPermissions() {
+            this.$server.projectCenter.getFolderHeader()
+                .then(res => {
+                    if (res.code === 200) {
+                        this.folderHeader = res.data
+                    } else {
+                        this.$message.error('获取文件夹权限失败')
+                    }
+                })
+        },
+        handleReset() {
+            this.data = this.$options.data()
+        },
         async handleGetData() {
+            this.handleReset()
+            await this.handleGetFolderPermissions()
             // 顺序加载
             this.spinning1 = true
             this.spinning2 = true
@@ -121,14 +139,13 @@ export default {
                                     }
                                 }
                                 folder.map(item => {
+                                    if (item.permissions.length > 0) {
+                                        addItem(item)
+                                    }
                                     if (item.children && item.children.length > 0) {
                                         item.children.map(leaf => {
                                             addItem(leaf)
                                         })
-                                    } else {
-                                        if (item.permissions.length > 0) {
-                                            addItem(item)
-                                        }
                                     }
                                 })
                                 this.$emit('getChangeItem', i, list)

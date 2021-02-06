@@ -74,14 +74,6 @@ export default {
     return $axios.post('/model/pivotschema/getDataSourceTableInfo', tables)
   },
   /**
-   * @description 更新数据模型信息
-   * @param {Object} params 请求参数
-   * @returns
-   */
-  putModelDetail(params) {
-    return $axios.post('/datamodel/datamodelInfo/getDataSourceTableInfo', params)
-  },
-  /**
    * @description 新增数据模型
    * @param {string | number} id 表id
    * @returns
@@ -184,15 +176,7 @@ export default {
     return $axios.post(`/model/table/getDataSourceTableDataList`, params)
   },
   /**
-   * @description 获取复制字段的id
-   * @param {Object} params 请求参数
-   * @returns
-   */
-  getCopyField(params) {
-    return $axios.post(`/model/pivotschema/getCopyField`, params)
-  },
-  /**
-   * @description
+   * @description 新建计算维度度量/获取复制字段
    * @param {Object} params 请求参数
    * @param {String} params.name 字段名称
    * @param {Number} params.role 字段角色，4：计算维度，5：计算度量
@@ -202,5 +186,32 @@ export default {
    */
   addCustomizModelPivotschema(params) {
     return $axios.post(`/model/pivotschema/getCustomizModelPivotschema`, params)
+  },
+  /**
+   * @description 获取拖拽之后单个表的信息
+   * @param {Object} params
+   * @param {Number} params.tableId
+   * @param {Number} params.datamodelId
+   * @returns
+   */
+  getSingleTableInfo(params) {
+    return $axios.post(`/model/table/getModelTableAndPivoSchema`, params)
+  },
+  /**
+   * @description 获取拖拽之后第二个开始单个表的信息和关系
+   * @param {Object} params
+   * @returns
+   */
+  getSingleTableInfoWithJoin(params) {
+    return $axios.post(`/model/join/getModelTableConfigInfoAndPivotschema`, params)
+  },
+  /**
+   * @description 获取维度度量信息
+   * @param {Object} params
+   * @param {Array} params.tables
+   * @returns
+   */
+  getDataModelTableInfoAndPivotshchemaInfo(params) {
+    return $axios.post(`/model/pivotschema/getDataModelTableInfoAndPivotshchemaInfo`, params)
   }
 }

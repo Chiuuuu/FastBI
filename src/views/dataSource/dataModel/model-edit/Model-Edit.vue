@@ -91,7 +91,20 @@
         <a-form :form="modelForm" :label-col="{ span: 3 }" :wrapper-col="{ span: 12 }">
           <a-form-item label="数据模型名称">
             <a-input
-              v-decorator="['name', { rules: [{ required: true, message: '请输入名称!' }] }]"
+              v-decorator="['name', {
+                rules: [
+                  {
+                    required: true,
+                    message: '请填写名称'
+                  },
+                  {
+                    type: 'string',
+                    min: 1,
+                    max: 20,
+                    message: '请输入1-20个字的名称'
+                  }
+                ]
+              }]"
             />
           </a-form-item>
         </a-form>
@@ -100,10 +113,10 @@
         <span class="d-s" :title="detailInfo.description">描述： {{detailInfo.description}}</span>
         <a-icon type="edit" v-on:click="openModal('describe-setting')" class="d-s-icon"/>
       </div>
+      <p class="tips"><a-icon theme="filled" type="exclamation-circle" style="margin-right: 2px;" />下方表显示红色表示表在数据源已被删除，请您删除此表。表显示黄色表示表中列字段发生了变动，请您重新构建表关联关系。</p>
       <div class="draw_board scrollbar">
         <edit-right-top ref='rightTopRef' :detailInfo="detailInfo"></edit-right-top>
       </div>
-      <a-divider />
       <div class="detail scrollbar">
         <div class="detail_header">
           <span>数据模型详情</span>
@@ -192,7 +205,7 @@
       />
       <div class="submit_btn">
         <!-- <a-button :disabled="!detailInfo">保存并新建报告</a-button> -->
-        <a-button type="primary" @click="handleSave" :disabled="!detailInfo">保 存</a-button>
+        <a-button v-if="hasBtnPermissionSave" type="primary" @click="handleSave" :disabled="!detailInfo">保 存</a-button>
         <a-button v-on:click="exit">退 出</a-button>
       </div>
     </div>
@@ -214,6 +227,7 @@ import RenameSetting from './setting/rename-setting'
 import UnionSetting from './setting/union-setting'
 import PanelItem from './panel-item'
 import { Node, conversionTree } from '../util'
+import { hasPermission } from '@/utils/permission'
 import groupBy from 'lodash/groupBy'
 import keys from 'lodash/keys'
 import DimensionsIcon from '@/assets/images/icon_dimension.png'
@@ -295,6 +309,7 @@ export default {
       addModelId: state => state.dataModel.addModelId, // 新增的模型id
       parentId: state => state.dataModel.parentId, // 选中的文件夹id
       datasource: state => state.dataModel.datasource, // 数据源
+      privileges: state => state.common.privileges,
       datasourceId: state => state.dataModel.datasourceId // 数据源
     }),
     model() {
@@ -320,6 +335,9 @@ export default {
       }
 
       return this.detailInfo.config.tables && this.detailInfo.config.tables.length === 0
+    },
+    hasBtnPermissionSave() {
+      return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.edit)
     }
   },
   mounted() {
@@ -330,7 +348,6 @@ export default {
       this.handleGetData(this.$route.query.modelId)
       this.$store.dispatch('dataModel/setModelId', this.$route.query.modelId)
     }
-    this.$EventBus.$on('deleteBelongCustom', this.handleDeleteCustomDimMea)
     this.$EventBus.$on('tableUnion', this.handleTableUnion)
   },
   beforeDestroy() {
@@ -416,6 +433,7 @@ export default {
       if (result.code === 200) {
         this.detailInfo = result.data
         this.$store.dispatch('dataModel/setAddModelId', result.data.id)
+        this.$store.commit('common/SET_PRIVILEGES', [0]) // 新增赋予所有权限
         this.$nextTick(() => {
           this.handleGetDatabase()
         })
@@ -475,30 +493,15 @@ export default {
       this.unionNode = node
       this.openModal('union-setting')
     },
-    // 删除表时, 删除和表关联的自定义维度度量
-    handleDeleteCustomDimMea(ownProps) {
-      // this.customDimensions = this.customDimensions.filter(item => item.modelTableId !== ownProps.id)
-      // this.customMeasures = this.customMeasures.filter(item => item.modelTableId !== ownProps.id)
-    },
     // 转换维度度量
     handleSwitchRole(type, vm) {
       let tableName = vm.itemData.tableName
-
-      // 1,4 表示维度 2,5表示度量
-      // 1,2 为一组相互对调
-      // 4,5 为一组相互对调
-      let role
-      if (vm.itemData.role === 1) {
-        role = 2
-      } else if (vm.itemData.role === 2) {
-        role = 1
-      } else if (vm.itemData.role === 4) {
-        role = 5
-      } else if (vm.itemData.role === 5) {
-        role = 4
+      const role = vm.itemData.role === 1 ? 2 : 1
+      if (vm.itemData.tableNo === 0) {
+        tableName = role === 1 ? '自定义维度' : '自定义度量'
       }
       if (vm.itemData.tableNo === 0) {
-        tableName = (role === 1 || role === 4) ? '自定义维度' : '自定义度量'
+        tableName = role === 1 ? '自定义维度' : '自定义度量'
       }
       const data = {
         ...vm.itemData,
@@ -538,17 +541,15 @@ export default {
     // 复制维度度量
     async handleCopyField(event, handler, vm) {
       const role = vm.itemData.role
-      const isDimension = role === 1 || role === 4
-      const isMeasures = role === 2 || role === 5
+      const isDimension = role === 1
+      const isMeasures = role === 2
       let newField = {
         ...vm.itemData,
-        id: '',
-        expr: `${vm.itemData.tableName},${vm.itemData.tableNo}`,
-        tableNo: 0,
-        tableName: '自定义' + (isDimension ? '维度' : '度量')
+        datamodelId: this.model === 'add' ? this.addModelId : this.modelId,
+        expr: vm.itemData.produceType === 0 ? `$$${vm.itemData.id}` : vm.itemData.expr,
+        raw_expr: vm.itemData.produceType === 0 ? `[${vm.itemData.alias}]` : vm.itemData.raw_expr
       }
-
-      const result = await this.$server.dataModel.getCopyField(newField)
+      const result = await this.$server.dataModel.addCustomizModelPivotschema(newField)
       if (result.code === 200) {
         newField = {
           ...newField,
@@ -599,30 +600,46 @@ export default {
         const map = new Map()
         list.forEach(element => {
           if (element.tableNo !== 0) {
-            if (map.has(element.alias)) {
-              let value = map.get(element.alias)
-              let alias = element.alias
-              if (value === 1 && map.get('tableName') !== element.tableName) {
-                // 不同表名同字段
-                alias = `${alias}(${element.tableName})`
-              } else if (value > 1 && map.get('tableName') === element.tableName) {
-                // 同表名同字段且已经存在过(value > 1)
-                alias = `${alias}(${element.tableName})(${value})`
-              } else {
-                // 同表名同字段
-                alias = `${alias}(${value})`
-              }
-              value++
-              map.set(element.alias, value)
-              element.alias = alias
-            } else {
-              map.set(element.alias, 1)
-              map.set('tableName', element.tableName)
-            }
+            this.changeAlias(map, element.alias, element)
           }
         })
       }
       return list
+    },
+    changeAlias(map, alias, element) {
+      if (map.has(alias)) {
+        const target = map.get(alias)
+        let value = target.value
+        if (value === 1 && target.tableName !== element.tableName) {
+          // 不同表名同字段
+          alias = `${element.alias}(${element.tableName})`
+        } else if (value > 1 && target.tableName === element.tableName) {
+          // 同表名同字段且已经存在过(value > 1)
+          alias = `${element.alias}(${element.tableName})(${value})`
+        } else {
+          // 同表名同字段
+          alias = `${element.alias}(${value})`
+        }
+        if (map.has(alias)) {
+          value++
+          map.set(alias, {
+            value,
+            tableName: element.tableName
+          })
+          this.changeAlias(map, alias, element)
+        } else {
+          map.set(alias, {
+            value: 1,
+            tableName: element.tableName
+          })
+          element.alias = alias
+        }
+      } else {
+        map.set(element.alias, {
+          value: 1,
+          tableName: element.tableName
+        })
+      }
     },
     /**
      * 合并维度数据
@@ -676,10 +693,15 @@ export default {
       if (result.code === 200) {
         this.$message.success('获取数据成功')
         this.detailInfo = result.data
-
         // 将自定义维度度量剥离处理
         this.detailInfo.pivotSchema.dimensions = this.handlePeelCustom(this.detailInfo.pivotSchema.dimensions, this.cacheDimensions)
         this.detailInfo.pivotSchema.measures = this.handlePeelCustom(this.detailInfo.pivotSchema.measures, this.cacheMeasures)
+
+        // 校验缺失字段
+        this.doWithMissing(this.cacheDimensions, result.data.pivotSchema)
+        this.doWithMissing(this.cacheMeasures, result.data.pivotSchema)
+
+        this.$store.commit('common/SET_PRIVILEGES', result.data.privileges || [])
 
         this.handleDimensions()
         this.handleMeasures()
@@ -689,6 +711,24 @@ export default {
       } else {
         this.$message.error(result.msg)
       }
+    },
+    // 替换为缺失文案
+    doWithMissing(list, pivotSchema) {
+      list.forEach(filed => {
+        const matchs = filed.raw_expr.match(/(\[)(.*?)(\])/g)
+        if (matchs) {
+          matchs.forEach(value => {
+            const matchStr = value.match(/(\[)(.+)(\])/)
+            const key = matchStr[2] ? matchStr[2] : ''
+            const pairList = [...pivotSchema.dimensions, ...pivotSchema.measures]
+            const missing = pairList.filter(item => item.alias === key).pop()
+            if (!missing) {
+              filed.status = 1
+              filed.raw_expr = filed.raw_expr.replace(value, '<此位置字段丢失>')
+            }
+          })
+        }
+      })
     },
     handlePeelCustom(list, cache) {
       if (list && list.length) {
@@ -801,9 +841,9 @@ export default {
         Object.keys(data).forEach(item => {
           const list = data[item]
           list.forEach(field => {
-            if (field.role === 1 || field.role === 4) {
+            if (field.role === 1) {
               cacheDimensions.push(field)
-            } else if (field.role === 2 || field.role === 5) {
+            } else if (field.role === 2) {
               cacheMeasures.push(field)
             }
           })

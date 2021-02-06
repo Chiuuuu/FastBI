@@ -111,7 +111,11 @@ export default {
     handleLeftDragStart(event, data) {
       this.nodeStatus = Object.assign(this.nodeStatus, {
         dragType: 'menu',
-        dragNode: new Node(data),
+        dragNode: {
+          ...data,
+          tableId: data.id
+        },
+        // dragNode: new Node(data),
         event
       })
     },

@@ -19,6 +19,7 @@
           <div class="description">
               <span class="d-s" :title="detailInfo.description">描述：{{detailInfo.description}}</span>
           </div>
+          <!-- <p class="tips"><a-icon theme="filled" type="exclamation-circle" style="margin-right: 2px;" />下方表显示红色表示表在数据源已被删除，请您删除此表。表显示黄色表示表中列字段发生了变动，请您重新构建表关联关系。</p> -->
           <div class="draw_board scrollbar">
             <div class="m-dml-map m-map">
               <a-empty v-if="tablesEmpty" class="main-empty">
@@ -34,7 +35,6 @@
               </template>
             </div>
           </div>
-          <a-divider />
           <div class="detail">
             <div class="detail_header">
               <span>数据模型详情</span>
@@ -121,7 +121,7 @@ export default {
     ...mapState({
       modelId: state => state.dataModel.modelId,
       modelName: state => state.dataModel.modelName,
-      privileges: state => state.dataModel.privileges,
+      privileges: state => state.common.privileges,
       datasourceId: state => state.dataModel.datasourceId
     }),
     hasEditPermission() {
@@ -150,7 +150,7 @@ export default {
         this.$message.success('获取数据成功')
         this.detailInfo = result.data
         this.$store.commit('dataModel/SET_MODELNAME', result.data.name)
-        this.$store.commit('dataModel/SET_PRIVILEGES', result.data.privileges || [])
+        this.$store.commit('common/SET_PRIVILEGES', result.data.privileges || [])
         this.handleDetailWithRoot()
         this.handleDimensions()
         this.handleMeasures()

@@ -20,7 +20,9 @@
           <a-input placeholder="请输入视图名称" v-model="form.name"></a-input>
         </a-form-model-item>
         <div>
-          <a-row><a-col :offset="4"><a-icon type="exclamation-circle" />SQL里不能存在同名字段</a-col></a-row>
+          <a-row>
+            <a-col :offset="4"><a-icon type="exclamation-circle" style="margin-right: 2px;" />仅支持ANSI SQL语法 <a-icon type="exclamation-circle" style="margin-right: 2px;" />SQL里不能存在同名字段</a-col>
+          </a-row>
           <a-form-model-item label="SQL语句" prop="cloneSql">
             <a-textarea style="height:200px;resize:unset" v-model="cloneSql" @blur.native.prevent.stop="handleValidateSql" />
           </a-form-model-item>
@@ -65,7 +67,7 @@ export default {
           },
           {
             max: 20,
-            message: '请输入1-20个字符的试图名称'
+            message: '请输入1-20个字符的视图名称'
           }
         ],
         cloneSql: [

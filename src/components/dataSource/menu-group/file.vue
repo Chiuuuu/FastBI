@@ -12,7 +12,8 @@
   >
     <h4 class="title" :title="file[fileName]">
       <a-icon type="file" v-if="icon === 'default'" style="margin-right: 2px;"/>
-      <img :src="fileIcon" class='file-icon' v-else/>
+      <div class="file-icon icon-bg icon-model" v-else-if="icon === 'dataModel'"/>
+      <div :class="['file-icon', 'icon-bg', 'icon-' + file.type]" v-else/>
       <span>{{ file[fileName] }}</span>
     </h4>
     <span class="menu" v-if="hasContextmenus">
@@ -65,7 +66,8 @@ export default {
   data() {
     return {
       contenxtmenu: '',
-      fileIcon: this.icon === 'default' ? '' : require(`@/assets/images/icon_${this.icon}.png`)
+      // fileIcon: this.icon === 'default' ? '' : require(`@/assets/images/icon_${this.icon}.png`),
+      fileIcon: this.icon === 'default' ? '' : require(`@/assets/images/common/types.png`)
     }
   },
   mounted() {
@@ -119,10 +121,7 @@ export default {
           }
           return item
         }),
-        styleObj: {
-          left: e.clientX + 'px',
-          top: e.clientY + 'px'
-        },
+        target: e,
         handleMarkCancel: function() {
           removeClass(that.$refs.file, 'file-active')
         }
@@ -131,3 +130,27 @@ export default {
   }
 }
 </script>
+<style lang="less" scoped>
+  .icon-bg {
+    background: url("../../../assets/images/common/types.png") no-repeat;
+    background-size: 110px 16px;
+  }
+  .icon-2 { // oracle
+    background-position: 0 0;
+  }
+  .icon-11 { // excel
+    background-position: -18px 0;
+  }
+  .icon-5 { // hive
+    background-position: -36px 0;
+  }
+  .icon-1 { // mysql
+    background-position: -54px 0;
+  }
+  .icon-12 { // csv
+    background-position: -72px 0;
+  }
+  .icon-model { // 数据模型
+    background-position: -94px 0;
+  }
+</style>

@@ -17,7 +17,6 @@
         取消
       </a-button>
       <a-button
-        v-permission:[$PERMISSION_CODE.OPERATOR.export]="$PERMISSION_CODE.OBJECT.datamodel"
         key="submit"
         type="primary"
         :loading="confirmLoading"

@@ -1,4 +1,5 @@
 import assing from 'lodash/assign'
+import cloneDeep from 'lodash/cloneDeep'
 import get from 'lodash/get'
 
 export class Node {
@@ -19,23 +20,14 @@ export class Node {
   setChildren(item) {
     this.children = item
   }
-  setTableId() {
-    this.props['tableId'] = this.props['id']
-  }
-  setTableNo(no) {
-    this.props['tableNo'] = no
-  }
   setJoinType(type) {
     this.props['joinType'] = type
   }
-  setDataModelId(id, key = 'datamodelId') {
-    this.props[key] = id
-  }
-  setJoin(data, key = 'join') {
-    this.props[key] = data
-  }
   setField(field, value) {
     this.props[field] = value
+  }
+  setProps(data) {
+    this.props = cloneDeep(data)
   }
   getProps() {
     return this.props

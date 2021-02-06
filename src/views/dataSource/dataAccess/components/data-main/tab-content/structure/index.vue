@@ -1,59 +1,61 @@
 <template>
-  <div class="tab-panel">
+  <a-spin class="tab-panel" :spinning="verifying">
     <div class="search_bar">
       <a-radio-group class="search_radio" v-model="tableType" @change="handleTableTypeChange">
         <a-radio-button :value="0">原始表</a-radio-button>
         <a-radio-button :value="1">自定义表</a-radio-button>
       </a-radio-group>
-      <a-row type="flex" justify="end" align="middle">
-        <a-col :span="6" style="margin-right:auto">
-          <a-input :value="tableKeyword" @change="handleGetTableKeyword" placeholder="请输入表名" class="search_input">
+      <a-row type="flex" align="middle">
+        <a-col :span="6" style="padding-left:20px">
+          <a-input :value="tableKeyword" @change="handleGetTableKeyword" placeholder="请输入表名">
             <a-icon slot="prefix" type="search" />
           </a-input>
         </a-col>
-        <a-col :span="13">
-          <a-row type="flex" justify="end" align="middle">
-          <a-button type="primary" class="select_button" @click="() => handleGetData()" :loading="spinning">刷新数据</a-button>
-          <a-button
-            v-if="tableType === 0 && hasBtnPermissionSchedule"
-            v-show="showExtractBtn"
-            type="primary"
-            style="margin-left:10px;"
-            class="select_button"
-            @click="showExtractLog"
-          >定时抽取记录</a-button>
-          <a-button
-            v-if="hasBtnPermissionExtract"
-            v-show="showExtractBtn"
-            type="primary"
-            class="select_button"
-            style="margin-left:10px;"
-            @click="handleExtract"
-            :loading="extractSping">立即抽取</a-button>
-          <a-button
-            v-if="tableType === 0 && hasBtnPermissionSchedule"
-            v-show="showExtractBtn"
-            type="primary"
-            style="margin-left:10px;"
-            @click="showSetting('batch')"
-            class="select_button"
-          >批量抽取</a-button>
-          <a-button
-            v-if="tableType === 0 && hasBtnPermissionSchedule"
-            v-show="showExtractBtn"
-            type="primary"
-            style="margin-left:10px;"
-            @click="showSetting('batchList')"
-            class="select_button"
-          >批量任务列表</a-button>
-          </a-row>
-        </a-col>
-        <a-col v-show="tableType === 0" :span="4" style="margin-left:10px">
-          <a-select style="width: 100%;" :value="database" @change="handleChangeDatabase">
+        <a-col :span="4" style="padding-left:10px">
+          <a-select v-show="tableType === 0" style="width: 100%;" :value="database" @change="handleChangeDatabase">
             <a-select-option v-for="item in databaseList" :key="item.name" :value="item.name">
               {{ item.name }}
             </a-select-option>
           </a-select>
+        </a-col>
+        <a-col :span="14">
+          <a-row type="flex" justify="end" align="middle">
+            <a-button type="primary" class="select_button" @click="() => handleGetTableList()" :loading="spinning">刷新数据</a-button>
+            <a-button
+              v-if="hasBtnPermissionEdit || hasBtnPermissionSchedule"
+              v-show="showExtractBtn"
+              type="primary"
+              class="select_button"
+              style="margin-left:10px;"
+              @click="handleExtract"
+              :loading="extractSping">立即抽取</a-button>
+            <a-button
+              v-if="tableType === 0 && hasBtnPermissionSchedule"
+              v-show="showExtractBtn"
+              type="primary"
+              style="margin-left:10px;"
+              @click="showSetting('batch')"
+              class="select_button"
+            >批量定时抽取</a-button>
+            <a-dropdown v-if="['excel', 'csv'].indexOf(modelType) === -1" :trigger="['click']">
+              <a-button type="primary" style="margin-left:10px;">更多<a-icon type="down" /></a-button>
+              <a-menu slot="overlay">
+                <a-menu-item>
+                  <span @click="handleSyncTable">同步库表结构</span>
+                </a-menu-item>
+                <a-menu-item
+                  v-if="tableType === 0 && hasBtnPermissionSchedule"
+                  v-show="showExtractBtn">
+                  <span @click="showExtractLog">定时抽取记录</span>
+                </a-menu-item>
+                <a-menu-item
+                  v-if="tableType === 0 && hasBtnPermissionSchedule"
+                  v-show="showExtractBtn">
+                  <span @click="showSetting('batchList')">批量任务列表</span>
+                </a-menu-item>
+              </a-menu>
+            </a-dropdown>
+          </a-row>
         </a-col>
       </a-row>
     </div>
@@ -88,11 +90,7 @@
           <a v-on:click="setting(row)">{{row.set ? '字段编辑' : '字段设置' }}</a>
         </span>
         <span slot="regular" slot-scope="row">
-          <a
-            v-if="hasBtnPermissionSchedule"
-            v-on:click="showSetting('single', row)"
-            >定时设置</a>
-          <span v-else>-</span>
+          <a v-on:click="showSetting('single', row)">定时设置</a>
         </span>
       </a-table>
       <a-modal width="920px" title="定时抽取记录" :bodyStyle="bodyStyle" :visible="visible1" @cancel="handleCloseExtractLog">
@@ -124,14 +122,19 @@
         ref="extract"
         :show="visible"
         :rows="clickRows"
-        @close="visible = false"
+        :database-id="databaseId"
+        @close="closeRegularList"
         @setRegular="setRegular" />
       <regular-setting
         ref="regular"
         :show="visible2"
         :rows="clickRows"
         :table-type="tableType"
-        :regular-info="regularInfo"
+        :reg-data="regData"
+        :large-data="largeDataList"
+        :has-change-data="hasChangeData"
+        @insertData="data => $refs.extract && $refs.extract.regData.push(data)"
+        @updateData="data => $refs.extract && $refs.extract.updateRows(data)"
         @close="closeRegular" />
       <table-info
         :table-id="checkTableId"
@@ -139,7 +142,7 @@
         @close="visible3 = false"
       />
     </div>
-  </div>
+  </a-spin>
 </template>
 <script>
 import { mapState } from 'vuex'
@@ -216,7 +219,12 @@ export default {
         total: 0
       },
       databaseList: [],
-      database: '',
+      database: '', // 当前数据库名
+      databaseId: '', // 当前数据库id
+      verifying: false,
+      regData: [], // 定时任务详情
+      largeDataList: [], // 所选表是否含有大量数据
+      hasChangeData: false, // 所选表是否有字段变动
       tableKeyword: '',
       logColumns,
       logData: [],
@@ -227,13 +235,12 @@ export default {
       visible2: false, // 添加定时任务弹窗
       visible3: false, // 查看表信息
       extractForm: '',
-      spinning: true,
+      spinning: false,
       selectedRows: [],
       selectedRowKeys: [],
       extractSping: false,
       modalSpin: false,
       clickRows: [],
-      regularInfo: {},
       checkTableId: '' // 查看数据的表id
     }
   },
@@ -245,7 +252,7 @@ export default {
       modelInfo: state => state.dataAccess.modelInfo,
       modelName: state => state.dataAccess.modelName,
       modelType: state => state.dataAccess.modelType,
-      privileges: state => state.dataAccess.privileges,
+      privileges: state => state.common.privileges,
       showExtractBtn: state => [ 'mysql', 'oracle', 'hive' ].indexOf(state.dataAccess.modelType) > -1
     }),
     rowSelection() {
@@ -266,21 +273,13 @@ export default {
         }
       }
     },
+    hasBtnPermissionEdit() {
+      return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.edit)
+    },
     hasBtnPermissionExtract() {
-      // if (!this.privileges || this.privileges.length < 1) {
-      //   return checkActionPermission(this.$PERMISSION_CODE.OBJECT.datasource, this.$PERMISSION_CODE.OPERATOR.extract)
-      // } else {
-      //   return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.extract)
-      // }
       return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.extract)
     },
     hasBtnPermissionSchedule() {
-      // if (!hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.schedule)) {
-        // if (!checkActionPermission(this.$PERMISSION_CODE.OBJECT.datasource, this.$PERMISSION_CODE.OPERATOR.schedule)) {
-          // return false
-        // }
-      // }
-      // return true
       return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.schedule)
     }
   },
@@ -304,20 +303,35 @@ export default {
       }
     },
     handleTableTypeChange(event) {
-      this.handleGetData()
+      this.handleGetTableList()
+    },
+    // 同步库库表结构
+    async handleSyncTable() {
+      this.spinning = true
+      const result = await this.$server.dataAccess.actionSyncTable(this.modelId, this.databaseId)
+        .finally(() => {
+          this.spinning = false
+        })
+
+      if (result.code === 200) {
+        this.$message.success('同步库表成功')
+        this.handleGetTableList()
+      } else {
+        this.$message.error(result.msg)
+      }
     },
     handleGetTableKeyword: debounce(function(e) {
       this.tableKeyword = e.target.value.trim()
       this.selectedRowKeys = []
       this.selectedRows = []
-      this.handleGetData()
+      this.handleGetTableList()
     }, 400),
     handleChangeDatabase(value) {
       this.database = value
       this.$store.commit('dataAccess/SET_DATABASENAME', value)
-      this.handleGetData()
+      this.handleGetTableList()
     },
-    async handleGetDatabase() {
+    async handleGetDatabaseList() {
       const result = await this.$server.dataAccess.getDatabaseList({
         datasourceId: this.modelId
       })
@@ -386,13 +400,20 @@ export default {
       if (!this.hasBtnPermissionSchedule || ['excel', 'csv'].indexOf(this.modelType) > -1) {
         columns.pop()
       }
+      if (!this.hasBtnPermissionEdit) {
+        columns.splice(5, 1)
+      }
       this.columns = columns
     },
     handleChangeTable(pagination) {
-      this.handleGetData(pagination)
+      this.handleGetTableList(pagination)
     },
     async handleGetData(pagination) {
       if (!this.modelType) return
+      await this.handleGetDatabaseList()
+      this.handleGetTableList()
+    },
+    async handleGetTableList(pagination) {
       this.handleColumns()
       this.spinning = true
       let databaseName
@@ -405,8 +426,13 @@ export default {
       if (['excel', 'csv'].indexOf(this.modelType) > -1) {
         databaseName = this.databaseName
       }
+
+      // 获取数据库id
+      const database = this.databaseList.find(item => item.name === databaseName)
+      this.databaseId = database ? database.id : ''
       const params = {
         databaseName,
+        databaseId: this.databaseId,
         keyword: this.tableKeyword,
         sourceId: this.modelId,
         tableType: this.tableType,
@@ -427,7 +453,10 @@ export default {
         this.$message.error(dabaseInfoResult.msg)
       }
     },
-    handleCheckTable(e, id) {
+    async handleCheckTable(e, id) {
+      // 先不做表校验
+      // const code = await this.handleVerifyTable(new Array(id))
+      // if (code === 'hasDelete') return
       this.checkTableId = id
       this.visible3 = true
     },
@@ -435,6 +464,67 @@ export default {
       this.visible1 = false
       this.logData = []
     },
+    /**
+      52009, "在线获取当前数据表的数据失败"
+      52017, "远程对应的原数据表不存在或已经被删"
+      52018, "远程对应的原表字段不存在或已经被删"
+      52019, "远程对应的原表字段已发生改变"
+      52020, "远程对应的库表结构没有改变"
+      52021, "远程对应的表字段较多,是宽表"
+      52022, "远程对应的表的数据量较大"
+     */
+    handleTableInfo(infoList) {
+      const changeList = []
+      const deleteList = []
+      const largeList = []
+      let normalCnt = 0
+      infoList.map(item => {
+        const codeList = Object.keys(item.codeMsgMap)
+        if (codeList.includes('52018') || codeList.includes('52019')) {
+          changeList.push(item)
+        } else if (codeList.includes('52017')) {
+          deleteList.push(item)
+        } else if (codeList.includes('52022')) {
+          largeList.push(item)
+        } else if (codeList.includes('52020')) {
+          normalCnt++
+        }
+      })
+      if (changeList.length > 0) { // 表字段发生变化
+        this.hasChangeData = true
+        return 'hasChange'
+      } else if (deleteList.length > 0) { // 有表被删除, 直接拦截操作
+        this.$message.error(h => h('span', { style: { textAlign: 'left' } }, deleteList.map(item => {
+          return h('span', {}, [
+            '表',
+            h('span', {}, item.tableName),
+            ':' + Object.values(item.codeMsgMap).join('、'),
+            h('br')
+          ])
+        })), 5)
+        return 'hasDelete'
+      } else if (largeList.length > 0) { // 有大数据表, 则定时任务需至少间隔2小时
+        this.largeDataList = largeList
+        return 'hasLarge'
+      } else if (infoList.length === normalCnt) { // 正常情况
+        return 'normal'
+      }
+    },
+    // 校验当前表数据变动
+    async handleVerifyTable(ids) {
+      this.verifying = true
+      const result = await this.$server.dataAccess.actionVerifyTable(ids)
+        .finally(() => {
+          this.verifying = false
+        })
+      if (result.code === 200) {
+        return this.handleTableInfo(result.data)
+      } else {
+        this.$message.error(result.msg)
+        return 'error'
+      }
+    },
+    // 抽取记录
     async showExtractLog() {
       if (this.data.length < 1) {
         return this.$message.error('当前数据库暂无数据')
@@ -459,15 +549,12 @@ export default {
       } else if (this.selectedRows.length > 10) {
         return this.$message.error('一次抽取最多只能选择10个')
       }
+      const code = await this.handleVerifyTable(this.selectedRows.map(item => item.id))
+      if (code === 'hasDelete' || code === 'error') return
       // 源表抽取
       let result
       if (this.tableType === 0) {
         const rows = this.selectedRows.map(item => {
-          // let databaseName = this.formInfo ? this.formInfo.databaseName : ''
-          // // sql, oracle的数据库名称在formInfo里, excel的在dabaseName里
-          // if (['excel', 'csv'].indexOf(this.modelType) > -1) {
-          //   databaseName = this.databaseName
-          // }
           const _item = {
             databaseName: this.database,
             sourceId: this.modelId,
@@ -483,22 +570,25 @@ export default {
           tableList: this.data
         }).finally(() => {
           this.extractSping = false
-          this.handleGetData()
+          this.handleGetTableList()
         })
       } else if (this.tableType === 1) { // 自定义表抽取
         this.extractSping = true
         result = await this.$server.dataAccess.actionCustomExtract(this.selectedRows.map(item => item.id)).finally(() => {
           this.extractSping = false
-          this.handleGetData()
+          this.handleGetTableList()
         })
       }
       if (result.code === 200) {
         if (result.data) {
-          if (result.data.length && result.data.length < this.selectedRows.length) {
-            this.$message.info(`抽取任务已下达 \n ${result.msg}`, 5)
-          } else if (result.data.length && result.data.length === this.selectedRows.length) {
-            this.$message.error('所选表格不是orc格式, 无法抽取')
+          if (result.data.length && result.data.length > 0 && result.data.length < this.selectedRows.length) {
+            return this.$message.info(`抽取任务已下达 \n ${result.msg}`, 5)
+          } else if (result.data.length && result.data.length > 0 && result.data.length === this.selectedRows.length) {
+            return this.$message.error('所选表格不是orc格式, 无法抽取')
           }
+        }
+        if (this.largeDataList.length > 0) {
+          this.$message.success('抽取任务已下达，前抽取的表数据量较多，耗时会更长，请您耐心等待')
         } else {
           this.$message.success('抽取任务已下达')
         }
@@ -506,39 +596,109 @@ export default {
         this.$message.error(result.msg)
       }
     },
-    setting(row) {
-      this.$emit('on-change-componet', 'Setting', row)
+    // 字段设置
+    async setting(row) {
+      // if (this.showExtractBtn) {
+      //   const code = await this.handleVerifyTable(new Array(row.id))
+      //   if (code === 'hasDelete' || code === 'error') return
+      // }
+
+      if (!this.showExtractBtn) {
+        this.$emit('on-change-componet', 'Setting', row)
+      } else {
+        // 先调一次接口校验表是否存在再跳转页面(上面的校验接口频繁调用会锁表)
+        let databaseName = this.formInfo ? this.formInfo.databaseName : ''
+        // sql, oracle的数据库名称在formInfo里, excel的在dabaseName里
+        if (['excel', 'csv'].indexOf(this.modelType) > -1) {
+          databaseName = this.databaseName
+        }
+        const result = await this.$server.dataAccess.getTableFieldDetail({
+          databaseName,
+          sourceName: this.modelName,
+          sourceId: row.datasourceId,
+          databaseId: row.databaseId,
+          tableId: row.id,
+          tableName: row.name
+        })
+        if (result.code === 200) {
+          this.$emit('on-change-componet', 'Setting', row)
+        } else {
+          this.$message.error(result.msg)
+        }
+      }
     },
-    showSetting(type, row) {
+    // 显示定时任务
+    async showSetting(type, row) {
+      // 点击单张表的定时设置
       if (type === 'single') {
         this.clickRows = new Array(row)
         this.visible = true
-      } else if (type === 'batch') {
+      } else if (type === 'batch') { // 点击批量抽取按钮
         if (this.selectedRows.length < 2) {
           return this.$message.error('请选择至少2项')
         } else if (this.selectedRows.length > 10) {
           return this.$message.error('最多只能选择10项')
         }
+        const code = await this.handleVerifyTable(this.selectedRows.map(item => item.id))
+        if (code === 'hasDelete' || code === 'error') return
         this.clickRows = this.selectedRows
         this.visible2 = true
-      } else if (type === 'batchList') {
+      } else if (type === 'batchList') { // 查看批量抽取记录
         if (this.data.length < 1) {
           return this.$message.error('当前数据库暂无数据')
         }
-        this.clickRows = this.data[0].databaseId
+        this.clickRows = []
         this.visible = true
       }
     },
+    // 关闭定时任务详情窗口
     closeRegular() {
       this.visible2 = false
-      this.regularInfo = {}
+      this.regData = []
+      this.largeDataList = []
+      this.hasChangeData = false
     },
-    setRegular(data) {
-      if (data) {
-        this.regularInfo = data
+    // 关闭定时任务列表窗口
+    closeRegularList() {
+      this.visible = false
+      this.largeDataList = []
+      this.hasChangeData = false
+      this.clickRows = []
+    },
+    // 获取定时任务详情(编辑用)
+    async handleGetRegularInfo(data) {
+      if (this.$refs.extract.modalSpin) this.$refs.extract.modalSpin = true
+      const res = await this.$server.dataAccess.getRegularInfo(data.id, data.groupId)
+          .catch(() => {
+            if (this.$refs.extract.modalSpin) this.$refs.extract.modalSpin = false
+          })
+      if (res.code === 200) {
+        // 校验当前表
+        const code = await this.handleVerifyTable(res.data.map(item => item.target))
+          .finally(() => {
+            if (this.$refs.extract.modalSpin) this.$refs.extract.modalSpin = false
+          })
+        if (code === 'hasDelete' || code === 'error') {
+          return code
+        } else {
+          this.regData = res.data
+        }
       } else {
-        this.regularInfo = {}
+        this.$message.error(res.msg)
+        if (this.$refs.extract.modalSpin) this.$refs.extract.modalSpin = false
       }
+    },
+    async setRegular(data) {
+      // 有data, 则是编辑状态
+      let code
+      if (data) {
+        code = await this.handleGetRegularInfo(data)
+      } else {
+        this.regData = []
+        code = await this.handleVerifyTable(this.clickRows.map(item => item.id))
+        if (this.$refs.extract) this.$refs.extract.modalSpin = false
+      }
+      if (code === 'hasDelete' || code === 'error') return
       this.visible2 = true
     }
   }

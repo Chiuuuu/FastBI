@@ -2,17 +2,15 @@
   <div class="menu" id="menuRef">
     <div class="menu_title">
       <span class="m-t-s">数据接入</span>
-      <a-dropdown :trigger="['click']" placement="bottomLeft">
+      <a-dropdown v-if="hasPermissionSourceAdd || hasPermissionFolderAdd" :trigger="['click']" placement="bottomLeft">
         <a class="ant-dropdown-link">
           <a-icon type="plus-square" class="menu_icon" />
         </a>
         <a-menu slot="overlay" class="drow_menu">
-          <a-menu-item
-          v-permission:[$PERMISSION_CODE.OPERATOR.add]="$PERMISSION_CODE.OBJECT.datasource"
-          v-on:click="showModal">
+          <a-menu-item v-if="hasPermissionSourceAdd" v-on:click="showModal">
             添加连接
           </a-menu-item>
-          <a-menu-item key="1" @click="handleAddNewFolder">
+          <a-menu-item v-if="hasPermissionFolderAdd" key="1" @click="handleAddNewFolder">
             新建文件夹
           </a-menu-item>
         </a-menu>
@@ -71,6 +69,7 @@
             >
               <template v-slot:file="slotProps">
                 <menu-file
+                  icon="dataSource"
                   :file="slotProps.file"
                   :index="slotProps.index"
                   :parent="folder"
@@ -85,6 +84,7 @@
           <template v-else>
             <ul class="items">
               <menu-file
+                icon="dataSource"
                 :file="folder"
                 :index="index"
                 :isSelect='fileSelectId === folder.id'
@@ -120,6 +120,7 @@ import ResetNameModal from '../data-main/data-menu/resetName'
 import MoveFileModal from '../data-main/data-menu/moveFile'
 import { mapState } from 'vuex'
 import { menuSearchLoop } from '@/utils/menuSearch'
+import { checkActionPermission, hasPermission } from '@/utils/permission'
 import { fetchTableInfo, fetchDeleteMenuById } from '../../../../../api/dataAccess/api'
 import MenuFile from '@/components/dataSource/menu-group/file'
 import MenuFolder from '@/components/dataSource/menu-group/folder'
@@ -177,27 +178,40 @@ export default {
         },
         {
           name: '重命名',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.sourceFolder
+          },
           onClick: this.handleFolderResetName
         },
         {
           name: '删除',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.sourceFolder
+          },
           onClick: this.handleFolderDelete
         }
       ],
       fileContenxtMenu: [
         {
           name: '移动到',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit
+          },
           onClick: this.handleFilemoveFile
         },
         {
           name: '重命名',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit
+          },
           onClick: this.handleFileResetName
         },
         {
           name: '删除',
           permission: {
-            OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove,
-            OBJECT: this.$PERMISSION_CODE.OBJECT.datasource
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove
           },
           onClick: this.handleFileDelete
         }
@@ -225,6 +239,12 @@ export default {
       set (value) {
         this.$store.commit('dataAccess/SET_MODELID', value)
       }
+    },
+    hasPermissionFolderAdd() {
+      return checkActionPermission(this.$PERMISSION_CODE.OBJECT.sourceFolder, this.$PERMISSION_CODE.OPERATOR.add)
+    },
+    hasPermissionSourceAdd() {
+      return checkActionPermission(this.$PERMISSION_CODE.OBJECT.datasource, this.$PERMISSION_CODE.OPERATOR.add)
     }
   },
   mounted() {
@@ -282,18 +302,18 @@ export default {
           this.$store.dispatch('dataAccess/setModelType', 'mysql')
         } else if (result.data.type === 2) {
           this.$store.dispatch('dataAccess/setModelType', 'oracle')
-        } else if (result.data.type === 3) {
-          this.$store.dispatch('dataAccess/setModelType', 'hive')
-        } else if (result.data.type === 4) {
-          this.$store.dispatch('dataAccess/setModelType', 'excel')
         } else if (result.data.type === 5) {
+          this.$store.dispatch('dataAccess/setModelType', 'hive')
+        } else if (result.data.type === 11) {
+          this.$store.dispatch('dataAccess/setModelType', 'excel')
+        } else if (result.data.type === 12) {
           this.$store.dispatch('dataAccess/setModelType', 'csv')
         }
         this.$store.dispatch('dataAccess/setModelInfo', result.data.properties)
         this.$store.dispatch('dataAccess/setModelName', result.data.name)
       })
       this.$store.commit('dataAccess/SET_DATABASENAME', '')
-      this.$store.commit('dataAccess/SET_PRIVILEGES', file.privileges || [])
+      this.$store.commit('common/SET_PRIVILEGES', file.privileges || [])
       this.$store.dispatch('dataAccess/setModelId', file.id)
       this.$store.dispatch('dataAccess/setParentId', file.parentId)
       this.$store.dispatch('dataAccess/setFirstFinished', true)
@@ -475,7 +495,7 @@ export default {
       this.$store.dispatch('dataAccess/setModelInfo', {})
       this.$store.dispatch('dataAccess/setModelName', '')
       this.$store.commit('dataAccess/SET_DATABASENAME', '')
-      this.$store.commit('dataAccess/SET_PRIVILEGES', [0])
+      this.$store.commit('common/SET_PRIVILEGES', [0])
       this.$EventBus.$emit('resetForm')
       this.$emit('on-menuChange-componet', 'Main')
       this.$EventBus.$emit('set-tab-index', '1')
