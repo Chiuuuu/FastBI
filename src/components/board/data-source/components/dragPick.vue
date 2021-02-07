@@ -259,7 +259,7 @@ export default {
             this.fileList.forEach(file => {
               let li = list.find(item => item.alias === file.alias)
               if (li && li.status === 1) {
-                item.status = li.status
+                file.status = li.status
               }
             })
           }
