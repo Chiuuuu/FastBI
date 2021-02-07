@@ -110,7 +110,7 @@ export default {
                   item => item.alias === file.alias
                 )
                 if (dimension && dimension.status === 1) {
-                  item.status = dimension.status
+                  file.status = dimension.status
                 }
               })
             }
@@ -121,7 +121,7 @@ export default {
                   item => item.alias === file.alias
                 )
                 if (measure && measure.status === 1) {
-                  item.status = measure.status
+                  file.status = measure.status
                 }
               })
             }
@@ -135,7 +135,7 @@ export default {
                   item => item.alias === file.alias
                 )
                 if (measure && measure.status === 1) {
-                  item.status = measure.status
+                  file.status = measure.status
                 }
               })
             }
@@ -148,7 +148,7 @@ export default {
               this.fileList.forEach(file => {
                 let li = list.find(item => item.alias === file.alias)
                 if (li && li.status === 1) {
-                  item.status = li.status
+                  file.status = li.status
                 }
               })
             }
