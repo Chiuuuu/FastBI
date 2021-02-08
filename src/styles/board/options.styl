@@ -149,10 +149,12 @@
     .gui-field-name {
       padding-right: 5px;
       line-height: 28px;
-      flex: 0  0 auto;
+      // flex: 0  0 auto;
       width: 65px;
     }
     .gui-field-container {
+      flex:1;
+      justify-content:flex-end;
       min-height: 24px;
       display: flex;
       // width: 175px;
@@ -175,6 +177,9 @@
         }
         &:last-child {
           margin: 0px;
+        }
+        .longwidth{
+            width:120px;
         }
       }
     }
