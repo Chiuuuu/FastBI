@@ -205,11 +205,11 @@ export default {
         this.chartType === '1'
       ) {
         // 饼图类型只能拉入一个度量
-        if (this.currSelected.setting.name === 've-pie') {
-          this.fileList[0] = dataFile
-        } else {
-          this.fileList.push(dataFile)
-        }
+        // if (this.currSelected.setting.name === 've-pie') {
+        //   this.fileList[0] = dataFile
+        // } else {
+        this.fileList.push(dataFile)
+        // }
         this.fileList = this.uniqueFun(this.fileList, 'alias')
         this.getData()
       }
@@ -225,10 +225,11 @@ export default {
         this.type === 'measures' &&
         this.dragFile === this.type
       ) {
-        if (this.currSelected.setting.name === 've-pie') {
-          this.fileList[0] = dataFile
-          // 如果是仪表盘，需要两个度量
-        } else if (this.fileList.length < 2) {
+        // if (this.currSelected.setting.name === 've-pie') {
+        //   this.fileList[0] = dataFile
+        //   // 如果是仪表盘，需要两个度量
+        // } else
+        if (this.fileList.length < 2) {
           this.fileList.push(dataFile)
         }
         this.fileList = this.uniqueFun(this.fileList, 'alias')
@@ -412,6 +413,16 @@ export default {
                   value: total
                 }
               ]
+              // 环形图第二度量
+              if (
+                this.currSelected.setting.chartType === 'v-ring' &&
+                apiData.measures[1]
+              ) {
+                rows.push({
+                  type: apiData.measures[1].alias,
+                  value: sum(res.rows, apiData.measures[1].alias)
+                })
+              }
               apiData.source = {
                 columns,
                 rows

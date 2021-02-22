@@ -1123,6 +1123,14 @@
                     @change="setSelfProperty"
                   ></el-color-picker>
                 </gui-field>
+                <gui-field label="显示轴刻度">
+                  <a-switch
+                    v-model="selfConfig.yAxis.axisTick.show"
+                    default-checked
+                    @change="switchChange"
+                    size="small"
+                  />
+                </gui-field>
                 <gui-field label="是否网格线">
                   <a-switch
                     v-model="selfConfig.yAxis.splitLine.show"

@@ -123,7 +123,7 @@ const list = [
               fontSize: 12
             },
             axisLine: {
-              show: false,
+              show: true,
               lineStyle: {
                 color: '#fff'
               }
@@ -134,6 +134,9 @@ const list = [
                 type: 'solid',
                 color: '#fff'
               }
+            },
+            axisTick: {
+              show: true
             }
           },
           series: {
@@ -281,6 +284,9 @@ const list = [
                 type: 'solid',
                 color: '#fff'
               }
+            },
+            axisTick: {
+              show: true
             }
           },
           series: {
@@ -418,6 +424,9 @@ const list = [
                 type: 'solid',
                 color: '#fff'
               }
+            },
+            axisTick: {
+              show: true
             }
           },
           series: {
