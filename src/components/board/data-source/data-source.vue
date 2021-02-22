@@ -192,7 +192,7 @@ export default {
     ...mapActions(['saveScreenData', 'handleRefreshData']),
     // 排序筛选字段选择
     sortFileChange(val) {
-      if (val === '') {
+      if (!val || (val && this.sortData.asc === '')) {
         this.sortData.asc = ''
       }
       let data = this.sortList.filter(item => item.id === val)

@@ -64,6 +64,7 @@ const list = [
           grid: { left: 50, top: 60, right: 50, bottom: 50 },
           legend: {
             show: true,
+            orient: 'horizontal',
             textStyle: {
               color: '#ffffff',
               fontSize: 12
@@ -211,6 +212,7 @@ const list = [
           grid: { left: 50, top: 60, right: 50, bottom: 50 },
           legend: {
             show: true,
+            orient: 'horizontal',
             textStyle: {
               color: '#ffffff',
               fontSize: 12
@@ -347,6 +349,7 @@ const list = [
           grid: { left: 50, top: 60, right: 50, bottom: 50 },
           legend: {
             show: true,
+            orient: 'horizontal',
             textStyle: {
               color: '#ffffff',
               fontSize: 12
@@ -475,6 +478,7 @@ const list = [
           grid: { left: 20, top: 60, right: 20, bottom: 30 },
           legend: {
             show: true,
+            orient: 'horizontal',
             textStyle: {
               color: '#ffffff',
               fontSize: 12
@@ -590,6 +594,7 @@ const list = [
           grid: { left: 20, top: 60, right: 20, bottom: 30 },
           legend: {
             show: true,
+            orient: 'horizontal',
             textStyle: {
               color: '#ffffff',
               fontSize: 12
@@ -699,7 +704,7 @@ const list = [
           tooltip: {
             show: false
           },
-          grid: { left: 20, top: 60, right: 20, bottom: 30 },
+          grid: { left: 0, top: 60, right: 0, bottom: 30 },
           xAxis: {
             show: false
           },
@@ -708,6 +713,7 @@ const list = [
           },
           legend: {
             show: false,
+            orient: 'horizontal',
             data: [],
             textStyle: {
               color: '#ffffff',
@@ -997,6 +1003,7 @@ const list = [
           grid: { left: 20, top: 20, right: 20, bottom: 30 },
           legend: {
             show: false,
+            orient: 'horizontal',
             data: [],
             textStyle: {
               color: '#ffffff',
@@ -1093,6 +1100,7 @@ const list = [
           grid: { left: 20, top: 60, right: 20, bottom: 30 },
           legend: {
             show: true,
+            orient: 'horizontal',
             textStyle: {
               color: '#ffffff',
               fontSize: 12
