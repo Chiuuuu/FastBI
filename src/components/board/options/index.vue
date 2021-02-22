@@ -322,7 +322,7 @@
                       :formatter="value => `右 ${value}`"
                       class="f-clear-width"
                       :min="0"
-                      :max="60"
+                      :max="200"
                       @change="setSelfProperty"
                     ></a-input-number>
                   </gui-inline>
@@ -679,6 +679,29 @@
                           onRadioChange($event, selfConfig.legend, 'top')
                         "
                         >底部</a-radio-button
+                      >
+                    </a-radio-group>
+                  </gui-inline>
+                </gui-field>
+                <gui-field label="排列">
+                  <gui-inline>
+                    <a-radio-group
+                      :value="selfConfig.legend.orient"
+                      size="small"
+                    >
+                      <a-radio-button
+                        value="horizontal"
+                        @click.native.stop="
+                          onRadioChange($event, selfConfig.legend, 'orient')
+                        "
+                        >水平</a-radio-button
+                      >
+                      <a-radio-button
+                        value="vertical"
+                        @click.native.stop="
+                          onRadioChange($event, selfConfig.legend, 'orient')
+                        "
+                        >垂直</a-radio-button
                       >
                     </a-radio-group>
                   </gui-inline>
