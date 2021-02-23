@@ -981,6 +981,79 @@
                     ></el-color-picker>
                   </gui-inline>
                 </gui-field>
+                <gui-field
+                  label="标题位置"
+                  v-if="selfConfig.xAxis.nameLocation"
+                >
+                  <a-radio-group
+                    :value="selfConfig.xAxis.nameLocation"
+                    size="small"
+                  >
+                    <a-radio-button
+                      value="middle"
+                      @click.native.stop="
+                        onRadioChange($event, selfConfig.xAxis, 'nameLocation')
+                      "
+                      >中部</a-radio-button
+                    >
+                    <a-radio-button
+                      value="end"
+                      @click.native.stop="
+                        onRadioChange($event, selfConfig.xAxis, 'nameLocation')
+                      "
+                      >末尾</a-radio-button
+                    >
+                  </a-radio-group>
+                </gui-field>
+                <gui-field label="标题边距">
+                  <gui-inline>
+                    <a-input-number
+                      v-model="selfConfig.xAxis.nameTextStyle.padding[0]"
+                      size="small"
+                      :formatter="value => `上 ${value}`"
+                      :parser="value => value.replace(/\上\s?|(,*)/g, '')"
+                      class="f-clear-width"
+                      :min="0"
+                      :max="60"
+                      @change="setSelfProperty"
+                    ></a-input-number>
+                  </gui-inline>
+                  <gui-inline>
+                    <a-input-number
+                      v-model="selfConfig.xAxis.nameTextStyle.padding[2]"
+                      size="small"
+                      :formatter="value => `下 ${value}`"
+                      class="f-clear-width"
+                      :min="0"
+                      :max="60"
+                      @change="setSelfProperty"
+                    ></a-input-number>
+                  </gui-inline>
+                </gui-field>
+                <gui-field label>
+                  <gui-inline>
+                    <a-input-number
+                      v-model="selfConfig.xAxis.nameTextStyle.padding[3]"
+                      size="small"
+                      :formatter="value => `左 ${value}`"
+                      class="f-clear-width"
+                      :min="0"
+                      :max="60"
+                      @change="setSelfProperty"
+                    ></a-input-number>
+                  </gui-inline>
+                  <gui-inline>
+                    <a-input-number
+                      v-model="selfConfig.xAxis.nameTextStyle.padding[1]"
+                      size="small"
+                      :formatter="value => `右 ${value}`"
+                      class="f-clear-width"
+                      :min="0"
+                      :max="200"
+                      @change="setSelfProperty"
+                    ></a-input-number>
+                  </gui-inline>
+                </gui-field>
                 <gui-field label="x轴文本">
                   <gui-inline label="字号">
                     <a-input-number
@@ -1096,6 +1169,79 @@
                       v-model="selfConfig.yAxis.nameTextStyle.color"
                       @change="setSelfProperty"
                     ></el-color-picker>
+                  </gui-inline>
+                </gui-field>
+                <gui-field
+                  label="标题位置"
+                  v-if="selfConfig.yAxis.nameLocation"
+                >
+                  <a-radio-group
+                    :value="selfConfig.yAxis.nameLocation"
+                    size="small"
+                  >
+                    <a-radio-button
+                      value="middle"
+                      @click.native.stop="
+                        onRadioChange($event, selfConfig.yAxis, 'nameLocation')
+                      "
+                      >中部</a-radio-button
+                    >
+                    <a-radio-button
+                      value="end"
+                      @click.native.stop="
+                        onRadioChange($event, selfConfig.yAxis, 'nameLocation')
+                      "
+                      >末尾</a-radio-button
+                    >
+                  </a-radio-group>
+                </gui-field>
+                <gui-field label="标题边距">
+                  <gui-inline>
+                    <a-input-number
+                      v-model="selfConfig.yAxis.nameTextStyle.padding[0]"
+                      size="small"
+                      :formatter="value => `上 ${value}`"
+                      :parser="value => value.replace(/\上\s?|(,*)/g, '')"
+                      class="f-clear-width"
+                      :min="0"
+                      :max="60"
+                      @change="setSelfProperty"
+                    ></a-input-number>
+                  </gui-inline>
+                  <gui-inline>
+                    <a-input-number
+                      v-model="selfConfig.yAxis.nameTextStyle.padding[2]"
+                      size="small"
+                      :formatter="value => `下 ${value}`"
+                      class="f-clear-width"
+                      :min="0"
+                      :max="60"
+                      @change="setSelfProperty"
+                    ></a-input-number>
+                  </gui-inline>
+                </gui-field>
+                <gui-field label>
+                  <gui-inline>
+                    <a-input-number
+                      v-model="selfConfig.yAxis.nameTextStyle.padding[3]"
+                      size="small"
+                      :formatter="value => `左 ${value}`"
+                      class="f-clear-width"
+                      :min="0"
+                      :max="60"
+                      @change="setSelfProperty"
+                    ></a-input-number>
+                  </gui-inline>
+                  <gui-inline>
+                    <a-input-number
+                      v-model="selfConfig.yAxis.nameTextStyle.padding[1]"
+                      size="small"
+                      :formatter="value => `右 ${value}`"
+                      class="f-clear-width"
+                      :min="0"
+                      :max="200"
+                      @change="setSelfProperty"
+                    ></a-input-number>
                   </gui-inline>
                 </gui-field>
                 <gui-field label="文本">
