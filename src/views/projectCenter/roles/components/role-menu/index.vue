@@ -328,7 +328,7 @@ export default {
         title: '确认提示',
         content: '确定删除该角色?',
         onOk: async () => {
-          const result = await this.$server.common.deleMenuById(`/business/role/${file.id}`)
+          const result = await this.$server.common.deleMenuById(`/business/role/deleteRole/${file.id}`)
           if (result.code === 200) {
             this.handleGetMenuList()
             this.$message.success('删除成功')

@@ -312,7 +312,8 @@ export default {
      * @param {String} params.gmtEnd 结束时间
      */
     putRegularInfo(params) {
-        return $axios.put('/datasource/schedule', params)
+        // return $axios.put('/datasource/schedule', params)
+        return $axios.post('/datasource/schedule/update', params)
     },
     /**
      * @description 修改自定义视图定时任务
@@ -327,21 +328,24 @@ export default {
      * @param {String} params.gmtEnd 结束时间
      */
     putCustomRegularInfo(params) {
-        return $axios.put('/datasource/schedule/view/update', params)
+        // return $axios.put('/datasource/schedule/view/update', params)
+        return $axios.post('/datasource/schedule/view/update', params)
     },
     /**
      * @description 删除定时任务
      * @param {String} id
      */
     deleRegularInfo(id) {
-        return $axios.delete('/datasource/schedule/delete/' + id)
+        // return $axios.delete('/datasource/schedule/delete/' + id)
+        return $axios.get('/datasource/schedule/delete/' + id)
     },
     /**
      * @description 删除批量定时任务
      * @param {String} groupId
      */
     deleBatchRegularInfo(groupId) {
-        return $axios.delete('/datasource/schedule/batch/' + groupId)
+        // return $axios.delete('/datasource/schedule/batch/' + groupId)
+        return $axios.get('/datasource/schedule/delete/batch/' + groupId)
     },
     /**
      * @description 获取抽取记录

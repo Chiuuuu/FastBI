@@ -44,7 +44,8 @@ export default {
      * @returns
      */
     deleUserById(id) {
-        return $axios.delete(`/business/editRoleUser/deleteUserRoles/${id}`)
+        // return $axios.delete(`/business/editRoleUser/deleteUserRoles/${id}`)
+        return $axios.get(`/business/editRoleUser/deleteUserRoles/${id}`)
     },
     /**
      * @description 更新，编辑用户
@@ -52,7 +53,8 @@ export default {
      * @returns
      */
     putUser(params) {
-        return $axios.put(`/business/editRoleUser/updateProjectUserRole`, params)
+        // return $axios.put(`/business/editRoleUser/updateProjectUserRole`, params)
+        return $axios.post(`/business/editRoleUser/updateProjectUserRole`, params)
     },
     /**
      * @description 获取用户属性列表
@@ -79,9 +81,9 @@ export default {
      * @param {String} id 角色id
      * @returns
      */
-    getRolePermission(id) {
-        return $axios.get('/business/rolePrivilege/' + id)
-    },
+    // getRolePermission(id) {
+    //     return $axios.get('/business/rolePrivilege/' + id)
+    // },
     /**
      * @description 新增角色
      * @param {Object} params 参数
@@ -115,14 +117,15 @@ export default {
         return $axios.get(`/user/RoleResourcePrivilege/showRolePrivilege/${roleId}/${type}`)
     },
     /**
-     * @description 获取权限树
+     * @description 更新角色信息
      * @param {Object} params
      * @param {String} params.name 名字
      * @param {String} params.description 描述
      * @returns
      */
     updateRole(params) {
-        return $axios.put(`/user/RoleResourcePrivilege/updateRolePrivilege`, params)
+        // return $axios.put(`/user/RoleResourcePrivilege/updateRolePrivilege`, params)
+        return $axios.post(`/user/RoleResourcePrivilege/updateRolePrivilege`, params)
     },
     /**
      * @description 为角色添加用户
@@ -140,6 +143,7 @@ export default {
      * @returns
      */
     deleRoleUser(id) {
-        return $axios.delete('/business/editRoleUser/' + id)
+        // return $axios.delete('/business/editRoleUser/' + id)
+        return $axios.get('/business/editRoleUser/delete/' + id)
     }
 }
