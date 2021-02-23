@@ -283,6 +283,11 @@ export default {
           current.setting.config.series.max = 100
           this.$store.dispatch('SetSelfProperty', current.setting.config)
         }
+        // 环形重置显示值
+        if (current.setting.chartType === 'v-ring') {
+          current.setting.config.chartTitle.text = '70%'
+          this.$store.dispatch('SetSelfProperty', current.setting.config)
+        }
       }
       if (this.chartType === '3') {
         if (current.setting.api_data.tableList.length === 0) {
@@ -413,14 +418,19 @@ export default {
                   value: total
                 }
               ]
-              // 环形图第二度量
+              // 环形图第二度量(指针值)
               if (
                 this.currSelected.setting.chartType === 'v-ring' &&
                 apiData.measures[1]
               ) {
-                rows.push({
+                let currentTotal = sum(res.rows, apiData.measures[1].alias)
+                rows[0] = {
                   type: apiData.measures[1].alias,
-                  value: sum(res.rows, apiData.measures[1].alias)
+                  value: currentTotal
+                }
+                rows.push({
+                  type: apiData.measures[0].alias,
+                  value: total - currentTotal
                 })
               }
               apiData.source = {
@@ -430,8 +440,8 @@ export default {
               // 保存apidata数据
               this.$store.dispatch('SetSelfDataSource', apiData)
               let config = deepClone(this.currSelected.setting.config)
-              if (this.currSelected.setting.chartType === 'v-multiPie') {
-                config.chartTitle.text = rows[0].value
+              if (this.currSelected.setting.chartType === 'v-ring') {
+                config.chartTitle.text = rows[1] ? rows[1].value : rows[0].value
                 this.$store.dispatch('SetSelfProperty', config)
               }
               // 如果是仪表盘，第二个度量是目标值（进度条最大值）

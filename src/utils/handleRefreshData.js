@@ -23,6 +23,17 @@ export function handleRefreshData({ chart, newData }) {
       let goalTotal = sum(newData, Object.keys(newData[0])[1])
       chart.setting.config.series.max = goalTotal
     }
+    // 环形图第二度量(指针值)
+    if (
+      chart.setting.chartType === 'v-ring' &&
+      chart.setting.api_data.measures[1]
+    ) {
+      let targetTotal = sum(newData, Object.keys(newData[0])[1])
+      rows.push({
+        type: chart.setting.api_data.measures[0].alias,
+        value: targetTotal - total
+      })
+    }
   } else if (chart.setting.chartType === 'v-multiPie') {
     // 嵌套饼图设置apis
     let rows = []
