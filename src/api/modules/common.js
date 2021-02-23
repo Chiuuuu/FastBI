@@ -16,7 +16,7 @@ export default {
    * @returns
    */
   deleMenuById(url) {
-    return $axios.delete(url)
+    return $axios.get(url)
   },
   /**
    * @description 修改文件夹(重命名, 移动)
@@ -26,7 +26,7 @@ export default {
    * @returns
    */
   putMenuFolderName(url, params) {
-    return $axios.put(url, params)
+    return $axios.post(url, params)
   },
   /**
    * @description 删除文件夹
@@ -34,7 +34,7 @@ export default {
    * @param {Object} params 请求参数
    */
   deleMenuFolder(url, params) {
-    return $axios.delete(url, params)
+    return $axios.get(url, params)
   },
   /**
    * @description 获取左侧菜单
