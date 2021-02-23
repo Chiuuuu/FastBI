@@ -259,7 +259,7 @@ export default {
             this.fileList.forEach(file => {
               let li = list.find(item => item.alias === file.alias)
               if (li && li.status === 1) {
-                item.status = li.status
+                file.status = li.status
               }
             })
           }
@@ -674,6 +674,21 @@ export default {
                   value: total
                 }
               ]
+              // 环形图第二度量(指针值)
+              if (
+                this.currSelected.setting.chartType === 'v-ring' &&
+                apiData.measures[1]
+              ) {
+                let currentTotal = sum(res.rows, apiData.measures[1].alias)
+                rows[0] = {
+                  type: apiData.measures[1].alias,
+                  value: currentTotal
+                }
+                rows.push({
+                  type: apiData.measures[0].alias,
+                  value: total - currentTotal
+                })
+              }
               apiData.source = {
                 columns,
                 rows

@@ -66,7 +66,7 @@
                 globalBgChange($event, globalSettings, 'backgroundType')
               "
             >
-              <gui-field label="背景颜色" hasPadding>
+              <gui-field label="背景颜色">
                 <el-color-picker
                   v-model="globalSettings.backgroundColor"
                   show-alpha
@@ -81,7 +81,7 @@
                 globalBgChange($event, globalSettings, 'backgroundType')
               "
             >
-              <gui-field label="背景图片" hasPadding>
+              <gui-field label="背景图片">
                 <div>
                   <a-button
                     size="small"
@@ -227,6 +227,7 @@
                 <gui-field label="文本">
                   <gui-inline label="字号">
                     <a-input-number
+                      class="longwidth"
                       v-model="selfConfig.title.textStyle.fontSize"
                       size="small"
                       :min="12"
@@ -321,7 +322,7 @@
                       :formatter="value => `右 ${value}`"
                       class="f-clear-width"
                       :min="0"
-                      :max="60"
+                      :max="200"
                       @change="setSelfProperty"
                     ></a-input-number>
                   </gui-inline>
@@ -395,6 +396,7 @@
                 <gui-field label="文本">
                   <gui-inline label="字号">
                     <a-input-number
+                      class="longwidth"
                       v-model="selfConfig.series.label.fontSize"
                       size="small"
                       :min="12"
@@ -480,7 +482,6 @@
                     v-model="selfConfig.series.radius[0]"
                     size="small"
                     placeholder="默认0"
-                    style="width:100px"
                     @change="setSelfProperty"
                   ></a-input>
                 </gui-field>
@@ -489,7 +490,6 @@
                     v-model="selfConfig.series.radius[1]"
                     size="small"
                     placeholder="默认50%"
-                    style="width:100px"
                     @change="setSelfProperty"
                   ></a-input>
                 </gui-field>
@@ -505,7 +505,6 @@
                     v-model="apis.radius"
                     size="small"
                     placeholder="默认100"
-                    style="width:100px"
                     @change="setApis"
                   ></a-input>
                 </gui-field>
@@ -526,6 +525,7 @@
                 <gui-field label="文本">
                   <gui-inline label="字号">
                     <a-input-number
+                      class="longwidth"
                       v-model="selfConfig.series.label.fontSize"
                       size="small"
                       :min="12"
@@ -586,6 +586,7 @@
                 <gui-field label="文本">
                   <gui-inline label="字号">
                     <a-input-number
+                      class="longwidth"
                       v-model="selfConfig.legend.textStyle.fontSize"
                       size="small"
                       :min="12"
@@ -682,6 +683,29 @@
                     </a-radio-group>
                   </gui-inline>
                 </gui-field>
+                <gui-field label="排列">
+                  <gui-inline>
+                    <a-radio-group
+                      :value="selfConfig.legend.orient"
+                      size="small"
+                    >
+                      <a-radio-button
+                        value="horizontal"
+                        @click.native.stop="
+                          onRadioChange($event, selfConfig.legend, 'orient')
+                        "
+                        >水平</a-radio-button
+                      >
+                      <a-radio-button
+                        value="vertical"
+                        @click.native.stop="
+                          onRadioChange($event, selfConfig.legend, 'orient')
+                        "
+                        >垂直</a-radio-button
+                      >
+                    </a-radio-group>
+                  </gui-inline>
+                </gui-field>
               </a-collapse-panel>
             </template>
             <!--雷达图独有-->
@@ -713,7 +737,6 @@
                   <a-input
                     v-model="selfConfig.radar.radius"
                     size="small"
-                    style="width:100px;"
                     @change="setSelfProperty"
                   ></a-input>
                 </gui-field>
@@ -937,13 +960,13 @@
                   <a-input
                     v-model="selfConfig.xAxis.name"
                     @change="setSelfProperty"
-                    style="width:100px;"
                     size="small"
                   ></a-input>
                 </gui-field>
                 <gui-field label="标题文本">
                   <gui-inline label="字号">
                     <a-input-number
+                      class="longwidth"
                       v-model="selfConfig.xAxis.nameTextStyle.fontSize"
                       size="small"
                       :min="12"
@@ -961,6 +984,7 @@
                 <gui-field label="x轴文本">
                   <gui-inline label="字号">
                     <a-input-number
+                      class="longwidth"
                       v-model="selfConfig.xAxis.axisLabel.fontSize"
                       size="small"
                       :min="12"
@@ -1053,13 +1077,13 @@
                   <a-input
                     v-model="selfConfig.yAxis.name"
                     @change="setSelfProperty"
-                    style="width:100px;"
                     size="small"
                   ></a-input>
                 </gui-field>
                 <gui-field label="标题文本">
                   <gui-inline label="字号">
                     <a-input-number
+                      class="longwidth"
                       v-model="selfConfig.yAxis.nameTextStyle.fontSize"
                       size="small"
                       :min="12"
@@ -1077,6 +1101,7 @@
                 <gui-field label="文本">
                   <gui-inline label="字号">
                     <a-input-number
+                      class="longwidth"
                       v-model="selfConfig.yAxis.axisLabel.fontSize"
                       size="small"
                       :min="12"
@@ -1097,6 +1122,14 @@
                     show-alpha
                     @change="setSelfProperty"
                   ></el-color-picker>
+                </gui-field>
+                <gui-field label="显示轴刻度">
+                  <a-switch
+                    v-model="selfConfig.yAxis.axisTick.show"
+                    default-checked
+                    @change="switchChange"
+                    size="small"
+                  />
                 </gui-field>
                 <gui-field label="是否网格线">
                   <a-switch

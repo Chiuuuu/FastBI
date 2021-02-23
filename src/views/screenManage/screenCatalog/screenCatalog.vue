@@ -82,7 +82,7 @@
         <span slot="description">暂无数据大屏</span>
       </a-empty>
     </div>
-    <div class="right scrollbar">
+    <div class="right scrollbar" style="overflow:hidden;">
       <div class="right-header" v-if="fileSelectId !== ''">
         <span class="nav_title">{{ fileSelectName }} </span>
         <img
