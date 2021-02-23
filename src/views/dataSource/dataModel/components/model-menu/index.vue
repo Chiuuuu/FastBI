@@ -319,7 +319,7 @@ export default {
       this.resetName.parentId = parent ? parent.id : 0
     },
     async _resetName(form) {
-      const result = await this.$server.common.putMenuFolderName('/model/catalog', {
+      const result = await this.$server.common.putMenuFolderName('/model/catalog/edit', {
         fileType: this.resetName.item.fileType,
         id: this.resetName.item.id,
         name: form.name,
@@ -348,7 +348,7 @@ export default {
         title: '确认提示',
         content: '确定删除该文件夹?',
         onOk: async () => {
-          const result = await this.$server.common.deleMenuById('/model/catalog/' + folder.id)
+          const result = await this.$server.common.deleMenuById('/model/catalog/removeCatalog/' + folder.id)
 
           if (result.code === 200) {
             this.handleGetMenuList()
@@ -373,7 +373,7 @@ export default {
      * 选择移动文件夹弹窗确认
      */
     async handleFileMoveCreate(parentId) {
-      const result = await this.$server.common.putMenuFolderName('/model/catalog', {
+      const result = await this.$server.common.putMenuFolderName('/model/catalog/edit', {
         fileType: this.selectFile.fileType,
         id: this.selectFile.id,
         name: this.selectFile.name,
@@ -397,7 +397,7 @@ export default {
         title: '确认提示',
         content: '确定删除该模型?',
         onOk: async () => {
-          const result = await this.$server.common.deleMenuById(`/model/catalog/${file.id}`)
+          const result = await this.$server.common.deleMenuById(`/model/catalog/removeCatalog/${file.id}`)
 
           if (result.code === 200) {
             this.$message.success('删除成功')
@@ -440,7 +440,7 @@ export default {
      */
     async handleFileDrop(folder) {
       if (!this.dragFile || this.dragFile.parentId === folder.id) return
-      const result = await this.$server.common.putMenuFolderName('/model/catalog', {
+      const result = await this.$server.common.putMenuFolderName('/model/catalog/edit', {
         fileType: this.dragFile.fileType,
         id: this.dragFile.id,
         name: this.dragFile.name,
@@ -463,7 +463,7 @@ export default {
     async handleWrapDrop(e) {
       const className = e.toElement.className
       if (className.indexOf('menu-wrap') > -1 && this.dragFile.parentId !== 0) {
-        const result = await this.$server.common.putMenuFolderName('/model/catalog', {
+        const result = await this.$server.common.putMenuFolderName('/model/catalog/edit', {
           fileType: this.dragFile.fileType,
           id: this.dragFile.id,
           name: this.dragFile.name,
@@ -542,7 +542,7 @@ export default {
       this.resetName.type = 'new'
     },
     async _addNewFolder(form) {
-      const result = await this.$server.common.addMenuFolder('/model/catalog', {
+      const result = await this.$server.common.addMenuFolder('/model/catalog/addDataModelCatalog', {
         name: form.name,
         type: 2,
         parentId: 0,
