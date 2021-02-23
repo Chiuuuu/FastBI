@@ -205,11 +205,11 @@ export default {
         this.chartType === '1'
       ) {
         // 饼图类型只能拉入一个度量
-        if (this.currSelected.setting.name === 've-pie') {
-          this.fileList[0] = dataFile
-        } else {
-          this.fileList.push(dataFile)
-        }
+        // if (this.currSelected.setting.name === 've-pie') {
+        //   this.fileList[0] = dataFile
+        // } else {
+        this.fileList.push(dataFile)
+        // }
         this.fileList = this.uniqueFun(this.fileList, 'alias')
         this.getData()
       }
@@ -225,10 +225,11 @@ export default {
         this.type === 'measures' &&
         this.dragFile === this.type
       ) {
-        if (this.currSelected.setting.name === 've-pie') {
-          this.fileList[0] = dataFile
-          // 如果是仪表盘，需要两个度量
-        } else if (this.fileList.length < 2) {
+        // if (this.currSelected.setting.name === 've-pie') {
+        //   this.fileList[0] = dataFile
+        //   // 如果是仪表盘，需要两个度量
+        // } else
+        if (this.fileList.length < 2) {
           this.fileList.push(dataFile)
         }
         this.fileList = this.uniqueFun(this.fileList, 'alias')
@@ -280,6 +281,11 @@ export default {
         // 如果是仪表盘，第二个度量是目标值（进度条最大值）,重置进度条范围
         if (current.setting.chartType === 'v-gauge') {
           current.setting.config.series.max = 100
+          this.$store.dispatch('SetSelfProperty', current.setting.config)
+        }
+        // 环形重置显示值
+        if (current.setting.chartType === 'v-ring') {
+          current.setting.config.chartTitle.text = '70%'
           this.$store.dispatch('SetSelfProperty', current.setting.config)
         }
       }
@@ -412,6 +418,21 @@ export default {
                   value: total
                 }
               ]
+              // 环形图第二度量(指针值)
+              if (
+                this.currSelected.setting.chartType === 'v-ring' &&
+                apiData.measures[1]
+              ) {
+                let currentTotal = sum(res.rows, apiData.measures[1].alias)
+                rows[0] = {
+                  type: apiData.measures[1].alias,
+                  value: currentTotal
+                }
+                rows.push({
+                  type: apiData.measures[0].alias,
+                  value: total - currentTotal
+                })
+              }
               apiData.source = {
                 columns,
                 rows
@@ -419,8 +440,8 @@ export default {
               // 保存apidata数据
               this.$store.dispatch('SetSelfDataSource', apiData)
               let config = deepClone(this.currSelected.setting.config)
-              if (this.currSelected.setting.chartType === 'v-multiPie') {
-                config.chartTitle.text = rows[0].value
+              if (this.currSelected.setting.chartType === 'v-ring') {
+                config.chartTitle.text = rows[1] ? rows[1].value : rows[0].value
                 this.$store.dispatch('SetSelfProperty', config)
               }
               // 如果是仪表盘，第二个度量是目标值（进度条最大值）

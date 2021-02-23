@@ -34,27 +34,25 @@ export default {
       default: 0
     }
   },
-  data () {
+  data() {
     return {
       selfConfig: {}
     }
   },
-  created () {
+  created() {
     this.selfConfig = deepClone(this.config)
   },
-  mounted () {
-
-  },
+  mounted() {},
   methods: {
     ...mapActions(['saveScreenData', 'updateChartData']),
     // 实时保存文本
-    textChange () {
+    textChange() {
       this.$store.dispatch('SetSelfProperty', this.selfConfig)
       this.updateChartData()
     }
   },
   computed: {
-    titleStyle () {
+    titleStyle() {
       return {
         padding: '0 10px',
         color: this.config.title.textStyle.color,
@@ -71,16 +69,15 @@ export default {
 
 <style lang="stylus" scoped>
 
-// .dv-text:hover{
+.dv-text:hover{
 
-//   border-right:none !important;
+  border-right:none !important;
 
-// }
+}
 
 // .dv-text:focus{
 
 //   border-right:none !important;
 
 // }
-
 </style>
