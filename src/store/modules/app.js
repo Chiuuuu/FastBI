@@ -160,7 +160,7 @@ const app = {
         params.setting = state.pageSettings
       }
       return screenManage
-        .saveScreenNew(params)
+        .saveScreen(params)
         .then(res => {
           if (res.code === 200) {
             // res.msg && message.success(res.msg)
