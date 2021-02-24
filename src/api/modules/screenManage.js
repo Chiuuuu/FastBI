@@ -2,15 +2,6 @@ import $axios from '@/axios'
 
 const screenManage = {
   /**
-   * @description 新建文件夹
-   * @param {Object} params 请求参数
-   * @returns
-   */
-  addFloder(params) {
-    return $axios.post('/screen/catalog', params)
-    // return $axios.post('/screen/folder', params)
-  },
-  /**
    * @description 文件夹列表
    * @param {Object} params 请求参数
    * @returns
@@ -18,23 +9,6 @@ const screenManage = {
   getFolderList(params) {
     return $axios.get('/screen/catalog/listScreenTree', params)
     // return $axios.get('/screen/folder/list', params)
-  },
-  /**
-   * @description 删除文件夹
-   * @param {*} params
-   * @returns
-   */
-  deleFolder(id) {
-    return $axios.get(`/screen/catalog/${id}`)
-    // return $axios.get('/screen/folder/screenDelete', params)
-  },
-  /**
-   * @description 修改文件夹
-   * @param {*} params
-   * @returns
-   */
-  putFolder(params) {
-    return $axios.put('/screen/folder', params)
   },
   /**
    * @description 新增大屏tab页签
@@ -74,7 +48,7 @@ const screenManage = {
    * @returns
    */
   deleteScreenTab(id) {
-    return $axios.delete(`/screen/bigscreen/removeScreenTab/${id}`)
+    return $axios.get(`/screen/bigscreen/removeScreenTab/${id}`)
   },
   /**
    * @description 调整大屏tab页签顺序
@@ -122,15 +96,7 @@ const screenManage = {
    * @returns
    */
   delShareScreen(screenId) {
-    return $axios.delete(`/screen/bigscreen/removeScreenShare/${screenId}`)
-  },
-  /**
-   * @description 保存大屏
-   * @param {*} params
-   * @returns
-   */
-  saveScreen(params) {
-    return $axios.post('/screen/bigscreen/save', params)
+    return $axios.get(`/screen/bigscreen/removeScreenShare/${screenId}`)
   },
   /**
    * @description 新建大屏
@@ -149,11 +115,11 @@ const screenManage = {
     return $axios.get(`/screen/bigscreen/copyScreen/${screenId}`)
   },
   /**
-   * @description 保存大屏new
+   * @description 保存大屏
    * @param {*} params
    * @returns
    */
-  saveScreenNew(params) {
+  saveScreen(params) {
     return $axios.post('/screen/bigscreen/saveScreen', params)
   },
   /**

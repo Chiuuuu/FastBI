@@ -538,7 +538,7 @@ export default {
         parentId
       }
       const result = await this.$server.common.putMenuFolderName(
-        '/screen/catalog',
+        '/screen/catalog/update',
         params
       )
       if (result.code === 200) {
@@ -611,16 +611,18 @@ export default {
       let params = {
         id
       }
-      this.$server.common.deleMenuFolder(`/screen/catalog/${id}`).then(res => {
-        if (res.code === 200) {
-          this.$message.success('删除成功')
-          this.getList()
-          this.fileSelectId = ''
-          this.fileSelectName = ''
-          this.$store.dispatch('SetParentId', '')
-          this.$store.commit('common/SET_PRIVILEGES', [])
-        }
-      })
+      this.$server.common
+        .deleMenuFolder(`/screen/catalog/delete/${id}`)
+        .then(res => {
+          if (res.code === 200) {
+            this.$message.success('删除成功')
+            this.getList()
+            this.fileSelectId = ''
+            this.fileSelectName = ''
+            this.$store.dispatch('SetParentId', '')
+            this.$store.commit('common/SET_PRIVILEGES', [])
+          }
+        })
     },
     // 重命名文件夹
     handleResetFolder(event, item, { folder }) {
@@ -718,7 +720,6 @@ export default {
                 }
               })
           }
-          // this.$server.common.putMenuFolderName('/screen/catalog', params)
         }
         this.screenForm.resetFields()
         this.screenVisible = false
@@ -784,7 +785,7 @@ export default {
             ...values
           }
           this.$server.common
-            .putMenuFolderName('/screen/catalog', params)
+            .putMenuFolderName('/screen/catalog/update', params)
             .then(res => {
               if (res.code === 200) {
                 this.$message.success(res.msg)
