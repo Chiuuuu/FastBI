@@ -281,6 +281,13 @@ export default {
         // 如果是仪表盘，第二个度量是目标值（进度条最大值）,重置进度条范围
         if (current.setting.chartType === 'v-gauge') {
           current.setting.config.series.max = 100
+          if (current.setting.api_data.measures.length === 0) {
+            current.setting.config.series.axisLine.lineStyle.color[0][1] =
+              current.setting.api_data.rows[0].value >
+              current.setting.config.warningValue
+                ? '#DC143C'
+                : '#f5c942'
+          }
           this.$store.dispatch('SetSelfProperty', current.setting.config)
         }
         // 环形重置显示值
@@ -445,6 +452,12 @@ export default {
                 this.$store.dispatch('SetSelfProperty', config)
               }
               // 如果是仪表盘，第二个度量是目标值（进度条最大值）
+              //   if (
+              //     this.currSelected.setting.chartType === 'v-gauge' &&
+              //     total > config.warningValue
+              //   ) {
+              //     config.series.axisLine.lineStyle.color[0][1] = '#f5c942'
+              //   }
               if (
                 this.currSelected.setting.chartType === 'v-gauge' &&
                 apiData.measures[1]

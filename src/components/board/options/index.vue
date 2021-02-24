@@ -1888,6 +1888,25 @@
                 ></a-input-number>
               </gui-field>
             </a-collapse-panel>
+            <a-collapse-panel
+              key="warnvalue"
+              header="预警值"
+              v-if="this.chartType === 'v-gauge'"
+            >
+              <gui-field label="预警值">
+                <a-input-number
+                  v-model="selfConfig.warningValue"
+                  size="small"
+                  :min="0"
+                  :max="
+                    currSelected.setting.config.series.max
+                      ? currSelected.setting.config.series.max
+                      : 100
+                  "
+                  @change="setSelfProperty"
+                ></a-input-number>
+              </gui-field>
+            </a-collapse-panel>
           </a-collapse>
         </div>
         <div v-else-if="tabsType === 1">
@@ -2020,6 +2039,21 @@ export default {
     },
     // 设置自有属性
     setSelfProperty() {
+      if (this.chartType === 'v-gauge') {
+        if (
+          (this.selfConfig.warningValue > 0 &&
+            (this.currSelected.setting.api_data.source.rows[0].value &&
+              this.currSelected.setting.api_data.source.rows[0].value >
+                this.selfConfig.warningValue)) ||
+          (!this.currSelected.setting.api_data.source.rows[0].value &&
+            this.currSelected.setting.api_data.rows[0].value >
+              this.selfConfig.warningValue)
+        ) {
+          this.selfConfig.series.axisLine.lineStyle.color[0][1] = '#DC143C'
+        } else {
+          this.selfConfig.series.axisLine.lineStyle.color[0][1] = '#f5c942'
+        }
+      }
       this.$store.dispatch('SetSelfProperty', this.selfConfig)
       // 发送请求来保存数据
       setBaseProperty(this.currentSelected)

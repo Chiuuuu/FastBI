@@ -710,6 +710,7 @@ const list = [
               fontSize: 20
             }
           },
+          warningValue: 80,
           tooltip: {
             show: false
           },

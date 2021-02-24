@@ -13,6 +13,11 @@
     >
       <span>{{ config.title.content }}</span>
     </div>
+    <div class="warningvalue" v-show="chartType === 'v-gauge'">
+      <span v-show="config.warningValue"
+        >预警值：{{ config.warningValue }}</span
+      >
+    </div>
     <component
       v-if="chartData.columns && chartData.columns.length > 0"
       v-bind:is="typeName"
