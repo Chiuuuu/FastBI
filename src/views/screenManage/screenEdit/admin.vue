@@ -338,8 +338,7 @@ export default {
     ChartImage,
     ChartTables,
     ChartNodata,
-    Screen,
-    IconFont
+    Screen
   },
   beforeDestroy() {
     off(document, 'keyup', this.handleKeyup)

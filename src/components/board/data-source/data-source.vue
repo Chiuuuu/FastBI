@@ -83,15 +83,6 @@
           </a-select>
         </div>
       </a-collapse-panel>
-      <!-- <a-collapse-panel key="filter" header="数据筛选">
-        <div class="empty">拖入字段</div>
-      </a-collapse-panel>
-      <a-collapse-panel key="sort" header="排序">
-      </a-collapse-panel>
-      <a-collapse-panel key="tips" header="鼠标移入时提示">
-      </a-collapse-panel>
-      <a-collapse-panel key="refresh" header="定时刷新">
-      </a-collapse-panel>-->
     </a-collapse>
   </div>
 </template>
@@ -141,8 +132,7 @@ export default {
       refreshList: [
         { name: '分', value: 'min' },
         { name: '小时', value: 'hour' }
-      ],
-      timer: null
+      ]
     }
   },
   watch: {
@@ -183,7 +173,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['currSelected']),
+    ...mapGetters(['currSelected', 'currentSelected']),
     chartType() {
       return this.currSelected ? this.currSelected.setting.type : ''
     }
@@ -226,10 +216,6 @@ export default {
       // 阻止默认事件，取消收起
       event.stopPropagation()
       this.refresh.isRefresh = checked
-      if (checked) {
-        this.frequencyChange(1)
-        this.unitChange(1)
-      }
       this.apiData.refresh = this.refresh
       this.$store.dispatch('SetSelfDataSource', this.apiData)
       this.saveScreenData()
@@ -247,12 +233,10 @@ export default {
           this.reset()
         }
       }
-      if (val !== 1) {
-        this.apiData.refresh = this.refresh
-        this.$store.dispatch('SetSelfDataSource', this.apiData)
-        this.saveScreenData()
-        this.setTimer()
-      }
+      this.apiData.refresh = this.refresh
+      this.$store.dispatch('SetSelfDataSource', this.apiData)
+      this.saveScreenData()
+      this.setTimer()
     },
     // 刷新单位设置
     unitChange(val) {
@@ -266,12 +250,10 @@ export default {
           this.reset()
         }
       }
-      if (val !== 1) {
-        this.apiData.refresh = this.refresh
-        this.$store.dispatch('SetSelfDataSource', this.apiData)
-        this.saveScreenData()
-        this.setTimer()
-      }
+      this.apiData.refresh = this.refresh
+      this.$store.dispatch('SetSelfDataSource', this.apiData)
+      this.saveScreenData()
+      this.setTimer()
     },
     reset() {
       this.refresh.frequency = 1
@@ -279,35 +261,7 @@ export default {
     },
     // 单个图表的定时器设置
     setTimer() {
-      if (this.timer) {
-        clearInterval(this.timer)
-        this.timer = null
-      } else {
-        // 所有条件都满足才开始倒计时刷新
-        if (
-          this.refresh.isRefresh &&
-          this.refresh.unit &&
-          this.refresh.frequency > 0
-        ) {
-          let count = 0
-          if (this.refresh.unit === 'min') {
-            count = this.refresh.frequency * 60 * 1000
-          } else if (this.refresh.unit === 'hour') {
-            count = this.refresh.frequency * 60 * 60 * 1000
-          }
-          this.timer = setInterval(() => {
-            this.refreshData()
-          }, count)
-        }
-      }
-    },
-    // 刷新大屏
-    refreshData() {
-      this.refreshScreen({
-        charSeted: true,
-        globalSettings: false,
-        needLoading: false
-      })
+      this.$emit('setChartTimer', this.currentSelected)
     }
   }
 }

@@ -1891,7 +1891,7 @@
           </a-collapse>
         </div>
         <div v-else-if="tabsType === 1">
-          <data-source></data-source>
+          <data-source @setChartTimer="setChartTimer"></data-source>
           <!-- <gui-group group-name="数据映射">
               <gui-field label="x">
                 <a-input v-model="apis.labelMap.x" size="small" @change="setApiLabelMap"></a-input>
@@ -1941,6 +1941,7 @@ import GuiColors from './gui-colors'
 import DataSource from '../data-source/data-source'
 import { DEFAULT_COLORS } from '../../../utils/defaultColors'
 import { deepClone } from '../../../utils/deepClone'
+import throttle from 'lodash/throttle'
 
 export default {
   name: 'BoardOptions',
@@ -1982,20 +1983,27 @@ export default {
       refreshList: [
         { name: '分', value: 'min' },
         { name: '小时', value: 'hour' }
-      ]
+      ],
+      timer: null,
+      chartTimers: {}
     }
   },
   mounted() {
     if (!this.screenId) {
       this.resetSetting()
     }
-    if (this.$route.path === '/screen/edit') {
-      this.setTimer()
-    }
+    // if (this.$route.path === '/screen/edit') {
+    //   this.setTimer()
+    // }
   },
   destroyed() {
     clearInterval(this.timer)
     this.timer = null
+    let keys = Object.keys(this.chartTimers)
+    keys.forEach(id => {
+      clearInterval(this.chartTimers[id])
+    })
+    this.chartTimers = {}
   },
   methods: {
     ...mapActions(['saveScreenData', 'updateChartData', 'refreshScreen']),
@@ -2046,19 +2054,15 @@ export default {
       this.saveScreenData()
     },
     // 全局刷新打开关闭
-    refreshChange(checked) {
+    refreshChange(checked, event) {
       // 阻止默认事件，取消收起
       event.stopPropagation()
       this.globalSettings.refresh.isRefresh = checked
-      if (checked) {
-        this.frequencyChange(1)
-        this.unitChange(1)
-      }
       this.$store.dispatch('SetPageSettings', this.globalSettings)
       this.saveScreenData()
       this.setTimer()
     },
-    frequencyChange(val) {
+    frequencyChange() {
       if (this.globalSettings.refresh.isRefresh) {
         if (
           this.globalSettings.refresh.unit === 'min' &&
@@ -2075,13 +2079,11 @@ export default {
           this.resetSetting()
         }
       }
-      if (val !== 1) {
-        this.$store.dispatch('SetPageSettings', this.globalSettings)
-        this.saveScreenData()
-        this.setTimer()
-      }
+      this.$store.dispatch('SetPageSettings', this.globalSettings)
+      this.saveScreenData()
+      this.setTimer()
     },
-    unitChange(val) {
+    unitChange() {
       if (this.globalSettings.refresh.isRefresh) {
         if (
           this.globalSettings.refresh.frequency > 1440 &&
@@ -2098,11 +2100,9 @@ export default {
           this.resetSetting()
         }
       }
-      if (val !== 1) {
-        this.$store.dispatch('SetSelfDataSource', this.globalSettings)
-        this.saveScreenData()
-        this.setTimer()
-      }
+      this.$store.dispatch('SetSelfDataSource', this.globalSettings)
+      this.saveScreenData()
+      this.setTimer()
     },
     // 数据源改变事件
     dataSourceChange() {
@@ -2250,33 +2250,58 @@ export default {
       if (this.timer) {
         clearInterval(this.timer)
         this.timer = null
-      } else {
-        // 所有条件都满足才开始倒计时刷新
-        if (
-          this.globalSettings.refresh.isRefresh &&
-          this.globalSettings.refresh.unit &&
-          this.globalSettings.refresh.frequency > 0
-        ) {
-          let count = 0
-          if (this.globalSettings.refresh.unit === 'min') {
-            count = this.globalSettings.refresh.frequency * 60 * 1000
-          } else if (this.globalSettings.refresh.unit === 'hour') {
-            count = this.globalSettings.refresh.frequency * 60 * 60 * 1000
-          }
-          this.timer = setInterval(() => {
-            this.refreshData()
-          }, count)
+      }
+      // 所有条件都满足才开始倒计时刷新
+      if (
+        this.globalSettings.refresh.isRefresh &&
+        this.globalSettings.refresh.unit &&
+        this.globalSettings.refresh.frequency > 0
+      ) {
+        let count = 0
+        if (this.globalSettings.refresh.unit === 'min') {
+          count = this.globalSettings.refresh.frequency * 60 * 1000
+        } else if (this.globalSettings.refresh.unit === 'hour') {
+          count = this.globalSettings.refresh.frequency * 60 * 60 * 1000
         }
+        this.timer = setInterval(() => {
+          this.refreshData()
+        }, count)
+      }
+    },
+    setChartTimer(id) {
+      if (this.chartTimers[id]) {
+        clearInterval(this.chartTimers[id])
+        this.chartTimers[id] = null
+      }
+      let selected = this.canvasMap.find(item => item.id === id)
+      let refresh = selected.setting.api_data.refresh
+      // 所有条件都满足才开始倒计时刷新
+      if (refresh.isRefresh && refresh.unit && refresh.frequency > 0) {
+        let count = 0
+        if (refresh.unit === 'min') {
+          count = refresh.frequency * 60 * 1000
+        } else if (refresh.unit === 'hour') {
+          count = refresh.frequency * 60 * 60 * 1000
+        }
+        this.chartTimers[id] = setInterval(() => {
+          this.refreshData()
+        }, count)
       }
     },
     // 刷新大屏
-    refreshData() {
-      this.refreshScreen({
-        charSeted: false,
-        globalSettings: true,
-        needLoading: false
-      })
-    }
+    refreshData: throttle(
+      function() {
+        this.refreshScreen({
+          charSeted: false,
+          needLoading: false
+        })
+      },
+      1000,
+      {
+        leading: true,
+        trailing: false
+      }
+    )
   },
   watch: {
     currSelected: {
@@ -2317,6 +2342,18 @@ export default {
             }
           }
           this.globalSettings = deepClone(setting)
+          // 初始化定时刷新(调完getScreenDetail，保证isRefresh数据准确)
+          if (setting.refresh.isRefresh && !this.timer) {
+            this.setTimer()
+          }
+          for (let chart of this.canvasMap) {
+            if (
+              chart.setting.api_data.refresh.isRefresh &&
+              !this.chartTimers[chart.id]
+            ) {
+              this.setChartTimer(chart.id)
+            }
+          }
         }
       },
       deep: true,

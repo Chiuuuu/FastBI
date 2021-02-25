@@ -212,7 +212,6 @@ export default {
       }
       this.refreshScreen({
         charSeted: false,
-        globalSettings: false,
         needLoading: true
       })
     }
