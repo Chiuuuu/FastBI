@@ -220,7 +220,7 @@ export default {
       return $axios.get(`/business/project/getProjectUserName/${projectId}`)
     },
     /**
-     * @description 
+     * @description
      * @param {String | Number} projectId 项目id
      * @returns
      */

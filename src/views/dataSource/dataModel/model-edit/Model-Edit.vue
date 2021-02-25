@@ -119,8 +119,9 @@
       </div>
       <div class="detail scrollbar">
         <div class="detail_header">
-          <span>数据模型详情</span>
+          <span>数据模型详情{{ createViewName ? `(已创建视图: ${createViewName})` : '' }}</span>
           <div class="detail_btn">
+            <a-button v-on:click="openModal('create-view')" :disabled="disableByDetailInfo">创建视图</a-button>
             <a-button v-on:click="openModal('check-table')" :disabled="disableByDetailInfo">查看宽表</a-button>
             <a-button v-on:click="openModal('batch-setting')" :disabled="disableByDetailInfo">批量编辑字段</a-button>
           </div>
@@ -225,6 +226,7 @@ import GeoSetting from './setting/geo-setting'
 import ComputeSetting from './setting/compute-setting'
 import RenameSetting from './setting/rename-setting'
 import UnionSetting from './setting/union-setting'
+import CreateView from './setting/create-view'
 import PanelItem from './panel-item'
 import { Node, conversionTree } from '../util'
 import { hasPermission } from '@/utils/permission'
@@ -252,7 +254,8 @@ export default {
     ComputeSetting, // 设置维度度量
     RenameSetting, // 维度度量重命名
     UnionSetting, // 表上下合并
-    PanelItem
+    PanelItem,
+    CreateView // 创建视图
   },
   provide() {
     return {
@@ -300,7 +303,8 @@ export default {
         span: 14
       },
       computeType: '', // 新建计算字段类型(维度, 度量)
-      databaseList: [] // 数据库列表
+      databaseList: [], // 数据库列表
+      createViewName: ''
     }
   },
   computed: {
@@ -692,6 +696,7 @@ export default {
 
       if (result.code === 200) {
         this.$message.success('获取数据成功')
+        this.createViewName = result.data.alias
         this.detailInfo = result.data
         // 将自定义维度度量剥离处理
         this.detailInfo.pivotSchema.dimensions = this.handlePeelCustom(this.detailInfo.pivotSchema.dimensions, this.cacheDimensions)
@@ -797,6 +802,11 @@ export default {
       if (this.modalName === 'compute-setting') {
         this.doWithComputeSetting(data)
       }
+
+      if (this.modalName === 'create-view') {
+        this.doWithCreateView(data)
+      }
+
       this.close()
     },
     doWithSqlSetting(data) {
@@ -866,6 +876,10 @@ export default {
       }
       this.handleDimensions()
       this.handleMeasures()
+    },
+    doWithCreateView(data) {
+      this.createViewName = data
+      this.detailInfo.alias = data
     },
     handleChangeTableName(list, tableNo, name) {
       if (list && list.length) {
