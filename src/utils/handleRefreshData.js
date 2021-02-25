@@ -5,7 +5,10 @@ export function handleRefreshData({ chart, newData }) {
     chart.setting.chartType === 'v-ring' ||
     chart.setting.chartType === 'v-gauge'
   ) {
-    let key = Object.keys(newData[0])[0]
+    let key =
+      chart.setting.chartType === 'v-ring'
+        ? Object.keys(newData[0])[0]
+        : Object.keys(newData[0])[1]
     let total = sum(newData, key)
     let rows = [
       {
@@ -20,7 +23,7 @@ export function handleRefreshData({ chart, newData }) {
       chart.setting.chartType === 'v-gauge' &&
       chart.setting.api_data.measures[1]
     ) {
-      let goalTotal = sum(newData, Object.keys(newData[0])[1])
+      let goalTotal = sum(newData, Object.keys(newData[0])[0])
       chart.setting.config.series.max = goalTotal
     }
     // 环形图第二度量(指针值)
