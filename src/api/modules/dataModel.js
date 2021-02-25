@@ -213,5 +213,15 @@ export default {
    */
   getDataModelTableInfoAndPivotshchemaInfo(params) {
     return $axios.post(`/model/pivotschema/getDataModelTableInfoAndPivotshchemaInfo`, params)
+  },
+  /**
+   * @description 创建视图
+   * @param {Object} params 请求体
+   * @param {Object} params.config 配置
+   * @param {Object} params.pivotSchema 维度度量等参数
+   * @returns
+   */
+  addDataModelView(params) {
+    return $axios.post(`/model/custom/createDataModelView`, params)
   }
 }
