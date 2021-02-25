@@ -166,7 +166,11 @@ export default {
       this.spinning = true
       this.$server.dataAccess.getJarPackageList(this.modelId)
         .then(res => {
-          this.fileInfoList = res.rows
+          if (res.code === 200) {
+            this.fileInfoList = res.rows
+          } else {
+            this.$message.error(res.msg)
+          }
         })
         .finally(() => {
           this.spinning = false
@@ -174,18 +178,11 @@ export default {
     },
     // 下载文件
     async handleDownload(name) {
-      // let a = document.createElement('a')
-      // a.href = process.env.VUE_APP_SERVICE_URL + `/jar/download/${this.modelId}/${name}.jar`
-      // a.download = name
-      // a.click()
-      // a = null
       this.spinning = true
       const res = await this.$server.dataAccess.actionDownloadJarFile(name, this.modelId)
         .finally(() => {
           this.spinning = false
         })
-      console.log(res)
-      // const blobUrl = window.URL.createObjectURL(new Blob([res]))
       let a = document.createElement('a')
       a.href = process.env.VUE_APP_SERVICE_URL + `/jarDownload/${res.msg}`
       a.download = name
