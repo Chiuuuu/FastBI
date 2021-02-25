@@ -318,5 +318,42 @@ export default {
      */
     getExtractLogList(id) {
         return $axios.get('/datasource/schedule/getProgressInfo/' + id)
+    },
+    // ----------------------------------------退役厅jar包相关----------------------------------------------------------
+    /**
+     * @description 获取jar包列表
+     * @param {String} id 数据源的id
+     */
+    getJarPackageList(id) {
+        return $axios.get('/jar/list/' + id)
+    },
+    /**
+     * @description 批量上传jar包
+     * @param {Array} data.jarFiles 文件列表
+     * @param {String} data.sourceId 文件列表
+     */
+    actionUploadJarFile(data) {
+        return $axios({
+            method: 'post',
+            headers: { 'Content-Type': 'multipart/form-data' },
+            url: '/jar/upload',
+            data
+        })
+    },
+    /**
+     * @description 批量上传jar包
+     * @param {Array} name 文件列表
+     * @param {String} id 文件列表
+     */
+    actionDownloadJarFile(name, id) {
+        return $axios.get(`/jar/getDownloadKey/${id}/${name}`)
+    },
+    /**
+     * @description 删除jar包
+     * @param {Array} fileList 文件列表
+     * @param {String} sourceId 源id
+     */
+    deleJarFiles(params) {
+        return $axios.post(`/jar/delete`, params)
     }
 }

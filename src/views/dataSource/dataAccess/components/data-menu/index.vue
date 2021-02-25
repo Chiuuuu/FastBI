@@ -141,7 +141,7 @@ export default {
   },
   data() {
     return {
-      modelList: ['mysql', 'oracle', 'hive', 'excel', 'csv'].map(function(item) {
+      modelList: ['mysql', 'oracle', 'hive', 'excel', 'csv', 'jar'].map(function(item) {
       // modelList: ['mysql', 'oracle', 'excel'].map(function(item) {
         // 弹窗选项列表
         return {
@@ -308,6 +308,8 @@ export default {
           this.$store.dispatch('dataAccess/setModelType', 'excel')
         } else if (result.data.type === 12) {
           this.$store.dispatch('dataAccess/setModelType', 'csv')
+        } else if (result.data.type === 13) {
+          this.$store.dispatch('dataAccess/setModelType', 'jar')
         }
         this.$store.dispatch('dataAccess/setModelInfo', result.data.properties)
         this.$store.dispatch('dataAccess/setModelName', result.data.name)

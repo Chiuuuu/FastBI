@@ -133,7 +133,7 @@ export default {
 <style lang="less" scoped>
   .icon-bg {
     background: url("../../../assets/images/common/types.png") no-repeat;
-    background-size: 110px 16px;
+    background-size: 128px 16px;
   }
   .icon-2 { // oracle
     background-position: 0 0;
@@ -149,6 +149,9 @@ export default {
   }
   .icon-12 { // csv
     background-position: -72px 0;
+  }
+  .icon-13 { // jar
+    background-position: -116px 0;
   }
   .icon-model { // 数据模型
     background-position: -94px 0;

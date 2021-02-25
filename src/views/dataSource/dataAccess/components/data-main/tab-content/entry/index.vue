@@ -15,6 +15,7 @@ import Oracle from './oracle'
 import Hive from './hive'
 import Excel from './excel'
 import Csv from './csv'
+import Jar from './jar'
 export default {
   name: 'tabContentEntry',
   components: {
@@ -22,7 +23,8 @@ export default {
     oracle: Oracle,
     hive: Hive,
     excel: Excel,
-    csv: Csv
+    csv: Csv,
+    jar: Jar
   },
   data() {
     return {

@@ -74,6 +74,8 @@ export default {
             return 'Excel'
           case 'csv':
             return 'Csv'
+          case 'jar':
+            return 'Jar'
         }
       },
       modelName: state => state.dataAccess.modelName,
