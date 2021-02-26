@@ -2,6 +2,8 @@ import dataSourceRouter from './dataSource'
 import screenManageRouter from './screenMange'
 import CorporateDomainRouter from './corporateDomain'
 import ProjectCenterRouter from './projectCenter'
+import PlatFormRouter from './platform'
+import LabelRouter from './label'
 
 const BaseLayout = () => import('@/layout/index')
 
@@ -13,6 +15,8 @@ export default {
     children: [
         dataSourceRouter,
         screenManageRouter,
+        PlatFormRouter,
+        LabelRouter,
         ProjectCenterRouter,
         CorporateDomainRouter
     ]
