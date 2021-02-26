@@ -14,6 +14,9 @@
         <span>{{userInfo.name}}<img src="@/assets/images/icon_head_portrait.png" alt=""/></span>
         <a-menu slot="overlay">
           <a-menu-item>
+            <a href="javascript:;" @click="clearBtn">清除缓存</a>
+          </a-menu-item>
+          <a-menu-item>
             <a href="javascript:;" @click="quitBtn">退出登录</a>
           </a-menu-item>
         </a-menu>
@@ -61,6 +64,16 @@ export default {
       this.$store.commit('user/CLEAR_PERMISSIONS')
       this.$router.push({
         path: '/login'
+      })
+    },
+    // 清除缓存
+    clearBtn() {
+      const dely = Math.floor((Math.random() * 3) + 1) // 1~3
+      this.$message.success({
+        content: '正在清除缓存,完成后将跳转至登录',
+        duration: dely
+      }).then(() => {
+        this.quitBtn()
       })
     },
 
