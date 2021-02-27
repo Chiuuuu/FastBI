@@ -1,7 +1,7 @@
 <template>
   <a-row :gutter="16" class="screen-manage">
     <a-col class="gutter-row screen-manage" :span="24">
-      <div class="main" style="height:100%">
+      <div class="main" style="height:100%;backgroundColor:transparent">
         <div class="right" style="color:red;height:100%">
           <div class="monitoring">
             <div class="contain left" ref="leftpanal">
