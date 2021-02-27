@@ -1898,11 +1898,7 @@
                   v-model="selfConfig.warningValue"
                   size="small"
                   :min="0"
-                  :max="
-                    currSelected.setting.config.series.max
-                      ? currSelected.setting.config.series.max
-                      : 100
-                  "
+                  :max="currSelected.setting.config.series.max"
                   @change="setSelfProperty"
                 ></a-input-number>
               </gui-field>
@@ -2040,18 +2036,25 @@ export default {
     // 设置自有属性
     setSelfProperty() {
       if (this.chartType === 'v-gauge') {
-        if (
-          (this.selfConfig.warningValue > 0 &&
-            (this.currSelected.setting.api_data.source.rows[0].value &&
-              this.currSelected.setting.api_data.source.rows[0].value >
-                this.selfConfig.warningValue)) ||
-          (!this.currSelected.setting.api_data.source.rows[0].value &&
-            this.currSelected.setting.api_data.rows[0].value >
-              this.selfConfig.warningValue)
-        ) {
-          this.selfConfig.series.axisLine.lineStyle.color[0][1] = '#DC143C'
+        this.selfConfig.series.axisLine.lineStyle.color[0][1] = '#f5c942'
+        // 没有维度度量数据
+        if (this.currSelected.setting.api_data.measures.length === 0) {
+          let value = this.currSelected.setting.api_data.rows[0].value
+          if (
+            this.selfConfig.warningValue &&
+            value > this.selfConfig.warningValue
+          ) {
+            this.selfConfig.series.axisLine.lineStyle.color[0][1] = '#DC143C'
+          }
         } else {
-          this.selfConfig.series.axisLine.lineStyle.color[0][1] = '#f5c942'
+          let value = this.currSelected.setting.api_data.source.rows[0].value
+          if (
+            value > this.currSelected.setting.config.series.max ||
+            (this.selfConfig.warningValue &&
+              value > this.selfConfig.warningValue)
+          ) {
+            this.selfConfig.series.axisLine.lineStyle.color[0][1] = '#DC143C'
+          }
         }
       }
       this.$store.dispatch('SetSelfProperty', this.selfConfig)
