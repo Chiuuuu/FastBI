@@ -223,12 +223,12 @@
           <span class="indent-text" @click="copyLink(releaseObj.url)"
             >复制链接</span
           >
-          <!-- <a-icon
+          <a-icon
             type="qrcode"
             class="qrcode"
             :style="{ fontSize: '20px' }"
             @click.stop="showCode = true"
-          /> -->
+          />
         </div>
         <div class="releace-line">
           <span class="label">分享密码：</span
