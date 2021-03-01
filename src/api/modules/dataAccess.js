@@ -107,6 +107,34 @@ export default {
         return $axios.post('/source/view/extract', params)
     },
     /**
+    * @description 校验替换的excel文件
+    * @param {Object} data.fileList 文件
+    * @param {Object} data.replaceDatabaseId 文件id
+    */
+    actionReplaceExcelFile(data) {
+        return $axios({
+            method: 'post',
+            headers: { 'Content-Type': 'multipart/form-data' },
+            url: '/datasource/excel/checkout',
+            data
+        })
+    },
+    /**
+    * @description 校验替换的csv文件
+    * @param {Object} data 参数
+    * @param {Object} data.fileList 文件
+    * @param {Object} data.replaceDatabaseId 文件id
+    * @param {String} data.delimiter 分隔符
+    */
+    actionReplaceCsvFile(data) {
+        return $axios({
+            method: 'post',
+            headers: { 'Content-Type': 'multipart/form-data' },
+            url: '/datasource/csv/checkout',
+            data
+        })
+    },
+    /**
      * @description 上传excel文件
      * @param {Object} file 文件
      */
