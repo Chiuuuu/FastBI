@@ -711,6 +711,7 @@ const list = [
             }
           },
           warningValue: 80,
+          selectedColor: '#f5c942',
           tooltip: {
             show: false
           },

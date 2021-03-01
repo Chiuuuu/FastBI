@@ -858,7 +858,7 @@
                 </gui-field>
                 <gui-field label="进度条背景色" width="80px">
                   <el-color-picker
-                    v-model="selfConfig.series.axisLine.lineStyle.color[0][1]"
+                    v-model="selfConfig.selectedColor"
                     @change="setSelfProperty"
                   ></el-color-picker>
                 </gui-field>
@@ -2036,7 +2036,7 @@ export default {
     // 设置自有属性
     setSelfProperty() {
       if (this.chartType === 'v-gauge') {
-        this.selfConfig.series.axisLine.lineStyle.color[0][1] = '#f5c942'
+        this.selfConfig.series.axisLine.lineStyle.color[0][1] = this.selfConfig.selectedColor
         // 没有维度度量数据
         if (this.currSelected.setting.api_data.measures.length === 0) {
           let value = this.currSelected.setting.api_data.rows[0].value
