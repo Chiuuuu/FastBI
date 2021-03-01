@@ -291,7 +291,7 @@ export default {
               '#DC143C'
           } else {
             current.setting.config.series.axisLine.lineStyle.color[0][1] =
-              '#f5c942'
+              current.setting.config.selectedColor
           }
           this.$store.dispatch('SetSelfProperty', current.setting.config)
         }
@@ -466,7 +466,7 @@ export default {
                   total > config.series.max ||
                   (config.warningValue && total > config.warningValue)
                     ? '#DC143C'
-                    : '#f5c942'
+                    : config.selectedColor
                 this.$store.dispatch('SetSelfProperty', config)
               }
               this.updateChartData()
