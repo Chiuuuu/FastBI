@@ -1,38 +1,71 @@
 .monitoring {
-  display: flex;
   width: 100%;
   height: 100%;
-
-  .contain {
-    background: white;
-    &.left {
-      flex: 1;
-      position: relative;
-      margin-right: 8px;
+  background: white;
+}
+.monitoringtab {
+  position: relative;
+  .search {
+    position: relative;
+    margin-right: 8px;
+    margin-bottom: 10px;
+    height: 32px;
+    .inp {
+      width: 120px;
+      &:first-child {
+        margin-right: 20px;
+      }
     }
-    &.right {
-      width: 400px;
-
-      .searchbar {
-        margin: 40px 20px;
+    .searchbar {
+      padding: 0 40px;
+    }
+    .btn {
+      position: absolute;
+      right: 30px;
+      top: 0;
+    }
+  }
+  .tablebox {
+    padding: 40px;
+    padding-top: 0;
+    height: 550px;
+    .table {
+      width: 100%;
+      table-layout: fixed;
+      .span {
+        text-align: center;
+        padding: 5px;
+        &.del {
+          color: blue;
+          cursor: pointer;
+        }
       }
-
-      ul li {
-        list-style: none;
+      &.header {
+        font-size: 20px;
+        background: rgb(215, 215, 215);
       }
-      .staticlist {
-        margin: 0 30px;
-        color: black;
-        font-size: 18px;
-        font-weight: bold;
-        & > li {
-          margin: 10px 0;
-          & > span {
-            margin-left: 10px;
-            color: rgb(94, 175, 212);
+      &.body {
+        font-size: 16px;
+        .tr {
+          &:nth-child(2n) {
+            background: rgb(242, 242, 242);
           }
         }
       }
+    }
+  }
+  .pagination {
+    position: absolute;
+    bottom: 20px;
+    display: flex;
+    flex-direction: row-reverse;
+    padding-right: 20px;
+    .pagesize {
+      margin-right: 20px;
+    }
+    .pagesizeinp {
+      margin: 0 5px;
+      width: 70px;
     }
   }
 }

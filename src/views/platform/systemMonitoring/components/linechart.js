@@ -1,7 +1,8 @@
 function getConfig(enddata = 20) {
   return {
     title: {
-      text: '系统访问量趋势分析'
+      text: '用户登录数',
+      padding: [5, 0, 0, 15]
     },
     grid: { left: 20, right: 50, bottom: 50 },
     dataZoom: [
@@ -16,32 +17,27 @@ function getConfig(enddata = 20) {
       }
     ],
     xAxis: {
-      name: '日期',
+      name: '',
       boundaryGap: false,
       nameLocation: 'end',
       nameGap: 5,
       nameTextStyle: {
-        //   color: '#fff',
         fontSize: '12',
         align: 'right'
       },
       axisLabel: {
-        //   color: '#ffffff',
         fontSize: 12,
         rotate: 0
       },
       axisLine: {
         show: true,
-        lineStyle: {
-          // color: '#fff'
-        }
+        lineStyle: {}
       },
       splitLine: {
         show: false,
         lineStyle: {
           width: 2,
           type: 'solid'
-          // color: '#fff'
         }
       },
       axisTick: {
@@ -49,27 +45,22 @@ function getConfig(enddata = 20) {
       }
     },
     yAxis: {
-      name: '访问量/次',
+      name: '',
       position: 'left',
       nameTextStyle: {
-        //   color: '#fff',
         fontSize: 12
       },
       axisLabel: {
-        //   color: '#ffffff',
         fontSize: 12
       },
       axisLine: {
         show: true,
-        lineStyle: {
-          // color: '#fff'
-        }
+        lineStyle: {}
       },
       splitLine: {
         show: true,
         lineStyle: {
           type: 'solid'
-          // color: '#fff'
         }
       },
       axisTick: {
@@ -79,23 +70,38 @@ function getConfig(enddata = 20) {
     series: {
       type: 'line',
       smooth: true, // 可选的
-      step: false, // step line
-      showSymbol: false, // 隐藏图标
+      showSymbol: true, // 隐藏图标
       lineStyle: {
         width: 2
       },
       label: {
-        show: false,
-        color: '#fff',
+        show: true,
+        color: 'black',
         fontSize: 12,
         position: 'top'
       },
       areaStyle: {
-        // 可选的
-        opacity: 0
+        color: {
+          type: 'linear',
+          x: 0,
+          y: 0,
+          x2: 0,
+          y2: 1,
+          colorStops: [
+            {
+              offset: 0,
+              color: 'rgb(17,207,255)' // 0% 处的颜色
+            },
+            {
+              offset: 1,
+              color: 'white' // 100% 处的颜色
+            }
+          ]
+        }
       }
     },
-    color: ['#EE6666']
+    // color: ['#EE6666']
+    color: ['RGB(0,0,191)']
   }
 }
 export default getConfig
