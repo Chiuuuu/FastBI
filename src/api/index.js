@@ -7,6 +7,7 @@ import projectCenter from '@/api/modules/projectCenter'
 import corporateDomain from '@/api/modules/corporateDomain'
 import user from '@/api/modules/user'
 import log from '@/api/modules/log'
+import systemMonitoring from '@/api/modules/systemMonitoring'
 
 const server = {
   user,
@@ -17,7 +18,8 @@ const server = {
   dataModel,
   projectCenter,
   corporateDomain,
-  log
+  log,
+  systemMonitoring
 }
 
 export default server

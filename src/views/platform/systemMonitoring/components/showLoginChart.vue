@@ -6,14 +6,14 @@
         <a-date-picker
           v-model="startTime"
           :disabled-date="disabledStartDate"
-          format="YYYY/MM/DD"
+          format="YYYY-MM-DD"
           placeholder="请选择日期"
         />
         至
         <a-date-picker
           v-model="endTime"
           :disabled-date="disabledEndDate"
-          format="YYYY/MM/DD"
+          format="YYYY-MM-DD"
           placeholder="请选择日期"
         />
         <div class="btn">
@@ -54,8 +54,8 @@ export default {
       chartData: { columns: ['日期', '访问量/次'] },
       chartExtend: getConfig(),
       height: 'auto',
-      startTime: '',
-      endTime: '',
+      startTime: null,
+      endTime: null,
       count: { totalVisits: '', totalUsers: '', totalUnits: '' },
       key: 0 // 控制图表刷新
     }
@@ -67,51 +67,27 @@ export default {
   },
   methods: {
     async getData() {
-      let dataList = [
-        { dateTime: '2021/01/01', visits: 1393, users: 200, units: 463 },
-        { dateTime: '2021/01/02', visits: 3530, users: 340, units: 523 },
-        { dateTime: '2021/01/03', visits: 2923, users: 120, units: 423 },
-        { dateTime: '2021/01/04', visits: 1723, users: 200, units: 643 },
-        { dateTime: '2021/01/05', visits: 3792, users: 450, units: 263 },
-        { dateTime: '2021/01/06', visits: 8593, users: 260, units: 423 },
-        { dateTime: '2021/01/11', visits: 1393, users: 200, units: 463 },
-        { dateTime: '2021/01/22', visits: 530, users: 340, units: 523 },
-        { dateTime: '2021/01/23', visits: 2923, users: 120, units: 423 },
-        { dateTime: '2021/01/24', visits: 1723, users: 200, units: 643 },
-        { dateTime: '2021/01/25', visits: 3792, users: 450, units: 263 },
-        { dateTime: '2021/01/26', visits: 4593, users: 260, units: 423 },
-        { dateTime: '2021/01/28', visits: 8593, users: 260, units: 423 }
-      ]
+      let dataList = []
       if (this.startTime && this.endTime) {
-        let start = new Date(this.startTime).getTime()
-        let end = new Date(this.endTime).getTime()
-        dataList = dataList.filter(item => {
-          let date = new Date(item.dateTime).getTime()
-          return date >= start && date <= end
-        })
+        let params = {
+          beginDate: this.startTime,
+          endDate: this.endTime
+        }
+        let res = await this.$server.systemMonitoring.showChartData(params)
+        dataList = res.data.graphData
       }
       this.createChartData(dataList)
     },
     createChartData(list) {
       let rows = []
-      let vcount = 0
-      let ucount = 0
-      let uncount = 0
       list.forEach(item => {
         rows.push({
-          日期: item.dateTime.substr(-5, 5).replace(/\//g, '-'),
-          '访问量/次': item.visits
+          日期: item.dayTime.replace(/-/g, '.'),
+          '访问量/次': item.total
         })
-        vcount += item.visits
-        ucount += item.users
-        uncount += item.units
       })
       this.chartData.rows = rows
-      this.count = {
-        totalVisits: vcount,
-        totalUsers: ucount,
-        totalUnits: uncount
-      }
+
       // 计算区间百分比
       let enddata = Math.floor((showLength / list.length) * 100)
       this.chartExtend = getConfig(enddata)
@@ -133,8 +109,8 @@ export default {
       )
     },
     reset() {
-      this.startTime = ''
-      this.endTime = ''
+      this.startTime = null
+      this.endTime = null
       this.getData()
     }
   }

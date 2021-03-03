@@ -2,129 +2,163 @@
   <div class="monitoringtab">
     <div class="search">
       <div class="searchbar">
-        用户名：
-        <a-input class="inp" placeholder="请输入用户名" v-model="username" />
-        姓名：
-        <a-input class="inp" placeholder="请输入姓名" v-model="name" />
-        <div class="btn">
-          <a-button
-            style="margin-right:20px"
-            type="primary"
-            icon="search"
-            @click="getData"
-          >
-            查询
-          </a-button>
-          <a-button icon="sync" @click="reset">
-            重置
-          </a-button>
-        </div>
+        <a-form-model layout="inline" :model="searchForm">
+          <a-form-model-item label="用户名" prop="userName">
+            <a-input
+              placeholder="请输入用户名"
+              v-model="searchForm.userName"
+              style="width: 200px"
+            ></a-input>
+          </a-form-model-item>
+          <a-form-model-item label="姓名" prop="name">
+            <a-input
+              placeholder="请输入姓名"
+              v-model="searchForm.name"
+              style="width: 200px"
+            ></a-input>
+          </a-form-model-item>
+          <a-form-model-item>
+            <a-button type="primary" @click="getData" :disabled="loading"
+              >查询</a-button
+            >
+          </a-form-model-item>
+          <a-form-model-item>
+            <a-button type="default" @click="reset" :disabled="loading"
+              >重置</a-button
+            >
+          </a-form-model-item>
+        </a-form-model>
       </div>
     </div>
-    <div class="tablebox">
-      <table class="table header">
-        <tr>
-          <th class="span" v-for="tit in tableHeader" :key="tit">
-            {{ tit }}
-          </th>
-        </tr>
-      </table>
-
-      <table class="table body">
-        <tr class="tr" v-for="(line, index) in dataList" :key="line.No">
-          <td class="span" v-for="val in line" :key="val">{{ val }}</td>
-          <td class="span del" @click="del(index)">剔除</td>
-        </tr>
-      </table>
-    </div>
-    <div class="pagination">
-      <a-pagination
-        show-quick-jumper
-        :total="totalList.length"
-        :pageSize="pageSize"
-        @change="onChange"
-      />
-      <span class="pagesize"
-        >每页显示<a-input-number
-          class="pagesizeinp"
-          v-model="pageSize"
-          :min="1"
-          :max="10"
-          @change="pagesizeChange"
-        />条</span
-      >
-    </div>
+    <a-table
+      class="role-list-table scrollbar"
+      row-key="No"
+      :columns="listColumn"
+      :data-source="dataList"
+      :loading="loading"
+      :pagination="pagination"
+      :scroll="{ y: 430 }"
+    >
+      <template #config="text, record, index">
+        <a-popconfirm
+          title="是否确定删除？"
+          ok-text="确定"
+          cancel-text="取消"
+          @confirm="del(record, index)"
+        >
+          <a href="#">剔除</a>
+        </a-popconfirm>
+      </template>
+    </a-table>
   </div>
 </template>
 <script>
+import { trimFormData } from '@/utils/form-utils'
+import index from '../../../../components/board/index.vue'
+const listColumn = [
+  {
+    title: '序号',
+    width: 100,
+    ellipsis: true,
+    dataIndex: 'No'
+  },
+  {
+    title: '用户名',
+    width: 100,
+    dataIndex: 'userName'
+  },
+  {
+    title: '姓名',
+    width: 100,
+    dataIndex: 'name'
+  },
+  {
+    title: '登录时间',
+    dataIndex: 'loginTime',
+    width: 200,
+    ellipsis: true
+  },
+  {
+    title: '操作',
+    dataIndex: 'config',
+    width: 100,
+    scopedSlots: { customRender: 'config' }
+  }
+]
 export default {
+  components: { index },
   name: 'SystemMonitoring',
   data() {
     return {
-      username: '',
-      name: '',
-      tableHeader: ['序号', '用户名', '姓名', '登录时间', '操作'],
-      totalList: [],
-      dataList: [],
-      total: 500,
-      pageSize: 10
+      searchForm: {
+        userName: '',
+        name: ''
+      },
+      listColumn,
+      loading: false,
+      dataList: []
+    }
+  },
+  computed: {
+    pagination() {
+      return {
+        showSizeChanger: true,
+        showQuickJumper: true,
+        total: this.dataList.length
+      }
     }
   },
   mounted() {
     this.getData()
   },
   methods: {
-    getData() {
-      this.totalList = [
-        {
-          No: 1,
-          userName: '爪子',
-          users: 'ttt',
-          dateTime: '2021/01/01'
-        },
-        {
-          No: 2,
-          userName: '蹄子',
-          users: 'ddd',
-          dateTime: '2021/01/02'
+    async getData() {
+      this.loading = true
+      let res = await this.$server.systemMonitoring.showCurrentUser()
+      this.loading = false
+      this.dataList = res.data.map((item, index) => {
+        return {
+          No: index + 1,
+          ...item
         }
-      ]
-      if (this.username) {
-        if (this.name) {
-          this.totalList = this.totalList.filter(
-            item => item.userName === this.username && item.name === this.name
-          )
-          return
+      })
+      this.searchForm = trimFormData(this.searchForm)
+      if (!this.searchForm.userName && !this.searchForm.name) {
+        return
+      }
+      // 按用户名和姓名过滤
+      this.dataList = this.dataList.filter(item => {
+        let isKeep = true
+        if (
+          this.searchForm.userName &&
+          item.userName.indexOf(this.searchForm.userName) === -1
+        ) {
+          isKeep = false
         }
-        this.totalList = this.totalList.filter(
-          item => item.userName === this.username
-        )
-      }
-      if (this.name) {
-        this.totalList = this.totalList.filter(item => item.name === this.name)
-      }
-      this.dataList = this.totalList.filter(
-        (item, index) => index >= 0 && index < this.pageSize
-      )
+        if (
+          this.searchForm.name &&
+          item.name.indexOf(this.searchForm.name) === -1
+        ) {
+          isKeep = false
+        }
+        return isKeep
+      })
     },
     reset() {
-      this.username = ''
-      this.name = ''
+      this.searchForm = this.$options.data().searchForm
       this.getData()
     },
-    del(index) {
-      this.dataList.splice(index, 1)
-    },
-    onChange(pageNumber) {
-      let listIndex = this.pageSize * (pageNumber - 1)
-      this.dataList = this.totalList.filter(
-        (item, index) => index >= listIndex && index < listIndex + this.pageSize
-      )
-    },
-    pagesizeChange() {
-      this.dataList = this.totalList.filter(
-        (item, index) => index >= 0 && index < this.pageSize
-      )
+    async del(item) {
+      let { No, ...params } = item
+      this.loading = true
+      let res = await this.$server.systemMonitoring.deleteUserData(params)
+      this.loading = false
+      this.dataList = res.data.data.map((item, index) => {
+        return {
+          No: index + 1,
+          ...item
+        }
+      })
     }
   }
 }
