@@ -5,10 +5,13 @@ export function handleRefreshData({ chart, newData }) {
     chart.setting.chartType === 'v-ring' ||
     chart.setting.chartType === 'v-gauge'
   ) {
-    let key =
-      chart.setting.chartType === 'v-ring'
-        ? Object.keys(newData[0])[0]
-        : Object.keys(newData[0])[1]
+    let key = Object.keys(newData[0])[0]
+    if (
+      chart.setting.chartType === 'v-gauge' &&
+      chart.setting.api_data.measures[1]
+    ) {
+      kety = Object.keys(newData[0])[1]
+    }
     let total = sum(newData, key)
     let rows = [
       {

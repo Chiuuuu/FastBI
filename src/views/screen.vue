@@ -156,6 +156,10 @@ export default {
           )
           this.$store.dispatch('SetPageList', pages)
           this.$store.dispatch('SetPageId', pages[0].id)
+          if (!this.screenId) {
+            loadingInstance.close()
+            return
+          }
           // 默认显示大屏第一个页签的数据
           this.getScreenDetail({
             id: this.screenId,
@@ -175,6 +179,9 @@ export default {
     },
     // 获取分享信息
     getShareData() {
+      if (!this.screenId) {
+        return false
+      }
       return this.$server.screenManage
         .showScreenRelease(this.screenId)
         .then(res => {
