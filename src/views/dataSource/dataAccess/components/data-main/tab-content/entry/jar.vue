@@ -255,8 +255,12 @@ export default {
       if (file.size > 100 * 1024 * 1024) return this.$message.error('文件大于100M, 无法上传')
 
       let name = file.name
+      // // 校验重名
+      // if (this.fileInfoList.some(file => file === name.slice(0, name.lastIndexOf('.')))) {
+      //   return this.$message.error('文件命名重复, 请重新添加')
+      // }
       // 校验重名
-      if (this.fileInfoList.some(file => file === name.slice(0, name.lastIndexOf('.')))) {
+      if (this.fileInfoList.some(file => file === name)) {
         return this.$message.error('文件命名重复, 请重新添加')
       }
 
@@ -264,7 +268,7 @@ export default {
       const fileType = name.slice(name.lastIndexOf('.') + 1, name.length)
       if (/jar/.test(fileType)) {
         this.fileList.push(file)
-        this.fileInfoList.push(name.slice(0, name.lastIndexOf('.')))
+        this.fileInfoList.push(name)
         // 新增文件未保存前不能查看库表结构
         this.$store.dispatch('dataAccess/setFirstFinished', false)
       } else {
