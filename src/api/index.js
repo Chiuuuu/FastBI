@@ -8,6 +8,7 @@ import corporateDomain from '@/api/modules/corporateDomain'
 import user from '@/api/modules/user'
 import log from '@/api/modules/log'
 import systemMonitoring from '@/api/modules/systemMonitoring'
+import label from '@/api/modules/label'
 
 const server = {
   user,
@@ -19,7 +20,8 @@ const server = {
   projectCenter,
   corporateDomain,
   log,
-  systemMonitoring
+  systemMonitoring,
+  label
 }
 
 export default server
