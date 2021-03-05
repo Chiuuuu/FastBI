@@ -9,7 +9,7 @@ export default {
   redirect: '/platform/systemMonitoring',
   component: RouteView,
   meta: {
-    title: '平台管理',
+    title: '系统管理',
     icon: 'layout',
     permissions: [PERMISSION_CODE.PAGE.log, PERMISSION_CODE.PAGE.monitoring]
   },
