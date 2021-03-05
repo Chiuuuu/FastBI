@@ -19,6 +19,7 @@
                 <a-input v-model="form.description" placeholder="请输入角色描述"></a-input>
               </a-form-model-item>
             </a-form-model>
+            <RoleTabMenu status="edit" @getCheckedkeys="getCheckedkeys"></RoleTabMenu>
             <RoleTabeRole
               status="edit"
               @getChangeItem="getChangeItem"
@@ -36,11 +37,13 @@
 import { mapState } from 'vuex'
 import { trimFormData } from '@/utils/form-utils'
 // import RolesTabDataPermission from '../tab-content/rolesTabDataPermission'
+import RoleTabMenu from '../tab-content/rolesTabMenu'
 import RoleTabeRole from '../tab-content/rolesTabRole'
 
 export default {
   name: 'roleEdit',
   components: {
+    RoleTabMenu,
     // RolesTabDataPermission,
     RoleTabeRole
   },
@@ -81,7 +84,8 @@ export default {
       basePrivilege: [],
       screen: [],
       dataModel: [],
-      dataSource: []
+      dataSource: [],
+      menu: []
     }
   },
   computed: {
@@ -110,6 +114,9 @@ export default {
       this.$router.push({
         path: '/projectCenter/roles/list'
       })
+    },
+    getCheckedkeys(checkedKeys) {
+      this.menu = [].concat(checkedKeys)
     },
     getChangeItem(role, item) {
       switch (role) {
@@ -158,7 +165,8 @@ export default {
         basePermissions: this.basePrivilege,
         screen: this.screen,
         dataModel: this.dataModel,
-        dataSource: this.dataSource
+        dataSource: this.dataSource,
+        menu: this.menu
       }, this.form)
       const res = await this.$server.projectCenter.updateRole(trimFormData(params))
         .finally(() => {

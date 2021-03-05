@@ -11,7 +11,7 @@
       theme="dark"
     >
       <template v-for="item in menuData">
-        <a-sub-menu :key="item.path">
+        <a-sub-menu :key="item.path" v-if="item.children.length">
           <template v-slot:title>
             <span>
               <a-icon :type="item.meta.icon" />

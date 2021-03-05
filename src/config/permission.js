@@ -15,7 +15,10 @@ const PERMISSION_CODE = {
         role: 5, // 角色管理
         dataPermission: 5, // 数据权限管理
         personnel: 4, // 人员管理
-        project: 4 // 项目管理
+        project: 4, // 项目管理
+        monitoring: 6, // 系统监控
+        log: 7, // 日志管理
+        label: 8 // 标签管理
     },
     OBJECT: {
         all: '0000', // 该模块下所有对象

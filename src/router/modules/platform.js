@@ -1,4 +1,4 @@
-// import PERMISSION_CODE from '@/config/permission'
+import PERMISSION_CODE from '@/config/permission'
 
 const RouteView = () => import('@/layout/routeView')
 const LogView = () => import('@/views/platform/log')
@@ -10,7 +10,8 @@ export default {
   component: RouteView,
   meta: {
     title: '平台管理',
-    icon: 'cloud'
+    icon: 'layout',
+    permissions: [PERMISSION_CODE.PAGE.log, PERMISSION_CODE.PAGE.monitoring]
   },
   children: [
     {
@@ -18,7 +19,8 @@ export default {
       name: 'systemLog',
       component: LogView,
       meta: {
-        title: '日志管理'
+        title: '日志管理',
+        permissions: [PERMISSION_CODE.PAGE.log]
       }
     },
     {
@@ -26,7 +28,8 @@ export default {
       name: 'systemMonitoring',
       component: SystemMonitoringView,
       meta: {
-        title: '系统监控'
+        title: '系统监控',
+        permissions: [PERMISSION_CODE.PAGE.monitoring]
       }
     }
   ]

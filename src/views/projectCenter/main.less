@@ -165,6 +165,23 @@
                 }
             }
 
+            .menuWrap {
+                &.show {
+                    height: calc(100% - 400px);
+                    &+.middle {
+                        height: calc(100% - 270px);
+                    }
+                }
+                height: calc(100% - 450px);
+                .menu-content {
+                    height: calc(100% - 54px);
+                    overflow-y: auto;
+                    padding-left: 8px;
+                }
+                &+.middle {
+                    height: calc(100% - 350px); // 暂时处理
+                }
+            }
             .middle {
                 // height: calc(100% - 50%);
                 height: calc(100% - 130px); // 暂时处理

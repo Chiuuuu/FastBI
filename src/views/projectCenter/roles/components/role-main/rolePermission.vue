@@ -9,6 +9,7 @@
         >编辑角色</a-button
       >
     </header>
+    <RoleTabMenu></RoleTabMenu>
     <RoleTabeRole status="show"></RoleTabeRole>
     <!-- <RolesTabDataPermission status="show"></RolesTabDataPermission> -->
   </div>
@@ -16,11 +17,13 @@
 <script>
 import { mapState } from 'vuex'
 // import RolesTabDataPermission from '../tab-content/rolesTabDataPermission'
+import RoleTabMenu from '../tab-content/rolesTabMenu'
 import RoleTabeRole from '../tab-content/rolesTabRole'
 
 export default {
     name: 'rolePermission',
     components: {
+      RoleTabMenu,
       // RolesTabDataPermission,
       RoleTabeRole
     },

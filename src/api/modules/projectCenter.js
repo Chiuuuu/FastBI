@@ -141,5 +141,14 @@ export default {
      */
     deleRoleUser(id) {
         return $axios.delete('/business/editRoleUser/' + id)
+    },
+
+    /**
+     * @description 获取角色菜单权限
+     * @param {Number} id
+     * @returns
+     */
+    getRoleMenuPermission(id) {
+        return $axios.get(`/user/RoleResourcePrivilege/showRoleMenuPrivilege/${id}`)
     }
 }
