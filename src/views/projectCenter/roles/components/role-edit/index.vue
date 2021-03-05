@@ -159,6 +159,10 @@ export default {
       }
     },
     async handleSave() {
+      if (this.menu.length === 0) {
+        this.$message.error('至少勾选一个菜单项')
+        return
+      }
       this.loading = true
       const params = Object.assign({
         id: this.roleId,

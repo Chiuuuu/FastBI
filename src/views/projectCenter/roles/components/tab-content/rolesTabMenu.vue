@@ -1,6 +1,6 @@
 <template>
   <div class="menuWrap" :class="status === 'show' ? 'show' : '' ">
-    <div class="title">菜单权限</div>
+    <div class="title">菜单权限{{status === 'show' ? '' : `(至少勾选一个菜单项)`}}</div>
     <div class="menu-content scrollbar">
       <a-spin :spinning="spinning">
         <a-tree
