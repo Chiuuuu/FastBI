@@ -6,6 +6,7 @@ import login from '@/api/modules/login'
 import projectCenter from '@/api/modules/projectCenter'
 import corporateDomain from '@/api/modules/corporateDomain'
 import user from '@/api/modules/user'
+import label from '@/api/modules/label'
 
 const server = {
   user,
@@ -15,7 +16,8 @@ const server = {
   dataAccess,
   dataModel,
   projectCenter,
-  corporateDomain
+  corporateDomain,
+  label
 }
 
 export default server

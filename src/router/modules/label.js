@@ -1,7 +1,7 @@
 // import PERMISSION_CODE from '@/config/permission'
 
 const RouteView = () => import('@/layout/routeView')
-const LabelListView = () => import('@/views/label/list')
+const LabelListView = () => import('@/views/label')
 
 export default {
   path: '/label',
