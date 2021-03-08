@@ -43,6 +43,7 @@ export default {
             getProvideTreeData: () => this.treeData,
             getCurrentRoleTab: () => this.currentTab,
             getFolderHeader: () => this.folderHeader,
+            getCheckedKeys: () => this.checkedKeys,
             status: this.status
         }
     },
@@ -51,6 +52,10 @@ export default {
             type: String,
             requried: true,
             default: 'show'
+        },
+        checkedKeys: {
+            type: Array,
+            default: () => []
         }
     },
     computed: {

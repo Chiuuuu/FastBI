@@ -1,6 +1,11 @@
 <template>
   <div class="menuWrap" :class="status === 'show' ? 'show' : '' ">
-    <div class="title">菜单权限{{status === 'show' ? '' : `(至少勾选一个菜单项)`}}</div>
+    <div class="title">
+      <a-row>
+        <a-col span="4">菜单权限{{status === 'show' ? '' : `(至少勾选一个菜单项)`}}</a-col>
+        <a-col span="2" style="padding-left:12px;">菜单显示</a-col>
+      </a-row>
+    </div>
     <div class="menu-content scrollbar">
       <a-spin :spinning="spinning">
         <a-tree
@@ -128,6 +133,7 @@ export default {
 
       if (result.code === 200) {
         this.checkedKeys = [].concat(result.data)
+        this.$emit('getCheckedkeys', this.checkedKeys)
       } else {
         this.$message.error(result.msg || '请求错误')
       }

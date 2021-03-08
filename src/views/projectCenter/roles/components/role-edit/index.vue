@@ -22,6 +22,7 @@
             <RoleTabMenu status="edit" @getCheckedkeys="getCheckedkeys"></RoleTabMenu>
             <RoleTabeRole
               status="edit"
+              :checkedKeys="menu"
               @getChangeItem="getChangeItem"
               @setBasePrivilege="getBasePrivilege"
               ></RoleTabeRole>

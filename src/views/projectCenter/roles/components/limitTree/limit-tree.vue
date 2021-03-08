@@ -51,7 +51,7 @@
 <script>
 export default {
   name: 'limitTree',
-  inject: ['status', 'getProvideActionList', 'getProvideTreeData', 'getCurrentRoleTab', 'getFolderHeader'],
+  inject: ['status', 'getProvideActionList', 'getProvideTreeData', 'getCurrentRoleTab', 'getFolderHeader', 'getCheckedKeys'],
   data() {
     return {
       replaceFields: {
@@ -61,7 +61,26 @@ export default {
   },
   computed: {
     isDisabled() {
-      return this.status === 'show'
+      if (this.status === 'show') {
+        return true
+      } else {
+        const checkedKeys = this.getCheckedKeys()
+        const currentTab = this.getCurrentRoleTab()
+        let key = ''
+        switch (currentTab) {
+          case 1:
+            key = '03'
+            break
+          case 2:
+            key = '02'
+            break
+          case 3:
+            key = '01'
+            break
+        }
+        const hasKey = checkedKeys.includes(key)
+        return !hasKey
+      }
     },
     injectActionList() {
       return this.getProvideActionList()
