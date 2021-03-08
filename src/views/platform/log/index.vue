@@ -55,6 +55,12 @@ export default {
   mounted() {
     this.handleGetData()
   },
+  beforeDestroy() {
+    if (this.timer) {
+      clearInterval(this.timer)
+      this.timer = ''
+    }
+  },
   methods: {
     handleChange(e) {
       if (e.target.value) {
@@ -65,7 +71,7 @@ export default {
       }
     },
     handleAutoGetData() {
-      const time = 1000 * 10
+      const time = 1000 * 60 * 1
       this.timer = setInterval(() => {
         this.handleGetData()
       }, time)
