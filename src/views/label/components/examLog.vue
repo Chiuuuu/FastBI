@@ -70,7 +70,7 @@ const listColumn = [
   },
   {
     title: '版本号',
-    dataIndex: 'version',
+    dataIndex: 'userVersion',
     width: 120,
     ellipsis: true
   },

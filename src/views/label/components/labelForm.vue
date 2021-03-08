@@ -25,9 +25,9 @@
       <a-form-model-item label="标签描述" prop="description">
         <a-textarea v-model="form.description" placeholder="请填写标签描述"></a-textarea>
       </a-form-model-item>
-      <a-form-model-item class="form-not-required" label="版本号" prop="version">
-        <!-- <a-input disabled v-model="form.version" placeholder="请填写版本号"></a-input> -->
-        <span>{{ form.version }}</span>
+      <a-form-model-item label="版本号" prop="userVersion">
+        <a-input v-model="form.userVersion" placeholder="请填写版本号"></a-input>
+        <!-- <span>{{ form.version }}</span> -->
       </a-form-model-item>
       <a-form-model-item v-if="!isNew" class="form-not-required" label="修改原因" prop="reason">
         <a-input v-model="form.reason" placeholder="选填"></a-input>
@@ -59,7 +59,8 @@ export default {
       form: {
         name: '',
         description: '',
-        version: '1',
+        userVersion: '1',
+        version: 1,
         reason: ''
       },
       rules: {
@@ -70,6 +71,10 @@ export default {
         description: [
           { required: true, message: '请填写标签描述' },
           { max: 50, message: '请填写小于50字的标签描述' }
+        ],
+        userVersion: [
+          { required: true, message: '请填写版本号' },
+          { pattern: /^\d+$/, message: '请填写数字' }
         ],
         reason: [
           { max: 50, message: '请填写小于50字的修改原因' }

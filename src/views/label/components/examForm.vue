@@ -23,8 +23,8 @@
       <a-form-model-item label="标签描述" prop="description">
         <span>{{ form.description }}</span>
       </a-form-model-item>
-      <a-form-model-item label="版本号" prop="version">
-        <span>{{ form.version }}</span>
+      <a-form-model-item label="版本号" prop="userVersion">
+        <span>{{ form.userVersion }}</span>
       </a-form-model-item>
     </a-form-model>
     <div slot="footer">
@@ -57,7 +57,7 @@ export default {
       form: {
         name: '',
         description: '',
-        version: ''
+        userVersion: ''
       }
     }
   },
@@ -71,7 +71,7 @@ export default {
     async handleExam(accept) {
       const params = {
         id: this.rowData.id,
-        version: this.rowData.version,
+        userVersion: this.rowData.userVersion,
         accept
       }
       this.loading = true
