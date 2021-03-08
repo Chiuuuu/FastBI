@@ -71,7 +71,15 @@
       </template>
       <template #config="list, record">
         <a v-if="record.status !== 2" @click="handleOpenModal('ExamForm', record)">审批</a>
-        <a v-else-if="record.status === 2" @click="handleCloseLabel(record)">下线</a>
+        <a-popconfirm
+          v-else-if="record.status === 2"
+          title="是否确定下线？"
+          ok-text="确定"
+          cancel-text="取消"
+          @confirm="handleCloseLabel(record)"
+        >
+          <a>下线</a>
+        </a-popconfirm>
         <a-divider type="vertical" />
         <a @click="handleOpenModal('CommentForm', record)">评估</a>
         <a-divider type="vertical" />
@@ -83,7 +91,7 @@
           cancel-text="取消"
           @confirm="handleDelete(record)"
         >
-          <a href="#">删除</a>
+          <a>删除</a>
         </a-popconfirm>
       </template>
     </a-table>
@@ -136,7 +144,7 @@ const listColumn = [
   },
   {
     title: '版本号',
-    dataIndex: 'version',
+    dataIndex: 'userVersion',
     width: 80,
     ellipsis: true
   },

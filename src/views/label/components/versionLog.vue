@@ -42,14 +42,15 @@
       </template>
 
       <template v-else-if="mode === 'diff'">
-        <a-table
+        <!-- <a-table
           rowKey="version"
           :columns="listColumn"
           :loading="listLoading"
           :data-source="diffData"
           :pagination="false"
           :scroll="{ x: 'calc(70vw - 50px)', y: 'calc(100vh - 430px)' }">
-        </a-table>
+        </a-table> -->
+        <TextCompare :diff-data="diffData" :list-column="listColumn" />
       </template>
     </div>
   </a-modal>
@@ -57,25 +58,28 @@
 
 <script>
 import paginationMixin from '../mixins/pagination'
+import TextCompare from './textCompare'
 
 const listColumn = [
   {
     title: '版本号',
     width: 100,
     ellipsis: true,
-    dataIndex: 'version'
+    dataIndex: 'userVersion'
   },
   {
     title: '标签名称',
     width: 200,
     ellipsis: true,
-    dataIndex: 'name'
+    dataIndex: 'name',
+    scopedSlots: { customRender: 'name' }
   },
   {
     title: '标签描述',
     width: 300,
     ellipsis: true,
-    dataIndex: 'description'
+    dataIndex: 'description',
+    scopedSlots: { customRender: 'description' }
   },
   {
     title: '操作人',
@@ -100,6 +104,9 @@ const listColumn = [
 export default {
   name: 'versionLog',
   mixins: [paginationMixin],
+  components: {
+    TextCompare
+  },
   props: {
     visible: {
       type: Boolean,
@@ -170,8 +177,8 @@ export default {
     },
     // 进入对比界面
     handleToDiff() {
-      if (this.diffData.length < 2) {
-        return this.$message.error('请至少选择2项记录进行对比')
+      if (this.diffData.length !== 2) {
+        return this.$message.error('请选择2项记录进行对比')
       }
       this.mode = 'diff'
       this.listData = []
