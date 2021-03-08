@@ -65,7 +65,7 @@ export default {
       }
     },
     handleAutoGetData() {
-      const time = 1000 * 60 * 1
+      const time = 1000 * 10
       this.timer = setInterval(() => {
         this.handleGetData()
       }, time)
