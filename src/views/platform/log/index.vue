@@ -56,25 +56,21 @@ export default {
     this.handleGetData()
   },
   beforeDestroy() {
-    if (this.timer) {
-      clearInterval(this.timer)
-      this.timer = ''
-    }
+    this.handleClearTimer()
   },
   methods: {
-    handleChange(e) {
-      if (e.target.value) {
-        this.handleAutoGetData()
-      } else {
-        clearInterval(this.timer)
+    handleClearTimer() {
+      if (this.timer) {
+        clearTimeout(this.timer)
         this.timer = ''
       }
     },
-    handleAutoGetData() {
-      const time = 1000 * 60 * 1
-      this.timer = setInterval(() => {
+    handleChange(e) {
+      if (e.target.value) {
         this.handleGetData()
-      }, time)
+      } else {
+        this.handleClearTimer()
+      }
     },
     async handleGetData() {
       this.loading = true
@@ -84,7 +80,14 @@ export default {
 
       if (result.code === 200) {
         this.list = [].concat(result.data)
+        if (this.form.auto) {
+          const time = 1000 * 10
+          this.timer = setTimeout(() => {
+            this.handleGetData()
+          }, time)
+        }
       } else {
+        this.handleClearTimer()
         this.$message.error(result.msg || '请求错误')
       }
     }
