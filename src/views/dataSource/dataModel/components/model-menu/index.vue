@@ -418,11 +418,11 @@ export default {
     */
     handleFileSelect(file, type) {
       if (type !== 'modal') {
+        // '点击左侧菜单获取模型信息'
         if (this.fileSelectId === file.id) return
         this.visible = false
         this.fileSelectId = file.id
         this.$emit('getModelInfo', this.fileSelectId)
-        console.log('点击左侧菜单获取模型信息')
       } else {
         if (this.modalFileSelectId === file.id) return
         this.modalFileSelectId = file.id

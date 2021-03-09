@@ -7,12 +7,18 @@
       <a-spin class="main-box" :spinning="spinning">
         <div class="header">
           <span class="data_con">{{modelName}}</span>
-          <div class="data_btn">
-              <a-button
-                v-if="hasEditPermission"
-                type="primary"
-                v-on:click="edit">编辑模型</a-button>
-              <a-button @click="handleGetData">刷新数据</a-button>
+          <div class="data_btn" v-show="currentView !== 'modelOperation'">
+            <a-button
+              v-if="hasEditPermission"
+              type="primary"
+              @click="edit">编辑模型</a-button>
+            <a-button
+              type="primary"
+              @click="handleGoToOperation">操作记录</a-button>
+            <a-button @click="handleGetData">刷新数据</a-button>
+          </div>
+          <div class="data_btn" v-show="currentView === 'modelOperation'">
+            <a-button @click="handleModelOperationBack">返回</a-button>
           </div>
         </div>
         <div class="scrollable scrollbar">
@@ -20,7 +26,7 @@
               <span class="d-s" :title="detailInfo.description">描述：{{detailInfo.description}}</span>
           </div>
           <!-- <p class="tips"><a-icon theme="filled" type="exclamation-circle" style="margin-right: 2px;" />下方表显示红色表示表在数据源已被删除，请您删除此表。表显示黄色表示表中列字段发生了变动，请您重新构建表关联关系。</p> -->
-          <div class="draw_board scrollbar">
+          <div class="draw_board scrollbar" v-show="currentView === 'modelShow'">
             <div class="m-dml-map m-map">
               <a-empty v-if="tablesEmpty" class="main-empty">
                 <span slot="description">暂无数据</span>
@@ -35,7 +41,7 @@
               </template>
             </div>
           </div>
-          <div class="detail">
+          <div class="detail" v-show="currentView === 'modelShow'">
             <div class="detail_header">
               <span>数据模型详情</span>
             </div>
@@ -86,6 +92,7 @@
               </div>
             </div>
           </div>
+          <ModelOperation v-show="currentView === 'modelOperation'" ref="modelOperation"></ModelOperation>
         </div>
       </a-spin>
     </template>
@@ -99,10 +106,12 @@ import { hasPermission } from '@/utils/permission'
 import { mapState } from 'vuex'
 import groupBy from 'lodash/groupBy'
 import keys from 'lodash/keys'
+import ModelOperation from '../model-operation'
 export default {
   name: 'model-main',
   components: {
-    TreeNode
+    TreeNode,
+    ModelOperation
   },
   data() {
     return {
@@ -114,7 +123,8 @@ export default {
       renderTables: [], // 用来渲染树组件
       dimensionsActiveKey: [],
       measuresActiveKey: [],
-      customStyle: 'border: 0'
+      customStyle: 'border: 0',
+      currentView: 'modelShow'
     }
   },
   computed: {
@@ -133,6 +143,7 @@ export default {
      * 获取数据
     */
     async handleGetData(id) {
+      this.handleModelOperationBack()
       this.spinning = true
       this.renderTables = []
       let modelId = ''
@@ -184,6 +195,15 @@ export default {
             }
           })
         })
+    },
+    handleGoToOperation() {
+      this.currentView = 'modelOperation'
+      this.$nextTick(() => {
+        this.$refs.modelOperation.handleResetForm()
+      })
+    },
+    handleModelOperationBack() {
+      this.currentView = this.$options.data().currentView
     },
     /**
      * 处理树形组件
