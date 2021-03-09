@@ -66,7 +66,7 @@
             <div class="operation" flex="dir:top">
               <div class="header">
                 <span class="d_h_s">维度</span>
-                <a-icon class="dicon" type="plus" />
+                <a-icon class="dicon" type="plus" @click="openModal('维度')" />
               </div>
               <!-- <b-scrollbar style="height: 100%;"> -->
               <div class="mea_main">
@@ -121,7 +121,7 @@
             <div class="operation scrollbar" flex="dir:top">
               <div class="header">
                 <span class="d_h_s">度量</span>
-                <a-icon class="dicon" type="plus" />
+                <a-icon class="dicon" type="plus" @click="openModal('度量')" />
               </div>
               <!-- <b-scrollbar style="height: 100%;"> -->
               <div class="mea_main">
@@ -173,6 +173,11 @@
               <!-- </b-scrollbar> -->
             </div>
           </div>
+          <compute-setting
+            :is-show="visible"
+            :compute-type="computeType"
+            @close="close"
+          ></compute-setting>
         </div>
         <!-- 初始界面 -->
         <div class="model-contain" v-else style="height:100%;">
@@ -230,6 +235,7 @@ import { deepClone } from '@/utils/deepClone'
 import debounce from 'lodash/debounce'
 import { menuSearchLoop } from '@/utils/menuSearch'
 import { Loading } from 'element-ui'
+import ComputeSetting from '@/views/dataSource/dataModel/model-edit/setting/compute-setting'
 
 export default {
   name: 'BoardModel',
@@ -239,6 +245,7 @@ export default {
       required: true
     }
   },
+  components: { ComputeSetting },
   data() {
     return {
       customStyle:
@@ -258,7 +265,12 @@ export default {
       searchResult: [], // 维度度量搜索结果列表
       searchSelected: '', // 搜索选中的维度度量
       dimensionsChecked: [], // 选中的维度id
-      measuresChecked: [] // 选中的度量id
+      measuresChecked: [], // 选中的度量id
+      visible: false,
+      computeType: '',
+      detailInfo: {}, // 聚合运算数据
+      cacheDimensions: [],
+      cacheMeasures: [] // 缓存自定义度量
     }
   },
   computed: {
@@ -453,6 +465,13 @@ export default {
     showMore(item) {
       item.showMore = true
     },
+    openModal(computeType) {
+      this.visible = true
+      if (computeType) this.computeType = computeType
+    },
+    close() {
+      this.visible = false
+    },
     // 转为维度或者度量
     changeItem(item, num) {
       let params = {
@@ -485,11 +504,23 @@ export default {
             res.data.measures.map(item => {
               item.showMore = false
             })
-            let dimensions = res.data.dimensions
-            let measures = res.data.measures
+            let dataList = res.data
+            let dimensions = dataList.dimensions
+            let measures = dataList.measures
             this.dimensions = this.transData(dimensions)
+            dimensions = dimensions.map(item => {
+              return { ...item, visible: true, produceType: 0 }
+            })
             this.measures = this.transData(measures)
+            measures = measures.map(item => {
+              return { ...item, visible: true, produceType: 0 }
+            })
             this.searchList = [...dimensions, ...measures]
+
+            this.detailInfo.pivotSchema = {
+              dimensions,
+              measures
+            } // 聚合运算数据
 
             // 获取被删除的数据(status===1)
             this.$emit('getErrorData', {
@@ -529,5 +560,92 @@ export default {
 
 .disable, .disable .ant-collapse-header {
   color: #ccc !important;
+}
+
+.mod {
+    width: 100%;
+    height: 350px;
+    display: flex;
+    justify-content: space-between;
+    .modal_l {
+        .modal_dropdown {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 40px;
+            width: 257px;
+            .dropdown {
+                position relative;
+                width 120px;
+                height 32px;
+                line-height 1.5;
+                border 1px solid #d9d9d9;
+                padding 4px 11px;
+                cursor pointer;
+                &::after {
+                    content: "";
+                    display: block;
+                    width: 0;
+                    height: 0;
+                    border-style: solid dashed dashed;
+                    border-width: 6px 5px;
+                    border-color: #aaa transparent transparent transparent;
+                    position: absolute;
+                    right: 12px;
+                    top: 12px;
+                }
+            }
+        }
+    }
+        .modal_r {
+        width: 365px;
+        padding: 20px 10px 32px;
+        background: rgba(246, 246, 246, 1);
+        display: flex;
+        justify-content: space-around;
+        .bar {
+            width: 140px;
+        }
+        .descript {
+            margin-top: 13px;
+            margin-left: 11px;
+        }
+        .list {
+            height: calc(100% - 32px)
+            border: 1px solid #d9d9d9;
+            background-color: #fff;
+            overflow-y: auto;
+        }
+        .list-item {
+            padding: 5px 12px;
+            line-height: 22px;
+            cursor: pointer;
+            &.active {
+                background-color: #40c0a8;
+                color: #fff;
+            }
+        }
+        .text {
+            padding: 10px 10px 10px 20px;
+            font-size: 12px;
+            max-height: 260px;
+            overflow: auto;
+            .tit {
+                padding-bottom: 10px;
+                font-weight: bolder;
+            }
+            .des {
+                word-break: break-all;
+                line-height: 18px;
+            }
+            .example {
+                margin-top: 10px;
+                line-height: 15px;
+                span.title {
+                    font-weight: bolder;
+                }
+            }
+        }
+    }
 }
 </style>
