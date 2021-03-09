@@ -77,7 +77,7 @@ const listColumn = [
   {
     title: '标签描述',
     width: 300,
-    ellipsis: true,
+    // ellipsis: true,
     dataIndex: 'description',
     scopedSlots: { customRender: 'description' }
   },
@@ -122,15 +122,10 @@ export default {
   computed: {
     rowSelection() {
       return {
-        fixed: true,
+        // fixed: true, // 高度不统一, 暂时先屏蔽
         selectedRowKeys: this.selectedRowKeys,
         onSelect: this.handleRowSelection,
-        onSelectAll: (selected, selectedRows, changeRows) => {
-          // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-          this.selectedRows = selectedRows
-          // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-          this.selectedRowKeys = selectedRows.map(item => item.version)
-        }
+        onSelectAll: this.handleRowSelectionAll
       }
     }
   },
@@ -166,6 +161,27 @@ export default {
           this.diffData.push(record)
           this.diffData = this.diffData.sort((a, b) => a.version - b.version)
         }
+      }
+    },
+    handleRowSelectionAll(selected, selectedRows, changeRows) {
+      this.selectedRows = selectedRows
+      this.selectedRowKeys = selectedRows.map(item => item.version)
+      if (!selected) {
+        changeRows.map(item => {
+          for (let i = 0; i < this.diffData.length; i++) {
+            const element = this.diffData[i]
+            if (element.version === item.version) {
+              this.diffData.splice(i, 1)
+              break
+            }
+          }
+        })
+      } else {
+        changeRows.map(item => {
+          if (!this.diffData.some(d => d.version === item.version)) {
+            this.diffData.push(item)
+          }
+        })
       }
     },
     handleClose() {
