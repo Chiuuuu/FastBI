@@ -18,7 +18,7 @@
               key="1"
               @click="addFolder"
             >
-              新建文件夹
+              新增类别
             </a-menu-item>
           </a-menu>
         </a-dropdown>
@@ -151,7 +151,7 @@
     <a-modal
       v-model="screenVisible"
       :title="
-        isAdd === 1 ? '新建大屏' : isAdd === 2 ? '重命名大屏' : '选择文件夹'
+        isAdd === 1 ? '新建大屏' : isAdd === 2 ? '重命名大屏' : '选择类别'
       "
       @ok="handleOk"
     >
@@ -592,7 +592,7 @@ export default {
     // 右键删除文件夹
     handleFolderDelete(event, item, { folder }) {
       if (folder.children && folder.children.length > 0) {
-        return this.$message.error('文件夹下存在数据大屏不可删除')
+        return this.$message.error('类别下存在数据大屏不可删除')
       }
       this.handleDelete(folder.id)
     },
@@ -627,7 +627,7 @@ export default {
       this.isAdd = 2
       this.id = folder.id
       this.folderVisible = true
-      this.folderTitle = '重命名文件夹'
+      this.folderTitle = '重命名类别'
       this.$nextTick(() => {
         this.$refs.newFolderForm.form.setFieldsValue({
           name: folder.name
@@ -745,7 +745,7 @@ export default {
     addFolder() {
       this.isAdd = 1
       this.folderVisible = true
-      this.folderTitle = '新建文件夹'
+      this.folderTitle = '新增类别'
     },
     // 创建文件夹
     creatFolder() {
