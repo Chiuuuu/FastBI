@@ -72,6 +72,7 @@ export default {
       const params = {
         id: this.rowData.id,
         userVersion: this.rowData.userVersion,
+        version: this.rowData.version,
         accept
       }
       this.loading = true

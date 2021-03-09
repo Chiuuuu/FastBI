@@ -201,7 +201,7 @@ export default {
           let isNewFile = false
           for (let i = 0; i < this.fileList.length; i++) {
             const item = this.fileList[i]
-            if (item === file) {
+            if (item.name === file) {
               isNewFile = true
               this.fileList.splice(i, 1)
               break

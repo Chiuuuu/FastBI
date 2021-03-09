@@ -296,6 +296,14 @@ export default {
     */
     handleFileSelect(file) {
       if (this.fileSelectId === file.id) return
+      this.$store.commit('dataAccess/SET_DATABASENAME', '')
+      this.$store.commit('common/SET_PRIVILEGES', file.privileges || [])
+      this.$store.dispatch('dataAccess/setModelId', file.id)
+      this.$store.dispatch('dataAccess/setParentId', file.parentId)
+      this.$store.dispatch('dataAccess/setFirstFinished', true)
+      this.$emit('on-menuChange-componet', 'Main')
+      this.$EventBus.$emit('set-tab-index', '1')
+
       this.fileSelectId = file.id
       this.getTableInfo(`/datasource/${file.id}`, result => {
         if (result.data.type === 1) {
@@ -310,17 +318,11 @@ export default {
           this.$store.dispatch('dataAccess/setModelType', 'csv')
         } else if (result.data.type === 13) {
           this.$store.dispatch('dataAccess/setModelType', 'jar')
+          this.$store.dispatch('dataAccess/setFirstFinished', false)
         }
         this.$store.dispatch('dataAccess/setModelInfo', result.data.properties)
         this.$store.dispatch('dataAccess/setModelName', result.data.name)
       })
-      this.$store.commit('dataAccess/SET_DATABASENAME', '')
-      this.$store.commit('common/SET_PRIVILEGES', file.privileges || [])
-      this.$store.dispatch('dataAccess/setModelId', file.id)
-      this.$store.dispatch('dataAccess/setParentId', file.parentId)
-      this.$store.dispatch('dataAccess/setFirstFinished', true)
-      this.$emit('on-menuChange-componet', 'Main')
-      this.$EventBus.$emit('set-tab-index', '1')
     },
     /**
     * 删除菜单
