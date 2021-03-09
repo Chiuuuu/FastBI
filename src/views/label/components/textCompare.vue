@@ -13,6 +13,9 @@
       <template #description="text, record, index">
         <span v-html="text"></span>
       </template>
+      <template #modUserName="text, record, index">
+        <span v-html="text"></span>
+      </template>
     </a-table>
     <div v-html="compare"></div>
   </div>
@@ -46,11 +49,14 @@ export default {
       this.listData = [].concat(this.diffData)
       const sameName = this.textCompare(this.listData[0].name, this.listData[1].name)
       const sameDesc = this.textCompare(this.listData[0].description, this.listData[1].description)
+      const sameModn = this.textCompare(this.listData[0].modUserName, this.listData[1].modUserName)
       // this.underLine(sameName, sameDesc)
       this.listData[0].name = sameName[0]
       this.listData[1].name = sameName[1]
       this.listData[0].description = sameDesc[0]
       this.listData[1].description = sameDesc[1]
+      this.listData[0].modUserName = sameModn[0]
+      this.listData[1].modUserName = sameModn[1]
     }
   },
   methods: {
@@ -128,7 +134,6 @@ export default {
         arr.splice(start, end - start, `<span style="text-decoration:underline">${cut}</span>`)
         longStr = arr.join('')
       })
-      console.log(shortIndex, longIndex)
       if (prevLen <= nextLen) {
         return [shortStr, longStr]
       } else {

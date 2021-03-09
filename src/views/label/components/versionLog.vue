@@ -70,7 +70,7 @@ const listColumn = [
   {
     title: '标签名称',
     width: 200,
-    ellipsis: true,
+    // ellipsis: true,
     dataIndex: 'name',
     scopedSlots: { customRender: 'name' }
   },
@@ -84,8 +84,9 @@ const listColumn = [
   {
     title: '操作人',
     width: 100,
-    ellipsis: true,
-    dataIndex: 'modUserName'
+    // ellipsis: true,
+    dataIndex: 'modUserName',
+    scopedSlots: { customRender: 'modUserName' }
   },
   {
     title: '修改原因',
