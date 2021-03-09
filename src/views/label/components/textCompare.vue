@@ -102,6 +102,7 @@ export default {
               break
             }
           }
+          if (!same) shortHead++
         }
         i++
         if (i === shortStr.length && same) {
