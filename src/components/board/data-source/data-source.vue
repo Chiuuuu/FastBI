@@ -13,7 +13,11 @@
         header="度量"
         v-if="chartType === '1' || chartType === '2'"
       >
-        <drag-area type="measures" :fileList="fileObj.measures"></drag-area>
+        <drag-area
+          type="measures"
+          :fileList="fileObj.measures"
+          ref="child"
+        ></drag-area>
       </a-collapse-panel>
       <a-collapse-panel key="tableList" header="列" v-if="chartType === '3'">
         <drag-area type="tableList" ref="table"></drag-area>
@@ -182,7 +186,7 @@ export default {
     ...mapActions(['saveScreenData', 'handleRefreshData']),
     // 排序筛选字段选择
     sortFileChange(val) {
-      if (!val || (val && this.sortData.asc === '')) {
+      if (!val || (val && this.sortData.asc === undefined)) {
         this.sortData.asc = ''
       }
       let data = this.sortList.filter(item => item.id === val)
