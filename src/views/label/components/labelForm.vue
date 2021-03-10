@@ -53,13 +53,18 @@ export default {
       }
     }
   },
+  created() {
+    if (this.rowData.id) {
+      this.form.userVersion++
+    }
+  },
   data() {
     return {
       bodyStyle: { padding: '10px 24px', 'max-height': 'calc(100vh - 240px)', 'overflow-y': 'auto' },
       form: {
         name: '',
         description: '',
-        userVersion: '1',
+        userVersion: 1,
         version: 1,
         reason: ''
       },
