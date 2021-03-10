@@ -23,7 +23,6 @@
       :scroll="{ x: '100%', y: 'calc(100vh - 360px)' }"
       @change="handleChangeTable"
       >
-        <template #type="text">{{getType(text)}}</template>
       </a-table>
   </div>
 </template>
@@ -49,21 +48,10 @@ const listColumn = [
   {
     title: '操作类型',
     dataIndex: 'type',
-    width: 200,
-    scopedSlots: { customRender: 'type' }
+    width: 200
   }
 ]
 
-const listData = []
-for (let i = 0; i < 20; i++) {
-  listData.push({
-    id: i,
-    time: '2021-03-22 11:27:43',
-    author: '系统管理员' + i,
-    account: 'admin',
-    type: 1
-  })
-}
 export default {
   name: 'DataModelOperation',
   data() {
@@ -101,16 +89,6 @@ export default {
     },
     handleResetForm() {
       this.searchForm = this.$options.data().searchForm
-    },
-    getType(type) {
-      switch (type) {
-        case 1:
-          return '修改'
-        case 2:
-          return '新建'
-        default:
-          return type
-      }
     },
     handleChangeTable(pagination) {
       this.handleGetData(pagination)
