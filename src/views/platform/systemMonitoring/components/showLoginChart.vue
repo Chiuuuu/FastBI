@@ -54,7 +54,7 @@ export default {
       chartData: { columns: ['日期', '访问量/次'] },
       chartExtend: getConfig(),
       height: 'auto',
-      startTime: moment().subtract(1, 'days'),
+      startTime: moment().subtract(6, 'days'),
       endTime: moment(),
       count: { totalVisits: '', totalUsers: '', totalUnits: '' },
       key: 0 // 控制图表刷新
