@@ -200,6 +200,7 @@ export default {
       this.currentView = 'modelOperation'
       this.$nextTick(() => {
         this.$refs.modelOperation.handleResetForm()
+        this.$refs.modelOperation.handleGetData()
       })
     },
     handleModelOperationBack() {

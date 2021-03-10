@@ -213,5 +213,17 @@ export default {
    */
   getDataModelTableInfoAndPivotshchemaInfo(params) {
     return $axios.post(`/model/pivotschema/getDataModelTableInfoAndPivotshchemaInfo`, params)
+  },
+  /**
+   * @description 获取模型操作记录
+   * @param {Object} params
+   * @param {String} params.keyword
+   * @param {String} params.modelId
+   * @param {String} params.pageSize
+   * @param {String} params.current
+   * @returns
+   */
+  getDataModelRecord(params) {
+    return $axios.post(`/model/record/selectModelRecordByKey`, params)
   }
 }

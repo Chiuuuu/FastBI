@@ -4,7 +4,7 @@
       <a-form-model-item label="关键词">
         <a-input
           placeholder="搜索关键词"
-          v-model="searchForm.searchWord"
+          v-model="searchForm.keyword"
           style="width: 240px"
         ></a-input>
       </a-form-model-item>
@@ -14,8 +14,8 @@
       </a-form-model-item>
     </a-form-model>
     <a-table
+      rowKey="gmtOperate"
       class="tableList"
-      rowKey="id"
       :loading="listLoading"
       :columns="listColumn"
       :pagination="pagination"
@@ -32,17 +32,17 @@ const listColumn = [
   {
     title: '操作时间',
     width: 200,
-    dataIndex: 'time'
+    dataIndex: 'gmtOperate'
   },
   {
     title: '操作者',
-    dataIndex: 'author',
+    dataIndex: 'name',
     width: 250,
     ellipsis: true
   },
   {
     title: '操作账号',
-    dataIndex: 'account',
+    dataIndex: 'username',
     width: 80,
     ellipsis: true
   },
@@ -69,7 +69,7 @@ export default {
   data() {
     return {
       searchForm: {
-        searchWord: ''
+        keyword: ''
       },
       pagination: {
         current: 1,
@@ -78,18 +78,26 @@ export default {
       },
       listLoading: false,
       listColumn,
-      listData
+      listData: []
     }
   },
   methods: {
-    handleGetData(pagination) {
+    async handleGetData(pagination) {
       const params = {
-        searchWord: this.searchForm.searchWord,
+        modelId: this.$store.state.dataModel.modelId,
+        keyword: this.searchForm.keyword,
         pageSize: this.pagination.pageSize,
         current: pagination ? pagination.current : this.$options.data().pagination.current
       }
-      console.log('获取数据', params)
-      this.pagination.current = params.current
+
+      const result = await this.$server.dataModel.getDataModelRecord(params)
+      if (result.code === 200) {
+        this.listData = result.rows
+        this.pagination.current = params.current
+        this.pagination.total = result.total
+      } else {
+        this.$message.error(result.msg || '获取记录失败')
+      }
     },
     handleResetForm() {
       this.searchForm = this.$options.data().searchForm
@@ -100,6 +108,8 @@ export default {
           return '修改'
         case 2:
           return '新建'
+        default:
+          return type
       }
     },
     handleChangeTable(pagination) {
