@@ -184,7 +184,8 @@ export default {
           this.spinning = false
         })
       let a = document.createElement('a')
-      a.href = process.env.VUE_APP_SERVICE_URL + `/jarDownload/${res.msg}`
+      a.href = `${process.env.VUE_APP_BASE_API}/jarDownload/${res.msg}`
+      console.log(a.href)
       a.download = name
       a.click()
       a = null
