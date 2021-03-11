@@ -16,6 +16,9 @@
       <template #modUserName="text, record, index">
         <span v-html="text"></span>
       </template>
+      <template #reason="text, record, index">
+        <span>{{ text || '/' }}</span>
+      </template>
     </a-table>
     <div v-html="compare"></div>
   </div>

@@ -15,9 +15,9 @@ export default {
     children: [
         dataSourceRouter,
         screenManageRouter,
-        PlatFormRouter,
         LabelRouter,
         ProjectCenterRouter,
-        CorporateDomainRouter
+        CorporateDomainRouter,
+        PlatFormRouter
     ]
 }

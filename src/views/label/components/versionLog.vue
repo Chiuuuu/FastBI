@@ -23,7 +23,11 @@
           :data-source="listData"
           :row-selection="rowSelection"
           :pagination="false"
-          :scroll="{ x: 'calc(70vw - 50px)', y: 'calc(100vh - 430px)' }">
+          :scroll="{ x: 'calc(70vw - 50px)', y: 'calc(100vh - 430px)' }"
+        >
+          <template #reason="text, record, index">
+            <span>{{ text || '/' }}</span>
+          </template>
         </a-table>
 
         <div class="list-pagination">
@@ -92,7 +96,8 @@ const listColumn = [
     title: '修改原因',
     width: 300,
     ellipsis: true,
-    dataIndex: 'reason'
+    dataIndex: 'reason',
+    scopedSlots: { customRender: 'reason' }
   },
   {
     title: '操作时间',

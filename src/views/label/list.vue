@@ -17,7 +17,7 @@
           <a-form-model-item label="标签状态" prop="status">
             <a-tree-select
               v-model="searchForm.searchStatus"
-              style="width: 350px"
+              style="width: 240px"
               :tree-data="treeData"
               placeholder="标签状态"
               treeNodeFilterProp="title"
@@ -28,14 +28,14 @@
           </a-form-model-item>
           <a-form-model-item label="创建日期" prop="gmtCreate">
             <a-range-picker
-              style="width: 210px"
+              style="width: 240px"
               v-model="searchForm.gmtCreate"
               format="YYYY-MM-DD"
             />
           </a-form-model-item>
           <a-form-model-item label="修改日期" prop="gmtModified">
             <a-range-picker
-              style="width: 210px"
+              style="width: 240px"
               v-model="searchForm.gmtModified"
               format="YYYY-MM-DD"
             />
@@ -56,7 +56,7 @@
       :columns="listColumn"
       :data-source="listData"
       :pagination="false"
-      :scroll="{ x: 1600, y: 'calc(100vh - 310px)' }"
+      :scroll="{ x: 1620, y: 'calc(100vh - 320px)' }"
       >
       <template #status="list, record">
         <span v-if="record.status === 1" style="color:#617BFF">待审核</span>
@@ -145,7 +145,7 @@ const listColumn = [
   {
     title: '版本号',
     dataIndex: 'userVersion',
-    width: 80,
+    width: 100,
     ellipsis: true
   },
   {
@@ -261,6 +261,9 @@ export default {
     handleResetForm() {
       this.searchForm = this.$options.data().searchForm
       this.$refs.form && this.$refs.form.resetFields()
+      this.$nextTick(() => {
+        this.handleRefreshList()
+      })
     },
     // 刷新列表
     handleRefreshList() {

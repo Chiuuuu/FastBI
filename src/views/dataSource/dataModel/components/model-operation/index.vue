@@ -89,6 +89,9 @@ export default {
     },
     handleResetForm() {
       this.searchForm = this.$options.data().searchForm
+      this.$nextTick(() => {
+        this.handleGetData()
+      })
     },
     handleChangeTable(pagination) {
       this.handleGetData(pagination)
