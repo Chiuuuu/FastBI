@@ -14,7 +14,7 @@
       <span>{{ config.title.content }}</span>
     </div>
     <div class="warningvalue" v-show="chartType === 'v-gauge'">
-      <span v-show="config.warningValue"
+      <span :style="{ opacity: config.warningValue ? 1 : 0 }"
         >预警值：{{ config.warningValue }}</span
       >
     </div>
