@@ -79,8 +79,7 @@ export default {
         ],
         userVersion: [
           { required: true, message: '请填写版本号' },
-          { pattern: /^\d+$/, message: '请填写数字' },
-          { max: 8, message: '版本号不得超过8位数' }
+          { pattern: /^\d{1,8}$/, message: '请填写8位有效数字' }
         ],
         reason: [
           { max: 50, message: '请填写小于50字的修改原因' }
