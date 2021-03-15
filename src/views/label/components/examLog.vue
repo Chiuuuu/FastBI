@@ -155,6 +155,10 @@ export default {
     handleResetForm() {
       this.form = this.$options.data().form
       this.$refs.form && this.$refs.form.resetFields()
+      this.pagination = this.$options.data().pagination
+      this.$nextTick(() => {
+        this.handleGetData()
+      })
     }
   }
 }

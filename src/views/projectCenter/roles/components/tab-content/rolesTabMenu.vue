@@ -86,7 +86,7 @@ export default {
           ]
         },
         {
-          title: '平台管理',
+          title: '系统管理',
           key: 'page-3',
           children: [
             {
