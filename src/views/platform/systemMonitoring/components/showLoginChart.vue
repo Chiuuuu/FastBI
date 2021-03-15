@@ -109,7 +109,7 @@ export default {
       )
     },
     reset() {
-      this.startTime = moment().subtract(1, 'days')
+      this.startTime = moment().subtract(6, 'days')
       this.endTime = moment()
       this.getData()
     }
