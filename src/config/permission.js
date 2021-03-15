@@ -18,7 +18,9 @@ const PERMISSION_CODE = {
         project: 4, // 项目管理
         monitoring: 6, // 系统监控
         log: 7, // 日志管理
-        label: 8 // 标签管理
+        label: 8, // 标签管理
+        modelMange: 9, // 模型管理
+        dataDictionary: 10 // 数据字典
     },
     OBJECT: {
         all: '0000', // 该模块下所有对象

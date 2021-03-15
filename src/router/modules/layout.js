@@ -4,6 +4,7 @@ import CorporateDomainRouter from './corporateDomain'
 import ProjectCenterRouter from './projectCenter'
 import PlatFormRouter from './platform'
 import LabelRouter from './label'
+import ModelMangeRouter from './modelMange'
 
 const BaseLayout = () => import('@/layout/index')
 
@@ -18,6 +19,7 @@ export default {
         LabelRouter,
         ProjectCenterRouter,
         CorporateDomainRouter,
-        PlatFormRouter
+        PlatFormRouter,
+        ModelMangeRouter
     ]
 }
