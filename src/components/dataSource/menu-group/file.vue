@@ -11,6 +11,7 @@
     @click="handleFileSelect"
   >
     <h4 class="title" :title="file[fileName]">
+      <a-checkbox :checked="checked" class="file-checkbox-btn" v-if="checkbox" @change="(e) => handleCheckboxChange(e, file)"></a-checkbox>
       <a-icon type="file" v-if="icon === 'default'" style="margin-right: 2px;"/>
       <div class="file-icon icon-bg icon-model" v-else-if="icon === 'dataModel'"/>
       <div :class="['file-icon', 'icon-bg', 'icon-' + file.type]" v-else/>
@@ -61,6 +62,14 @@ export default {
     fileName: {
       type: String,
       default: 'name'
+    },
+    checkbox: {
+      type: Boolean,
+      default: false
+    },
+    checked: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -126,11 +135,17 @@ export default {
           removeClass(that.$refs.file, 'file-active')
         }
       })
+    },
+    handleCheckboxChange(e, file) {
+      this.$emit('fileCheckbox', e, file)
     }
   }
 }
 </script>
 <style lang="less" scoped>
+  .file-checkbox-btn {
+    margin-right: 5px;
+  }
   .icon-bg {
     background: url("../../../assets/images/common/types.png") no-repeat;
     background-size: 128px 16px;
