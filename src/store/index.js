@@ -7,6 +7,7 @@ import getters from './getters'
 import dataAccess from './modules/dataAccess'
 import options from './modules/options'
 import dataModel from './modules/dataModel'
+import modelMange from './modules/modelMange'
 import user from './modules/user'
 import permission from './modules/permission'
 import projectRoles from './modules/projectCenter/roles'
@@ -25,7 +26,8 @@ export default new Vuex.Store({
         user,
         permission,
         projectRoles,
-        projectPermissions
+        projectPermissions,
+        modelMange
     },
     getters
 })

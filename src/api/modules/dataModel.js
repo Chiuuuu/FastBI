@@ -225,5 +225,17 @@ export default {
    */
   getDataModelRecord(params) {
     return $axios.post(`/model/record/selectModelRecordByKey`, params)
+  },
+  /**
+   * @description 数据模型比较
+   * @param {Object} params
+   * @param {String} params.left_modelId
+   * @param {String} params.left_modelName
+   * @param {String} params.right_modelId
+   * @param {String} params.right_modelName
+   * @returns
+   */
+  actionModelCompare(params) {
+    return $axios.post(`/model/management/dataModelExcuteTimeCompared`, params)
   }
 }

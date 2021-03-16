@@ -111,6 +111,22 @@ export default {
               key: '08'
             }
           ]
+        },
+        {
+          title: '数据模型管理',
+          key: 'page-5',
+          children: [
+            {
+              title: '模型管理',
+              scopedSlots: { title: 'custom' },
+              key: '09'
+            },
+            {
+              title: '数据字典',
+              scopedSlots: { title: 'custom' },
+              key: '10'
+            }
+          ]
         }
       ]
     }
