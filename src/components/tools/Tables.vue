@@ -39,6 +39,13 @@
           ref="tableheader"
           :style="{ width: tableWidth + 'px' }"
         >
+          <colgroup>
+            <col
+              v-for="(value, index) in colWidths"
+              :key="index"
+              :style="{ width: value + 'px' }"
+            />
+          </colgroup>
           <thead>
             <tr>
               <th
@@ -64,6 +71,13 @@
             ref="tablebody"
             :style="{ width: tableWidth + 'px' }"
           >
+            <colgroup>
+              <col
+                v-for="(value, index) in colWidths"
+                :key="index"
+                :style="{ width: value + 'px' }"
+              />
+            </colgroup>
             <tr v-for="(row, index) in tableData" :key="index">
               <td
                 :style="customRow(index)"
@@ -124,7 +138,8 @@ export default {
       showTableSize: {},
       tableWidth: '',
       bodyHeight: '',
-      bodyWidth: ''
+      bodyWidth: '',
+      colWidths: []
     }
   },
   watch: {
@@ -134,17 +149,16 @@ export default {
           this.showHeader = val.header.show
           this._calcStyle()
         }
-        for (let item of this.columns) {
-          // 是否自动换行
-          //   item.ellipsis = val.table.ellipsis
-        }
+        // for (let item of this.columns) {
+        // 是否自动换行
+        //   item.ellipsis = val.table.ellipsis
+        // }
       },
       deep: true,
       immediate: true
     },
     apiData: {
       handler(val) {
-        console.log(val)
         if (val) {
           if (val.tableList.length > 0 && val.source && val.source.columns) {
             for (let item of val.source.columns) {
@@ -164,7 +178,7 @@ export default {
             for (let row of rows) {
               let newObj = {}
               for (let col of this.columns) {
-                newObj[col.title] = row[col.title]
+                newObj[col.key] = row[col.key]
               }
               newRows.push(newObj)
             }
@@ -226,20 +240,61 @@ export default {
       this.width = width + 'px'
       this.height = height + 'px'
 
-      // 控制每一列最小长度200
-      // 计算表格宽度(表头表格宽度一致)
-      this.tableWidth = this.columns.length * 200
-      // 计算显示尺寸-charttable(比较表的尺寸和缩放框的大小)
+      // 计算表格每列宽度
+      this.getColWidths()
+
+      // 计算表宽(单元格宽度求和)
+      this.tableWidth = this.colWidths.reduce((total, value) => {
+        return total + value
+      })
+
+      // 计算显示尺寸-tablebody(比较表格的尺寸和缩放框的大小)
       this.showTableSize = {
         tableX: Math.min(this.tableWidth, this.chartSize.width),
-        tableY: Math.min(
-          this.$refs.charttable.clientHeight,
-          this.chartSize.height - title.offsetHeight
-        )
+        tableY:
+          Math.min(
+            this.$refs.tablebody.clientHeight,
+            this.chartSize.height - title.offsetHeight
+          ) - 10 // 去掉滚动轴占高
       }
       // 计算表格（不含表头）高度
       this.bodyHeight =
         this.showTableSize.tableY - this.$refs.tableheader.clientHeight
+    },
+    // 计算单元格宽度
+    getColWidths() {
+      this.colWidths = []
+      for (let row of this.tableData) {
+        let index = 0
+        for (let col of this.columns) {
+          // 计算每个单元格的大小（取每一列最长的宽度作为单位格宽度）
+          if (!this.colWidths[index]) {
+            // 默认取表头宽度
+            this.colWidths[index] =
+              this.getActaulLen(col.title) *
+                this.config.header.textStyle.fontSize *
+                0.6 +
+              30
+          }
+          let colWidth =
+            this.getActaulLen(row[col.key]) *
+              this.config.table.textStyle.fontSize *
+              0.6 +
+            30
+          if (colWidth > this.colWidths[index]) {
+            this.colWidths[index] = colWidth
+          }
+          index++
+        }
+      }
+    },
+    // 汉字转换成两个字符长度
+    getActaulLen(value) {
+      let str = value
+      if (typeof str === 'number') {
+        str = str.toString()
+      }
+      return str.replace(/[\u0391-\uFFE5]/g, 'aa').length
     },
     getScrollLeft(e) {
       this.bodyWidth = e.target.scrollLeft + this.showTableSize.tableX

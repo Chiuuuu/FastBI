@@ -37,6 +37,14 @@
                   @click="modelAdd"
                 />
               </a-select-option>
+              <a-select-option value="添加数据接入">
+                <span @click="modelAdd">添加数据接入</span>
+                <a-icon
+                  type="rollback"
+                  style="margin-left:130px"
+                  @click="modelAdd"
+                />
+              </a-select-option>
             </a-select>
           </div>
           <div class="operation_search">

@@ -18,8 +18,16 @@
       >
         <a-dropdown :trigger="['click', 'contextmenu']" v-model="item.showMore">
           <a-icon class="icon-more" type="caret-down" />
-          <a-menu slot="overlay" @click="deleteFile(item, index)">
-            <a-menu-item key="3">移除</a-menu-item>
+          <a-menu slot="overlay">
+            <a-sub-menu key="1" title="聚合方式">
+              <a-menu-item>求和</a-menu-item>
+              <a-menu-item>平均</a-menu-item>
+              <a-menu-item>最大</a-menu-item>
+              <a-menu-item>最小</a-menu-item>
+            </a-sub-menu>
+            <a-menu-item key="3" @click="deleteFile(item, index)"
+              >移除</a-menu-item
+            >
           </a-menu>
         </a-dropdown>
         <a-tooltip :title="item.alias">
