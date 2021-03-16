@@ -39,12 +39,15 @@ export default {
         return $axios.post(`/datasource/read/teble`, params)
     },
     /**
-     * @description 读取数据库的表数据
-     * @param {string} id 表id
+     * @description 获取表数据
+     * @param {Object} params 请求参数
+     * @param {string} params.size 列数
+     * @param {string} params.page 第几列
+     * @param {string} params.id 表id
      * @returns
      */
-    getTableInfo(id) {
-        return $axios.get(`/datasource/table/read/${id}`)
+    getTableInfo(params) {
+        return $axios.post(`/datasource/table/read`, params)
     },
     /**
      * @description 保存数据信息

@@ -8,23 +8,33 @@
     @cancel="$emit('close')"
   >
     <a-spin :spinning="spinning">
-      <table class="check-table">
-        <thead>
-          <tr>
-            <th>序号</th>
-            <th v-for="(item, index) in columns" :key="index" :title="item['COLUMN_NAME']">
-              {{ item['COLUMN_NAME'] }}
-              <span class="type">{{ item['TYPE_NAME'] | formatType }}</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(item, index) in tableData" :key="index">
-            <td>{{ index + 1 }}</td>
-            <td v-for="(col, i) in columns" :key="i" :title="item[col['COLUMN_NAME']]">{{ item[col['COLUMN_NAME']] }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <a-row type="flex" justify="space-between" align="middle">
+        <a-col v-if="colPagination.page !== 1" :span="1">
+          <a-button type="default" icon="left" @click="handleChangePage('minus')" />
+        </a-col>
+        <a-col :span="autoSpan">
+          <table class="check-table">
+            <thead>
+              <tr>
+                <th>序号</th>
+                <th v-for="(item, index) in columns" :key="index" :title="item['COLUMN_NAME']">
+                  {{ item['COLUMN_NAME'] }}
+                  <span class="type">{{ item['TYPE_NAME'] | formatType }}</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in tableData" :key="index">
+                <td>{{ index + 1 }}</td>
+                <td v-for="(col, i) in columns" :key="i" :title="item[col['COLUMN_NAME']]">{{ item[col['COLUMN_NAME']] }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </a-col>
+        <a-col v-if="colPagination.page * colPagination.size < colPagination.total" :span="1">
+          <a-button type="default" icon="right" @click="handleChangePage('add')" />
+        </a-col>
+      </a-row>
       <a-empty class="table-empty" v-if="tableData.length === 0"></a-empty>
     </a-spin>
   </a-modal>
@@ -42,7 +52,25 @@ export default {
       spinning: false,
       bodyStyle: { 'maxHeight': 'calc(100vh - 240px)', 'overflow-y': 'auto' },
       columns: [],
-      tableData: []
+      tableData: [],
+      colPagination: {
+        total: 0,
+        size: 50,
+        page: 1
+      }
+    }
+  },
+  computed: {
+    autoSpan() {
+      const left = this.colPagination.page !== 1
+      const right = this.colPagination.page * this.colPagination.size < this.colPagination.total
+      if (left && right) {
+        return 22
+      } else if (left || right) {
+        return 23
+      } else {
+        return 24
+      }
     }
   },
   filters: {
@@ -66,6 +94,11 @@ export default {
   watch: {
     show(newValue, oldValue) {
       if (newValue) {
+        this.colPagination = {
+          total: 0,
+          size: 50,
+          page: 1
+        }
         this.handleGetTableInfo()
       } else {
         this.columns = []
@@ -76,11 +109,17 @@ export default {
   methods: {
     handleGetTableInfo() {
       this.spinning = true
-      this.$server.dataAccess.getTableInfo(this.tableId)
+      const params = {
+        id: this.tableId,
+        size: this.colPagination.size,
+        page: this.colPagination.page
+      }
+      this.$server.dataAccess.getTableInfo(params)
         .then(res => {
           if (res.code === 200) {
-            this.columns = res.headers
-            this.tableData = res.rows
+            this.columns = res.tableDataInfo.headers
+            this.tableData = res.tableDataInfo.rows
+            this.colPagination.total = res.total
           } else {
             this.$message.error(res.msg)
           }
@@ -88,6 +127,14 @@ export default {
         .finally(() => {
           this.spinning = false
         })
+    },
+    handleChangePage(type) {
+      if (type === 'add') {
+        this.colPagination.page++
+      } else if (type === 'minus') {
+        this.colPagination.page--
+      }
+      this.handleGetTableInfo()
     }
   }
 }
