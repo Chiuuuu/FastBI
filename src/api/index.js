@@ -9,6 +9,7 @@ import user from '@/api/modules/user'
 import log from '@/api/modules/log'
 import systemMonitoring from '@/api/modules/systemMonitoring'
 import label from '@/api/modules/label'
+import dataDictionary from '@/api/modules/dataDictionary'
 
 const server = {
   user,
@@ -21,7 +22,8 @@ const server = {
   corporateDomain,
   log,
   systemMonitoring,
-  label
+  label,
+  dataDictionary
 }
 
 export default server

@@ -5,7 +5,7 @@ const LabelListView = () => import('@/views/label')
 
 export default {
   path: '/label',
-  redirect: '/label/list',
+  redirect: '/label/labelList',
   component: RouteView,
   meta: {
     title: '标签管理',

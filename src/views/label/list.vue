@@ -1,5 +1,5 @@
 <template>
-  <div class="main main-padding">
+  <div class="main main-padding main-bg scrollbar">
     <a-row type="flex" justify="space-between" style="margin-bottom:10px">
       <a-col><a-button type="primary" @click="handleOpenModal('LabelForm')">新建</a-button></a-col>
       <a-col><a-button type="primary" @click="handleOpenModal('ExamLog')">标签审核日志</a-button></a-col>

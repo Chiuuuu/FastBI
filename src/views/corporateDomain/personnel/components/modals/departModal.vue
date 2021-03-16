@@ -94,7 +94,7 @@ export default {
     handleModalFormCancel(data) {
       this.activeIndex = -1
       if (!data.id) {
-        this.deptList.shift()
+        this.list.shift()
       }
     }
   }

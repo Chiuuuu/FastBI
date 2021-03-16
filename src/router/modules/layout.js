@@ -17,9 +17,9 @@ export default {
         dataSourceRouter,
         screenManageRouter,
         LabelRouter,
-        ProjectCenterRouter,
-        CorporateDomainRouter,
         PlatFormRouter,
-        ModelMangeRouter
+        ModelMangeRouter,
+        ProjectCenterRouter,
+        CorporateDomainRouter
     ]
 }
