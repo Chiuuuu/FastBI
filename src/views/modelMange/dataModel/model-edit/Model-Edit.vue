@@ -50,7 +50,7 @@
       <!-- <a-divider /> -->
       <div v-if="isDatabase" class="SQL_View table_list">
         <div class="menu_search">
-          <span class="search_span">自定义SQL视图</span>
+          <span class="search_span">逻辑模型规则设定</span>
           <a-icon class="view_icon" type="plus-square" @click="handleAddSQL('new')" />
         </div>
         <!-- <div class="text-center"> -->
@@ -110,7 +110,7 @@
         <div class="detail_main">
           <div class="dimensionality">
             <div class="dim_title">
-              <span class="dim_span">维度</span>
+              <span class="dim_span">模型输入</span>
               <div class="dim_operation">
                 <a v-on:click="openModal('compute-setting', '维度')" style="color:#627CFF;line-height:38px">新建计算维度</a>
                 <a-divider type="vertical" />
@@ -140,7 +140,7 @@
           </div>
           <div class="measurement">
             <div class="mea_title">
-              <span class="mea_span">度量</span>
+              <span class="mea_span">模型输出</span>
               <div class="mea_operation">
                 <a v-on:click="openModal('compute-setting', '度量')" style="color:#627CFF;margin-right:20px;line-height:38px">新建计算度量</a>
               </div>

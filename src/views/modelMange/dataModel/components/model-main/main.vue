@@ -48,7 +48,7 @@
             <div class="detail_main">
               <div class="dimensionality">
                 <div class="dim_title">
-                  <span class="dim_span">维度</span>
+                  <span class="dim_span">模型输入</span>
                 </div>
                 <div class="dim_menu scrollbar">
                   <a-collapse :bordered="false" v-model="dimensionsActiveKey">
@@ -70,7 +70,7 @@
               </div>
               <div class="measurement">
                 <div class="dim_title">
-                  <span class="mea_span">度量</span>
+                  <span class="mea_span">模型输出</span>
                 </div>
                 <div class="mea_menu scrollbar">
                   <a-collapse :bordered="false" v-model="measuresActiveKey">

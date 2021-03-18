@@ -1,6 +1,6 @@
 <template>
   <a-modal
-    title="添加自定义SQL视图"
+    title="添加逻辑模型规则设定"
     :visible="isShow"
     destroyOnClose
     :confirmLoading="loading"
