@@ -87,16 +87,6 @@ export default {
       }
     }
   },
-  computed: {
-    currentCol() {
-      const { size, page } = this.data.colPagination
-      return this.columns.slice((page - 1) * size, page * size - 1)
-    },
-    currentRow() {
-      const { size, page } = this.data.colPagination
-      return this.tableData.slice((page - 1) * size, page * size - 1)
-    }
-  },
   watch: {
     show(newValue, oldValue) {
       if (newValue) {
