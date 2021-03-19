@@ -7,34 +7,42 @@
     :visible="show"
     @cancel="$emit('close')"
   >
-    <a-spin :spinning="spinning">
-      <a-row type="flex" justify="space-between" align="middle">
-        <a-col v-if="colPagination.page !== 1" :span="1">
-          <a-button type="default" icon="left" @click="handleChangePage('minus')" />
-        </a-col>
-        <a-col :span="autoSpan">
-          <table class="check-table">
-            <thead>
-              <tr>
-                <th>序号</th>
-                <th v-for="(item, index) in columns" :key="index" :title="item['COLUMN_NAME']">
-                  {{ item['COLUMN_NAME'] }}
-                  <span class="type">{{ item['TYPE_NAME'] | formatType }}</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(item, index) in tableData" :key="index">
-                <td>{{ index + 1 }}</td>
-                <td v-for="(col, i) in columns" :key="i" :title="item[col['COLUMN_NAME']]">{{ item[col['COLUMN_NAME']] }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </a-col>
-        <a-col v-if="colPagination.page * colPagination.size < colPagination.total" :span="1">
-          <a-button type="default" icon="right" @click="handleChangePage('add')" />
-        </a-col>
-      </a-row>
+    <a-button
+      class="arrow arrow-left"
+      :disabled="this.colPagination.page === 1"
+      type="default"
+      icon="left"
+      @click="handleChangePage('minus')"
+    />
+    <a-button
+      class="arrow arrow-right"
+      :disabled="this.colPagination.page * this.colPagination.size >= this.colPagination.total"
+      type="default"
+      icon="right"
+      @click="handleChangePage('add')"
+    />
+    <a-spin style="padding: 0 20px" :spinning="spinning">
+      <table class="check-table">
+        <thead>
+          <tr>
+            <th>序号</th>
+            <th v-for="(item, index) in columns" :key="index" :title="item['COLUMN_NAME']">
+              {{ item['COLUMN_NAME'] }}
+              <span class="type">{{ item['TYPE_NAME'] | formatType }}</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item, index) in tableData" :key="index">
+            <td>{{ index + 1 }}</td>
+            <td
+              v-for="(col, i) in columns"
+              :key="i"
+              :title="item[col['COLUMN_NAME']]"
+            >{{ item[col['COLUMN_NAME']] }}</td>
+          </tr>
+        </tbody>
+      </table>
       <a-empty class="table-empty" v-if="tableData.length === 0"></a-empty>
     </a-spin>
   </a-modal>
@@ -50,26 +58,14 @@ export default {
   data() {
     return {
       spinning: false,
-      bodyStyle: { 'maxHeight': 'calc(100vh - 240px)', 'overflow-y': 'auto' },
+      bodyStyle: { height: 'calc(100vh - 240px)', 'overflow-y': 'auto' },
       columns: [],
       tableData: [],
+      pageList: {},
       colPagination: {
         total: 0,
-        size: 50,
+        size: 5,
         page: 1
-      }
-    }
-  },
-  computed: {
-    autoSpan() {
-      const left = this.colPagination.page !== 1
-      const right = this.colPagination.page * this.colPagination.size < this.colPagination.total
-      if (left && right) {
-        return 22
-      } else if (left || right) {
-        return 23
-      } else {
-        return 24
       }
     }
   },
@@ -91,18 +87,25 @@ export default {
       }
     }
   },
+  computed: {
+    currentCol() {
+      const { size, page } = this.data.colPagination
+      return this.columns.slice((page - 1) * size, page * size - 1)
+    },
+    currentRow() {
+      const { size, page } = this.data.colPagination
+      return this.tableData.slice((page - 1) * size, page * size - 1)
+    }
+  },
   watch: {
     show(newValue, oldValue) {
       if (newValue) {
-        this.colPagination = {
-          total: 0,
-          size: 50,
-          page: 1
-        }
+        this.colPagination = this.$options.data().colPagination
         this.handleGetTableInfo()
       } else {
         this.columns = []
         this.tableData = []
+        this.pageList = {}
       }
     }
   },
@@ -114,19 +117,27 @@ export default {
         size: this.colPagination.size,
         page: this.colPagination.page
       }
-      this.$server.dataAccess.getTableInfo(params)
-        .then(res => {
-          if (res.code === 200) {
-            this.columns = res.tableDataInfo.headers
-            this.tableData = res.tableDataInfo.rows
-            this.colPagination.total = res.total
-          } else {
-            this.$message.error(res.msg)
-          }
-        })
-        .finally(() => {
-          this.spinning = false
-        })
+      if (this.pageList[params.page]) {
+        this.spinning = false
+        this.columns = this.pageList[params.page].headers
+        this.tableData = this.pageList[params.page].rows
+      } else {
+        this.$server.dataAccess
+          .getTableInfo(params)
+          .then((res) => {
+            if (res.code === 200) {
+              this.pageList[params.page] = res.tableDataInfo
+              this.columns = res.tableDataInfo.headers
+              this.tableData = res.tableDataInfo.rows
+              this.colPagination.total = res.total
+            } else {
+              this.$message.error(res.msg)
+            }
+          })
+          .finally(() => {
+            this.spinning = false
+          })
+      }
     },
     handleChangePage(type) {
       if (type === 'add') {
@@ -141,36 +152,48 @@ export default {
 </script>
 
 <style lang="less" scoped>
-  .check-table {
-    width: 100%;
-    border: 1px solid #e8e8e8;
-    td, th {
-      font-size: 14px;
-      height: 21px;
-      padding: 8px;
-      max-width: 200px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    th {
-      background: #f8f8fa;
-    }
-    tr {
-      border-top: 1px solid #e8e8e8;
-      border-bottom: 1px solid #e8e8e8;
-    }
-    .type {
-      font-size: 12px;
-      color: #9c9c9c;
-      font-weight: normal;
-    }
+.check-table {
+  width: 100%;
+  border: 1px solid #e8e8e8;
+  td,
+  th {
+    font-size: 14px;
+    height: 21px;
+    padding: 8px;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
-  .table-empty {
-    padding: 20px 0;
-    margin: 0;
-    border-right: 1px solid #e8e8e8;
-    border-left: 1px solid #e8e8e8;
+  th {
+    background: #f8f8fa;
+  }
+  tr {
+    border-top: 1px solid #e8e8e8;
     border-bottom: 1px solid #e8e8e8;
   }
+  .type {
+    font-size: 12px;
+    color: #9c9c9c;
+    font-weight: normal;
+  }
+}
+.table-empty {
+  padding: 20px 0;
+  margin: 0;
+  border-right: 1px solid #e8e8e8;
+  border-left: 1px solid #e8e8e8;
+  border-bottom: 1px solid #e8e8e8;
+}
+.arrow {
+  position: absolute;
+  z-index: 2001;
+  top: 50%;
+}
+.arrow-left {
+  left: 10px;
+}
+.arrow-right {
+  right: 10px;
+}
 </style>
