@@ -145,5 +145,15 @@ export default {
     deleRoleUser(id) {
         // return $axios.delete('/business/editRoleUser/' + id)
         return $axios.get('/business/editRoleUser/delete/' + id)
+    },
+    /**
+     * @description 获取数据源表格列表(权限勾选)
+     * @param {Object} params
+     * @param {Array} params.roleId
+     * @param {Array} params.refId
+     * @returns
+     */
+    getRoleSourceTable(params) {
+        return $axios.post('/user/RoleResourcePrivilege/dbPrivileges', params)
     }
 }

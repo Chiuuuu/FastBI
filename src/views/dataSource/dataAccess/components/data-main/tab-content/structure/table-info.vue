@@ -64,7 +64,7 @@ export default {
       pageList: {},
       colPagination: {
         total: 0,
-        size: 5,
+        size: 50,
         page: 1
       }
     }

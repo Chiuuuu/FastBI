@@ -22,6 +22,7 @@
             <RoleTabeRole
               status="edit"
               @getChangeItem="getChangeItem"
+              @getTablePermi="getTablePermi"
               @setBasePrivilege="getBasePrivilege"
               ></RoleTabeRole>
             <!-- <RolesTabDataPermission status="edit"></RolesTabDataPermission> -->
@@ -132,12 +133,38 @@ export default {
         if (target) {
           target.permissions = item.permissions
         } else {
-          list.push({
-            id: item.id,
-            permissions: item.permissions,
-            name: item.title
-          })
+          // const params = {
+          //   id: item.id,
+          //   permissions: item.permissions,
+          //   name: item.title,
+          //   dataBasePri: []
+          // }
+          // if (role === 3 && item.fileType === 1) {
+          //   params.dataBasePri = []
+          // }
+          // list.push(params)
+          list.push(item)
         }
+      }
+    },
+    getTablePermi(role, item) {
+      switch (role) {
+        case 1:
+          role = 'screen'
+          break
+        case 2:
+          role = 'dataModel'
+          break
+        case 3:
+          role = 'dataSource'
+          break
+      }
+      const list = this[role]
+      const target = list.find(t => t.id === item.id)
+      if (target) {
+        target.dataBasePri = item.dataBasePri
+      } else {
+        list.push(item)
       }
     },
     getBasePrivilege(permissions, type) {
