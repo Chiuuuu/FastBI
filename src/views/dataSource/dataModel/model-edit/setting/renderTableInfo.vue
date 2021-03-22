@@ -12,8 +12,22 @@
         取消
       </a-button>
     </template>
-    <a-spin :spinning="loading">
-      <a-empty v-if="data.length === 0" class="main-empty"></a-empty>
+    <a-button
+      class="arrow arrow-left"
+      :disabled="this.colPagination.page === 1"
+      type="default"
+      icon="left"
+      @click="handleChangePage('minus')"
+    />
+    <a-button
+      class="arrow arrow-right"
+      :disabled="this.colPagination.page * this.colPagination.size >= this.colPagination.total"
+      type="default"
+      icon="right"
+      @click="handleChangePage('add')"
+    />
+    <a-spin style="padding: 0 50px;" :spinning="loading">
+      <a-empty v-if="tableData.length === 0" class="main-empty"></a-empty>
       <div class="table-area" v-else>
         <table class="table">
           <thead>
@@ -24,8 +38,8 @@
                   <div class="hr" data-resize="true"></div>
                 </div>
               </th>
-              <template v-for="item in columnsList">
-                <th :key="item.title">
+              <template v-for="item in currentCol">
+                <th :key="item.name">
                   <div class="wrap">
                     <div class="txt" :title="item.name">
                       <span class='txt-title'>{{item.name}}</span>
@@ -36,11 +50,13 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item,index) in data" :key="index">
+            <tr v-for="(item,index) in tableData" :key="index">
               <td><div class="txt txt-order">{{index+1}}</div></td>
-              <td v-for="(subitem,subIndex) in item" :key="subIndex">
-                <div class="txt" :title="subitem">{{subitem}}</div>
-              </td>
+              <td
+                v-for="(col, i) in currentCol"
+                :key="i"
+                :title="item[col.name]"
+              ><div class="txt" :title="item[col.name]">{{ item[col.name] }}</div></td>
             </tr>
           </tbody>
         </table>
@@ -62,7 +78,14 @@ export default {
   data() {
     return {
       columns: [],
-      columnsList: [],
+      currentCol: [],
+      pageList: [],
+      tableData: [],
+      colPagination: {
+        total: 0,
+        size: 50,
+        page: 1
+      },
       data: [],
       loading: true
     }
@@ -82,31 +105,88 @@ export default {
      * 获取数据
     */
     async handleGetData() {
-      this.loading = true
-      const result = await this.$server.dataModel.getTableDetailInfo({
-        tableName: this.item.name,
-        tableId: this.item.id,
-        databaseId: this.item.databaseId
-      })
+      const { size, page } = this.colPagination
+      if (this.validPageSection()) {
+        this.currentCol = this.columns.slice((page - 1) * size, page * size)
+      } else {
+        this.loading = true
+        const result = await this.$server.dataModel.getTableDetailInfo({
+          tableName: this.item.name,
+          tableId: this.item.id,
+          databaseId: this.item.databaseId,
+          current: page,
+          columnSize: size
+        })
 
-      if (result.code === 200) {
-        this.columnsList = result.data.columnNameList
-        this.data = result.data.rows
-        this.$nextTick(() => {
-          this.loading = false
+        if (result.code === 200) {
+          this.colPagination.total = result.data.total
+          this.handleColCache(result.data)
+          this.$nextTick(() => {
+            this.loading = false
+          })
+        } else {
+          this.$message.error(result.msg, 1).then(() => {
+              this.loading = false
+          })
+        }
+      }
+    },
+    /**
+     * 考虑到今后有可能有跳页和改变size的情况, 先实现一个方法缓存记录
+     * 设置一个长度为total的数组, 请求的区间缓存到数组, 下请求前做校验
+     */
+    handleColCache(tableDataInfo) {
+      const { size, page, total } = this.colPagination
+      const start = size * (page - 1)
+      const end = size * page > total ? total - 1 : size * page - 1
+      if (this.pageList.length < 1) {
+        this.pageList.length = total
+        this.columns.length = total
+      }
+      // 将当前区间数据写入缓存
+      for (let s = start; s <= end; s++) {
+        this.pageList.splice(s, 1, s)
+        this.columns.splice(s, 1, tableDataInfo.columnNameList[s - start])
+      }
+      if (this.tableData.length > 0) {
+        this.tableData.map((item, index) => {
+          return Object.assign(item, tableDataInfo.rows[index])
         })
       } else {
-        this.$message.error(result.msg, 1).then(() => {
-            this.loading = false
-        })
+        this.tableData = tableDataInfo.rows
       }
+      this.currentCol = this.columns.slice((page - 1) * size, page * size)
+    },
+    // 校验当前缓存区间
+    validPageSection() {
+      const { size, page, total } = this.colPagination
+      const start = size * (page - 1)
+      const end = size * page > total ? total - 1 : size * page - 1
+      if (total < 1) return false
+      // 遍历当前区间是否存在缓存
+      for (let s = start; s <= end; s++) {
+        if (this.pageList[s] === undefined) {
+          return false
+        }
+      }
+      return true
+    },
+    handleChangePage(type) {
+      if (type === 'add') {
+        this.colPagination.page++
+      } else if (type === 'minus') {
+        this.colPagination.page--
+      }
+      this.handleGetData()
     },
     handleClose() {
       this.$emit('close')
     },
     handleAfterClose() {
-      this.data = this.$options.data().data
-      this.columnsList = this.$options.data().columnsList
+      this.tableData = this.$options.data().tableData
+      this.currentCol = this.$options.data().currentCol
+      this.columns = this.$options.data().columns
+      this.pageList = this.$options.data().pageList
     }
   }
 }
@@ -181,5 +261,16 @@ export default {
   tbody tr:nth-child(odd) {
     background: #f5f5f5;
   }
+}
+.arrow {
+  position: absolute;
+  z-index: 2001;
+  top: 50%;
+}
+.arrow-left {
+  left: 10px;
+}
+.arrow-right {
+  right: 10px;
 }
 </style>
