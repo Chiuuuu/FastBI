@@ -223,5 +223,15 @@ export default {
    */
   addDataModelView(params) {
     return $axios.post(`/model/custom/createDataModelView`, params)
+  },
+  /**
+   * @description 导入BI库
+   * @param {Object} params 请求体
+   * @param {Object} params.config 配置
+   * @param {Object} params.pivotSchema 维度度量等参数
+   * @returns
+   */
+  addDataModelTable(params) {
+    return $axios.post(`/model/custom/createDataModelWideTable`, params)
   }
 }
