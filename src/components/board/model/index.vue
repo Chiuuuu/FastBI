@@ -115,8 +115,20 @@
                           v-model="item2.showMore"
                         >
                           <a-icon class="icon-more" type="caret-down" />
-                          <a-menu slot="overlay" @click="changeItem(item2, 2)">
-                            <a-menu-item key="3">转为度量</a-menu-item>
+                          <a-menu slot="overlay">
+                            <a-menu-item key="3" @click="changeItem(item2, 2)"
+                              >转为度量</a-menu-item
+                            >
+                            <a-sub-menu
+                              key="4"
+                              title="创建地理字段"
+                              @click="openGeoSetting(item2)"
+                            >
+                              <a-menu-item>国家</a-menu-item>
+                              <a-menu-item>省市</a-menu-item>
+                              <a-menu-item>城市</a-menu-item>
+                              <a-menu-item>区县</a-menu-item>
+                            </a-sub-menu>
                           </a-menu>
                         </a-dropdown>
                       </li>
@@ -169,8 +181,20 @@
                           v-model="item2.showMore"
                         >
                           <a-icon class="icon-more" type="caret-down" />
-                          <a-menu slot="overlay" @click="changeItem(item2, 1)">
-                            <a-menu-item key="3">转为维度</a-menu-item>
+                          <a-menu slot="overlay">
+                            <a-menu-item key="3" @click="changeItem(item2, 1)"
+                              >转为维度</a-menu-item
+                            >
+                            <a-sub-menu
+                              key="4"
+                              title="创建地理字段"
+                              @click="openGeoSetting(item2)"
+                            >
+                              <a-menu-item>国家</a-menu-item>
+                              <a-menu-item>省市</a-menu-item>
+                              <a-menu-item>城市</a-menu-item>
+                              <a-menu-item>区县</a-menu-item>
+                            </a-sub-menu>
                           </a-menu>
                         </a-dropdown>
                       </li>
@@ -186,6 +210,11 @@
             :compute-type="computeType"
             @close="close"
           ></compute-setting>
+          <geo-setting
+            :is-show="createMapVisible"
+            region="城市"
+            @close="createMapVisible = false"
+          ></geo-setting>
         </div>
         <!-- 初始界面 -->
         <div class="model-contain" v-else style="height:100%;">
@@ -244,6 +273,7 @@ import debounce from 'lodash/debounce'
 import { menuSearchLoop } from '@/utils/menuSearch'
 import { Loading } from 'element-ui'
 import ComputeSetting from '@/views/dataSource/dataModel/model-edit/setting/compute-setting'
+import GeoSetting from './components/geo-setting'
 
 export default {
   name: 'BoardModel',
@@ -253,7 +283,7 @@ export default {
       required: true
     }
   },
-  components: { ComputeSetting },
+  components: { ComputeSetting, GeoSetting },
   data() {
     return {
       customStyle:
@@ -275,6 +305,7 @@ export default {
       dimensionsChecked: [], // 选中的维度id
       measuresChecked: [], // 选中的度量id
       visible: false,
+      createMapVisible: false,
       computeType: '',
       detailInfo: {}, // 聚合运算数据
       cacheDimensions: [],
@@ -477,6 +508,10 @@ export default {
       this.visible = true
       if (computeType) this.computeType = computeType
     },
+    openGeoSetting(item) {
+      this.createMapVisible = true
+      item.showMore = false
+    },
     close() {
       this.visible = false
     },
@@ -655,5 +690,66 @@ export default {
             }
         }
     }
+}
+.cacsader{
+    display: flex;
+    justify-content: space-around;
+
+    }
+.geo-contain{
+    display: flex;
+    justify-content space-between;
+  // width: 750px;
+.geo-map{
+    width: 188px;
+    height 279px;
+    background:rgba(248,248,248,1);
+    margin-top: 19px;
+    }
+.geo-set{
+    width: 580px;
+    .set-head{
+    background:rgba(248,248,248,1);
+    margin-left: 18px;
+    margin-top: 19px;
+    height: 36px;
+    display: flex;
+    justify-content space-between;
+    .g-s-s{
+    font-size:14px;
+    font-family:Microsoft YaHei;
+    font-weight:400;
+    color:rgba(1,4,15,1);
+    line-height:35px;
+    margin-left: 12px;
+    }
+.g-s-r{
+    font-size:14px;
+    font-family:Microsoft YaHei;
+    font-weight:400;
+    color:rgba(252,92,92,1);
+    line-height:35px;
+    margin-right: 12px;
+    }
+}
+.set-select{
+    display: flex;
+    justify-content: space-between;
+    margin-left: 18px;
+    margin-top: 14px;
+    .s-s-s{
+        font-size:14px;
+        font-family:Microsoft YaHei;
+        font-weight:400;
+        color:rgba(1,4,15,1);
+        }
+    }
+    .set-table{
+        margin-top: 10px;
+        margin-left: 30px;
+        width: 90%;
+        }
+    }
+
 }
 </style>

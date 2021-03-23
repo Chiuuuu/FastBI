@@ -6,17 +6,30 @@
     @dragover.stop.prevent
   >
     <slot> </slot>
+    <map-type-view
+      :visible="visible"
+      @ok="handleOk"
+      @close="visible = false"
+    ></map-type-view>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapActions } from 'vuex' // 导入vuex
+import MapTypeView from '../drag/components/map-type-view.vue'
 
 export default {
   name: 'DropPanel',
+  data() {
+    return {
+      visible: false,
+      com: {}
+    }
+  },
   computed: {
     ...mapGetters(['canvasMap', 'pageSettings', 'screenId'])
   },
+  components: { MapTypeView },
   methods: {
     ...mapActions(['addChartData'], ['saveScreenData']),
     // 元素drop
@@ -27,6 +40,7 @@ export default {
         tabId: this.$route.query.tabId,
         ...nodeInfo
       }
+
       console.log(nodeInfo)
       // 获取drop事件
       // let offsetX = event.offsetX
@@ -36,7 +50,16 @@ export default {
       //   left: offsetX + 'px',
       //   top: offsetY + 'px'
       // }
+      if (nodeInfo.setting.chartType === 'v-map') {
+        this.com = nodeInfo
+        this.visible = true
+        return
+      }
       this.addChartData(nodeInfo)
+    },
+    handleOk() {
+      this.visible = false
+      this.addChartData(this.com)
     }
   }
 }
