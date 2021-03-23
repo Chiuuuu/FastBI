@@ -34,9 +34,6 @@
   </a-spin>
 </template>
 <script>
-import { Node } from '../util'
-import { mapState } from 'vuex'
-import pick from 'lodash/pick'
 import assign from 'lodash/assign'
 import RenderTableInfo from './setting/renderTableInfo.vue'
 export default {
@@ -115,7 +112,6 @@ export default {
           ...data,
           tableId: data.id
         },
-        // dragNode: new Node(data),
         event
       })
     },

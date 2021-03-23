@@ -56,16 +56,22 @@
         </div>
       </div>
     </div>
+    <map-type-view
+      :visible="visible"
+      @ok="handleOk"
+      @close="visible = false"
+    ></map-type-view>
   </div>
 </template>
 
 <script>
 import { mapActions } from 'vuex' // 导入vuex
 import { Icon } from 'ant-design-vue'
+import MapTypeView from './components/map-type-view.vue'
 
 const IconFont = Icon.createFromIconfontCN({
   scriptUrl: '//at.alicdn.com/t/font_2276651_71nv5th6v94.js'
-}) //引入iconfont
+}) // 引入iconfont
 export default {
   name: 'DragList',
   props: {
@@ -78,7 +84,20 @@ export default {
   },
   data() {
     return {
-      hovered: false
+      hovered: false,
+      visible: false,
+      com: {}
+    }
+  },
+  computed: {
+    regionList() {
+      if (this.mapType === 2) {
+        return this.provinceList
+      }
+      if (this.mapType === 3) {
+        return this.cityList
+      }
+      return []
     }
   },
   mounted() {},
@@ -127,9 +146,19 @@ export default {
         tabId: this.$route.query.tabId,
         setting: { ...component }
       }
+      // todo: 地图选择类型弹窗
+      //   if (component.chartType === 'v-map') {
+      //     this.com = nodeInfo
+      //     this.visible = true
+      //     return
+      //   }
       this.addChartData(nodeInfo)
+    },
+    handleOk() {
+      this.visible = false
+      this.addChartData(this.com)
     }
   },
-  components: { IconFont }
+  components: { MapTypeView }
 }
 </script>

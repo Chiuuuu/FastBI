@@ -119,9 +119,9 @@
       </div>
       <div class="detail scrollbar">
         <div class="detail_header">
-          <span>数据模型详情{{ createViewName ? `(已创建视图: ${createViewName})` : '' }}</span>
+          <span>数据模型详情<span class="sub">{{ createViewName ? `(已导入BI库-表名: ${createViewName})` : '' }}</span></span>
           <div class="detail_btn">
-            <a-button v-on:click="openModal('create-view')" :disabled="disableByDetailInfo">创建视图</a-button>
+            <a-button v-on:click="openModal('create-view')" :disabled="disableByDetailInfo">导入BI库</a-button>
             <a-button v-on:click="openModal('check-table')" :disabled="disableByDetailInfo">查看宽表</a-button>
             <a-button v-on:click="openModal('batch-setting')" :disabled="disableByDetailInfo">批量编辑字段</a-button>
           </div>

@@ -1425,18 +1425,18 @@
                 </gui-field>
                 <gui-field label="文本">
                   <a-switch
-                    v-model="selfConfig.geo.label.normal.show"
+                    v-model="selfConfig.series[0].label.normal.show"
                     size="small"
                     @change="switchChange"
                   ></a-switch>
                 </gui-field>
                 <gui-field
                   label="文本样式"
-                  v-if="selfConfig.geo.label.normal.show"
+                  v-if="selfConfig.series[0].label.normal.show"
                 >
                   <gui-inline label="字号">
                     <a-input-number
-                      v-model="selfConfig.geo.label.normal.fontSize"
+                      v-model="selfConfig.series[0].label.normal.fontSize"
                       size="small"
                       :min="12"
                       :max="40"
@@ -1445,25 +1445,25 @@
                   </gui-inline>
                   <gui-inline label="颜色">
                     <el-color-picker
-                      v-model="selfConfig.geo.label.normal.color"
+                      v-model="selfConfig.series[0].label.normal.color"
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-inline>
                 </gui-field>
                 <gui-field label="文本悬停">
                   <a-switch
-                    v-model="selfConfig.geo.label.emphasis.show"
+                    v-model="selfConfig.series[0].label.emphasis.show"
                     size="small"
                     @change="switchChange"
                   ></a-switch>
                 </gui-field>
                 <gui-field
                   label="文本悬停样式"
-                  v-if="selfConfig.geo.label.emphasis.show"
+                  v-if="selfConfig.series[0].label.emphasis.show"
                 >
                   <gui-inline label="字号">
                     <a-input-number
-                      v-model="selfConfig.geo.label.emphasis.fontSize"
+                      v-model="selfConfig.series[0].label.emphasis.fontSize"
                       size="small"
                       :min="12"
                       :max="40"
@@ -1472,7 +1472,7 @@
                   </gui-inline>
                   <gui-inline label="颜色">
                     <el-color-picker
-                      v-model="selfConfig.geo.label.emphasis.color"
+                      v-model="selfConfig.series[0].label.emphasis.color"
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-inline>
@@ -1480,27 +1480,53 @@
                 <gui-field label="多边形">
                   <gui-inline label="区域" style="width:auto;">
                     <el-color-picker
-                      v-model="selfConfig.geo.itemStyle.normal.areaColor"
+                      ref="areaColor"
+                      v-model="selfConfig.series[0].itemStyle.normal.areaColor"
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-inline>
                   <gui-inline label="边框" style="width:auto;">
                     <el-color-picker
-                      v-model="selfConfig.geo.itemStyle.normal.borderColor"
+                      v-model="selfConfig.series[0].itemStyle.normal.borderColor"
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-inline>
                 </gui-field>
+                <gui-field label="区域透明">
+                  <a-switch
+                    v-model="mapOpacity"
+                    size="small"
+                    @change="switchChange"
+                  ></a-switch>
+                  <!-- <a-input-number
+                    v-model="selfConfig.geo.itemStyle.normal.opacity"
+                    size="small"
+                    :max="1"
+                    :min="0"
+                    :step="0.1"
+                    @change="setSelfProperty"
+                  ></a-input-number> -->
+                </gui-field>
+                <gui-field label="边框宽度">
+                  <a-input-number
+                    v-model="selfConfig.series[0].itemStyle.normal.borderWidth"
+                    size="small"
+                    :max="10"
+                    :min="0"
+                    :step="1"
+                    @change="setSelfProperty"
+                  ></a-input-number>
+                </gui-field>
                 <gui-field label="多边形悬停">
                   <gui-inline label="区域" style="width:auto;">
                     <el-color-picker
-                      v-model="selfConfig.geo.itemStyle.emphasis.areaColor"
+                      v-model="selfConfig.series[0].itemStyle.emphasis.areaColor"
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-inline>
                   <gui-inline label="边框" style="width:auto;">
                     <el-color-picker
-                      v-model="selfConfig.geo.itemStyle.emphasis.borderColor"
+                      v-model="selfConfig.series[0].itemStyle.emphasis.borderColor"
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-inline>
@@ -1510,7 +1536,7 @@
                 <a-switch
                   slot="extra"
                   v-if="collapseActive.indexOf('mapIndicator') > -1"
-                  v-model="selfConfig.series.label.show"
+                  v-model="selfConfig.series[1].label.show"
                   default-checked
                   size="small"
                   @change="switchChange"
@@ -1518,7 +1544,7 @@
                 <gui-field label="指标文本">
                   <gui-inline label="字号">
                     <a-input-number
-                      v-model="selfConfig.series.label.fontSize"
+                      v-model="selfConfig.series[1].label.fontSize"
                       size="small"
                       :min="12"
                       :max="40"
@@ -1527,24 +1553,21 @@
                   </gui-inline>
                   <gui-inline label="颜色">
                     <el-color-picker
-                      v-model="selfConfig.series.label.color"
+                      v-model="selfConfig.series[1].label.color"
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-inline>
                 </gui-field>
                 <gui-field label="类型">
-                  <el-select
-                    v-model="selfConfig.series.type"
-                    size="mini"
+                  <a-select
+                    style="width: 120px"
+                    v-model="selfConfig.series[1].type"
+                    size="small"
                     @change="setSelfProperty"
-                    :value="selfConfig.series.type"
                   >
-                    <el-option label="散点/气泡" value="scatter"></el-option>
-                    <el-option
-                      label="动画气泡"
-                      value="effectScatter"
-                    ></el-option>
-                  </el-select>
+                    <a-select-option value="scatter">散点/气泡</a-select-option>
+                    <a-select-option value="effectScatter">动画气泡</a-select-option>
+                  </a-select>
                 </gui-field>
                 <gui-field
                   label="涟漪动画"
@@ -1552,28 +1575,28 @@
                 >
                   <gui-inline label="最大缩放比">
                     <a-input-number
-                      v-model="selfConfig.series.rippleEffect.scale"
+                      v-model="selfConfig.series[1].rippleEffect.scale"
                       size="small"
                       :step="0.5"
                       @change="setSelfProperty"
                     ></a-input-number>
                   </gui-inline>
                   <gui-inline label="波纹方式">
-                    <el-select
-                      v-model="selfConfig.series.rippleEffect.brushType"
-                      size="mini"
+                    <a-select
+                      style="width:70px"
+                      v-model="selfConfig.series[1].rippleEffect.brushType"
+                      size="small"
                       @change="setSelfProperty"
-                      :value="selfConfig.series.rippleEffect.brushType"
                     >
-                      <el-option label="stroke" value="stroke"></el-option>
-                      <el-option label="fill" value="fill"></el-option>
-                    </el-select>
+                      <a-select-option value="stroke">stroke</a-select-option>
+                      <a-select-option value="fill">fill</a-select-option>
+                    </a-select>
                   </gui-inline>
                 </gui-field>
                 <gui-field label="气泡悬停">
                   <gui-inline label="边框宽度">
                     <a-input-number
-                      v-model="selfConfig.series.itemStyle.emphasis.borderWidth"
+                      v-model="selfConfig.series[1].itemStyle.emphasis.borderWidth"
                       size="small"
                       :min="0"
                       :max="2"
@@ -1582,7 +1605,7 @@
                   </gui-inline>
                   <gui-inline label="边框颜色" style="width:auto;">
                     <el-color-picker
-                      v-model="selfConfig.series.itemStyle.emphasis.borderColor"
+                      v-model="selfConfig.series[1].itemStyle.emphasis.borderColor"
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-inline>
@@ -1891,7 +1914,7 @@
           </a-collapse>
         </div>
         <div v-else-if="tabsType === 1">
-          <data-source></data-source>
+          <data-source @setChartTimer="setChartTimer"></data-source>
           <!-- <gui-group group-name="数据映射">
               <gui-field label="x">
                 <a-input v-model="apis.labelMap.x" size="small" @change="setApiLabelMap"></a-input>
@@ -1941,6 +1964,7 @@ import GuiColors from './gui-colors'
 import DataSource from '../data-source/data-source'
 import { DEFAULT_COLORS } from '../../../utils/defaultColors'
 import { deepClone } from '../../../utils/deepClone'
+import throttle from 'lodash/throttle'
 
 export default {
   name: 'BoardOptions',
@@ -1982,20 +2006,28 @@ export default {
       refreshList: [
         { name: '分', value: 'min' },
         { name: '小时', value: 'hour' }
-      ]
+      ],
+      timer: null,
+      chartTimers: {},
+      mapOpacity: false // 地图区域思否透明
     }
   },
   mounted() {
     if (!this.screenId) {
       this.resetSetting()
     }
-    if (this.$route.path === '/screen/edit') {
-      this.setTimer()
-    }
+    // if (this.$route.path === '/screen/edit') {
+    //   this.setTimer()
+    // }
   },
   destroyed() {
     clearInterval(this.timer)
     this.timer = null
+    let keys = Object.keys(this.chartTimers)
+    keys.forEach(id => {
+      clearInterval(this.chartTimers[id])
+    })
+    this.chartTimers = {}
   },
   methods: {
     ...mapActions(['saveScreenData', 'updateChartData', 'refreshScreen']),
@@ -2046,19 +2078,15 @@ export default {
       this.saveScreenData()
     },
     // 全局刷新打开关闭
-    refreshChange(checked) {
+    refreshChange(checked, event) {
       // 阻止默认事件，取消收起
       event.stopPropagation()
       this.globalSettings.refresh.isRefresh = checked
-      if (checked) {
-        this.frequencyChange(1)
-        this.unitChange(1)
-      }
       this.$store.dispatch('SetPageSettings', this.globalSettings)
       this.saveScreenData()
       this.setTimer()
     },
-    frequencyChange(val) {
+    frequencyChange() {
       if (this.globalSettings.refresh.isRefresh) {
         if (
           this.globalSettings.refresh.unit === 'min' &&
@@ -2075,13 +2103,11 @@ export default {
           this.resetSetting()
         }
       }
-      if (val !== 1) {
-        this.$store.dispatch('SetPageSettings', this.globalSettings)
-        this.saveScreenData()
-        this.setTimer()
-      }
+      this.$store.dispatch('SetPageSettings', this.globalSettings)
+      this.saveScreenData()
+      this.setTimer()
     },
-    unitChange(val) {
+    unitChange() {
       if (this.globalSettings.refresh.isRefresh) {
         if (
           this.globalSettings.refresh.frequency > 1440 &&
@@ -2098,11 +2124,9 @@ export default {
           this.resetSetting()
         }
       }
-      if (val !== 1) {
-        this.$store.dispatch('SetSelfDataSource', this.globalSettings)
-        this.saveScreenData()
-        this.setTimer()
-      }
+      this.$store.dispatch('SetSelfDataSource', this.globalSettings)
+      this.saveScreenData()
+      this.setTimer()
     },
     // 数据源改变事件
     dataSourceChange() {
@@ -2198,6 +2222,14 @@ export default {
     switchChange(checked, event) {
       // 阻止默认事件，取消收起
       event.stopPropagation()
+      // 地图区域特殊处理区域透明
+      if (this.mapOpacity) {
+        this.selfConfig.geo.itemStyle.normal.areaColor = 'transparent'
+      } else {
+        if (this.$refs.areaColor) {
+          this.selfConfig.geo.itemStyle.normal.areaColor = this.$refs.areaColor.color.value
+        }
+      }
       this.setSelfProperty()
     },
 
@@ -2250,33 +2282,58 @@ export default {
       if (this.timer) {
         clearInterval(this.timer)
         this.timer = null
-      } else {
-        // 所有条件都满足才开始倒计时刷新
-        if (
-          this.globalSettings.refresh.isRefresh &&
-          this.globalSettings.refresh.unit &&
-          this.globalSettings.refresh.frequency > 0
-        ) {
-          let count = 0
-          if (this.globalSettings.refresh.unit === 'min') {
-            count = this.globalSettings.refresh.frequency * 60 * 1000
-          } else if (this.globalSettings.refresh.unit === 'hour') {
-            count = this.globalSettings.refresh.frequency * 60 * 60 * 1000
-          }
-          this.timer = setInterval(() => {
-            this.refreshData()
-          }, count)
+      }
+      // 所有条件都满足才开始倒计时刷新
+      if (
+        this.globalSettings.refresh.isRefresh &&
+        this.globalSettings.refresh.unit &&
+        this.globalSettings.refresh.frequency > 0
+      ) {
+        let count = 0
+        if (this.globalSettings.refresh.unit === 'min') {
+          count = this.globalSettings.refresh.frequency * 60 * 1000
+        } else if (this.globalSettings.refresh.unit === 'hour') {
+          count = this.globalSettings.refresh.frequency * 60 * 60 * 1000
         }
+        this.timer = setInterval(() => {
+          this.refreshData()
+        }, count)
+      }
+    },
+    setChartTimer(id) {
+      if (this.chartTimers[id]) {
+        clearInterval(this.chartTimers[id])
+        this.chartTimers[id] = null
+      }
+      let selected = this.canvasMap.find(item => item.id === id)
+      let refresh = selected.setting.api_data.refresh
+      // 所有条件都满足才开始倒计时刷新
+      if (refresh.isRefresh && refresh.unit && refresh.frequency > 0) {
+        let count = 0
+        if (refresh.unit === 'min') {
+          count = refresh.frequency * 60 * 1000
+        } else if (refresh.unit === 'hour') {
+          count = refresh.frequency * 60 * 60 * 1000
+        }
+        this.chartTimers[id] = setInterval(() => {
+          this.refreshData()
+        }, count)
       }
     },
     // 刷新大屏
-    refreshData() {
-      this.refreshScreen({
-        charSeted: false,
-        globalSettings: true,
-        needLoading: false
-      })
-    }
+    refreshData: throttle(
+      function() {
+        this.refreshScreen({
+          charSeted: false,
+          needLoading: false
+        })
+      },
+      1000,
+      {
+        leading: true,
+        trailing: false
+      }
+    )
   },
   watch: {
     currSelected: {
@@ -2317,6 +2374,18 @@ export default {
             }
           }
           this.globalSettings = deepClone(setting)
+          // 初始化定时刷新(调完getScreenDetail，保证isRefresh数据准确)
+          if (setting.refresh.isRefresh && !this.timer) {
+            this.setTimer()
+          }
+          for (let chart of this.canvasMap) {
+            if (
+              chart.setting.api_data.refresh.isRefresh &&
+              !this.chartTimers[chart.id]
+            ) {
+              this.setChartTimer(chart.id)
+            }
+          }
         }
       },
       deep: true,

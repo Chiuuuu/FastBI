@@ -39,12 +39,15 @@ export default {
         return $axios.post(`/datasource/read/teble`, params)
     },
     /**
-     * @description 读取数据库的表数据
-     * @param {string} id 表id
+     * @description 获取表数据
+     * @param {Object} params 请求参数
+     * @param {string} params.size 列数
+     * @param {string} params.page 第几列
+     * @param {string} params.id 表id
      * @returns
      */
-    getTableInfo(id) {
-        return $axios.get(`/datasource/table/read/${id}`)
+    getTableInfo(params) {
+        return $axios.post(`/datasource/table/read`, params)
     },
     /**
      * @description 保存数据信息
@@ -309,7 +312,8 @@ export default {
      * @param {String} params.gmtEnd 结束时间
      */
     putRegularInfo(params) {
-        return $axios.put('/datasource/schedule', params)
+        // return $axios.put('/datasource/schedule', params)
+        return $axios.post('/datasource/schedule/update', params)
     },
     /**
      * @description 修改自定义视图定时任务
@@ -324,21 +328,24 @@ export default {
      * @param {String} params.gmtEnd 结束时间
      */
     putCustomRegularInfo(params) {
-        return $axios.put('/datasource/schedule/view/update', params)
+        // return $axios.put('/datasource/schedule/view/update', params)
+        return $axios.post('/datasource/schedule/view/update', params)
     },
     /**
      * @description 删除定时任务
      * @param {String} id
      */
     deleRegularInfo(id) {
-        return $axios.delete('/datasource/schedule/delete/' + id)
+        // return $axios.delete('/datasource/schedule/delete/' + id)
+        return $axios.get('/datasource/schedule/delete/' + id)
     },
     /**
      * @description 删除批量定时任务
      * @param {String} groupId
      */
     deleBatchRegularInfo(groupId) {
-        return $axios.delete('/datasource/schedule/batch/' + groupId)
+        // return $axios.delete('/datasource/schedule/batch/' + groupId)
+        return $axios.get('/datasource/schedule/delete/batch/' + groupId)
     },
     /**
      * @description 获取抽取记录

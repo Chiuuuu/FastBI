@@ -16,14 +16,20 @@
         <a-col v-if="item.fileType === 0" :span="injectActionList.length * 2">
           <a-checkbox-group :value="item.permissions" style="width:100%">
             <a-row>
-              <a-col span="5" v-for="(subitem,subindex) in injectFolderHeader" :key="subitem.permission" :style="{
+              <a-col
+                span="5"
+                v-for="(subitem,subindex) in injectFolderHeader"
+                :key="subitem.permission"
+                :style="{
                 width: `${100 / injectActionList.length}%`
-              }">
+              }"
+              >
                 <a-checkbox
                   :class="`custom-checkbox-${subindex+1}`"
                   :value="subitem.permission"
                   @change="(e) => onChange(subitem, e, item)"
-                  :disabled="isDisabled"></a-checkbox>
+                  :disabled="isDisabled"
+                ></a-checkbox>
               </a-col>
             </a-row>
           </a-checkbox-group>
@@ -31,17 +37,31 @@
         <a-col v-if="item.fileType === 1" :span="injectActionList.length * 2">
           <a-checkbox-group :value="item.permissions" style="width:100%">
             <a-row>
-              <a-col span="5" v-for="(subitem,subindex) in injectActionList" :key="subitem.permission" :style="{
+              <a-col
+                span="5"
+                v-for="(subitem,subindex) in injectActionList"
+                :key="subitem.permission"
+                :style="{
                 width: `${100 / injectActionList.length}%`
-              }">
+              }"
+              >
                 <a-checkbox
                   :class="`custom-checkbox-${subindex+1}`"
                   :value="subitem.permission"
                   @change="(e) => onChange(subitem, e, item)"
-                  :disabled="isDisabled"></a-checkbox>
+                  :disabled="isDisabled"
+                ></a-checkbox>
               </a-col>
             </a-row>
           </a-checkbox-group>
+        </a-col>
+        <a-col v-if="injectRoleTab === 3 && item.fileType === 1" span="2">
+          <a-button
+            style="margin-left:10px"
+            size="small"
+            type="primary"
+            @click="$emit('setTable', item)"
+          >查看</a-button>
         </a-col>
       </a-row>
     </template>
@@ -51,7 +71,13 @@
 <script>
 export default {
   name: 'limitTree',
-  inject: ['status', 'getProvideActionList', 'getProvideTreeData', 'getCurrentRoleTab', 'getFolderHeader'],
+  inject: [
+    'status',
+    'getProvideActionList',
+    'getProvideTreeData',
+    'getCurrentRoleTab',
+    'getFolderHeader'
+  ],
   data() {
     return {
       replaceFields: {
@@ -84,24 +110,39 @@ export default {
         item.permissions.splice(0)
         // 如果去除了文件的查看权限, 则子节点所有权限全部删除
         if (item.fileType === 0 && item.children && item.children.length > 0) {
-          item.children.map(leaf => {
+          item.children.map((leaf) => {
             this.handleCheckbox('read', checked, leaf)
           })
+        } else if (item.fileType === 1 && item.dataBasePri) { // 将数据源的库权限清空
+          item.dataBasePri.splice(0)
         }
       }
 
       if (checked) {
-        if (item.permissions.length === 0 || (!item.permissions.includes(readKey) && !item.permissions.includes(permission))) {
+        if (
+          item.permissions.length === 0 ||
+          (!item.permissions.includes(readKey) &&
+            !item.permissions.includes(permission))
+        ) {
           item.permissions.push(readKey)
           if (permission !== readKey) item.permissions.push(permission)
-        } else if (item.permissions.includes(readKey) && !item.permissions.includes(permission)) {
+          // 勾选查看时将数据源的库组权限都勾上
+          if (item.fileType === 1 && item.dataBasePri) {
+            item.dataBasePri.splice(0)
+            item.dataBasePri.push(item.id)
+          }
+        } else if (
+          item.permissions.includes(readKey) &&
+          !item.permissions.includes(permission)
+        ) {
           item.permissions.push(permission)
         }
 
         // 如果子节点勾选了权限, 则父节点(文件夹)也要相应勾上查看权限
         if (item.fileType === 1 && +item.parentId) {
-          const parent = this.injectTreeData.find(p => p.id === item.parentId)
-          !parent.permissions.includes('folderRead') && this.handleCheckbox('folderRead', checked, parent)
+          const parent = this.injectTreeData.find((p) => p.id === item.parentId)
+          !parent.permissions.includes('folderRead') &&
+            this.handleCheckbox('folderRead', checked, parent)
         }
       } else {
         const index = item.permissions.indexOf(permission)
@@ -118,37 +159,11 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-@deep: ~">>>";
+@deep: ~'>>>';
 .limitTree {
+  padding-left: 16px;
   @{deep} li ul {
     padding: 0;
-  }
-  @{deep} .custom-checkbox{
-    &-1 {
-      .ant-checkbox {
-        margin-left: 12%;
-      }
-    }
-    &-2 {
-      .ant-checkbox {
-        margin-left: 42%;
-      }
-    }
-    &-3 {
-      .ant-checkbox {
-        margin-left: 62%;
-      }
-    }
-    &-4 {
-      .ant-checkbox {
-        margin-left: 65%;
-      }
-    }
-    &-5 {
-      .ant-checkbox {
-        margin-left: 90%;
-      }
-    }
   }
 }
 </style>

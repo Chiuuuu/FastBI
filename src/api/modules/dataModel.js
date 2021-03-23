@@ -87,7 +87,7 @@ export default {
    * @returns
    */
   saveModel(params) {
-    return $axios.put('/model/datamodel/updateDataModelDetailInfo', params)
+    return $axios.post('/model/datamodel/updateDataModelDetailInfo', params)
   },
   /**
    * @description 查看宽表
@@ -127,7 +127,7 @@ export default {
    * @returns
    */
   saveCustomSql(params) {
-    return $axios.post(`model/custom/excute`, params)
+    return $axios.post(`/model/custom/excute`, params)
   },
   /**
    * 删除自定义SQL
@@ -137,7 +137,7 @@ export default {
    * @returns
    */
   deleCustomSql(params) {
-    return $axios.put('model/custom/remove', params)
+    return $axios.post('/model/custom/remove', params)
   },
   /**
    * 获取自定义SQL信息
@@ -145,7 +145,7 @@ export default {
    * @returns
    */
   getCustomSqlDetail(id) {
-    return $axios.get(`model/custom/${id}`)
+    return $axios.get(`/model/custom/${id}`)
   },
   /**
    * 校验Sql
@@ -153,7 +153,7 @@ export default {
    * @returns
    */
   actionValidateCustomSql(params) {
-    return $axios.post(`model/custom/checkCustomizeSQL`, params)
+    return $axios.post(`/model/custom/checkCustomizeSQL`, params)
   },
   /**
    * 校验表上下合拼是否成功
@@ -223,5 +223,15 @@ export default {
    */
   addDataModelView(params) {
     return $axios.post(`/model/custom/createDataModelView`, params)
+  },
+  /**
+   * @description 导入BI库
+   * @param {Object} params 请求体
+   * @param {Object} params.config 配置
+   * @param {Object} params.pivotSchema 维度度量等参数
+   * @returns
+   */
+  addDataModelTable(params) {
+    return $axios.post(`/model/custom/createDataModelWideTable`, params)
   }
 }

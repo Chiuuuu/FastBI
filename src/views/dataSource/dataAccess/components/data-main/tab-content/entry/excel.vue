@@ -59,7 +59,7 @@
         </a-form-model-item>
       </a-form-model>
       <a-row class="preview-list">
-        <a-col :span="4" style="width: 150px">
+        <a-col :span="4" style="height:100%;width: 150px">
           <div class="preview-tab">
             <div class="tab-title">Sheet子表</div>
             <ul>
@@ -74,7 +74,7 @@
             </ul>
           </div>
         </a-col>
-        <a-col :span="19">
+        <a-col :span="19" style="height:100%">
           <!-- <div class="preview-controller">
             <span>从第</span>
             <div class="preview-line">

@@ -18,8 +18,18 @@
       >
         <a-dropdown :trigger="['click', 'contextmenu']" v-model="item.showMore">
           <a-icon class="icon-more" type="caret-down" />
-          <a-menu slot="overlay" @click="deleteFile(item, index)">
-            <a-menu-item key="3">移除</a-menu-item>
+          <a-menu slot="overlay">
+            <a-sub-menu key="1" title="聚合方式">
+              <a-menu-item
+                v-for="(item, index) in polymerizationData"
+                :key="index"
+                @click="changePolymerization(item.value)"
+                >{{ item.name }}</a-menu-item
+              >
+            </a-sub-menu>
+            <a-menu-item key="3" @click="deleteFile(item, index)"
+              >移除</a-menu-item
+            >
           </a-menu>
         </a-dropdown>
         <a-tooltip :title="item.alias">
@@ -56,6 +66,12 @@ export default {
         filter: '拖入字段',
         tableList: '拖入字段'
       },
+      polymerizationData: [
+        { name: '求和', value: 'SUM' },
+        { name: '平均', value: 'AVG' },
+        { name: '最大值', value: 'MAX' },
+        { name: '最小', value: 'MIN' }
+      ],
       isdrag: false, // 是否拖拽中
       fileList: [], // 维度字段数组
       isVaild: false //
@@ -256,6 +272,8 @@ export default {
     showMore(item) {
       item.showMore = true
     },
+    // 修改数据聚合方式
+    changePolymerization(type) {},
     // 删除当前维度或者度量
     deleteFile(item, index) {
       this.fileList.splice(index, 1)

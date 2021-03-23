@@ -160,7 +160,7 @@ const app = {
         params.setting = state.pageSettings
       }
       return screenManage
-        .saveScreenNew(params)
+        .saveScreen(params)
         .then(res => {
           if (res.code === 200) {
             // res.msg && message.success(res.msg)
@@ -256,7 +256,6 @@ const app = {
           if (needRefresh) {
             return dispatch('refreshScreen', {
               charSeted: false,
-              globalSettings: false,
               needLoading: false
             })
           }
@@ -265,17 +264,7 @@ const app = {
       })
     },
     // 刷新大屏
-    async refreshScreen(
-      { state, rootGetters },
-      { charSeted, globalSettings, needLoading }
-    ) {
-      // 全局配置，信息不完整不处理
-      if (
-        globalSettings &&
-        (!globalSettings.unit || globalSettings.frequency <= 0)
-      ) {
-        return false
-      }
+    async refreshScreen({ state, rootGetters }, { charSeted, needLoading }) {
       // 有loading的是手动刷新，refreshCache设为true
       let params = {
         tabId: state.currentPageId,
@@ -299,6 +288,10 @@ const app = {
               return true
             }
             for (let id of ids) {
+              // 图表设置刷新只刷新对应的图表
+              if (charSeted && charSeted !== id) {
+                continue
+              }
               let chart = rootGetters.canvasMap.find(
                 chart => chart.id + '' === id
               )
@@ -312,26 +305,9 @@ const app = {
                   continue
                 }
                 chart.setting.isEmpty = false
-
-                // 单个图表有设置定时器的时候，满足控制条件才处理
-                let apidata = chart.setting.api_data
-                if (
-                  charSeted &&
-                  (!apidata.refresh.isRefresh ||
-                    !apidata.refresh.unit ||
-                    apidata.refresh.frequency <= 0)
-                ) {
-                  return false
-                }
                 // 更新界面
                 handleRefreshData({ chart, newData })
               }
-              //   else {
-              //     // 其他页的也要更新
-              //     handleRefreshData({ chart: dataItem[id], newData })
-              //     delete dataItem[id].graphData
-              //     updateList.push(dataItem[id])
-              //   }
             }
             screenManage.saveAllChart(rootGetters.canvasMap)
             if (needLoading) {
