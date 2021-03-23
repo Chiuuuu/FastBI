@@ -161,35 +161,9 @@ export default {
 <style lang="less" scoped>
 @deep: ~'>>>';
 .limitTree {
+  padding-left: 16px;
   @{deep} li ul {
     padding: 0;
-  }
-  @{deep} .custom-checkbox {
-    &-1 {
-      .ant-checkbox {
-        margin-left: 12%;
-      }
-    }
-    &-2 {
-      .ant-checkbox {
-        margin-left: 42%;
-      }
-    }
-    &-3 {
-      .ant-checkbox {
-        margin-left: 62%;
-      }
-    }
-    &-4 {
-      .ant-checkbox {
-        margin-left: 65%;
-      }
-    }
-    &-5 {
-      .ant-checkbox {
-        margin-left: 90%;
-      }
-    }
   }
 }
 </style>

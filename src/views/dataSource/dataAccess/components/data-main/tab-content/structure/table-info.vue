@@ -10,39 +10,41 @@
     <a-button
       class="arrow arrow-left"
       :disabled="this.colPagination.page === 1"
-      type="default"
+      type="primary"
       icon="left"
       @click="handleChangePage('minus')"
     />
     <a-button
       class="arrow arrow-right"
       :disabled="this.colPagination.page * this.colPagination.size >= this.colPagination.total"
-      type="default"
+      type="primary"
       icon="right"
       @click="handleChangePage('add')"
     />
-    <a-spin style="padding: 0 20px" :spinning="spinning">
-      <table class="check-table">
-        <thead>
-          <tr>
-            <th>序号</th>
-            <th v-for="(item, index) in currentCol" :key="index" :title="item['COLUMN_NAME']">
-              {{ item['COLUMN_NAME'] }}
-              <span class="type">{{ item['TYPE_NAME'] | formatType }}</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(item, index) in tableData" :key="index">
-            <td>{{ index + 1 }}</td>
-            <td
-              v-for="(col, i) in currentCol"
-              :key="i"
-              :title="item[col['COLUMN_NAME']]"
-            >{{ item[col['COLUMN_NAME']] }}</td>
-          </tr>
-        </tbody>
-      </table>
+    <a-spin style="padding: 0 50px" :spinning="spinning">
+      <div class="table-area scrollbar">
+        <table class="check-table">
+          <thead>
+            <tr>
+              <th>序号</th>
+              <th v-for="(item, index) in currentCol" :key="index" :title="item['COLUMN_NAME']">
+                {{ item['COLUMN_NAME'] }}
+                <span class="type">{{ item['TYPE_NAME'] | formatType }}</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in tableData" :key="index">
+              <td>{{ index + 1 }}</td>
+              <td
+                v-for="(col, i) in currentCol"
+                :key="i"
+                :title="item[col['COLUMN_NAME']]"
+              >{{ item[col['COLUMN_NAME']] }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <a-empty class="table-empty" v-if="tableData.length === 0"></a-empty>
     </a-spin>
   </a-modal>
@@ -58,7 +60,7 @@ export default {
   data() {
     return {
       spinning: false,
-      bodyStyle: { height: 'calc(100vh - 240px)', 'overflow-y': 'auto' },
+      bodyStyle: { height: 'calc(100vh - 240px)', 'overflow-y': 'auto', padding: '0' },
       columns: [],
       currentCol: [],
       tableData: [],
@@ -180,6 +182,10 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.table-area {
+  overflow: auto;
+  height: calc(100vh - 240px);
+}
 .check-table {
   width: 100%;
   border: 1px solid #e8e8e8;
@@ -217,6 +223,8 @@ export default {
   position: absolute;
   z-index: 2001;
   top: 50%;
+  height: 100px;
+  width: 23px;
 }
 .arrow-left {
   left: 10px;

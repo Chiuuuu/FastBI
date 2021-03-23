@@ -4,7 +4,6 @@
     <a-tabs class="tabs scrollbar" @change="handleChangeTab">
       <a-tab-pane
         forceRender
-        style="padding-left: 16px"
         :key="1"
         tab="数据大屏"
       >
@@ -19,7 +18,6 @@
       </a-tab-pane>
       <a-tab-pane
         forceRender
-        style="padding-left: 16px"
         :key="2"
         tab="数据模型"
       >
@@ -34,7 +32,6 @@
       </a-tab-pane>
       <a-tab-pane
         forceRender
-        style="padding-left: 16px"
         :key="3"
         tab="数据接入"
       >

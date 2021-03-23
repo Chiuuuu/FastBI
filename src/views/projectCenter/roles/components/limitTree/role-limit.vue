@@ -1,6 +1,6 @@
 <template>
   <div class="tab scrollbar">
-    <a-row class="line">
+    <a-row class="line" style="padding-left: 16px">
       <a-col span="2">{{ roleTitle }}</a-col>
       <a-col>
         <a-checkbox-group
@@ -11,66 +11,38 @@
         ></a-checkbox-group>
       </a-col>
     </a-row>
-    <a-row>
+    <a-row class="title">
       <a-col span="14">
-        <a-checkbox
-          style="margin-right:12px"
-          :disabled="status === 'show'"
-          :indeterminate="indeterminate"
-          :checked="checkAll"
-          @change="handleCheckAll"
-        >
-          <span style="margin-left:5px">所有目录</span>
-        </a-checkbox>
+        <span>所有目录</span>
       </a-col>
-      <a-col :span="injectActionList.length * 2">
-        <a-checkbox-group :value="injectAllPermission" style="width:100%">
-          <a-row>
-            <a-col
-              span="5"
-              v-for="(subitem, subindex) in injectActionList"
-              :key="subitem.permission"
-              :style="{
-                width: `${100 / injectActionList.length}%`
-              }"
-            >
-              <a-checkbox
-                style="margin-left:12px;"
-                :class="`custom-checkbox-${subindex + 1}`"
-                :value="subitem.permission"
-                @change="e => handleCheckbox(subitem, e)"
-                :disabled="status === 'show'"
-              >{{ subitem.name }}</a-checkbox>
-            </a-col>
-          </a-row>
-        </a-checkbox-group>
-      </a-col>
-      <!-- <a-col span="2" align="left" v-for="item in injectActionList" :key="item.permission">{{item.name}}</a-col> -->
+      <a-col span="2" align="left" v-for="item in injectActionList" :key="item.permission">{{item.name}}</a-col>
       <a-col span="2" align="left" v-if="injectRoleTab === 3">
         <span>可见库组</span>
       </a-col>
     </a-row>
-    <!-- <a-row>
-      <a-col :span="14" style="margin-right:30px">
-        <span style="margin-right: 8px">全选</span>
-        <a-checkbox :disabled="status === 'show'" :checked="checkAll" @change="handleCheckAll"></a-checkbox>
-      </a-col>
-      <a-col :span="8">
-        <a-checkbox-group :value="injectAllPermission" style="width:100%">
-          <a-row>
-            <a-col span="5" v-for="(subitem,subindex) in injectActionList" :key="subitem.permission" :style="{
-              width: `${100 / injectActionList.length}%`
-            }">
-              <a-checkbox
-                :class="`custom-checkbox-${subindex+1}`"
-                :value="subitem.permission"
-                @change="(e) => handleCheckbox(subitem, e)"
-                :disabled="status === 'show'"></a-checkbox>
-            </a-col>
-          </a-row>
-        </a-checkbox-group>
-      </a-col>
-    </a-row>-->
+    <div class="checkbox-all">
+      <a-row>
+        <a-col :span="14">
+          <span style="margin-right: 8px">全选</span>
+          <a-checkbox :disabled="status === 'show'" :checked="checkAll" @change="handleCheckAll"></a-checkbox>
+        </a-col>
+        <a-col :span="8">
+          <a-checkbox-group :value="injectAllPermission" style="width:100%">
+            <a-row>
+              <a-col span="5" v-for="(subitem,subindex) in injectActionList" :key="subitem.permission" :style="{
+                width: `${100 / injectActionList.length}%`
+              }">
+                <a-checkbox
+                  :class="`custom-checkbox-${subindex+1}`"
+                  :value="subitem.permission"
+                  @change="(e) => handleCheckbox(subitem, e)"
+                  :disabled="status === 'show'"></a-checkbox>
+              </a-col>
+            </a-row>
+          </a-checkbox-group>
+        </a-col>
+      </a-row>
+    </div>
     <div class="content scrollbar">
       <limit-tree ref="tree" v-on="$listeners" @setTable="handleSetVisibleTable"></limit-tree>
     </div>
@@ -312,4 +284,9 @@ export default {
 </script>
 
 <style scoped>
+.checkbox-all {
+  margin-top: 10px;
+  margin-left:40px;
+  padding: 0 5px;
+}
 </style>

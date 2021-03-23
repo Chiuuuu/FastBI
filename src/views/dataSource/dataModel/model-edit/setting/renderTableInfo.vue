@@ -3,6 +3,7 @@
     class="widthModal"
     :visible="isShow"
     :title="item.name"
+    :bodyStyle="bodyStyle"
     width="1000px"
     :afterClose="handleAfterClose"
     @cancel="handleClose"
@@ -15,20 +16,20 @@
     <a-button
       class="arrow arrow-left"
       :disabled="this.colPagination.page === 1"
-      type="default"
+      type="primary"
       icon="left"
       @click="handleChangePage('minus')"
     />
     <a-button
       class="arrow arrow-right"
       :disabled="this.colPagination.page * this.colPagination.size >= this.colPagination.total"
-      type="default"
+      type="primary"
       icon="right"
       @click="handleChangePage('add')"
     />
     <a-spin style="padding: 0 50px;" :spinning="loading">
       <a-empty v-if="tableData.length === 0" class="main-empty"></a-empty>
-      <div class="table-area" v-else>
+      <div class="table-area scrollbar" v-else>
         <table class="table">
           <thead>
             <tr>
@@ -77,6 +78,7 @@ export default {
   },
   data() {
     return {
+      bodyStyle: { height: 'calc(100vh - 240px)', 'overflow-y': 'auto', padding: '0' },
       columns: [],
       currentCol: [],
       pageList: [],
@@ -200,7 +202,7 @@ export default {
 }
 .table-area {
   overflow: auto;
-  height: calc(60vh - 10px);
+  height: calc(100vh - 240px);
 }
 .table {
   table-layout: fixed;
@@ -266,6 +268,8 @@ export default {
   position: absolute;
   z-index: 2001;
   top: 50%;
+  height: 100px;
+  width: 23px;
 }
 .arrow-left {
   left: 10px;
