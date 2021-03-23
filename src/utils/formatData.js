@@ -39,6 +39,7 @@ export function convertData (data) {
   let res = []
   for (let i = 0; i < data.length; i++) {
     let geoCoord = geoCoordMap[data[i].name]
+    console.log(geoCoord)
     if (geoCoord) {
       res.push({
         name: data[i].name,
