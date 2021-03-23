@@ -14,7 +14,7 @@
       <span>{{ config.title.content }}</span>
     </div>
     <component
-      v-if="chartData.columns && chartData.columns.length > 0"
+      v-if="chartData.columns && chartData.columns.length > 0 && typeName !== 've-map'"
       v-bind:is="typeName"
       :events="chartEvents"
       :data="chartData"
@@ -27,6 +27,22 @@
       :extend="chartExtend"
       :options="chartOptions"
       :settings="chartSettings"
+    ></component>
+    <component
+      v-else
+      v-bind:is="typeName"
+      :events="chartEvents"
+      :data="chartData"
+      :width="width"
+      :height="height"
+      ref="chart"
+      :legend-visible="legendVisible"
+      :after-config="afterConfig"
+      :title="chartType === 'v-ring' ? config.chartTitle : {}"
+      :extend="chartExtend"
+      :options="chartOptions"
+      :settings="chartSettings"
+      :series="chartSeries"
     ></component>
     <!-- <div v-else class="dv-charts-null">
       <a-icon  type="pie-chart" style="font-size:50px;" />
@@ -41,6 +57,8 @@ import {
 } from 'bin-ui/src/utils/resize-event'
 import { formatData, convertData } from '../../utils/formatData'
 import { deepClone } from '@/utils/deepClone'
+import guangzhou from '@/utils/guangdong.json'
+import omit from 'lodash/omit'
 
 export default {
   name: 'ChartsFactory',
@@ -96,6 +114,7 @@ export default {
       chartExtend: {},
       chartOptions: {},
       chartSettings: {},
+      chartSeries: {},
       backgroundStyle: {},
       colors: []
     }
@@ -106,11 +125,17 @@ export default {
         if (val) {
           // 图例
           this.legendVisible = val.legend && val.legend.show
-          this.chartExtend = { ...val }
+          // this.chartExtend = { ...val }
 
+          if (this.typeName === 've-map') {
+            this.chartExtend = { ...omit(val, ['series']) }
+            this.chartSeries = val.series
+          } else {
+            this.chartExtend = { ...val }
+          }
           // this.colors = [...val.colors]
-          // this.$log.primary('========>chartExtend')
-          // this.$print(this.chartExtend)
+          this.$log.primary('========>chartExtend')
+          this.$print(this.chartExtend)
         }
       },
       deep: true,
@@ -173,8 +198,8 @@ export default {
       handler(val) {
         if (val) {
           this.chartSettings = { ...val }
-          // this.$log.primary('========>chartSettings')
-          // this.$print(this.chartSettings)
+          this.$log.primary('========>chartSettings')
+          this.$print(this.chartSettings)
         }
       },
       deep: true,
@@ -210,9 +235,13 @@ export default {
   methods: {
     afterConfig(options) {
       if (this.typeName === 've-map') {
-        let data = [...options.series[0].data]
-        options.series[0].data = convertData(data)
+        // console.log(options.series)
+        // let data = [...options.series[1].data]
+        options.series[0].data = this.apiData.data
+        // options.series[1].data = convertData(this.apiData.data)
+        // options.series[1].data = this.apiData.data
       }
+      console.log(options)
       return options
     },
     _calcStyle() {
