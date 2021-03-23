@@ -34,11 +34,10 @@
                 @click="handleGetDataBase(index)"
               >
                 <div class="text">{{ item.name }}</div>
-                <a-icon
-                  slot="actions"
-                  type="delete"
-                  @click.stop="handleRemove(item)"
-                ></a-icon>
+                <div>
+                  <a-icon type="retweet" style="margin-right:10px" @click.stop="handleReplaceFile(item, index)" />
+                  <a-icon type="delete" @click.stop="handleRemove(item)"></a-icon>
+                </div>
               </div>
             </template>
             <a-empty style="margin-top:35px" v-else>
@@ -53,14 +52,14 @@
             :before-upload="beforeFileUpload"
             @change="handleFileChange"
           >
-            <a-button type="primary" :loading="loading">
+            <a-button ref="uploader" type="primary" :loading="loading">
               添加文件
             </a-button>
           </a-upload>
         </a-form-model-item>
       </a-form-model>
       <a-row class="preview-list">
-        <a-col :span="4" style="width: 150px">
+        <a-col :span="4" style="height:100%;width: 150px">
           <div class="preview-tab">
             <div class="tab-title">Sheet子表</div>
             <ul>
@@ -75,7 +74,7 @@
             </ul>
           </div>
         </a-col>
-        <a-col :span="19">
+        <a-col :span="19" style="height:100%">
           <!-- <div class="preview-controller">
             <span>从第</span>
             <div class="preview-line">
@@ -171,7 +170,12 @@ export default {
       currentColumns: [], // 当前显示的表头
       fieldList: [], // 列表数据
       noTitleFieldList: [], // 自动生成表头时的列表(暂无该需求)
-      currentFieldList: [] // 当前显示的列表
+      currentFieldList: [], // 当前显示的列表
+      replaceFile: {
+        isReplace: false, // 是否在进行文件替换操作
+        index: -1, // 被替换的文件索引
+        info: null // 被替换的文件详情
+      }
     }
   },
   computed: {
@@ -186,7 +190,8 @@ export default {
       databaseName: state => state.dataAccess.databaseName
     }),
     currentFileList() {
-      return this.fileInfoList.length > 0 ? this.fileInfoList : this.fileList
+      // return this.fileInfoList.length > 0 ? this.fileInfoList : this.fileList
+      return this.fileInfoList
     },
     currentDataBase() {
       return this.databaseList[this.currentFileIndex] || {}
@@ -269,6 +274,9 @@ export default {
             this.handleGetDataBase(index)
           })
         })
+        .catch(() => {
+          this.spinning = false
+        })
     },
     // 获取当前文件对应的数据库信息
     async handleGetDataBase(index) {
@@ -282,9 +290,12 @@ export default {
         this.currentFileIndex = index
         let database = this.databaseList[index]
         if (!database) { // 不存在当前数据库, 调接口查询并写入
-          this.spinning = true
           if (!this.fileInfoList[index]) return
+          this.spinning = true
           const res = await this.$server.dataAccess.getFileSheetList(this.fileInfoList[index].id)
+            .catch(() => {
+              this.spinning = false
+            })
           if (res.code === 200) {
             database = new MapSheet(res.rows)
             this.$set(this.databaseList, index, database)
@@ -296,8 +307,27 @@ export default {
         this.renderCurrentTable(0)
       }
     },
+    // 清空替换文件
+    clearReplaceFile() {
+      this.replaceFile = {
+        isReplace: false,
+        index: -1,
+        info: null
+      }
+    },
+    // 替换文件
+    handleReplaceFile(file, index) {
+      if (this.loading) return
+      this.replaceFile = {
+        isReplace: true,
+        index: index,
+        info: file
+      }
+      this.$refs.uploader.$el.click()
+    },
     // 删除文件
     handleRemove(file) {
+      if (this.loading) return
       this.$confirm({
         title: '确认提示',
         content: '您确定要删除该文件吗',
@@ -305,6 +335,10 @@ export default {
           let index = this.currentFileList.indexOf(file)
           this.databaseList.splice(index, 1)
           this.fileInfoList.splice(index, 1)
+          // 如果删除当前被替换的文件, 清空替换文件对象
+          if (this.replaceFile.index > -1 && file.id === this.replaceFile.info.id) {
+            this.clearReplaceFile()
+          }
           // 遍历新增的文件列表, 如果有就删除对象
           let isNewFile = false
           for (let i = 0; i < this.fileList.length; i++) {
@@ -362,23 +396,44 @@ export default {
     },
     // 校验文件
     fileValidate(file) {
-      if (this.currentFileList.length > 0) {
-        return this.$message.error('只支持上传一个文件')
+      let isValid = true
+
+      // 校验替换时的文件名
+      let name = file.name
+      name = name.slice(0, name.lastIndexOf('.'))
+      if (this.replaceFile.isReplace && this.replaceFile.info.name !== name) {
+        this.$message.error('替换的文件名称不一致')
+        isValid = false
+      }
+
+      if (isValid && this.currentFileList.length > 0 && !this.replaceFile.isReplace) {
+        this.$message.error('只支持上传一个文件')
+        isValid = false
       }
       // 校验大小
-      if (file.size > 1 * 1024 * 1024) return this.$message.error('文件大于1M, 无法上传')
-
-      let name = file.name
-      // 校验重名
-      if (this.fileInfoList.some(file => file.name === name.slice(0, name.lastIndexOf('.')))) {
-        return this.$message.error('文件命名重复, 请重新添加')
+      if (isValid && file.size > 1 * 1024 * 1024) {
+        isValid = false
+        this.$message.error('文件大于1M, 无法上传')
       }
 
+      // 校验重名
+      if (isValid && !this.replaceFile.isReplace && this.fileInfoList.some(file => file.name === name)) {
+        isValid = false
+        this.$message.error('文件命名重复, 请重新添加')
+      }
+      if (!isValid) {
+        this.clearReplaceFile()
+        return
+      }
       // 校验excel文件类型
-      const fileType = name.slice(name.lastIndexOf('.') + 1, name.length)
+      const fileType = file.name.slice(file.name.lastIndexOf('.') + 1, file.name.length)
       if (/xls|xlsx/.test(fileType)) {
         file.id = file.uid || 'vc-upload-' + (+new Date())
-        this.actionUploadFile(file)
+        if (this.replaceFile.isReplace) {
+          this.actionReplaceFile(file)
+        } else {
+          this.actionUploadFile(file)
+        }
       } else {
         this.$message.error(name + '不是excel文件')
       }
@@ -441,13 +496,18 @@ export default {
       formData.append('file', file)
       this.spinning = true
       const result = await this.$server.dataAccess.actionUploadExcelFile(formData)
+        .catch(() => {
+          this.spinning = false
+        })
       if (result.code === 200) {
         if (result.rows && result.rows.length === 0) {
           this.spinning = false
           return this.$message.error('解析失败')
         }
         this.$message.success('解析成功')
-        this.fileList.push(file)
+        // 临时方案
+        this.fileList[0] = file
+        // this.fileList.push(file)
 
         // 处理掉文件后缀
         const fileInfo = {
@@ -470,6 +530,74 @@ export default {
       } else {
         this.$message.error(result.msg)
       }
+    },
+    // 替换文件
+    async actionReplaceFile(file) {
+      const formData = new FormData()
+      let result = null
+      // 替换未入库文件
+      const flag = isNaN(this.replaceFile.info.id)
+      if (flag) {
+        formData.append('file', file)
+        this.spinning = true
+        result = await this.$server.dataAccess.actionUploadExcelFile(formData)
+          .catch(() => {
+            this.clearReplaceFile()
+          })
+          .finally(() => {
+            this.spinning = false
+          })
+      } else {
+        formData.append('fileList[0]', file)
+        formData.append('replaceDatabaseId', this.replaceFile.info.id)
+        this.spinning = true
+        result = await this.$server.dataAccess.actionReplaceExcelFile(formData)
+          .catch(() => {
+            this.clearReplaceFile()
+          })
+          .finally(() => {
+            this.spinning = false
+          })
+      }
+      if (result.code === 200) {
+        if (result.rows && result.rows.length === 0) {
+          this.spinning = false
+          return this.$message.error('解析失败')
+        }
+        this.$message.success('解析成功')
+
+        const currentIndex = this.replaceFile.index
+        // 如果是新增的文件, 直接替换
+        let isNewFile = false
+        for (let i = 0; i < this.fileList.length; i++) {
+          const item = this.fileList[i]
+          if (item.id === this.replaceFile.info.id) {
+            isNewFile = true
+            this.fileList.splice(i, 1, file)
+            const name = file.name
+            this.fileInfoList[currentIndex] = {
+              id: file.id,
+              name: name.slice(0, name.lastIndexOf('.'))
+            }
+            break
+          }
+        }
+        // if (!isNewFile) {
+        //   this.fileList.push(file)
+        // }
+        // 临时方案
+        this.fileList[0] = file
+
+        const database = new MapSheet(result.rows[0].mapSheet)
+        this.$set(this.databaseList, currentIndex, database)
+        this.$nextTick(() => {
+          this.handleGetDataBase(currentIndex)
+        })
+      } else {
+        this.$message.error(result.msg)
+      }
+      // 当前版本暂不清空, 保留替换历史
+      // this.clearReplaceFile()
     },
     // 渲染当前表格
     async renderCurrentTable(index) {
@@ -558,20 +686,21 @@ export default {
           this.fileList.map((file, index) => {
             formData.append('fileList[' + index + ']', file)
           })
-          this.deleteIdList.map((id, index) => {
-            if (!isNaN(id)) {
-              formData.append('databasesIdList[' + index + ']', id)
-            }
-          })
           formData.append('databaseName', this.databaseName)
           formData.append('sourceSaveInput.name', this.form.name)
           formData.append('sourceSaveInput.type', 11)
           formData.append('sourceSaveInput.parentId', this.parentId || 0)
           formData.append('sourceSaveInput.id', this.modelId || 0)
-          if (this.deleteIdList.length > 0 || this.fileList.length > 0) {
-            formData.append('excelType', 1)
-          } else {
-            formData.append('excelType', 0)
+          if (this.deleteIdList.length > 0) {
+            formData.append('operation', 0)
+            this.deleteIdList.map((id, index) => {
+              if (!isNaN(id)) {
+                formData.append('databasesIdList[' + index + ']', id)
+              }
+            })
+          } else if (this.replaceFile.index > -1 && !isNaN(this.replaceFile.info.id)) {
+            formData.append('operation', 1)
+            formData.append('replaceDatabaseIdList[0]', this.replaceFile.info.id)
           }
 
           this.$server.dataAccess.saveExcelInfo(formData)

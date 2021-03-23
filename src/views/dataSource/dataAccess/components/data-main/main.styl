@@ -95,31 +95,33 @@
             }
         }
         .preview-list {
+            height: 426px;
             border-top: 1px solid #e5e5e5;
             margin-bottom: 20px;
             .preview-tab {
-                background-color #f6f6f6;
-                padding-top: 5px;
-                margin-right: 20px;
+                height 100%
+                width 150px
+                background-color: #f6f6f6;
+                border: 1px solid #e8e8e8;
+                margin-top: 20px;
                 .tab-title {
+                    display block
                     color: #000000D9;
-                    padding-left: 5px;
-                    margin-bottom: 10px;
+                    height: 38px;
+                    padding: 8px;
                     // margin-top: 20px;
                 }
             }
             .preview-tab-item {
-                width 130px
+                display block
                 overflow hidden
                 text-overflow: ellipsis
                 white-space nowrap
-                padding-top 5px
-                padding-left 5px
-                padding-bottom 5px
+                height: 38px;
+                padding: 8px;
                 cursor pointer
                 &:hover, &.active {
                     background-color #617bff
-                    color #fff
                 }  
             }
             .preview-controller {

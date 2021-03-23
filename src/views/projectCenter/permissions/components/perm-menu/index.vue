@@ -303,7 +303,7 @@ export default {
         title: '确认提示',
         content: '确定删除该数据接入?',
         onOk: async () => {
-          // const result = await this.$server.common.deleMenuById(`/datasource/catalog/${file.id}`)
+          // const result = await this.$server.common.deleMenuById(`/datasource/catalog/delete/${file.id}`)
           // if (result.code === 200) {
           //   this.handleGetMenuList()
           //   this.$message.success('删除成功')
@@ -328,7 +328,7 @@ export default {
         title: '确认提示',
         content: '确定删除该文件夹?',
         onOk: async () => {
-          // const result = await this.$server.common.deleMenuById(`/datasource/catalog/${file.id}`)
+          // const result = await this.$server.common.deleMenuById(`/datasource/catalog/delete/${file.id}`)
           // if (result.code === 200) {
           //   this.handleGetMenuList()
           //   this.$message.success('删除成功')
@@ -381,7 +381,7 @@ export default {
      */
     async handleFileDrop(folder) {
       if (!this.dragFile || this.dragFile.parentId === folder.id) return
-      // const result = await this.$server.common.putMenuFolderName('/datasource/catalog/updata', {
+      // const result = await this.$server.common.putMenuFolderName('/datasource/catalog/update', {
       //   fileType: this.dragFile.fileType,
       //   id: this.dragFile.id,
       //   name: this.dragFile.name,
@@ -404,7 +404,7 @@ export default {
     async handleWrapDrop(e) {
       const className = e.toElement.className
       if (className.indexOf('menu-wrap') > -1 && this.dragFile.parentId !== 0) {
-        // const result = await this.$server.common.putMenuFolderName('/datasource/catalog/updata', {
+        // const result = await this.$server.common.putMenuFolderName('/datasource/catalog/update', {
         //   fileType: this.dragFile.fileType,
         //   id: this.dragFile.id,
         //   name: this.dragFile.name,
@@ -430,7 +430,7 @@ export default {
      * 选择移动文件夹弹窗确认
      */
     async handleFileMoveCreate(parentId) {
-      // const result = await this.$server.common.putMenuFolderName('/datasource/catalog/updata', {
+      // const result = await this.$server.common.putMenuFolderName('/datasource/catalog/update', {
       //   fileType: this.selectFile.fileType,
       //   id: this.selectFile.id,
       //   name: this.selectFile.name,
@@ -492,7 +492,7 @@ export default {
      * 修改文件夹及菜单名称
      */
     async handleResetName(values) {
-      // const result = await this.$server.common.putMenuFolderName('/datasource/catalog/updata', {
+      // const result = await this.$server.common.putMenuFolderName('/datasource/catalog/update', {
       //   fileType: this.resetName.item.fileType,
       //   id: this.resetName.item.id,
       //   name: values.name,

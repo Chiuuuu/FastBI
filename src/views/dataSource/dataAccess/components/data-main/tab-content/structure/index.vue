@@ -100,6 +100,7 @@
           :columns="logColumns"
           :data-source="logData"
           :loading="modalSpin"
+          :footer="null"
           :scroll="{ y: 300 }"
         >
           <template #status="text">

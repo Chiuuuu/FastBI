@@ -36,7 +36,8 @@ export default {
      * @returns
      */
     updateUser(params) {
-        return $axios.put('/business/user', params)
+        // return $axios.put('/business/user', params)
+        return $axios.post('/business/user', params)
     },
     /**
      * @description 启用/禁用用户
@@ -50,7 +51,8 @@ export default {
      * @returns
      */
     deleUser(id) {
-        return $axios.delete('/business/user/' + id)
+        // return $axios.delete('/business/user/' + id)
+        return $axios.get('/business/user/delete/' + id)
     },
     /**
      * @description 根据用户名/姓名查询用户列表
@@ -86,7 +88,8 @@ export default {
      * @returns
      */
     updateDept(params) {
-      return $axios.put('/business/department', params)
+      // return $axios.put('/business/department', params)
+      return $axios.post('/business/department/edit', params)
     },
     /**
      * @description 删除部门
@@ -94,7 +97,8 @@ export default {
      * @returns
      */
     deleDept(id) {
-      return $axios.delete('/business/department/' + id)
+      // return $axios.delete('/business/department/' + id)
+      return $axios.get('/business/department/remove/' + id)
     },
 
     /** ----------------------------岗位------------------------------------- */
@@ -124,7 +128,8 @@ export default {
      * @returns
      */
     updatePost(params) {
-      return $axios.put('/business/post', params)
+      // return $axios.put('/business/post', params)
+      return $axios.post('/business/post/edit', params)
     },
     /**
      * @description 删除部门
@@ -132,7 +137,8 @@ export default {
      * @returns
      */
     delePost(id) {
-      return $axios.delete('/business/post/' + id)
+      // return $axios.delete('/business/post/' + id)
+      return $axios.get('/business/post/remove/' + id)
     },
     /** --------------------------------角色属性-------------------------------------- */
     /**
@@ -161,7 +167,8 @@ export default {
      * @returns
      */
     updateUserProp(params) {
-      return $axios.put('/business/userAttr', params)
+      // return $axios.put('/business/userAttr', params)
+      return $axios.post('/business/userAttr/update', params)
     },
     /** ----------------------------项目管理------------------------------------- */
     /**
@@ -194,7 +201,8 @@ export default {
      * @returns
      */
     putProject(params) {
-      return $axios.put(`/business/project`, params)
+      // return $axios.put(`/business/project`, params)
+      return $axios.post(`/business/project/edit`, params)
     },
     /**
      * @description 删除项目
@@ -202,7 +210,8 @@ export default {
      * @returns
      */
     deleProject(projectId) {
-      return $axios.delete(`/business/project/${projectId}`)
+      // return $axios.delete(`/business/project/${projectId}`)
+      return $axios.get(`/business/project/remove/${projectId}`)
     },
     /**
      * @description 获取管理员下拉列表
@@ -220,7 +229,7 @@ export default {
       return $axios.get(`/business/project/getProjectUserName/${projectId}`)
     },
     /**
-     * @description 
+     * @description
      * @param {String | Number} projectId 项目id
      * @returns
      */

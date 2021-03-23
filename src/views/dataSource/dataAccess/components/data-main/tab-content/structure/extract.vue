@@ -18,6 +18,7 @@
       :data-source="regData"
       :loading="modalSpin"
       :pagination='false'
+      :footer="null"
     >
       <span slot="repeat" slot-scope="type">
         {{ type === 0 ? '只执行一次' : '重复执行' }}
