@@ -44,11 +44,13 @@
       </a-select> -->
     </div>
     <div class="geo-contain">
-      <div class="geo-map"></div>
+      <div class="geo-map">
+        <div ref="mapChart" style="height: 100%"></div>
+      </div>
       <div class="geo-set">
         <div class="set-head">
           <span class="g-s-s">地区匹配</span>
-          <span class="g-s-r">(6个未匹配项)</span>
+          <span class="g-s-r">({{ unmatchedLen }}个未匹配项)</span>
         </div>
         <!-- <div class="set-select">
           <div>
@@ -64,10 +66,41 @@
         </div> -->
         <div class="set-table">
           <a-table :columns="colu" :data-source="datas">
-            <span slot="config">
-              <a>请选择配置项</a>
-            </span>
+            <template slot="config" slot-scope="text, record">
+              <a @click="openMatchWindow(record.key)">{{
+                record.current || '请选择配置项'
+              }}</a>
+            </template>
           </a-table>
+          <a-modal
+            v-model="visible"
+            :width="250"
+            :dialog-style="{ top: '200px' }"
+            :closable="false"
+          >
+            <template slot="footer">
+              <a-button key="cancel" type="primary" @click="visible = false">
+                取消
+              </a-button>
+            </template>
+            <a-input
+              v-model="keyword"
+              placeholder="请输入关键字搜索"
+              :maxLength="30"
+              @pressEnter="search"
+            >
+              <a-icon slot="prefix" type="search" />
+            </a-input>
+            <div class="area-list">
+              <p
+                v-for="(item, index) in searchList"
+                :key="index"
+                @click="selectArea(item)"
+              >
+                {{ item }}
+              </p>
+            </div>
+          </a-modal>
         </div>
       </div>
     </div>
@@ -83,6 +116,7 @@ const colu = [
   {
     title: '匹配到',
     dataIndex: 'config',
+
     scopedSlots: {
       customRender: 'config'
     }
@@ -91,27 +125,48 @@ const colu = [
 
 const datas = [
   {
-    data: '天河'
+    key: '1',
+    data: '天河',
+    current: ''
   },
   {
-    data: '海珠'
+    key: '2',
+    data: '海珠',
+    current: ''
+  },
+  {
+    key: '3',
+    data: '增',
+    current: ''
   }
 ]
 const countryData = ['中国']
 const proData = {
-  中国: ['广东省', '浙江省']
+  中国: ['广东省']
 }
 const cityData = {
-  广东省: ['广州市', '肇庆市', '深圳市'],
-  浙江省: ['宁波市', '温州市', '杭州市']
+  广东省: ['广州市']
+  //   浙江省: ['宁波市', '温州市', '杭州市']
 }
 const areaData = {
-  广州市: ['海珠区', '越秀区', '荔湾区'],
-  深圳市: ['罗湖区', '福田区', '南山区'],
-  肇庆市: ['怀集县', '四会市', '封开县'],
-  宁波市: ['镇海区', '宁海区', '象山区'],
-  温州市: ['文成区', '苍南区', '平阳区'],
-  杭州市: ['上城区', '下城区', '富阳区']
+  广州市: [
+    '海珠区',
+    '越秀区',
+    '荔湾区',
+    '增城区',
+    '天河区',
+    '白云区',
+    '黄埔区',
+    '番禺区',
+    '花都区',
+    '南沙区',
+    '从化区'
+  ]
+  //   深圳市: ['罗湖区', '福田区', '南山区'],
+  //   肇庆市: ['怀集县', '四会市', '封开县'],
+  //   宁波市: ['镇海区', '宁海区', '象山区'],
+  //   温州市: ['文成区', '苍南区', '平阳区'],
+  //   杭州市: ['上城区', '下城区', '富阳区']
 }
 
 export default {
@@ -133,11 +188,26 @@ export default {
       cities: cityData[proData[countryData[0]][0]],
       city: cityData[proData[countryData[0]][0]][0],
       areas: areaData[cityData[proData[countryData[0]][0]][0]],
-      area: areaData[cityData[proData[countryData[0]][0]][0]][0]
+      area: areaData[cityData[proData[countryData[0]][0]][0]][0],
+      searchList: areaData[cityData[proData[countryData[0]][0]][0]], // 匹配列表
+      visible: false,
+      keyword: '',
+      currentKey: ''
       // key: value
     }
   },
+  computed: {
+    unmatchedLen() {
+      let umatcheds = this.datas.filter(item => !item.current)
+      return umatcheds.length
+    }
+  },
   methods: {
+    openMatchWindow(key) {
+      this.keyword = ''
+      this.visible = true
+      this.currentKey = key
+    },
     handlecountryChange(value) {
       this.provinces = proData[value]
       this.province = proData[value][0]
@@ -155,6 +225,20 @@ export default {
     handleSave() {
       this.handleClose()
     },
+    search() {
+      if (this.keyword) {
+        this.searchList = this.areaData.filter(
+          item => item.indexOf(this.keyword) > -1
+        )
+      } else {
+        this.searchList = this.areaData
+      }
+    },
+    selectArea(value) {
+      let area = this.datas.find(item => item.key === this.currentKey)
+      area.current = value
+      this.visible = false
+    },
     handleClose() {
       this.$emit('close')
     }
@@ -162,9 +246,16 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .cacsader {
   height: 30px;
   line-height: 30px;
+}
+.area-list {
+  margin-top: 20px;
+  & > p {
+    margin: 0;
+    cursor: pointer;
+  }
 }
 </style>

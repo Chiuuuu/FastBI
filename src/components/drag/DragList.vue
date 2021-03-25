@@ -147,11 +147,11 @@ export default {
         setting: { ...component }
       }
       // todo: 地图选择类型弹窗
-      //   if (component.chartType === 'v-map') {
-      //     this.com = nodeInfo
-      //     this.visible = true
-      //     return
-      //   }
+      if (component.chartType === 'v-map') {
+        this.com = nodeInfo
+        this.visible = true
+        return
+      }
       this.addChartData(nodeInfo)
     },
     handleOk() {

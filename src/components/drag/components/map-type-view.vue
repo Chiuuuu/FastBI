@@ -34,13 +34,19 @@ export default {
   data() {
     return {
       mapTypeList: [
-        { key: 1, name: '中国地图' },
-        { key: 2, name: '省级地图' },
+        // { key: 1, name: '中国地图' },
+        // { key: 2, name: '省级地图' },
         { key: 3, name: '市级地图' }
       ],
-      provinceList: [{ key: 1, name: '广东省' }, { key: 2, name: '湖南省' }],
-      cityList: [{ key: 1, name: '广州市' }, { key: 2, name: '深圳市' }],
-      mapType: 1,
+      provinceList: [
+        { key: 1, name: '广东省' }
+        //   { key: 2, name: '湖南省' }
+      ],
+      cityList: [
+        { key: 1, name: '广州市' }
+        //   { key: 2, name: '深圳市' }
+      ],
+      mapType: 3,
       region: 1
     }
   },
