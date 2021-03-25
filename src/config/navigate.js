@@ -861,6 +861,10 @@ const list = [
               fontFamily: 'not specified'
             }
           },
+          tooltip: {
+            trigger: 'item',
+            formatter: '{b} : {c}'
+          },
           grid: { left: 0, top: 10, right: 0, bottom: 10 },
           legend: {
             show: false,
@@ -873,7 +877,8 @@ const list = [
             left: 'center',
             top: 'auto',
             right: 'auto',
-            bottom: 'auto'
+            bottom: 'auto',
+            data: ['区域', '人口']
           },
           visualMap: {
             show: false,
@@ -965,7 +970,7 @@ const list = [
             {
               type: 'map',
               map: 'guangzhou',
-              name: '地图',
+              name: '区域',
               aspectScale: 0.75,
               zoom: 1.1,
               roam: true,
@@ -996,6 +1001,7 @@ const list = [
             },
             {
               type: 'scatter', // scatter,effectScatter
+              name: '人口',
               coordinateSystem: 'geo',
               symbolSize: 10,
               aspectScale: 0.75,

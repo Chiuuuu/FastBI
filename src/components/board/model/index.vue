@@ -125,10 +125,10 @@
                               title="创建地理字段"
                               @click="openGeoSetting(item2)"
                             >
-                              <a-menu-item>国家</a-menu-item>
-                              <a-menu-item>省市</a-menu-item>
+                              <!-- <a-menu-item>国家</a-menu-item>
+                              <a-menu-item>省市</a-menu-item> -->
                               <a-menu-item>城市</a-menu-item>
-                              <a-menu-item>区县</a-menu-item>
+                              <!-- <a-menu-item>区县</a-menu-item> -->
                             </a-sub-menu>
                           </a-menu>
                         </a-dropdown>
@@ -203,10 +203,10 @@
                               title="创建地理字段"
                               @click="openGeoSetting(item2)"
                             >
-                              <a-menu-item>国家</a-menu-item>
-                              <a-menu-item>省市</a-menu-item>
+                              <!-- <a-menu-item>国家</a-menu-item>
+                              <a-menu-item>省市</a-menu-item> -->
                               <a-menu-item>城市</a-menu-item>
-                              <a-menu-item>区县</a-menu-item>
+                              <!-- <a-menu-item>区县</a-menu-item> -->
                             </a-sub-menu>
                           </a-menu>
                         </a-dropdown>
@@ -731,6 +731,7 @@ export default {
 .geo-map{
     width: 188px;
     height 279px;
+    padding:10px;
     background:rgba(248,248,248,1);
     margin-top: 19px;
     }

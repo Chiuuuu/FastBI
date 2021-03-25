@@ -8,7 +8,7 @@
     :style="titleStyle"
     :disabled="true"
     :autoSize="{ minRows: 2, maxRows: 50 }"
-    @change="textChange"
+    @blur="textChange"
   />
   <!-- <div class="dv-text" style="width: 100%;height:100%;" ref="wrap">
     <div class="titles" ref="titles" v-if="config.title" :style="titleStyle">
@@ -53,9 +53,19 @@ export default {
       this.updateChartData()
     }
   },
+  watch: {
+    config: {
+      handler(val, oldval) {
+        if (val) {
+          this.key++
+        }
+      },
+      deep: true,
+      immediate: true
+    }
+  },
   computed: {
     titleStyle() {
-      this.key++
       return {
         padding: '0 10px',
         color: this.config.title.textStyle.color,
@@ -72,15 +82,15 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.dv-text{
-    resize:none;
-}
+// .dv-text{
+//     resize:none;
+// }
 
-.dv-text:hover{
+// .dv-text:hover{
 
-  border-right:none !important;
+//   border-right:none !important;
 
-}
+// }
 
 // .dv-text:focus{
 
