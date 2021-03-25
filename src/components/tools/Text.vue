@@ -1,12 +1,13 @@
 <template>
   <a-textarea
     class="dv-text"
+    :key="key"
     placeholder="点击以输入文本内容，输入*按键可插入度量"
     v-model="selfConfig.title.content"
     ref="text"
     :style="titleStyle"
     :disabled="true"
-    :autoSize="{ minRows: 2, maxRows: 6 }"
+    :autoSize="{ minRows: 2, maxRows: 50 }"
     @change="textChange"
   />
   <!-- <div class="dv-text" style="width: 100%;height:100%;" ref="wrap">
@@ -36,7 +37,8 @@ export default {
   },
   data() {
     return {
-      selfConfig: {}
+      selfConfig: {},
+      key: 0
     }
   },
   created() {
@@ -53,11 +55,13 @@ export default {
   },
   computed: {
     titleStyle() {
+      this.key++
       return {
         padding: '0 10px',
         color: this.config.title.textStyle.color,
         fontSize: this.config.title.textStyle.fontSize + 'px',
         textAlign: this.config.title.textAlign,
+        fontFamily: this.config.title.textStyle.fontFamily,
         background: 'none',
         border: 'none',
         ...this.background
@@ -68,6 +72,9 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+.dv-text{
+    resize:none;
+}
 
 .dv-text:hover{
 
