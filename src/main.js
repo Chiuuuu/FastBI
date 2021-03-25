@@ -2,7 +2,16 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-import { Button, ColorPicker, Select, Option, Input } from 'element-ui'
+import {
+  Button,
+  ColorPicker,
+  Select,
+  Option,
+  Input,
+  CheckboxGroup,
+  CheckboxButton,
+  Checkbox
+} from 'element-ui'
 import BinUI from 'bin-ui'
 import VCharts from 'v-charts'
 import 'bin-ui/lib/styles/index.css'
@@ -17,12 +26,17 @@ import permission from '@/directive/permission'
 import hasPermission from '@/directive/hasPermission'
 import PERMISSION_CODE from '@/config/permission'
 
+import './font/font.css'
+
 // element-ui 局部引用
 Vue.use(Button)
 Vue.use(ColorPicker)
 Vue.use(Select)
 Vue.use(Option)
 Vue.use(Input)
+Vue.use(CheckboxGroup)
+Vue.use(CheckboxButton)
+Vue.use(Checkbox)
 
 Vue.use(BinUI)
 Vue.use(VCharts)
@@ -32,7 +46,8 @@ Vue.use(hasPermission)
 
 Vue.prototype.$server = server
 Vue.prototype.$EventBus = new Vue()
-Vue.prototype.$base = process.env.NODE_ENV === 'production' ? '/bin-data-site' : ''
+Vue.prototype.$base =
+  process.env.NODE_ENV === 'production' ? '/bin-data-site' : ''
 Vue.prototype.$PERMISSION_CODE = PERMISSION_CODE
 // if (sessionStorage.getItem('store')) {
 //   store.replaceState(
@@ -46,7 +61,7 @@ Vue.prototype.$PERMISSION_CODE = PERMISSION_CODE
 // })
 
 new Vue({
-    router,
-    store,
-    render: h => h(App)
+  router,
+  store,
+  render: h => h(App)
 }).$mount('#app')

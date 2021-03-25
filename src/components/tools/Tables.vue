@@ -290,6 +290,9 @@ export default {
     },
     // 汉字转换成两个字符长度
     getActaulLen(value) {
+      if (!value) {
+        return 0
+      }
       let str = value
       if (typeof str === 'number') {
         str = str.toString()

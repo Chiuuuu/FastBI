@@ -74,7 +74,8 @@
             <div class="operation" flex="dir:top">
               <div class="header">
                 <span class="d_h_s">维度</span>
-                <a-icon class="dicon" type="plus" @click="openModal('维度')" />
+                <a-icon class="dicon" type="plus" />
+                <!-- @click="openModal('维度')" -->
               </div>
               <!-- <b-scrollbar style="height: 100%;"> -->
               <div class="mea_main">
@@ -141,7 +142,8 @@
             <div class="operation scrollbar" flex="dir:top">
               <div class="header">
                 <span class="d_h_s">度量</span>
-                <a-icon class="dicon" type="plus" @click="openModal('度量')" />
+                <a-icon class="dicon" type="plus" />
+                <!-- @click="openModal('度量')" -->
               </div>
               <!-- <b-scrollbar style="height: 100%;"> -->
               <div class="mea_main">
@@ -185,6 +187,17 @@
                             <a-menu-item key="3" @click="changeItem(item2, 1)"
                               >转为维度</a-menu-item
                             >
+                            <!-- <a-sub-menu key="1" title="聚合方式">
+                              <a-menu-item
+                                v-for="(aggregator,
+                                index) in polymerizationData"
+                                :key="index"
+                                @click.native="
+                                  changePolymerization(aggregator.value, item2)
+                                "
+                                >{{ aggregator.name }}</a-menu-item
+                              >
+                            </a-sub-menu> -->
                             <a-sub-menu
                               key="4"
                               title="创建地理字段"
@@ -309,7 +322,14 @@ export default {
       computeType: '',
       detailInfo: {}, // 聚合运算数据
       cacheDimensions: [],
-      cacheMeasures: [] // 缓存自定义度量
+      cacheMeasures: [], // 缓存自定义度量
+      polymerizationData: [
+        { name: '求和', value: 'SUM' },
+        { name: '平均', value: 'AVG' },
+        { name: '最大值', value: 'MAX' },
+        { name: '最小值', value: 'MIN' },
+        { name: '统计', value: 'CNT' }
+      ]
     }
   },
   computed: {
@@ -528,6 +548,14 @@ export default {
           this.getPivoSchemaList(this.modelId, 2)
         }
       })
+    },
+    // 修改数据聚合方式
+    changePolymerization(type, item) {
+      item.showMore = false
+      if (item.defaultAggregator !== type) {
+        item.defaultAggregator = type
+      }
+      //   this.getData()
     },
     // 维度、度量列表
     getPivoSchemaList(id, type = 1) {

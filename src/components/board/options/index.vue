@@ -231,7 +231,7 @@
                       v-model="selfConfig.title.textStyle.fontSize"
                       size="small"
                       :min="12"
-                      :max="40"
+                      :max="100"
                       @change="setSelfProperty"
                     ></a-input-number>
                   </gui-inline>
@@ -241,6 +241,21 @@
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-inline>
+                </gui-field>
+                <gui-field label="字体" v-if="isText">
+                  <a-select
+                    v-model="selfConfig.title.textStyle.fontFamily"
+                    style="width: 164px"
+                    size="small"
+                    @change="setSelfProperty"
+                  >
+                    <a-select-option
+                      :value="font.value"
+                      v-for="(font, index) in fontFamilyList"
+                      :key="index"
+                      >{{ font.label }}</a-select-option
+                    >
+                  </a-select>
                 </gui-field>
                 <gui-field label="对齐方式">
                   <a-radio-group
@@ -522,6 +537,31 @@
                   @change="switchChange"
                   size="small"
                 />
+                <!-- <gui-field label="显示内容"> -->
+                显示内容
+                <a-select
+                  mode="tags"
+                  placeholder="选择显示内容"
+                  :default-value="['{b}', '{@2012}', '({d}%)']"
+                  style="width: 100%"
+                  @change="onChange"
+                >
+                  <a-select-option
+                    v-for="i in formatList"
+                    :key="i.label"
+                    :value="i.value"
+                  >
+                    {{ i.label }}
+                  </a-select-option>
+                </a-select>
+                <!-- <a-checkbox-group
+                    class="f-flexcolumn"
+                    v-model="formatShow"
+                    :options="plainOptions"
+                    @change="onChange"
+                  /> -->
+                <!-- </gui-field> -->
+
                 <gui-field label="文本">
                   <gui-inline label="字号">
                     <a-input-number
@@ -1416,7 +1456,7 @@
               <a-collapse-panel key="geo" header="地理坐标系">
                 <gui-field label="视角缩放">
                   <a-input-number
-                    v-model="selfConfig.geo.zoom"
+                    v-model="selfConfig.series[0].zoom"
                     size="small"
                     :min="0"
                     :step="0.1"
@@ -1487,7 +1527,9 @@
                   </gui-inline>
                   <gui-inline label="边框" style="width:auto;">
                     <el-color-picker
-                      v-model="selfConfig.series[0].itemStyle.normal.borderColor"
+                      v-model="
+                        selfConfig.series[0].itemStyle.normal.borderColor
+                      "
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-inline>
@@ -1520,13 +1562,17 @@
                 <gui-field label="多边形悬停">
                   <gui-inline label="区域" style="width:auto;">
                     <el-color-picker
-                      v-model="selfConfig.series[0].itemStyle.emphasis.areaColor"
+                      v-model="
+                        selfConfig.series[0].itemStyle.emphasis.areaColor
+                      "
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-inline>
                   <gui-inline label="边框" style="width:auto;">
                     <el-color-picker
-                      v-model="selfConfig.series[0].itemStyle.emphasis.borderColor"
+                      v-model="
+                        selfConfig.series[0].itemStyle.emphasis.borderColor
+                      "
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-inline>
@@ -1566,7 +1612,9 @@
                     @change="setSelfProperty"
                   >
                     <a-select-option value="scatter">散点/气泡</a-select-option>
-                    <a-select-option value="effectScatter">动画气泡</a-select-option>
+                    <a-select-option value="effectScatter"
+                      >动画气泡</a-select-option
+                    >
                   </a-select>
                 </gui-field>
                 <gui-field
@@ -1596,7 +1644,9 @@
                 <gui-field label="气泡悬停">
                   <gui-inline label="边框宽度">
                     <a-input-number
-                      v-model="selfConfig.series[1].itemStyle.emphasis.borderWidth"
+                      v-model="
+                        selfConfig.series[1].itemStyle.emphasis.borderWidth
+                      "
                       size="small"
                       :min="0"
                       :max="2"
@@ -1605,7 +1655,9 @@
                   </gui-inline>
                   <gui-inline label="边框颜色" style="width:auto;">
                     <el-color-picker
-                      v-model="selfConfig.series[1].itemStyle.emphasis.borderColor"
+                      v-model="
+                        selfConfig.series[1].itemStyle.emphasis.borderColor
+                      "
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-inline>
@@ -1976,6 +2028,13 @@ export default {
   },
   data() {
     return {
+      formatList: [
+        { label: '维度', value: '{b}' },
+        { label: '度量', value: '{@2012}' },
+        { label: '占比', value: '({d}%)' }
+      ],
+      plainOptions: ['a', 'b', 'c'],
+      formatShow: [],
       tabsType: 0, // 0：配置，1：数据，2：交互
       globalSettings: {
         width: 0,
@@ -2009,7 +2068,19 @@ export default {
       ],
       timer: null,
       chartTimers: {},
-      mapOpacity: false // 地图区域思否透明
+      mapOpacity: false, // 地图区域思否透明
+      fontFamilyList: [
+        { label: '默认', value: 'not specified' },
+        { label: 'simfang', value: 'simfang' },
+        { label: '仿宋_GB2312', value: '仿宋_GB2312' },
+        { label: 'times', value: 'times' },
+        { label: '微软雅黑', value: 'msyh' },
+        { label: 'simkai', value: 'simkai' },
+        { label: '庞门正道标题体', value: '庞门正道标题体' },
+        { label: 'HuXiaoBoNanShenTi-2', value: 'HuXiaoBoNanShenTi-2' },
+        { label: '优设标题黑', value: '优设标题黑' },
+        { label: 'digital-7-4', value: 'digital-7-4' }
+      ]
     }
   },
   mounted() {
@@ -2049,6 +2120,10 @@ export default {
       // 发送请求来保存数据
       setBaseProperty(this.currentSelected)
       this.updateChartData()
+    },
+    onChange(checkedValues) {
+      this.selfConfig.series.label.formatter = checkedValues.join('')
+      this.setSelfProperty()
     },
     // 设置自有属性
     setSelfProperty() {
@@ -2224,10 +2299,12 @@ export default {
       event.stopPropagation()
       // 地图区域特殊处理区域透明
       if (this.mapOpacity) {
-        this.selfConfig.geo.itemStyle.normal.areaColor = 'transparent'
+        this.selfConfig.geo.itemStyle.normal.areaColor = this.selfConfig.series[0].itemStyle.normal.areaColor
+        this.selfConfig.series[0].itemStyle.normal.areaColor = 'transparent'
       } else {
         if (this.$refs.areaColor) {
-          this.selfConfig.geo.itemStyle.normal.areaColor = this.$refs.areaColor.color.value
+          this.selfConfig.series[0].itemStyle.normal.areaColor = this.selfConfig.geo.itemStyle.normal.areaColor
+          //   this.selfConfig.geo.itemStyle.normal.areaColor = this.$refs.areaColor.color.value
         }
       }
       this.setSelfProperty()

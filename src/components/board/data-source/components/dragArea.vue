@@ -19,15 +19,19 @@
         <a-dropdown :trigger="['click', 'contextmenu']" v-model="item.showMore">
           <a-icon class="icon-more" type="caret-down" />
           <a-menu slot="overlay">
-            <a-sub-menu key="1" title="聚合方式">
+            <a-sub-menu
+              key="1"
+              title="聚合方式"
+              v-show="item.file === 'measures'"
+            >
               <a-menu-item
-                v-for="(item, index) in polymerizationData"
+                v-for="(aggregator, index) in polymerizationData"
                 :key="index"
-                @click="changePolymerization(item.value)"
-                >{{ item.name }}</a-menu-item
+                @click.native="changePolymerization(aggregator.value, item)"
+                >{{ aggregator.name }}</a-menu-item
               >
             </a-sub-menu>
-            <a-menu-item key="3" @click="deleteFile(item, index)"
+            <a-menu-item key="3" @click.native="deleteFile(item, index)"
               >移除</a-menu-item
             >
           </a-menu>
@@ -70,7 +74,8 @@ export default {
         { name: '求和', value: 'SUM' },
         { name: '平均', value: 'AVG' },
         { name: '最大值', value: 'MAX' },
-        { name: '最小', value: 'MIN' }
+        { name: '最小值', value: 'MIN' },
+        { name: '统计', value: 'CNT' }
       ],
       isdrag: false, // 是否拖拽中
       fileList: [], // 维度字段数组
@@ -273,7 +278,13 @@ export default {
       item.showMore = true
     },
     // 修改数据聚合方式
-    changePolymerization(type) {},
+    changePolymerization(type, item) {
+      item.showMore = false
+      if (item.defaultAggregator !== type) {
+        item.defaultAggregator = type
+      }
+      this.getData()
+    },
     // 删除当前维度或者度量
     deleteFile(item, index) {
       this.fileList.splice(index, 1)
@@ -330,7 +341,18 @@ export default {
       // 表格
       if (this.type === 'tableList') {
         // 不区分默认都放在维度
-        selected.setting.api_data.dimensions = this.fileList
+        let di = []
+        let me = []
+        this.fileList.forEach(item => {
+          if (item.file === 'dimensions') {
+            di.push(item)
+          }
+          if (item.file === 'measures') {
+            me.push(item)
+          }
+        })
+        selected.setting.api_data.dimensions = di
+        selected.setting.api_data.measures = me
         selected.setting.api_data.tableList = this.fileList
       }
 
