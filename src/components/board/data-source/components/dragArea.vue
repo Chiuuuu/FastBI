@@ -27,7 +27,7 @@
               <a-menu-item
                 v-for="(aggregator, index) in polymerizationData"
                 :key="index"
-                @click.native="changePolymerization(aggregator.value, item)"
+                @click.native="changePolymerization(aggregator, item)"
                 >{{ aggregator.name }}</a-menu-item
               >
             </a-sub-menu>
@@ -79,7 +79,13 @@ export default {
       ],
       isdrag: false, // 是否拖拽中
       fileList: [], // 维度字段数组
-      isVaild: false //
+      isVaild: false, //
+      polymerizeType: [
+        { name: '求和', value: 'SUM' },
+        { name: '平均', value: 'AVG' },
+        { name: '最大值', value: 'MAX' },
+        { name: '最小值', value: 'MIN' }
+      ] // 聚合方式
     }
   },
   inject: ['errorFile'],
@@ -199,6 +205,7 @@ export default {
     handleDropOnFilesWD(event) {
       // h5 api
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
+      console.log(dataFile)
       if (
         this.currSelected.datamodelId &&
         this.currSelected.datamodelId !== '0' &&
@@ -250,6 +257,9 @@ export default {
         //   this.fileList[0] = dataFile
         //   // 如果是仪表盘，需要两个度量
         // } else
+        if (this.currSelected.setting.chartType === 'v-text') {
+          dataFile.alias = dataFile.alias + '(求和)'
+        }
         if (this.fileList.length < 2) {
           this.fileList.push(dataFile)
         }
@@ -278,11 +288,10 @@ export default {
       item.showMore = true
     },
     // 修改数据聚合方式
-    changePolymerization(type, item) {
+    changePolymerization(i, item) {
       item.showMore = false
-      if (item.defaultAggregator !== type) {
-        item.defaultAggregator = type
-      }
+      item.alias = item.alias.replace(/\(.*?\)/, '(' + i.name + ')')
+      item.defaultAggregator = i.value
       this.getData()
     },
     // 删除当前维度或者度量
@@ -425,6 +434,16 @@ export default {
           return
         }
         if (res.code === 200) {
+          if (this.currSelected.setting.chartType === 'v-text') {
+            let config = deepClone(this.currSelected.setting.config)
+            let str = ''
+            for (let item of this.fileList) {
+              str += res.rows[0][item.alias] + ' '
+            }
+            console.log(str)
+            config.title.content = str
+            this.$store.dispatch('SetSelfProperty', config)
+          }
           if (this.type === 'tableList') {
             let columns = []
             for (let item of this.fileList) {

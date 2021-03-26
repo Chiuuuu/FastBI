@@ -35,6 +35,18 @@ export default {
       default: 0
     }
   },
+  watch: {
+    config: {
+      handler(val) {
+        console.log(val)
+        if (val) {
+          this.selfConfig = val
+        }
+      },
+      deep: true,
+      immediate: true
+    }
+  },
   data() {
     return {
       selfConfig: {},
@@ -51,17 +63,6 @@ export default {
     textChange() {
       this.$store.dispatch('SetSelfProperty', this.selfConfig)
       this.updateChartData()
-    }
-  },
-  watch: {
-    config: {
-      handler(val, oldval) {
-        if (val) {
-          this.key++
-        }
-      },
-      deep: true,
-      immediate: true
     }
   },
   computed: {
