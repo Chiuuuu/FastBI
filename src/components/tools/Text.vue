@@ -35,6 +35,18 @@ export default {
       default: 0
     }
   },
+  watch: {
+    config: {
+      handler(val) {
+        console.log(val)
+        if (val) {
+          this.selfConfig = val
+        }
+      },
+      deep: true,
+      immediate: true
+    }
+  },
   data() {
     return {
       selfConfig: {},
