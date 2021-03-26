@@ -18,8 +18,13 @@
       >
         <a-dropdown :trigger="['click', 'contextmenu']" v-model="item.showMore">
           <a-icon class="icon-more" type="caret-down" />
-          <a-menu slot="overlay" @click="deleteFile(item, index)">
-            <a-menu-item key="3">移除</a-menu-item>
+          <a-menu slot="overlay">
+            <a-sub-menu key="2" title="聚合方式">
+              <a-menu-item v-for="i in polymerizeType" :key="i.value" @click="typeClick(i, item)">
+                {{i.name}}
+              </a-menu-item>
+            </a-sub-menu>
+            <a-menu-item key="3"  @click="deleteFile(item, index)">移除</a-menu-item>
           </a-menu>
         </a-dropdown>
         <a-tooltip :title="item.alias">
@@ -58,7 +63,13 @@ export default {
       },
       isdrag: false, // 是否拖拽中
       fileList: [], // 维度字段数组
-      isVaild: false //
+      isVaild: false, //
+      polymerizeType: [
+        { name: '求和', value: 'SUM' },
+        { name: '平均', value: 'AVG' },
+        { name: '最大值', value: 'MAX' },
+        { name: '最小值', value: 'MIN' }
+      ] // 聚合方式
     }
   },
   inject: ['errorFile'],
@@ -178,6 +189,7 @@ export default {
     handleDropOnFilesWD(event) {
       // h5 api
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
+      console.log(dataFile)
       if (
         this.currSelected.datamodelId &&
         this.currSelected.datamodelId !== '0' &&
@@ -229,6 +241,9 @@ export default {
         //   this.fileList[0] = dataFile
         //   // 如果是仪表盘，需要两个度量
         // } else
+        if (this.currSelected.setting.chartType === 'v-text') {
+          dataFile.alias = dataFile.alias + '(求和)'
+        }
         if (this.fileList.length < 2) {
           this.fileList.push(dataFile)
         }
@@ -255,6 +270,13 @@ export default {
     // 点击右键显示更多
     showMore(item) {
       item.showMore = true
+    },
+    // 选择聚合方式
+    typeClick(i, item) {
+      item.showMore = false
+      item.alias = item.alias.replace(/\(.*?\)/, '(' + i.name + ')')
+      item.defaultAggregator = i.value
+      this.getData()
     },
     // 删除当前维度或者度量
     deleteFile(item, index) {
@@ -385,6 +407,15 @@ export default {
           return
         }
         if (res.code === 200) {
+          if (this.currSelected.setting.chartType === 'v-text') {
+            let config = deepClone(this.currSelected.setting.config)
+            let str = ''
+            for (let item of this.fileList) {
+              str += res.rows[0][item.alias] + ' '
+            }
+            config.title.content = str
+            this.$store.dispatch('SetSelfProperty', config)
+          }
           if (this.type === 'tableList') {
             let columns = []
             for (let item of this.fileList) {

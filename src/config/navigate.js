@@ -1251,6 +1251,7 @@ const list = [
         title: '文本',
         name: 've-text',
         chartType: 'v-text',
+        type: '2',
         icon: 'icon_add.png',
         api_data: {},
         apis: {},
