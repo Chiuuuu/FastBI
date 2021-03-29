@@ -1044,7 +1044,7 @@ const list = [
                   let data = params.data
                   return `${data.name}：${data.value[2]}`
                 },
-                color: '',
+                color: DEFAULT_COLORS[0],
                 fontSize: 12,
                 position: 'right', // 可选inside
                 emphasis: {

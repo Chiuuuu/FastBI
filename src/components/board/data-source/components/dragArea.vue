@@ -237,8 +237,12 @@ export default {
         // if (this.currSelected.setting.name === 've-pie') {
         //   this.fileList[0] = dataFile
         // } else {
-        this.fileList.push(dataFile)
-        // }
+        // 地图类型暂时只能拉入一个度量
+        if (this.currSelected.setting.name === 've-map') {
+          this.fileList[0] = dataFile
+        } else {
+          this.fileList.push(dataFile)
+        }
         this.fileList = this.uniqueFun(this.fileList, 'alias')
         this.getData()
       }

@@ -1642,7 +1642,7 @@
                   </gui-inline>
                   <gui-inline label="颜色">
                     <el-color-picker
-                      v-model="selfConfig.geo.label.color"
+                      v-model="selfConfig.series[targetMeasure].label.color"
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-inline>
