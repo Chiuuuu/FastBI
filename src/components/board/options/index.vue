@@ -1367,7 +1367,7 @@
             </template>
             <!--地图独有-->
             <template v-if="isMap">
-              <a-collapse-panel key="map" header="视觉映射">
+              <!-- <a-collapse-panel key="map" header="视觉映射">
                 <a-switch
                   slot="extra"
                   v-if="collapseActive.indexOf('map') > -1"
@@ -1464,7 +1464,7 @@
                     </gui-colors>
                   </div>
                 </gui-field>
-              </a-collapse-panel>
+              </a-collapse-panel> -->
               <a-collapse-panel key="geo" header="地理坐标系">
                 <gui-field label="视角缩放">
                   <a-input-number
@@ -1586,21 +1586,35 @@
                 </gui-field>
               </a-collapse-panel>
               <a-collapse-panel key="mapIndicator" header="指标设置">
+                <gui-field label="对应度量">
+                  <a-select
+                    style="width: 120px"
+                    v-model="targetMeasure"
+                    size="small"
+                  >
+                    <a-select-option
+                      v-for="(series, index) in selfConfig.series"
+                      :key="index"
+                      :value="index"
+                      >第{{ index + 1 }}个度量</a-select-option
+                    >
+                  </a-select>
+                </gui-field>
                 <a-switch
                   slot="extra"
                   v-if="collapseActive.indexOf('mapIndicator') > -1"
-                  v-model="selfConfig.series[0].label.show"
+                  v-model="selfConfig.series[targetMeasure].label.show"
                   default-checked
                   size="small"
                   @change="switchChange"
                 />
                 <gui-field
                   label="文本样式"
-                  v-if="selfConfig.series[0].label.show"
+                  v-if="selfConfig.series[targetMeasure].label.show"
                 >
                   <gui-inline label="字号">
                     <a-input-number
-                      v-model="selfConfig.series[0].label.fontSize"
+                      v-model="selfConfig.series[targetMeasure].label.fontSize"
                       size="small"
                       :min="12"
                       :max="40"
@@ -1617,19 +1631,30 @@
                 <gui-field label="形状">
                   <a-select
                     style="width: 120px"
-                    v-model="selfConfig.series[0].symbol"
+                    v-model="selfConfig.series[targetMeasure].symbol"
                     size="small"
                     @change="setSelfProperty"
                   >
                     <a-select-option value="circle">圆形</a-select-option>
                     <a-select-option value="rent">方形</a-select-option>
                     <a-select-option value="pin">水滴</a-select-option>
+                    <a-select-option value="triangle">三角形</a-select-option>
+                    <a-select-option value="arrow">箭头</a-select-option>
                   </a-select>
+                </gui-field>
+                <gui-field label="大小">
+                  <a-input-number
+                    v-model="selfConfig.series[targetMeasure].symbolSize"
+                    size="small"
+                    :min="0"
+                    :max="40"
+                    @change="setSelfProperty"
+                  ></a-input-number>
                 </gui-field>
                 <gui-field label="类型">
                   <a-select
                     style="width: 120px"
-                    v-model="selfConfig.series[0].type"
+                    v-model="selfConfig.series[targetMeasure].type"
                     size="small"
                     @change="setSelfProperty"
                   >
@@ -1641,11 +1666,15 @@
                 </gui-field>
                 <gui-field
                   label="涟漪动画"
-                  v-if="selfConfig.series[0].type === 'effectScatter'"
+                  v-if="
+                    selfConfig.series[targetMeasure].type === 'effectScatter'
+                  "
                 >
                   <gui-inline label="最大缩放比">
                     <a-input-number
-                      v-model="selfConfig.series[0].rippleEffect.scale"
+                      v-model="
+                        selfConfig.series[targetMeasure].rippleEffect.scale
+                      "
                       size="small"
                       :step="0.5"
                       @change="setSelfProperty"
@@ -1654,7 +1683,9 @@
                   <gui-inline label="波纹方式">
                     <a-select
                       style="width:70px"
-                      v-model="selfConfig.series[0].rippleEffect.brushType"
+                      v-model="
+                        selfConfig.series[targetMeasure].rippleEffect.brushType
+                      "
                       size="small"
                       @change="setSelfProperty"
                     >
@@ -1667,7 +1698,8 @@
                   <gui-inline label="边框宽度">
                     <a-input-number
                       v-model="
-                        selfConfig.series[0].itemStyle.emphasis.borderWidth
+                        selfConfig.series[targetMeasure].itemStyle.emphasis
+                          .borderWidth
                       "
                       size="small"
                       :min="0"
@@ -1678,7 +1710,8 @@
                   <gui-inline label="边框颜色" style="width:auto;">
                     <el-color-picker
                       v-model="
-                        selfConfig.series[0].itemStyle.emphasis.borderColor
+                        selfConfig.series[targetMeasure].itemStyle.emphasis
+                          .borderColor
                       "
                       @change="setSelfProperty"
                     ></el-color-picker>
@@ -2048,6 +2081,14 @@ export default {
       required: true
     }
   },
+  provide() {
+    return {
+      // 地图删除维度的时候调用，重置样式指标设置选择的度量
+      initTargetMeasure: () => {
+        this.targetMeasure = 0
+      }
+    }
+  },
   data() {
     return {
       formatList: [
@@ -2102,7 +2143,8 @@ export default {
         { label: 'HuXiaoBoNanShenTi-2', value: 'HuXiaoBoNanShenTi-2' },
         { label: '优设标题黑', value: 'youshe' },
         { label: 'digital-7-4', value: 'digital-7-4' }
-      ]
+      ],
+      targetMeasure: 0 // 地图指标设置对应度量
     }
   },
   mounted() {
