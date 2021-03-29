@@ -14,7 +14,11 @@
       <span>{{ config.title.content }}</span>
     </div>
     <component
-      v-if="chartData.columns && chartData.columns.length > 0 && typeName !== 've-map'"
+      v-if="
+        chartData.columns &&
+          chartData.columns.length > 0 &&
+          typeName !== 've-map'
+      "
       v-bind:is="typeName"
       :events="chartEvents"
       :data="chartData"
@@ -43,6 +47,7 @@
       :options="chartOptions"
       :settings="chartSettings"
       :series="chartSeries"
+      :get="geo"
     ></component>
     <!-- <div v-else class="dv-charts-null">
       <a-icon  type="pie-chart" style="font-size:50px;" />
@@ -116,7 +121,8 @@ export default {
       chartSettings: {},
       chartSeries: {},
       backgroundStyle: {},
-      colors: []
+      colors: [],
+      geo: {}
     }
   },
   watch: {
@@ -130,6 +136,7 @@ export default {
           if (this.typeName === 've-map') {
             this.chartExtend = { ...omit(val, ['series']) }
             this.chartSeries = val.series
+            this.geo = val.geo
           } else {
             this.chartExtend = { ...val }
           }
@@ -237,7 +244,9 @@ export default {
       if (this.typeName === 've-map') {
         // console.log(options.series)
         // let data = [...options.series[1].data]
-        options.series[0].data = this.apiData.data
+        // this.apiData.data.forEach((item, index) => {
+        //   options.series[index].data = item
+        // })
         // options.series[1].data = convertData(this.apiData.data)
         // options.series[1].data = this.apiData.data
       }
@@ -264,6 +273,8 @@ export default {
         color: this.config.title.textStyle.color,
         fontSize: this.config.title.textStyle.fontSize + 'px',
         textAlign: this.config.title.textAlign,
+        fontFamily: this.config.title.textStyle.fontFamily,
+        fontWeight: this.config.title.textStyle.fontWeight,
         height: 'auto'
       }
     }

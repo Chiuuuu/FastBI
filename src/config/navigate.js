@@ -60,7 +60,8 @@ const list = [
             textStyle: {
               color: '#ffffff',
               fontSize: 20,
-              fontFamily: 'not specified'
+              fontFamily: 'not specified',
+              fontWeight: 'normal'
             }
           },
           grid: { left: 50, top: 60, right: 50, bottom: 50 },
@@ -212,7 +213,8 @@ const list = [
             textStyle: {
               color: '#ffffff',
               fontSize: 20,
-              fontFamily: 'not specified'
+              fontFamily: 'not specified',
+              fontWeight: 'normal'
             }
           },
           grid: { left: 50, top: 60, right: 50, bottom: 50 },
@@ -353,7 +355,8 @@ const list = [
             textStyle: {
               color: '#ffffff',
               fontSize: 20,
-              fontFamily: 'not specified'
+              fontFamily: 'not specified',
+              fontWeight: 'normal'
             }
           },
           grid: { left: 50, top: 60, right: 50, bottom: 50 },
@@ -486,7 +489,8 @@ const list = [
             textStyle: {
               color: '#ffffff',
               fontSize: 20,
-              fontFamily: 'not specified'
+              fontFamily: 'not specified',
+              fontWeight: 'normal'
             }
           },
           grid: { left: 20, top: 60, right: 20, bottom: 30 },
@@ -604,7 +608,8 @@ const list = [
             textStyle: {
               color: '#ffffff',
               fontSize: 20,
-              fontFamily: 'not specified'
+              fontFamily: 'not specified',
+              fontWeight: 'normal'
             }
           },
           grid: { left: 20, top: 60, right: 20, bottom: 30 },
@@ -715,7 +720,8 @@ const list = [
             textStyle: {
               color: '#ffffff',
               fontSize: 20,
-              fontFamily: 'not specified'
+              fontFamily: 'not specified',
+              fontWeight: 'normal'
             }
           },
           tooltip: {
@@ -804,18 +810,23 @@ const list = [
         icon: '图表-雷达图.png',
         modelId: '',
         api_data: {
-          // columns: ['位置', '人口'],
-          // rows: [
-          //   { '位置': '从化区', '人口': 50 },
-          //   { '位置': 'dd', '人口': 10 },
-          //   { '位置': '白云区', '人口': 90 },
-          //   { '位置': '南沙区', '人口': 100 }
-          // ],
+          //   columns: ['位置', '人口'],
+          //   rows: [
+          //     { 位置: '从化区', 人口: 50 },
+          //     { 位置: '白云区', 人口: 90 },
+          //     { 位置: '南沙区', 人口: 100 }
+          //   ],
           data: [
-            { name: '白云区', value: 110 },
-            { name: '天河区', value: 190 },
-            { name: '南沙区', value: 130 },
-            { name: '南沙2', value: 20 }
+            // { name: '白云区', value: 110 },
+            // { name: '天河区', value: 190 }
+            // { name: '南沙区', value: 130 },
+            // { name: '南沙区', value: 20 }
+            [
+              //   { name: '黄埔区', value: [113.450761, 23.103239, 10] }
+              //   { name: '荔湾区', value: [113.243038, 23.124943, 200] },
+              //   { name: '从化区', value: [113.587386, 23.545283, 10] },
+              //   { name: '增城区', value: [113.764271, 23.341053, 200] }
+            ]
           ]
         },
         apis: {
@@ -858,12 +869,19 @@ const list = [
             textStyle: {
               color: '#ffffff',
               fontSize: 20,
-              fontFamily: 'not specified'
+              fontFamily: 'not specified',
+              fontWeight: 'normal'
             }
           },
           tooltip: {
             trigger: 'item',
-            formatter: '{b} : {c}'
+            confine: true,
+            formatter: '{b} ：{c}'
+            // formatter: p => {
+            //   let dataCon = p.data
+            //   let txtCon = `${dataCon.name}： ${dataCon.value[2]}`
+            //   return txtCon
+            // }
           },
           grid: { left: 0, top: 10, right: 0, bottom: 10 },
           legend: {
@@ -878,13 +896,13 @@ const list = [
             top: 'auto',
             right: 'auto',
             bottom: 'auto',
-            data: ['区域', '人口']
+            data: ['人口']
           },
           visualMap: {
             show: false,
             type: 'piecewise',
             min: 0,
-            max: 100,
+            max: 403631060,
             seriesIndex: [0],
             inRange: {
               color: ['#50a3ba', '#eac736', '#d94e5d'],
@@ -895,116 +913,118 @@ const list = [
               fontSize: 12
             }
           },
-          xAxis: {
-            show: false,
-            axisLabel: {
-              color: '#ffffff',
-              fontSize: 12,
-              rotate: 0
-            },
-            axisLine: {
-              show: false,
-              lineStyle: {
-                color: '#cccccc'
-              }
-            },
-            splitLine: {
-              show: false,
-              lineStyle: {
-                color: '#cccccc'
-              }
-            }
-          },
-          yAxis: {
-            show: false,
-            axisLabel: {
-              color: '#ffffff',
-              fontSize: 12
-            },
-            axisLine: {
-              show: false,
-              lineStyle: {
-                color: '#cccccc'
-              }
-            },
-            splitLine: {
-              show: false,
-              lineStyle: {
-                color: '#cccccc'
-              }
-            }
-          },
+          //   xAxis: {
+          //     show: false,
+          //     axisLabel: {
+          //       color: '#ffffff',
+          //       fontSize: 12,
+          //       rotate: 0
+          //     },
+          //     axisLine: {
+          //       show: false,
+          //       lineStyle: {
+          //         color: '#cccccc'
+          //       }
+          //     },
+          //     splitLine: {
+          //       show: false,
+          //       lineStyle: {
+          //         color: '#cccccc'
+          //       }
+          //     }
+          //   },
+          //   yAxis: {
+          //     show: false,
+          //     axisLabel: {
+          //       color: '#ffffff',
+          //       fontSize: 12
+          //     },
+          //     axisLine: {
+          //       show: false,
+          //       lineStyle: {
+          //         color: '#cccccc'
+          //       }
+          //     },
+          //     splitLine: {
+          //       show: false,
+          //       lineStyle: {
+          //         color: '#cccccc'
+          //       }
+          //     }
+          //   },
           // 地图独有的
           geo: {
+            type: 'map',
             map: 'guangzhou',
-            show: false,
+            aspectScale: 0.75,
+            zoom: 1.1,
             roam: true,
-            // zoom: 1.2,
+            mapLocation: {
+              x: 'left',
+              y: 'top'
+            },
             label: {
               normal: {
-                show: false
+                show: true,
+                color: '#fff'
               },
               emphasis: {
-                show: false,
-                areaColor: ''
+                show: true
               }
             },
-            layoutSize: '100%',
             itemStyle: {
               normal: {
-                // show: false
-                // areaColor: '#009DA1',
-                //   borderColor: '#53D9FF',
-                //   borderWidth: 2,
-                //   shadowColor: 'rgba(10,76,139,1)',
-                //   shadowOffsetY: 0,
-                //   shadowBlur: 60
+                areaColor: 'rgba(1, 33, 92, 0.45)',
+                borderColor: '#215495',
+                borderWidth: 1,
+                shadowColor: 'rgba(0,54,255, 1)',
+                shadowBlur: 150
               },
               emphasis: {
-                show: false,
-                areaColor: '#6A9FFF'
+                borderColor: '#073684',
+                areaColor: '#061E3D'
               }
             }
           },
           series: [
-            {
-              type: 'map',
-              map: 'guangzhou',
-              name: '区域',
-              aspectScale: 0.75,
-              zoom: 1.1,
-              roam: true,
-              mapLocation: {
-                x: 'left',
-                y: 'top'
-              },
-              label: {
-                normal: {
-                  show: true,
-                  color: '#fff'
-                },
-                emphasis: {
-                  show: true
-                }
-              },
-              itemStyle: {
-                normal: {
-                  areaColor: 'rgba(147, 235, 248, .8)',
-                  borderColor: '#215495',
-                  borderWidth: 1
-                },
-                emphasis: {
-                  borderColor: '#073684',
-                  areaColor: '#061E3D'
-                }
-              }
-            },
+            // {
+            //   type: 'map',
+            //   map: 'guangzhou',
+            //   aspectScale: 0.75,
+            //   zoom: 1.1,
+            //   roam: true,
+            //   mapLocation: {
+            //     x: 'left',
+            //     y: 'top'
+            //   },
+            //   label: {
+            //     normal: {
+            //       show: true,
+            //       color: '#fff'
+            //     },
+            //     emphasis: {
+            //       show: true
+            //     }
+            //   },
+            //   itemStyle: {
+            //     normal: {
+            //       areaColor: 'rgba(147, 235, 248, .8)',
+            //       borderColor: '#215495',
+            //       borderWidth: 1
+            //     },
+            //     emphasis: {
+            //       borderColor: '#073684',
+            //       areaColor: '#061E3D'
+            //     }
+            //   }
+            // },
             {
               type: 'scatter', // scatter,effectScatter
               name: '人口',
               coordinateSystem: 'geo',
               symbolSize: 10,
-              aspectScale: 0.75,
+              symbol: 'circle',
+              //   aspectScale: 0.75,
               hoverAnimation: true,
               showEffectOn: 'render',
               rippleEffect: {
@@ -1027,10 +1047,11 @@ const list = [
                   borderWidth: 1
                 }
               },
+              color: DEFAULT_COLORS,
               zlevel: 1
             }
-          ],
-          color: DEFAULT_COLORS
+          ]
+          //   color: 'red'
         },
         view: { width: 300, height: 500, x: 710, y: 290 }
       },
@@ -1073,7 +1094,8 @@ const list = [
             textStyle: {
               color: '#ffffff',
               fontSize: 20,
-              fontFamily: 'not specified'
+              fontFamily: 'not specified',
+              fontWeight: 'normal'
             }
           },
           chartTitle: {
@@ -1084,9 +1106,9 @@ const list = [
             itemGap: 20,
             textStyle: {
               color: '#ffffff',
-              fontFamily: '微软雅黑',
+              fontFamily: 'not specified',
               fontSize: 20,
-              fontWeight: 'bolder'
+              fontWeight: 'normal'
             }
           },
           tooltip: {
@@ -1187,7 +1209,8 @@ const list = [
             textStyle: {
               color: '#ffffff',
               fontSize: 20,
-              fontFamily: 'not specified'
+              fontFamily: 'not specified',
+              fontWeight: 'normal'
             }
           },
           grid: { left: 20, top: 60, right: 20, bottom: 30 },
@@ -1294,7 +1317,8 @@ const list = [
             textStyle: {
               color: '#ffffff',
               fontSize: 20,
-              fontFamily: 'not specified'
+              fontFamily: 'not specified',
+              fontWeight: 'normal'
             }
           }
         },
@@ -1425,7 +1449,8 @@ const list = [
             textStyle: {
               color: '#fff',
               fontSize: 20,
-              fontFamily: 'not specified'
+              fontFamily: 'not specified',
+              fontWeight: 'normal'
             }
           },
           header: {

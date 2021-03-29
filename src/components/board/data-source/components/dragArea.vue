@@ -52,6 +52,7 @@ import { mapGetters, mapActions } from 'vuex'
 import { deepClone } from '@/utils/deepClone'
 import { sum, summary } from '@/utils/summaryList'
 import navigateList from '@/config/navigate' // 导航条菜单
+import geoJson from '@/utils/guangdong.json'
 
 export default {
   props: {
@@ -294,6 +295,15 @@ export default {
       item.defaultAggregator = i.value
       this.getData()
     },
+    // 抓取区中心点
+    getCenterCoordinate(name) {
+      let dataList = geoJson.features
+      let countryside = dataList.find(item => item.properties.name === name)
+      if (!countryside) {
+        return null
+      }
+      return countryside.properties.center
+    },
     // 删除当前维度或者度量
     deleteFile(item, index) {
       this.fileList.splice(index, 1)
@@ -308,6 +318,14 @@ export default {
           // 清空modelid
           //   current.packageJson.api_data.modelId = ''
           this.$store.dispatch('SetSelfDataSource', current.setting.api_data)
+          // 地图数据还原
+          if (current.setting.chartType === 'v-map') {
+            current.setting.api_data.data = [[]]
+            current.setting.config.series[0].data = [[]]
+            this.$store.dispatch('SetSelfDataSource', current.setting.api_data)
+            this.$store.dispatch('SetSelfProperty', current.setting.config)
+            this.updateChartData()
+          }
           // 嵌套饼图apis恢复原始状态
           if (current.setting.chartType === 'v-multiPie') {
             let apis = {
@@ -434,6 +452,46 @@ export default {
           return
         }
         if (res.code === 200) {
+          if (this.currSelected.setting.chartType === 'v-map') {
+            let config = deepClone(this.currSelected.setting.config)
+            let legend = []
+            let datas = []
+            // 重置series
+            config.series = [config.series[0]]
+            // 只有一个维度，唯一名称
+            let alias = apiData.dimensions[0].alias
+            // 一个度量对应一个series.data
+            apiData.measures.forEach((measure, index) => {
+              // 添加series
+              if (index > 0) {
+                config.series[index] = Object.assign({}, config.series[0])
+              }
+              config.series[index].name = measure.alias
+              legend.push(measure.alias)
+              let data = []
+              for (let item of res.rows) {
+                // 抓取区域坐标
+                let center = this.getCenterCoordinate(item[alias])
+                // 找不到对应坐标跳过
+                if (!center) {
+                  continue
+                }
+                data.push({
+                  name: item[alias],
+                  value: center.concat(item[measure.alias]) // 链接数组，坐标和值
+                })
+                console.log('test', data)
+              }
+              config.series[index].data = data
+              datas.push(data)
+            })
+            config.legend.data = legend
+            apiData.data = datas
+            this.$store.dispatch('SetSelfProperty', config)
+            this.$store.dispatch('SetSelfDataSource', apiData)
+            this.updateChartData()
+            return
+          }
           if (this.currSelected.setting.chartType === 'v-text') {
             let config = deepClone(this.currSelected.setting.config)
             let str = ''
