@@ -37,14 +37,14 @@
                   @click="modelAdd"
                 />
               </a-select-option>
-              <a-select-option value="添加数据接入">
+              <!-- <a-select-option value="添加数据接入">
                 <span @click="modelAdd">添加数据接入</span>
                 <a-icon
                   type="rollback"
                   style="margin-left:130px"
                   @click="modelAdd"
                 />
-              </a-select-option>
+              </a-select-option> -->
             </a-select>
           </div>
           <div class="operation_search">
@@ -198,16 +198,6 @@
                                 >{{ aggregator.name }}</a-menu-item
                               >
                             </a-sub-menu> -->
-                            <a-sub-menu
-                              key="4"
-                              title="创建地理字段"
-                              @click="openGeoSetting(item2)"
-                            >
-                              <!-- <a-menu-item>国家</a-menu-item>
-                              <a-menu-item>省市</a-menu-item> -->
-                              <a-menu-item>城市</a-menu-item>
-                              <!-- <a-menu-item>区县</a-menu-item> -->
-                            </a-sub-menu>
                           </a-menu>
                         </a-dropdown>
                       </li>
@@ -224,9 +214,12 @@
             @close="close"
           ></compute-setting>
           <geo-setting
+            v-if="createMapVisible"
             :is-show="createMapVisible"
             region="城市"
+            :dimensions-data="createdMapData"
             @close="createMapVisible = false"
+            @handleSave="handleSave"
           ></geo-setting>
         </div>
         <!-- 初始界面 -->
@@ -329,7 +322,8 @@ export default {
         { name: '最大值', value: 'MAX' },
         { name: '最小值', value: 'MIN' },
         { name: '统计', value: 'CNT' }
-      ]
+      ],
+      createdMapData: {}
     }
   },
   computed: {
@@ -529,6 +523,8 @@ export default {
       if (computeType) this.computeType = computeType
     },
     openGeoSetting(item) {
+      item.modelId = this.modelId
+      this.createdMapData = item
       this.createMapVisible = true
       item.showMore = false
     },
@@ -619,6 +615,13 @@ export default {
         }, {})
       )
       return result
+    },
+    handleSave(datas) {
+      let selected = this.canvasMap.find(
+        item => item.id === this.currentSelected
+      )
+      selected.setting.api_data.mapDatas = datas
+      console.log(this.currSelected)
     }
   }
 }

@@ -65,42 +65,26 @@
           </div>
         </div> -->
         <div class="set-table">
-          <a-table :columns="colu" :data-source="datas">
+          <a-table
+            :loading="loading"
+            :columns="colu"
+            :data-source="datas"
+            :pagination="false"
+            class="table-list"
+          >
             <template slot="config" slot-scope="text, record">
               <a @click="openMatchWindow(record.key)">{{
-                record.current || '请选择配置项'
+                record.MathedVal || '请选择配置项'
               }}</a>
             </template>
           </a-table>
-          <a-modal
-            v-model="visible"
-            :width="250"
-            :dialog-style="{ top: '200px' }"
-            :closable="false"
-          >
-            <template slot="footer">
-              <a-button key="cancel" type="primary" @click="visible = false">
-                取消
-              </a-button>
-            </template>
-            <a-input
-              v-model="keyword"
-              placeholder="请输入关键字搜索"
-              :maxLength="30"
-              @pressEnter="search"
-            >
-              <a-icon slot="prefix" type="search" />
-            </a-input>
-            <div class="area-list">
-              <p
-                v-for="(item, index) in searchList"
-                :key="index"
-                @click="selectArea(item)"
-              >
-                {{ item }}
-              </p>
-            </div>
-          </a-modal>
+          <match-window
+            v-if="visible"
+            :visible="visible"
+            :matchList="areas"
+            @selectArea="selectArea"
+            @close="visible = false"
+          ></match-window>
         </div>
       </div>
     </div>
@@ -108,6 +92,10 @@
 </template>
 
 <script>
+import optionObj from './mapOptions'
+import echarts from 'echarts'
+import guangZhouJson from '@/utils/guangdong.json'
+import matchWindow from './matchWindow'
 const colu = [
   {
     title: '您的数据',
@@ -123,23 +111,7 @@ const colu = [
   }
 ]
 
-const datas = [
-  {
-    key: '1',
-    data: '天河',
-    current: ''
-  },
-  {
-    key: '2',
-    data: '海珠',
-    current: ''
-  },
-  {
-    key: '3',
-    data: '增',
-    current: ''
-  }
-]
+const datas = []
 const countryData = ['中国']
 const proData = {
   中国: ['广东省']
@@ -168,12 +140,13 @@ const areaData = {
   //   温州市: ['文成区', '苍南区', '平阳区'],
   //   杭州市: ['上城区', '下城区', '富阳区']
 }
-
 export default {
+  components: { matchWindow },
   name: 'geoSetting',
   props: {
     isShow: Boolean,
-    region: String
+    region: String,
+    dimensionsData: {}
   },
   data() {
     return {
@@ -189,20 +162,69 @@ export default {
       city: cityData[proData[countryData[0]][0]][0],
       areas: areaData[cityData[proData[countryData[0]][0]][0]],
       area: areaData[cityData[proData[countryData[0]][0]][0]][0],
-      searchList: areaData[cityData[proData[countryData[0]][0]][0]], // 匹配列表
       visible: false,
-      keyword: '',
-      currentKey: ''
-      // key: value
+      currentKey: '',
+      loading: false,
+      condition: {} // 返回的匹配字段
     }
   },
   computed: {
     unmatchedLen() {
-      let umatcheds = this.datas.filter(item => !item.current)
+      let umatcheds = this.datas.filter(item => !item.MathedVal)
       return umatcheds.length
     }
   },
+  mounted() {
+    this.$nextTick(() => {
+      this.drawMap()
+    })
+    this.getDimensionsDatas()
+  },
   methods: {
+    // 获取维度数据
+    async getDimensionsDatas() {
+      let params = {
+        level: '3',
+        fieldId: this.dimensionsData.fieldId,
+        country: '中国',
+        province: '广东省',
+        city: '广州市',
+        pivotschemaId: this.dimensionsData.pivotschemaId
+      }
+      this.loading = true
+      let res = await this.$server.screenManage.getGeoData(params)
+      this.loading = false
+      // 模型数据被删
+      if (res.code === 500 && res.msg === 'IsChanged') {
+        this.$message.error('模型数据不存在')
+        return
+      }
+      if (res.code === 200) {
+        // 获取所有维度数据列表
+        this.condition = res.data.geoConfig.condition
+        let dataList = []
+        let keyList = Object.keys(this.condition)
+        // 构造被匹配数据列表
+        keyList.forEach((key, index) => {
+          dataList.push({
+            key: index + '',
+            data: key,
+            MathedVal: this.condition[key]
+          })
+        })
+        this.datas = dataList
+      } else {
+        res.msg && this.$message.error(res.msg)
+      }
+    },
+    drawMap() {
+      this.myChart = echarts.init(this.$refs.mapChart)
+      echarts.registerMap('guangzhou', guangZhouJson)
+      let option = optionObj
+      if (option && typeof option === 'object') {
+        this.myChart.setOption(option, true)
+      }
+    },
     openMatchWindow(key) {
       this.keyword = ''
       this.visible = true
@@ -222,21 +244,35 @@ export default {
       this.areas = areaData[value]
       this.area = areaData[value][0]
     },
-    handleSave() {
-      this.handleClose()
-    },
-    search() {
-      if (this.keyword) {
-        this.searchList = this.areaData.filter(
-          item => item.indexOf(this.keyword) > -1
-        )
-      } else {
-        this.searchList = this.areaData
+    async handleSave() {
+      if (this.unmatchedLen > 0) {
+        this.$message.error(`还有未匹配项`)
+        return
+      }
+      let params = {
+        level: '3',
+        fieldId: this.dimensionsData.fieldId,
+        country: '中国',
+        province: '广东省',
+        city: '广州市',
+        pivotschemaId: this.dimensionsData.pivotschemaId,
+        condition: this.condition
+      }
+      let res = await this.$server.screenManage.saveGeoData(params)
+      if (res.code === 500) {
+        this.$message.error(res.msg)
+        return
+      }
+      if (res.code === 200) {
+        this.$message.success('保存成功')
+        this.$emit('close')
       }
     },
+    // 匹配赋值
     selectArea(value) {
       let area = this.datas.find(item => item.key === this.currentKey)
-      area.current = value
+      area.MathedVal = value
+      this.condition[area.data] = value
       this.visible = false
     },
     handleClose() {
@@ -257,5 +293,9 @@ export default {
     margin: 0;
     cursor: pointer;
   }
+}
+.table-list {
+  height: 269px;
+  overflow-y: scroll;
 }
 </style>
