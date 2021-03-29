@@ -3,7 +3,7 @@
     :bodyStyle="bodyStyle"
     :maskClosable="false"
     width="700px"
-    title="添加定时任务"
+    title="定时任务设置"
     :confirmLoading="loading"
     :visible="show"
     @cancel="handleClose"

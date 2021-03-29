@@ -73,8 +73,10 @@ export default {
     formatType: function(value) {
       switch (value) {
         case 'BIGINT':
+        case 'INT':
           return '整数'
         case 'TIMESTAMP':
+        case 'TIME':
           return '日期时间'
         case 'DATE':
           return '日期'
