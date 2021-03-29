@@ -2495,7 +2495,7 @@ export default {
       function() {
         this.refreshScreen({
           charSeted: false,
-          needLoading: false
+          needLoading: true
         })
       },
       1000,
