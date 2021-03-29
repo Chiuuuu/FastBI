@@ -1545,6 +1545,25 @@
                     ></el-color-picker>
                   </gui-inline>
                 </gui-field>
+                <gui-field label="阴影">
+                  <gui-inline label="颜色" style="width:auto;">
+                    <el-color-picker
+                      ref="areaColor"
+                      show-alpha
+                      v-model="selfConfig.geo.itemStyle.normal.shadowColor"
+                      @change="setSelfProperty"
+                    ></el-color-picker>
+                  </gui-inline>
+                  <gui-inline label="模糊大小" style="width:auto;">
+                    <a-input-number
+                      v-model="selfConfig.geo.itemStyle.normal.shadowBlur"
+                      size="small"
+                      :min="0"
+                      :max="200"
+                      @change="setSelfProperty"
+                    ></a-input-number>
+                  </gui-inline>
+                </gui-field>
                 <!-- <gui-field label="区域透明">
                   <a-switch
                     v-model="mapOpacity"

@@ -47,7 +47,8 @@
       :options="chartOptions"
       :settings="chartSettings"
       :series="chartSeries"
-      :get="geo"
+      :geo="geo"
+      :tooltip="mapToolTip"
     ></component>
     <!-- <div v-else class="dv-charts-null">
       <a-icon  type="pie-chart" style="font-size:50px;" />
@@ -122,7 +123,8 @@ export default {
       chartSeries: {},
       backgroundStyle: {},
       colors: [],
-      geo: {}
+      geo: {},
+      mapToolTip: {}
     }
   },
   watch: {
@@ -137,6 +139,12 @@ export default {
             this.chartExtend = { ...omit(val, ['series']) }
             this.chartSeries = val.series
             this.geo = val.geo
+            this.mapToolTip = val.tooltip
+            // 添加格式回调函数
+            this.mapToolTip.formatter = function(params) {
+              let data = params.data
+              return `${params.seriesName}<br />${data.name}：${data.value[2]}`
+            }
           } else {
             this.chartExtend = { ...val }
           }

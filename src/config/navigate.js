@@ -875,11 +875,10 @@ const list = [
           },
           tooltip: {
             trigger: 'item',
-            confine: true,
-            formatter: '{b} ：{c}'
-            // formatter: p => {
-            //   console.log('test', p)
-            //   return `${p.data.name}： ${p.value[2]}`
+            confine: true
+            // formatter: '{b} ：{c}'
+            // formatter(params) {
+            //   return params.name
             // }
           },
           grid: { left: 0, top: 10, right: 0, bottom: 10 },
@@ -1041,10 +1040,13 @@ const list = [
               },
               label: {
                 show: false,
-                formatter: '{b}',
+                formatter: function(params) {
+                  let data = params.data
+                  return `${data.name}：${data.value[2]}`
+                },
                 color: '',
                 fontSize: 12,
-                position: 'inside', // 可选inside
+                position: 'right', // 可选inside
                 emphasis: {
                   show: true
                 }
