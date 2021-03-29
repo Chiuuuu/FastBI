@@ -154,7 +154,6 @@ import { on, off } from 'bin-ui/src/utils/dom' //
 import { getCanvasMaps } from '@/api/canvasMaps/canvas-maps-request' // 图层的方法
 import { getPageSettings, resetPageSettings } from '@/api/app/app-request' // axious请求，拦截器
 import ChartsFactory from '@/components/charts/charts-factory'
-import ChartMap from '@/components/tools/Map' // 地图
 import ChartText from '@/components/tools/Text' // 文本模块
 import ChartImage from '@/components/tools/Image' // 图片模块
 import ChartTables from '@/components/tools/Tables' // 表格模块
@@ -344,9 +343,7 @@ export default {
     ChartImage,
     ChartTables,
     ChartNodata,
-    Screen,
-    IconFont,
-    ChartMap
+    Screen
   },
   beforeDestroy() {
     off(document, 'keyup', this.handleKeyup)
