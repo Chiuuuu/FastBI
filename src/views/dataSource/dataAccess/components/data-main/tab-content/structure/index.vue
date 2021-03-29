@@ -589,7 +589,7 @@ export default {
           }
         }
         if (this.largeDataList.length > 0) {
-          this.$message.success('抽取任务已下达，前抽取的表数据量较多，耗时会更长，请您耐心等待')
+          this.$message.success('抽取任务已下达，当前抽取的表数据量较多，耗时会更长，请您耐心等待')
         } else {
           this.$message.success('抽取任务已下达')
         }
