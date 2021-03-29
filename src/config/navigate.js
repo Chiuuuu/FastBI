@@ -875,12 +875,10 @@ const list = [
           },
           tooltip: {
             trigger: 'item',
-            confine: true,
-            formatter: '{b} ：{c}'
-            // formatter: p => {
-            //   let dataCon = p.data
-            //   let txtCon = `${dataCon.name}： ${dataCon.value[2]}`
-            //   return txtCon
+            confine: true
+            // formatter: '{b} ：{c}'
+            // formatter(params) {
+            //   return params.name
             // }
           },
           grid: { left: 0, top: 10, right: 0, bottom: 10 },
@@ -898,21 +896,30 @@ const list = [
             bottom: 'auto',
             data: ['人口']
           },
-          visualMap: {
-            show: false,
-            type: 'piecewise',
-            min: 0,
-            max: 403631060,
-            seriesIndex: [0],
-            inRange: {
-              color: ['#50a3ba', '#eac736', '#d94e5d'],
-              symbolSize: [10, 16]
-            },
-            textStyle: {
-              color: '#fff',
-              fontSize: 12
-            }
-          },
+          //   visualMap: {
+          //     show: false,
+          //     type: 'piecewise',
+          //     min: 0,
+          //     max: 403631060,
+          //     seriesIndex: [0],
+          //     inRange: {
+          //       color: ['#50a3ba', '#eac736', '#d94e5d'],
+          //       symbolSize: [10, 16],
+          //       symbol: [
+          //         'circle',
+          //         'rect',
+          //         'roundRect',
+          //         'triangle',
+          //         'diamond',
+          //         'pin',
+          //         'arrow'
+          //       ]
+          //     },
+          //     textStyle: {
+          //       color: '#fff',
+          //       fontSize: 12
+          //     }
+          //   },
           //   xAxis: {
           //     show: false,
           //     axisLabel: {
@@ -1022,8 +1029,8 @@ const list = [
               type: 'scatter', // scatter,effectScatter
               name: '人口',
               coordinateSystem: 'geo',
-              symbolSize: 10,
               symbol: 'circle',
+              symbolSize: 10,
               //   aspectScale: 0.75,
               hoverAnimation: true,
               showEffectOn: 'render',
@@ -1033,10 +1040,13 @@ const list = [
               },
               label: {
                 show: false,
-                formatter: '{b}',
+                formatter: function(params) {
+                  let data = params.data
+                  return `${data.name}：${data.value[2]}`
+                },
                 color: '',
                 fontSize: 12,
-                position: 'inside', // 可选inside
+                position: 'right', // 可选inside
                 emphasis: {
                   show: true
                 }
@@ -1047,11 +1057,10 @@ const list = [
                   borderWidth: 1
                 }
               },
-              color: DEFAULT_COLORS,
               zlevel: 1
             }
-          ]
-          //   color: 'red'
+          ],
+          color: DEFAULT_COLORS
         },
         view: { width: 300, height: 500, x: 710, y: 290 }
       },

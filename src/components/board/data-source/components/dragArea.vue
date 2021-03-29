@@ -89,7 +89,7 @@ export default {
       ] // 聚合方式
     }
   },
-  inject: ['errorFile'],
+  inject: ['errorFile', 'initTargetMeasure'],
   watch: {
     currSelected: {
       handler(val) {
@@ -311,6 +311,10 @@ export default {
       let current = deepClone(this.currSelected)
       // 维度度量删除完以后重置该图表数据
       if (this.chartType === '1' || this.chartType === '2') {
+        if (current.setting.chartType === 'v-map') {
+          // 重置地图样式配置对应的度量数据
+          this.initTargetMeasure()
+        }
         if (
           current.setting.api_data.dimensions.length === 0 &&
           current.setting.api_data.measures.length === 0
@@ -480,7 +484,6 @@ export default {
                   name: item[alias],
                   value: center.concat(item[measure.alias]) // 链接数组，坐标和值
                 })
-                console.log('test', data)
               }
               config.series[index].data = data
               datas.push(data)

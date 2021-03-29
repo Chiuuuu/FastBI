@@ -245,10 +245,10 @@ export default {
       this.area = areaData[value][0]
     },
     async handleSave() {
-      if (this.unmatchedLen > 0) {
-        this.$message.error(`还有未匹配项`)
-        return
-      }
+      //   if (this.unmatchedLen > 0) {
+      //     this.$message.error(`还有未匹配项`)
+      //     return
+      //   }
       let params = {
         level: '3',
         fieldId: this.dimensionsData.fieldId,
