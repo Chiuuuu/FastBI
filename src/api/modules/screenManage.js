@@ -236,6 +236,18 @@ const screenManage = {
    */
   screenModuleTransform(params) {
     return $axios.post('/screen/pivotschema/ScreenModuleTransform', params)
+  },
+  /**
+   * 获取创建地理字段数据
+   */
+  getGeoData(params) {
+    return $axios.post('/screen/pivotschema/initGeoInfo', params)
+  },
+  /**
+   *保存创建地理字段
+   */
+  saveGeoData(params) {
+    return $axios.post('/screen/pivotschema/setGeoInfo', params)
   }
 }
 

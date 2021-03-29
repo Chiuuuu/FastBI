@@ -1,26 +1,16 @@
 let option = {
-  backgroundColor: '#ccc',
-  geo: {
-    map: 'guangzhou',
-    roam: true,
-    zoom: 1.2,
-    layoutSize: '50%',
-    label: {
-      emphasis: {
-        show: true
-      }
-    },
-    itemStyle: {
-      normal: {
-        areaColor: '#2b87bb',
-        borderColor: '#73ffb3'
-      },
-      emphasis: {
-        borderColor: '#fff',
-        borderWidth: 1,
-        areaColor: '#4e4e4e'
+  series: [
+    {
+      type: 'map',
+      mapType: 'guangzhou', // 自定义扩展图表类型
+      itemStyle: {
+        normal: {
+          areaColor: 'rgba(46, 163, 236, 0.3)',
+          borderColor: '#2EA3EC',
+          borderWidth: 1
+        }
       }
     }
-  }
+  ]
 }
 export default option

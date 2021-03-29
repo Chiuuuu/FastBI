@@ -41,6 +41,7 @@ export default {
         console.log(val)
         if (val) {
           this.selfConfig = val
+          this.key++
         }
       },
       deep: true,
@@ -73,6 +74,7 @@ export default {
         fontSize: this.config.title.textStyle.fontSize + 'px',
         textAlign: this.config.title.textAlign,
         fontFamily: this.config.title.textStyle.fontFamily,
+        fontWeight: this.config.title.textStyle.fontWeight,
         background: 'none',
         border: 'none',
         ...this.background
@@ -83,9 +85,9 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-// .dv-text{
-//     resize:none;
-// }
+.dv-text{
+    resize:none;
+}
 
 // .dv-text:hover{
 
