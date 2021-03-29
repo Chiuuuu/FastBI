@@ -1642,7 +1642,7 @@
                   </gui-inline>
                   <gui-inline label="颜色">
                     <el-color-picker
-                      v-model="selfConfig.geo.label.color"
+                      v-model="selfConfig.series[targetMeasure].label.color"
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-inline>
@@ -2495,7 +2495,7 @@ export default {
       function() {
         this.refreshScreen({
           charSeted: false,
-          needLoading: false
+          needLoading: true
         })
       },
       1000,
