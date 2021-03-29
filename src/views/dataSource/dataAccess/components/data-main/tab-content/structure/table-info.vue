@@ -9,14 +9,14 @@
   >
     <a-button
       class="arrow arrow-left"
-      :disabled="this.colPagination.page === 1"
+      :disabled="colPagination.config.page === 1"
       type="primary"
       icon="left"
       @click="handleChangePage('minus')"
     />
     <a-button
       class="arrow arrow-right"
-      :disabled="this.colPagination.page * this.colPagination.size >= this.colPagination.total"
+      :disabled="colPagination.config.page * colPagination.config.size >= colPagination.config.total"
       type="primary"
       icon="right"
       @click="handleChangePage('add')"
@@ -27,17 +27,17 @@
           <thead>
             <tr>
               <th>序号</th>
-              <th v-for="(item, index) in currentCol" :key="index" :title="item['COLUMN_NAME']">
+              <th v-for="(item, index) in colPagination.currentCol" :key="index" :title="item['COLUMN_NAME']">
                 {{ item['COLUMN_NAME'] }}
                 <span class="type">{{ item['TYPE_NAME'] | formatType }}</span>
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in tableData" :key="index">
+            <tr v-for="(item, index) in colPagination.tableData" :key="index">
               <td>{{ index + 1 }}</td>
               <td
-                v-for="(col, i) in currentCol"
+                v-for="(col, i) in colPagination.currentCol"
                 :key="i"
                 :title="item[col['COLUMN_NAME']]"
               >{{ item[col['COLUMN_NAME']] }}</td>
@@ -45,12 +45,13 @@
           </tbody>
         </table>
       </div>
-      <a-empty class="table-empty" v-if="tableData.length === 0"></a-empty>
+      <a-empty class="table-empty" v-if="colPagination.tableData.length === 0"></a-empty>
     </a-spin>
   </a-modal>
 </template>
 
 <script>
+import ColPagination from '@/utils/table-col-pagination'
 export default {
   name: 'tableInfo',
   props: {
@@ -61,15 +62,11 @@ export default {
     return {
       spinning: false,
       bodyStyle: { height: 'calc(100vh - 240px)', 'overflow-y': 'auto', padding: '0' },
-      columns: [],
-      currentCol: [],
-      tableData: [],
-      pageList: [],
-      colPagination: {
+      colPagination: new ColPagination({
         total: 0,
         size: 50,
         page: 1
-      }
+      })
     }
   },
   filters: {
@@ -95,19 +92,13 @@ export default {
       if (newValue) {
         this.colPagination = this.$options.data().colPagination
         this.handleGetTableInfo()
-      } else {
-        this.columns = []
-        this.tableData = []
-        this.pageList = []
       }
     }
   },
   methods: {
     handleGetTableInfo() {
-      const { size, page } = this.colPagination
-      if (this.validPageSection()) {
-        this.currentCol = this.columns.slice((page - 1) * size, page * size)
-      } else {
+      const { size, page } = this.colPagination.config
+      if (!this.colPagination.validPageSection()) {
         this.spinning = true
         const params = {
           id: this.tableId,
@@ -118,8 +109,8 @@ export default {
           .getTableInfo(params)
           .then((res) => {
             if (res.code === 200) {
-              this.colPagination.total = res.total
-              this.handleColCache(res.tableDataInfo)
+              this.colPagination.config.total = res.total
+              this.colPagination.handleColCache(res.tableDataInfo.headers, res.tableDataInfo.rows)
             } else {
               this.$message.error(res.msg)
             }
@@ -129,51 +120,11 @@ export default {
           })
       }
     },
-    /**
-     * 考虑到今后有可能有跳页和改变size的情况, 先实现一个方法缓存记录
-     * 设置一个长度为total的数组, 请求的区间缓存到数组, 下请求前做校验
-     */
-    handleColCache(tableDataInfo) {
-      const { size, page, total } = this.colPagination
-      const start = size * (page - 1)
-      const end = size * page > total ? total - 1 : size * page - 1
-      if (this.pageList.length < 1) {
-        this.pageList.length = total
-        this.columns.length = total
-      }
-      // 将当前区间数据写入缓存
-      for (let s = start; s <= end; s++) {
-        this.pageList.splice(s, 1, s)
-        this.columns.splice(s, 1, tableDataInfo.headers[s - start])
-      }
-      if (this.tableData.length > 0) {
-        this.tableData.map((item, index) => {
-          return Object.assign(item, tableDataInfo.rows[index])
-        })
-      } else {
-        this.tableData = tableDataInfo.rows
-      }
-      this.currentCol = this.columns.slice((page - 1) * size, page * size)
-    },
-    // 校验当前缓存区间
-    validPageSection() {
-      const { size, page, total } = this.colPagination
-      const start = size * (page - 1)
-      const end = size * page > total ? total - 1 : size * page - 1
-      if (total < 1) return false
-      // 遍历当前区间是否存在缓存
-      for (let s = start; s <= end; s++) {
-        if (this.pageList[s] === undefined) {
-          return false
-        }
-      }
-      return true
-    },
     handleChangePage(type) {
       if (type === 'add') {
-        this.colPagination.page++
+        this.colPagination.config.page++
       } else if (type === 'minus') {
-        this.colPagination.page--
+        this.colPagination.config.page--
       }
       this.handleGetTableInfo()
     }

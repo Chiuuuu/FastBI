@@ -25,12 +25,11 @@
         <span class="search_span">数据库</span>
       </div>
       <a-select
-        v-if="databaseName !== ''"
+        v-model="databaseName"
         class="menu_select"
-        :default-value="databaseName"
         @change="handleChangeDatabase"
       >
-        <a-select-option :value="databaseName">{{ databaseName }}</a-select-option>
+        <a-select-option v-for="database in databaseList" :key="database.id" :value="database.name">{{ database.name }}</a-select-option>
       </a-select>
       <a-divider />
       <div class="table_list" :class="{'no-sql': !isDatabase}">
@@ -273,6 +272,7 @@ export default {
       isDatabase: false, // 是否是SQL数据源, 控制自定义SQL渲染
       tableSearch: '', // 表搜索关键字
       searchList: [],
+      databaseName: '', // 当前数据库
       leftMenuList: [],
       rightMenuList: [],
       sqlForm: {},
@@ -318,9 +318,6 @@ export default {
     }),
     model() {
       return this.$route.query.type
-    },
-    databaseName() {
-      return this.databaseList.length > 0 ? this.databaseList[0].name : ''
     },
     tableSearchList() {
       return this.tableSearch ? this.searchList : this.leftMenuList
@@ -458,23 +455,28 @@ export default {
 
       if (result.code === 200) {
         this.databaseList = result.data
+        this.databaseName = (this.databaseList.length && this.databaseList.length > 0) ? this.databaseList[0].name : ''
         if (this.databaseList.length && this.databaseList.length > 0) {
-          const listResult = await this.$server.dataModel.getTableListById(result.data[0].id)
-          if (listResult.code === 200) {
-            this.leftMenuList = [].concat(listResult.data.filter(item => {
-              item.type = +item.type
-              return item.type === 0
-            }))
-            this.rightMenuList = [].concat(listResult.data.filter(item => item.type === 1))
-            this.$store.dispatch('dataModel/setDatabaseId', result.data[0].id)
-          } else {
-            this.$message.error(listResult.msg)
-          }
+          this.handleGetDatabaseTable(result.data[0].id)
         }
         // this.handleDimensions()
         // this.handleMeasures()
       } else {
         this.$message.error(result.msg)
+      }
+    },
+    // 获取当前库下的表
+    async handleGetDatabaseTable(id) {
+      const listResult = await this.$server.dataModel.getTableListById(id)
+      if (listResult.code === 200) {
+        this.leftMenuList = [].concat(listResult.data.filter(item => {
+          item.type = +item.type
+          return item.type === 0
+        }))
+        this.rightMenuList = [].concat(listResult.data.filter(item => item.type === 1))
+        this.$store.dispatch('dataModel/setDatabaseId', id)
+      } else {
+        this.$message.error(listResult.msg)
       }
     },
     handleSearchTable: debounce(function(event) {
@@ -485,12 +487,9 @@ export default {
     /**
      * 切换数据库
      */
-    async handleChangeDatabase(value) {
-      // this.$refs.editLeftRef.handleGetMenuList(value)
-      // this.$store.dispatch('dataModel/setDatabaseId', value)
-      // this.detailInfo.config.tables = []
-      // this.detailInfo.pivotSchema.dimensions = []
-      // this.detailInfo.pivotSchema.measures = []
+    async handleChangeDatabase(value, data) {
+      this.handleGetDatabaseTable(data.key)
+      this.$store.dispatch('dataModel/setDatabaseId', data.key)
     },
     // 表上下合并
     handleTableUnion(node) {

@@ -8,7 +8,7 @@
     :style="titleStyle"
     :disabled="true"
     :autoSize="{ minRows: 2, maxRows: 50 }"
-    @change="textChange"
+    @blur="textChange"
   />
   <!-- <div class="dv-text" style="width: 100%;height:100%;" ref="wrap">
     <div class="titles" ref="titles" v-if="config.title" :style="titleStyle">
@@ -35,6 +35,19 @@ export default {
       default: 0
     }
   },
+  watch: {
+    config: {
+      handler(val) {
+        console.log(val)
+        if (val) {
+          this.selfConfig = val
+          this.key++
+        }
+      },
+      deep: true,
+      immediate: true
+    }
+  },
   data() {
     return {
       selfConfig: {},
@@ -55,13 +68,13 @@ export default {
   },
   computed: {
     titleStyle() {
-      this.key++
       return {
         padding: '0 10px',
         color: this.config.title.textStyle.color,
         fontSize: this.config.title.textStyle.fontSize + 'px',
         textAlign: this.config.title.textAlign,
         fontFamily: this.config.title.textStyle.fontFamily,
+        fontWeight: this.config.title.textStyle.fontWeight,
         background: 'none',
         border: 'none',
         ...this.background
@@ -76,11 +89,11 @@ export default {
     resize:none;
 }
 
-.dv-text:hover{
+// .dv-text:hover{
 
-  border-right:none !important;
+//   border-right:none !important;
 
-}
+// }
 
 // .dv-text:focus{
 

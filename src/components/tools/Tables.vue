@@ -340,7 +340,9 @@ export default {
         padding: '0 10px',
         color: this.config.title.textStyle.color,
         fontSize: this.config.title.textStyle.fontSize + 'px',
-        textAlign: this.config.title.textAlign
+        textAlign: this.config.title.textAlign,
+        fontFamily: this.config.title.textStyle.fontFamily,
+        fontWeight: this.config.title.textStyle.fontWeight
       }
     },
     HeaderStyle() {

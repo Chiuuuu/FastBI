@@ -242,7 +242,7 @@
                     ></el-color-picker>
                   </gui-inline>
                 </gui-field>
-                <gui-field label="字体" v-if="isText">
+                <gui-field label="字体">
                   <a-select
                     v-model="selfConfig.title.textStyle.fontFamily"
                     style="width: 164px"
@@ -255,6 +255,18 @@
                       :key="index"
                       >{{ font.label }}</a-select-option
                     >
+                  </a-select>
+                </gui-field>
+                <gui-field label="粗细">
+                  <a-select
+                    v-model="selfConfig.title.textStyle.fontWeight"
+                    style="width: 164px"
+                    size="small"
+                    @change="setSelfProperty"
+                  >
+                    <a-select-option value="normal">正常</a-select-option>
+                    <a-select-option value="bolder">加粗</a-select-option>
+                    <a-select-option value="lighter">更细</a-select-option>
                   </a-select>
                 </gui-field>
                 <gui-field label="对齐方式">
@@ -1456,7 +1468,7 @@
               <a-collapse-panel key="geo" header="地理坐标系">
                 <gui-field label="视角缩放">
                   <a-input-number
-                    v-model="selfConfig.series[0].zoom"
+                    v-model="selfConfig.geo.zoom"
                     size="small"
                     :min="0"
                     :step="0.1"
@@ -1465,18 +1477,18 @@
                 </gui-field>
                 <gui-field label="文本">
                   <a-switch
-                    v-model="selfConfig.series[0].label.normal.show"
+                    v-model="selfConfig.geo.label.normal.show"
                     size="small"
                     @change="switchChange"
                   ></a-switch>
                 </gui-field>
                 <gui-field
                   label="文本样式"
-                  v-if="selfConfig.series[0].label.normal.show"
+                  v-if="selfConfig.geo.label.normal.show"
                 >
                   <gui-inline label="字号">
                     <a-input-number
-                      v-model="selfConfig.series[0].label.normal.fontSize"
+                      v-model="selfConfig.geo.label.normal.fontSize"
                       size="small"
                       :min="12"
                       :max="40"
@@ -1485,25 +1497,25 @@
                   </gui-inline>
                   <gui-inline label="颜色">
                     <el-color-picker
-                      v-model="selfConfig.series[0].label.normal.color"
+                      v-model="selfConfig.geo.label.normal.color"
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-inline>
                 </gui-field>
                 <gui-field label="文本悬停">
                   <a-switch
-                    v-model="selfConfig.series[0].label.emphasis.show"
+                    v-model="selfConfig.geo.label.emphasis.show"
                     size="small"
                     @change="switchChange"
                   ></a-switch>
                 </gui-field>
                 <gui-field
                   label="文本悬停样式"
-                  v-if="selfConfig.series[0].label.emphasis.show"
+                  v-if="selfConfig.geo.label.emphasis.show"
                 >
                   <gui-inline label="字号">
                     <a-input-number
-                      v-model="selfConfig.series[0].label.emphasis.fontSize"
+                      v-model="selfConfig.geo.label.emphasis.fontSize"
                       size="small"
                       :min="12"
                       :max="40"
@@ -1512,7 +1524,7 @@
                   </gui-inline>
                   <gui-inline label="颜色">
                     <el-color-picker
-                      v-model="selfConfig.series[0].label.emphasis.color"
+                      v-model="selfConfig.geo.label.emphasis.color"
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-inline>
@@ -1521,26 +1533,25 @@
                   <gui-inline label="区域" style="width:auto;">
                     <el-color-picker
                       ref="areaColor"
-                      v-model="selfConfig.series[0].itemStyle.normal.areaColor"
-                      @change="setSelfProperty"
+                      show-alpha
+                      v-model="selfConfig.geo.itemStyle.normal.areaColor"
+                      @change="changeAreaColor"
                     ></el-color-picker>
                   </gui-inline>
                   <gui-inline label="边框" style="width:auto;">
                     <el-color-picker
-                      v-model="
-                        selfConfig.series[0].itemStyle.normal.borderColor
-                      "
+                      v-model="selfConfig.geo.itemStyle.normal.borderColor"
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-inline>
                 </gui-field>
-                <gui-field label="区域透明">
+                <!-- <gui-field label="区域透明">
                   <a-switch
                     v-model="mapOpacity"
                     size="small"
                     @change="switchChange"
-                  ></a-switch>
-                  <!-- <a-input-number
+                  ></a-switch> -->
+                <!-- <a-input-number
                     v-model="selfConfig.geo.itemStyle.normal.opacity"
                     size="small"
                     :max="1"
@@ -1548,10 +1559,10 @@
                     :step="0.1"
                     @change="setSelfProperty"
                   ></a-input-number> -->
-                </gui-field>
+                <!-- </gui-field> -->
                 <gui-field label="边框宽度">
                   <a-input-number
-                    v-model="selfConfig.series[0].itemStyle.normal.borderWidth"
+                    v-model="selfConfig.geo.itemStyle.normal.borderWidth"
                     size="small"
                     :max="10"
                     :min="0"
@@ -1562,17 +1573,13 @@
                 <gui-field label="多边形悬停">
                   <gui-inline label="区域" style="width:auto;">
                     <el-color-picker
-                      v-model="
-                        selfConfig.series[0].itemStyle.emphasis.areaColor
-                      "
+                      v-model="selfConfig.geo.itemStyle.emphasis.areaColor"
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-inline>
                   <gui-inline label="边框" style="width:auto;">
                     <el-color-picker
-                      v-model="
-                        selfConfig.series[0].itemStyle.emphasis.borderColor
-                      "
+                      v-model="selfConfig.geo.itemStyle.emphasis.borderColor"
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-inline>
@@ -1582,15 +1589,18 @@
                 <a-switch
                   slot="extra"
                   v-if="collapseActive.indexOf('mapIndicator') > -1"
-                  v-model="selfConfig.series[1].label.show"
+                  v-model="selfConfig.series[0].label.show"
                   default-checked
                   size="small"
                   @change="switchChange"
                 />
-                <gui-field label="指标文本">
+                <gui-field
+                  label="文本样式"
+                  v-if="selfConfig.series[0].label.show"
+                >
                   <gui-inline label="字号">
                     <a-input-number
-                      v-model="selfConfig.series[1].label.fontSize"
+                      v-model="selfConfig.series[0].label.fontSize"
                       size="small"
                       :min="12"
                       :max="40"
@@ -1599,15 +1609,27 @@
                   </gui-inline>
                   <gui-inline label="颜色">
                     <el-color-picker
-                      v-model="selfConfig.series[1].label.color"
+                      v-model="selfConfig.geo.label.color"
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-inline>
                 </gui-field>
+                <gui-field label="形状">
+                  <a-select
+                    style="width: 120px"
+                    v-model="selfConfig.series[0].symbol"
+                    size="small"
+                    @change="setSelfProperty"
+                  >
+                    <a-select-option value="circle">圆形</a-select-option>
+                    <a-select-option value="rent">方形</a-select-option>
+                    <a-select-option value="pin">水滴</a-select-option>
+                  </a-select>
+                </gui-field>
                 <gui-field label="类型">
                   <a-select
                     style="width: 120px"
-                    v-model="selfConfig.series[1].type"
+                    v-model="selfConfig.series[0].type"
                     size="small"
                     @change="setSelfProperty"
                   >
@@ -1619,11 +1641,11 @@
                 </gui-field>
                 <gui-field
                   label="涟漪动画"
-                  v-if="selfConfig.series.type === 'effectScatter'"
+                  v-if="selfConfig.series[0].type === 'effectScatter'"
                 >
                   <gui-inline label="最大缩放比">
                     <a-input-number
-                      v-model="selfConfig.series[1].rippleEffect.scale"
+                      v-model="selfConfig.series[0].rippleEffect.scale"
                       size="small"
                       :step="0.5"
                       @change="setSelfProperty"
@@ -1632,7 +1654,7 @@
                   <gui-inline label="波纹方式">
                     <a-select
                       style="width:70px"
-                      v-model="selfConfig.series[1].rippleEffect.brushType"
+                      v-model="selfConfig.series[0].rippleEffect.brushType"
                       size="small"
                       @change="setSelfProperty"
                     >
@@ -1645,7 +1667,7 @@
                   <gui-inline label="边框宽度">
                     <a-input-number
                       v-model="
-                        selfConfig.series[1].itemStyle.emphasis.borderWidth
+                        selfConfig.series[0].itemStyle.emphasis.borderWidth
                       "
                       size="small"
                       :min="0"
@@ -1656,7 +1678,7 @@
                   <gui-inline label="边框颜色" style="width:auto;">
                     <el-color-picker
                       v-model="
-                        selfConfig.series[1].itemStyle.emphasis.borderColor
+                        selfConfig.series[0].itemStyle.emphasis.borderColor
                       "
                       @change="setSelfProperty"
                     ></el-color-picker>
@@ -2125,6 +2147,15 @@ export default {
       this.selfConfig.series.label.formatter = checkedValues.join('')
       this.setSelfProperty()
     },
+    changeAreaColor(color) {
+      //   if (this.selfConfig.geo.itemStyle.normal.areaColor !== 'transparent') {
+      //     this.selfConfig.geo.itemStyle.normal.areaColor = this.selfConfig.geo.itemStyle.normal.areaColor
+      //   }
+      if (!color) {
+        this.selfConfig.geo.itemStyle.normal.areaColor = 'transparent'
+      }
+      this.setSelfProperty()
+    },
     // 设置自有属性
     setSelfProperty() {
       this.$store.dispatch('SetSelfProperty', this.selfConfig)
@@ -2299,11 +2330,12 @@ export default {
       event.stopPropagation()
       // 地图区域特殊处理区域透明
       if (this.mapOpacity) {
-        this.selfConfig.geo.itemStyle.normal.areaColor = this.selfConfig.series[0].itemStyle.normal.areaColor
-        this.selfConfig.series[0].itemStyle.normal.areaColor = 'transparent'
+        this.selfConfig.geo.itemStyle.normal.areaColor = this.selfConfig.geo.itemStyle.normal.areaColor
+        this.selfConfig.geo.itemStyle.normal.areaColor = 'transparent'
       } else {
-        if (this.$refs.areaColor) {
-          this.selfConfig.series[0].itemStyle.normal.areaColor = this.selfConfig.geo.itemStyle.normal.areaColor
+        // 透明还原
+        if (this.selfConfig.geo.itemStyle.normal.areaColor === 'transparent') {
+          this.selfConfig.geo.itemStyle.normal.areaColor = this.selfConfig.geo.itemStyle.normal.areaColor
           //   this.selfConfig.geo.itemStyle.normal.areaColor = this.$refs.areaColor.color.value
         }
       }

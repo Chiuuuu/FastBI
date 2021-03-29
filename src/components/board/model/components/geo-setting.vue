@@ -44,11 +44,13 @@
       </a-select> -->
     </div>
     <div class="geo-contain">
-      <div class="geo-map"></div>
+      <div class="geo-map">
+        <div ref="mapChart" style="height: 100%"></div>
+      </div>
       <div class="geo-set">
         <div class="set-head">
           <span class="g-s-s">地区匹配</span>
-          <span class="g-s-r">(6个未匹配项)</span>
+          <span class="g-s-r">({{ unmatchedLen }}个未匹配项)</span>
         </div>
         <!-- <div class="set-select">
           <div>
@@ -63,11 +65,26 @@
           </div>
         </div> -->
         <div class="set-table">
-          <a-table :columns="colu" :data-source="datas">
-            <span slot="config">
-              <a>请选择配置项</a>
-            </span>
+          <a-table
+            :loading="loading"
+            :columns="colu"
+            :data-source="datas"
+            :pagination="false"
+            class="table-list"
+          >
+            <template slot="config" slot-scope="text, record">
+              <a @click="openMatchWindow(record.key)">{{
+                record.MathedVal || '请选择配置项'
+              }}</a>
+            </template>
           </a-table>
+          <match-window
+            v-if="visible"
+            :visible="visible"
+            :matchList="areas"
+            @selectArea="selectArea"
+            @close="visible = false"
+          ></match-window>
         </div>
       </div>
     </div>
@@ -75,6 +92,10 @@
 </template>
 
 <script>
+import optionObj from './mapOptions'
+import echarts from 'echarts'
+import guangZhouJson from '@/utils/guangdong.json'
+import matchWindow from './matchWindow'
 const colu = [
   {
     title: '您的数据',
@@ -83,42 +104,49 @@ const colu = [
   {
     title: '匹配到',
     dataIndex: 'config',
+
     scopedSlots: {
       customRender: 'config'
     }
   }
 ]
 
-const datas = [
-  {
-    data: '天河'
-  },
-  {
-    data: '海珠'
-  }
-]
+const datas = []
 const countryData = ['中国']
 const proData = {
-  中国: ['广东省', '浙江省']
+  中国: ['广东省']
 }
 const cityData = {
-  广东省: ['广州市', '肇庆市', '深圳市'],
-  浙江省: ['宁波市', '温州市', '杭州市']
+  广东省: ['广州市']
+  //   浙江省: ['宁波市', '温州市', '杭州市']
 }
 const areaData = {
-  广州市: ['海珠区', '越秀区', '荔湾区'],
-  深圳市: ['罗湖区', '福田区', '南山区'],
-  肇庆市: ['怀集县', '四会市', '封开县'],
-  宁波市: ['镇海区', '宁海区', '象山区'],
-  温州市: ['文成区', '苍南区', '平阳区'],
-  杭州市: ['上城区', '下城区', '富阳区']
+  广州市: [
+    '海珠区',
+    '越秀区',
+    '荔湾区',
+    '增城区',
+    '天河区',
+    '白云区',
+    '黄埔区',
+    '番禺区',
+    '花都区',
+    '南沙区',
+    '从化区'
+  ]
+  //   深圳市: ['罗湖区', '福田区', '南山区'],
+  //   肇庆市: ['怀集县', '四会市', '封开县'],
+  //   宁波市: ['镇海区', '宁海区', '象山区'],
+  //   温州市: ['文成区', '苍南区', '平阳区'],
+  //   杭州市: ['上城区', '下城区', '富阳区']
 }
-
 export default {
+  components: { matchWindow },
   name: 'geoSetting',
   props: {
     isShow: Boolean,
-    region: String
+    region: String,
+    dimensionsData: {}
   },
   data() {
     return {
@@ -133,11 +161,75 @@ export default {
       cities: cityData[proData[countryData[0]][0]],
       city: cityData[proData[countryData[0]][0]][0],
       areas: areaData[cityData[proData[countryData[0]][0]][0]],
-      area: areaData[cityData[proData[countryData[0]][0]][0]][0]
-      // key: value
+      area: areaData[cityData[proData[countryData[0]][0]][0]][0],
+      visible: false,
+      currentKey: '',
+      loading: false,
+      condition: {} // 返回的匹配字段
     }
   },
+  computed: {
+    unmatchedLen() {
+      let umatcheds = this.datas.filter(item => !item.MathedVal)
+      return umatcheds.length
+    }
+  },
+  mounted() {
+    this.$nextTick(() => {
+      this.drawMap()
+    })
+    this.getDimensionsDatas()
+  },
   methods: {
+    // 获取维度数据
+    async getDimensionsDatas() {
+      let params = {
+        level: '3',
+        fieldId: this.dimensionsData.fieldId,
+        country: '中国',
+        province: '广东省',
+        city: '广州市',
+        pivotschemaId: this.dimensionsData.pivotschemaId
+      }
+      this.loading = true
+      let res = await this.$server.screenManage.getGeoData(params)
+      this.loading = false
+      // 模型数据被删
+      if (res.code === 500 && res.msg === 'IsChanged') {
+        this.$message.error('模型数据不存在')
+        return
+      }
+      if (res.code === 200) {
+        // 获取所有维度数据列表
+        this.condition = res.data.geoConfig.condition
+        let dataList = []
+        let keyList = Object.keys(this.condition)
+        // 构造被匹配数据列表
+        keyList.forEach((key, index) => {
+          dataList.push({
+            key: index + '',
+            data: key,
+            MathedVal: this.condition[key]
+          })
+        })
+        this.datas = dataList
+      } else {
+        res.msg && this.$message.error(res.msg)
+      }
+    },
+    drawMap() {
+      this.myChart = echarts.init(this.$refs.mapChart)
+      echarts.registerMap('guangzhou', guangZhouJson)
+      let option = optionObj
+      if (option && typeof option === 'object') {
+        this.myChart.setOption(option, true)
+      }
+    },
+    openMatchWindow(key) {
+      this.keyword = ''
+      this.visible = true
+      this.currentKey = key
+    },
     handlecountryChange(value) {
       this.provinces = proData[value]
       this.province = proData[value][0]
@@ -152,8 +244,36 @@ export default {
       this.areas = areaData[value]
       this.area = areaData[value][0]
     },
-    handleSave() {
-      this.handleClose()
+    async handleSave() {
+      if (this.unmatchedLen > 0) {
+        this.$message.error(`还有未匹配项`)
+        return
+      }
+      let params = {
+        level: '3',
+        fieldId: this.dimensionsData.fieldId,
+        country: '中国',
+        province: '广东省',
+        city: '广州市',
+        pivotschemaId: this.dimensionsData.pivotschemaId,
+        condition: this.condition
+      }
+      let res = await this.$server.screenManage.saveGeoData(params)
+      if (res.code === 500) {
+        this.$message.error(res.msg)
+        return
+      }
+      if (res.code === 200) {
+        this.$message.success('保存成功')
+        this.$emit('close')
+      }
+    },
+    // 匹配赋值
+    selectArea(value) {
+      let area = this.datas.find(item => item.key === this.currentKey)
+      area.MathedVal = value
+      this.condition[area.data] = value
+      this.visible = false
     },
     handleClose() {
       this.$emit('close')
@@ -162,9 +282,20 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .cacsader {
   height: 30px;
   line-height: 30px;
+}
+.area-list {
+  margin-top: 20px;
+  & > p {
+    margin: 0;
+    cursor: pointer;
+  }
+}
+.table-list {
+  height: 269px;
+  overflow-y: scroll;
 }
 </style>
