@@ -44,8 +44,8 @@
             </tr>
           </tbody>
         </table>
+        <a-empty class="table-empty" v-if="colPagination.tableData.length === 0"></a-empty>
       </div>
-      <a-empty class="table-empty" v-if="colPagination.tableData.length === 0"></a-empty>
     </a-spin>
   </a-modal>
 </template>

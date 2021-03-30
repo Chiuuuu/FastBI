@@ -27,8 +27,7 @@
       @click="handleChangePage('add')"
     />
     <a-spin style="padding: 0 50px;" :spinning="loading">
-      <a-empty v-if="colPagination.tableData.length === 0" class="main-empty"></a-empty>
-      <div class="table-area scrollbar" v-else>
+      <div class="table-area scrollbar">
         <table class="table">
           <thead>
             <tr>
@@ -60,6 +59,7 @@
             </tr>
           </tbody>
         </table>
+        <a-empty v-if="colPagination.tableData.length === 0" class="main-empty"></a-empty>
       </div>
     </a-spin>
   </a-modal>
