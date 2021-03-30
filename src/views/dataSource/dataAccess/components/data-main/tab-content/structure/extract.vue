@@ -20,6 +20,9 @@
       :pagination='false'
       :footer="null"
     >
+      <span slot="name" slot-scope="name, row">
+        <a @click="handleRegular(row, 'check')">{{ name }}</a>
+      </span>
       <span slot="repeat" slot-scope="type">
         {{ type === 0 ? '只执行一次' : '重复执行' }}
       </span>
@@ -48,7 +51,8 @@ const regColumns = [
     dataIndex: 'name',
     ellipsis: true,
     width: 200,
-    key: 'name'
+    key: 'name',
+    scopedSlots: { customRender: 'name' }
   },
   {
     title: '执行频率',
@@ -153,7 +157,9 @@ export default {
       })
     },
     handleRegular(row, type) {
-      if (type === 'edit') {
+      if (type === 'check') {
+        this.$emit('checkRegular', row)
+      } else if (type === 'edit') {
         this.modalSpin = true
         this.$emit('setRegular', row)
       } else if (type === 'delete') {

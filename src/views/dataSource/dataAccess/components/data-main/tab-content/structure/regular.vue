@@ -8,6 +8,13 @@
     :visible="show"
     @cancel="handleClose"
     @ok="handleOk">
+    <template slot="footer">
+      <template v-if="!isCheck">
+        <a-button type="default" key="back" @click="handleClose">取消</a-button>
+        <a-button type="primary" key="submit" @click="handleOk">确定</a-button>
+      </template>
+      <span v-else></span>
+    </template>
     <a-spin :spinning="spinning">
       <a-form-model
         ref="form"
@@ -19,7 +26,7 @@
         <template v-if="single">
           <a-form-model-item class="form-not-required" label="抽取方式" prop="extractType">
             <a-radio-group style="width:100%" v-model="form.extractType">
-              <a-radio :value="0">
+              <a-radio :disabled="isCheck" :value="0">
                 <span>全量覆盖抽取</span>
                 <a-popover>
                   <template slot="content">
@@ -28,7 +35,7 @@
                   <a-icon style="margin-left:10px" type="question-circle" theme="outlined" />
                 </a-popover>
               </a-radio>
-              <a-radio :value="1" :disabled="tableType === 1 || largeData.length > 0">
+              <a-radio :value="1" :disabled="isCheck || tableType === 1 || largeData.length > 0">
                 <span>增量抽取</span>
                 <a-popover>
                   <template slot="content">
@@ -40,16 +47,16 @@
             </a-radio-group>
           </a-form-model-item>
           <a-form-model-item v-if="form.extractType === 1" label="抽取依据字段" prop="incrementalColumn" :rules="increaseColRules">
-            <a-select v-model="form.incrementalColumn" placeholder="请选择依据字段" @change="handleSelectIncreaseField">
+            <a-select :disabled="isCheck" v-model="form.incrementalColumn" placeholder="请选择依据字段" @change="handleSelectIncreaseField">
               <a-select-option v-for="item in increaseList[0].fieldList" :key="item.name" :value="item.name">{{ item.name }}</a-select-option>
             </a-select>
           </a-form-model-item>
         </template>
         <a-form-model-item label="任务名称" prop="name">
-          <a-input v-model="form.name" placeholder="请输入任务名称"></a-input>
+          <a-input :disabled="isCheck" v-model="form.name" placeholder="请输入任务名称"></a-input>
         </a-form-model-item>
         <a-form-model-item label="执行频率" prop="repeat">
-          <a-select v-model="form.repeat" placeholder="请选择更新方式">
+          <a-select :disabled="isCheck" v-model="form.repeat" placeholder="请选择更新方式">
             <a-select-option :value="0">只执行一次</a-select-option>
             <a-select-option :value="1">重复执行</a-select-option>
           </a-select>
@@ -62,8 +69,8 @@
         >
           <div>
             <span>每隔&nbsp;</span>
-            <a-input style="width:100px" v-model="form.interval"></a-input>
-            <a-select class="regular-bordered" style="width:80px" @select="handleSelectFrequency" v-model="form.frequency" placeholder="请选择更新方式">
+            <a-input :disabled="isCheck" style="width:100px" v-model="form.interval"></a-input>
+            <a-select :disabled="isCheck" class="regular-bordered" style="width:80px" @select="handleSelectFrequency" v-model="form.frequency" placeholder="请选择更新方式">
               <a-select-option :value="0">分钟</a-select-option>
               <a-select-option :value="1">小时</a-select-option>
               <a-select-option :value="2">天</a-select-option>
@@ -75,6 +82,7 @@
         </a-form-model-item>
         <a-form-model-item label="开始时间" prop="gmtStart">
           <a-date-picker
+            :disabled="isCheck"
             style="width:100%"
             show-time
             v-model="form.gmtStart"
@@ -85,6 +93,7 @@
         </a-form-model-item>
         <a-form-model-item class="form-not-required" label="结束时间" prop="gmtEnd">
           <a-date-picker
+            :disabled="isCheck"
             style="width:100%"
             show-time
             v-model="form.gmtEnd"
@@ -104,10 +113,11 @@
       >
         <template #extractType="list, record, index">
           <a-select style="width: 150px" v-model="record.extractType" placeholder="请选择方式" @change="handleSelectExtractType($event, record)">
-            <a-select-option :value="0">全量更新</a-select-option>
+            <a-select-option :disabled="isCheck" :value="0">全量更新</a-select-option>
             <a-select-option
               :value="1"
-              :disabled="tableType === 1 ||
+              :disabled="isCheck ||
+              tableType === 1 ||
               (record.fieldList && record.fieldList.length === 0) ||
               isLargeData(record.target)"
             >增量更新</a-select-option>
@@ -154,6 +164,10 @@ export default {
       default: false
     },
     hasChangeData: { // 字段有变动的表
+      type: Boolean,
+      default: false
+    },
+    isCheck: {
       type: Boolean,
       default: false
     },

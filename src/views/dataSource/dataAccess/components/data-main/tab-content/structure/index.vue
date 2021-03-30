@@ -125,7 +125,8 @@
         :rows="clickRows"
         :database-id="databaseId"
         @close="closeRegularList"
-        @setRegular="setRegular" />
+        @setRegular="setRegular"
+        @checkRegular="handleCheckRegularInfo" />
       <regular-setting
         ref="regular"
         :show="visible2"
@@ -134,6 +135,7 @@
         :reg-data="regData"
         :large-data="largeDataList"
         :has-change-data="hasChangeData"
+        :is-check="isCheckRegular"
         @insertData="data => $refs.extract && $refs.extract.regData.push(data)"
         @updateData="data => $refs.extract && $refs.extract.updateRows(data)"
         @close="closeRegular" />
@@ -223,6 +225,7 @@ export default {
       database: '', // 当前数据库名
       databaseId: '', // 当前数据库id
       verifying: false,
+      isCheckRegular: false, // 是否为查看状态(定时任务详情)
       regData: [], // 定时任务详情
       largeDataList: [], // 所选表是否含有大量数据
       hasChangeData: false, // 所选表是否有字段变动
@@ -658,6 +661,7 @@ export default {
       this.regData = []
       this.largeDataList = []
       this.hasChangeData = false
+      this.isCheckRegular = false
     },
     // 关闭定时任务列表窗口
     closeRegularList() {
@@ -666,13 +670,28 @@ export default {
       this.hasChangeData = false
       this.clickRows = []
     },
+    // 获取定时任务详情(查看用)
+    async handleCheckRegularInfo(data) {
+      if (this.$refs.extract.modalSpin) this.$refs.extract.modalSpin = true
+      const res = await this.$server.dataAccess.getRegularInfo(data.id, data.groupId)
+        .catch(() => {
+          if (this.$refs.extract.modalSpin) this.$refs.extract.modalSpin = false
+        })
+      if (res.code === 200) {
+        this.visible2 = true
+        this.isCheckRegular = true
+        this.regData = res.data
+      } else {
+        this.$message.error(res.msg)
+      }
+    },
     // 获取定时任务详情(编辑用)
     async handleGetRegularInfo(data) {
       if (this.$refs.extract.modalSpin) this.$refs.extract.modalSpin = true
       const res = await this.$server.dataAccess.getRegularInfo(data.id, data.groupId)
-          .catch(() => {
-            if (this.$refs.extract.modalSpin) this.$refs.extract.modalSpin = false
-          })
+        .catch(() => {
+          if (this.$refs.extract.modalSpin) this.$refs.extract.modalSpin = false
+        })
       if (res.code === 200) {
         // 校验当前表
         const code = await this.handleVerifyTable(res.data.map(item => item.target))
