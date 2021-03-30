@@ -112,19 +112,18 @@
         :data-source="increaseList"
       >
         <template #extractType="list, record, index">
-          <a-select style="width: 150px" v-model="record.extractType" placeholder="请选择方式" @change="handleSelectExtractType($event, record)">
-            <a-select-option :disabled="isCheck" :value="0">全量更新</a-select-option>
+          <a-select :disabled="isCheck" style="width: 150px" v-model="record.extractType" placeholder="请选择方式" @change="handleSelectExtractType($event, record)">
+            <a-select-option :value="0">全量更新</a-select-option>
             <a-select-option
               :value="1"
-              :disabled="isCheck ||
-              tableType === 1 ||
+              :disabled="tableType === 1 ||
               (record.fieldList && record.fieldList.length === 0) ||
               isLargeData(record.target)"
             >增量更新</a-select-option>
           </a-select>
         </template>
         <template #fieldList="list, record, index">
-          <a-select v-if="record.extractType === 1" style="width: 150px" :default-value="list[0].name" placeholder="请选择字段" @change="handleSelectIncreaseFieldBatch($event, record)">
+          <a-select :disabled="isCheck" v-if="record.extractType === 1" style="width: 150px" :default-value="list[0].name" placeholder="请选择字段" @change="handleSelectIncreaseFieldBatch($event, record)">
             <a-select-option v-for="item in list" :key="item.name" :value="item.name">{{ item.name }}</a-select-option>
           </a-select>
         </template>

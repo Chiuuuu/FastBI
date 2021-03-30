@@ -431,6 +431,12 @@ export default {
         databaseName = this.databaseName
       }
 
+      // 当前库组列表没有默认数据库(即没有权限)则不掉接口
+      if (!databaseName) {
+        this.spinning = false
+        return
+      }
+
       // 获取数据库id
       const database = this.databaseList.find(item => item.name === databaseName)
       this.databaseId = database ? database.id : ''
