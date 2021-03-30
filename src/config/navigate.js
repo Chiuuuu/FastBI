@@ -1289,6 +1289,7 @@ const list = [
         },
         config: {
           title: {
+            total: '',
             content: '',
             textAlign: 'left',
             textStyle: {

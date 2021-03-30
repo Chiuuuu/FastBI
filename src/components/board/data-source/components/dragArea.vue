@@ -440,7 +440,6 @@ export default {
             for (let item of this.fileList) {
               str += res.rows[0][item.alias] + ' '
             }
-            console.log(str)
             config.title.content = str
             this.$store.dispatch('SetSelfProperty', config)
           }

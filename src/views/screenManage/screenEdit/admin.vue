@@ -162,6 +162,7 @@ import ChartNodata from '@/components/tools/Nodata'
 import Screen from '@/views/screen' // 全屏
 
 import { Icon } from 'ant-design-vue'
+import { deepClone } from '@/utils/deepClone'
 
 const IconFont = Icon.createFromIconfontCN({
   scriptUrl: '//at.alicdn.com/t/font_2276651_71nv5th6v94.js'

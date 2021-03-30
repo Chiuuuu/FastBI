@@ -183,7 +183,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['saveScreenData', 'handleRefreshData']),
+    ...mapActions(['saveScreenData', 'handleRefreshData', 'updateChartData']),
     // 排序筛选字段选择
     sortFileChange(val) {
       if (!val || (val && this.sortData.asc === undefined)) {
@@ -222,7 +222,7 @@ export default {
       this.refresh.isRefresh = checked
       this.apiData.refresh = this.refresh
       this.$store.dispatch('SetSelfDataSource', this.apiData)
-      this.saveScreenData()
+      this.updateChartData()
       this.setTimer()
     },
     // 刷新频率设置
@@ -239,7 +239,7 @@ export default {
       }
       this.apiData.refresh = this.refresh
       this.$store.dispatch('SetSelfDataSource', this.apiData)
-      this.saveScreenData()
+      this.updateChartData()
       this.setTimer()
     },
     // 刷新单位设置
@@ -256,7 +256,7 @@ export default {
       }
       this.apiData.refresh = this.refresh
       this.$store.dispatch('SetSelfDataSource', this.apiData)
-      this.saveScreenData()
+      this.updateChartData()
       this.setTimer()
     },
     reset() {
