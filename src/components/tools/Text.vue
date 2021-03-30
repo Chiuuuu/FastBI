@@ -8,7 +8,6 @@
     :style="titleStyle"
     :disabled="true"
     :autoSize="{ minRows: 2, maxRows: 50 }"
-    @blur="textChange"
   />
   <!-- <div class="dv-text" style="width: 100%;height:100%;" ref="wrap">
     <div class="titles" ref="titles" v-if="config.title" :style="titleStyle">

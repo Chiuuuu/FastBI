@@ -240,7 +240,7 @@ const app = {
       return screenManage.updateChart(params)
     },
     // 获取大屏详情
-    async getScreenDetail({ dispatch, commit }, { id, tabId, needRefresh }) {
+    async getScreenDetail({ dispatch, commit, rootGetters }, { id, tabId, needRefresh }) {
       return screenManage.getScreenDetailById(id, tabId).then(res => {
         if (res.code === 200) {
           this.screenData = res.data
@@ -253,6 +253,27 @@ const app = {
           dispatch('dataModel/setSelectedModelList', res.list)
           commit('common/SET_PRIVILEGES', res.data.privileges || [])
           commit('SET_IS_PUBLISH', res.data.isPublish)
+
+          console.log(rootGetters)
+          for (let item of rootGetters.canvasMap) {
+            if (item.setting.name === 've-text') {
+              if (this.timer) {
+                clearInterval(this.timer)
+                this.timer = null
+              }
+              let config = item.setting.config
+              if (item.setting.api_data.refresh.isRefresh) {
+                this.timer = setInterval(() => {
+                  config.title.content = Number(config.title.content)
+                  let num = Math.floor(Math.random() * 101)
+                  config.title.content = config.title.content + num
+                  config.title.total = config.title.content
+                  console.log(config.title)
+                  dispatch('SetSelfProperty', config)
+                }, 10000)
+              }
+            }
+          }
           if (needRefresh) {
             return dispatch('refreshScreen', {
               charSeted: false,
