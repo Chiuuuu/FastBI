@@ -982,10 +982,10 @@ const list = [
             itemStyle: {
               normal: {
                 areaColor: 'rgba(1, 33, 92, 0.45)',
-                borderColor: '#215495',
-                borderWidth: 1,
+                borderColor: 'rgba(147, 235, 248, 1)',
+                borderWidth: 2,
                 shadowColor: 'rgba(0,54,255, 1)',
-                shadowBlur: 150
+                shadowBlur: 100
               },
               emphasis: {
                 borderColor: '#073684',

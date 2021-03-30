@@ -2213,7 +2213,7 @@ export default {
       //     this.selfConfig.geo.itemStyle.normal.areaColor = this.selfConfig.geo.itemStyle.normal.areaColor
       //   }
       if (!color) {
-        this.selfConfig.geo.itemStyle.normal.areaColor = 'transparent'
+        this.selfConfig.geo.itemStyle.normal.areaColor = 'rgba(0,0,0,0)'
       }
       this.setSelfProperty()
     },
@@ -2390,16 +2390,16 @@ export default {
       // 阻止默认事件，取消收起
       event.stopPropagation()
       // 地图区域特殊处理区域透明
-      if (this.mapOpacity) {
-        this.selfConfig.geo.itemStyle.normal.areaColor = this.selfConfig.geo.itemStyle.normal.areaColor
-        this.selfConfig.geo.itemStyle.normal.areaColor = 'transparent'
-      } else {
-        // 透明还原
-        if (this.selfConfig.geo.itemStyle.normal.areaColor === 'transparent') {
-          this.selfConfig.geo.itemStyle.normal.areaColor = this.selfConfig.geo.itemStyle.normal.areaColor
-          //   this.selfConfig.geo.itemStyle.normal.areaColor = this.$refs.areaColor.color.value
-        }
-      }
+      //   if (this.mapOpacity) {
+      //     this.selfConfig.geo.itemStyle.normal.areaColor = this.selfConfig.geo.itemStyle.normal.areaColor
+      //     this.selfConfig.geo.itemStyle.normal.areaColor = 'transparent'
+      //   } else {
+      //     // 透明还原
+      //     if (this.selfConfig.geo.itemStyle.normal.areaColor === 'transparent') {
+      //       this.selfConfig.geo.itemStyle.normal.areaColor = this.selfConfig.geo.itemStyle.normal.areaColor
+      //       //   this.selfConfig.geo.itemStyle.normal.areaColor = this.$refs.areaColor.color.value
+      //     }
+      //   }
       this.setSelfProperty()
     },
 
