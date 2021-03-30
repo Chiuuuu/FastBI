@@ -158,7 +158,7 @@ export default {
       default: false
     },
     largeData: Array, // 有大数据量的表
-    regData: Array, // 有大数据量的表
+    regData: Array, // 编辑的任务
     rows: [Array],
     tableType: Number // 0 原表, 1 自定义表
   },
@@ -347,6 +347,10 @@ export default {
     },
     gmtStartValidator(rule, value, callback) {
       if (+new Date(value) < +new Date() + 60 * 1000) {
+        // 编辑时, 当前重复执行的任务还未结束时, 不检验开始时间是否大于当前时间
+        if (this.regData.length > 0 && this.form.repeat === 1 && (!this.form.gmtEnd || +new Date(this.form.gmtEnd) > +new Date())) {
+          callback()
+        }
         this.errorState = 1
         callback(new Error('开始时间最早需设置在1分钟后'))
       } else if (value && this.form.gmtEnd && +new Date(this.form.gmtEnd) < +new Date(value)) {

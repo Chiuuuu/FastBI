@@ -24,7 +24,15 @@
         {{ type === 0 ? '只执行一次' : '重复执行' }}
       </span>
       <span slot="config" slot-scope="row">
-        <a style="margin-right: 20px" v-on:click="handleRegular(row, 'edit')">编辑</a>
+        <a-tooltip v-if="row.executed > 0 && row.repeat === 0" placement="left">
+          <span slot="title">该任务已执行完毕, 无法编辑</span>
+          <span style="color:#ccc;margin-right: 20px">编辑</span>
+        </a-tooltip>
+        <a-tooltip v-else-if="row.repeat === 1 && row.gmtEnd && +new Date(row.gmtEnd) < +new Date()" placement="left">
+          <span slot="title">该任务已执行完毕, 无法编辑</span>
+          <span style="color:#ccc;margin-right: 20px">编辑</span>
+        </a-tooltip>
+        <a v-else style="margin-right: 20px" v-on:click="handleRegular(row, 'edit')">编辑</a>
         <a v-on:click="handleRegular(row, 'delete')">删除</a>
       </span>
     </a-table>
