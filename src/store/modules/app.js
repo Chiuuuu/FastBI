@@ -254,27 +254,27 @@ const app = {
           commit('common/SET_PRIVILEGES', res.data.privileges || [])
           commit('SET_IS_PUBLISH', res.data.isPublish)
 
-          console.log(rootGetters)
-          for (let item of rootGetters.canvasMap) {
-            if (item.setting.name === 've-text') {
-              if (this.timer) {
-                clearInterval(this.timer)
-                this.timer = null
-              }
-              if (item.setting.api_data.refresh.isRefresh) {
-                this.timer = (function(item) {
-                  let config = item.setting.config
-                  setInterval(() => {
-                    config.title.content = Number(config.title.content)
-                    let num = Math.floor(Math.random() * 101)
-                    config.title.content = config.title.content + num
-                    config.title.total = config.title.content
-                    dispatch('SetSelfProperty', config)
-                  }, 10000)
-                })(item)
-              }
-            }
-          }
+          // console.log(rootGetters)
+          // for (let item of rootGetters.canvasMap) {
+          //   if (item.setting.name === 've-text') {
+          //     if (this.timer) {
+          //       clearInterval(this.timer)
+          //       this.timer = null
+          //     }
+          //     if (item.setting.api_data.refresh.isRefresh) {
+          //       this.timer = (function(item) {
+          //         let config = item.setting.config
+          //         setInterval(() => {
+          //           config.title.content = Number(config.title.content)
+          //           let num = Math.floor(Math.random() * 101)
+          //           config.title.content = config.title.content + num
+          //           config.title.total = config.title.content
+          //           dispatch('SetSelfProperty', config)
+          //         }, 10000)
+          //       })(item)
+          //     }
+          //   }
+          // }
           if (needRefresh) {
             return dispatch('refreshScreen', {
               charSeted: false,
