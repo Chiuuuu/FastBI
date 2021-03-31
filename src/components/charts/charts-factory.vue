@@ -138,16 +138,22 @@ export default {
           if (this.typeName === 've-map') {
             this.chartExtend = { ...omit(val, ['series']) }
             this.chartSeries = val.series
-            // 添加标签格式回调
-            this.chartSeries[0].label.formatter = function(params) {
-              return params.data.value[2].toFixed(2)
+            if (this.chartSeries[0].label.formatter === '{b} ：{c}') {
+              // 添加标签格式回调
+              this.chartSeries[0].label.formatter = function(params) {
+                return params.data.value[2].toFixed(2)
+              }
             }
             this.geo = val.geo
             this.mapToolTip = val.tooltip
-            // 添加格式回调函数
-            this.mapToolTip.formatter = function(params) {
-              let data = params.data
-              return `${params.seriesName}<br />${data.name}：${data.value[2]}`
+            if (this.mapToolTip.formatter === '{b} ：{c}') {
+              // 添加格式回调函数
+              this.mapToolTip.formatter = function(params) {
+                let data = params.data
+                return `${params.seriesName}<br />${data.name}：${
+                  data.value[2]
+                }`
+              }
             }
           } else {
             this.chartExtend = { ...val }

@@ -807,7 +807,7 @@ const list = [
         type: '1',
         isEmpty: false,
         chartType: 'v-map',
-        icon: '图表-雷达图.png',
+        icon: 'icon_map.png',
         modelId: '',
         api_data: {
           //   columns: ['位置', '人口'],
@@ -875,8 +875,8 @@ const list = [
           },
           tooltip: {
             trigger: 'item',
-            confine: true
-            // formatter: '{b} ：{c}'
+            confine: true,
+            formatter: '{b} ：{c}'
             // formatter(params) {
             //   return params.name
             // }
@@ -1040,10 +1040,7 @@ const list = [
               },
               label: {
                 show: false,
-                formatter: function(params) {
-                  let data = params.data
-                  return `${data.name}：${data.value[2]}`
-                },
+                formatter: '{b} ：{c}',
                 color: DEFAULT_COLORS[0],
                 fontSize: 12,
                 position: 'right', // 可选inside
