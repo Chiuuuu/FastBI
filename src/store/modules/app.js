@@ -261,16 +261,17 @@ const app = {
                 clearInterval(this.timer)
                 this.timer = null
               }
-              let config = item.setting.config
               if (item.setting.api_data.refresh.isRefresh) {
-                this.timer = setInterval(() => {
-                  config.title.content = Number(config.title.content)
-                  let num = Math.floor(Math.random() * 101)
-                  config.title.content = config.title.content + num
-                  config.title.total = config.title.content
-                  console.log(config.title)
-                  dispatch('SetSelfProperty', config)
-                }, 10000)
+                this.timer = (function(item) {
+                  let config = item.setting.config
+                  setInterval(() => {
+                    config.title.content = Number(config.title.content)
+                    let num = Math.floor(Math.random() * 101)
+                    config.title.content = config.title.content + num
+                    config.title.total = config.title.content
+                    dispatch('SetSelfProperty', config)
+                  }, 10000)
+                })(item)
               }
             }
           }
