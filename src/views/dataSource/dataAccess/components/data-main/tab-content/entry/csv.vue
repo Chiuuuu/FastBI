@@ -458,7 +458,7 @@ export default {
         // 临时方案
         this.fileList[0] = file
 
-        const database = isNaN ? result.rows[0].tableContent : result.rows
+        const database = flag ? result.rows[0].tableContent : result.rows
         this.$set(this.databaseList, currentIndex, database)
         this.$nextTick(() => {
           this.handleGetDataBase(currentIndex)
