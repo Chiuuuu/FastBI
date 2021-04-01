@@ -204,10 +204,10 @@ export default {
         this.pageSettings.refresh.frequency > 0
       ) {
         let count = 0
-        if (this.globalSettings.refresh.unit === 'min') {
-          count = this.globalSettings.refresh.frequency * 60 * 1000
-        } else if (this.globalSettings.refresh.unit === 'hour') {
-          count = this.globalSettings.refresh.frequency * 60 * 60 * 1000
+        if (this.pageSettings.refresh.unit === 'min') {
+          count = this.pageSettings.refresh.frequency * 60 * 1000
+        } else if (this.pageSettings.refresh.unit === 'hour') {
+          count = this.pageSettings.refresh.frequency * 60 * 60 * 1000
         }
         this.timer = setInterval(() => {
           this.refreshData()
