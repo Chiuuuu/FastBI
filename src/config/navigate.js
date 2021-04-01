@@ -1307,7 +1307,7 @@ const list = [
         api_data: {},
         apis: {},
         modelId: '',
-        canEdit: false,
+        canEdit: true,
         background: {
           backgroundType: '1',
           backgroundColor: 'none',
