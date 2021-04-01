@@ -68,6 +68,8 @@ import {
   removeResizeListener
 } from 'bin-ui/src/utils/resize-event'
 
+import throttle from 'lodash/throttle'
+
 export default {
   name: 'screen',
   components: {
@@ -82,7 +84,9 @@ export default {
   data() {
     return {
       wrapStyle: {},
-      range: ''
+      range: '',
+      chartTimer: null,
+      timer: null
     }
   },
   computed: {
@@ -129,6 +133,10 @@ export default {
   },
   beforeDestroy() {
     removeResizeListener(this.$refs.dvScreen, this._calcStyle)
+    clearInterval(this.timer)
+    this.timer = null
+    clearInterval(this.chartTimer)
+    this.chartTimer = null
   },
   methods: {
     ...mapActions(['getScreenDetail', 'refreshScreen']),
@@ -167,8 +175,11 @@ export default {
             needRefresh: true
           }).then(res => {
             loadingInstance.close()
-            if (res && this.isPublish === 1) {
-              this.getShareData()
+            if (res) {
+              this.setTimer()
+              if (this.isPublish === 1) {
+                this.getShareData()
+              }
             }
           })
         } else {
@@ -176,6 +187,49 @@ export default {
           loadingInstance.close()
         }
       })
+    },
+    // 设置定时器
+    setTimer() {
+      if (this.timer) {
+        clearInterval(this.timer)
+        this.timer = null
+      }
+      if (this.chartTimer) {
+        clearInterval(this.chartTimer)
+        this.chartTimer = null
+      }
+      if (
+        this.pageSettings.refresh.isRefresh &&
+        this.pageSettings.refresh.unit &&
+        this.pageSettings.refresh.frequency > 0
+      ) {
+        let count = 0
+        if (this.globalSettings.refresh.unit === 'min') {
+          count = this.globalSettings.refresh.frequency * 60 * 1000
+        } else if (this.globalSettings.refresh.unit === 'hour') {
+          count = this.globalSettings.refresh.frequency * 60 * 60 * 1000
+        }
+        this.timer = setInterval(() => {
+          this.refreshData()
+        }, count)
+      }
+      for (let item of this.canvasMap) {
+        let refresh = item.setting.api_data.refresh
+        if (refresh.isRefresh && refresh.unit && refresh.frequency > 0) {
+          let count = 0
+          if (refresh.unit === 'min') {
+            count = refresh.frequency * 60 * 1000
+          } else if (refresh.unit === 'hour') {
+            count = refresh.frequency * 60 * 60 * 1000
+          }
+          let _this = this
+          this.chartTimer = (function(item) {
+            setInterval(() => {
+              _this.refreshData()
+            }, count)
+          })(item)
+        }
+      }
     },
     // 获取分享信息
     getShareData() {
@@ -211,6 +265,20 @@ export default {
       }
       this.range = range
     },
+    // 刷新大屏
+    refreshData: throttle(
+      function() {
+        this.refreshScreen({
+          charSeted: false,
+          needLoading: true
+        })
+      },
+      1000,
+      {
+        leading: true,
+        trailing: false
+      }
+    ),
     // 刷新大屏
     refreshData() {
       if (!this.screenId) {
