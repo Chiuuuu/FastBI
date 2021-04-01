@@ -2291,7 +2291,7 @@ export default {
           this.resetSetting()
         }
       }
-      this.$store.dispatch('SetSelfDataSource', this.globalSettings)
+      this.$store.dispatch('SetPageSettings', this.globalSettings)
       this.saveScreenData()
       this.setTimer()
     },
