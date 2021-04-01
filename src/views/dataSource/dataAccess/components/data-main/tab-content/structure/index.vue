@@ -410,6 +410,8 @@ export default {
       this.columns = columns
     },
     handleChangeTable(pagination) {
+      this.selectedRowKeys = []
+      this.selectedRows = []
       this.handleGetTableList(pagination)
     },
     async handleGetData(pagination) {
@@ -599,6 +601,7 @@ export default {
         }
         if (this.largeDataList.length > 0) {
           this.$message.success('抽取任务已下达，当前抽取的表数据量较多，耗时会更长，请您耐心等待')
+          this.largeDataList = []
         } else {
           this.$message.success('抽取任务已下达')
         }

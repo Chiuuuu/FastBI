@@ -2,7 +2,7 @@
   <div
     class="dragArea"
     :class="{
-      'dragable-vaild': type === dragFile || (isdrag && type === 'tableList')
+      'dragable-vaild': isdrag && (type === dragFile || type === 'tableList')
     }"
     @drop.stop.prevent="handleDropOnFilesWD($event)"
     @dragover.stop.prevent
@@ -213,6 +213,7 @@ export default {
         this.currSelected.datamodelId !== dataFile.datamodelId
       ) {
         this.$message.error('一个图表只能拖入一个数据模型的字段')
+        this.isdrag = false
         return false
       }
       dataFile.showMore = false // 是否点击显示更多

@@ -35,7 +35,7 @@
             v-model="sortData.pivotschemaId"
             placeholder="选择字段"
             class="f-flex1"
-            style="margin-right:10px"
+            style="margin-right:10px;width:50%"
             @change="sortFileChange"
           >
             <a-select-option
