@@ -1,19 +1,18 @@
 <template>
-  <a-textarea
-    class="dv-text"
-    :key="key"
-    placeholder="点击以输入文本内容，输入*按键可插入度量"
-    v-model="selfConfig.title.content"
-    ref="text"
-    :style="titleStyle"
-    :disabled="true"
-    :autoSize="{ minRows: 2, maxRows: 50 }"
-  />
-  <!-- <div class="dv-text" style="width: 100%;height:100%;" ref="wrap">
-    <div class="titles" ref="titles" v-if="config.title" :style="titleStyle">
-      <span>{{ config.title.content }}</span>
-    </div>
-  </div>-->
+  <div class="text-box" :style="backgroundStyle">
+    <div
+      :class="['dv-text', { 'cursor-text': canEdit }]"
+      ref="text"
+      :contenteditable="canEdit"
+      v-html="innerText ? `<p>${innerText}</p>` : ''"
+      :style="contentStyle"
+      placeholder="点击以输入文本内容"
+      @mousedown.stop
+      @focus="locked = true"
+      @blur="locked = false"
+      @input="textChange"
+    ></div>
+  </div>
 </template>
 
 <script>
@@ -32,15 +31,39 @@ export default {
     },
     id: {
       default: 0
+    },
+    canEdit: {
+      type: Boolean,
+      default: false
     }
   },
   watch: {
     config: {
       handler(val) {
-        console.log(val)
         if (val) {
           this.selfConfig = val
-          this.key++
+          if (!this.locked) {
+            this.innerText = this.selfConfig.title.text
+          }
+        }
+      },
+      deep: true,
+      immediate: true
+    },
+    background: {
+      handler(val) {
+        if (val) {
+          this.backgroundStyle = {
+            background:
+              val.backgroundType === '1'
+                ? val.backgroundColor
+                : `url(${val.backgroundSrc})`,
+            //  backgroundColor: val.backgroundColor,
+            borderColor: val.borderColor,
+            borderWidth: val.borderWidth + 'px',
+            borderStyle: val.borderStyle,
+            borderRadius: val.borderRadius + 'px'
+          }
         }
       },
       deep: true,
@@ -50,7 +73,10 @@ export default {
   data() {
     return {
       selfConfig: {},
-      key: 0
+      backgroundStyle: {},
+      key: 0,
+      innerText: '',
+      locked: false
     }
   },
   created() {
@@ -60,32 +86,49 @@ export default {
   methods: {
     ...mapActions(['saveScreenData', 'updateChartData']),
     // 实时保存文本
-    textChange() {
+    textChange(e) {
+      this.selfConfig.title.text = e.target.innerText
       this.$store.dispatch('SetSelfProperty', this.selfConfig)
       this.updateChartData()
     }
   },
   computed: {
-    titleStyle() {
+    contentStyle() {
       return {
         padding: '0 10px',
         color: this.config.title.textStyle.color,
         fontSize: this.config.title.textStyle.fontSize + 'px',
         textAlign: this.config.title.textAlign,
         fontFamily: this.config.title.textStyle.fontFamily,
-        fontWeight: this.config.title.textStyle.fontWeight,
-        background: 'none',
-        border: 'none',
-        ...this.background
+        fontWeight: this.config.title.textStyle.fontWeight
       }
     }
   }
 }
 </script>
 
-<style lang="stylus" scoped>
-.dv-text{
-    resize:none;
+<style lang="less" scoped>
+.text-box {
+  height: 100%;
+  pointer-events: auto !important;
+  overflow: hidden;
+  word-wrap: break-word;
+  word-break: break-all;
+}
+.dv-text {
+  resize: none;
+  padding: 2px 5px 10px 5px;
+  min-height: 30%;
+  cursor: default;
+  &.cursor-text {
+    cursor: text;
+  }
+  &[contenteditable='true'] {
+    &:empty:before {
+      content: attr(placeholder);
+      display: block;
+    }
+  }
 }
 
 // .dv-text:hover{

@@ -315,7 +315,11 @@ export default {
       // 对应的是维度
       if (dataFile.file === 'dimensions') {
         // 获取维度对应字段列表
-        let params = { datamodelId: dataFile.modelId, dimensions: [dataFile] }
+        let params = {
+          datamodelId: dataFile.screenTableId,
+          resourceType: dataFile.resourceType,
+          dimensions: [dataFile]
+        }
         let res = await this.$server.screenManage.getDataPick(params)
         // 模型数据被删
         if (res.code === 500 && res.msg === 'IsChanged') {
@@ -337,11 +341,28 @@ export default {
         }
       } else {
         // 对应的是度量
-        let { pivotschemaId } = dataFile
-        let res = await this.$server.screenManage.getMeasureCheck(pivotschemaId)
-        if (res.code === 200 && res.data) {
-          dataFile.conditionList = [] // 条件行
-        } else {
+        let { pivotschemaId, resourceType, dataType } = dataFile
+        try {
+          // 数据接入类型直接判断，dataType是不是BIGINT/DOUBLE类型
+          if (
+            resourceType === 3 &&
+            dataType !== 'BIGINT' &&
+            dataType !== 'DOUBLE'
+          ) {
+            throw false
+          }
+          // 模型调接口判断
+          if (resourceType === 8) {
+            let res = await this.$server.screenManage.getMeasureCheck(
+              pivotschemaId
+            )
+            if (res.code !== 200 || !res.data) {
+              throw false
+            }
+          }
+          // 通过验证初始化条件列表
+          dataFile.conditionList = []
+        } catch (err) {
           this.$message.error('当前字段为文本类型，无法进行数值区间筛选')
           this.isdrag = false
           return
@@ -392,7 +413,8 @@ export default {
       this.manualValue = '' // 手动输入值
       if (item.file === 'dimensions') {
         let params = {
-          datamodelId: this.currentFile.modelId,
+          datamodelId: this.currentFile.screenTableId,
+          resourceType: this.currentFile.resourceType,
           dimensions: [this.currentFile]
         }
         let res = await this.$server.screenManage.getDataPick(params)
@@ -549,14 +571,21 @@ export default {
       // 构造dataDimensionsLimit,dataDimensionsLimit列表
       this.fileList.forEach(item => {
         if (item.file === 'dimensions') {
-          let { pivotschemaId, type, dataType, value } = item
-          dimensionsLimitList.push({ pivotschemaId, type, dataType, value })
+          let { pivotschemaId, type, dataType, value, name } = item
+          dimensionsLimitList.push({
+            pivotschemaId,
+            type,
+            dataType,
+            value,
+            name
+          })
         } else {
-          let { pivotschemaId, type, dataType, conditionList } = item
+          let { pivotschemaId, type, dataType, conditionList, name } = item
           measuresLimitList.push({
             pivotschemaId,
             type,
             dataType,
+            name,
             value: conditionList
           })
         }
@@ -588,7 +617,7 @@ export default {
       this.getData()
     },
     // 根据维度度量获取数据
-    getData() {
+    async getData() {
       let apiData = deepClone(this.currSelected.setting.api_data)
       let type = this.currSelected.setting.type
       if (type === '1') {
@@ -622,161 +651,165 @@ export default {
       let selected = this.canvasMap.find(
         item => item.id === this.currentSelected
       )
-      this.$server.screenManage.getData(this.currSelected).then(res => {
-        selected.setting.isEmpty = false
-        // 数据源被删掉
-        if (res.code === 500 && res.msg === 'IsChanged') {
-          selected.setting.isEmpty = true
+      let res = ''
+      if (apiData.measures[0].resourceType === 8) {
+        res = await this.$server.screenManage.getData(selected)
+      } else {
+        res = await this.$server.screenManage.getDataForSource(selected)
+      }
+      selected.setting.isEmpty = false
+      // 数据源被删掉
+      if (res.code === 500 && res.msg === 'IsChanged') {
+        selected.setting.isEmpty = true
+        this.updateChartData()
+        return
+      }
+      if (res.code === 200) {
+        // 查不到数据
+        if (res.rows.length === 0) {
+          // 清空数据
+          apiData.source.columns = []
+          apiData.source.rows = []
+          this.$store.dispatch('SetSelfDataSource', apiData)
           this.updateChartData()
           return
         }
-        if (res.code === 200) {
-          // 查不到数据
-          if (res.rows.length === 0) {
-            // 清空数据
-            apiData.source.columns = []
-            apiData.source.rows = []
+        let rows = res.rows
+        if (this.currSelected.setting.chartType === 'v-tables') {
+          let columns = []
+          let keys = Object.keys(rows[0])
+          for (let alias of keys) {
+            columns.push({
+              title: alias,
+              dataIndex: alias,
+              key: alias
+            })
+          }
+          if (rows.length > 10) {
+            rows.length = 10
+          }
+          apiData.source = {
+            columns,
+            rows
+          }
+          this.$store.dispatch('SetSelfDataSource', apiData)
+        } else {
+          // 仪表盘/环形图 只显示度量
+          if (this.chartType === '2') {
+            let columns = ['type', 'value'] // 维度固定
+            for (let m of apiData.measures) {
+              columns.push(m.alias) // 默认columns第二项起为指标
+            }
+            // 对返回的数据列进行求和
+            let total = sum(res.rows, apiData.measures[0].alias)
+            let rows = [
+              {
+                type: apiData.measures[0].alias,
+                value: total
+              }
+            ]
+            // 环形图第二度量(指针值)
+            if (
+              this.currSelected.setting.chartType === 'v-ring' &&
+              apiData.measures[1]
+            ) {
+              let currentTotal = sum(res.rows, apiData.measures[1].alias)
+              rows[0] = {
+                type: apiData.measures[1].alias,
+                value: currentTotal
+              }
+              rows.push({
+                type: apiData.measures[0].alias,
+                value: total - currentTotal
+              })
+            }
+            apiData.source = {
+              columns,
+              rows
+            }
+            // 保存apidata数据
             this.$store.dispatch('SetSelfDataSource', apiData)
-            this.updateChartData()
+            let config = deepClone(this.currSelected.setting.config)
+            if (this.currSelected.setting.chartType === 'v-multiPie') {
+              config.chartTitle.text = rows[0].value
+              this.$store.dispatch('SetSelfProperty', config)
+            }
+            // 如果是仪表盘，第二个度量是目标值（进度条最大值）
+            if (
+              this.currSelected.setting.chartType === 'v-gauge' &&
+              apiData.measures[1]
+            ) {
+              let goalTotal = sum(res.rows, apiData.measures[1].alias)
+              config.series.max = goalTotal
+              this.$store.dispatch('SetSelfProperty', config)
+            }
+            //   this.updateChartData()
             return
           }
-          let rows = res.rows
-          if (this.currSelected.setting.chartType === 'v-tables') {
-            let columns = []
-            let keys = Object.keys(rows[0])
-            for (let alias of keys) {
-              columns.push({
-                title: alias,
-                dataIndex: alias,
-                key: alias
-              })
-            }
-            if (rows.length > 10) {
-              rows.length = 10
-            }
-            apiData.source = {
-              columns,
-              rows
-            }
-            this.$store.dispatch('SetSelfDataSource', apiData)
-          } else {
-            // 仪表盘/环形图 只显示度量
-            if (this.chartType === '2') {
-              let columns = ['type', 'value'] // 维度固定
-              for (let m of apiData.measures) {
-                columns.push(m.alias) // 默认columns第二项起为指标
-              }
-              // 对返回的数据列进行求和
-              let total = sum(res.rows, apiData.measures[0].alias)
-              let rows = [
-                {
-                  type: apiData.measures[0].alias,
-                  value: total
-                }
-              ]
-              // 环形图第二度量(指针值)
-              if (
-                this.currSelected.setting.chartType === 'v-ring' &&
-                apiData.measures[1]
-              ) {
-                let currentTotal = sum(res.rows, apiData.measures[1].alias)
-                rows[0] = {
-                  type: apiData.measures[1].alias,
-                  value: currentTotal
-                }
-                rows.push({
-                  type: apiData.measures[0].alias,
-                  value: total - currentTotal
-                })
-              }
-              apiData.source = {
-                columns,
-                rows
-              }
-              // 保存apidata数据
-              this.$store.dispatch('SetSelfDataSource', apiData)
-              let config = deepClone(this.currSelected.setting.config)
-              if (this.currSelected.setting.chartType === 'v-multiPie') {
-                config.chartTitle.text = rows[0].value
-                this.$store.dispatch('SetSelfProperty', config)
-              }
-              // 如果是仪表盘，第二个度量是目标值（进度条最大值）
-              if (
-                this.currSelected.setting.chartType === 'v-gauge' &&
-                apiData.measures[1]
-              ) {
-                let goalTotal = sum(res.rows, apiData.measures[1].alias)
-                config.series.max = goalTotal
-                this.$store.dispatch('SetSelfProperty', config)
-              }
-              //   this.updateChartData()
-              return
-            }
 
-            let columns = []
-            let rows = []
-            let dimensionKeys = [] // 度量key
-            for (let m of apiData.dimensions) {
-              dimensionKeys.push(m.alias)
-              columns.push(m.alias) // 默认columns第二项起为指标
-            }
-
-            let measureKeys = [] // 度量key
-            for (let m of apiData.measures) {
-              measureKeys.push(m.alias)
-              columns.push(m.alias) // 默认columns第二项起为指标
-            }
-
-            // 嵌套饼图设置apis
-            if (this.currSelected.setting.chartType === 'v-multiPie') {
-              // name是各维度数据拼接，value是分类汇总过的数值
-              columns = ['name', 'value']
-              let result = res.rows
-              let level = []
-              // 一个维度是一层饼
-              dimensionKeys.forEach(item => {
-                // 根据当前维度分类得到的列表
-                let list = summary(result, item, measureKeys[0]) // 嵌套饼图度量只有一个，直接取第一个数
-                rows = rows.concat(list) // 把所有维度分类出来的数组进行拼接（v-charts配置格式要求）
-
-                level.push(list.map(obj => obj.name)) // 按维度分层
-              })
-
-              let apis = {
-                level
-              }
-              console.log(apis)
-              this.$store.dispatch('SetApis', apis)
-            } else {
-              res.rows.map((item, index) => {
-                let obj = {}
-                for (let item2 of dimensionKeys) {
-                  obj[item2] = item[item2]
-                }
-                obj[dimensionKeys] = item[dimensionKeys]
-                for (let item2 of measureKeys) {
-                  obj[item2] = item[item2]
-                }
-                // if (obj[dimensionKeys]) {
-                rows.push(obj)
-                // }
-              })
-              console.log(columns)
-              console.log(rows)
-            }
-
-            apiData.source = {
-              columns,
-              rows
-            }
-            console.log(apiData)
-            this.$store.dispatch('SetSelfDataSource', apiData)
+          let columns = []
+          let rows = []
+          let dimensionKeys = [] // 度量key
+          for (let m of apiData.dimensions) {
+            dimensionKeys.push(m.alias)
+            columns.push(m.alias) // 默认columns第二项起为指标
           }
-          this.updateChartData()
-        } else {
-          this.$message.error(res.msg)
+
+          let measureKeys = [] // 度量key
+          for (let m of apiData.measures) {
+            measureKeys.push(m.alias)
+            columns.push(m.alias) // 默认columns第二项起为指标
+          }
+
+          // 嵌套饼图设置apis
+          if (this.currSelected.setting.chartType === 'v-multiPie') {
+            // name是各维度数据拼接，value是分类汇总过的数值
+            columns = ['name', 'value']
+            let result = res.rows
+            let level = []
+            // 一个维度是一层饼
+            dimensionKeys.forEach(item => {
+              // 根据当前维度分类得到的列表
+              let list = summary(result, item, measureKeys[0]) // 嵌套饼图度量只有一个，直接取第一个数
+              rows = rows.concat(list) // 把所有维度分类出来的数组进行拼接（v-charts配置格式要求）
+
+              level.push(list.map(obj => obj.name)) // 按维度分层
+            })
+
+            let apis = {
+              level
+            }
+            console.log(apis)
+            this.$store.dispatch('SetApis', apis)
+          } else {
+            res.rows.map((item, index) => {
+              let obj = {}
+              for (let item2 of dimensionKeys) {
+                obj[item2] = item[item2]
+              }
+              obj[dimensionKeys] = item[dimensionKeys]
+              for (let item2 of measureKeys) {
+                obj[item2] = item[item2]
+              }
+              // if (obj[dimensionKeys]) {
+              rows.push(obj)
+              // }
+            })
+            console.log(columns)
+            console.log(rows)
+          }
+
+          apiData.source = {
+            columns,
+            rows
+          }
+          console.log(apiData)
+          this.$store.dispatch('SetSelfDataSource', apiData)
         }
-      })
+        this.updateChartData()
+      } else {
+        this.$message.error(res.msg)
+      }
     }
   }
 }
