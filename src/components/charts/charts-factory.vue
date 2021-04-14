@@ -14,6 +14,7 @@
       <span>{{ config.title.content }}</span>
     </div>
     <component
+      :key="key"
       v-if="
         chartData.columns &&
           chartData.columns.length > 0 &&
@@ -65,10 +66,15 @@ import { formatData, convertData } from '../../utils/formatData'
 import { deepClone } from '@/utils/deepClone'
 import guangzhou from '@/utils/guangdong.json'
 import omit from 'lodash/omit'
+import { DEFAULT_COLORS } from '@/utils/defaultColors'
 
 export default {
   name: 'ChartsFactory',
   props: {
+    id: {
+      type: String,
+      default: '0'
+    },
     typeName: {
       type: String,
       required: true
@@ -99,11 +105,33 @@ export default {
     }
   },
   data() {
-    var self = this
+    let self = this
     this.chartEvents = {
       click: function(e) {
         self.name = e.name
-        console.log(e)
+        self.$nextTick(() => {
+          let chart = self.$refs.chart.echarts
+          // 鼠标单击时选中,选中颜色不变，其余变暗
+          if (self.typeName === 've-bar' || self.typeName === 've-histogram') {
+            self.chartExtend.series.itemStyle.normal.color = function(params) {
+              return params.dataIndex === e.dataIndex
+                ? DEFAULT_COLORS[params.seriesIndex]
+                : self.hexToRgba(DEFAULT_COLORS[params.seriesIndex], 0.4)
+            }
+            self.key++
+          } else if (self.typeName === 've-pie') {
+            self.chartExtend.series.itemStyle.normal.color = function(params) {
+              return params.dataIndex === e.dataIndex
+                ? DEFAULT_COLORS[params.dataIndex]
+                : self.hexToRgba(DEFAULT_COLORS[params.dataIndex], 0.4)
+            }
+            // 强行渲染，非数据变动不会自动重新渲染
+            self.key++
+          }
+          self.$emit('linkage', self.id, e)
+          chart.off('click')
+          self.setChartClick()
+        })
       }
     }
     return {
@@ -124,7 +152,8 @@ export default {
       backgroundStyle: {},
       colors: [],
       geo: {},
-      mapToolTip: {}
+      mapToolTip: {},
+      key: 0
     }
   },
   watch: {
@@ -138,29 +167,29 @@ export default {
           if (this.typeName === 've-map') {
             this.chartExtend = { ...omit(val, ['series']) }
             this.chartSeries = val.series
-            if (
-              !this.chartSeries[0].label.formatter ||
-              this.chartSeries[0].label.formatter === '{b} ：{c}'
-            ) {
-              // 添加标签格式回调
-              this.chartSeries[0].label.formatter = function(params) {
-                return params.data.value[2].toFixed(2)
-              }
-            }
+            // if (
+            //   !this.chartSeries[0].label.formatter ||
+            //   this.chartSeries[0].label.formatter === '{b} ：{c}'
+            // ) {
+            //   // 添加标签格式回调
+            //   this.chartSeries[0].label.formatter = function(params) {
+            //     return params.data.value[2].toFixed(2)
+            //   }
+            // }
             this.geo = val.geo
             this.mapToolTip = val.tooltip
-            if (
-              !this.mapToolTip.formatter ||
-              this.mapToolTip.formatter === '{b} ：{c}'
-            ) {
-              // 添加格式回调函数
-              this.mapToolTip.formatter = function(params) {
-                let data = params.data
-                return `${params.seriesName}<br />${data.name}：${
-                  data.value[2]
-                }`
-              }
-            }
+            // if (
+            //   !this.mapToolTip.formatter ||
+            //   this.mapToolTip.formatter === '{b} ：{c}'
+            // ) {
+            //   // 添加格式回调函数
+            //   this.mapToolTip.formatter = function(params) {
+            //     let data = params.data
+            //     return `${params.seriesName}<br />${data.name}：${
+            //       data.value[2]
+            //     }`
+            //   }
+            // }
           } else {
             this.chartExtend = { ...val }
           }
@@ -191,10 +220,8 @@ export default {
             }
           }
           if (val.dimensions && val.measures) {
-            if (
-              (val.dimensions.length === 0 && val.measures.length > 0) ||
-              (val.dimensions.length > 0 && val.measures.length === 0)
-            ) {
+            // 缺维度或者缺度量都不改变数据
+            if (val.dimensions.length === 0 || val.measures.length === 0) {
               return
             }
             if (
@@ -205,21 +232,13 @@ export default {
               if (!val.source) {
                 return
               }
-              this.chartData = val.source
+              // 如果有联动，显示联动的数据
+              this.chartData = val.selectData ? val.selectData : val.source
               return
             }
           }
           this.chartData.columns = val.columns
           this.chartData.rows = val.rows
-
-          // if (val.source) {
-          //   let data = formatData(val.source)
-          //   // let data = val.source
-          //   this.chartData.columns = [...data.columns]
-          //   this.chartData.rows = [...data.rows]
-          //   this.$log.primary('========>chartData')
-          //   this.$print(this.chartData)
-          // }
         }
       },
       deep: true,
@@ -259,23 +278,29 @@ export default {
   mounted() {
     this._calcStyle()
     addResizeListener(this.$refs.wrap, this._calcStyle)
+    this.setChartClick()
   },
   beforeDestroy() {
     removeResizeListener(this.$refs.wrap, this._calcStyle)
   },
   methods: {
     afterConfig(options) {
-      if (this.typeName === 've-map') {
-        // console.log(options.series)
-        // let data = [...options.series[1].data]
-        // this.apiData.data.forEach((item, index) => {
-        //   options.series[index].data = item
-        // })
-        // options.series[1].data = convertData(this.apiData.data)
-        // options.series[1].data = this.apiData.data
-      }
-      console.log(options)
       return options
+    },
+    // 添加图表点击事件，可以点击非数据区域
+    setChartClick() {
+      this.$nextTick(() => {
+        let self = this
+        this.$refs.chart.echarts.getZr().on('click', function(params) {
+          if (typeof params.target === 'undefined') {
+            // 重置数据颜色样式
+            delete self.chartExtend.series.itemStyle.normal.color
+            // 强行渲染，非数据变动不会自动重新渲染
+            self.key++
+            self.$emit('resetOriginData', self.id)
+          }
+        })
+      })
     },
     _calcStyle() {
       const wrap = this.$refs.wrap
@@ -288,6 +313,20 @@ export default {
       }
       this.width = width + 'px'
       this.height = height + 'px'
+    },
+    // 颜色转透明色，用于选中图表转换显示颜色
+    hexToRgba(hex, opacity) {
+      return hex && hex.replace(/\s+/g, '').length === 7
+        ? 'rgba(' +
+            parseInt('0x' + hex.slice(1, 3)) +
+            ',' +
+            parseInt('0x' + hex.slice(3, 5)) +
+            ',' +
+            parseInt('0x' + hex.slice(5, 7)) +
+            ',' +
+            opacity +
+            ')'
+        : ''
     }
   },
   computed: {
@@ -305,3 +344,8 @@ export default {
   }
 }
 </script>
+<style lang="less" scoped>
+.chart-event {
+  pointer-events: auto !important;
+}
+</style>

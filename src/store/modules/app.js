@@ -4,6 +4,7 @@ import { message } from 'ant-design-vue'
 import { Loading } from 'element-ui'
 import { handleRefreshData } from '@/utils/handleRefreshData'
 import { messages } from 'bin-ui'
+import guangzhou from '@/utils/guangdong.json'
 
 let orginPageSettings = {
   width: 1920,
@@ -175,19 +176,34 @@ const app = {
     },
     // 新增图表
     async addChartData({ dispatch, state }, obj) {
+      // 地图去掉mapOrgin，减少数据
+      if (obj.setting.name === 've-map') {
+        obj.setting.apis.mapOrigin = ''
+      }
+      // 素材库不需要config
+      let name = obj.setting.config
+        ? obj.setting.config.title.content
+        : obj.setting.name
       let params = {
         tabId: obj.tabId,
-        name: obj.setting.config.title.content || '文本',
+        name: name || '文本',
         screenId: state.screenId,
-        datamodelId: obj.setting.api_data.modelId || 0, // 复制的图表存在模型，先判断有没有模型
+        datamodelId: obj.datamodelId || 0, // 复制的图表存在模型，先判断有没有模型
         isPublish: 1,
         setting: obj.setting
       }
+
       return screenManage
         .addChart(params)
         .then(res => {
           if (res.code === 200) {
             // res.msg && message.success(res.msg)
+            // 地图类型还原json
+            if (res.data.setting.name === 've-map') {
+              res.data.setting.apis.mapOrigin = guangzhou
+            } else {
+            }
+
             dispatch('AddCanvasMap', res.data)
             // 保存图层顺序
             dispatch('saveScreenData')
@@ -225,10 +241,14 @@ const app = {
       })
     },
     // 保存图表
-    async updateChartData({ dispatch, state, rootGetters }) {
+    async updateChartData({ state, rootGetters }) {
       let chart = rootGetters.canvasMap.find(
         item => item.id === rootGetters.currentSelected
       )
+      // 地图去掉mapOrgin，减少数据
+      if (chart.setting.name === 've-map') {
+        chart.setting.apis.mapOrigin = ''
+      }
       let params = {
         id: chart.id,
         name: chart.name,
@@ -246,8 +266,15 @@ const app = {
           this.screenData = res.data
           dispatch('SetFileName', res.data ? res.data.name : '')
           dispatch('SetPageSettings', res.data ? res.data.setting : {})
+          // 地图加上json
+          let graphs = res.data ? res.data.screenGraphs : []
+          graphs.forEach(item => {
+            if (item.setting.name === 've-map') {
+              item.setting.apis.mapOrigin = guangzhou
+            }
+          })
           dispatch('InitCanvasMaps', {
-            maps: res.data ? res.data.screenGraphs : [],
+            maps: graphs,
             idList: res.data ? res.data.setting.idList : []
           })
           dispatch('dataModel/setSelectedModelList', res.list)
@@ -295,6 +322,10 @@ const app = {
               let chart = rootGetters.canvasMap.find(
                 chart => chart.id + '' === id
               )
+              // 素材库不需要数据
+              if (chart.name === 'material') {
+                continue
+              }
               let newData = dataItem[id].graphData
 
               // 找到chart的表示当前页

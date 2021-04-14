@@ -2,7 +2,7 @@
   <div
     class="dragArea"
     :class="{
-      'dragable-vaild': isdrag && (type === dragFile || type === 'tableList')
+      'dragable-vaild': isdrag
     }"
     @drop.stop.prevent="handleDropOnFilesWD($event)"
     @dragover.stop.prevent
@@ -41,7 +41,7 @@
         </a-tooltip>
       </div>
     </div>
-    <div class="empty" :class="{ field: isdrag && type === dragFile }">
+    <div class="empty" :class="{ field: isdrag }">
       {{ emptyText[type] }}
     </div>
   </div>
@@ -198,6 +198,14 @@ export default {
     ]),
     chartType() {
       return this.currSelected ? this.currSelected.setting.type : ''
+    },
+    // 拖入一个维度的进入联动选择列
+    toBindList() {
+      return this.canvasMap.filter(
+        item =>
+          item.setting.api_data.dimensions &&
+          item.setting.api_data.dimensions.length > 0
+      )
     }
   },
   methods: {
@@ -206,11 +214,10 @@ export default {
     handleDropOnFilesWD(event) {
       // h5 api
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
-      console.log(dataFile)
       if (
         this.currSelected.datamodelId &&
         this.currSelected.datamodelId !== '0' &&
-        this.currSelected.datamodelId !== dataFile.datamodelId
+        this.currSelected.datamodelId !== dataFile.screenTableId
       ) {
         this.$message.error('一个图表只能拖入一个数据模型的字段')
         this.isdrag = false
@@ -362,7 +369,7 @@ export default {
       }
     },
     // 根据维度度量获取数据
-    getData() {
+    async getData() {
       let selected = this.canvasMap.find(
         item => item.id === this.currentSelected
       )
@@ -397,12 +404,11 @@ export default {
         this.fileList.length > 0
       ) {
         // modelId 赋值
-        selected.datamodelId = this.fileList[0].datamodelId
-        // apiData.datamodelId = this.fileList[0].datamodelId
-        // apiData.modelId = this.fileList[0].datamodelId
+        selected.datamodelId = this.fileList[0].screenTableId
         selected.setting.api_data.modelId = parseInt(
-          this.fileList[0].datamodelId
+          this.fileList[0].screenTableId
         )
+        selected.setting.resourceType = this.fileList[0].resourceType
       }
       this.updateChartData()
 
@@ -412,6 +418,7 @@ export default {
           selected.datamodelId = 0
           selected.setting.api_data.modelId = 0
           selected.setting.isEmpty = false
+          selected.setting.resourceType = ''
           this.updateChartData()
           return
         }
@@ -430,6 +437,7 @@ export default {
           selected.datamodelId = 0
           selected.setting.api_data.modelId = 0
           selected.setting.isEmpty = false
+          selected.setting.resourceType = ''
           this.updateChartData()
           return
         }
@@ -442,6 +450,7 @@ export default {
           selected.datamodelId = 0
           selected.setting.api_data.modelId = 0
           selected.setting.isEmpty = false
+          selected.setting.resourceType = ''
           this.updateChartData()
           return
         }
@@ -452,199 +461,217 @@ export default {
 
       let params = selected
       let apiData = deepClone(this.currSelected.setting.api_data)
-      this.$server.screenManage.getData(params).then(res => {
-        selected.setting.isEmpty = false
-        // 数据源被删掉
-        if (res.code === 500 && res.msg === 'IsChanged') {
-          selected.setting.isEmpty = true
+      let res = ''
+      if (apiData.measures[0].resourceType === 8) {
+        res = await this.$server.screenManage.getData(params)
+      } else {
+        res = await this.$server.screenManage.getDataForSource(params)
+      }
+      selected.setting.isEmpty = false
+      // 数据源被删掉
+      if (res.code === 500 && res.msg === 'IsChanged') {
+        selected.setting.isEmpty = true
+        this.updateChartData()
+        return
+      }
+      if (res.code === 200) {
+        if (this.currSelected.setting.chartType === 'v-map') {
+          let config = deepClone(this.currSelected.setting.config)
+          let legend = []
+          let datas = []
+          // 重置series
+          config.series = [config.series[0]]
+          // 只有一个维度，唯一名称
+          let alias = apiData.dimensions[0].alias
+          // 一个度量对应一个series.data
+          apiData.measures.forEach((measure, index) => {
+            // 添加series
+            if (index > 0) {
+              config.series[index] = Object.assign({}, config.series[0])
+            }
+            config.series[index].name = measure.alias
+            legend.push(measure.alias)
+            let data = []
+            for (let item of res.rows) {
+              // 抓取区域坐标
+              let center = this.getCenterCoordinate(item[alias])
+              // 找不到对应坐标跳过
+              if (!center) {
+                continue
+              }
+              data.push({
+                name: item[alias],
+                value: center.concat(item[measure.alias]) // 链接数组，坐标和值
+              })
+            }
+            config.series[index].data = data
+            datas.push(data)
+          })
+          config.legend.data = legend
+          apiData.data = datas
+          this.$store.dispatch('SetSelfProperty', config)
+          this.$store.dispatch('SetSelfDataSource', apiData)
           this.updateChartData()
           return
         }
-        if (res.code === 200) {
-          if (this.currSelected.setting.chartType === 'v-map') {
-            let config = deepClone(this.currSelected.setting.config)
-            let legend = []
-            let datas = []
-            // 重置series
-            config.series = [config.series[0]]
-            // 只有一个维度，唯一名称
-            let alias = apiData.dimensions[0].alias
-            // 一个度量对应一个series.data
-            apiData.measures.forEach((measure, index) => {
-              // 添加series
-              if (index > 0) {
-                config.series[index] = Object.assign({}, config.series[0])
-              }
-              config.series[index].name = measure.alias
-              legend.push(measure.alias)
-              let data = []
-              for (let item of res.rows) {
-                // 抓取区域坐标
-                let center = this.getCenterCoordinate(item[alias])
-                // 找不到对应坐标跳过
-                if (!center) {
-                  continue
-                }
-                data.push({
-                  name: item[alias],
-                  value: center.concat(item[measure.alias]) // 链接数组，坐标和值
-                })
-              }
-              config.series[index].data = data
-              datas.push(data)
+        if (this.currSelected.setting.chartType === 'v-text') {
+          let config = deepClone(this.currSelected.setting.config)
+          let str = ''
+          for (let item of this.fileList) {
+            str += res.rows[0][item.alias] + ' '
+          }
+          config.title.content = str
+          this.$store.dispatch('SetSelfProperty', config)
+        }
+        if (this.type === 'tableList') {
+          let columns = []
+          for (let item of this.fileList) {
+            columns.push({
+              title: item.alias,
+              dataIndex: item.alias,
+              key: item.alias
             })
-            config.legend.data = legend
-            apiData.data = datas
-            this.$store.dispatch('SetSelfProperty', config)
+          }
+          let rows = res.rows
+          if (rows.length > 10) {
+            rows.length = 10
+          }
+          apiData.source = {
+            columns,
+            rows
+          }
+          this.$store.dispatch('SetSelfDataSource', apiData)
+        } else {
+          // 仪表盘/环形图 只显示度量
+          if (this.chartType === '2') {
+            let columns = ['type', 'value'] // 维度固定
+            for (let m of apiData.measures) {
+              columns.push(m.alias) // 默认columns第二项起为指标
+            }
+            // 对返回的数据列进行求和
+            let total = sum(res.rows, apiData.measures[0].alias)
+            let rows = [
+              {
+                type: apiData.measures[0].alias,
+                value: total
+              }
+            ]
+            // 环形图第二度量(指针值)
+            if (
+              this.currSelected.setting.chartType === 'v-ring' &&
+              apiData.measures[1]
+            ) {
+              let currentTotal = sum(res.rows, apiData.measures[1].alias)
+              rows[0] = {
+                type: apiData.measures[1].alias,
+                value: currentTotal
+              }
+              rows.push({
+                type: apiData.measures[0].alias,
+                value: total - currentTotal
+              })
+            }
+            apiData.source = {
+              columns,
+              rows
+            }
+            // 保存apidata数据
             this.$store.dispatch('SetSelfDataSource', apiData)
+            let config = deepClone(this.currSelected.setting.config)
+            if (this.currSelected.setting.chartType === 'v-ring') {
+              config.chartTitle.text = rows[1] ? rows[1].value : rows[0].value
+              this.$store.dispatch('SetSelfProperty', config)
+            }
+            // 如果是仪表盘，第二个度量是目标值（进度条最大值）
+            if (
+              this.currSelected.setting.chartType === 'v-gauge' &&
+              apiData.measures[1]
+            ) {
+              let goalTotal = sum(res.rows, apiData.measures[1].alias)
+              config.series.max = goalTotal
+              this.$store.dispatch('SetSelfProperty', config)
+            }
             this.updateChartData()
             return
           }
-          if (this.currSelected.setting.chartType === 'v-text') {
-            let config = deepClone(this.currSelected.setting.config)
-            let str = ''
-            for (let item of this.fileList) {
-              str += res.rows[0][item.alias] + ' '
-            }
-            config.title.content = str
-            this.$store.dispatch('SetSelfProperty', config)
+
+          let columns = []
+          let rows = []
+          let dimensionKeys = [] // 度量key
+          for (let m of apiData.dimensions) {
+            dimensionKeys.push(m.alias)
+            columns.push(m.alias) // 默认columns第二项起为指标
           }
-          if (this.type === 'tableList') {
-            let columns = []
-            for (let item of this.fileList) {
-              columns.push({
-                title: item.alias,
-                dataIndex: item.alias,
-                key: item.alias
-              })
+
+          let measureKeys = [] // 度量key
+          for (let m of apiData.measures) {
+            measureKeys.push(m.alias)
+            columns.push(m.alias) // 默认columns第二项起为指标
+          }
+
+          // 嵌套饼图设置apis
+          if (this.currSelected.setting.chartType === 'v-multiPie') {
+            // name是各维度数据拼接，value是分类汇总过的数值
+            columns = ['name', 'value']
+            let result = res.rows
+            let level = []
+            // 一个维度是一层饼
+            dimensionKeys.forEach(item => {
+              // 根据当前维度分类得到的列表
+              let list = summary(result, item, measureKeys[0]) // 嵌套饼图度量只有一个，直接取第一个数
+              rows = rows.concat(list) // 把所有维度分类出来的数组进行拼接（v-charts配置格式要求）
+
+              level.push(list.map(obj => obj.name)) // 按维度分层
+            })
+
+            let apis = {
+              level
             }
-            let rows = res.rows
-            if (rows.length > 10) {
-              rows.length = 10
-            }
-            apiData.source = {
-              columns,
-              rows
-            }
-            this.$store.dispatch('SetSelfDataSource', apiData)
+            console.log(apis)
+            this.$store.dispatch('SetApis', apis)
           } else {
-            // 仪表盘/环形图 只显示度量
-            if (this.chartType === '2') {
-              let columns = ['type', 'value'] // 维度固定
-              for (let m of apiData.measures) {
-                columns.push(m.alias) // 默认columns第二项起为指标
+            res.rows.map((item, index) => {
+              let obj = {}
+              for (let item2 of dimensionKeys) {
+                obj[item2] = item[item2]
               }
-              // 对返回的数据列进行求和
-              let total = sum(res.rows, apiData.measures[0].alias)
-              let rows = [
-                {
-                  type: apiData.measures[0].alias,
-                  value: total
-                }
-              ]
-              // 环形图第二度量(指针值)
-              if (
-                this.currSelected.setting.chartType === 'v-ring' &&
-                apiData.measures[1]
-              ) {
-                let currentTotal = sum(res.rows, apiData.measures[1].alias)
-                rows[0] = {
-                  type: apiData.measures[1].alias,
-                  value: currentTotal
-                }
-                rows.push({
-                  type: apiData.measures[0].alias,
-                  value: total - currentTotal
-                })
+              obj[dimensionKeys] = item[dimensionKeys]
+              for (let item2 of measureKeys) {
+                obj[item2] = item[item2]
               }
-              apiData.source = {
-                columns,
-                rows
-              }
-              // 保存apidata数据
-              this.$store.dispatch('SetSelfDataSource', apiData)
-              let config = deepClone(this.currSelected.setting.config)
-              if (this.currSelected.setting.chartType === 'v-ring') {
-                config.chartTitle.text = rows[1] ? rows[1].value : rows[0].value
-                this.$store.dispatch('SetSelfProperty', config)
-              }
-              // 如果是仪表盘，第二个度量是目标值（进度条最大值）
-              if (
-                this.currSelected.setting.chartType === 'v-gauge' &&
-                apiData.measures[1]
-              ) {
-                let goalTotal = sum(res.rows, apiData.measures[1].alias)
-                config.series.max = goalTotal
-                this.$store.dispatch('SetSelfProperty', config)
-              }
-              this.updateChartData()
-              return
-            }
-
-            let columns = []
-            let rows = []
-            let dimensionKeys = [] // 度量key
-            for (let m of apiData.dimensions) {
-              dimensionKeys.push(m.alias)
-              columns.push(m.alias) // 默认columns第二项起为指标
-            }
-
-            let measureKeys = [] // 度量key
-            for (let m of apiData.measures) {
-              measureKeys.push(m.alias)
-              columns.push(m.alias) // 默认columns第二项起为指标
-            }
-
-            // 嵌套饼图设置apis
-            if (this.currSelected.setting.chartType === 'v-multiPie') {
-              // name是各维度数据拼接，value是分类汇总过的数值
-              columns = ['name', 'value']
-              let result = res.rows
-              let level = []
-              // 一个维度是一层饼
-              dimensionKeys.forEach(item => {
-                // 根据当前维度分类得到的列表
-                let list = summary(result, item, measureKeys[0]) // 嵌套饼图度量只有一个，直接取第一个数
-                rows = rows.concat(list) // 把所有维度分类出来的数组进行拼接（v-charts配置格式要求）
-
-                level.push(list.map(obj => obj.name)) // 按维度分层
-              })
-
-              let apis = {
-                level
-              }
-              console.log(apis)
-              this.$store.dispatch('SetApis', apis)
-            } else {
-              res.rows.map((item, index) => {
-                let obj = {}
-                for (let item2 of dimensionKeys) {
-                  obj[item2] = item[item2]
-                }
-                obj[dimensionKeys] = item[dimensionKeys]
-                for (let item2 of measureKeys) {
-                  obj[item2] = item[item2]
-                }
-                // if (obj[dimensionKeys]) {
-                rows.push(obj)
-                // }
-              })
-              console.log(columns)
-              console.log(rows)
-            }
-
-            apiData.source = {
-              columns,
-              rows
-            }
-            console.log(apiData)
-            this.$store.dispatch('SetSelfDataSource', apiData)
+              // if (obj[dimensionKeys]) {
+              rows.push(obj)
+              // }
+            })
+            console.log(columns)
+            console.log(rows)
           }
-          this.updateChartData()
-        } else {
-          this.$message.error(res.msg)
+
+          apiData.source = {
+            columns,
+            rows
+          }
+          console.log(apiData)
+          this.$store.dispatch('SetSelfDataSource', apiData)
         }
-      })
+        this.updateChartData()
+      } else {
+        this.$message.error(res.msg)
+      }
+    },
+    // 设置图表联动
+    setLinkage() {
+      // 保存被选中图表的联动列表
+      for (let id of this.toBindList) {
+        let chart = this.canvasMap.find(item => item.id === id)
+        if (id === this.currentSelected) {
+          chart.bindedList = this.checkList
+        } else if (this.checkList.indexOf(id) > -1) {
+          chart.beBinded = this.currentSelected
+        } else if (chart.beBinded === this.currentSelected) {
+          chart.beBinded = ''
+        }
+      }
     }
   }
 }

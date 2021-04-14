@@ -21,39 +21,50 @@
       <!-- 操作界面 -->
       <div v-if="modelExpand" style="height:calc(100% - 150px);">
         <div class="model-operation" v-if="model">
-          <div class="operation_select">
-            <a-select v-model="modelId" style="width:90%">
+          <div class="operation">
+            <a-radio-group
+              v-model="resourceType"
+              button-style="solid"
+              style="width:100%"
+            >
+              <a-radio-button
+                :value="8"
+                style="width:50%"
+                @click.native="changeAddType(8)"
+              >
+                数据模型
+              </a-radio-button>
+              <a-radio-button
+                :value="3"
+                style="width:50%"
+                @click.native="changeAddType(3)"
+              >
+                数据接入
+              </a-radio-button>
+            </a-radio-group>
+          </div>
+          <div class="operation">
+            <a-select v-model="resourceId" style="width:62%">
               <a-select-option
                 v-for="item in disableItem"
-                :value="item.modelid"
-                :key="item.modelid"
-                >{{ item.modelname }}</a-select-option
+                :value="item.tableId"
+                :key="item.id"
+                >{{ item.resourceName }}</a-select-option
               >
-              <a-select-option value="添加数据模型">
-                <span @click="modelAdd">添加数据模型</span>
-                <a-icon
-                  type="rollback"
-                  style="margin-left:130px"
-                  @click="modelAdd"
-                />
-              </a-select-option>
-              <!-- <a-select-option value="添加数据接入">
-                <span @click="modelAdd">添加数据接入</span>
-                <a-icon
-                  type="rollback"
-                  style="margin-left:130px"
-                  @click="modelAdd"
-                />
-              </a-select-option> -->
             </a-select>
+            <a-button
+              style="margin-left:8px"
+              @click="resourceType === 8 ? modelAdd() : sourceAdd()"
+              >添加</a-button
+            >
           </div>
-          <div class="operation_search">
+          <div class="operation">
             {{ searchValue }}
             <a-select
               show-search
               :value="searchValue"
               placeholder="请输入关键字搜索"
-              style="width:90%"
+              style="width:100%"
               :default-active-first-option="false"
               :show-arrow="false"
               :filter-option="false"
@@ -74,14 +85,14 @@
             <div class="operation" flex="dir:top">
               <div class="header">
                 <span class="d_h_s">维度</span>
-                <a-icon class="dicon" type="plus" />
+                <!-- <a-icon class="dicon" type="plus" /> -->
                 <!-- @click="openModal('维度')" -->
               </div>
               <!-- <b-scrollbar style="height: 100%;"> -->
               <div class="mea_main">
                 <a-collapse
                   class="scrollbar"
-                  style="height:100%;overflow: scroll;"
+                  style="height:100%;overflow: scroll;margin-top: 10px;"
                   v-model="dimensionsKey"
                   :bordered="false"
                 >
@@ -142,14 +153,14 @@
             <div class="operation scrollbar" flex="dir:top">
               <div class="header">
                 <span class="d_h_s">度量</span>
-                <a-icon class="dicon" type="plus" />
+                <!-- <a-icon class="dicon" type="plus" /> -->
                 <!-- @click="openModal('度量')" -->
               </div>
               <!-- <b-scrollbar style="height: 100%;"> -->
               <div class="mea_main">
                 <a-collapse
                   class="scrollbar"
-                  style="height:100%;overflow: scroll;"
+                  style="height:100%;overflow: scroll;margin-top: 10px;"
                   v-model="measuresKey"
                 >
                   <a-collapse-panel
@@ -232,39 +243,13 @@
             />
           </div>
           <!-- <b-scrollbar style="height: 100%;"> -->
-          <!-- 数据模型列表 -->
-          <div class="model-main scrollbar">
-            <a-collapse v-model="modelKey" :bordered="false">
-              <template #expandIcon="props">
-                <a-icon
-                  type="folder"
-                  :rotate="props.isActive ? 0 : 0"
-                  style="font-size:16px"
-                />
-              </template>
-              <template v-for="(item, index) in modelList">
-                <a-collapse-panel
-                  :showArrow="Boolean(item.fileType === 0)"
-                  :key="String(index)"
-                  :header="item.name"
-                  :style="customStyle"
-                  :class="disableId.includes(item.id) ? 'disable' : ''"
-                  @click.native="modelHandle(item)"
-                >
-                  <div style="margin-left:25px;cursor: pointer;">
-                    <p
-                      @click="modelHandle(item2)"
-                      v-for="item2 in item.children"
-                      :key="item2.id"
-                      :class="disableId.includes(item2.id) ? 'disable' : ''"
-                    >
-                      {{ item2.name }}
-                    </p>
-                  </div>
-                </a-collapse-panel>
-              </template>
-            </a-collapse>
-          </div>
+          <!--大屏数据-->
+          <add-data-list
+            :type="resourceType"
+            :data-list="dataList"
+            :disable-list="disableId"
+            @fileHandle="fileHandle"
+          ></add-data-list>
           <!-- </b-scrollbar> -->
         </div>
       </div>
@@ -280,7 +265,7 @@ import { menuSearchLoop } from '@/utils/menuSearch'
 import { Loading } from 'element-ui'
 import ComputeSetting from '@/views/dataSource/dataModel/model-edit/setting/compute-setting'
 import GeoSetting from './components/geo-setting'
-
+import AddDataList from './components/addDataList'
 export default {
   name: 'BoardModel',
   props: {
@@ -289,7 +274,7 @@ export default {
       required: true
     }
   },
-  components: { ComputeSetting, GeoSetting },
+  components: { ComputeSetting, GeoSetting, AddDataList },
   data() {
     return {
       customStyle:
@@ -298,12 +283,10 @@ export default {
       dimensionsKey: ['0', '1', '2', '3'], // 默认展开
       measuresKey: ['0', '1', '2', '3'],
       model: true,
-      modelList: [], // 数据模型列表
       dimensions: [], // 维度列表
       measures: [], // 度量列表
-      modelId: '',
+      resourceId: '',
       disableId: [], // 已经选中的数据模型无法点击
-      disableItem: [], // 选中的数据模型 供选择列表
       searchValue: undefined, // 搜索的维度度量
       searchList: [], // 维度度量整合成一个数组可供搜索
       searchResult: [], // 维度度量搜索结果列表
@@ -323,7 +306,11 @@ export default {
         { name: '最小值', value: 'MIN' },
         { name: '统计', value: 'CNT' }
       ],
-      createdMapData: {}
+      createdMapData: {},
+      resourceType: 8, // 当前数据类型标识（接入:3|模型:8）
+      dataList: [], // 显示的菜单列表
+      modelList: [], // 模型菜单
+      sourceList: [] // 接入菜单
     }
   },
   computed: {
@@ -335,22 +322,30 @@ export default {
       'currentSelected',
       'currSelected',
       'canvasMap'
-    ])
+    ]),
+    // 过滤模型列表
+    savedModels() {
+      return this.selectedModelList.filter(item => item.resourceType === 8)
+    },
+    // 过滤接入列表
+    savedSources() {
+      return this.selectedModelList.filter(item => item.resourceType === 3)
+    },
+    // 根据类型显示对应列表
+    disableItem() {
+      return this.resourceType === 8 ? this.savedModels : this.savedSources
+    }
   },
   watch: {
     selectedModelList: {
       handler(val) {
         if (val.length > 0) {
           if (!this.add) {
-            this.modelId = val[0].modelid
+            this.resourceId = val[0].tableId
             this.model = true
           }
-          //   if (this.modelId) {
-          //     this.getPivoSchemaList(this.modelId)
-          //   }
-          this.disableItem = val
           val.map(item => {
-            this.disableId.push(item.modelid)
+            this.disableId.push(item.tableId)
           })
         }
       },
@@ -360,7 +355,8 @@ export default {
       handler(val) {
         if (val) {
           if (val.datamodelId !== '0' && val.datamodelId !== 0) {
-            this.modelId = val.datamodelId
+            this.resourceId = val.datamodelId
+            this.resourceType = val.setting.resourceType
             this.dimensionsChecked = []
             if (val.setting.api_data.dimensions.length > 0) {
               val.setting.api_data.dimensions.map(item => {
@@ -378,16 +374,22 @@ export default {
       },
       deep: true
     },
-    modelId(val) {
-      if (val && this.selectedModelList.length > 0) {
-        this.getPivoSchemaList(val)
+    resourceId(val) {
+      // modelId是文字的时候只获取列表不获取维度度量
+      if (
+        !val ||
+        val === '添加数据模型' ||
+        val === '添加数据接入' ||
+        this.selectedModelList.length === 0
+      ) {
+        return
       }
+      this.getPivoSchemaList(val)
     }
   },
   mounted() {
-    this.disableItem = this.selectedModelList
-    this.modelId =
-      this.selectedModelList.length > 0 ? this.selectedModelList[0].modelid : ''
+    this.resourceId =
+      this.savedModels.length > 0 ? this.savedModels[0].tableId : ''
   },
   methods: {
     // 数据模型搜索
@@ -399,14 +401,41 @@ export default {
         this.getModelList()
       }
     }, 400),
+    // 切换数据类型
+    changeAddType(type) {
+      this.resourceType = type
+      // 清空当前维度度量数据
+      this.dimensions = []
+      this.measures = []
+      // 默认取对应类型列表第一个值
+      if (type === 8) {
+        this.resourceId =
+          this.savedModels.length > 0 ? this.savedModels[0].tableId : ''
+      } else {
+        this.resourceId =
+          this.savedSources.length > 0 ? this.savedSources[0].tableId : ''
+      }
+    },
+    // 搜索关键字
     handleGetSearchList(value) {
       let result = []
-      this.modelList.map(item => {
+      // 按模型/接入搜索
+      if (this.resourceType === 8) {
+        this.dataList = this.search(this.modelList, value)
+      } else {
+        this.dataList = this.search(this.sourceList, value)
+      }
+    },
+    // 搜索关键字
+    search(list, value) {
+      let result = []
+      list.map(item => {
         const newItem = menuSearchLoop(item, value)
-        if (newItem) result.push(newItem)
+        if (newItem) {
+          result.push(newItem)
+        }
       })
-      this.modelList = result
-      console.log('搜索结果', this.modelList)
+      return result
     },
     // 点击展开收起
     toCollapse() {
@@ -415,6 +444,7 @@ export default {
     // 添加数据模型
     modelAdd() {
       if (this.modelList.length > 0) {
+        this.dataList = this.modelList
         this.model = !this.model
         return
       }
@@ -424,47 +454,85 @@ export default {
         }
       })
     },
+    // 添加数据接入
+    sourceAdd() {
+      if (this.sourceList.length > 0) {
+        this.dataList = this.sourceList
+        this.model = !this.model
+        return
+      }
+      this.getSourceList().then(res => {
+        if (res) {
+          this.model = !this.model
+        }
+      })
+    },
+    // 获取数据接入列表
+    async getSourceList() {
+      let catalog = await this.$server.common.getMenuList(
+        '/datasource/catalog/list/1'
+      )
+      if (catalog.code === 200) {
+        catalog.rows.map(item => {
+          item.selected = false
+          item.showMore = false
+        })
+        this.dataList = catalog.rows
+        return true
+      }
+      return false
+    },
     back() {
       if (
         this.currSelected &&
         this.currSelected.datamodelId !== '0' &&
         this.currSelected.datamodelId !== 0
       ) {
-        this.modelId = this.currSelected.datamodelId
-      } else {
-        this.modelId = this.selectedModelList[0].modelid
+        this.resourceId = this.currSelected.datamodelId
+        this.resourceType = this.currSelected.setting.resourceType
       }
       this.model = true
     },
     // 点击选中模型
-    modelHandle(item) {
-      if (item.fileType !== 0 && !this.disableId.includes(item.id)) {
-        this.model = !this.model
-        this.$store.dispatch('SetDataModel', item)
-        this.add = true // 点击模型
-        this.saveModal(item.id)
-        item.modelname = item.name
-        item.modelid = item.id
-        this.disableItem.push(item)
-        this.$store.dispatch('dataModel/setSelectedModelList', this.disableItem)
-      }
+    fileHandle(item) {
+      this.model = !this.model
+      this.$store.dispatch('SetDataModel', item)
+      this.add = true // 点击模型F
+      this.saveData(item)
+      item.resourceName = item.name
+      item.tableId = item.id
+      let list = this.selectedModelList.concat([item])
+      this.$store.dispatch('dataModel/setSelectedModelList', list)
     },
     // 保存选中的模型
-    saveModal(id) {
+    async saveData(item) {
       let params = {
-        datamodelId: id,
-        screenId: this.screenId
+        screenId: this.screenId,
+        resourceName: item.name,
+        datasourceId: '',
+        databaseId: '',
+        tableId: item.id
       }
-      this.$server.screenManage.screenModuleSave({ params }).then(res => {
-        console.log(res)
-        // this.getScreenData()
-        this.modelId = id
-      })
+      // 数据接入
+      if (item.resourceType === 3) {
+        params = {
+          ...params,
+          datasourceId: item.datasourceId,
+          databaseId: item.databaseId,
+          tableId: item.id,
+          origin: 3 // 数据源:3,模型:8
+        }
+      } else {
+        // 模型
+        params.origin = 8 // 数据源:3,模型:8
+      }
+      await this.$server.screenManage.screenModuleSave(params)
+      this.resourceId = item.id
     },
     // 拖动开始 type 拖拽的字段类型维度或者度量
     dragstart(item, type, event) {
-      item.modelId = this.modelId
       item.file = type
+      item.resourceType = this.resourceType
       event.dataTransfer.setData('dataFile', JSON.stringify(item))
       this.$store.dispatch('SetDragFile', type)
     },
@@ -486,10 +554,8 @@ export default {
             item.selected = false
             item.showMore = false
           })
-          this.modelList = res.data
+          this.dataList = res.data
           return true
-          // this.modelList = res.data.folders
-          // this.modelList = this.modelList.concat(res.data.items)
         }
       })
     },
@@ -523,7 +589,7 @@ export default {
       if (computeType) this.computeType = computeType
     },
     openGeoSetting(item) {
-      item.modelId = this.modelId
+      item.modelId = this.resourceId
       this.createdMapData = item
       this.createMapVisible = true
       item.showMore = false
@@ -534,6 +600,7 @@ export default {
     // 转为维度或者度量
     changeItem(item, num) {
       let params = {
+        screenTableId: item.screenTableId,
         datamodelId: item.datamodelId,
         pivotschemaId: item.pivotschemaId,
         role: num, // 转成维度传1，转成度量传2
@@ -541,7 +608,7 @@ export default {
       }
       this.$server.screenManage.screenModuleTransform(params).then(res => {
         if (res.code === 200) {
-          this.getPivoSchemaList(this.modelId, 2)
+          this.getPivoSchemaList(this.resourceId, 2)
         }
       })
     },
@@ -571,9 +638,9 @@ export default {
             res.data.measures.map(item => {
               item.showMore = false
             })
-            let dataList = res.data
-            let dimensions = dataList.dimensions
-            let measures = dataList.measures
+            let datas = res.data
+            let dimensions = datas.dimensions
+            let measures = datas.measures
             this.dimensions = this.transData(dimensions)
             dimensions = dimensions.map(item => {
               return { ...item, visible: true, produceType: 0 }
