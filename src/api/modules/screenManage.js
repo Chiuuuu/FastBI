@@ -184,10 +184,10 @@ const screenManage = {
    * @param {*} id
    * @returns
    */
-  getPivoSchemaList(dataModelId, screenId, type) {
+  getPivoSchemaList(tableId, screenId) {
     // return $axios.get(`/model/pivotschema/selectModelPivotschemaListByRole/${id}`)
     return $axios.get(
-      `/screen/pivotschema/selectModelPivotschemaListByRole/${dataModelId}/${screenId}/${type}`
+      `/screen/pivotschema/selectModelPivotschemaListByRole/${tableId}/${screenId}`
     )
   },
   /**
@@ -197,6 +197,14 @@ const screenManage = {
    */
   getData(params) {
     return $axios.post('/screen/graph/getData', params)
+  },
+  /**
+   * @description 根据维度度量获取数据(数据接入)
+   * @param {*} params
+   * @returns
+   */
+  getDataForSource(params) {
+    return $axios.post('/screen/graph/getDataFromSource', params)
   },
   /**
    * @description 度量原始数据类型是否数值类型
@@ -229,7 +237,7 @@ const screenManage = {
    * @returns
    */
   screenModuleSave(params) {
-    return $axios.get('/screen/pivotschema/ScreenModuleSave', params)
+    return $axios.post('/screen/pivotschema/ScreenModuleSave', params)
   },
   /**
    * 数据模型维度度量转换
@@ -248,6 +256,12 @@ const screenManage = {
    */
   saveGeoData(params) {
     return $axios.post('/screen/pivotschema/setGeoInfo', params)
+  },
+  /**
+   *获取省市级联数据
+   */
+  getprovinceListData() {
+    return $axios.get('/system/geo/getGeoTreeList')
   }
 }
 

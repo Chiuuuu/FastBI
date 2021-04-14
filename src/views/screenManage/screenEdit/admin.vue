@@ -21,14 +21,6 @@
           @mouseleave="handleNoHover(transform)"
         >
           <div class="item" v-if="coverageExpand">
-            <!-- <a-icon
-              v-if="transform.setting.icon"
-              :type="transform.setting.icon"
-            />
-            <icon-font
-              v-if="transform.setting.iconFont"
-              :type="transform.setting.iconFont"
-            /> -->
             <img
               style="width:18px;heigth:18px;"
               :src="require(`@/assets/images/chart/${transform.setting.icon}`)"
@@ -80,6 +72,17 @@
               v-if="transform.setting.isEmpty"
               :config="transform.setting.config"
             ></chart-nodata>
+            <!--素材库-->
+            <ChartMaterial
+              v-else-if="transform.setting.name === 'material'"
+              :url="transform.setting.url"
+            ></ChartMaterial>
+            <!--进度条-->
+            <SteepBar
+              v-else-if="transform.setting.name === 'steepBar'"
+              :config="transform.setting.config"
+              :background="transform.setting.background"
+            ></SteepBar>
             <!-- 文本 -->
             <chart-text
               v-else-if="transform.setting.name === 've-text'"
@@ -157,7 +160,9 @@ import ChartsFactory from '@/components/charts/charts-factory'
 import ChartText from '@/components/tools/Text' // 文本模块
 import ChartImage from '@/components/tools/Image' // 图片模块
 import ChartTables from '@/components/tools/Tables' // 表格模块
-import ChartNodata from '@/components/tools/Nodata'
+import ChartNodata from '@/components/tools/Nodata' // 数据丢失
+import ChartMaterial from '@/components/tools/Material' // 素材库
+import SteepBar from '@/components/tools/SteepBar' // 进度条
 import Screen from '@/views/screen' // 全屏
 
 import { Icon } from 'ant-design-vue'
@@ -344,6 +349,8 @@ export default {
     ChartImage,
     ChartTables,
     ChartNodata,
+    ChartMaterial,
+    SteepBar,
     Screen
   },
   beforeDestroy() {

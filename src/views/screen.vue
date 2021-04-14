@@ -10,6 +10,17 @@
                 v-if="transform.setting.isEmpty"
                 :config="transform.setting.config"
               ></chart-nodata>
+              <!--素材库-->
+              <ChartMaterial
+                v-else-if="transform.setting.name === 'material'"
+                :url="transform.setting.url"
+              ></ChartMaterial>
+              <!--进度条-->
+              <SteepBar
+                v-else-if="transform.setting.name === 'steepBar'"
+                :config="transform.setting.config"
+                :background="transform.setting.background"
+              ></SteepBar>
               <!-- 文本 -->
               <chart-text
                 v-else-if="transform.setting.name === 've-text'"
@@ -35,6 +46,8 @@
               ></chart-tables>
               <charts-factory
                 v-else
+                :id="transform.id"
+                ref="chart"
                 :type-name="transform.setting.name"
                 :chart-type="transform.setting.chartType"
                 :type="transform.setting.type"
@@ -42,6 +55,8 @@
                 :api-data="transform.setting.api_data"
                 :apis="transform.setting.apis"
                 :background="transform.setting.background"
+                @linkage="setLinkageData"
+                @resetOriginData="resetOriginData"
               ></charts-factory>
             </preview-box>
           </template>
@@ -61,6 +76,8 @@ import ChartText from '@/components/tools/Text'
 import ChartImage from '@/components/tools/Image'
 import ChartTables from '@/components/tools/Tables'
 import ChartNodata from '@/components/tools/Nodata'
+import ChartMaterial from '@/components/tools/Material'
+import SteepBar from '@/components/tools/SteepBar'
 import { Loading } from 'element-ui'
 
 import {
@@ -78,7 +95,9 @@ export default {
     ChartText,
     ChartImage,
     ChartTables,
-    ChartNodata
+    ChartNodata,
+    ChartMaterial,
+    SteepBar
   },
   props: {},
   data() {
@@ -204,10 +223,10 @@ export default {
         this.pageSettings.refresh.frequency > 0
       ) {
         let count = 0
-        if (this.globalSettings.refresh.unit === 'min') {
-          count = this.globalSettings.refresh.frequency * 60 * 1000
-        } else if (this.globalSettings.refresh.unit === 'hour') {
-          count = this.globalSettings.refresh.frequency * 60 * 60 * 1000
+        if (this.pageSettings.refresh.unit === 'min') {
+          count = this.pageSettings.refresh.frequency * 60 * 1000
+        } else if (this.pageSettings.refresh.unit === 'hour') {
+          count = this.pageSettings.refresh.frequency * 60 * 60 * 1000
         }
         this.timer = setInterval(() => {
           this.refreshData()
@@ -222,10 +241,10 @@ export default {
           } else if (refresh.unit === 'hour') {
             count = refresh.frequency * 60 * 60 * 1000
           }
-          let _this = this
-          this.chartTimer = (function(item) {
+          let self = this
+          this.chartTimer = (function() {
             setInterval(() => {
-              _this.refreshData()
+              self.refreshData()
             }, count)
           })(item)
         }
@@ -279,16 +298,49 @@ export default {
         trailing: false
       }
     ),
-    // 刷新大屏
-    refreshData() {
-      if (!this.screenId) {
-        this.$message.error('暂无数据可刷新，请先添加数据')
-        return
+    // 设置联动的图标的数据
+    setLinkageData(id, e) {
+      // 没有联动图表不进行操作
+      let selected = this.canvasMap.find(item => item.id === id)
+      //   if (!selected.bindList) {
+      //     return
+      //   }
+      let bindCharts = selected.bindList
+      // 测试数据
+      bindCharts = ['540314407381487645']
+      for (let chartId of bindCharts) {
+        let chart = this.canvasMap.find(item => item.id === chartId)
+        let apiData = chart.setting.api_data
+        // 维度不相同无法联动
+        if (
+          apiData.dimensions[0].id !==
+          selected.setting.api_data.dimensions[0].id
+        ) {
+          continue
+        }
+        // 构造联动选择的数据，找到点击的维度数据
+        this.$set(apiData, 'selectData', {
+          columns: apiData.source.columns,
+          rows: apiData.source.rows.filter(
+            item => item[apiData.dimensions[0].alias] === e.name
+          )
+        })
       }
-      this.refreshScreen({
-        charSeted: false,
-        needLoading: true
-      })
+
+      console.log('linkage')
+    },
+    // 重置被联动的图标数据
+    resetOriginData(id) {
+      let selected = this.canvasMap.find(item => item.id === id)
+      let bindCharts = selected.bindList
+      // 测试数据
+      bindCharts = ['540314407381487645']
+      for (let chartId of bindCharts) {
+        let chart = this.canvasMap.find(item => item.id === chartId)
+        let apiData = chart.setting.api_data
+        // 删除联动数据
+        this.$delete(apiData, 'selectData')
+      }
     }
   }
 }

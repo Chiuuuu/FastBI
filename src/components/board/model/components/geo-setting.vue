@@ -26,14 +26,22 @@
         style="width: 100px"
         @change="handleprovinceChange"
       >
-        <a-select-option v-for="pro in provinces" :key="pro">
-          {{ pro }}
+        <a-select-option
+          v-for="pro in provinceList"
+          :key="pro.name"
+          :value="pro.name"
+        >
+          {{ pro.name }}
         </a-select-option>
       </a-select>
       <span>市级： </span>
       <a-select v-model="city" style="width: 100px" @change="handlecityChange">
-        <a-select-option v-for="city in cities" :key="city">
-          {{ city }}
+        <a-select-option
+          v-for="city in cityList"
+          :key="city.name"
+          :value="city.name"
+        >
+          {{ city.name }}
         </a-select-option>
       </a-select>
       <!-- <span>区县： </span> -->
@@ -165,7 +173,24 @@ export default {
       visible: false,
       currentKey: '',
       loading: false,
-      condition: {} // 返回的匹配字段
+      condition: {}, // 返回的匹配字段
+      provinceList: [
+        {
+          name: '广东省',
+          adcode: '110000',
+          parentId: '0',
+          level: 1,
+          cityList: [
+            {
+              name: '广州市',
+              adcode: '110000',
+              parentId: '0',
+              level: 1
+            }
+          ]
+        }
+      ],
+      cityList: []
     }
   },
   computed: {
@@ -178,14 +203,21 @@ export default {
     this.$nextTick(() => {
       this.drawMap()
     })
+    // this.getProvinceList()
     this.getDimensionsDatas()
   },
   methods: {
+    async getProvinceList() {
+      let res = await this.$server.screenManage.getGeoData()
+      if (res.code === 200) {
+        this.provinceList = res.data
+      }
+    },
     // 获取维度数据
     async getDimensionsDatas() {
       let params = {
         level: '3',
-        fieldId: this.dimensionsData.fieldId,
+        fieldId: this.dimensionsData.pivotschemaId,
         country: '中国',
         province: '广东省',
         city: '广州市',
@@ -251,7 +283,7 @@ export default {
       //   }
       let params = {
         level: '3',
-        fieldId: this.dimensionsData.fieldId,
+        fieldId: this.dimensionsData.pivotschemaId,
         country: '中国',
         province: '广东省',
         city: '广州市',
