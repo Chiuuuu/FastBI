@@ -44,7 +44,7 @@ export default {
     // 标题配置
     title: {
       enable: true,
-      text: '数据模型'
+      text: '大屏数据'
     },
     // 样式
     style: {
