@@ -186,6 +186,7 @@
           </div>
         </div>
       </div>
+
       <!-- 动态弹窗组件 -->
       <component
         ref='componentRef'
@@ -905,7 +906,7 @@ export default {
         name: 'modelShow'
       })
     },
-    async handleSave() {
+    handleSave() {
       let formAllRight = true
       if (this.model === 'add') {
         this.modelForm.validateFields((err, values) => {
@@ -954,7 +955,33 @@ export default {
         },
         parentId: this.parentId
       }
-      const result = await this.$server.dataModel.saveModel(params)
+      if (!this.modelId) {
+        this.actionSaveModel(params, false)
+      } else {
+        this.$confirm({
+          title: '确认提示?',
+          content: '是否覆盖大屏的数据',
+          okText: '覆盖',
+          cancelText: '仅保存',
+          onOk: () => {
+            this.actionSaveModel(params, true)
+          },
+          onCancel: () => {
+            this.actionSaveModel(params, false)
+          }
+        })
+      }
+    },
+    /**
+     * 模型保存接口 cover: 是否覆盖大屏
+     */
+    async actionSaveModel(params, cover) {
+      let result
+      if (cover) {
+        result = await this.$server.dataModel.saveModelCover(params)
+      } else {
+        result = await this.$server.dataModel.saveModel(params)
+      }
       if (result.code === 200) {
         if (this.model === 'add') {
           await this.handleSaveModelSourceId()
