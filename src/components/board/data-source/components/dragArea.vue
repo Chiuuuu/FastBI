@@ -266,15 +266,16 @@ export default {
         this.type === 'measures' &&
         this.dragFile === this.type
       ) {
-        // if (this.currSelected.setting.name === 've-pie') {
-        //   this.fileList[0] = dataFile
-        //   // 如果是仪表盘，需要两个度量
-        // } else
-        if (this.currSelected.setting.chartType === 'v-text') {
-          dataFile.alias = dataFile.alias + '(求和)'
-        }
-        if (this.fileList.length < 2) {
-          this.fileList.push(dataFile)
+        // 进度条只有一个度量
+        if (this.currSelected.setting.name === 'steepBar') {
+          this.fileList[0] = dataFile
+        } else {
+          if (this.currSelected.setting.chartType === 'v-text') {
+            dataFile.alias = dataFile.alias + '(求和)'
+          }
+          if (this.fileList.length < 2) {
+            this.fileList.push(dataFile)
+          }
         }
         this.fileList = this.uniqueFun(this.fileList, 'alias')
         this.getData()
@@ -331,8 +332,8 @@ export default {
           current.setting.api_data.dimensions.length === 0 &&
           current.setting.api_data.measures.length === 0
         ) {
-          // 清空modelid
-          //   current.packageJson.api_data.modelId = ''
+          // 清空数据
+          delete current.setting.api_data.source
           this.$store.dispatch('SetSelfDataSource', current.setting.api_data)
           // 地图数据还原
           if (current.setting.chartType === 'v-map') {
