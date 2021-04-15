@@ -11,6 +11,8 @@ const RolesEdit = () => import('@/views/projectCenter/roles/components/role-edit
 const PermissionsView = () => import('@/views/projectCenter/permissions')
 const PermissionsEdit = () => import('@/views/projectCenter/permissions/components/perm-edit')
 
+const SreenMaterialView = () => import('@/views/screenMaterial')
+
 export default {
   path: '/projectCenter',
   redirect: '/projectCenter/users',
@@ -60,6 +62,14 @@ export default {
         }
       ]
     },
+    {
+      path: 'screenMaterial',
+      name: 'screenMaterial',
+      component: SreenMaterialView,
+      meta: {
+        title: '素材管理'
+      }
+    }
     // {
     //   path: 'permissions',
     //   name: 'permissions',
