@@ -1,9 +1,24 @@
 <template>
   <div class="dv-steep-bar" ref="wrap" :style="backgroundStyle">
-    <!--底部条-->
-    <div class="background-bar" :style="barStyle">
-      <!--数值条-->
-      <div class="value-bar" :style="contentStyle"></div>
+    <div
+      class="titles"
+      ref="titles"
+      v-if="config.title && config.title.show"
+      :style="titleStyle"
+    >
+      <span>{{ config.title.content }}</span>
+    </div>
+    <div class="bar-body" :style="{ height: bodyHeight }">
+      <!--底部条-->
+      <div class="background-bar" :style="barStyle">
+        <!--数值条-->
+        <div class="value-bar" :style="contentStyle"></div>
+      </div>
+      <span
+        v-show="percentNum && config.common.isShowValue"
+        :style="valueStyle"
+        >{{ percentNum }}</span
+      >
     </div>
   </div>
 </template>
@@ -24,6 +39,10 @@ export default {
     background: {
       type: Object,
       required: true
+    },
+    apiData: {
+      type: Object,
+      required: true
     }
   },
   data() {
@@ -34,24 +53,50 @@ export default {
         columns: ['x', 'y'],
         rows: [{ x: 'x', y: 100 }]
       },
+      contentStyle: {},
       backgroundStyle: {},
-      barStyle: {},
-      contentStyle: {}
+      bodyHeight: 0, // 进度条框高度
+      value: 0
     }
   },
   watch: {
+    apiData: {
+      handler(val) {
+        if (val) {
+          this.value = 0
+          if (val.source) {
+            // 获取显示值
+            this.value = val.source.rows[0].value
+          }
+        }
+      },
+      deep: true,
+      immediate: true
+    },
     config: {
       handler(val) {
         if (val) {
-          this.barStyle = {
-            height: val.common.height + 'px',
-            background: val.buttonBar.background,
-            borderRadius: val.buttonBar.borderRadius
+          let backgroundColor = ''
+          switch (val.valueBar.backgroundType) {
+            case '1':
+              backgroundColor = val.valueBar.background
+              break
+            case '2':
+              backgroundColor = `linear-gradient(to right,${
+                val.valueBar.lineColor[0]
+              },${val.valueBar.lineColor[1]})`
+              break
+            case '3':
+              backgroundColor = `radial-gradient(${
+                val.valueBar.radialColor[0]
+              },${val.valueBar.radialColor[1]})`
+              break
           }
           this.contentStyle = {
-            height: val.common.height + 'px',
-            background: val.valueBar.background,
-            borderRadius: val.valueBar.borderRadius
+            width: this.percentNum || '100%',
+            height: this.config.common.height + 'px',
+            background: backgroundColor,
+            borderRadius: this.config.valueBar.borderRadius + 'px'
           }
         }
       },
@@ -78,6 +123,39 @@ export default {
       immediate: true
     }
   },
+  computed: {
+    // 计算百分比
+    percentNum() {
+      if (!this.value) {
+        return 0
+      }
+      return (this.value / this.config.common.targetValue) * 100 + '%'
+    },
+    barStyle() {
+      return {
+        height: this.config.common.height + 'px',
+        background: this.config.buttonBar.background,
+        borderRadius: this.config.buttonBar.borderRadius + 'px'
+      }
+    },
+    titleStyle() {
+      return {
+        padding: '0 10px',
+        color: this.config.title.textStyle.color,
+        fontSize: this.config.title.textStyle.fontSize + 'px',
+        textAlign: this.config.title.textAlign,
+        fontFamily: this.config.title.textStyle.fontFamily,
+        fontWeight: this.config.title.textStyle.fontWeight
+      }
+    },
+    valueStyle() {
+      return {
+        marginLeft: '10px',
+        color: this.config.common.textStyle.color,
+        fontSize: this.config.common.textStyle.fontSize + 'px'
+      }
+    }
+  },
   mounted() {
     this._calcStyle()
     addResizeListener(this.$refs.wrap, this._calcStyle)
@@ -96,6 +174,8 @@ export default {
       let height = wrap.clientHeight
       this.width = width + 'px'
       this.height = height + 'px'
+      this.bodyHeight =
+        wrap.clientHeight - this.$refs.titles.clientHeight + 'px'
     }
   }
 }
@@ -104,18 +184,20 @@ export default {
 .dv-steep-bar {
   width: 100%;
   height: 100%;
-  padding: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  .background-bar {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-    .value-bar {
-      position: absolute;
-      left: 0;
-      right: 0;
+  .bar-body {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .background-bar {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      .value-bar {
+        position: absolute;
+        left: 0;
+        right: 0;
+      }
     }
   }
 }

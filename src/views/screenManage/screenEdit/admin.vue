@@ -82,6 +82,7 @@
               v-else-if="transform.setting.name === 'steepBar'"
               :config="transform.setting.config"
               :background="transform.setting.background"
+              :api-data="transform.setting.api_data"
             ></SteepBar>
             <!-- 文本 -->
             <chart-text
