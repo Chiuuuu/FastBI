@@ -121,6 +121,8 @@
         </template>
       </template>
     </a-table>
+
+    <!-- 用户新建及编辑弹窗 -->
     <UserModal
       ref="userModal"
       :show="visible1"
@@ -129,20 +131,22 @@
       :modal-type="modalType"
       @close="visible1 = false"
     />
-    <DepartModal
-      ref="departModal"
-      :show="visible2"
+
+    <!-- 部门管理弹窗 -->
+    <ModalListManager
+      :options="deptOptions"
+      @refresh="handleGetDepartList"
+      @close="deptOptions.visible = false" />
+
+    <!-- 岗位管理弹窗 -->
+    <PostModal
+      ref="postModal"
+      :visible="visible2"
       :dept-list="departList"
       :modal-data="modalData"
       @close="visible2 = false"
     />
-    <PostModal
-      ref="postModal"
-      :show="visible3"
-      :dept-list="departList"
-      :modal-data="modalData"
-      @close="visible3 = false"
-    />
+
   </div>
 </template>
 
@@ -150,9 +154,9 @@
 import { mapState } from 'vuex'
 import { trimFormData } from '@/utils/form-utils'
 import UserModal from '../modals/userModal'
-import DepartModal from '../modals/departModal'
 import PostModal from '../modals/postModal'
 import omit from 'lodash/omit'
+import ModalListManager from '@/components/modal-list-manager'
 
 const personColumn = [
   {
@@ -218,17 +222,26 @@ export default {
   name: 'personManage',
   components: {
     UserModal,
-    DepartModal,
-    PostModal
+    PostModal,
+    ModalListManager
   },
   data() {
+    // 部门管理
+    const deptOptions = {
+      visible: false,
+      title: '部门',
+      list: [],
+      add: params => this.$server.corporateDomain.addDept(params.name),
+      update: params => this.$server.corporateDomain.updateDept(params),
+      delete: params => this.$server.corporateDomain.deleDept(params.id)
+    }
     return {
       loading: false,
       modalData: {},
       modalType: '',
       visible1: false,
       visible2: false,
-      visible3: false,
+      deptOptions,
       personSearch: {
         username: '',
         name: '',
@@ -275,14 +288,15 @@ export default {
       }
     },
     handleSetDepart() {
-      const data = {} // 取当前项目下的部门岗位
-      this.modalData = data
-      this.visible2 = true
+      this.deptOptions = Object.assign({}, this.deptOptions, {
+        visible: true,
+        list: this.departList
+      })
     },
     handleSetPost() {
       const data = {} // 取当前项目下的部门岗位
       this.modalData = data
-      this.visible3 = true
+      this.visible2 = true
     },
     handleTableChange(pagination) {
       this.handleGetData(pagination)
@@ -295,8 +309,10 @@ export default {
         })
       if (res.code === 200) {
         this.departList = res.data
+        this.deptOptions.list = res.data
       } else {
         this.departList = []
+        this.deptOptions.list = []
         this.$message.error('获取部门列表失败')
       }
     },
@@ -309,8 +325,10 @@ export default {
         })
       if (res.code === 200) {
         this.postList = res.data
+        this.postOptions.list = res.data
       } else {
         this.postList = []
+        this.postOptions.list = []
         this.$message.error('获取部门列表失败')
       }
     },

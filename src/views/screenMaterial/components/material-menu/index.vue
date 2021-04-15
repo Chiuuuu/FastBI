@@ -161,7 +161,7 @@ export default {
     },
     // 删除分组
     handleCategoryDelete(params) {
-      return this.$server.screenMaterial.deleCategory(params)
+      return this.$server.screenMaterial.deleCategory(params.id)
     }
   }
 }

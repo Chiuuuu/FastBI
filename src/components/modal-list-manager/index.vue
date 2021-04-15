@@ -121,7 +121,7 @@ export default {
     /** 删除 */
     handleModalFormDelete(formData, index) {
       this.spinning = true
-      this.options.delete(formData.id)
+      this.options.delete(formData)
         .then(res => {
           if (res.code === 200) {
             this.$message.success('删除成功')
