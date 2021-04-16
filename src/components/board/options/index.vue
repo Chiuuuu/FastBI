@@ -21,10 +21,15 @@
         >
           数据
         </div>
-        <!-- <div class="tab-item" v-if="currentSelected.setting.name!=='ve-image'"
-          :class="{'active':tabsType===2}" @click="tabsTypeChange(2)">
+        <!--维度度量都有的图才可以创建交互-->
+        <div
+          class="tab-item"
+          v-if="currSelected.setting.type === '1'"
+          :class="{ active: tabsType === 2 }"
+          @click="tabsTypeChange(2)"
+        >
           交互
-        </div>-->
+        </div>
       </div>
     </div>
     <div class="options-body scrollbar">
@@ -2378,7 +2383,7 @@
           </gui-group>-->
         </div>
         <div v-else>
-          <div flex="main:center">暂无交互事件</div>
+          <div flex="main:center"><Interactive /></div>
         </div>
       </div>
       <!-- </b-scrollbar> -->
@@ -2406,6 +2411,7 @@ import GuiField from './gui-field'
 import GuiInline from './gui-inline'
 import GuiColors from './gui-colors'
 import DataSource from '../data-source/data-source'
+import Interactive from './interactive'
 import { DEFAULT_COLORS } from '../../../utils/defaultColors'
 import { deepClone } from '../../../utils/deepClone'
 import throttle from 'lodash/throttle'
@@ -2953,6 +2959,6 @@ export default {
       )
     }
   },
-  components: { GuiField, GuiInline, GuiColors, DataSource }
+  components: { GuiField, GuiInline, GuiColors, DataSource, Interactive }
 }
 </script>

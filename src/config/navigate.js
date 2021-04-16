@@ -1572,10 +1572,7 @@ const list = [
             view: { width: 400, height: 400, x: 760, y: 340 }
           }
         ]
-      },
-      { title: '图标', children: [] },
-      { title: '边框', children: [] },
-      { title: '线', children: [] }
+      }
     ]
   }
   // {

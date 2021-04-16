@@ -109,6 +109,10 @@ export default {
     this.chartEvents = {
       click: function(e) {
         self.name = e.name
+        // 判断是否启用了联动
+        if (!self.apiData.interactive || !self.apiData.interactive.clickLink) {
+          return
+        }
         self.$nextTick(() => {
           let chart = self.$refs.chart.echarts
           // 重复选择数据，进行重置
@@ -294,7 +298,6 @@ export default {
   mounted() {
     this._calcStyle()
     addResizeListener(this.$refs.wrap, this._calcStyle)
-    this.setChartClick()
   },
   beforeDestroy() {
     removeResizeListener(this.$refs.wrap, this._calcStyle)

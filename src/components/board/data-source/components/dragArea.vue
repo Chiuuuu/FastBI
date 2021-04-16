@@ -198,14 +198,6 @@ export default {
     ]),
     chartType() {
       return this.currSelected ? this.currSelected.setting.type : ''
-    },
-    // 拖入一个维度的进入联动选择列
-    toBindList() {
-      return this.canvasMap.filter(
-        item =>
-          item.setting.api_data.dimensions &&
-          item.setting.api_data.dimensions.length > 0
-      )
     }
   },
   methods: {
@@ -652,26 +644,11 @@ export default {
             columns,
             rows
           }
-          console.log(apiData)
           this.$store.dispatch('SetSelfDataSource', apiData)
         }
         this.updateChartData()
       } else {
         this.$message.error(res.msg)
-      }
-    },
-    // 设置图表联动
-    setLinkage() {
-      // 保存被选中图表的联动列表
-      for (let id of this.toBindList) {
-        let chart = this.canvasMap.find(item => item.id === id)
-        if (id === this.currentSelected) {
-          chart.bindedList = this.checkList
-        } else if (this.checkList.indexOf(id) > -1) {
-          chart.beBinded = this.currentSelected
-        } else if (chart.beBinded === this.currentSelected) {
-          chart.beBinded = ''
-        }
       }
     }
   }
