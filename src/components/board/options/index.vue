@@ -21,10 +21,15 @@
         >
           数据
         </div>
-        <!-- <div class="tab-item" v-if="currentSelected.setting.name!=='ve-image'"
-          :class="{'active':tabsType===2}" @click="tabsTypeChange(2)">
+        <!--维度度量都有的图才可以创建交互-->
+        <div
+          class="tab-item"
+          v-if="currSelected.setting.type === '1'"
+          :class="{ active: tabsType === 2 }"
+          @click="tabsTypeChange(2)"
+        >
           交互
-        </div>-->
+        </div>
       </div>
     </div>
     <div class="options-body scrollbar">
@@ -2115,16 +2120,155 @@
               </a-collapse-panel>-->
             </template>
             <!--进度条-->
-            <!-- <template v-if="isSteepBar">
+            <template v-if="isSteepBar">
               <a-collapse-panel key="steepBar" header="进度条">
-                  <gui-field label="底部">
-                  <el-color-picker
-                    v-model="selfConfig.table.evenBackgroundColor"
+                <gui-field label="高度">
+                  <a-input-number
+                    v-model="selfConfig.common.height"
+                    size="small"
+                    :min="0"
+                    :max="40"
                     @change="setSelfProperty"
-                  ></el-color-picker>
+                  ></a-input-number>
+                </gui-field>
+                <gui-field label="目标值">
+                  <a-input-number
+                    v-model="selfConfig.common.targetValue"
+                    size="small"
+                    :min="1"
+                    @change="setSelfProperty"
+                  ></a-input-number>
+                </gui-field>
+                <gui-field label="显示值">
+                  <a-switch
+                    v-model="selfConfig.common.isShowValue"
+                    size="small"
+                    @change="switchChange"
+                  ></a-switch>
+                </gui-field>
+                <gui-field label="文本">
+                  <gui-inline label="字号">
+                    <a-input-number
+                      v-model="selfConfig.common.textStyle.fontSize"
+                      size="small"
+                      :min="12"
+                      :max="40"
+                      @change="setSelfProperty"
+                    ></a-input-number>
+                  </gui-inline>
+                  <gui-inline label="颜色">
+                    <el-color-picker
+                      v-model="selfConfig.common.textStyle.color"
+                      @change="setSelfProperty"
+                    ></el-color-picker>
+                  </gui-inline>
+                </gui-field>
+                <gui-field label="进度条背景">
+                  <gui-inline label="圆角">
+                    <a-input-number
+                      v-model="selfConfig.buttonBar.borderRadius"
+                      size="small"
+                      :min="0"
+                      :max="40"
+                      @change="setSelfProperty"
+                    ></a-input-number>
+                  </gui-inline>
+                  <gui-inline label="颜色">
+                    <el-color-picker
+                      v-model="selfConfig.buttonBar.background"
+                      @change="setSelfProperty"
+                    ></el-color-picker>
+                  </gui-inline>
+                </gui-field>
+                <gui-field label="进度条圆角">
+                  <a-input-number
+                    v-model="selfConfig.valueBar.borderRadius"
+                    size="small"
+                    :min="0"
+                    :max="40"
+                    @change="setSelfProperty"
+                  ></a-input-number>
+                </gui-field>
+                <gui-field label="进度条颜色">
+                  <a-radio-group
+                    v-model="selfConfig.valueBar.backgroundType"
+                    name="radioGroup"
+                  >
+                    <a-radio
+                      :style="radioStyle"
+                      value="1"
+                      @click.native.stop="
+                        onRadioChange(
+                          $event,
+                          selfConfig.valueBar,
+                          'backgroundType'
+                        )
+                      "
+                    >
+                      <gui-field label="单色">
+                        <el-color-picker
+                          v-model="selfConfig.valueBar.background"
+                          show-alpha
+                          @change="setSelfProperty"
+                        ></el-color-picker>
+                      </gui-field>
+                    </a-radio>
+                    <a-radio
+                      :style="radioStyle"
+                      value="2"
+                      @click.native.stop="
+                        onRadioChange(
+                          $event,
+                          selfConfig.valueBar,
+                          'backgroundType'
+                        )
+                      "
+                    >
+                      <gui-field label="线性渐变">
+                        <gui-inline label="左">
+                          <el-color-picker
+                            v-model="selfConfig.valueBar.lineColor[0]"
+                            @change="setSelfProperty"
+                          ></el-color-picker>
+                        </gui-inline>
+                        <gui-inline label="右">
+                          <el-color-picker
+                            v-model="selfConfig.valueBar.lineColor[1]"
+                            @change="setSelfProperty"
+                          ></el-color-picker>
+                        </gui-inline>
+                      </gui-field>
+                    </a-radio>
+                    <a-radio
+                      :style="radioStyle"
+                      value="3"
+                      @click.native.stop="
+                        onRadioChange(
+                          $event,
+                          selfConfig.valueBar,
+                          'backgroundType'
+                        )
+                      "
+                    >
+                      <gui-field label="径向渐变">
+                        <gui-inline label="左">
+                          <el-color-picker
+                            v-model="selfConfig.valueBar.radialColor[0]"
+                            @change="setSelfProperty"
+                          ></el-color-picker>
+                        </gui-inline>
+                        <gui-inline label="右">
+                          <el-color-picker
+                            v-model="selfConfig.valueBar.radialColor[1]"
+                            @change="setSelfProperty"
+                          ></el-color-picker>
+                        </gui-inline>
+                      </gui-field>
+                    </a-radio>
+                  </a-radio-group>
                 </gui-field>
               </a-collapse-panel>
-            </template> -->
+            </template>
             <a-collapse-panel
               key="background"
               header="背景设置"
@@ -2239,7 +2383,7 @@
           </gui-group>-->
         </div>
         <div v-else>
-          <div flex="main:center">暂无交互事件</div>
+          <div flex="main:center"><Interactive /></div>
         </div>
       </div>
       <!-- </b-scrollbar> -->
@@ -2267,6 +2411,7 @@ import GuiField from './gui-field'
 import GuiInline from './gui-inline'
 import GuiColors from './gui-colors'
 import DataSource from '../data-source/data-source'
+import Interactive from './interactive'
 import { DEFAULT_COLORS } from '../../../utils/defaultColors'
 import { deepClone } from '../../../utils/deepClone'
 import throttle from 'lodash/throttle'
@@ -2814,6 +2959,6 @@ export default {
       )
     }
   },
-  components: { GuiField, GuiInline, GuiColors, DataSource }
+  components: { GuiField, GuiInline, GuiColors, DataSource, Interactive }
 }
 </script>

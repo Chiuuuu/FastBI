@@ -249,6 +249,7 @@
             :data-list="dataList"
             :disable-list="disableId"
             @fileHandle="fileHandle"
+            :key="key"
           ></add-data-list>
           <!-- </b-scrollbar> -->
         </div>
@@ -310,7 +311,8 @@ export default {
       resourceType: 8, // 当前数据类型标识（接入:3|模型:8）
       dataList: [], // 显示的菜单列表
       modelList: [], // 模型菜单
-      sourceList: [] // 接入菜单
+      sourceList: [], // 接入菜单
+      key: 0 // 刷新菜单
     }
   },
   computed: {
@@ -395,10 +397,13 @@ export default {
     // 数据模型搜索
     modelSearch: debounce(function(event) {
       const value = event.target.value
-      if (value !== '') {
+      if (value) {
         this.handleGetSearchList(value)
       } else {
-        this.getModelList()
+        this.dataList =
+          this.resourceType === 8 ? this.modelList : this.sourceList
+        // 强制刷新菜单
+        this.key++
       }
     }, 400),
     // 切换数据类型
@@ -418,13 +423,14 @@ export default {
     },
     // 搜索关键字
     handleGetSearchList(value) {
-      let result = []
       // 按模型/接入搜索
       if (this.resourceType === 8) {
         this.dataList = this.search(this.modelList, value)
       } else {
         this.dataList = this.search(this.sourceList, value)
       }
+      // 强制刷新菜单
+      this.key++
     },
     // 搜索关键字
     search(list, value) {
@@ -477,6 +483,7 @@ export default {
           item.selected = false
           item.showMore = false
         })
+        this.sourceList = catalog.rows
         this.dataList = catalog.rows
         return true
       }
@@ -554,6 +561,7 @@ export default {
             item.selected = false
             item.showMore = false
           })
+          this.modelList = res.data
           this.dataList = res.data
           return true
         }

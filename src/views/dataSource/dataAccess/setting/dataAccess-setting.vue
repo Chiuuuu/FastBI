@@ -197,7 +197,7 @@ export default {
     return {
       data: [],
       fieldKeyword: '',
-      sping: true,
+      sping: false,
       loading: false,
       showSetting: false,
       setType: '',

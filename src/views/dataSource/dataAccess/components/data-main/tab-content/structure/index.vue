@@ -611,34 +611,7 @@ export default {
     },
     // 字段设置
     async setting(row) {
-      // if (this.showExtractBtn) {
-      //   const code = await this.handleVerifyTable(new Array(row.id))
-      //   if (code === 'hasDelete' || code === 'error') return
-      // }
-
-      if (!this.showExtractBtn) {
-        this.$emit('on-change-componet', 'Setting', row)
-      } else {
-        // 先调一次接口校验表是否存在再跳转页面(上面的校验接口频繁调用会锁表)
-        let databaseName = this.formInfo ? this.formInfo.databaseName : ''
-        // sql, oracle的数据库名称在formInfo里, excel的在dabaseName里
-        if (['excel', 'csv'].indexOf(this.modelType) > -1) {
-          databaseName = this.databaseName
-        }
-        const result = await this.$server.dataAccess.getTableFieldDetail({
-          databaseName,
-          sourceName: this.modelName,
-          sourceId: row.datasourceId,
-          databaseId: row.databaseId,
-          tableId: row.id,
-          tableName: row.name
-        })
-        if (result.code === 200) {
-          this.$emit('on-change-componet', 'Setting', row)
-        } else {
-          this.$message.error(result.msg)
-        }
-      }
+      this.$emit('on-change-componet', 'Setting', row)
     },
     // 显示定时任务
     async showSetting(type, row) {

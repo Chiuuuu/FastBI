@@ -3,7 +3,7 @@
     title="岗位管理"
     :bodyStyle="bodyStyle"
     :maskClosable="false"
-    :visible="show"
+    :visible="visible"
     :footer="null"
     destroyOnClose
     @cancel="handleClose">
@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import modalMixin from './modalMixin'
+import modalMixin from '@/components/modal-list-manager/mixin'
 export default {
   name: 'personnelPostModal',
   props: {
@@ -124,5 +124,8 @@ export default {
 </script>
 
 <style lang="less" scoped>
-@import "./modal-common.less";
+@import "@/components/modal-list-manager/modal-common.less";
+.form-list {
+  height: calc(100% - 120px);
+}
 </style>

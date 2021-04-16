@@ -1499,19 +1499,40 @@ const list = [
             name: 'steepBar',
             chartType: 'steepBar',
             icon: 'icon-zhexian3.png',
+            type: '2',
             modelId: '',
             api_data: {},
             apis: {},
             config: {
-              noTitle: true,
               title: {
-                content: '图片'
+                show: true,
+                content: '进度条',
+                textAlign: 'left',
+                textStyle: {
+                  color: '#fff',
+                  fontSize: 20,
+                  fontFamily: 'not specified',
+                  fontWeight: 'normal'
+                }
               },
               common: {
-                height: 20
+                height: 5,
+                targetValue: 100,
+                isShowValue: true,
+                textStyle: {
+                  color: '#fff',
+                  fontSize: 20
+                },
+                location: 'inside' // inside/outside
               },
-              buttonBar: { background: 'black', borderRadius: 0 },
-              valueBar: { background: 'blue', borderRadius: 0 }
+              buttonBar: { background: '#f5f5f5', borderRadius: 100 },
+              valueBar: {
+                backgroundType: 1,
+                background: '#1890ff',
+                lineColor: ['#108ee9', '#87d068'],
+                radialColor: ['#108ee9', '#87d068'],
+                borderRadius: 100
+              } // 背景类型(单色:1||线性渐变:2||径向渐变:3)
             },
             background: {
               backgroundType: '1',
@@ -1551,10 +1572,7 @@ const list = [
             view: { width: 400, height: 400, x: 760, y: 340 }
           }
         ]
-      },
-      { title: '图标', children: [] },
-      { title: '边框', children: [] },
-      { title: '线', children: [] }
+      }
     ]
   }
   // {

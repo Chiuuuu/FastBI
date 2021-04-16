@@ -90,6 +90,14 @@ export default {
     return $axios.post('/model/datamodel/updateDataModelDetailInfo', params)
   },
   /**
+   * @description 保存数据模型并覆盖大屏
+   * @param {Object} params 请求参数
+   * @returns
+   */
+  saveModelCover(params) {
+    return $axios.post('/screen/pivotschema/coverScreenPivoshecmaList', params)
+  },
+  /**
    * @description 查看宽表
    * @param {Object} params 请求体
    * @param {Object} params.config 配置

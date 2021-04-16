@@ -82,6 +82,7 @@
               v-else-if="transform.setting.name === 'steepBar'"
               :config="transform.setting.config"
               :background="transform.setting.background"
+              :api-data="transform.setting.api_data"
             ></SteepBar>
             <!-- 文本 -->
             <chart-text
@@ -223,6 +224,8 @@ export default {
         this.getScreenData()
       })
     }
+    // 获取素材库
+    this.getMaterial()
   },
   mounted() {
     on(document, 'keyup', this.handleKeyup)
@@ -238,6 +241,11 @@ export default {
   },
   methods: {
     ...mapActions(['saveScreenData', 'deleteChartData', 'getScreenDetail']),
+    // 获取素材库
+    async getMaterial() {
+      let res = await this.$server.screenManage.getMaterialGroupList()
+      this.navigate[2].tabs = res.data
+    },
     // 获取大屏页签
     async getScreenTabs() {
       this.$server.screenManage

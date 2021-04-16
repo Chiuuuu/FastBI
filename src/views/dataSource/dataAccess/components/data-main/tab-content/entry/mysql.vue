@@ -146,6 +146,9 @@ export default {
           {
             required: true,
             message: '请输入密码'
+          },
+          {
+            validator: this.validateSavePassword
           }
         ]
         // dbid: [
@@ -154,6 +157,7 @@ export default {
         //   }
         // ]
       },
+      connectPassword: '',
       connectBtn: false,
       connectStatus: false, // 是否连接
       saveBtn: false,
@@ -189,6 +193,13 @@ export default {
     this.$EventBus.$off('setFormData', this.handleSetFormData)
   },
   methods: {
+    validateSavePassword(rule, value, callback) {
+      if (this.connectPassword !== '' && this.connectPassword !== value) {
+        callback(new Error('请输入正确地密码'))
+      } else {
+        callback()
+      }
+    },
     handleSetFormData() {
       this.handleResetForm()
       this.form = Object.assign(this.form, this.modelInfo, { name: this.modelName })
@@ -204,8 +215,12 @@ export default {
         this.connectStatus = false
         this.$emit('on-set-tab', '1')
         let setFirstFinished = false
-        if (prop === 'password' && this.modelId !== 0) {
-          setFirstFinished = true
+        if (prop === 'password') {
+          if (this.connectPassword !== '' && this.connectPassword !== this.form[prop]) {
+            this.connectStatus = true
+          } else if (this.modelId !== 0) {
+            setFirstFinished = true
+          }
         }
         this.$store.dispatch('dataAccess/setFirstFinished', setFirstFinished)
       }
@@ -233,6 +248,7 @@ export default {
      * 重置表单
      */
     handleResetForm() {
+      this.connectPassword = ''
       this.$refs['dbForm'] && this.$refs.dbForm.resetFields()
       this.connectStatus = false
     },
@@ -258,6 +274,7 @@ export default {
           })
 
           if (result.code === 200) {
+            this.connectPassword = this.form.password
             this.databaseList = [].concat(result.rows)
             const item = this.databaseList.find(item => item.name === this.$store.state.dataAccess.modelInfo.databaseName)
             if (item) {
@@ -290,6 +307,11 @@ export default {
           // this.form = Object.assign(this.form, {
           //   databaseName: datadbitem.name
           // })
+
+          // 保存前先校验密码是否正确
+          if (this.connectPassword !== this.form.password) {
+
+          }
 
           this.saveBtn = true
           const params = {

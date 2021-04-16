@@ -198,14 +198,6 @@ export default {
     ]),
     chartType() {
       return this.currSelected ? this.currSelected.setting.type : ''
-    },
-    // 拖入一个维度的进入联动选择列
-    toBindList() {
-      return this.canvasMap.filter(
-        item =>
-          item.setting.api_data.dimensions &&
-          item.setting.api_data.dimensions.length > 0
-      )
     }
   },
   methods: {
@@ -266,15 +258,16 @@ export default {
         this.type === 'measures' &&
         this.dragFile === this.type
       ) {
-        // if (this.currSelected.setting.name === 've-pie') {
-        //   this.fileList[0] = dataFile
-        //   // 如果是仪表盘，需要两个度量
-        // } else
-        if (this.currSelected.setting.chartType === 'v-text') {
-          dataFile.alias = dataFile.alias + '(求和)'
-        }
-        if (this.fileList.length < 2) {
-          this.fileList.push(dataFile)
+        // 进度条只有一个度量
+        if (this.currSelected.setting.name === 'steepBar') {
+          this.fileList[0] = dataFile
+        } else {
+          if (this.currSelected.setting.chartType === 'v-text') {
+            dataFile.alias = dataFile.alias + '(求和)'
+          }
+          if (this.fileList.length < 2) {
+            this.fileList.push(dataFile)
+          }
         }
         this.fileList = this.uniqueFun(this.fileList, 'alias')
         this.getData()
@@ -331,8 +324,8 @@ export default {
           current.setting.api_data.dimensions.length === 0 &&
           current.setting.api_data.measures.length === 0
         ) {
-          // 清空modelid
-          //   current.packageJson.api_data.modelId = ''
+          // 清空数据
+          delete current.setting.api_data.source
           this.$store.dispatch('SetSelfDataSource', current.setting.api_data)
           // 地图数据还原
           if (current.setting.chartType === 'v-map') {
@@ -651,26 +644,11 @@ export default {
             columns,
             rows
           }
-          console.log(apiData)
           this.$store.dispatch('SetSelfDataSource', apiData)
         }
         this.updateChartData()
       } else {
         this.$message.error(res.msg)
-      }
-    },
-    // 设置图表联动
-    setLinkage() {
-      // 保存被选中图表的联动列表
-      for (let id of this.toBindList) {
-        let chart = this.canvasMap.find(item => item.id === id)
-        if (id === this.currentSelected) {
-          chart.bindedList = this.checkList
-        } else if (this.checkList.indexOf(id) > -1) {
-          chart.beBinded = this.currentSelected
-        } else if (chart.beBinded === this.currentSelected) {
-          chart.beBinded = ''
-        }
       }
     }
   }

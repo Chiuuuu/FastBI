@@ -109,25 +109,41 @@ export default {
     this.chartEvents = {
       click: function(e) {
         self.name = e.name
+        // 判断是否启用了联动
+        if (!self.apiData.interactive || !self.apiData.interactive.clickLink) {
+          return
+        }
         self.$nextTick(() => {
           let chart = self.$refs.chart.echarts
+          // 重复选择数据，进行重置
+          if (self.currentIndex === e.dataIndex) {
+            // 重置数据颜色样式
+            delete self.chartExtend.series.itemStyle.normal.color
+            // 强行渲染，非数据变动不会自动重新渲染
+            self.key++
+            self.$emit('resetOriginData', self.id)
+            return
+          }
           // 鼠标单击时选中,选中颜色不变，其余变暗
           if (self.typeName === 've-bar' || self.typeName === 've-histogram') {
+            // 柱状图折线图数据颜色体现在度量，用seriesIndex
             self.chartExtend.series.itemStyle.normal.color = function(params) {
               return params.dataIndex === e.dataIndex
                 ? DEFAULT_COLORS[params.seriesIndex]
                 : self.hexToRgba(DEFAULT_COLORS[params.seriesIndex], 0.4)
             }
-            self.key++
           } else if (self.typeName === 've-pie') {
+            // 饼图数据颜色体现在维度，用dataIndex
             self.chartExtend.series.itemStyle.normal.color = function(params) {
               return params.dataIndex === e.dataIndex
                 ? DEFAULT_COLORS[params.dataIndex]
                 : self.hexToRgba(DEFAULT_COLORS[params.dataIndex], 0.4)
             }
-            // 强行渲染，非数据变动不会自动重新渲染
-            self.key++
           }
+          // 记录当前选择数据的index
+          self.currentIndex = e.dataIndex
+          // 强行渲染，非数据变动不会自动重新渲染
+          self.key++
           self.$emit('linkage', self.id, e)
           chart.off('click')
           self.setChartClick()
@@ -153,7 +169,8 @@ export default {
       colors: [],
       geo: {},
       mapToolTip: {},
-      key: 0
+      key: 0,
+      currentIndex: '' // 记录当前选择的度量数据(图表联动)
     }
   },
   watch: {
@@ -220,8 +237,11 @@ export default {
             }
           }
           if (val.dimensions && val.measures) {
-            // 缺维度或者缺度量都不改变数据
-            if (val.dimensions.length === 0 || val.measures.length === 0) {
+            // 没有删完维度度量的时候不改变图表
+            if (
+              (val.dimensions.length === 0 && val.measures.length > 0) ||
+              (val.dimensions.length > 0 && val.measures.length === 0)
+            ) {
               return
             }
             if (
@@ -278,7 +298,6 @@ export default {
   mounted() {
     this._calcStyle()
     addResizeListener(this.$refs.wrap, this._calcStyle)
-    this.setChartClick()
   },
   beforeDestroy() {
     removeResizeListener(this.$refs.wrap, this._calcStyle)

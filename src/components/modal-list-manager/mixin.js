@@ -1,9 +1,8 @@
-import ModalForm from './modalForm'
+import ModalForm from './modal-form'
 
 const ModalMixin = {
   props: {
-    modalData: Object,
-    show: Boolean
+    visible: Boolean
   },
   components: {
     ModalForm
@@ -20,13 +19,14 @@ const ModalMixin = {
     handleModalFormEdit(index) {
       this.activeIndex = index
     },
+    /** 校验是否完成上个item的操作 */
     handleCheckNextToDo() {
-        if (this.activeIndex !== -1) {
-            this.$message.error('请完成操作')
-            return false
-        } else {
-            return true
-        }
+      if (this.activeIndex !== -1) {
+        this.$message.error('请完成操作')
+        return false
+      } else {
+        return true
+      }
     },
     /** 添加 */
     handleAddItem() {
