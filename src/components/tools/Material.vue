@@ -1,6 +1,6 @@
 <template>
   <div class="dv-material" style="width: 100%;height:100%;" ref="wrap">
-    <img style="width: 100%;height:100%;" :src="url" alt="" />
+    <img style="width: 100%;height:100%;" :src="url | imgUrlFilter" alt="" />
   </div>
 </template>
 
@@ -17,6 +17,13 @@ export default {
     url: {
       type: String,
       required: true
+    }
+  },
+  filters: {
+    // thumbnail表示缩略图，控件内去掉thumbnail显示原图
+    imgUrlFilter(url) {
+      let imgUrl = url.replace(/\/thumbnail/g, '')
+      return imgUrl
     }
   },
   data() {

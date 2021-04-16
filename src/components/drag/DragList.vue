@@ -3,13 +3,13 @@
     <div
       class="list-group"
       :class="{ hovered: category.hovered }"
-      v-for="category in dragList"
+      v-for="(category, i) in dragList"
       :key="category.type"
     >
       <div
         class="list-group-header"
         flex="dir:top"
-        @mouseenter="initTabChildren(category)"
+        @mouseenter="initTabChildren(category, i)"
         @mouseleave="category.hovered = false"
       >
         <!-- <b-icon v-if="category.icon" :name="category.icon" size="18"></b-icon> -->
@@ -33,31 +33,57 @@
             v-for="(tab, index) in category.tabs"
             :key="tab.title"
             :class="{ selected: index === selectedIndex }"
-            @mouseover="selectTab(index)"
+            @mouseenter="selectTab(tab, index, i)"
           >
-            {{ tab.title }}
+            {{ tab.title || tab.name }}
           </div>
         </div>
         <div class="right">
           <!--素材库-->
           <div v-if="category.type === 'Base'" class="material">
-            <div
-              class="material-box"
-              v-for="component in category.tabs[selectedIndex].children"
-              :key="component.key"
-            >
-              <p class="material-text">
-                {{ component.imgName }}
-              </p>
-              <img
-                class="material-img"
-                :src="component.url"
-                alt="test"
-                draggable="true"
-                @click="handleAddForMaterial(component, $event)"
-                @dragstart="handleDragStartForMaterial(component, $event)"
-              />
+            <div class="material-body">
+              <div class="material-content">
+                <div
+                  class="material-box"
+                  v-for="component in category.tabs[selectedIndex].children"
+                  :key="component.key"
+                >
+                  <p class="material-text">
+                    {{ component.imgName }}
+                  </p>
+                  <img
+                    class="material-img"
+                    :src="component.url"
+                    alt="test"
+                    draggable="true"
+                    @click="handleAddForMaterial(component, $event)"
+                    @dragstart="handleDragStartForMaterial(component, $event)"
+                  />
+                </div>
+              </div>
             </div>
+            <footer class="material-footer">
+              <a-pagination
+                v-if="category.tabs[selectedIndex].current"
+                v-model="category.tabs[selectedIndex].current"
+                size="small"
+                :pageSize="category.tabs[selectedIndex].pageSize"
+                :total="category.tabs[selectedIndex].total"
+                show-less-items
+                @change="getMaterials(category.tabs[selectedIndex])"
+              />
+              <div class="pageSize-box">
+                每页显示
+                <a-input-number
+                  style="width:50px;"
+                  v-model="category.tabs[selectedIndex].pageSize"
+                  size="small"
+                  :min="1"
+                  :max="20"
+                  @change="getMaterials(category.tabs[selectedIndex])"
+                ></a-input-number>
+              </div>
+            </footer>
           </div>
           <!--控件-->
           <div
@@ -93,6 +119,7 @@
 import { mapActions } from 'vuex' // 导入vuex
 import { Icon } from 'ant-design-vue'
 import MapTypeView from './components/map-type-view.vue'
+import { Loading } from 'element-ui'
 
 const IconFont = Icon.createFromIconfontCN({
   scriptUrl: '//at.alicdn.com/t/font_2276651_71nv5th6v94.js'
@@ -186,13 +213,69 @@ export default {
       this.addChartData(this.com)
     },
     // 点击头部菜单默认选择第一个页签
-    initTabChildren(category) {
+    initTabChildren(category, i) {
       category.hovered = true
       this.selectedIndex = 0
+      // 素材库加载第一页图片
+      if (i === 2) {
+        let tab = category.tabs[0]
+        // 没有加载数据过才请求
+        if (tab.children.length === 0) {
+          this.getMaterials(tab)
+        }
+      }
     },
     // 切换子列表
-    selectTab(index) {
+    selectTab(tab, index, i) {
+      if (i < 2) {
+        return
+      }
       this.selectedIndex = index
+      // 没有加载数据过才请求
+      if (tab.children.length === 0) {
+        // 获取对应分组素材
+        this.getMaterials(tab)
+      }
+    },
+    // 获取素材图片
+    async getMaterials(tab) {
+      let params = {
+        id: tab.id,
+        current: tab.current || 1, // 默认第一页
+        pageSize: tab.pageSize || 5 // 默认5条/页
+      }
+      let loadingInstance = Loading.service({
+        lock: true,
+        text: '加载中...',
+        target: document.querySelector('.material'),
+        background: 'rgb(255, 255, 255, 0.6)'
+      })
+      let res = await this.$server.screenManage.getMaterials(params)
+      // 构造大屏控件配置
+      let list = []
+      for (let imgData of res.rows) {
+        list.push({
+          key: imgData.id,
+          name: 'material',
+          chartType: 'material',
+          icon: 'icon_addteb.png',
+          modelId: '',
+          api_data: {},
+          isEmpty: false,
+          imgName: imgData.name,
+          url: process.env.VUE_APP_SERVICE_URL + imgData.filePath,
+          view: { width: 400, height: 400, x: 760, y: 340 }
+        })
+      }
+      // 素材内容，分页信息赋值
+      this.$set(tab, 'children', list)
+      // 只有初始加载没有分页信息
+      if (!tab.current) {
+        this.$set(tab, 'current', 1)
+        this.$set(tab, 'total', res.total)
+        this.$set(tab, 'pageSize', 5)
+      }
+      loadingInstance.close()
     },
     // 添加素材
     handleAddForMaterial(component) {

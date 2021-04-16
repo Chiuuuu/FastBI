@@ -262,6 +262,18 @@ const screenManage = {
    */
   getprovinceListData() {
     return $axios.get('/system/geo/getGeoTreeList')
+  },
+  /**
+   *获取素材库分组
+   */
+  getMaterialGroupList() {
+    return $axios.get('/screen/material/groupList')
+  },
+  /**
+   *获取素材库内容
+   */
+  getMaterials(params) {
+    return $axios.post('/screen/material/picList', params)
   }
 }
 
