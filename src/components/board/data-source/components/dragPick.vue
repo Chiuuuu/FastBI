@@ -342,31 +342,29 @@ export default {
       } else {
         // 对应的是度量
         let { pivotschemaId, resourceType, dataType } = dataFile
-        try {
-          // 数据接入类型直接判断，dataType是不是BIGINT/DOUBLE类型
-          if (
-            resourceType === 3 &&
-            dataType !== 'BIGINT' &&
-            dataType !== 'DOUBLE'
-          ) {
-            throw false
-          }
-          // 模型调接口判断
-          if (resourceType === 8) {
-            let res = await this.$server.screenManage.getMeasureCheck(
-              pivotschemaId
-            )
-            if (res.code !== 200 || !res.data) {
-              throw false
-            }
-          }
-          // 通过验证初始化条件列表
-          dataFile.conditionList = []
-        } catch (err) {
+        // 数据接入类型直接判断，dataType是不是BIGINT/DOUBLE类型
+        if (
+          resourceType === 3 &&
+          dataType !== 'BIGINT' &&
+          dataType !== 'DOUBLE'
+        ) {
           this.$message.error('当前字段为文本类型，无法进行数值区间筛选')
           this.isdrag = false
           return
         }
+        // 模型调接口判断
+        if (resourceType === 8) {
+          let res = await this.$server.screenManage.getMeasureCheck(
+            pivotschemaId
+          )
+          if (res.code !== 200 || !res.data) {
+            this.$message.error('当前字段为文本类型，无法进行数值区间筛选')
+            this.isdrag = false
+            return
+          }
+        }
+        // 通过验证初始化条件列表
+        dataFile.conditionList = []
       }
       dataFile.type = 1 // 只显示、排除,'include'/'exclude'
 

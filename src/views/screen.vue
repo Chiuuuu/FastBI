@@ -137,15 +137,12 @@ export default {
     screenId: {
       handler(val) {
         if (val) {
-          this.getScreenData()
+          if (this.$route.name === 'catalog') this.getScreenData()
         }
       },
       deep: true,
       immediate: true
     }
-  },
-  created() {
-    // this.getScreenData()
   },
   mounted() {
     this.$nextTick(this._calcStyle)
@@ -235,6 +232,9 @@ export default {
       }
       for (let item of this.canvasMap) {
         let refresh = item.setting.api_data.refresh
+        if (!refresh) {
+          continue
+        }
         if (refresh.isRefresh && refresh.unit && refresh.frequency > 0) {
           let count = 0
           if (refresh.unit === 'min') {
@@ -300,44 +300,81 @@ export default {
       }
     ),
     // 设置联动的图标的数据
-    setLinkageData(id, e) {
-      // 没有联动图表不进行操作
+    async setLinkageData(id, e) {
       let selected = this.canvasMap.find(item => item.id === id)
-      //   if (!selected.bindList) {
-      //     return
-      //   }
-      let bindCharts = selected.bindList
-      // 测试数据
-      bindCharts = ['540314407381487645']
+      let apiData = selected.setting.api_data
+      let bindCharts = apiData.interactive.bindedList
+      // 没有关联图表不需要联动
+      if (!bindCharts) {
+        return
+      }
+      // 获取需要筛选的维度信息
+      let dimensionData = apiData.dimensions[0]
+      dimensionData.value = [e.name]
+      // 关联的每个图表进行数据筛选
       for (let chartId of bindCharts) {
         let chart = this.canvasMap.find(item => item.id === chartId)
-        let apiData = chart.setting.api_data
-        // 维度不相同无法联动
-        if (
-          apiData.dimensions[0].id !==
-          selected.setting.api_data.dimensions[0].id
-        ) {
+        if (!chart) {
           continue
         }
-        // 构造联动选择的数据，找到点击的维度数据
-        this.$set(apiData, 'selectData', {
-          columns: apiData.source.columns,
-          rows: apiData.source.rows.filter(
-            item => item[apiData.dimensions[0].alias] === e.name
-          )
-        })
+        this.getBindData(chart, dimensionData)
       }
+    },
+    // 获取联动数据筛选数据,不需要保存
+    async getBindData(chart, dimensionData) {
+      let apiData = chart.setting.api_data
+      // 进行过数据筛选的不再执行联动
+      if (apiData.options) {
+        return
+      }
+      let { pivotschemaId, dataType, value, name } = dimensionData
+      let dimensionsLimit = [{ pivotschemaId, type: 1, dataType, value, name }]
+      apiData.dataLink = { ...apiData.options, dimensionsLimit }
 
-      console.log('linkage')
+      let res = await this.$server.screenManage.getDataLink(chart)
+      if (res.code === 200) {
+        let columns = []
+        let rows = []
+        let dimensionKeys = [] // 度量key
+        for (let m of apiData.dimensions) {
+          dimensionKeys.push(m.alias)
+          columns.push(m.alias) // 默认columns第二项起为指标
+        }
+
+        let measureKeys = [] // 度量key
+        for (let m of apiData.measures) {
+          measureKeys.push(m.alias)
+          columns.push(m.alias) // 默认columns第二项起为指标
+        }
+        res.rows.map((item, index) => {
+          let obj = {}
+          for (let item2 of dimensionKeys) {
+            obj[item2] = item[item2]
+          }
+          obj[dimensionKeys] = item[dimensionKeys]
+          for (let item2 of measureKeys) {
+            obj[item2] = item[item2]
+          }
+          rows.push(obj)
+        })
+        // 构造联动选择的数据
+        this.$set(apiData, 'selectData', {
+          columns,
+          rows
+        })
+      } else {
+        this.$message.error(res.msg)
+      }
     },
     // 重置被联动的图标数据
     resetOriginData(id) {
       let selected = this.canvasMap.find(item => item.id === id)
-      let bindCharts = selected.bindList
-      // 测试数据
-      bindCharts = ['540314407381487645']
+      let bindCharts = selected.setting.api_data.interactive.bindedList
       for (let chartId of bindCharts) {
         let chart = this.canvasMap.find(item => item.id === chartId)
+        if (!chart) {
+          continue
+        }
         let apiData = chart.setting.api_data
         // 删除联动数据
         this.$delete(apiData, 'selectData')

@@ -220,9 +220,7 @@ const app = {
     },
     // 删除图表
     async deleteChartData({ dispatch, state, rootGetters }) {
-      let chart = rootGetters.canvasMap.find(
-        item => item.id === rootGetters.currentSelected
-      )
+      let chart = rootGetters.currSelected
       let params = {
         id: chart.id,
         name: chart.name,
@@ -232,6 +230,19 @@ const app = {
       screenManage.deleteChart(params).then(res => {
         if (res.code === 200) {
           dispatch('DelCanvasMap', chart.id)
+          // 如果有当前图表联动关系的要清除
+          let updateList = [rootGetters.currSelected]
+          rootGetters.canvasMap.forEach(chart => {
+            let apiData = chart.setting.api_data
+            if (
+              apiData.interactive &&
+              apiData.interactive.beBinded === rootGetters.currentSelected
+            ) {
+              apiData.interactive.beBinded = ''
+              updateList.push(chart)
+            }
+          })
+          screenManage.saveAllChart(updateList)
           dispatch('SingleSelected', null)
           dispatch('HideContextMenu')
           // 保存图层顺序
@@ -242,13 +253,10 @@ const app = {
     },
     // 保存图表
     async updateChartData({ state, rootGetters }) {
-      let chart = rootGetters.canvasMap.find(
-        item => item.id === rootGetters.currentSelected
-      )
-      // 地图去掉mapOrgin，减少数据
-      if (chart.setting.name === 've-map') {
-        chart.setting.apis.mapOrigin = ''
-      }
+      let chart = rootGetters.currSelected
+      // 图表联动数据selectData不保存后台
+      delete chart.setting.api_data.selectData
+
       let params = {
         id: chart.id,
         name: chart.name,
@@ -268,11 +276,6 @@ const app = {
           dispatch('SetPageSettings', res.data ? res.data.setting : {})
           // 地图加上json
           let graphs = res.data ? res.data.screenGraphs : []
-          graphs.forEach(item => {
-            if (item.setting.name === 've-map') {
-              item.setting.apis.mapOrigin = guangzhou
-            }
-          })
           dispatch('InitCanvasMaps', {
             maps: graphs,
             idList: res.data ? res.data.setting.idList : []

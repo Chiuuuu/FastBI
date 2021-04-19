@@ -69,6 +69,16 @@
                 </a-select-option>
               </a-select>
             </template>
+            <template slot="extractable" slot-scope="text, record, index">
+              <a-select style="width:60px" :value='`${text}`' @change="(value) => handleSelectChangeValue(value, record, index, 'extractable')">
+                <a-select-option value="true">
+                  是
+                </a-select-option>
+                <a-select-option value="false">
+                  否
+                </a-select-option>
+              </a-select>
+            </template>
             </a-table>
           </div>
           <a-modal v-model="showSetting" @cancel="handleCancelModal" @ok="handleBatchSetting">
@@ -178,6 +188,11 @@ const columns = [
     title: '是否可见',
     dataIndex: 'visible',
     scopedSlots: { customRender: 'visible' }
+  },
+  {
+    title: '是否抽取',
+    dataIndex: 'extractable',
+    scopedSlots: { customRender: 'extractable' }
   }
 ]
 

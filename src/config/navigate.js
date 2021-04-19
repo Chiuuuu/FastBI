@@ -560,7 +560,7 @@ const list = [
                 }
               },
               series: {
-                selectedMode: 'single',
+                // selectedMode: 'single',
                 label: {
                   show: true,
                   color: '',
@@ -568,6 +568,12 @@ const list = [
                   position: 'outside', // 可选inside
                   formatter: '{b}: {@2012} ({d}%)',
                   formatterSelect: ['{b}', '{@2012}', '({d}%)']
+                },
+                // 选中时样式
+                select: {
+                  itemStyle: {
+                    normal: {}
+                  }
                 },
                 roseType: false, // 饼图可选玫瑰图
                 center: ['50%', '50%'], // 饼图可选

@@ -24,7 +24,10 @@
         <!--维度度量都有的图才可以创建交互-->
         <div
           class="tab-item"
-          v-if="currSelected.setting.type === '1'"
+          v-if="
+            currSelected.setting.type === '1' &&
+              currSelected.setting.name !== 've-map'
+          "
           :class="{ active: tabsType === 2 }"
           @click="tabsTypeChange(2)"
         >
@@ -579,14 +582,6 @@
                     {{ i.label }}
                   </a-select-option>
                 </a-select>
-                <!-- <a-checkbox-group
-                    class="f-flexcolumn"
-                    v-model="formatShow"
-                    :options="plainOptions"
-                    @change="onChange"
-                  /> -->
-                <!-- </gui-field> -->
-
                 <gui-field label="文本">
                   <gui-inline label="字号">
                     <a-input-number
