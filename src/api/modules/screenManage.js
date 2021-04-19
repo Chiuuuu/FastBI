@@ -199,6 +199,14 @@ const screenManage = {
     return $axios.post('/screen/graph/getData', params)
   },
   /**
+   * @description 数据筛选(联动)
+   * @param {*} params
+   * @returns
+   */
+  getDataLink(params) {
+    return $axios.post('/screen/graph/dataLink', params)
+  },
+  /**
    * @description 根据维度度量获取数据(数据接入)
    * @param {*} params
    * @returns

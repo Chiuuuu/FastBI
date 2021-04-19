@@ -133,6 +133,8 @@ export default {
     // 打开全屏
     openScreen() {
       this.$store.dispatch('SetIsScreen', true)
+      // 清空当前选中
+      this.$store.dispatch('SingleSelected', null)
       // 位置在screen.vue,对应画板元素
       this.$nextTick(() => {
         var docElm = document.querySelector('.dv-screen')

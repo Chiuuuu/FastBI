@@ -2,7 +2,15 @@
   <!--互动-->
   <div class="data-Interactive">
     图表联动
-    <div class="empty" @click="openBindWindow">创建图表联动</div>
+    <div class="empty" @click="openBindWindow">
+      {{
+        currSelected.setting.api_data.interactive &&
+        currSelected.setting.api_data.interactive.bindedList &&
+        currSelected.setting.api_data.interactive.bindedList.length > 0
+          ? '编辑'
+          : '创建'
+      }}图表联动
+    </div>
     点击时进行图表联动
     <a-checkbox v-model="clickLink" @click.native="openLink" />
 
@@ -17,6 +25,7 @@
       <button class="ant-btn ant-btn-primary pick-btn" @click="search">
         搜索
       </button>
+      <!--模型列表多选-->
       <div class="pick-checkbox-box">
         <b-scrollbar style="height:100%;">
           <a-checkbox :checked="checkAll" @change="onCheckAllChange"
@@ -26,21 +35,30 @@
           <a-checkbox-group
             class="f-flexcolumn"
             v-model="bindList"
-            @change="onChange"
+            @change="checkSelectAll"
           >
-            <a-checkbox
-              style="margin-top:5px"
+            <div
+              class="f-flexcolumn"
               v-for="chart in chartList"
               :key="chart.id"
-              :value="chart.id"
-              :disabled="checkHaveBind() || checkBeBinded(chart)"
             >
-              {{ chart.setting.config.title.content }}
-              <span v-show="checkBeBinded(chart)">已存在于联动路径中</span>
-              <span v-show="checkHaveBind">已被创建联动</span>
-            </a-checkbox>
+              <a-checkbox
+                style="margin-top:5px"
+                :value="chart.id"
+                :disabled="
+                  checkHaveBind(chart) ||
+                    checkBeBinded(chart) ||
+                    chart.id === currentSelected
+                "
+              >
+                {{ chart.setting.config.title.content }}
+                <span v-show="chart.id === currentSelected">(当前报表)</span>
+                <span v-show="checkBeBinded(chart)">已存在于联动路径中</span>
+                <span v-show="checkHaveBind(chart)">已被创建联动</span>
+              </a-checkbox>
+            </div>
           </a-checkbox-group>
-          <a-checkbox default-checked disabled
+          <a-checkbox style="margin-top:5px" default-checked disabled
             >{{
               currSelected.setting.config.title.content
             }}（当前报表）</a-checkbox
@@ -63,38 +81,39 @@ export default {
       chartList: []
     }
   },
-  mounted() {
-    this.chartList = this.toBindList
-    debugger
+  watch: {
+    currentSelected: {
+      handler(val) {
+        if (val) {
+          let interactive = this.currSelected.setting.api_data.interactive
+          if (interactive && interactive.clickLink) {
+            this.clickLink = interactive.clickLink
+          }
+        }
+      },
+      immediate: true
+    }
   },
   computed: {
     ...mapGetters([
       'currentSelected',
       'currSelected',
-      'screenId',
       'canvasMap',
       'selectedModelList'
     ]),
     // 拖入一个维度的进入联动选择列
     toBindList() {
-      //   let list = []
-      //   this.canvasMap.forEach(item => {
-      //     // 排除当前图表，用了同模型的图表都添加进选择列
-      //     if (
-      //       item.id !== this.currentSelected &&
-      //       item.datamodelId === this.currSelected.datamodelId
-      //     ) {
-      //       list.push({
-      //         label: item.setting.config.title.content,
-      //         value: item.id
-      //       })
-      //     }
-      //   })
-      return this.canvasMap.filter(
+      // 排除当前图表id
+      let excludeId = this.currentSelected
+      let list = this.canvasMap.filter(
         item =>
-          item.id !== this.currentSelected &&
-          item.datamodelId === this.currSelected.datamodelId
+          item.id !== excludeId &&
+          item.datamodelId !== '0' &&
+          item.datamodelId === this.currSelected.datamodelId &&
+          item.setting.type === '1' && // 维度度量都存在的图表类型才可以图表联动
+          item.setting.chartType !== 'v-map' // 排除地图
       )
+      return list
     },
     // 当前图表对应的模型
     currentData() {
@@ -113,13 +132,19 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['saveScreenData', 'updateChartData', 'refreshScreen']),
+    ...mapActions(['updateChartData']),
     openBindWindow() {
+      // 获取可选列表
+      this.chartList = this.toBindList
+      // 重置选中列表
       this.bindList = []
+      // 获取已选列表
       let apiData = this.currSelected.setting.api_data
       if (apiData.interactive && apiData.interactive.bindedList) {
-        this.bindedList = apiData.interactive.bindedList
+        this.bindList = apiData.interactive.bindedList
       }
+      // 检查全选
+      this.checkSelectAll()
       this.visible = true
     },
     // 模糊查询
@@ -135,18 +160,22 @@ export default {
     // 点击全选
     onCheckAllChange(e) {
       this.checkAll = e.target.checked
-      this.bindList = e.target.checked ? this.currentFile.originList : []
+      this.bindList = e.target.checked ? this.toBindList : []
     },
     // 多选框变化的时候重新判断全选
-    onChange() {
-      this.checkAll = this.chartList.length === this.toBindList.length // 判断是否全选
+    checkSelectAll() {
+      this.checkAll = this.bindList.length === this.toBindList.length // 判断是否全选
     },
     // 是否开启图表联动
     openLink() {
       this.clickLink = !this.clickLink
       let apiData = this.currSelected.setting.api_data
-      apiData.interactive = { clickLink: this.clickLink }
+      apiData.interactive = {
+        ...apiData.interactive,
+        clickLink: this.clickLink
+      }
       this.$store.dispatch('SetSelfDataSource', apiData)
+      this.updateChartData()
     },
     // 检查可选图表是否已经绑定当前图表
     checkBeBinded(chart) {
@@ -157,10 +186,11 @@ export default {
       return false
     },
     // 检查可选图表是否已经被其他图表绑定
-    checkHaveBind() {
-      let apiData = this.currSelected.setting.api_data
+    checkHaveBind(chart) {
+      let apiData = chart.setting.api_data
       if (
         apiData.interactive &&
+        apiData.interactive.beBinded &&
         apiData.interactive.beBinded !== this.currentSelected
       ) {
         return true
@@ -168,17 +198,34 @@ export default {
       return false
     },
     // 设置图表联动
-    setLinkage() {
+    async setLinkage() {
       //  保存被选中图表的联动列表
       let apiData = this.currSelected.setting.api_data
-      apiData.interactive.bindedList = this.bindList
+      apiData.interactive = {
+        ...apiData.interactive,
+        bindedList: this.bindList
+      }
       this.$store.dispatch('SetSelfDataSource', apiData)
 
+      let updateList = [this.currSelected]
       // 锁定被关联的列表
-      for (let id of this.bindList) {
-        let chart = this.canvasMap.find(item => item.id === id)
-        chart.beBinded = this.currentSelected
+      for (let chart of this.toBindList) {
+        // 是否被选中
+        let isInBindList = this.bindList.some(id => id === chart.id)
+        // 获取图表信息
+        let chartApiData = chart.setting.api_data
+        if (chartApiData.interactive) {
+          chartApiData.interactive.beBinded = isInBindList
+            ? this.currentSelected
+            : ''
+        } else if (isInBindList) {
+          chartApiData.interactive = { beBinded: this.currentSelected }
+        }
+        updateList.push(chart)
       }
+      // 批量保存图表绑定关系
+      await this.$server.screenManage.saveAllChart(updateList)
+      this.visible = false
     }
   }
 }
