@@ -110,7 +110,7 @@ export default {
       click: function(e) {
         self.name = e.name
         // 判断是否启用了联动
-        if (!self.apiData.interactive || !self.apiData.interactive.clickLink) {
+        if (!self.isClickLink) {
           return
         }
         self.$nextTick(() => {
@@ -119,7 +119,7 @@ export default {
           if (self.currentIndex === e.dataIndex) {
             // 重置数据颜色样式
             delete self.chartExtend.series.itemStyle.normal.color
-            // 强行渲染，非数据变动不会自动重新渲染
+            // 强行渲染
             self.key++
             self.$emit('resetOriginData', self.id)
             return
@@ -142,7 +142,7 @@ export default {
           }
           // 记录当前选择数据的index
           self.currentIndex = e.dataIndex
-          // 强行渲染，非数据变动不会自动重新渲染
+          // 强行渲染
           self.key++
           self.$emit('linkage', self.id, e)
           chart.off('click')
@@ -298,6 +298,10 @@ export default {
   mounted() {
     this._calcStyle()
     addResizeListener(this.$refs.wrap, this._calcStyle)
+    // 添加了图表联动的图表也要添加重置图表事件
+    if (this.isClickLink) {
+      this.setChartClick()
+    }
   },
   beforeDestroy() {
     removeResizeListener(this.$refs.wrap, this._calcStyle)
@@ -359,6 +363,10 @@ export default {
         fontWeight: this.config.title.textStyle.fontWeight,
         height: 'auto'
       }
+    },
+    // 是否开启图表联动
+    isClickLink() {
+      return this.apiData.interactive && this.apiData.interactive.clickLink
     }
   }
 }
