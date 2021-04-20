@@ -1,7 +1,7 @@
 <template>
   <div style="overflow:hidden;height:100%">
     <div class="screen-catalog" ref="screenCatalog">
-      <div class="left">
+      <div class="left menu">
         <div class="menu_title">
           <span>大屏目录</span>
           <a-dropdown
@@ -455,7 +455,7 @@ export default {
       'canvasMap'
     ]),
     folderSelectList() {
-      return this.folderList.filter(item => item.fileType === 0)
+      return this.folderList.filter((item) => item.fileType === 0)
       //   .concat({ name: '清空' })
     },
     fileSelectId: {
@@ -553,7 +553,7 @@ export default {
       let params = {
         type: 3
       }
-      this.$server.screenManage.getFolderList({ params }).then(res => {
+      this.$server.screenManage.getFolderList({ params }).then((res) => {
         if (res.code === 200) {
           let rows = res.data
           // 大屏文件保存不需要文件夹
@@ -583,7 +583,7 @@ export default {
       this.getFirstScreen(list, index + 1)
     },
     // 搜索文件
-    menuSearch: debounce(function(event) {
+    menuSearch: debounce(function (event) {
       const value = event.target.value
       if (value !== '') {
         this.handleGetSearchList(value)
@@ -593,7 +593,7 @@ export default {
     }, 400),
     handleGetSearchList(value) {
       let result = []
-      this.folderList.map(item => {
+      this.folderList.map((item) => {
         const newItem = menuSearchLoop(item, value)
         if (newItem) result.push(newItem)
       })
@@ -659,7 +659,7 @@ export default {
       })
       this.$server.screenManage
         .copyScreen(file.id)
-        .then(res => {
+        .then((res) => {
           if (res.code === 200) {
             this.getList()
             this.$message.success(res.msg)
@@ -695,7 +695,7 @@ export default {
       }
       this.$server.common
         .deleMenuFolder(`/screen/catalog/delete/${id}`)
-        .then(res => {
+        .then((res) => {
           if (res.code === 200) {
             this.$message.success('删除成功')
             this.getList()
@@ -914,7 +914,7 @@ export default {
     // 发布
     release() {
       if (this.isPublish === 0) {
-        this.$server.screenManage.getScreenLink(this.screenId).then(res => {
+        this.$server.screenManage.getScreenLink(this.screenId).then((res) => {
           this.releaseObj = { url: res.data, expired: 7, password: '' }
           this.releaseVisible = true
         })
@@ -983,7 +983,7 @@ export default {
       }
       // 未发布
       if (this.isPublish === 0) {
-        this.$server.screenManage.releaseScreen(params).then(res => {
+        this.$server.screenManage.releaseScreen(params).then((res) => {
           if (res.code === 200) {
             this.$message.success('发布成功')
             // 状态改为已发布
@@ -994,7 +994,7 @@ export default {
       } else {
         // 重新发布
         params.id = this.releaseObj.id
-        this.$server.screenManage.reShareScreen(params).then(res => {
+        this.$server.screenManage.reShareScreen(params).then((res) => {
           if (res.code === 200) {
             this.$message.success('发布成功')
             this.releaseObj.valid = true
@@ -1066,6 +1066,7 @@ export default {
 }
 </script>
 
-<style lang="styl" scoped>
-@import './screenCatalog.styl';
+<style lang="less" scoped>
+@import '~@/styles/common/menu.less';
+@import './screenCatalog.less';
 </style>

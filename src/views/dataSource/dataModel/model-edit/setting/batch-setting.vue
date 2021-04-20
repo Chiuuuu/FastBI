@@ -177,7 +177,7 @@ export default {
       if (has) {
         this.cacheTables[record.tableNo].splice(index, 1, {
           ...record,
-          visible: value === 'true'
+          visible: value
         })
       }
     },

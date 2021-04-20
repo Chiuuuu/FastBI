@@ -169,7 +169,7 @@ export default {
     padding: 0 12px;
     height: 30px;
     line-height: 30px;
-    border: 1px solid #efefef;
+    border: 1px solid #e5e5e5;
   }
   .txt-wrap {
     position: relative;

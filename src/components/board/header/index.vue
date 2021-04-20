@@ -15,7 +15,7 @@
         v-model="screenName"
         @focus="onfocus"
         @blur="onBlur"
-        style="background:rgba(255,255,255,0.2)"
+        style="background:#2e3951"
       />
     </div>
     <div class="control" flex-box="1">

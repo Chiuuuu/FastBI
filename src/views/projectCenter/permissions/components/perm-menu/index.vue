@@ -7,12 +7,8 @@
           <a-icon type="plus-square" class="menu_icon" />
         </a>
         <a-menu slot="overlay" class="drow_menu">
-          <a-menu-item @click="showModal">
-            新建角色
-          </a-menu-item>
-          <a-menu-item key="1" @click="handleAddNewFolder">
-            新建文件夹
-          </a-menu-item>
+          <a-menu-item @click="showModal">新建角色</a-menu-item>
+          <a-menu-item key="1" @click="handleAddNewFolder">新建文件夹</a-menu-item>
         </a-menu>
       </a-dropdown>
       <a-modal
@@ -228,13 +224,13 @@ export default {
   },
   computed: {
     ...mapState({
-      tableList: state => state.projectPermissions.menuList
+      tableList: (state) => state.projectPermissions.menuList
     }),
     menuList() {
       return this.searchValue ? this.searchList : this.tableList
     },
     folderList() {
-      return this.tableList.filter(item => item.fileType === 0)
+      return this.tableList.filter((item) => item.fileType === 0)
     },
     fileSelectId: {
       get() {
@@ -279,7 +275,7 @@ export default {
     /**
      * 搜索目录列表
      */
-    handleSearchMenu: debounce(function(event) {
+    handleSearchMenu: debounce(function (event) {
       const value = event.target.value
       this.searchValue = value
       if (value) {
@@ -288,7 +284,7 @@ export default {
     }, 400),
     handleGetSearchList(value) {
       let result = []
-      this.tableList.map(item => {
+      this.tableList.map((item) => {
         const newItem = menuSearchLoop(item, value)
         if (newItem) result.push(newItem)
       })
@@ -525,7 +521,7 @@ export default {
      * 判断是否有相同名称
      */
     handleHasName(list, values) {
-      const isHas = list.filter(item => {
+      const isHas = list.filter((item) => {
         return item.name === values.name
       })
       console.log(isHas)
@@ -535,6 +531,6 @@ export default {
 }
 </script>
 
-<style lang="styl" scoped>
-@import "../../../components/menu/menu.styl";
+<style lang="less" scoped>
+@import '~@/styles/common/menu.less';
 </style>

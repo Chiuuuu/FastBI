@@ -2,17 +2,17 @@
   <div class="menu" id="menuRef">
     <div class="menu_title">
       <span class="m-t-s">数据接入</span>
-      <a-dropdown v-if="hasPermissionSourceAdd || hasPermissionFolderAdd" :trigger="['click']" placement="bottomLeft">
+      <a-dropdown
+        v-if="hasPermissionSourceAdd || hasPermissionFolderAdd"
+        :trigger="['click']"
+        placement="bottomLeft"
+      >
         <a class="ant-dropdown-link">
           <a-icon type="plus-square" class="menu_icon" />
         </a>
         <a-menu slot="overlay" class="drow_menu">
-          <a-menu-item v-if="hasPermissionSourceAdd" v-on:click="showModal">
-            添加连接
-          </a-menu-item>
-          <a-menu-item v-if="hasPermissionFolderAdd" key="1" @click="handleAddNewFolder">
-            新建文件夹
-          </a-menu-item>
+          <a-menu-item v-if="hasPermissionSourceAdd" v-on:click="showModal">添加连接</a-menu-item>
+          <a-menu-item v-if="hasPermissionFolderAdd" key="1" @click="handleAddNewFolder">新建文件夹</a-menu-item>
         </a-menu>
       </a-dropdown>
       <a-modal
@@ -76,7 +76,7 @@
                   :file="slotProps.file"
                   :index="slotProps.index"
                   :parent="folder"
-                  :isSelect='fileSelectId === slotProps.file.id'
+                  :isSelect="fileSelectId === slotProps.file.id"
                   :contextmenus="fileContenxtMenu"
                   @fileSelect="handleFileSelect"
                   @fileDrag="handleFileDrag"
@@ -90,7 +90,7 @@
                 icon="dataSource"
                 :file="folder"
                 :index="index"
-                :isSelect='fileSelectId === folder.id'
+                :isSelect="fileSelectId === folder.id"
                 :contextmenus="fileContenxtMenu"
                 @fileSelect="handleFileSelect"
                 @fileDrag="handleFileDrag"
@@ -124,7 +124,10 @@ import MoveFileModal from '../data-main/data-menu/moveFile'
 import { mapState } from 'vuex'
 import { menuSearchLoop } from '@/utils/menuSearch'
 import { checkActionPermission, hasPermission } from '@/utils/permission'
-import { fetchTableInfo, fetchDeleteMenuById } from '../../../../../api/dataAccess/api'
+import {
+  fetchTableInfo,
+  fetchDeleteMenuById
+} from '../../../../../api/dataAccess/api'
 import MenuFile from '@/components/dataSource/menu-group/file'
 import MenuFolder from '@/components/dataSource/menu-group/folder'
 import debounce from 'lodash/debounce'
@@ -265,22 +268,28 @@ export default {
       return this.searchValue ? this.searchList : this.tableList
     },
     folderList() {
-      return this.tableList.filter(item => item.fileType === 0)
+      return this.tableList.filter((item) => item.fileType === 0)
     },
     fileSelectId: {
       get () {
         return this.$store.state.common.menuSelectId
       },
-      set (value) {
+      set(value) {
         this.$store.commit('dataAccess/SET_MODELID', value)
         this.$store.commit('common/SET_MENUSELECTID', value)
       }
     },
     hasPermissionFolderAdd() {
-      return checkActionPermission(this.$PERMISSION_CODE.OBJECT.sourceFolder, this.$PERMISSION_CODE.OPERATOR.add)
+      return checkActionPermission(
+        this.$PERMISSION_CODE.OBJECT.sourceFolder,
+        this.$PERMISSION_CODE.OPERATOR.add
+      )
     },
     hasPermissionSourceAdd() {
-      return checkActionPermission(this.$PERMISSION_CODE.OBJECT.datasource, this.$PERMISSION_CODE.OPERATOR.add)
+      return checkActionPermission(
+        this.$PERMISSION_CODE.OBJECT.datasource,
+        this.$PERMISSION_CODE.OPERATOR.add
+      )
     }
   },
   mounted() {
@@ -289,18 +298,18 @@ export default {
   },
   methods: {
     /**
-    * 获取左侧菜单数据
-    */
+     * 获取左侧菜单数据
+     */
     handleGetMenuList() {
       this.$store.dispatch('dataAccess/getMenuList', this)
     },
     /**
      * @description 获取表详情信息
-    */
+     */
     async getTableInfo(url, callback) {
       const result = await this.$server.common.getDetailByMenuId(url)
       if (result.code === 200) {
-        if (callback && (callback instanceof Function)) {
+        if (callback && callback instanceof Function) {
           callback(result)
         }
         this.$EventBus.$emit('setFormData')
@@ -311,7 +320,7 @@ export default {
     /**
      * 搜索目录列表
      */
-    handleSearchMenu: debounce(function(event) {
+    handleSearchMenu: debounce(function (event) {
       const value = event.target.value
       this.searchValue = value
       if (value) {
@@ -320,7 +329,7 @@ export default {
     }, 400),
     handleGetSearchList(value) {
       let result = []
-      this.tableList.map(item => {
+      this.tableList.map((item) => {
         const newItem = menuSearchLoop(item, value)
         if (newItem) result.push(newItem)
       })
@@ -328,8 +337,8 @@ export default {
       console.log('搜索结果', this.searchList)
     },
     /**
-    * 选择左侧菜单
-    */
+     * 选择左侧菜单
+     */
     handleFileSelect(file) {
       if (this.fileSelectId === file.id) return
       this.fileSelectId = file.id
@@ -362,14 +371,16 @@ export default {
       this.$EventBus.$emit('set-tab-index', '1')
     },
     /**
-    * 删除菜单
-    */
+     * 删除菜单
+     */
     handleFileDelete(event, item, { file }) {
       this.$confirm({
         title: '确认提示',
         content: '确定删除该数据接入?',
         onOk: async () => {
-          const result = await this.$server.common.deleMenuById(`/datasource/catalog/delete/${file.id}`)
+          const result = await this.$server.common.deleMenuById(
+            `/datasource/catalog/delete/${file.id}`
+          )
           if (result.code === 200) {
             this.handleGetMenuList()
             this.$message.success('删除成功')
@@ -395,7 +406,9 @@ export default {
         title: '确认提示',
         content: '确定删除该文件夹?',
         onOk: async () => {
-          const result = await this.$server.common.deleMenuById(`/datasource/catalog/delete/${folder.id}`)
+          const result = await this.$server.common.deleMenuById(
+            `/datasource/catalog/delete/${folder.id}`
+          )
           if (result.code === 200) {
             this.handleGetMenuList()
             this.$message.success('删除成功')
@@ -416,8 +429,8 @@ export default {
       this.$store.dispatch('dataAccess/setParentId', vm ? vm.folder.id : 0)
     },
     /**
-    * 修改文件夹名称
-    */
+     * 修改文件夹名称
+     */
     handleFolderResetName(event, item, { folder }) {
       this.resetNameVisible = true
       this.resetName.type = 'reset'
@@ -426,7 +439,7 @@ export default {
     },
     /**
      * 菜单重命名
-    */
+     */
     handleFileResetName(mouseEvent, event, { file, parent }) {
       this.resetName.type = 'reset'
       this.resetNameVisible = true
@@ -458,13 +471,16 @@ export default {
      */
     async handleFileDrop(folder) {
       if (!this.dragFile || this.dragFile.parentId === folder.id) return
-      const result = await this.$server.common.putMenuFolderName('/datasource/catalog/update', {
-        fileType: this.dragFile.fileType,
-        id: this.dragFile.id,
-        name: this.dragFile.name,
-        parentId: folder.id,
-        type: 1
-      })
+      const result = await this.$server.common.putMenuFolderName(
+        '/datasource/catalog/update',
+        {
+          fileType: this.dragFile.fileType,
+          id: this.dragFile.id,
+          name: this.dragFile.name,
+          parentId: folder.id,
+          type: 1
+        }
+      )
       if (result.code === 200) {
         this.handleGetMenuList()
         this.$message.success('移动成功')
@@ -481,13 +497,16 @@ export default {
     async handleWrapDrop(e) {
       const className = e.toElement.className
       if (className.indexOf('menu-wrap') > -1 && this.dragFile.parentId !== 0) {
-        const result = await this.$server.common.putMenuFolderName('/datasource/catalog/update', {
-          fileType: this.dragFile.fileType,
-          id: this.dragFile.id,
-          name: this.dragFile.name,
-          parentId: 0,
-          type: 1
-        })
+        const result = await this.$server.common.putMenuFolderName(
+          '/datasource/catalog/update',
+          {
+            fileType: this.dragFile.fileType,
+            id: this.dragFile.id,
+            name: this.dragFile.name,
+            parentId: 0,
+            type: 1
+          }
+        )
         if (result.code === 200) {
           this.handleGetMenuList()
           this.$message.success('移动成功')
@@ -507,13 +526,16 @@ export default {
      * 选择移动文件夹弹窗确认
      */
     async handleFileMoveCreate(parentId) {
-      const result = await this.$server.common.putMenuFolderName('/datasource/catalog/update', {
-        fileType: this.selectFile.fileType,
-        id: this.selectFile.id,
-        name: this.selectFile.name,
-        parentId: parentId,
-        type: 1
-      })
+      const result = await this.$server.common.putMenuFolderName(
+        '/datasource/catalog/update',
+        {
+          fileType: this.selectFile.fileType,
+          id: this.selectFile.id,
+          name: this.selectFile.name,
+          parentId: parentId,
+          type: 1
+        }
+      )
       if (result.code === 200) {
         this.handleGetMenuList()
         this.$message.success('移动成功')
@@ -576,12 +598,15 @@ export default {
       //   items: []
       // }
       // this.tableList.push(item)
-      const result = await this.$server.common.addMenuFolder('/datasource/catalog', {
-        fileType: 0,
-        name: values.name,
-        parentId: 0,
-        type: 1
-      })
+      const result = await this.$server.common.addMenuFolder(
+        '/datasource/catalog',
+        {
+          fileType: 0,
+          name: values.name,
+          parentId: 0,
+          type: 1
+        }
+      )
       if (result.code === 200) {
         this.handleGetMenuList()
         this.$message.success('新建成功')
@@ -605,13 +630,16 @@ export default {
       // this.menuNode.targetNode = Object.assign(target, {
       //   name: values.name
       // })
-      const result = await this.$server.common.putMenuFolderName('/datasource/catalog/update', {
-        fileType: this.resetName.item.fileType,
-        id: this.resetName.item.id,
-        name: values.name,
-        parentId: this.resetName.parentId || 0,
-        type: 1
-      })
+      const result = await this.$server.common.putMenuFolderName(
+        '/datasource/catalog/update',
+        {
+          fileType: this.resetName.item.fileType,
+          id: this.resetName.item.id,
+          name: values.name,
+          parentId: this.resetName.parentId || 0,
+          type: 1
+        }
+      )
       if (result.code === 200) {
         this.handleGetMenuList()
         if (this.resetName.item.id === this.fileSelectId) {
@@ -627,7 +655,7 @@ export default {
      * 判断是否有相同名称
      */
     handleHasName(list, values) {
-      const isHas = list.filter(item => {
+      const isHas = list.filter((item) => {
         return item.name === values.name
       })
       console.log(isHas)
@@ -643,6 +671,6 @@ export default {
 }
 </script>
 
-<style lang="styl" scope>
-@import "./menu.styl";
+<style lang="less" scoped>
+@import '~@/styles/common/menu.less';
 </style>

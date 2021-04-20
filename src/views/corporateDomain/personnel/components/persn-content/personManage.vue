@@ -64,8 +64,8 @@
       <a-button
         class="btn-add"
         type="primary"
-        ghost
         @click="showModal('add')"
+        icon="plus"
         :disabled="loading"
         >添加</a-button
       >
@@ -77,7 +77,7 @@
       :pagination="pagination"
       :data-source="personData"
       :loading="loading"
-      :scroll="{ y: 'calc(100vh - 350px)', x: 1230 }"
+      :scroll="{ y: 'calc(100vh - 350px)', x: 1250 }"
       @change="handleTableChange"
     >
       <!-- 部门 -->
@@ -104,12 +104,8 @@
       <!-- 操作 -->
       <template #config="text, record">
         <template v-if="record && record.id !== adminId">
-          <a
-            class="handler-margin"
-            @click="handleEdit(record)"
-            style="margin-right: 20px"
-            >编辑</a
-          >
+          <a @click="handleEdit(record)">编辑</a>
+          <a-divider type="vertical" />
           <a-popconfirm
             title="是否确定删除？"
             ok-text="确定"
@@ -213,7 +209,7 @@ const personColumn = [
     title: '操作',
     dataIndex: 'config',
     fixed: 'right',
-    width: 110,
+    width: 130,
     scopedSlots: { customRender: 'config' }
   }
 ]

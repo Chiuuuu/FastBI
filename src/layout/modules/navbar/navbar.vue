@@ -2,19 +2,24 @@
   <a-row class="navbar" type="flex" justify="end" align="middle">
     <a-select
       :value="selectProject"
-      style="min-width: 120px;margin-right:20px;"
+      dropdownClassName="navbar-project"
+      class="navbar-project"
+      :dropdownStyle="{
+        'border': '1px solid #788397',
+        'border-radius': '4px',
+        'background': '#2e3951',
+        'color': '#bcc1c8'
+      }"
       @change="handleChangeProject"
     >
-      <a-select-option v-for="item in projectList" :key="item.id">{{
-        item.name
-      }}</a-select-option>
+      <a-select-option v-for="item in projectList" :key="item.id"><span style="color: #BCC1C8">{{ item.name }}</span></a-select-option>
     </a-select>
     <div class="user">
-      <a-dropdown>
-        <span
-          >{{ userInfo.name
-          }}<img src="@/assets/images/icon_head_portrait.png" alt=""
-        /></span>
+      <a-dropdown :overlay-style="{ color: '#fff' }">
+        <span>
+          {{userInfo.name}}
+          <a-icon type="down" />
+        </span>
         <a-menu slot="overlay">
           <a-menu-item>
             <a href="javascript:;" @click="quitBtn">退出登录</a>
@@ -34,9 +39,9 @@ export default {
       return this.$store.state.common.sidebarUnfold
     },
     ...mapState({
-      selectProject: state => state.user.selectProject,
-      projectList: state => state.user.projectList,
-      userInfo: state => state.user.info
+      selectProject: (state) => state.user.selectProject,
+      projectList: (state) => state.user.projectList,
+      userInfo: (state) => state.user.info
     })
   },
   methods: {
@@ -86,6 +91,40 @@ export default {
 }
 </script>
 
-<style lang="stylus" scoped>
-@import "./navbar.styl";
+<style lang="less" scoped>
+@deep: ~'>>>';
+.navbar {
+  position: relative;
+  height: 56px;
+  background: #2e3951;
+  box-shadow: 0 2px 4px 0 rgba(36, 77, 169, 0.1);
+  color: #fff;
+
+  .sidebar-unfold-icon {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+  .user {
+    margin-right: 20px;
+  }
+
+  // 项目选择下拉框
+  .navbar-project {
+    min-width: 240px;
+    margin-right: 20px;
+    background: #2e3951;
+
+    @{deep} .ant-select-selection {
+      color: #BCC1C8;
+      border: 1px solid #788397;
+      background: #2e3951;
+      .ant-select-arrow-icon {
+        color: #BCC1C8;
+      }
+    }
+  }
+}
 </style>

@@ -18,7 +18,7 @@ import 'bin-ui/lib/styles/index.css'
 import Antd from 'ant-design-vue'
 import 'ant-design-vue/dist/antd.less'
 
-import './styles/index.styl'
+import './styles/index.less'
 
 import server from '@/api/index'
 

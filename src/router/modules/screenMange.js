@@ -9,8 +9,8 @@ export default {
   redirect: '/screenManage/catalog',
   component: RouteView,
   meta: {
-    title: '可视化管理',
-    icon: 'desktop',
+    title: '大屏管理',
+    icon: 'screenManage',
     permissions: [PERMISSION_CODE.PAGE.screen]
   },
   children: [

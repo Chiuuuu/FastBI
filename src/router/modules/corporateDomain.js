@@ -10,7 +10,7 @@ export default {
   component: RouteView,
   meta: {
     title: '企业域管理',
-    icon: 'cloud',
+    icon: 'corporateDomain',
     permissions: [PERMISSION_CODE.PAGE.personnel, PERMISSION_CODE.PAGE.project]
   },
   children: [

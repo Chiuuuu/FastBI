@@ -177,7 +177,7 @@ export default {
     background-color: #fff;
     white-space: nowrap;
     &:hover {
-      background-color: #e0e0e0;
+      background-color: #eef0f5;
 
       ul.sub {
         display: block;

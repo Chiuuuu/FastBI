@@ -170,8 +170,8 @@ export default {
 }
 </script>
 
-<style lang="styl" scoped>
-@import '../../../dataSource/dataAccess/components/data-menu/menu.styl';
+<style lang="less" scoped>
+@import '~@/styles/common/menu.less';
 .menu-manager {
   cursor: pointer;
   margin-right: 8px;

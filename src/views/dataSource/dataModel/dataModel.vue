@@ -1,8 +1,12 @@
 <template>
-  <div class="data-model screen-manage">
-    <Menu @getModelInfo="handleEmitMainGetData"></Menu>
-    <Main ref="modelMainRef"></Main>
-  </div>
+  <a-row class="data-model screen-manage">
+    <a-col class="screen-manage" :span="5">
+      <Menu @getModelInfo="handleEmitMainGetData"></Menu>
+    </a-col>
+    <a-col class="screen-manage" :span="19">
+      <Main ref="modelMainRef"></Main>
+    </a-col>
+  </a-row>
 </template>
 
 <script>
@@ -37,9 +41,9 @@ export default {
 }
 </script>
 
-<style lang="styl" scoped>
+<style lang="less" scoped>
 .data-model {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 </style>

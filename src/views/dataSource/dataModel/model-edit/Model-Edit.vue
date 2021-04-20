@@ -21,9 +21,8 @@
           <a-select-option value="SQL Server">
             SQL Server
           </a-select-option>
-        </a-select> -->
+      </a-select>-->
       <!-- </div> -->
-      <a-divider />
       <div class="menu_search">
         <span class="search_span">数据库</span>
       </div>
@@ -59,7 +58,6 @@
           @on-left-drag-leave="handleLeftDragLeave"
         ></edit-left>
       </div>
-      <!-- <a-divider /> -->
       <div v-if="isDatabase" class="SQL_View table_list">
         <div class="menu_search">
           <span class="search_span">自定义SQL视图</span>
@@ -96,7 +94,7 @@
               </a-menu-item>
             </a-menu>
           </a-dropdown>
-        </div> -->
+        </div>-->
       </div>
     </div>
     <div class="right" ref="rightBody" :class="{ add_new: model === 'add' }">
@@ -191,7 +189,7 @@
                   >新建计算维度</a
                 >
                 <a-divider type="vertical" />
-                <!-- <a v-on:click="openModal('geo-setting')" style="color:#627CFF;">设置地理位置</a> -->
+                <!-- <a v-on:click="openModal('geo-setting')" style="color:#3875FF;">设置地理位置</a> -->
               </div>
             </div>
             <div class="dim_menu scrollbar">
@@ -379,12 +377,12 @@ export default {
   },
   computed: {
     ...mapState({
-      modelId: state => state.dataModel.modelId, // 选中的菜单id
-      addModelId: state => state.dataModel.addModelId, // 新增的模型id
-      parentId: state => state.dataModel.parentId, // 选中的文件夹id
-      datasource: state => state.dataModel.datasource, // 数据源
-      privileges: state => state.common.privileges,
-      datasourceId: state => state.dataModel.datasourceId // 数据源
+      modelId: (state) => state.dataModel.modelId, // 选中的菜单id
+      addModelId: (state) => state.dataModel.addModelId, // 新增的模型id
+      parentId: (state) => state.dataModel.parentId, // 选中的文件夹id
+      datasource: (state) => state.dataModel.datasource, // 数据源
+      privileges: (state) => state.common.privileges,
+      datasourceId: (state) => state.dataModel.datasourceId // 数据源
     }),
     model() {
       return this.$route.query.type
@@ -556,7 +554,7 @@ export default {
       if (result.code === 200) {
         const baseBalck = [11, 12] // 黑名单
         const type = result.data.type
-        this.isDatabase = !baseBalck.some(item => item === type)
+        this.isDatabase = !baseBalck.some((item) => item === type)
         this.datasourceName = result.data.name
       } else {
         this.$message.error(result.msg)
@@ -627,7 +625,7 @@ export default {
         this.$message.error(listResult.msg)
       }
     },
-    handleSearchTable: debounce(function(event) {
+    handleSearchTable: debounce(function (event) {
       const value = event.target.value
       this.tableSearch = value ? value.trim() : value
       this.searchList = this.leftMenuList.filter(
@@ -699,7 +697,7 @@ export default {
       this.handleMeasures()
     },
     getTargetIndex(list, target) {
-      return list.findIndex(item => item.alias === target)
+      return list.findIndex((item) => item.alias === target)
     },
     // 复制维度度量
     async handleCopyField(event, handler, vm) {
@@ -757,7 +755,7 @@ export default {
         let hasFind = true
         while (len >= 0 && hasFind) {
           field.alias = `${source}(${hasNumber})`
-          const hasSame = list.some(item => item.alias === field.alias)
+          const hasSame = list.some((item) => item.alias === field.alias)
           hasFind = hasSame
           if (hasFind) {
             hasNumber++
@@ -778,7 +776,7 @@ export default {
     handleSameName(list) {
       if (Array.isArray(list) && list.length > 1) {
         const map = new Map()
-        list.forEach(element => {
+        list.forEach((element) => {
           if (element.tableNo !== 0) {
             this.changeAlias(map, element.alias, element)
           }
@@ -908,10 +906,10 @@ export default {
     },
     // 替换为缺失文案
     doWithMissing(list, pivotSchema) {
-      list.forEach(filed => {
+      list.forEach((filed) => {
         const matchs = filed.raw_expr.match(/(\[)(.*?)(\])/g)
         if (matchs) {
-          matchs.forEach(value => {
+          matchs.forEach((value) => {
             const matchStr = value.match(/(\[)(.+)(\])/)
             const key = matchStr[2] ? matchStr[2] : ''
             const pairList = [
@@ -929,7 +927,7 @@ export default {
     },
     handlePeelCustom(list, cache) {
       if (list && list.length) {
-        return list.filter(item => {
+        return list.filter((item) => {
           if (item.tableNo === 0) {
             cache.push(item)
           } else {
@@ -1063,9 +1061,9 @@ export default {
       if (data) {
         const cacheDimensions = []
         const cacheMeasures = []
-        Object.keys(data).forEach(item => {
+        Object.keys(data).forEach((item) => {
           const list = data[item]
-          list.forEach(field => {
+          list.forEach((field) => {
             if (field.role === 1) {
               cacheDimensions.push(field)
             } else if (field.role === 2) {
@@ -1111,7 +1109,7 @@ export default {
     },
     handleChangeTableName(list, tableNo, name) {
       if (list && list.length) {
-        return list.map(item => {
+        return list.map((item) => {
           if (item.tableNo === tableNo || `${item.tableNo}` === tableNo) {
             item.tableName = name
           }
@@ -1153,9 +1151,11 @@ export default {
       }
 
       if (this.detailInfo.config.tables.length > 1) {
-        const hasEmpty = this.detailInfo.config.tables.slice(1).some(table => {
-          return table.join.conditions.length === 0
-        })
+        const hasEmpty = this.detailInfo.config.tables
+          .slice(1)
+          .some((table) => {
+            return table.join.conditions.length === 0
+          })
         if (hasEmpty) {
           this.$message.error('还有表未关联')
           return
@@ -1174,7 +1174,7 @@ export default {
         }
       }
 
-      this.detailInfo.config.tables.map(table => {
+      this.detailInfo.config.tables.map((table) => {
         table.alias = table.name
       })
 
@@ -1254,6 +1254,6 @@ export default {
 }
 </script>
 
-<style lang="styl" scope>
-@import "./Model-Edit.styl";
+<style lang="less" scoped>
+@import './Model-Edit.less';
 </style>

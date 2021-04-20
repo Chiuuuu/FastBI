@@ -9,22 +9,21 @@
       :selectedKeys="selectedKeys"
       @openChange="v => openKeys = v"
       mode="inline"
-      theme="dark"
     >
       <template v-for="item in menuData">
         <a-sub-menu :key="item.path">
           <template v-slot:title>
             <span>
-              <a-icon :type="item.meta.icon" />
+              <img class="menu-icon" :src="require('@/assets/images/sidebar/' + item.meta.icon + '.png')">
               <span>{{ item.meta.title }}</span>
             </span>
           </template>
           <a-menu-item
-            v-for="subItem in item.children"
+            v-for="(subItem, index) in item.children"
             :key="subItem.path"
-            @click="selectMenu(subItem)"
-            >{{ subItem.meta.title }}</a-menu-item
-          >
+            class="sub-menu-icon"
+            @click="selectMenu(subItem, index)"
+          >{{ subItem.meta.title }}</a-menu-item>
         </a-sub-menu>
       </template>
     </a-menu>
@@ -38,6 +37,11 @@ export default {
   data() {
     const renderRouter = getRenderRouter(this.$store.state.permission.routes)
     const menuData = this.getMenuData(renderRouter.children)
+    const path = this.$route.path
+    const defaultOpenKeys = ['/' + path.split('/').splice(1).shift()]
+    const defaultSelectedKeys = [
+      this.$router.currentRoute.meta.sideBar || this.$router.currentRoute.name
+    ]
     return {
       menuData: menuData,
       openKeys: [],
@@ -45,8 +49,10 @@ export default {
     }
   },
   watch: {
-    '$route.path': function() {
-      this.setSelectKeys()
+    '$route.path': function (value) {
+      this.selectedKeys = [
+        this.$router.currentRoute.meta.sideBar || this.$router.currentRoute.name
+      ] // [value.split('/').pop()]
     }
   },
   created() {
@@ -66,7 +72,7 @@ export default {
     },
     getMenuData(list) {
       const sidebar = []
-      list.forEach(item => {
+      list.forEach((item) => {
         if (item.meta && item.meta.title) {
           const newItem = { ...item }
           delete newItem.children
@@ -79,7 +85,8 @@ export default {
       return sidebar
     },
     // 点击选择菜单栏跳转页面
-    selectMenu(item, id) {
+    selectMenu(item, index) {
+      this.activeIndex = index
       this.$router.push({
         name: item.name
       })
@@ -88,6 +95,64 @@ export default {
 }
 </script>
 
-<style lang="stylus" scoped>
-@import "./sidebar.styl";
+<style lang="less" scoped>
+@deep: ~'>>>';
+.sidebar {
+  background: #001529;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 220px;
+  .header {
+    height: 56px;
+    line-height: 56px;
+    padding-left: 20px;
+    padding-right: 20px;
+    position: relative;
+    img {
+      width: 100%;
+    }
+    span {
+      color: #fff;
+      font-weight: bold;
+      font-size: 18px;
+    }
+  }
+  .menu-body {
+    height: calc(100% - 56px);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  // 一级菜单icon
+  .menu-icon {
+    width: 18px;
+    height: 18px;
+    vertical-align: top;
+    margin-top: 10px;
+    margin-right: 14px;
+  }
+  // 二级菜单圆点icon
+  .sub-menu-icon {
+    position: relative;
+    padding-left: 56px !important;
+  }
+  .sub-menu-icon::before {
+    content: "";
+    position: absolute;
+    left: 38px;
+    top: 18px;
+    background: rgba(0,0,0,.65);
+    display: block;
+    width: 4px;
+    height: 4px;
+    border-radius: 3px;
+  }
+  @{deep} .ant-menu-item-selected.sub-menu-icon::before,
+  .sub-menu-icon:hover::before {
+    background: #3875ff;
+  }
+}
 </style>

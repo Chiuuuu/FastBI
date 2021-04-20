@@ -1,6 +1,6 @@
 <template>
-  <a-row :gutter="16" class="screen-manage">
-    <a-col class="gutter-row screen-manage" :span="5">
+  <a-row class="screen-manage">
+    <a-col class="screen-manage" :span="5">
       <Menu @on-menuChange-componet="handleMenuChangeComponet"></Menu>
     </a-col>
     <a-col class="gutter-row screen-manage" :span="19">

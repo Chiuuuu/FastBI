@@ -7,12 +7,8 @@
           <a-icon type="plus-square" class="menu_icon" />
         </a>
         <a-menu slot="overlay" class="drow_menu">
-          <a-menu-item @click="showModal">
-            新建角色
-          </a-menu-item>
-          <a-menu-item key="1" @click="handleAddNewFolder">
-            新建文件夹
-          </a-menu-item>
+          <a-menu-item @click="showModal">新建角色</a-menu-item>
+          <a-menu-item key="1" @click="handleAddNewFolder">新建文件夹</a-menu-item>
         </a-menu>
       </a-dropdown>
       <a-modal
@@ -26,7 +22,14 @@
         @cancel="handleCancelModal"
         @ok="handleAddRole"
       >
-        <a-form-model ref="addForm" :model="form" :rules="rules" width="500px" :label-col="{ span: 6 }" :wrapper-col="{ span: 12 }">
+        <a-form-model
+          ref="addForm"
+          :model="form"
+          :rules="rules"
+          width="500px"
+          :label-col="{ span: 6 }"
+          :wrapper-col="{ span: 12 }"
+        >
           <a-form-model-item label="角色名称" prop="name">
             <a-input v-model="form.name" placeholder="请输入角色名称"></a-input>
           </a-form-model-item>
@@ -70,7 +73,7 @@
                   :file="slotProps.file"
                   :index="slotProps.index"
                   :parent="folder"
-                  :isSelect='fileSelectId === slotProps.file.id'
+                  :isSelect="fileSelectId === slotProps.file.id"
                   :contextmenus="fileContenxtMenu"
                   @fileSelect="handleFileSelect"
                   @fileDrag="handleFileDrag"
@@ -83,7 +86,7 @@
               <menu-file
                 :file="folder"
                 :index="index"
-                :isSelect='fileSelectId === folder.id'
+                :isSelect="fileSelectId === folder.id"
                 :contextmenus="fileContenxtMenu"
                 @fileSelect="handleFileSelect"
                 @fileDrag="handleFileDrag"
@@ -219,20 +222,20 @@ export default {
   },
   computed: {
     ...mapState({
-      tableList: state => state.projectRoles.menuList,
-      roleId: state => state.projectRoles.roleId
+      tableList: (state) => state.projectRoles.menuList,
+      roleId: (state) => state.projectRoles.roleId
     }),
     menuList() {
       return this.searchValue ? this.searchList : this.tableList
     },
     folderList() {
-      return this.tableList.filter(item => item.fileType === 0)
+      return this.tableList.filter((item) => item.fileType === 0)
     },
     fileSelectId: {
       get () {
         return this.$store.state.common.menuSelectId
       },
-      set (value) {
+      set(value) {
         this.$store.commit('projectRoles/SET_ROLEID', value)
         this.$store.commit('common/SET_MENUSELECTID', value)
       }
@@ -244,16 +247,18 @@ export default {
   },
   methods: {
     /**
-    * 获取左侧菜单数据
-    */
+     * 获取左侧菜单数据
+     */
     handleGetMenuList() {
       this.$store.dispatch('projectRoles/getMenuList', this)
     },
     /**
      * @description 获取角色详情信息
-    */
+     */
     async getRoleInfo() {
-      const roleInfo = await this.$server.projectCenter.getRoleInfo(this.fileSelectId)
+      const roleInfo = await this.$server.projectCenter.getRoleInfo(
+        this.fileSelectId
+      )
       // const rolePermission = await this.$server.projectCenter.getRolePermission(this.fileSelectId)
       if (roleInfo.code === 200) {
         this.$store.commit('projectRoles/SET_ROLEINFO', roleInfo.data)
@@ -270,7 +275,7 @@ export default {
     },
     /**
      * 打开弹窗
-    */
+     */
     showModal(event, item, vm) {
       this.visible = true
       if (vm && vm.folder) {
@@ -281,7 +286,7 @@ export default {
     },
     /**
      * 模态窗取消
-    */
+     */
     handleCancelModal() {
       this.form = this.$options.data().form
       this.$refs.addForm.resetFields()
@@ -290,7 +295,7 @@ export default {
     /**
      * 搜索目录列表
      */
-    handleSearchMenu: debounce(function(event) {
+    handleSearchMenu: debounce(function (event) {
       const value = event.target.value
       this.searchValue = value
       if (value) {
@@ -299,15 +304,15 @@ export default {
     }, 400),
     handleGetSearchList(value) {
       let result = []
-      this.tableList.map(item => {
+      this.tableList.map((item) => {
         const newItem = menuSearchLoop(item, value)
         if (newItem) result.push(newItem)
       })
       this.searchList = result
     },
     /**
-    * 选择左侧菜单
-    */
+     * 选择左侧菜单
+     */
     handleFileSelect(file) {
       if (this.fileSelectId === file.id) return
       this.fileSelectId = file.id
@@ -316,14 +321,16 @@ export default {
       this.$store.commit('projectRoles/SET_PARENTID', file.parentId)
     },
     /**
-    * 删除菜单
-    */
+     * 删除菜单
+     */
     handleFileDelete(event, item, { file }) {
       this.$confirm({
         title: '确认提示',
         content: '确定删除该角色?',
         onOk: async () => {
-          const result = await this.$server.common.deleMenuById(`/business/role/deleteRole/${file.id}`)
+          const result = await this.$server.common.deleMenuById(
+            `/business/role/deleteRole/${file.id}`
+          )
           if (result.code === 200) {
             this.handleGetMenuList()
             this.$message.success('删除成功')
@@ -348,7 +355,9 @@ export default {
         title: '确认提示',
         content: '确定删除该文件夹?',
         onOk: async () => {
-          const result = await this.$server.common.deleMenuById(`/business/role/deleteCatalog/${folder.id}`)
+          const result = await this.$server.common.deleMenuById(
+            `/business/role/deleteCatalog/${folder.id}`
+          )
           if (result.code === 200) {
             this.handleGetMenuList()
             this.$message.success('删除成功')
@@ -360,8 +369,8 @@ export default {
       })
     },
     /**
-    * 修改文件夹名称
-    */
+     * 修改文件夹名称
+     */
     handleFolderResetName(event, item, { folder }) {
       this.resetNameVisible = true
       this.resetName.type = 'reset'
@@ -374,7 +383,7 @@ export default {
     handleEditRole(event, item, { file }) {
       // 切换至编辑模式
       this.$router.push({
-          path: '/projectCenter/roles/edit/id=' + file.id
+        path: '/projectCenter/roles/edit/id=' + file.id
       })
     },
     /**
@@ -401,12 +410,15 @@ export default {
      */
     async handleFileDrop(folder) {
       if (!this.dragFile || this.dragFile.parentId === folder.id) return
-      const result = await this.$server.common.putMenuFolderName('/business/role/editSycCatlog', {
-        fileType: this.dragFile.fileType,
-        id: this.dragFile.id,
-        name: this.dragFile.name,
-        parentId: folder.id
-      })
+      const result = await this.$server.common.putMenuFolderName(
+        '/business/role/editSycCatlog',
+        {
+          fileType: this.dragFile.fileType,
+          id: this.dragFile.id,
+          name: this.dragFile.name,
+          parentId: folder.id
+        }
+      )
       if (result.code === 200) {
         this.handleGetMenuList()
         this.$message.success('移动成功')
@@ -423,12 +435,15 @@ export default {
     async handleWrapDrop(e) {
       const className = e.toElement.className
       if (className.indexOf('menu-wrap') > -1 && this.dragFile.parentId !== 0) {
-        const result = await this.$server.common.putMenuFolderName('/business/role/editSycCatlog', {
-          fileType: this.dragFile.fileType,
-          id: this.dragFile.id,
-          name: this.dragFile.name,
-          parentId: 0
-        })
+        const result = await this.$server.common.putMenuFolderName(
+          '/business/role/editSycCatlog',
+          {
+            fileType: this.dragFile.fileType,
+            id: this.dragFile.id,
+            name: this.dragFile.name,
+            parentId: 0
+          }
+        )
         if (result.code === 200) {
           this.handleGetMenuList()
           this.$message.success('移动成功')
@@ -448,12 +463,15 @@ export default {
      * 选择移动文件夹弹窗确认
      */
     async handleFileMoveCreate(parentId) {
-      const result = await this.$server.common.putMenuFolderName('/business/role/editSycCatlog', {
-        fileType: this.selectFile.fileType,
-        id: this.selectFile.id,
-        name: this.selectFile.name,
-        parentId: parentId
-      })
+      const result = await this.$server.common.putMenuFolderName(
+        '/business/role/editSycCatlog',
+        {
+          fileType: this.selectFile.fileType,
+          id: this.selectFile.id,
+          name: this.selectFile.name,
+          parentId: parentId
+        }
+      )
       if (result.code === 200) {
         this.handleGetMenuList()
         this.$message.success('移动成功')
@@ -489,17 +507,19 @@ export default {
      * 新增角色
      */
     handleAddRole() {
-      this.$refs.addForm.validate(async valid => {
+      this.$refs.addForm.validate(async (valid) => {
         if (valid) {
           this.confirmLoading = true
-          const result = await this.$server.common.addMenuFolder('/business/role/addRole', {
-            fileType: 1,
-            name: this.form.name,
-            description: this.form.description,
-            parentId: this.form.parentId
-          }).finally(() => {
-            this.confirmLoading = false
-          })
+          const result = await this.$server.common
+            .addMenuFolder('/business/role/addRole', {
+              fileType: 1,
+              name: this.form.name,
+              description: this.form.description,
+              parentId: this.form.parentId
+            })
+            .finally(() => {
+              this.confirmLoading = false
+            })
           if (result.code === 200) {
             this.handleGetMenuList()
             this.$message.success('新建成功')
@@ -518,11 +538,14 @@ export default {
      * 新增文件夹
      */
     async handleAddFolder(values) {
-      const result = await this.$server.common.addMenuFolder('/business/role/addCatalog', {
-        fileType: 0,
-        name: values.name,
-        parentId: 0
-      })
+      const result = await this.$server.common.addMenuFolder(
+        '/business/role/addCatalog',
+        {
+          fileType: 0,
+          name: values.name,
+          parentId: 0
+        }
+      )
       if (result.code === 200) {
         this.handleGetMenuList()
         this.$message.success('新建成功')
@@ -535,12 +558,15 @@ export default {
      * 重命名文件夹
      */
     async handleResetName(values) {
-      const result = await this.$server.common.putMenuFolderName('/business/role/editSycCatlog', {
-        fileType: this.resetName.item.fileType,
-        id: this.resetName.item.id,
-        name: values.name,
-        parentId: 0
-      })
+      const result = await this.$server.common.putMenuFolderName(
+        '/business/role/editSycCatlog',
+        {
+          fileType: this.resetName.item.fileType,
+          id: this.resetName.item.id,
+          name: values.name,
+          parentId: 0
+        }
+      )
       if (result.code === 200) {
         this.handleGetMenuList()
         this.$message.success('修改成功')
@@ -553,7 +579,7 @@ export default {
      * 判断是否有相同名称
      */
     handleHasName(list, values) {
-      const isHas = list.filter(item => {
+      const isHas = list.filter((item) => {
         return item.name === values.name
       })
       console.log(isHas)
@@ -563,6 +589,6 @@ export default {
 }
 </script>
 
-<style lang="styl" scoped>
-@import "../../../components/menu/menu.styl";
+<style lang="less" scoped>
+@import '~@/styles/common/menu.less';
 </style>

@@ -71,11 +71,13 @@
                 </div>
               </a-spin>
             </template>
-            <a class="handler-margin" @click="handleCheckUsers(record)"
+            <a @click="handleCheckUsers(record)"
               >查看项目用户</a
             >
           </a-popover>
-          <a class="handler-margin" @click="handleEdit(record)">编辑</a>
+          <a-divider type="vertical" />
+          <a @click="handleEdit(record)">编辑</a>
+          <a-divider type="vertical" />
           <a-popconfirm
             title="是否确定删除？"
             ok-text="确定"

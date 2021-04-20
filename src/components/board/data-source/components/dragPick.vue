@@ -23,9 +23,11 @@
           </a-menu>
         </a-dropdown>
         <a-tooltip :title="item.alias">
-          <span ref="itemName" class="field-text" @click="showSelect(item)">{{
+          <span ref="itemName" class="field-text" @click="showSelect(item)">
+            {{
             item.alias
-          }}</span>
+            }}
+          </span>
         </a-tooltip>
       </div>
     </div>
@@ -33,25 +35,18 @@
 
     <a-modal v-model="screenVisible" title="数据筛选">
       <template slot="footer">
-        <a-button key="cancel" @click="screenVisible = false">
-          取消
-        </a-button>
+        <a-button key="cancel" @click="screenVisible = false">取消</a-button>
         <a-button
           key="submit"
           type="primary"
           :style="{
-            background: isNoSelectData ? 'grey' : '#617BFF'
+            background: isNoSelectData ? 'grey' : '#3f88ec'
           }"
           @click="handleOk"
-        >
-          确定
-        </a-button>
+        >确定</a-button>
       </template>
       <div v-if="currentFile.file === 'dimensions'">
-        <a-radio-group
-          v-model="currentFile.operation"
-          @change="isEmpty = false"
-        >
+        <a-radio-group v-model="currentFile.operation" @change="isEmpty = false">
           <a-radio :value="'list'">列表</a-radio>
           <a-radio :value="'manual'">手动</a-radio>
         </a-radio-group>
@@ -68,9 +63,7 @@
           v-show="currentFile.operation === 'list'"
           class="ant-btn ant-btn-primary pick-btn"
           @click="search"
-        >
-          查询
-        </button>
+        >查询</button>
         <input
           v-show="currentFile.operation === 'manual'"
           type="text"
@@ -83,17 +76,10 @@
           v-show="currentFile.operation === 'manual'"
           class="ant-btn ant-btn-primary"
           @click="addManualProperty"
-        >
-          添加
-        </button>
-        <div
-          class="pick-checkbox-box hasborder"
-          v-show="currentFile.operation === 'list'"
-        >
+        >添加</button>
+        <div class="pick-checkbox-box hasborder" v-show="currentFile.operation === 'list'">
           <b-scrollbar style="height:100%;">
-            <a-checkbox :checked="checkAll" @change="onCheckAllChange"
-              >全选</a-checkbox
-            >
+            <a-checkbox :checked="checkAll" @change="onCheckAllChange">全选</a-checkbox>
             <a-checkbox-group
               class="f-flexcolumn"
               v-model="currentFile.checkedList"
@@ -103,34 +89,21 @@
           </b-scrollbar>
         </div>
         <!--手动筛选-->
-        <div
-          class="pick-checkbox-box"
-          v-show="currentFile.operation === 'manual'"
-        >
+        <div class="pick-checkbox-box" v-show="currentFile.operation === 'manual'">
           <b-scrollbar style="height:100%;">
-            <div
-              class="pick-property"
-              v-for="(item, index) in currentFile.manualList"
-              :key="item"
-            >
+            <div class="pick-property" v-for="(item, index) in currentFile.manualList" :key="item">
               <span>{{ item }}</span>
-              <icon-font
-                class="pick-del"
-                @click="deleteManualProperty(index)"
-                type="icon-guanbi"
-              />
+              <icon-font class="pick-del" @click="deleteManualProperty(index)" type="icon-guanbi" />
               <!-- <span class="pick-del" @click="deleteManualProperty(index)"
                 >删除</span
-              > -->
+              >-->
             </div>
           </b-scrollbar>
         </div>
       </div>
       <!--拖动的是度量-->
       <div v-else>
-        <button class="ant-btn ant-btn-primary" @click="addCondition">
-          添加条件
-        </button>
+        <button class="ant-btn ant-btn-primary" @click="addCondition">添加条件</button>
         <div class="pick-checkbox-box" style="margin:0;padding:0">
           <b-scrollbar style="height:100%;">
             <br />
@@ -148,8 +121,7 @@
                   v-for="option in conditionOptions"
                   :key="option.label"
                   :value="option.op"
-                  >{{ option.label }}</a-select-option
-                >
+                >{{ option.label }}</a-select-option>
               </a-select>
               <a-input-number
                 v-model="item.firstValue"
@@ -167,16 +139,12 @@
                 class="inputnumber"
                 style="text-overflow: clip;"
               ></a-input-number>
-              <icon-font
-                @click="delectCondition(index)"
-                class="icon"
-                type="icon-guanbi"
-              />
+              <icon-font @click="delectCondition(index)" class="icon" type="icon-guanbi" />
               <!-- <a-icon
                 @click="delectCondition(index)"
                 class="icon"
                 type="close"
-              /> -->
+              />-->
             </div>
           </b-scrollbar>
         </div>
@@ -259,8 +227,8 @@ export default {
         if (val) {
           if (this.fileList) {
             let list = val.dimensions.concat(val.measures)
-            this.fileList.forEach(file => {
-              let li = list.find(item => item.alias === file.alias)
+            this.fileList.forEach((file) => {
+              let li = list.find((item) => item.alias === file.alias)
               if (li && li.status === 1) {
                 file.status = li.status
               }
@@ -306,7 +274,7 @@ export default {
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
 
       // 验重
-      if (this.fileList.some(item => dataFile.alias === item.alias)) {
+      if (this.fileList.some((item) => dataFile.alias === item.alias)) {
         this.$message.error(`${dataFile.alias}已存在`)
         this.isdrag = false
         return
@@ -374,7 +342,7 @@ export default {
     // 对象数组去重,type表示对象里面的一个属性
     uniqueFun(arr, type) {
       const res = new Map()
-      return arr.filter(a => !res.has(a[type]) && res.set(a[type], 1))
+      return arr.filter((a) => !res.has(a[type]) && res.set(a[type], 1))
     },
     // 当可拖动的元素进入可放置的目标时
     dragenter(event) {
@@ -398,7 +366,7 @@ export default {
         return
       }
       this.currentFile.searchList = this.currentFile.originList.filter(
-        item => item.indexOf(this.listValue) > -1
+        (item) => item.indexOf(this.listValue) > -1
       )
     },
     // 点击再次打开数据筛选弹窗
@@ -501,7 +469,7 @@ export default {
         delete this.currentFile.searchList // 不上传，模糊查询用的
         if (this.isExist) {
           let file = this.fileList.find(
-            item => item.alias === this.currentFile.alias
+            (item) => item.alias === this.currentFile.alias
           )
           file = this.currentFile
         } else {
@@ -510,7 +478,7 @@ export default {
       } else {
         if (
           this.currentFile.conditionList.some(
-            item =>
+            (item) =>
               !item.firstValue ||
               (item.condition === 'range' && !item.secondValue)
           )
@@ -520,7 +488,7 @@ export default {
         }
         // 处理度量筛选数据
         // 如果是排除的，action取补集符号
-        this.currentFile.conditionList.forEach(item => {
+        this.currentFile.conditionList.forEach((item) => {
           if (!item.firstValue) {
             this.$message.error('请输入筛选数值')
             return
@@ -562,7 +530,7 @@ export default {
 
         if (this.isExist) {
           let file = this.fileList.find(
-            item => item.alias === this.currentFile.alias
+            (item) => item.alias === this.currentFile.alias
           )
           file = this.currentFile
         } else {
@@ -574,7 +542,7 @@ export default {
       this.screenVisible = false
 
       // 构造dataDimensionsLimit,dataDimensionsLimit列表
-      this.fileList.forEach(item => {
+      this.fileList.forEach((item) => {
         if (item.file === 'dimensions') {
           let { pivotschemaId, type, dataType, value, name } = item
           dimensionsLimitList.push({
@@ -630,8 +598,8 @@ export default {
           return
         }
         if (
-          apiData.dimensions.some(item => item.status === 1) ||
-          apiData.measures.some(item => item.status === 1)
+          apiData.dimensions.some((item) => item.status === 1) ||
+          apiData.measures.some((item) => item.status === 1)
         ) {
           return
         }
@@ -654,13 +622,13 @@ export default {
         if (apiData.tableList.length === 0) {
           return
         }
-        if (apiData.tableList.some(item => item.status === 1)) {
+        if (apiData.tableList.some((item) => item.status === 1)) {
           return
         }
       }
 
       let selected = this.canvasMap.find(
-        item => item.id === this.currentSelected
+        (item) => item.id === this.currentSelected
       )
 
       let loadingInstance = Loading.service({

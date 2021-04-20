@@ -3,6 +3,7 @@
     <div class="tab-datasource-model scrollbar">
       <a-form-model
         ref="fileForm"
+        labelAlign="right"
         :model="form"
         :rules="rules"
         :label-col="{ span: 4 }"
@@ -36,8 +37,8 @@
                 >
                   <div class="text">{{ item.name }}</div>
                   <div>
-                    <a-icon type="retweet" title="替换" style="margin-right:10px" @click.stop="handleReplaceFile(item, index)" />
-                    <a-icon type="delete" title="删除" @click.stop="handleRemove(item)"></a-icon>
+                    <img class="excel-list--item-icon" src="~@/assets/images/replace.png" title="替换" alt="替换" @click.stop="handleReplaceFile(item, index)">
+                    <img class="excel-list--item-icon" src="~@/assets/images/trash.png" title="删除" alt="删除" @click.stop="handleRemove(item)">
                   </div>
                 </div>
               </template>
@@ -54,64 +55,60 @@
             :before-upload="beforeFileUpload"
             @change="handleFileChange"
           >
-            <a-button ref="uploader" type="primary" :loading="spinning || loading">
+            <a-button ref="uploader" type="primary" :loading="spinning || loading" icon="plus">
               添加文件
             </a-button>
           </a-upload>
         </a-form-model-item>
       </a-form-model>
       <a-row class="preview-list">
-        <a-col :span="4" style="height:100%;width: 150px;">
-          <div class="preview-tab">
-            <div class="tab-title">Sheet子表</div>
-            <ul class="scrollbar" style="overflow-y: auto;height: calc(100% - 38px);">
-              <li
-                class="preview-tab-item"
-                :title="sheet.name"
-                :class="{ 'active': currentSheetIndex === index }"
-                v-for="(sheet, index) in sheetList"
-                :key="index"
-                @click="handleChangeTab(sheet, index)"
-              >{{ sheet.name }}</li>
-            </ul>
-          </div>
-        </a-col>
-        <a-col :span="19" style="height:100%">
-          <!-- <div class="preview-controller">
-            <span>从第</span>
-            <div class="preview-line">
-              <a-input style="width:60px" v-model="line" @keyup.enter.stop="handleEnterLine" />
-              <div class="arrow-box" style="width:16px">
-                <div class="arrow" @click="countLine('plus')">
-                  <i class="arrow-up"></i>
-                </div>
-                <div class="arrow" @click="countLine('minus')">
-                  <i class="arrow-down"></i>
-                </div>
+        <div class="preview-tab">
+          <div class="tab-title">Sheet子表</div>
+          <ul class="scrollbar" style="overflow-y: auto;height: calc(100% - 38px);">
+            <li
+              class="preview-tab-item"
+              :title="sheet.name"
+              :class="{ 'active': currentSheetIndex === index }"
+              v-for="(sheet, index) in sheetList"
+              :key="index"
+              @click="handleChangeTab(sheet, index)"
+            >{{ sheet.name }}</li>
+          </ul>
+        </div>
+        <!-- <div class="preview-controller">
+          <span>从第</span>
+          <div class="preview-line">
+            <a-input style="width:60px" v-model="line" @keyup.enter.stop="handleEnterLine" />
+            <div class="arrow-box" style="width:16px">
+              <div class="arrow" @click="countLine('plus')">
+                <i class="arrow-up"></i>
+              </div>
+              <div class="arrow" @click="countLine('minus')">
+                <i class="arrow-down"></i>
               </div>
             </div>
-            <span>行开始获取数据</span>
-            <a-checkbox style="margin-left: 50px" @change="handleCheckBox">自动生成列名</a-checkbox>
-          </div> -->
-          <div class="sheet-table scrollbar">
-            <template v-if="currentFieldList.length > 0">
-              <a-spin :spinning="spinning">
-                <table>
-                  <thead class="sheet-head">
-                    <tr style="border: none"><th v-for="item in currentColumns" :key="item.dataIndex"><div class="cell-item">{{ item.title }}</div></th></tr>
-                  </thead>
-                  <tbody class="sheet-body scrollbar">
-                    <tr v-for="(item, index) in currentFieldList" :key="item.key">
-                      <td><div class="cell-item">{{ index + 1 }}</div></td>
-                      <td v-for="col in currentColumns.slice(1)" :key="col.dataIndex"><div class="cell-item">{{ item[col.dataIndex] }}</div></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </a-spin>
-            </template>
-            <a-empty style="margin: 20px 0" v-else></a-empty>
           </div>
-        </a-col>
+          <span>行开始获取数据</span>
+          <a-checkbox style="margin-left: 50px" @change="handleCheckBox">自动生成列名</a-checkbox>
+        </div> -->
+        <div class="sheet-table scrollbar">
+          <template v-if="currentFieldList.length > 0">
+            <a-spin :spinning="spinning">
+              <table>
+                <thead class="sheet-head">
+                  <tr style="border: none"><th v-for="item in currentColumns" :key="item.dataIndex"><div class="cell-item">{{ item.title }}</div></th></tr>
+                </thead>
+                <tbody class="sheet-body scrollbar">
+                  <tr v-for="(item, index) in currentFieldList" :key="item.key">
+                    <td><div class="cell-item">{{ index + 1 }}</div></td>
+                    <td v-for="col in currentColumns.slice(1)" :key="col.dataIndex"><div class="cell-item">{{ item[col.dataIndex] }}</div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </a-spin>
+          </template>
+          <a-empty style="margin: 20px 0" v-else></a-empty>
+        </div>
       </a-row>
     </div>
     <a-button

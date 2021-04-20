@@ -1,11 +1,12 @@
 <template>
   <a-modal
     class="modModal"
+    width="1000px"
+    destroyOnClose
     :visible="isShow"
     :title="'新建计算字段（' + computeType + '）'"
-    width="1000px"
+    :bodyStyle="{padding: 0}"
     :confirmLoading="confirmLoading"
-    destroyOnClose
     :afterClose="handleAfterClose"
     @ok="handleSave"
     @cancel="handleClose"
@@ -15,6 +16,7 @@
         <div class="set">
           <a-form-model
             ref="form"
+            labelAlign="right"
             :model="form"
             :rules="rules"
             :label-col="{ span: 3 }"

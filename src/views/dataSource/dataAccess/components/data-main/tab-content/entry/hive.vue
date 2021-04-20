@@ -3,7 +3,7 @@
   <a-form-model
     ref="dbForm"
     class="tab-datasource-model scrollbar"
-    labelAlign="left"
+    labelAlign="right"
     :model="form"
     :rules="rules"
     :label-col="labelCol"

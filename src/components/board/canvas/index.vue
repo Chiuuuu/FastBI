@@ -6,7 +6,6 @@
   >
     <div
       class="canvas-panel-wrap"
-      :style="wrapStyle"
       @click.stop.prevent="cancelSelected"
     >
       <b-scrollbar style="height:100%;">
@@ -54,7 +53,6 @@ export default {
   name: 'CanvasMain',
   data() {
     return {
-      wrapStyle: {},
       screenStyle: {},
       range: 0.65,
       fullScreenRange: 1, // 全屏缩放值
@@ -73,16 +71,11 @@ export default {
     _calcStyle() {
       const wrap = this.$refs.canvasMain
       if (!wrap) return
-      // 计算wrap样式
-      this.wrapStyle = {
-        width: wrap.clientWidth + 'px',
-        height: wrap.clientHeight - 61 + 'px'
-      }
       this.screenStyle = {
-        width: `${this.pageSettings.width * this.range + 120}px`,
+        width: `${this.pageSettings.width * this.range + 90}px`,
         height: `${Math.max(
-          this.pageSettings.height * this.range + 120,
-          wrap.clientHeight - 61
+          this.pageSettings.height * this.range + 90,
+          wrap.clientHeight - 71
         )}px`
       }
 
@@ -127,10 +120,10 @@ export default {
     range(val) {
       const wrap = this.$refs.canvasMain
       this.screenStyle = {
-        width: `${this.pageSettings.width * val + 120}px`,
+        width: `${this.pageSettings.width * val + 90}px`,
         height: `${Math.max(
-          this.pageSettings.height * val + 120,
-          wrap.clientHeight - 61
+          this.pageSettings.height * val + 90,
+          wrap.clientHeight - 71
         )}px`
       }
       this.SetCanvasRange(val)

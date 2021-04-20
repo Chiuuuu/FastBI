@@ -3,6 +3,7 @@
     <div class="tab-datasource-model scrollbar">
       <a-form-model
         ref="fileForm"
+        labelAlign="right"
         :model="form"
         :rules="rules"
         :label-col="{ span: 4 }"
@@ -36,8 +37,8 @@
                 >
                   <div class="text">{{ item.name }}</div>
                   <div>
-                    <a-icon type="retweet" title="替换" style="margin-right:10px" @click.stop="handleReplaceFile(item, index)" />
-                    <a-icon type="delete" title="删除" @click.stop="handleRemove(item)"></a-icon>
+                    <img class="excel-list--item-icon" src="~@/assets/images/replace.png" title="替换" alt="替换" @click.stop="handleReplaceFile(item, index)">
+                    <img class="excel-list--item-icon" src="~@/assets/images/trash.png" title="删除" alt="删除" @click.stop="handleRemove(item)">
                   </div>
                 </div>
               </template>
@@ -54,7 +55,7 @@
             :before-upload="beforeFileUpload"
             @change="handleFileChange"
           >
-            <a-button ref="uploader" type="primary" :loading="spinning || loading">
+            <a-button ref="uploader" type="primary" :loading="spinning || loading" icon="plus">
               添加文件
             </a-button>
           </a-upload>
@@ -83,7 +84,7 @@
         </a-form-model-item>
       </a-form-model>
       <a-row class="preview-list">
-        <a-col style="margin-left:150px" :span="19">
+        <a-col :span="19">
           <!-- <div class="preview-controller">
             <span>从第</span>
             <div class="preview-line">

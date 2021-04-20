@@ -3,7 +3,7 @@
   <a-form-model
     ref="dbForm"
     class="tab-datasource-model scrollbar"
-    labelAlign="left"
+    labelAlign="right"
     :model="form"
     :rules="rules"
     :label-col="labelCol"
@@ -30,7 +30,7 @@
             <span>MYSQL数据库暂时支持5.7等常用版本。</span>
           </div>
         </template>
-        <a-icon class="database_tips" type="info-circle" theme="filled" />
+        <a-icon class="database_tips" type="info-circle" />
       </a-popover>
     </a-form-model-item>
     <a-form-model-item label="服务器" prop="ip">

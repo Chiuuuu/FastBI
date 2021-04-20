@@ -1,0 +1,102 @@
+@import "var.less";
+.screen-manage {
+  height: 100%;
+  .menu_tips {
+    font-size: 12px;
+    color: #999;
+    text-align: center;
+    margin: 1em 0;
+  }
+}
+.menu-wrap{
+  flex: 1;
+  overflow-y: auto;
+  .group {
+    &.is-folder {
+      .items {
+        .item {
+          padding-left: 20px;
+        }
+      }
+    }
+    ul {
+        margin: 0;
+    }
+    .file-icon {
+      display: inline-block;
+      margin-right: 5px;
+      margin-bottom: -3px;
+      height: 16px;
+      width: 16px;
+    }
+    .folder {
+      height: 30px;
+      line-height: 30px;
+      position: relative;
+      &.dragable-current {
+        border: 1px solid #ebf1ff;
+      }
+      &.folder-active,
+      &:hover {
+        cursor: pointer;
+        z-index: 3;
+        background: #ebf1ff;
+        .menu {
+          display: inline-block;
+        }
+      }
+    }
+    .title {
+      padding: 0 28px 0 14px;
+      height: 30px;
+      line-height: 30px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 12px;
+      .folder-icon {
+          font-size: 14px;
+          margin-right: 5px;
+          margin-bottom: 5px;
+      }
+    }
+    .menu {
+      display: none;
+      position: absolute;
+      right: 30px;
+      top: 3px;
+      height: 28px;
+      line-height: 28px;
+      min-height: auto;
+      .caret-down {
+        width: 0;
+        height: 0;
+        border: 6px solid rgba(0, 0, 0, 0.85);
+        border-color: rgba(0, 0, 0, 0.85) transparent transparent transparent;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+    }
+    .items {
+      .item {
+        height: 30px;
+        line-height: 30px;
+        padding: 0;
+        position: relative;
+        font-size: 14px;
+        font-family: Microsoft YaHei;
+        font-weight: 400;
+        &.file-active,
+        &:hover {
+          cursor: pointer;
+          z-index: 3;
+          background: #EBF1FF;
+          .menu {
+            display: inline-block;
+          }
+        }
+      }
+    }
+  }
+}

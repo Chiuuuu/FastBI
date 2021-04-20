@@ -55,7 +55,8 @@
       </template>
 
       <template #config="text, record, index">
-        <a class="handler-margin" v-show="index === activeTableIndex" @click="handleSaveEditRow">保存</a>
+        <a v-show="index === activeTableIndex" @click="handleSaveEditRow">保存</a>
+        <a-divider v-show="index === activeTableIndex" type="vertical" />
         <a v-show="index === activeTableIndex" @click="activeTableIndex = -1">取消</a>
         <a v-show="index !== activeTableIndex" @click="handleEditUserRow(record, index)">编辑</a>
       </template>

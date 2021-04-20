@@ -208,9 +208,7 @@
         <div class="set_btn">
           <a-row type="flex" justify="space-around" align="middle">
             <a-col>
-              <a-button style="width:88px;height:30px;" @click="back">
-                取消
-              </a-button>
+              <a-button style="width:88px;height:30px;" @click="back">取消</a-button>
             </a-col>
             <a-col>
               <a-button
@@ -285,7 +283,7 @@ export default {
   props: {
     fieldInfo: {
       type: Object,
-      default: function() {
+      default: function () {
         return {}
       }
     }
@@ -350,12 +348,12 @@ export default {
   },
   computed: {
     ...mapState({
-      formInfo: state => state.dataAccess.modelInfo,
-      modelId: state => state.dataAccess.modelId,
-      readRows: state => state.dataAccess.readRows,
-      modelType: state => state.dataAccess.modelType,
-      modelName: state => state.dataAccess.modelName,
-      databaseName: state => state.dataAccess.databaseName
+      formInfo: (state) => state.dataAccess.modelInfo,
+      modelId: (state) => state.dataAccess.modelId,
+      readRows: (state) => state.dataAccess.readRows,
+      modelType: (state) => state.dataAccess.modelType,
+      modelName: (state) => state.dataAccess.modelName,
+      databaseName: (state) => state.dataAccess.databaseName
     }),
     selectDrawer() {
       return this.selectedRows.length > 0
@@ -498,7 +496,7 @@ export default {
     },
     handleBatchSetting() {
       let value = this.modalForm[this.setType]
-      this.selectedRows.forEach(item => {
+      this.selectedRows.forEach((item) => {
         if (this.setType === 'visible') {
           item[this.setType] = value === 'true'
         } else {
@@ -552,6 +550,6 @@ export default {
 }
 </script>
 
-<style lang="styl" scope>
-@import "./dataAccess-setting.styl";
+<style lang="less" scoped>
+@import './dataAccess-setting.less';
 </style>

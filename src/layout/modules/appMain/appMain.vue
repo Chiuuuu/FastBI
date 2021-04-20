@@ -53,6 +53,23 @@ export default {
 }
 </script>
 
-<style lang="stylus" scoped>
-@import "./appMain.styl";
+<style lang="less" scoped>
+.app-main {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background: #eef0f5;
+  padding-left: 220px;
+
+  .container {
+    padding: 20px;
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  p {
+    margin-bottom: 50vh;
+  }
+}
 </style>

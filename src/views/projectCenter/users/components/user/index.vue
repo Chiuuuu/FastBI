@@ -51,7 +51,7 @@
       <a-button
         class="btn-add"
         type="primary"
-        ghost
+        icon="plus"
         @click="handleShowModal('add')"
         :disabled="loading"
         >添加</a-button
@@ -68,9 +68,8 @@
         @change="handleTableChange"
       >
         <template #config="text, record, index">
-          <a @click="handleEditUser(record, index)" style="margin-right: 20px"
-            >编辑</a
-          >
+          <a @click="handleEditUser(record, index)">编辑</a>
+          <a-divider type="vertical" />
           <a-popconfirm
             title="是否确定移除？"
             ok-text="确定"

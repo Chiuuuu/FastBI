@@ -1,3 +1,40 @@
+@import "var.less";
+@import "variables.less";
+@import "menugroup.less";
+
+#app {
+  height: 100vh;
+  color: #fff;
+  font-size: 14px;
+  // background-color: $color-main;
+  // margin-top: -21px;
+}
+* {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+}
+// body{
+//   line-height: 0 !important;
+// }
+.pointer{
+  cursor: pointer;
+}
+.m-window {
+  position: absolute;
+  z-index: 304;
+  top: 0;
+  display: table;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  &.mask-transparent {
+    background: rgba(0, 0, 0, 0);
+  }
+}
+
 /* 滚动条样式 */
 .scrollbar::-webkit-scrollbar,
 .ant-table-body::-webkit-scrollbar,
@@ -10,40 +47,62 @@
 .ant-table-body::-webkit-scrollbar-thumb,
 .ant-table-body-inner::-webkit-scrollbar-thumb,
 .ant-modal-body::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, .05);
+  background-color: #EEF0F5;
   border-radius: 5px;
-  -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, .1);
 }
 .scrollbar:hover::-webkit-scrollbar-thumb,
 .ant-table-body:hover::-webkit-scrollbar-thumb,
 .ant-table-body-inner:hover::-webkit-scrollbar-thumb,
 .ant-modal-body:hover::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, .2);
+  background-color: #EEF0F5;
   border-radius: 5px;
-  -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, .1);
 }
 .scrollbar::-webkit-scrollbar-thumb:hover,
 .ant-table-body::-webkit-scrollbar-thumb:hover,
 .ant-table-body-inner::-webkit-scrollbar-thumb:hover,
 .ant-modal-body::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(0, 0, 0, .4);
-  -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, .1);
+  background-color: #EEF0F5;
 }
 .scrollbar::-webkit-scrollbar-track,
 .ant-table-body::-webkit-scrollbar-track,
 .ant-table-body-inner::-webkit-scrollbar-track,
 .ant-modal-body::-webkit-scrollbar-track {
-  border-radius: 5px;
-  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0);
-  background-color: white;
+  background-color: #fff;
 }
 .scrollbar::-webkit-scrollbar-track:hover,
 .ant-table-body::-webkit-scrollbar-track:hover,
 .ant-table-body-inner::-webkit-scrollbar-track:hover,
 .ant-modal-body::-webkit-scrollbar-track:hover {
-  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .4);
-  background-color: rgba(0, 0, 0, .01);
+  background-color: #fff;
 }
 .ant-table-fixed-right, .ant-table-fixed-left {
   height: calc(100% - 8px);
+}
+
+// form-label没有required属性的, 对齐必填项
+.form-not-required .ant-form-item-label {
+  padding-left: 11px;  
+}
+
+.text-center {
+  text-align: center;
+}
+
+// loading框默认百分百
+.ant-spin-nested-loading, .ant-spin-container {
+  width: 100%;
+  height: 100%;
+}
+
+// 分页器选中状态
+.ant-pagination-item-active {
+  background: #3875FF;
+  a {
+    color: #fff;
+  }
+}
+
+// 默认表头样式修改
+.ant-table-thead > tr > th {
+  background-image: linear-gradient(to top, #f3f3f3, #fbfbfb);
 }

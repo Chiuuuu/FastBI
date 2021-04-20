@@ -32,6 +32,6 @@
 export default {}
 </script>
 
-<style lang="styl" scoped>
-@import "./screenEdit.styl";
+<style lang="less" scoped>
+@import './screenEdit.less';
 </style>

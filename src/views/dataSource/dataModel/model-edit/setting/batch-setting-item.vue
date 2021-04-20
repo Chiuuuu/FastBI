@@ -55,7 +55,12 @@
       >
         <a-select-option value="true">是</a-select-option>
         <a-select-option value="false">否</a-select-option>
-      </a-select>
+      </a-select> -->
+      <a-switch
+        :checked="text"
+        checked-children="是"
+        un-checked-children="否"
+        @change="(value) => handleSelect(value, record, index)" />
     </template>
   </a-table>
 </template>

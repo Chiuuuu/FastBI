@@ -19,7 +19,7 @@
         />
       </div>
       <!-- 操作界面 -->
-      <div v-if="modelExpand" style="height: calc(100% - 150px)">
+      <div v-if="modelExpand" style="height:calc(100% - 56px);">
         <div class="model-operation" v-if="model">
           <div class="operation">
             <a-radio-group
@@ -110,13 +110,13 @@
                   <a-collapse-panel
                     v-for="(item, index) in dimensions"
                     :key="String(index)"
-                    :header="item[0] ? item[0].tableName : ''"
+                    :header="item[0] ? item[0].tableName : '维度'"
                     :style="customStyle"
                   >
                     <ul class="filewrap">
                       <li
                         v-for="(item2, index2) in item"
-                        class="filelist"
+                        class="filelist dimensions"
                         :class="[
                           { active: item2.id === searchSelected },
                           { error: item2.status === 1 }
@@ -177,13 +177,13 @@
                   <a-collapse-panel
                     v-for="(item, index) in measures"
                     :key="String(index)"
-                    :header="item[0].tableName"
+                    :header="item[0] ? item[0].tableName : '度量'"
                     :style="customStyle"
                   >
                     <ul class="filewrap">
                       <li
                         v-for="(item2, index2) in item"
-                        class="filelist"
+                        class="filelist measures"
                         :class="[
                           { active: item2.id === searchSelected },
                           { error: item2.status === 1 }

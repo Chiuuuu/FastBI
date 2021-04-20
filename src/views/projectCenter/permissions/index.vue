@@ -1,9 +1,9 @@
 <template>
-  <a-row :gutter="16" class="screen-manage">
-    <a-col class="gutter-row screen-manage" :span="5">
+  <a-row class="screen-manage">
+    <a-col class="screen-manage" :span="5" style="border-right: 1px solid #e5e5e5">
       <Menu />
     </a-col>
-    <a-col class="gutter-row screen-manage" :span="19">
+    <a-col class="screen-manage" :span="19">
       <Main />
     </a-col>
   </a-row>

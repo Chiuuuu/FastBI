@@ -100,7 +100,7 @@ export default {
 <style lang="less" scoped>
 @deep: ~'>>>';
 @{deep} .ant-btn-link {
-  color: #617bff;
+  color: #3f88ec;
   padding: 0;
 }
 @{deep} .ant-btn-link[disabled] {
