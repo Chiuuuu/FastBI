@@ -39,7 +39,7 @@
         <a-button
           class="btn-add"
           type="primary"
-          ghost
+          icon="plus"
           @click="showModal('add')"
           :disabled="loading"
           >添加项目</a-button>

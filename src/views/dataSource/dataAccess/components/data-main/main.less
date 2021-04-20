@@ -42,10 +42,8 @@
         line-height: 48px;
     }
     @{deep} .tab-excel{
-        height: calc(100% - 84px);
+        height: calc(100% - 70px);
         overflow-y: auto;
-        margin-top: 21px;
-        margin-left: 21px;
         text-align: left;
         .excel-list{
             position: relative;
@@ -95,24 +93,33 @@
                 margin-right: 15px;
             }
         }
+        .form-area {
+            height: 50%;
+            overflow-y: auto;
+        }
         .preview-list {
             display: flex;
             padding-left: 15px;
             padding-right: 15px;
-            height: 426px;
-            margin-bottom: 20px;
+            height: 50%;
+            overflow-y: auto;
+            border-top: 1px solid #e5e5e5;
+            padding-top: 20px;
             .preview-tab {
                 height: 100%;
                 width: 168px;
                 background-color: #f9f9f9;
                 border-right: 1px solid #e5e5e5;
-                margin-top: 20px;
                 .tab-title {
                     display: block;
                     height: 38px;
                     padding: 8px;
                     color: #000000A6;
                     font-weight: 700;
+                }
+                > ul {
+                   height: calc(100% - 38px);
+                   overflow-y: auto;
                 }
             }
             .preview-tab-item {
@@ -202,22 +209,20 @@
     }
     @{deep} .tab-datasource {
         height: 100%;
-        margin-top: 21px;
-        margin-left: 21px;
         text-align: left;
         .ant-form-item-label {
             width: 120px !important;    
         }
     }
     @{deep} .tab-datasource-model {
-        height: calc(100% - 84px);
+        height: calc(100% - 70px);
         overflow-y: auto;
-        margin-bottom: 22px;
+        margin-bottom: 20px;
     }
     @{deep} .btn_sub {
         float: right;
-        margin-right: 32px;
-        margin-bottom: 32px;
+        margin-right: 20px;
+        margin-bottom: 20px;
         width: 88px;
         height: 30px;
     }

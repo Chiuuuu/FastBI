@@ -3,6 +3,7 @@
     <div class="tab-datasource-model scrollbar">
       <a-form-model
         ref="fileForm"
+        class="form-area scrollbar"
         labelAlign="right"
         :model="form"
         :rules="rules"
@@ -83,7 +84,7 @@
           </a-radio-group>
         </a-form-model-item>
       </a-form-model>
-      <a-row class="preview-list">
+      <a-row class="preview-list scrollbar">
         <a-col :span="19">
           <!-- <div class="preview-controller">
             <span>从第</span>

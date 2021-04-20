@@ -3,6 +3,7 @@
     <div class="tab-datasource-model scrollbar">
       <a-form-model
         ref="fileForm"
+        class="form-area scrollbar"
         labelAlign="right"
         :model="form"
         :rules="rules"
