@@ -4,7 +4,7 @@
       <span class="m-t-s">素材库</span>
       <!-- 管理按钮 -->
       <span class="menu-manager" @click="showModal">
-        <a-icon type="setting" />管理分组
+        <a-icon type="setting" /><span> 管理分组</span>
       </span>
     </div>
 
