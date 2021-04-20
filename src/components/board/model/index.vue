@@ -343,7 +343,8 @@ export default {
       handler(val) {
         if (val.length > 0) {
           if (!this.add) {
-            this.resourceId = val[0].tableId
+            this.resourceId =
+              this.savedModels.length > 0 ? this.savedModels[0].tableId : ''
             this.model = true
           }
           val.map(item => {
@@ -388,10 +389,6 @@ export default {
       }
       this.getPivoSchemaList(val)
     }
-  },
-  mounted() {
-    this.resourceId =
-      this.savedModels.length > 0 ? this.savedModels[0].tableId : ''
   },
   methods: {
     // 数据模型搜索
