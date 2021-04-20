@@ -85,8 +85,9 @@
     <a-modal
       class="previewer"
       v-model="previewVisible"
+      title="素材预览"
       :centered="true"
-      :bodyStyle="{ height: '80vh', 'text-align': 'center', 'overflow-y': 'auto' }"
+      :bodyStyle="{ height: '60vh', 'text-align': 'center', 'overflow-y': 'auto' }"
       :footer="null"
       @cancel="previewUrl = ''"
     >
@@ -265,7 +266,7 @@ export default {
 <style lang="less" scoped>
 @deep: ~'>>>';
 .previewer @{deep} .ant-modal {
-  width: 70vw !important;
+  width: 50vw !important;
 }
 .container {
   display: flex;
