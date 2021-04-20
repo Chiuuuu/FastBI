@@ -65,7 +65,7 @@
         </a-form-model-item>
         <a-form-model-item label="本地图片" prop="file">
           <a-upload
-            accept=".jpg, .png, .gif, .jpeg, .bmp, .heic"
+            accept=".jpg, .png, .gif, .jpeg, .bmp, .heic, .ico"
             list-type="picture-card"
             :file-list="fileList"
             :before-upload="() => false"
@@ -86,7 +86,7 @@
       class="previewer"
       v-model="previewVisible"
       :centered="true"
-      :bodyStyle="{ height: '90vh', 'text-align': 'center', 'overflow-y': 'auto' }"
+      :bodyStyle="{ height: '80vh', 'text-align': 'center', 'overflow-y': 'auto' }"
       :footer="null"
       @cancel="previewUrl = ''"
     >
@@ -183,6 +183,7 @@ export default {
         })
       if (result.code === 200) {
         this.materialList = result.rows
+        this.pagination.total = result.total
       } else {
         this.$message.error(result.msg || '查询失败')
       }
@@ -196,8 +197,8 @@ export default {
     handleImageChange({ file, fileList }) {
       this.fileList = fileList
       if (fileList.length > 0) {
-        if (file.size > 3 * 1024 * 1024) {
-          this.$message.error('上传文件不得大于3M')
+        if (file.size > 10 * 1024 * 1024) {
+          this.$message.error('上传文件不得大于10M')
           this.fileList.splice(0)
         } else {
           this.form.file = file
@@ -264,7 +265,7 @@ export default {
 <style lang="less" scoped>
 @deep: ~'>>>';
 .previewer @{deep} .ant-modal {
-  width: 90vw !important;
+  width: 70vw !important;
 }
 .container {
   display: flex;

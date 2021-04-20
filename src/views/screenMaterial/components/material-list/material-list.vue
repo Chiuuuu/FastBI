@@ -1,6 +1,9 @@
 <template>
   <div class="material-list">
-    <MaterialListItem v-for="item in materialList" :key="item.id" :data="item" v-on="$listeners" />
+    <template v-if="materialList.length > 0">
+      <MaterialListItem v-for="item in materialList" :key="item.id" :data="item" v-on="$listeners" />
+    </template>
+    <a-empty class="material-list-empty" :imageStyle="{ height: '200px' }" v-else></a-empty>
   </div>
 </template>
 
@@ -35,5 +38,11 @@ export default {
   width: 100%;
   display: flex;
   flex-wrap: wrap;
+}
+.material-list-empty {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-90px, -115px);
 }
 </style>

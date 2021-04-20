@@ -2,7 +2,7 @@
   <div class="material-list-item">
     <!-- 标题 -->
     <div class="title-area">
-      <div style="padding-top:20px" v-if="mode === 'show'">{{ formatName(data.name) }}</div>
+      <div style="padding-top:20px" v-if="mode === 'show'">{{ data.name }}</div>
       <a-form-model v-else ref="form" :model="form" :rules="rules">
         <a-form-model-item prop="name">
           <a-input
@@ -172,7 +172,6 @@ export default {
   }
 
   .image-area {
-    display: table-cell;
     width: 100%;
     height: 148px;
     vertical-align: middle;
@@ -181,6 +180,7 @@ export default {
 
   .image {
     width: 100%;
+    height: 148px;
   }
 
   .controller {
