@@ -67,6 +67,7 @@ export default {
           if (val.source) {
             // 获取显示值
             this.value = val.source.rows[0].value
+            this.contentStyle.width = this.percentNum || '100%'
           }
         }
       },
@@ -129,7 +130,8 @@ export default {
       if (!this.value) {
         return 0
       }
-      return (this.value / this.config.common.targetValue) * 100 + '%'
+      let precent = (this.value / this.config.common.targetValue) * 100
+      return precent.toFixed(2) + '%'
     },
     barStyle() {
       return {

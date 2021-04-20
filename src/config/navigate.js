@@ -1533,7 +1533,7 @@ const list = [
               },
               buttonBar: { background: '#f5f5f5', borderRadius: 100 },
               valueBar: {
-                backgroundType: 1,
+                backgroundType: '1',
                 background: '#1890ff',
                 lineColor: ['#108ee9', '#87d068'],
                 radialColor: ['#108ee9', '#87d068'],
