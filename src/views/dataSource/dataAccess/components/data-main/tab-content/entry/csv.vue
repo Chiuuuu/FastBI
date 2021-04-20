@@ -79,14 +79,14 @@
               <a-button
                 v-show="form.delimiter === '3'"
                 @click="handleRenderByDelimiter"
-                type="primary">立即解析</a-button>
+                type="primary"
+              >立即解析</a-button>
             </a-radio>
           </a-radio-group>
         </a-form-model-item>
       </a-form-model>
-      <a-row class="preview-list scrollbar">
-        <a-col :span="19">
-          <!-- <div class="preview-controller">
+      <div class="preview-list scrollbar">
+        <!-- <div class="preview-controller">
             <span>从第</span>
             <div class="preview-line">
               <a-input style="width:60px" v-model="line" @keyup.enter.stop="handleEnterLine" />
@@ -101,27 +101,34 @@
             </div>
             <span>行开始获取数据</span>
             <a-checkbox style="margin-left: 50px" @change="handleCheckBox">自动生成列名</a-checkbox>
-          </div> -->
-          <div class="sheet-table scrollbar">
-            <template v-if="currentFieldList.length > 0">
-              <a-spin :spinning="spinning">
-                <table>
-                  <thead class="sheet-head">
-                    <tr style="border: none"><th v-for="item in currentColumns" :key="item.dataIndex"><div class="cell-item">{{ item.title }}</div></th></tr>
-                  </thead>
-                  <tbody class="sheet-body scrollbar">
-                    <tr v-for="(item, index) in currentFieldList" :key="item.key">
-                      <td><div class="cell-item">{{ index + 1 }}</div></td>
-                      <td v-for="col in currentColumns.slice(1)" :key="col.dataIndex"><div class="cell-item">{{ item[col.dataIndex] }}</div></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </a-spin>
-            </template>
-            <a-empty style="margin: 20px 0" v-else></a-empty>
-          </div>
-        </a-col>
-      </a-row>
+        </div>-->
+        <div class="sheet-table scrollbar">
+          <template v-if="currentFieldList.length > 0">
+            <a-spin :spinning="spinning">
+              <table>
+                <thead class="sheet-head">
+                  <tr style="border: none">
+                    <th v-for="item in currentColumns" :key="item.dataIndex">
+                      <div class="cell-item">{{ item.title }}</div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="sheet-body scrollbar">
+                  <tr v-for="(item, index) in currentFieldList" :key="item.key">
+                    <td>
+                      <div class="cell-item">{{ index + 1 }}</div>
+                    </td>
+                    <td v-for="col in currentColumns.slice(1)" :key="col.dataIndex">
+                      <div class="cell-item">{{ item[col.dataIndex] }}</div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </a-spin>
+          </template>
+          <a-empty style="margin: 20px 0" v-else></a-empty>
+        </div>
+      </div>
     </div>
     <a-button
       type="primary"
@@ -129,9 +136,7 @@
       @click="handleSaveForm"
       :loading="spinning || loading"
       v-if="hasPermission"
-    >
-      保存
-    </a-button>
+    >保存</a-button>
   </div>
 </template>
 
@@ -174,7 +179,7 @@ export default {
             message: '长度为1~20'
           }
         ],
-        delimiter: [ { validator: this.delimiterValidate } ]
+        delimiter: [{ validator: this.delimiterValidate }]
       },
       labelCol: {
         span: 4
@@ -205,15 +210,15 @@ export default {
     queryDelimiter() {
       switch (this.form.delimiter) {
         case '0':
-         return ','
+          return ','
         case '1':
-         return ';'
+          return ';'
         case '2':
-         return ' '
+          return ' '
         case '3':
-         return this.inputDelimiter
+          return this.inputDelimiter
         default:
-           return ','
+          return ','
       }
     }
   },
@@ -238,7 +243,8 @@ export default {
     handleSetFormData() {
       if (this.modelType !== 'csv') return
       this.handleResetForm()
-      if (this.modelId) { // 有id就是编辑状态
+      if (this.modelId) {
+        // 有id就是编辑状态
         this.$set(this.form, 'name', this.modelName)
         let delimiter = this.modelInfo.delimiter
         if (delimiter === ',') {
@@ -278,8 +284,9 @@ export default {
     },
     getFileList() {
       this.spinning = true
-      this.$server.dataAccess.getModelFileList(this.modelId)
-        .then(res => {
+      this.$server.dataAccess
+        .getModelFileList(this.modelId)
+        .then((res) => {
           this.fileInfoList = res.rows
           const name = this.modelInfo ? this.modelInfo.databaseName : ''
 
@@ -307,7 +314,10 @@ export default {
       } else {
         this.currentFileIndex = index
         this.renderCurrentTable()
-        this.$store.dispatch('dataAccess/setDatabaseName', this.fileInfoList[index].name)
+        this.$store.dispatch(
+          'dataAccess/setDatabaseName',
+          this.fileInfoList[index].name
+        )
       }
     },
     // 校验文件
@@ -356,9 +366,12 @@ export default {
       }
 
       // 校验csv文件类型
-      const fileType = file.name.slice(file.name.lastIndexOf('.') + 1, file.name.length)
+      const fileType = file.name.slice(
+        file.name.lastIndexOf('.') + 1,
+        file.name.length
+      )
       if (/csv/.test(fileType)) {
-        file.id = file.uid || 'vc-upload-' + (+new Date())
+        file.id = file.uid || 'vc-upload-' + +new Date()
         if (this.replaceFile.isReplace) {
           this.actionReplaceFile(file)
         } else {
@@ -371,7 +384,7 @@ export default {
     // 读取未上传的文件
     async readUnUploadFile(id) {
       const formData = new FormData()
-      this.fileList.map(item => {
+      this.fileList.map((item) => {
         if (item.id === id) {
           formData.append('csvFile', item)
           formData.append('delimiter', this.queryDelimiter)
@@ -383,7 +396,11 @@ export default {
           this.spinning = false
         })
       if (result.code === 200) {
-        this.$set(this.databaseList, this.currentFileIndex, result.rows[0].tableContent)
+        this.$set(
+          this.databaseList,
+          this.currentFileIndex,
+          result.rows[0].tableContent
+        )
         this.$nextTick(() => {
           this.renderCurrentTable()
         })
@@ -454,7 +471,8 @@ export default {
             this.spinning = false
             this.uploadProgress = '加载中'
           })
-      } else { // 已入库文件
+      } else {
+        // 已入库文件
         formData.append('fileList[0]', file)
         formData.append('replaceDatabaseId', this.replaceFile.info.id)
         formData.append('delimiter', this.queryDelimiter)
@@ -591,17 +609,19 @@ export default {
         }
       }
       const columns = new Array({
-          title: '序号',
-          dataIndex: 'no',
-          scopedSlots: {
-            customRender: 'no'
-          }
-        }).concat(table[0].map((col, index) => {
+        title: '序号',
+        dataIndex: 'no',
+        scopedSlots: {
+          customRender: 'no'
+        }
+      }).concat(
+        table[0].map((col, index) => {
           return {
             title: col,
             dataIndex: index + ''
           }
-        }))
+        })
+      )
 
       this.columns = columns
       this.noTitleColumns = columns.map((item, index) => {
@@ -630,7 +650,7 @@ export default {
         return data
       })
       const head = {}
-      columns.map(item => {
+      columns.map((item) => {
         head[item.dataIndex] = item.title
       })
       this.fieldList = tableData
