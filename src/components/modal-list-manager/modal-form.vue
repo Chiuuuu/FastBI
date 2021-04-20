@@ -29,6 +29,15 @@ export default {
       type: Number,
       default: -1
     },
+    options: { // 允许输入最大字数
+      type: Object,
+      default() {
+        return {
+          title: '',
+          max: 20
+        }
+      }
+    },
     data: { // 数据
       type: Object,
       default: () => ({
@@ -42,7 +51,7 @@ export default {
       rules: {
         name: [
           { required: true, message: '请输入名称' },
-          { max: 20, min: 1, message: '请输入1-20个字的名称' }
+          { max: this.options.max, min: 1, message: `请输入1-${this.options.max}个字的${this.options.title}名称` }
         ]
       }
     }

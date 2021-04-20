@@ -76,6 +76,7 @@ export default {
       modalOptions: {
         visible: false,
         title: '分组',
+        max: 10,
         list: this.categoryList.slice(1),
         add: this.handleCategoryAdd,
         delete: this.handleCategoryDelete,
