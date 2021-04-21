@@ -150,6 +150,8 @@ export default {
     handleCategoryAdd(params) {
       if (params.name === '默认分组') {
         return Promise.resolve('组名重复,请重新输入')
+      } else if (this.categoryList.length >= 20) {
+        return Promise.resolve('最多只能创建20个分组')
       }
       return this.$server.screenMaterial.addCategory(params)
     },
