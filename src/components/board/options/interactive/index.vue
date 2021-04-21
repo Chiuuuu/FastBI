@@ -88,7 +88,9 @@ export default {
           let interactive = this.currSelected.setting.api_data.interactive
           if (interactive && interactive.clickLink) {
             this.clickLink = interactive.clickLink
+            return
           }
+          this.clickLink = false
         }
       },
       immediate: true
@@ -160,7 +162,9 @@ export default {
     // 点击全选
     onCheckAllChange(e) {
       this.checkAll = e.target.checked
-      this.bindList = e.target.checked ? this.toBindList : []
+      this.bindList = e.target.checked
+        ? this.toBindList.map(item => item.id)
+        : []
     },
     // 多选框变化的时候重新判断全选
     checkSelectAll() {
