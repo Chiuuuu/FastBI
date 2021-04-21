@@ -29,7 +29,7 @@
               <th>序号</th>
               <th v-for="(item, index) in colPagination.currentCol" :key="index" :title="item['COLUMN_NAME']">
                 {{ item['COLUMN_NAME'] }}
-                <span class="type">{{ item['TYPE_NAME'] | formatType }}</span>
+                <!-- <span class="type">{{ item['TYPE_NAME'] | formatType }}</span> -->
               </th>
             </tr>
           </thead>
