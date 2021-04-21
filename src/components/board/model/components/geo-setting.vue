@@ -154,7 +154,8 @@ export default {
   props: {
     isShow: Boolean,
     region: String,
-    dimensionsData: {}
+    dimensionsData: Object,
+    type: Number
   },
   data() {
     return {
@@ -215,9 +216,13 @@ export default {
     },
     // 获取维度数据
     async getDimensionsDatas() {
+      debugger
       let params = {
         level: '3',
-        fieldId: this.dimensionsData.pivotschemaId,
+        fieldId:
+          this.type === 3
+            ? this.dimensionsData.pivotschemaId
+            : this.dimensionsData.fieldId, // 接入类型fieldId和pivotschemaId都是pivotschemaId，数据模型fieldId取原fieldId
         country: '中国',
         province: '广东省',
         city: '广州市',
@@ -283,7 +288,10 @@ export default {
       //   }
       let params = {
         level: '3',
-        fieldId: this.dimensionsData.pivotschemaId,
+        fieldId:
+          this.type === 3
+            ? this.dimensionsData.pivotschemaId
+            : this.dimensionsData.fieldId, // 接入类型fieldId和pivotschemaId都是pivotschemaId，数据模型fieldId取原fieldId
         country: '中国',
         province: '广东省',
         city: '广州市',
