@@ -4,7 +4,7 @@
       <span class="m-t-s">素材库</span>
       <!-- 管理按钮 -->
       <span class="menu-manager" @click="showModal">
-        <a-icon type="setting" />管理分组
+        <a-icon type="setting" /><span> 管理分组</span>
       </span>
     </div>
 
@@ -76,6 +76,7 @@ export default {
       modalOptions: {
         visible: false,
         title: '分组',
+        max: 10,
         list: this.categoryList.slice(1),
         add: this.handleCategoryAdd,
         delete: this.handleCategoryDelete,

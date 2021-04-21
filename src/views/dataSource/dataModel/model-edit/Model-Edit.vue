@@ -419,7 +419,7 @@ export default {
     async handleGetDatabaseList() {
       const result = await this.$server.dataModel.getDatabaseList(this.$route.query.datasourceId)
       if (result.code === 200) {
-        const baseBalck = [4, 5] // 黑名单
+        const baseBalck = [11, 12] // 黑名单
         const type = result.data.type
         this.isDatabase = !baseBalck.some(item => item === type)
         this.datasourceName = result.data.name

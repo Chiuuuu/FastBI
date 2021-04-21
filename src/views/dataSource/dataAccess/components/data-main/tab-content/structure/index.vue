@@ -592,18 +592,20 @@ export default {
         })
       }
       if (result.code === 200) {
-        if (result.data) {
-          if (result.data.length && result.data.length > 0 && result.data.length < this.selectedRows.length) {
-            return this.$message.info(`抽取任务已下达 \n ${result.msg}`, 5)
-          } else if (result.data.length && result.data.length > 0 && result.data.length === this.selectedRows.length) {
-            return this.$message.error('所选表格不是orc格式, 无法抽取')
-          }
-        }
+        // if (result.data) {
+        //   if (result.data.length && result.data.length > 0 && result.data.length < this.selectedRows.length) {
+        //     return this.$message.info(`抽取任务已下达 \n ${result.msg}`, 5)
+        //   } else if (result.data.length && result.data.length > 0 && result.data.length === this.selectedRows.length) {
+        //     return this.$message.error('所选表格不是orc格式, 无法抽取')
+        //   } else {
+        //     return this.$message.info(result.msg)
+        //   }
+        // }
         if (this.largeDataList.length > 0) {
-          this.$message.success('抽取任务已下达，当前抽取的表数据量较多，耗时会更长，请您耐心等待')
+          this.$message.info(result.msg + '，当前抽取的表数据量较多，耗时会更长，请您耐心等待')
           this.largeDataList = []
         } else {
-          this.$message.success('抽取任务已下达')
+          this.$message.info(result.msg)
         }
       } else {
         this.$message.error(result.msg)

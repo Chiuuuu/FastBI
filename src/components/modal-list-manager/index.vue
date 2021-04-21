@@ -25,6 +25,7 @@
             :index="index"
             :data="depart"
             :activeIndex="activeIndex"
+            :options="options"
             @edit="handleModalFormEdit"
             @save="handleModalFormSave"
             @cancel="handleModalFormCancel"
@@ -49,6 +50,7 @@ export default {
         return {
           visible: false,
           list: [],
+          max: 20,
           update: function() {},
           delete: function() {},
           add: function() {}

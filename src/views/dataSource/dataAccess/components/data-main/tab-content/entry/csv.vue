@@ -299,9 +299,9 @@ export default {
         isValid = false
       }
       // 校验大小
-      if (isValid && file.size > 1 * 1024 * 1024) {
+      if (isValid && file.size > 3 * 1024 * 1024) {
         isValid = false
-        this.$message.error('文件大于1M, 无法上传')
+        this.$message.error('文件大于3M, 无法上传')
       }
 
       // 校验重名
