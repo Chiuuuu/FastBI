@@ -405,10 +405,11 @@ export default {
     }, 400),
     // 切换数据类型
     changeAddType(type) {
+      // 没有切换数据类型
+      if (type === this.resourceType) {
+        return
+      }
       this.resourceType = type
-      // 清空当前维度度量数据
-      this.dimensions = []
-      this.measures = []
       // 默认取对应类型列表第一个值
       if (type === 8) {
         this.resourceId =
@@ -416,6 +417,11 @@ export default {
       } else {
         this.resourceId =
           this.savedSources.length > 0 ? this.savedSources[0].tableId : ''
+      }
+      // 当前没有选中数据清空维度度量
+      if (!this.resourceId) {
+        this.dimensions = []
+        this.measures = []
       }
     },
     // 搜索关键字
