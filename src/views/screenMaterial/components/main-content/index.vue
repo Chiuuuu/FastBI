@@ -16,7 +16,11 @@
 
     <!-- 素材列表 -->
     <a-spin :spinning="spinning" class="material-list-area scrollbar">
-      <MaterialList :material-list="materialList" @refresh="handleGetData" @preview="handlePreviewImage" />
+      <MaterialList
+        :material-list="materialList"
+        @refresh="handleGetData"
+        @preview="handlePreviewImage"
+      />
     </a-spin>
     <!-- 素材列表end -->
 
@@ -87,11 +91,18 @@
       v-model="previewVisible"
       title="素材预览"
       :centered="true"
-      :bodyStyle="{ height: '60vh', 'text-align': 'center', 'overflow-y': 'auto' }"
+      :bodyStyle="{ 'max-height': '80vh', 'padding': 0, 'text-align': 'center', 'overflow-y': 'auto' }"
       :footer="null"
       @cancel="previewUrl = ''"
     >
-      <img style="width: 100%" :src="previewUrl" />
+      <img
+        style="cursor: move"
+        :src="previewUrl"
+        @mousedown="handleImgMouseDown"
+        @mouseup="handleImgMouseUp"
+        @mouseleave="handleImgMouseUp"
+        @mousemove="handleImgMouseMove"
+      />
     </a-modal>
   </div>
 </template>
@@ -156,6 +167,13 @@ export default {
       materialList: [],
 
       // 预览大图
+      isMovingImage: false,
+      mouseLocation: {
+        x: 0, // 鼠标坐标
+        y: 0, // 鼠标坐标
+        scrollX: 0, // 当前横向滚动距离
+        scrollY: 0 // 当前纵向滚动距离
+      },
       previewVisible: false,
       previewUrl: ''
     }
@@ -166,6 +184,22 @@ export default {
     },
     categoryList() {
       return this.getCategoryList()
+    }
+  },
+  watch: {
+    previewVisible(newValue, oldValue) {
+      if (newValue) {
+        this.$nextTick(() => {
+          document
+            .querySelector('.previewer.ant-modal-root .ant-modal-body')
+            .addEventListener('scroll', this.onPreviewScroll)
+        })
+      } else {
+        this.mouseLocation = this.$options.data().mouseLocation
+        document
+          .querySelector('.previewer.ant-modal-root .ant-modal-body')
+          .removeEventListener('scroll', this.onPreviewScroll)
+      }
     }
   },
   methods: {
@@ -228,6 +262,58 @@ export default {
         }
       }
     },
+    // 图片预览鼠标拖拽移动相关
+    handleImgMouseDown(e) {
+      e.preventDefault()
+      this.isMovingImage = true
+      this.mouseLocation = Object.assign({}, this.mouseLocation, {
+        x: e.layerX + this.mouseLocation.scrollX,
+        y: e.layerY + this.mouseLocation.scrollY
+      })
+    },
+    handleImgMouseMove(e) {
+      if (this.isMovingImage) {
+        // 获取滚动窗
+        const scrollBody = document.querySelector(
+          '.previewer.ant-modal-root .ant-modal-body'
+        )
+        // 当前可滚动的距离
+        const scrollWidth = e.target.clientWidth - scrollBody.clientWidth
+        const scrollHeight = e.target.clientHeight - scrollBody.clientHeight
+
+        // 点击时记录的坐标 - 鼠标移动的坐标
+        let scrollX = this.mouseLocation.x - e.layerX
+        if (scrollX < 0) { // 边界值处理
+          scrollX = 0
+        } else if (scrollX > scrollWidth) {
+          scrollX = scrollWidth
+        }
+        let scrollY = this.mouseLocation.y - e.layerY
+        if (scrollY < 0) { // 边界值处理
+          scrollY = 0
+        } else if (scrollY > scrollHeight) {
+          scrollY = scrollHeight
+        }
+
+        // 滚动窗口并更新当前滚动距离
+        scrollBody.scrollTo(scrollX, scrollY)
+        this.mouseLocation = Object.assign({}, this.mouseLocation, {
+          scrollX: scrollX,
+          scrollY: scrollY
+        })
+      }
+    },
+    handleImgMouseUp(e) {
+      e.preventDefault()
+      this.isMovingImage = false
+    },
+    onPreviewScroll({ target }) {
+      // 窗口滚轮滚动时,记录滚动位置
+      this.mouseLocation = Object.assign({}, this.mouseLocation, {
+        scrollX: target.scrollLeft,
+        scrollY: target.scrollTop
+      })
+    },
     // 确认新建素材
     handleSaveMaterial() {
       this.$refs.form.validate(async (ok) => {
@@ -238,7 +324,8 @@ export default {
           formData.append('file', this.form.file)
 
           this.loading = true
-          const result = await this.$server.screenMaterial.addMaterial(formData)
+          const result = await this.$server.screenMaterial
+            .addMaterial(formData)
             .finally(() => {
               this.loading = false
             })
@@ -266,7 +353,7 @@ export default {
 <style lang="less" scoped>
 @deep: ~'>>>';
 .previewer @{deep} .ant-modal {
-  width: 50vw !important;
+  width: 60vw !important;
 }
 .container {
   display: flex;

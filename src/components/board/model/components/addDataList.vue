@@ -87,6 +87,11 @@ export default {
   },
   methods: {
     fileHandle(item) {
+      // 数据接入没有一级目录的时候获取三级
+      if (this.type === 3 && item.fileType === 1) {
+        this.getTableList(item)
+        return
+      }
       if (item.fileType !== 0 && !this.disableList.includes(item.id)) {
         item.resourceType = this.type
         this.$emit('fileHandle', item)
