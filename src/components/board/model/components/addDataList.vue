@@ -19,7 +19,7 @@
           @click.native="fileHandle(item)"
         >
           <!--数据接入类型的有三级数据-->
-          <a-collapse v-if="type === 3" v-model="modelKey" :bordered="false">
+          <a-collapse v-if="type === 3" v-model="secModelKey" :bordered="false">
             <template v-for="item2 in item.children">
               <a-collapse-panel
                 :showArrow="false"
@@ -78,12 +78,19 @@ export default {
     return {
       customStyle:
         'background: #ffffff;border-radius: 4px;border: 0;overflow: hidden;color:red !important;',
-      modelKey: ['0', '1', '2', '3', '4', '5', '6', '7'],
+      modelKey: [],
+      secModelKey: [],
       menuList: []
     }
   },
   mounted() {
     this.menuList = this.dataList
+    this.modelKey = []
+    this.menuList.forEach((item, index) => {
+      if (item.fileType === 0) {
+        this.modelKey.push(String(index))
+      }
+    })
   },
   methods: {
     fileHandle(item) {
