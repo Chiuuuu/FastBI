@@ -27,7 +27,7 @@
                 :header="item2.name"
                 :style="customStyle"
                 :class="disableList.includes(item2.id) ? 'disable' : ''"
-                @click.native="getTableList(item2)"
+                @click.native="fileHandle(item2)"
               >
                 <div style="margin-left:25px;cursor: pointer;">
                   <p
@@ -94,8 +94,8 @@ export default {
   },
   methods: {
     fileHandle(item) {
-      // 数据接入没有一级目录的时候获取三级
-      if (this.type === 3 && item.fileType === 1) {
+      // 数据接入没有datasourceId不是三级数据，往下请求三级数据
+      if (this.type === 3 && !item.datasourceId) {
         this.getTableList(item)
         return
       }
@@ -106,6 +106,10 @@ export default {
     },
     // 获取数据接入表格列表
     async getTableList(item) {
+      // 三级数据不需要请求
+      if (!item.children) {
+        return
+      }
       // 表列表已经存在的不用再请求一次
       if (item.children.length > 0) {
         return
@@ -132,6 +136,7 @@ export default {
 <style lang="less" scoped>
 .model-main {
   height: 100%;
+  padding-left: 6px;
   overflow-y: scroll;
 }
 .model-main .ant-collapse-content > .ant-collapse-content-box {
