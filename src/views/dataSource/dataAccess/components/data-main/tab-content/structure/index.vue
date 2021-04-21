@@ -601,14 +601,28 @@ export default {
         //     return this.$message.info(result.msg)
         //   }
         // }
+        const errorList = result.msg.split('\\n')
         if (this.largeDataList.length > 0) {
-          this.$message.info(result.msg + '，当前抽取的表数据量较多，耗时会更长，请您耐心等待')
+          this.$message.info({
+            content: h => h('div', [
+              h('div', {}, '当前抽取的表数据量较多，耗时会更长，请您耐心等待'),
+              errorList.map(item => h('div', {}, item))
+            ]),
+            icon: '抽取提示'
+          })
           this.largeDataList = []
         } else {
-          this.$message.info(result.msg)
+          this.$message.info({
+            content: h => h('div', errorList.map(item => h('div', {}, item))),
+            icon: '抽取提示'
+          })
         }
       } else {
-        this.$message.error(result.msg)
+        const errorList = result.msg.split('\\n')
+        this.$message.error({
+          content: h => h('div', errorList.map(item => h('div', {}, item))),
+          icon: '抽取提示'
+        })
       }
     },
     // 字段设置
