@@ -176,8 +176,12 @@ export default {
       let height = wrap.clientHeight
       this.width = width + 'px'
       this.height = height + 'px'
-      this.bodyHeight =
-        wrap.clientHeight - this.$refs.titles.clientHeight + 'px'
+      if (this.$refs.titles) {
+        this.bodyHeight =
+          wrap.clientHeight - this.$refs.titles.clientHeight + 'px'
+      } else {
+        this.bodyHeight = wrap.clientHeight
+      }
     }
   }
 }
