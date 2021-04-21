@@ -162,9 +162,11 @@ export default {
     // 点击全选
     onCheckAllChange(e) {
       this.checkAll = e.target.checked
-      this.bindList = e.target.checked
-        ? this.toBindList.map(item => item.id)
-        : []
+      // 过滤禁用项
+      let list = this.toBindList.filter(
+        chart => !this.checkBeBinded(chart) && !this.checkHaveBind(chart)
+      )
+      this.bindList = e.target.checked ? list.map(item => item.id) : []
     },
     // 多选框变化的时候重新判断全选
     checkSelectAll() {
