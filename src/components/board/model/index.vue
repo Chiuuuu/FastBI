@@ -229,6 +229,7 @@
             :is-show="createMapVisible"
             region="城市"
             :dimensions-data="createdMapData"
+            :type="resourceType"
             @close="createMapVisible = false"
             @handleSave="handleSave"
           ></geo-setting>
