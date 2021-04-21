@@ -21,12 +21,13 @@
         >
           数据
         </div>
-        <!--维度度量都有的图才可以创建交互-->
+        <!--维度度量都有的图才可以创建交互(暂时排除地图、嵌套饼图)-->
         <div
           class="tab-item"
           v-if="
             currSelected.setting.type === '1' &&
-              currSelected.setting.name !== 've-map'
+              currSelected.setting.name !== 've-map' &&
+              currSelected.setting.chartType !== 'v-multiPie'
           "
           :class="{ active: tabsType === 2 }"
           @click="tabsTypeChange(2)"

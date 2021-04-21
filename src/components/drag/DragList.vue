@@ -20,22 +20,24 @@
         />
         <span>{{ category.title }}</span>
       </div>
+      <!--素材库下拉窗尺寸变大-->
       <div
         class="list-group-body"
+        :style="i === 2 ? 'height:500px' : ''"
         flex
         v-show="category.hovered"
         @mouseenter="category.hovered = true"
         @mouseleave="category.hovered = false"
       >
-        <!-- 列表左侧 -->
-        <div class="left">
+        <!-- 列表左侧 --><!--素材库下拉窗尺寸变大-->
+        <div class="left" :style="i === 2 ? 'width:100px' : ''">
           <div
             v-for="(tab, index) in category.tabs"
             :key="tab.title"
             :class="{ selected: index === selectedIndex }"
             @mouseenter="selectTab(tab, index, i)"
           >
-            {{ tab.title || tab.name }}
+            <p class="tab-title">{{ tab.title || tab.name }}</p>
           </div>
         </div>
         <div class="right">
