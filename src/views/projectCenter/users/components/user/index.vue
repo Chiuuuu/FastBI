@@ -51,7 +51,6 @@
       <a-button
         class="btn-add"
         type="primary"
-        icon="plus"
         @click="handleShowModal('add')"
         :disabled="loading"
         >添加</a-button
