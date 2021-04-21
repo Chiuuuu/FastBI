@@ -187,7 +187,7 @@
               }
             }
             .material{
-              width: 430px;
+              width: 380px;
             .material-body {
               flex:1;
               overflow-y:scroll;
@@ -197,10 +197,18 @@
               flex-wrap: wrap;
               .material-box {
                 margin:8px;
-                .material-text{margin:0;width:100%;color:black;text-align:center;}
+                width:100px;
+                .material-text{
+                    margin:0;
+                    width:100%;
+                    color:black;
+                    text-align:center;
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                    white-space: nowrap;}
                 .material-img {
-                  width: 60px;
-                  height:50px;
+                  width: 95px;
+                  height:65px;
                   cursor: pointer;
                 }
               }}
