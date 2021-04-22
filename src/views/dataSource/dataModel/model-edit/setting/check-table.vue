@@ -116,12 +116,14 @@ export default {
           return '字符串'
         case 'TIMESTAMP':
           return '时间'
+        case 'DATE':
+          return '日期'
         case 'BIGINT':
           return '整数'
         case 'DOUBLE':
           return '小数'
         default:
-          return '无知类型'
+          return '未知类型'
       }
     },
     /**
