@@ -216,7 +216,6 @@ export default {
     },
     // 获取维度数据
     async getDimensionsDatas() {
-      debugger
       let params = {
         level: '3',
         fieldId:

@@ -313,6 +313,8 @@ export default {
         case 'VARCHAR':
           value = '字符串'
           break
+        default:
+          value = '未知类型'
       }
       return value
     },
