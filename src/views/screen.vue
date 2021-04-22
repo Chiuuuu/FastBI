@@ -1,8 +1,8 @@
 <template>
-  <div class="dv-screen" :style="wrapStyle" ref="dvScreen">
-    <div :style="canvasPanelStyle">
-      <b-scrollbar style="height:100%">
-        <div class="canvas-panel">
+  <div class="dv-screen" ref="dvScreen">
+    <b-scrollbar :style="wrapStyle">
+      <div :style="scrollBoxStyle">
+        <div class="canvas-panel" :style="canvasPanelStyle">
           <template v-for="transform in canvasMap">
             <preview-box :key="transform.id" :item="transform">
               <!--数据模型不存在-->
@@ -62,8 +62,8 @@
             </preview-box>
           </template>
         </div>
-      </b-scrollbar>
-    </div>
+      </div>
+    </b-scrollbar>
   </div>
 </template>
 
@@ -130,6 +130,13 @@ export default {
             : `url(${
                 this.pageSettings.backgroundSrc
               }) 0% 0% / 100% 100% no-repeat`
+      }
+    },
+    scrollBoxStyle() {
+      return {
+        width: `${this.pageSettings.width * this.range}px`,
+        height: `${this.pageSettings.height * this.range}px`,
+        overFlow: 'hidden'
       }
     }
   },

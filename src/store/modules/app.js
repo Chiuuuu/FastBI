@@ -231,7 +231,7 @@ const app = {
         if (res.code === 200) {
           dispatch('DelCanvasMap', chart.id)
           // 如果有当前图表联动关系的要清除
-          let updateList = [rootGetters.currSelected]
+          let updateList = []
           rootGetters.canvasMap.forEach(chart => {
             let apiData = chart.setting.api_data
             if (
@@ -242,7 +242,10 @@ const app = {
               updateList.push(chart)
             }
           })
-          screenManage.saveAllChart(updateList)
+          if (updateList.length > 0) {
+            screenManage.saveAllChart(updateList)
+          }
+          dispatch('dataModel/setSelectedModelList', res.data)
           dispatch('SingleSelected', null)
           dispatch('HideContextMenu')
           // 保存图层顺序

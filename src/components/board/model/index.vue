@@ -344,14 +344,19 @@ export default {
       handler(val) {
         if (val.length > 0) {
           if (!this.add) {
-            this.resourceId =
-              this.savedModels.length > 0 ? this.savedModels[0].tableId : ''
+            if (this.resourceType === 8) {
+              this.resourceId =
+                this.savedModels.length > 0 ? this.savedModels[0].tableId : ''
+            } else {
+              this.resourceId =
+                this.savedSources.length > 0 ? this.savedSources[0].tableId : ''
+            }
             this.model = true
           }
-          val.map(item => {
-            this.disableId.push(item.tableId)
-          })
+        } else {
+          this.resourceId = ''
         }
+        this.disableId = val.map(item => item.tableId)
       },
       deep: true
     },
@@ -379,13 +384,12 @@ export default {
       deep: true
     },
     resourceId(val) {
-      // modelId是文字的时候只获取列表不获取维度度量
-      if (
-        !val ||
-        val === '添加数据模型' ||
-        val === '添加数据接入' ||
-        this.selectedModelList.length === 0
-      ) {
+      // 没有选中数据，清空维度度量信息
+      if (!val) {
+        this.dimensions = []
+        this.measures = []
+      }
+      if (this.selectedModelList.length === 0) {
         return
       }
       this.getPivoSchemaList(val)
@@ -514,6 +518,8 @@ export default {
       item.tableId = item.id
       let list = this.selectedModelList.concat([item])
       this.$store.dispatch('dataModel/setSelectedModelList', list)
+      // 完成添加动作，重置add标记
+      this.add = false
     },
     // 保存选中的模型
     async saveData(item) {
