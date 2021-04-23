@@ -388,6 +388,7 @@ export default {
       if (!val) {
         this.dimensions = []
         this.measures = []
+        return
       }
       if (this.selectedModelList.length === 0) {
         return
@@ -514,12 +515,6 @@ export default {
       this.$store.dispatch('SetDataModel', item)
       this.add = true // 点击模型F
       this.saveData(item)
-      item.resourceName = item.name
-      item.tableId = item.id
-      let list = this.selectedModelList.concat([item])
-      this.$store.dispatch('dataModel/setSelectedModelList', list)
-      // 完成添加动作，重置add标记
-      this.add = false
     },
     // 保存选中的模型
     async saveData(item) {
@@ -545,6 +540,12 @@ export default {
       }
       await this.$server.screenManage.screenModuleSave(params)
       this.resourceId = item.id
+      item.resourceName = item.name
+      item.tableId = item.id
+      let list = this.selectedModelList.concat([item])
+      this.$store.dispatch('dataModel/setSelectedModelList', list)
+      // 完成添加动作，重置add标记
+      this.add = false
     },
     // 拖动开始 type 拖拽的字段类型维度或者度量
     dragstart(item, type, event) {
