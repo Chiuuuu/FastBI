@@ -51,7 +51,6 @@
 import { mapGetters, mapActions } from 'vuex'
 import { deepClone } from '@/utils/deepClone'
 import { sum, summary } from '@/utils/summaryList'
-import navigateList from '@/config/navigate' // 导航条菜单
 import geoJson from '@/utils/guangdong.json'
 
 export default {

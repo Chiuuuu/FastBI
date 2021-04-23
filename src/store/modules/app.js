@@ -113,20 +113,20 @@ const app = {
     },
     // 新建大屏
     async addScreenData({ commit, state }, obj) {
-      commit('SET_PAGE_SETTING', state.orginPageSettings)
-      commit('SET_PAGE_LIST', [])
       let params = {
         name: obj && obj.name ? obj.name : router.history.current.query.name,
         // parentId: obj && obj.parentId ? obj.parentId : router.history.current.query.parentId,
         // 没有选目录默认在外面
         parentId: obj && obj.parentId ? obj.parentId : '0',
         isSaved: 1,
-        setting: state.pageSettings
+        setting: state.orginPageSettings // 新建传默认配置
       }
       screenManage
         .addScreen(params)
         .then(res => {
           if (res.code === 200) {
+            commit('SET_PAGE_SETTING', state.orginPageSettings)
+            commit('SET_PAGE_LIST', [])
             commit('SET_SCREEN_ID', res.id)
             res.msg && message.success(res.msg)
             router.push({
