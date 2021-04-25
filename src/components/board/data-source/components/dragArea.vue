@@ -233,11 +233,10 @@ export default {
         this.chartType === '1'
       ) {
         // 饼图类型只能拉入一个度量
-        // if (this.currSelected.setting.name === 've-pie') {
-        //   this.fileList[0] = dataFile
-        // } else {
-        // 地图类型暂时只能拉入一个度量
-        if (this.currSelected.setting.name === 've-map') {
+        if (this.currSelected.setting.name === 've-pie') {
+          this.fileList[0] = dataFile
+        } else if (this.currSelected.setting.name === 've-map') {
+          // 地图类型暂时只能拉入一个度量
           this.fileList[0] = dataFile
         } else {
           this.fileList.push(dataFile)
@@ -619,7 +618,6 @@ export default {
             let apis = {
               level
             }
-            console.log(apis)
             this.$store.dispatch('SetApis', apis)
           } else {
             res.rows.map((item, index) => {
@@ -635,8 +633,6 @@ export default {
               rows.push(obj)
               // }
             })
-            console.log(columns)
-            console.log(rows)
           }
 
           apiData.source = {
