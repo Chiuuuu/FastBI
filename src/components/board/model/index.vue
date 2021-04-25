@@ -343,7 +343,7 @@ export default {
     selectedModelList: {
       handler(val) {
         if (val.length > 0) {
-          if (!this.add) {
+          if (!val.find(item => item.id === this.resourceId)) {
             if (this.resourceType === 8) {
               this.resourceId =
                 this.savedModels.length > 0 ? this.savedModels[0].tableId : ''
@@ -513,7 +513,6 @@ export default {
     fileHandle(item) {
       this.model = !this.model
       this.$store.dispatch('SetDataModel', item)
-      this.add = true // 点击模型F
       this.saveData(item)
     },
     // 保存选中的模型
@@ -539,13 +538,11 @@ export default {
         params.origin = 8 // 数据源:3,模型:8
       }
       await this.$server.screenManage.screenModuleSave(params)
-      this.resourceId = item.id
       item.resourceName = item.name
       item.tableId = item.id
       let list = this.selectedModelList.concat([item])
       this.$store.dispatch('dataModel/setSelectedModelList', list)
-      // 完成添加动作，重置add标记
-      this.add = false
+      this.resourceId = item.id
     },
     // 拖动开始 type 拖拽的字段类型维度或者度量
     dragstart(item, type, event) {
@@ -707,7 +704,6 @@ export default {
         item => item.id === this.currentSelected
       )
       selected.setting.api_data.mapDatas = datas
-      console.log(this.currSelected)
     }
   }
 }

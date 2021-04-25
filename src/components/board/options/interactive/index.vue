@@ -113,7 +113,8 @@ export default {
           item.datamodelId !== '0' &&
           item.datamodelId === this.currSelected.datamodelId &&
           item.setting.type === '1' && // 维度度量都存在的图表类型才可以图表联动
-          item.setting.chartType !== 'v-map' // 排除地图
+          item.setting.chartType !== 'v-map' && // 排除地图
+          item.setting.chartType !== 'v-multiPie' // 排除嵌套饼图
       )
       return list
     },
