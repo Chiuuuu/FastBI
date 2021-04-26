@@ -7,6 +7,9 @@ export function handleRefreshData({ chart, newData }) {
     let rows = chart.setting.config.series[0].data
     for (let row of rows) {
       let data = newData.find(item => item[dimension] === row.name)
+      if (!data) {
+        continue
+      }
       row.value[2] = data[measure]
     }
     return
