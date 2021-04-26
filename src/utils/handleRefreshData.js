@@ -1,7 +1,24 @@
 import { sum, summary } from '@/utils/summaryList'
 // 处理大屏刷新数据
 export function handleRefreshData({ chart, newData }) {
-  let sourceRows = chart.setting.api_data.source.rows
+  if (chart.setting.chartType === 'v-map') {
+    let measure = chart.setting.api_data.measures[0].alias
+    let dimension = chart.setting.api_data.dimensions[0].alias
+    let rows = chart.setting.config.series[0].data
+    for (let row of rows) {
+      let data = newData.find(item => item[dimension] === row.name)
+      row.value[2] = data[measure]
+    }
+    return
+  }
+  let source = chart.setting.api_data.source
+  if (!source) {
+    return
+  }
+  let sourceRows = source.rows
+  if (!sourceRows) {
+    return
+  }
   if (chart.setting.type === '2') {
     sourceRows.forEach((row, index) => {
       // 按对应key重新取值
