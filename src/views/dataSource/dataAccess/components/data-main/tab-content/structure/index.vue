@@ -187,7 +187,7 @@ const logColumns = [
   {
     title: '状态',
     align: 'center',
-    width: 80,
+    width: 100,
     dataIndex: 'status',
     scopedSlots: { customRender: 'status' }
   },
