@@ -2518,7 +2518,6 @@ export default {
     },
     // 设置基本属性
     setBaseProperty() {
-      console.log(this.baseProperty)
       this.$store.dispatch('SetBaseProperty', this.baseProperty)
       // 发送请求来保存数据
       setBaseProperty(this.currentSelected)
@@ -2648,10 +2647,9 @@ export default {
       if (!e.target.files[0]) {
         return
       }
-      const isLt2M = e.target.files[0].size / 1024 / 1024 < 2
-      console.log(isLt2M)
+      const isLt2M = e.target.files[0].size / 1024 / 1024 < 5
       if (!isLt2M) {
-        this.$message.error('图片大小不能超过2M!')
+        this.$message.error('图片大小不能超过5M!')
         return
       }
       var form = new FormData()
@@ -2701,7 +2699,6 @@ export default {
     // 点击选择对齐方式
     onAlignChange(data, event) {
       this.$set(data, 'textAlign', event.target.value)
-      console.log(data, event)
       this.setSelfProperty()
     },
 
@@ -2855,7 +2852,6 @@ export default {
     pageSettings: {
       handler(val) {
         if (val) {
-          console.log(val)
           let setting = val
           if (!setting.refresh) {
             setting.refresh = {
