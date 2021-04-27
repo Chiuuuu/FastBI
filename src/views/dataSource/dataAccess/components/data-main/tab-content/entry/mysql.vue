@@ -250,6 +250,7 @@ export default {
     handleResetForm() {
       this.connectPassword = ''
       this.$refs['dbForm'] && this.$refs.dbForm.resetFields()
+      this.form = this.$options.data().form
       this.connectStatus = false
     },
     /**
