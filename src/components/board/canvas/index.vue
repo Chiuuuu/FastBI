@@ -104,6 +104,17 @@ export default {
         )}px`
       }
       this.SetCanvasRange(val)
+    },
+    // 页面尺寸变化，背景板自适应
+    'pageSettings.width'(val) {
+      if (val) {
+        this._calcStyle()
+      }
+    },
+    'pageSettings.height'(val) {
+      if (val) {
+        this._calcStyle()
+      }
     }
     // pageSettings: {
     //   handler(val) {
