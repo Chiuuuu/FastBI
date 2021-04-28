@@ -2,7 +2,7 @@
   <div class="login" flex="main:center cross:center">
     <div class="login-form" flex="dir:top">
       <div class="login-title">
-        <img src="../../assets/images/login/login_logo3.png" alt="智能大数据分析平台" />
+        <img src="../../assets/images/login/logo_liantong.png" alt="智能大数据分析平台" />
       </div>
       <div class="login-form-main">
         <a-form-model ref="form" :model="form" :rules="rules" @submit="handleSubmit" @submit.native.prevent>
@@ -125,7 +125,7 @@ export default {
     transform: translateY(-190px);
 
     width: 470px;
-    height: 380px;
+    height: 400px;
     background: #fff;
     align-items: center;
     justify-content: center;
@@ -138,7 +138,7 @@ export default {
     }
     // 标题背景
     .login-title {
-      height: 43px;
+      height: 60px;
       width: 100%;
       padding: 0 24px;
       img {

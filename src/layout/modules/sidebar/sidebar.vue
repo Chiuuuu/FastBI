@@ -1,7 +1,7 @@
 <template>
   <div class="sidebar">
     <div class="header">
-      <img src="../../../assets/images/login/login_logo.png" />
+      <img src="../../../assets/images/login/logo_liantong.png" />
     </div>
     <a-menu
       class="menu-body scrollbar"
@@ -108,12 +108,14 @@ export default {
   width: 220px;
   .header {
     height: 56px;
-    line-height: 56px;
     padding-left: 20px;
     padding-right: 20px;
     position: relative;
+    background: #fff;
+    border-bottom: 1px solid #BCC1C8;
     img {
       width: 100%;
+      margin-top: 8px;
     }
     span {
       color: #fff;
