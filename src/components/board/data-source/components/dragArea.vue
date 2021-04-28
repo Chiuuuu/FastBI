@@ -453,7 +453,10 @@ export default {
       let params = selected
       let apiData = deepClone(this.currSelected.setting.api_data)
       let res = ''
-      if (apiData.measures[0].resourceType === 8) {
+      if (
+        (apiData.measures[0] && apiData.measures[0].resourceType === 8) ||
+        apiData.tableList[0].resourceType === 8
+      ) {
         res = await this.$server.screenManage.getData(params)
       } else {
         res = await this.$server.screenManage.getDataForSource(params)
