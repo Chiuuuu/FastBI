@@ -111,8 +111,8 @@ export default {
 // 大背景
 .login {
   position: relative;
-  background: url('../../assets/images/login/background.png') no-repeat;
-  background-size: cover;
+  background: url('../../assets/images/login/background_liantong.png') no-repeat;
+  background-size: auto 100%;
   width: 100%;
   height: 100%;
   overflow: auto;
@@ -130,7 +130,7 @@ export default {
     align-items: center;
     justify-content: center;
     padding: 30px 40px;
-    box-shadow: 0 4px 12px 0 rgba(44, 78, 177, 0.2);
+    box-shadow: 0 4px 24px 0 rgba(44, 78, 177, 0.5);
     border-radius: 4px;
 
     @{deep} .ant-input {
