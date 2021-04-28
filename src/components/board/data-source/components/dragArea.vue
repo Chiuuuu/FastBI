@@ -455,7 +455,7 @@ export default {
       let res = ''
       if (
         (apiData.measures[0] && apiData.measures[0].resourceType === 8) ||
-        apiData.tableList[0].resourceType === 8
+        (apiData.tableList[0] && apiData.tableList[0].resourceType === 8)
       ) {
         res = await this.$server.screenManage.getData(params)
       } else {
@@ -514,7 +514,7 @@ export default {
           for (let item of this.fileList) {
             str += res.rows[0][item.alias] + ' '
           }
-          config.title.content = str
+          config.title.text = str
           this.$store.dispatch('SetSelfProperty', config)
         }
         if (this.type === 'tableList') {
