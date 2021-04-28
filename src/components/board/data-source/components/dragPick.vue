@@ -650,7 +650,10 @@ export default {
         item => item.id === this.currentSelected
       )
       let res = ''
-      if (apiData.measures[0].resourceType === 8) {
+      if (
+        (apiData.measures[0] && apiData.measures[0].resourceType === 8) ||
+        apiData.tableList[0].resourceType === 8
+      ) {
         res = await this.$server.screenManage.getData(selected)
       } else {
         res = await this.$server.screenManage.getDataForSource(selected)
