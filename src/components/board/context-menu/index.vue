@@ -21,30 +21,25 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex"
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
-  name: "ContextMenu",
-  data () {
+  name: 'ContextMenu',
+  data() {
     return {
       menuList: [
-        { icon: "ios-share", text: "置顶", order: "top" },
-        { icon: "ios-download", text: "置底", order: "bottom" },
-        { icon: "md-arrow-round-up", text: "上移一层", order: "up" },
-        { icon: "md-arrow-round-down", text: "下移一层", order: "down" },
-        { icon: "ios-copy", text: "复制", order: "copy" },
-        { icon: "ios-trash", text: "删除", order: "remove" },
-      ],
+        { icon: 'ios-share', text: '置顶', order: 'top' },
+        { icon: 'ios-download', text: '置底', order: 'bottom' },
+        { icon: 'md-arrow-round-up', text: '上移一层', order: 'up' },
+        { icon: 'md-arrow-round-down', text: '下移一层', order: 'down' },
+        { icon: 'ios-copy', text: '复制', order: 'copy' },
+        { icon: 'ios-trash', text: '删除', order: 'remove' }
+      ]
     }
   },
   computed: {
-    ...mapGetters([
-      "contextMenuInfo",
-      "pageSettings",
-      "canvasMap",
-      "screenId"
-    ]),
-    contextMenuStyle () {
+    ...mapGetters(['contextMenuInfo', 'pageSettings', 'canvasMap', 'screenId']),
+    contextMenuStyle() {
       let x =
         this.contextMenuInfo.x !== undefined
           ? parseInt(this.contextMenuInfo.x) > 0
@@ -67,36 +62,36 @@ export default {
         let winHeight = document.documentElement.clientHeight
         let winWidth = document.documentElement.clientWidth
         if (x + 200 > winWidth) {
-          tmpObj["right"] = "10px"
+          tmpObj['right'] = '10px'
         } else {
-          tmpObj["left"] = x + "px"
+          tmpObj['left'] = x + 'px'
         }
         if (y + 100 > winHeight) {
-          tmpObj["bottom"] = "42px"
+          tmpObj['bottom'] = '42px'
         } else {
-          tmpObj["top"] = y + "px"
+          tmpObj['top'] = y + 'px'
         }
       }
       return tmpObj
-    },
+    }
   },
   methods: {
     ...mapActions(['saveScreenData', 'deleteChartData']),
     //  执行菜单命令
-    handleCommand (order) {
+    handleCommand(order) {
       console.log(order)
-      if (order === "remove") {
+      if (order === 'remove') {
         // 如果是删除操作则弹出一个对话框来确认
         // this.$EventBus.$emit('context/menu/delete')
         this.deleteOne()
       } else {
-        this.$store.dispatch("ContextMenuCommand", order)
+        this.$store.dispatch('ContextMenuCommand', order)
       }
     },
     // 删除图表
-    deleteOne () {
+    deleteOne() {
       this.deleteChartData()
-    },
-  },
+    }
+  }
 }
 </script>

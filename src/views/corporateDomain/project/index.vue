@@ -8,14 +8,12 @@
 <script>
 import Main from './components/proj-main'
 export default {
-	name: 'corporateProject',
+  name: 'corporateProject',
   components: {
     Main
   },
   data() {
-    return {
-      
-    }
+    return {}
   }
 }
 </script>

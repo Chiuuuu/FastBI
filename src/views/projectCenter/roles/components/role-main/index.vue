@@ -8,7 +8,7 @@
         <div class="role-layout">
           <a-tabs v-model="activeTab" class="tabs" @change="handleChangeModule">
             <a-tab-pane key="permission" tab="权限设置">
-              <role-permission ref='permissionManage'></role-permission>
+              <role-permission ref="permissionManage"></role-permission>
             </a-tab-pane>
             <a-tab-pane key="user" tab="角色用户">
               <role-user ref="userManage"></role-user>
@@ -38,8 +38,8 @@ export default {
   },
   computed: {
     ...mapState({
-      roleId: state => state.projectRoles.roleId,
-      formInfo: state => state.projectRoles.roleInfo
+      roleId: (state) => state.projectRoles.roleId,
+      formInfo: (state) => state.projectRoles.roleInfo
     })
   },
   created() {
@@ -54,13 +54,11 @@ export default {
         tab.handleGetData && tab.handleGetData()
       }
     },
-    async handleGetRoleInfo() {
-      
-    }
+    async handleGetRoleInfo() {}
   }
 }
 </script>
 
 <style lang="less" scoped>
-@import "../../../main.less";
+@import '../../../main.less';
 </style>

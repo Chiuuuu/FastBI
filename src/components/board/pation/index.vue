@@ -1,15 +1,7 @@
 <template>
   <div class="pagination">
-    <div
-      v-for="(page, index) in pages"
-      :key="page.id"
-      @click="toOtherPage(page.id)"
-    >
-      <a-dropdown
-        :trigger="['contextmenu']"
-        v-model="page.showDropDown"
-        placement="topCenter"
-      >
+    <div v-for="(page, index) in pages" :key="page.id" @click="toOtherPage(page.id)">
+      <a-dropdown :trigger="['contextmenu']" v-model="page.showDropDown" placement="topCenter">
         <div
           :class="[
             'page',
@@ -24,7 +16,8 @@
           @dragend="handleDragEnd($event, page)"
         >
           {{ page.name
-          }}<input
+          }}
+          <input
             ref="input"
             @blur="onBlur(page)"
             @dblclick="renameTab(page, index)"
@@ -34,15 +27,8 @@
         </div>
         <a-menu slot="overlay">
           <a-menu-item key="1" @click="copyTab(page, index)">复制</a-menu-item>
-          <a-menu-item key="2" @click="renameTab(page, index)"
-            >重命名</a-menu-item
-          >
-          <a-menu-item
-            key="3"
-            @click="deleteTab(page, index)"
-            :disabled="pages.length === 1"
-            >删除</a-menu-item
-          >
+          <a-menu-item key="2" @click="renameTab(page, index)">重命名</a-menu-item>
+          <a-menu-item key="3" @click="deleteTab(page, index)" :disabled="pages.length === 1">删除</a-menu-item>
         </a-menu>
       </a-dropdown>
     </div>
@@ -84,9 +70,9 @@ export default {
     getTabsData() {
       return this.$server.screenManage
         .getScreenTabs(this.screenId)
-        .then(res => {
+        .then((res) => {
           if (res.code === 200) {
-            this.pages = res.rows.map(item =>
+            this.pages = res.rows.map((item) =>
               Object.assign(item, { showDropDown: false, isFocus: false })
             )
             return true
@@ -100,7 +86,7 @@ export default {
       if (this.pages.length < 10) {
         // 获取页面上是页面X的格式的序号
         let noList = []
-        this.pages.forEach(item => {
+        this.pages.forEach((item) => {
           if (/页面\d/.test(item.name)) {
             noList.push(parseInt(item.name.replace(/[^0-9]/gi, '')))
           }
@@ -114,7 +100,7 @@ export default {
           orderNo: this.pages.length + 1,
           screenId: this.screenId
         }
-        this.$server.screenManage.addScreenTab(params).then(res => {
+        this.$server.screenManage.addScreenTab(params).then((res) => {
           if (res.code === 200) {
             // 新增tab成功跳转到新tab
             this.toOtherPage(res.data)
@@ -129,7 +115,7 @@ export default {
     getCopyName(name, i) {
       let copyName = `${name}(${i})`
       // 如果复制后缀出现重名，序号往上叠加
-      if (this.pages.some(item => item.name === copyName)) {
+      if (this.pages.some((item) => item.name === copyName)) {
         return this.getCopyName(name, i + 1)
       }
       return copyName
@@ -145,9 +131,9 @@ export default {
           screenId: this.screenId,
           id: page.id
         }
-        this.$server.screenManage.copyScreenTab(params).then(res => {
+        this.$server.screenManage.copyScreenTab(params).then((res) => {
           if (res.code === 200) {
-            this.getTabsData().then(res => {
+            this.getTabsData().then((res) => {
               this.saveOrder()
             })
           }
@@ -179,7 +165,7 @@ export default {
         screenId: this.screenId,
         id: page.id
       }
-      this.$server.screenManage.renameScreenTab(params).then(res => {
+      this.$server.screenManage.renameScreenTab(params).then((res) => {
         if (res.code === 200) {
           page.isFocus = false
           page.name = this.showName
@@ -202,7 +188,7 @@ export default {
               this.toOtherPage(
                 index === 0 ? this.pages[1].id : this.pages[index - 1].id
               )
-              this.getTabsData().then(res => {
+              this.getTabsData().then((res) => {
                 this.saveOrder()
               })
               return
@@ -210,7 +196,7 @@ export default {
             // 删除的不是选中的直接删除不跳转
             this.pages.splice(index, 1)
           } else {
-            res.msg && this.$message.error(result.msg)
+            res.msg && this.$message.error(res.msg)
           }
         }
       })
@@ -221,8 +207,8 @@ export default {
         item.orderNo = index + 1
       })
 
-      this.$server.screenManage.orderScreenTab(this.pages).then(res => {
-        if (res.code != 200) {
+      this.$server.screenManage.orderScreenTab(this.pages).then((res) => {
+        if (res.code !== 200) {
           res.msg && this.$message.error(res.msg)
         }
       })
@@ -239,7 +225,7 @@ export default {
       e.dataTransfer.dropEffect = 'move'
     },
     handleDragEnter(e, item) {
-      //为需要移动的元素设置dragstart事件
+      // 为需要移动的元素设置dragstart事件
       e.dataTransfer.effectAllowed = 'move'
       if (item === this.dragItem) {
         return

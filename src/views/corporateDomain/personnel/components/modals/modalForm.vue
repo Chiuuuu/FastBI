@@ -7,40 +7,19 @@
         </a-form-model-item>
       </a-col>
       <a-col :span="4" class="text-center">
-        <a-button
-          type="link"
-          v-show="isEdit"
-          @click="handleEdit"
-          :disabled="isDisabled"
-          >编辑</a-button
-        >
-        <a-popconfirm
-          title="是否确定删除？"
-          ok-text="确定"
-          cancel-text="取消"
-          @confirm="handleDelete"
-        >
-          <a-button v-show="isEdit" type="link" style="margin-left:5px;"
-            >删除</a-button
-          >
+        <a-button type="link" v-show="isEdit" @click="handleEdit" :disabled="isDisabled">编辑</a-button>
+        <a-popconfirm title="是否确定删除？" ok-text="确定" cancel-text="取消" @confirm="handleDelete">
+          <a-button v-show="isEdit" type="link" style="margin-left:5px;">删除</a-button>
         </a-popconfirm>
-        <a-button type="link" v-show="!isEdit" @click="handleSave"
-          >保存</a-button
-        >
-        <a-button
-          type="link"
-          v-show="!isEdit"
-          @click="handleCancel"
-          style="margin-left:5px;"
-          >取消</a-button
-        >
+        <a-button type="link" v-show="!isEdit" @click="handleSave">保存</a-button>
+        <a-button type="link" v-show="!isEdit" @click="handleCancel" style="margin-left:5px;">取消</a-button>
       </a-col>
     </a-row>
   </a-form-model>
 </template>
 <script>
 export default {
-  name: "ModalForm",
+  name: 'ModalForm',
   props: {
     index: {
       type: Number,
@@ -52,13 +31,13 @@ export default {
     },
     status: {
       type: String,
-      default: "show"
+      default: 'show'
     },
     data: {
       type: Object,
-      default: () => {
-        name: "";
-      }
+      default: () => ({
+        name: ''
+      })
     }
   },
   data() {
@@ -66,48 +45,48 @@ export default {
       form: Object.assign({}, this.data),
       rules: {
         name: [
-          { required: true, message: "请输入名称" },
-          { max: 20, min: 1, message: "请输入1-20个字的名称" }
+          { required: true, message: '请输入名称' },
+          { max: 20, min: 1, message: '请输入1-20个字的名称' }
         ]
       }
-    };
+    }
   },
   computed: {
     isEdit() {
-      return this.activeIndex !== this.index;
+      return this.activeIndex !== this.index
     },
     isDisabled() {
       if (this.activeIndex === -1) {
-        return false;
+        return false
       } else {
-        return this.activeIndex !== this.index;
+        return this.activeIndex !== this.index
       }
     }
   },
   methods: {
     handleEdit() {
-      this.$emit("edit", this.index);
+      this.$emit('edit', this.index)
     },
     handleSave() {
-      this.$refs.form.validate(valid => {
+      this.$refs.form.validate((valid) => {
         if (valid) {
-          this.$emit("save", this.form, this.index);
+          this.$emit('save', this.form, this.index)
         } else {
-          return false;
+          return false
         }
-      });
+      })
     },
     handleDelete() {
-      this.$emit("delete", this.data, this.index);
+      this.$emit('delete', this.data, this.index)
     },
     handleCancel() {
-      this.$emit("cancel", this.data);
+      this.$emit('cancel', this.data)
     }
   }
-};
+}
 </script>
 <style lang="less" scoped>
-@deep: ~">>>";
+@deep: ~'>>>';
 @{deep} .ant-btn-link {
   color: #617bff;
   padding: 0;

@@ -4,28 +4,16 @@
       <div class="searchbar">
         <a-form-model layout="inline" :model="searchForm">
           <a-form-model-item label="用户名" prop="userName">
-            <a-input
-              placeholder="请输入用户名"
-              v-model="searchForm.userName"
-              style="width: 200px"
-            ></a-input>
+            <a-input placeholder="请输入用户名" v-model="searchForm.userName" style="width: 200px"></a-input>
           </a-form-model-item>
           <a-form-model-item label="姓名" prop="name">
-            <a-input
-              placeholder="请输入姓名"
-              v-model="searchForm.name"
-              style="width: 200px"
-            ></a-input>
+            <a-input placeholder="请输入姓名" v-model="searchForm.name" style="width: 200px"></a-input>
           </a-form-model-item>
           <a-form-model-item>
-            <a-button type="primary" @click="getData" :disabled="loading"
-              >查询</a-button
-            >
+            <a-button type="primary" @click="getData" :disabled="loading">查询</a-button>
           </a-form-model-item>
           <a-form-model-item>
-            <a-button type="default" @click="reset" :disabled="loading"
-              >重置</a-button
-            >
+            <a-button type="default" @click="reset" :disabled="loading">重置</a-button>
           </a-form-model-item>
         </a-form-model>
       </div>
@@ -40,12 +28,7 @@
       :scroll="{ y: 430 }"
     >
       <template #config="text, record, index">
-        <a-popconfirm
-          title="是否确定删除？"
-          ok-text="确定"
-          cancel-text="取消"
-          @confirm="del(record, index)"
-        >
+        <a-popconfirm title="是否确定删除？" ok-text="确定" cancel-text="取消" @confirm="del(record, index)">
           <a href="#">剔除</a>
         </a-popconfirm>
       </template>
@@ -127,7 +110,7 @@ export default {
         return
       }
       // 按用户名和姓名过滤
-      this.dataList = this.dataList.filter(item => {
+      this.dataList = this.dataList.filter((item) => {
         let isKeep = true
         if (
           this.searchForm.userName &&

@@ -7,12 +7,8 @@
           <a-icon type="plus-square" class="menu_icon" />
         </a>
         <a-menu slot="overlay" class="drow_menu">
-          <a-menu-item @click="showModal">
-            新建角色
-          </a-menu-item>
-          <a-menu-item key="1" @click="handleAddNewFolder">
-            新建文件夹
-          </a-menu-item>
+          <a-menu-item @click="showModal">新建角色</a-menu-item>
+          <a-menu-item key="1" @click="handleAddNewFolder">新建文件夹</a-menu-item>
         </a-menu>
       </a-dropdown>
       <a-modal
@@ -24,7 +20,13 @@
           overflowY: 'auto'
         }"
       >
-        <a-form-model :model="form" :rules="rules" width="500px" :label-col="{ span: 6 }" :wrapper-col="{ span: 12 }">
+        <a-form-model
+          :model="form"
+          :rules="rules"
+          width="500px"
+          :label-col="{ span: 6 }"
+          :wrapper-col="{ span: 12 }"
+        >
           <a-form-model-item label="角色名称" prop="name">
             <a-input placeholder="请输入角色名称"></a-input>
           </a-form-model-item>
@@ -68,7 +70,7 @@
                   :file="slotProps.file"
                   :index="slotProps.index"
                   :parent="folder"
-                  :isSelect='fileSelectId === slotProps.file.id'
+                  :isSelect="fileSelectId === slotProps.file.id"
                   :contextmenus="fileContenxtMenu"
                   @fileSelect="handleFileSelect"
                   @fileDrag="handleFileDrag"
@@ -81,7 +83,7 @@
               <menu-file
                 :file="folder"
                 :index="index"
-                :isSelect='fileSelectId === folder.id'
+                :isSelect="fileSelectId === folder.id"
                 :contextmenus="fileContenxtMenu"
                 @fileSelect="handleFileSelect"
                 @fileDrag="handleFileDrag"
@@ -216,19 +218,19 @@ export default {
   },
   computed: {
     ...mapState({
-      tableList: state => state.projectPermissions.menuList
+      tableList: (state) => state.projectPermissions.menuList
     }),
     menuList() {
       return this.searchValue ? this.searchList : this.tableList
     },
     folderList() {
-      return this.tableList.filter(item => item.fileType === 0)
+      return this.tableList.filter((item) => item.fileType === 0)
     },
     fileSelectId: {
-      get () {
+      get() {
         return this.$store.state.projectPermissions.permissionId
       },
-      set (value) {
+      set(value) {
         this.$store.commit('projectPermissions/SET_PERMISSIONID', value)
       }
     }
@@ -239,18 +241,18 @@ export default {
   },
   methods: {
     /**
-    * 获取左侧菜单数据
-    */
+     * 获取左侧菜单数据
+     */
     handleGetMenuList() {
       this.$store.dispatch('projectPermissions/getMenuList', this)
     },
     /**
      * @description 获取表详情信息
-    */
+     */
     async getTableInfo(url, callback) {
       const result = await this.$server.common.getDetailByMenuId(url)
       if (result.code === 200) {
-        if (callback && (callback instanceof Function)) {
+        if (callback && callback instanceof Function) {
           callback(result)
         }
         this.$EventBus.$emit('setFormData')
@@ -260,14 +262,14 @@ export default {
     },
     /**
      * 打开弹窗
-    */
+     */
     showModal() {
       this.visible = true
     },
     /**
      * 搜索目录列表
      */
-    handleSearchMenu: debounce(function(event) {
+    handleSearchMenu: debounce(function (event) {
       const value = event.target.value
       this.searchValue = value
       if (value) {
@@ -276,7 +278,7 @@ export default {
     }, 400),
     handleGetSearchList(value) {
       let result = []
-      this.tableList.map(item => {
+      this.tableList.map((item) => {
         const newItem = menuSearchLoop(item, value)
         if (newItem) result.push(newItem)
       })
@@ -284,8 +286,8 @@ export default {
       console.log('搜索结果', this.searchList)
     },
     /**
-    * 选择左侧菜单
-    */
+     * 选择左侧菜单
+     */
     handleFileSelect(file) {
       if (this.fileSelectId === file.id) return
       this.fileSelectId = file.id
@@ -296,8 +298,8 @@ export default {
       this.$store.commit('projectPermissions/SET_PARENTID', file.parentId)
     },
     /**
-    * 删除菜单
-    */
+     * 删除菜单
+     */
     handleFileDelete(event, item, { file }) {
       this.$confirm({
         title: '确认提示',
@@ -340,8 +342,8 @@ export default {
       })
     },
     /**
-    * 修改文件夹名称
-    */
+     * 修改文件夹名称
+     */
     handleFolderResetName(event, item, { folder }) {
       this.resetNameVisible = true
       this.resetName.type = 'reset'
@@ -350,7 +352,7 @@ export default {
     },
     /**
      * 菜单重命名
-    */
+     */
     handleFileResetName(mouseEvent, event, { file, parent }) {
       this.resetName.type = 'reset'
       this.resetNameVisible = true
@@ -512,7 +514,7 @@ export default {
      * 判断是否有相同名称
      */
     handleHasName(list, values) {
-      const isHas = list.filter(item => {
+      const isHas = list.filter((item) => {
         return item.name === values.name
       })
       console.log(isHas)
@@ -523,5 +525,5 @@ export default {
 </script>
 
 <style lang="styl" scoped>
-@import "../../../components/menu/menu.styl";
+@import '../../../components/menu/menu.styl';
 </style>
