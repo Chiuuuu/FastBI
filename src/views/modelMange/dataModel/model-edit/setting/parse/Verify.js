@@ -57,8 +57,11 @@ export class Verify {
           }
           const result = this.methods[func.value].apply(
             this,
-            expr.args.map(arg => {
-              return this.validate(arg)
+            expr.args.map((arg, index) => {
+              if (this.argHasFun(arg)) {
+                throw new Error('不支持嵌套函数')
+              }
+              return this.validateFun(arg, index, func)
             })
           )
           return expr.isNeg ? -result : result
@@ -97,6 +100,87 @@ export class Verify {
         throw new Error("I don't know how to validate " + expr)
     }
   }
+
+  // 判断参数中是否含有函数
+  argHasFun(arg) {
+    if (arg.left) {
+      return this.argHasFun(arg.left) && this.argHasFun(arg.right)
+    } else {
+      return arg.type === 'fun'
+    }
+  }
+
+  // 针对不同的函数作出调整
+  validateFun(arg, index, func) {
+    switch (func.value) {
+      // 逻辑判断支持等式运算
+      case 'LOGICAND':
+      case 'LOGICOR':
+        return arg.type === 'assign' ? this.validateCaseAssign(arg) : this.validate(arg)
+
+      // 财务运算-年金函数
+      case 'PMT': {
+        console.log(index, this.validate(arg))
+        const result = this.validate(arg)
+        if (index === 0) {
+          if (result.type !== 'float' && result.type !== 'integer') {
+            throw new Error('Rate仅支持数字类型')
+          }
+        } else if (index === 1) {
+          if (result.type !== 'integer') {
+            throw new Error('Nper仅支持整数类型')
+          }
+        } else if (index === 2) {
+          if (result.type !== 'float' && result.type !== 'integer') {
+            throw new Error('Pv仅支持数字类型')
+          }
+        } else if (index === 3) {
+          if (result.type !== 'float' && result.type !== 'integer') {
+            throw new Error('Fv仅支持数字类型')
+          }
+        } else if (index === 4) {
+          if (result.value !== 0 && result.value !== 1) {
+            throw new Error('Type仅支持0或1')
+          }
+        }
+        return {
+          type: result.type,
+          value: true
+        }
+      }
+
+      default:
+        return this.validate(arg)
+    }
+  }
+
+  // 由于目前只有逻辑运算才需要校验等式, 所以暂时单拎出来
+  validateCaseAssign(expr) {
+    const left = this.validate(expr.left)
+    const right = this.validate(expr.right)
+    // 等式左边
+    if (!['integer', 'float', 'neg', 'alias'].includes(left.type) || left.value === false) {
+      throw Error(`聚合粒度错误: 等式左边必须为数字类型`)
+    }
+    if (left.type === 'alias') {
+      const type = left.value.dataType
+      if (type !== 'BIGINT' && type !== 'DOUBLE') {
+        throw Error(`聚合粒度错误: 等式左边必须为数字类型`)
+      }
+    }
+    // 等式右边
+    if (!['integer', 'float', 'neg', 'alias'].includes(right.type) || right.value === false) {
+      throw Error(`聚合粒度错误: 等式右边必须为数字类型`)
+    }
+    if (right.type === 'alias') {
+      const type = right.value.dataType
+      if (type !== 'BIGINT' && type !== 'DOUBLE') {
+        throw Error(`聚合粒度错误: 等式右边必须为数字类型`)
+      }
+    }
+    return right
+  }
+
   evaluate(operator, left, right) {
     function num(x) {
       if (typeof x === 'number') {
@@ -119,11 +203,11 @@ export class Verify {
       return item.dataType === 'BIGINT'
     }
 
-        /**
-     * @description 是否字符串
-     * @param {Object} item
-     * @returns
-     */
+    /**
+ * @description 是否字符串
+ * @param {Object} item
+ * @returns
+ */
     function isString(item) {
       return item.dataType === 'VARCHAR'
     }

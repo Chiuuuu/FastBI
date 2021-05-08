@@ -53,6 +53,10 @@ export class TokenStream {
     {
       name: 'ATTR',
       got: 1
+    },
+    {
+      name: 'AVG',
+      min: 1
     }
   ];
   FNAME = [
@@ -63,6 +67,42 @@ export class TokenStream {
     {
       name: 'MINIMUM',
       min: 2
+    },
+    {
+      name: 'ABS', // 绝对值
+      got: 1
+    },
+    {
+      name: 'ROUND', // 四舍五入
+      got: 1
+    },
+    {
+      name: 'INT', // 向下取整
+      got: 1
+    },
+    {
+      name: 'TODAY', // 今天日期
+      got: 0
+    },
+    {
+      name: 'NOW', // 现在时间
+      got: 0
+    },
+    {
+      name: 'LEN', // 字符串长度
+      got: 1 // string
+    },
+    {
+      name: 'LOGICAND', // 逻辑与
+      min: 1
+    },
+    {
+      name: 'LOGICOR', // 逻辑或
+      min: 1
+    },
+    {
+      name: 'PMT', // 年金函数PMT(财务)
+      got: 5 // (Rate: float, Nper: integer, Pv: float | integer, Fv: float | integer, Type: 0 | 1)
     }
   ]
 

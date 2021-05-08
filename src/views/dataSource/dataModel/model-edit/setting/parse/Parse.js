@@ -445,7 +445,6 @@ export class Parse {
     if (func && func.type === 'aggregator') {
       this.argsValidata(func, args)
     }
-
     return args
   }
 
