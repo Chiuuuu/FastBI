@@ -139,6 +139,19 @@ const list = [
               show: true
             }
           },
+					dataZoom: {
+						show: true,
+						height: 25,
+						bottom:'6%',
+						handleSize: '110%',
+						handleStyle:{
+							color:"#d3dee5",
+						},
+						textStyle:{
+							color:"#fff"
+						},
+						borderColor:"#90979c"
+					},
           series: {
             type: 'line',
             smooth: false, // 可选的
@@ -155,7 +168,10 @@ const list = [
             areaStyle: {
               // 可选的
               opacity: 0
-            }
+            },
+						emphasis: {
+							focus: 'series'
+						},
           },
           color: DEFAULT_COLORS
         },
@@ -289,6 +305,19 @@ const list = [
               show: true
             }
           },
+					dataZoom: {
+						show: true,
+						height: 25,
+						bottom:'6%',
+						handleSize: '110%',
+						handleStyle:{
+							color:"#d3dee5",
+						},
+						textStyle:{
+							color:"#fff"
+						},
+						borderColor:"#90979c"
+					},
           series: {
             label: {
               show: false,
@@ -539,6 +568,9 @@ const list = [
             }
           },
           series: {
+						emphasis: { //
+							focus: 'self',
+						},
             label: {
               show: true,
               color: '',
@@ -548,7 +580,8 @@ const list = [
             },
             roseType: false, // 饼图可选玫瑰图
             center: ['50%', '50%'], // 饼图可选
-            radius: ['0', '70%'] // 饼图可选
+            radius: ['0', '70%'] ,// 饼图可选
+						
           },
           color: DEFAULT_COLORS
         },

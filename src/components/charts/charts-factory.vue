@@ -32,6 +32,7 @@
       :extend="chartExtend"
       :options="chartOptions"
       :settings="chartSettings"
+			:after-set-option="afterSetOption"
     ></component>
     <!-- <div v-else class="dv-charts-null">
       <a-icon  type="pie-chart" style="font-size:50px;" />
@@ -84,8 +85,38 @@ export default {
     this.chartEvents = {
       click: function(e) {
         self.name = e.name
-        console.log(e)
-      }
+      },
+			mouseover: function(e) {
+				// 笔刷 -- 柱状图/饼图  -- 鼠标移入
+				if(!['v-pie','v-bar','v-histogram'].includes(self.chartType)){
+					return
+				}
+				let option = self.chartObj.getOption()
+				let dataIndex = e.dataIndex;
+				option.series.forEach((item,index)=>{
+					item.itemStyle = {
+						opacity:0.2
+					}
+					item.emphasis.itemStyle = {
+						opacity:1
+					}
+				})
+				self.chartObj.setOption(option);
+			},
+			mouseout: function(e) {
+				// 笔刷 -- 柱状图/饼图  -- 鼠标移出
+				if(!['v-pie','v-bar','v-histogram'].includes(self.chartType)){
+					return
+				}
+				let option = self.chartObj.getOption()
+				let dataIndex = e.dataIndex;
+				option.series.forEach((item,index)=>{
+					item.itemStyle = {
+						opacity:1
+					}
+				})
+				self.chartObj.setOption(option);
+			},
     }
     return {
       wrapStyle: {},
@@ -102,7 +133,8 @@ export default {
       chartOptions: {},
       chartSettings: {},
       backgroundStyle: {},
-      colors: []
+      colors: [],
+			chartObj:{},//echart实例
     }
   },
   watch: {
@@ -160,7 +192,6 @@ export default {
           }
           this.chartData.columns = val.columns
           this.chartData.rows = val.rows
-
           // if (val.source) {
           //   let data = formatData(val.source)
           //   // let data = val.source
@@ -231,7 +262,11 @@ export default {
       }
       this.width = width + 'px'
       this.height = height + 'px'
-    }
+    },
+		// 获取echarts实例
+		afterSetOption(chartObj){
+			this.chartObj = chartObj;
+		}
   },
   computed: {
     titleStyle() {

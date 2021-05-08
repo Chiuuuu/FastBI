@@ -1903,7 +1903,21 @@
                 ></a-input-number>
               </gui-field>
             </a-collapse-panel>
+						<!-- 缩放 柱状图折线图 -->
+						<template v-if="showDataZoom">
+							<a-collapse-panel key="dataZoom" header="缩放">
+							  <a-switch
+							    slot="extra"
+							    v-if="collapseActive.indexOf('dataZoom') > -1"
+							    v-model="selfConfig.dataZoom.show"
+							    default-checked
+							    @change="switchChange"
+							    size="small"
+							  />
+							</a-collapse-panel>
+					  </template>
           </a-collapse>
+					
         </div>
         <div v-else-if="tabsType === 1">
           <data-source></data-source>
@@ -1985,7 +1999,6 @@ export default {
       backgroundApi: {},
       predefineColors: DEFAULT_COLORS,
       dataSource: '',
-
       activeKey: ['1'],
       radioStyle: {
         display: 'flex',
@@ -2424,7 +2437,12 @@ export default {
       return (
         this.selfConfig.yAxis && (this.isLine || this.isHistogram || this.isBar)
       )
-    }
+    },
+		showDataZoom(){
+			return (
+			  this.selfConfig.dataZoom && (this.isLine || this.isBar || this.isHistogram)
+			)
+		}
   },
   components: { GuiField, GuiInline, GuiColors, DataSource }
 }
