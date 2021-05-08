@@ -182,6 +182,110 @@ const expression = [
     example: '[总人口] / [城市数量]',
     syntax: '表达式1 / 表达式2',
     groups: ['calculation']
+  },
+  {
+    id: 'COUNT',
+    name: '计数',
+    expression: 'COUNT(表达式)',
+    description: '返回所有符合表达式的字段。COUNT 只能用于数字字段。',
+    example: 'COUNT([城市数量])',
+    syntax: 'COUNT(表达式)',
+    groups: ['calculation']
+  },
+  {
+    id: 'AVG',
+    name: '平均值',
+    expression: 'AVG(表达式1, 表达式2)',
+    description: '返回表达式中所有值的总和的平均值。AVG 只能用于数字字段。',
+    example: 'AVG([总人口], [城市数量])',
+    syntax: 'AVG(表达式1, 表达式2)',
+    groups: ['calculation']
+  },
+  {
+    id: 'ABS',
+    name: '绝对值',
+    expression: 'ABS(表达式)',
+    description: '返回表达式的绝对值。ABS 只能用于数字字段。',
+    example: 'ABS([总人口])',
+    syntax: 'ABS(表达式)',
+    groups: ['calculation']
+  },
+  {
+    id: 'ROUND',
+    name: '四舍五入',
+    expression: 'ROUND(表达式)',
+    description: '返回表达式四舍五入后的值。ROUND 只能用于数字字段。',
+    example: 'ROUND([总人口])',
+    syntax: 'ROUND(表达式)',
+    groups: ['calculation']
+  },
+  {
+    id: 'INT',
+    name: '取整',
+    expression: 'INT(表达式)',
+    description: '返回表达式的整数值。INT 只能用于数字字段。',
+    example: 'INT([总人口])',
+    syntax: 'INT(表达式)',
+    groups: ['calculation']
+  },
+  {
+    id: 'LEN',
+    name: '字符长度',
+    expression: 'LEN(表达式)',
+    description: '返回表达式的字符长度。LEN 只能用于字符字段。',
+    example: 'LEN([总人口])',
+    syntax: 'LEN(表达式)',
+    groups: ['calculation']
+  },
+  {
+    id: 'NOW',
+    name: '当前时间',
+    expression: 'NOW()',
+    description: '返回当前时间。',
+    example: 'NOW()',
+    syntax: 'NOW()',
+    groups: ['date']
+  },
+  {
+    id: 'TODAY',
+    name: '当前日期',
+    expression: 'TODAY()',
+    description: '返回当前日期。',
+    example: 'TODAY()',
+    syntax: 'TODAY()',
+    groups: ['date']
+  },
+  {
+    id: 'PMT',
+    name: '年金PMT',
+    expression: 'PMT(表达式1, 表达式2, 表达式3, 表达式4, 表达式5)',
+    description: `PMT(Rate, Nper, Pv, Fv, Type) 
+    \\nRate贷款利率（期利率）。
+    \\nNper该项贷款的付款总期数(总年数或还租期数）。
+    \\nPv现值（租赁本金），或一系列未来付款的当前值的累积和，也称为本金。
+    \\nFv为未来值（余值），或在最后一次付款后希望得到的现金余额，如果省略Fv，则假设其值为零，也就是一笔贷款的未来值为零。
+    \\nType数字0或1，用以指定各期的付款时间是在期初还是期末。1代表期初（先付：每期的第一天付），不输入或输入0代表期末（后付：每期的最后一天付）。`,
+    example: 'PMT()',
+    syntax: 'PMT()',
+    groups: ['calculation']
+  },
+  {
+    id: 'LOGICAND',
+    name: '逻辑与',
+    expression: 'LOGICAND(logic1, logic2, logic3)',
+    description: '检查所有参数是否为TRUE, 所有参数均为TRUE则返回TRUE, 否则返回FALSE。',
+    example: 'LOGICAND([城市数量], [及格人数] + [不及格人数] = [总人数], ...)',
+    syntax: 'LOGICAND(logic1, logic2, logic3)',
+    groups: ['logic']
+  },
+  {
+    id: 'LOGICOR',
+    name: '逻辑或',
+    expression: 'LOGICOR([城市数量], [及格人数] + [不及格人数] = [总人数], ...)',
+    description: '检查所有参数是否为TRUE, 任一参数均为TRUE则返回TRUE, 否则返回FALSE。',
+    example: 'LOGICOR(logic1, logic2, logic3)',
+    syntax: 'LOGICOR(logic1, logic2, logic3)',
+    groups: ['logic']
   }
 ]
 

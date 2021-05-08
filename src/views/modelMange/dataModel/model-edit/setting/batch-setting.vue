@@ -7,23 +7,29 @@
     @close="handleClose"
   >
     <div class="drawer-btn">
-      <a-button style="width: 110px"
+      <a-button
+        style="width: 110px"
         :disabled="!fieldSetable"
-        @click="handleShowSetting($event, 'dataType')">设置字段类型</a-button>
-      <a-button style="width: 110px"
+        @click="handleShowSetting($event, 'dataType')"
+      >设置字段类型</a-button>
+      <a-button
+        style="width: 110px"
         :disabled="!selectDrawer"
-        @click="handleShowSetting($event, 'role')">设置字段属性</a-button>
-      <a-button style="width: 110px"
+        @click="handleShowSetting($event, 'role')"
+      >设置数据属性</a-button>
+      <a-button
+        style="width: 110px"
         :disabled="!selectDrawer"
-        @click="handleShowSetting($event, 'visible')">设置是否可见</a-button>
+        @click="handleShowSetting($event, 'visible')"
+      >设置是否可见</a-button>
     </div>
-    <div v-if="Object.keys(cacheTables).length > 0"
-         class="drawer-menu draw-menu-batch scrollbar">
+    <div v-if="Object.keys(cacheTables).length > 0" class="drawer-menu draw-menu-batch scrollbar">
       <a-collapse style="width: 100%">
         <a-collapse-panel
           v-for="(value, name) in cacheTables"
           :key="name"
-          :header="handleGetPanelName(value[0].tableName)">
+          :header="handleGetPanelName(value[0].tableName)"
+        >
           <BatchSettingItem
             :tableData="value"
             @deleteSelectAllRows="handleDeleteSelectAllRows"
@@ -37,7 +43,8 @@
       </a-collapse>
     </div>
     <a-empty v-else class="drawer-menu" />
-    <div :style="{
+    <div
+      :style="{
         position: 'absolute',
         right: 0,
         bottom: 0,
@@ -47,40 +54,36 @@
         background: '#fff',
         textAlign: 'right',
         zIndex: 1,
-      }">
-      <a-button :style="{ marginRight: '8px' }" @click="$emit('close')">
-        取消
-      </a-button>
-      <a-button type="primary" @click="handleSave"> 保存 </a-button>
+      }"
+    >
+      <a-button :style="{ marginRight: '8px' }" @click="$emit('close')">取消</a-button>
+      <a-button type="primary" @click="handleSave">保存</a-button>
     </div>
     <a-modal
       :visible="showSetting"
       :afterClose="handleAfterClose"
       @cancel="handleCancelModal"
-      @ok="handleBatchSetting">
+      @ok="handleBatchSetting"
+    >
       <template v-if="setType === 'dataType'">
         <a-form-model :model="modalForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
           <a-form-model-item label="字段类型" required>
             <a-select default-value="BIGINT" style="width: 100px" v-model="modalForm.dataType">
-              <a-select-option value="BIGINT"> 整数 </a-select-option>
-              <a-select-option value="DOUBLE"> 小数 </a-select-option>
-              <a-select-option value="VARCHAR"> 字符串 </a-select-option>
-              <a-select-option value="DATE"> 日期 </a-select-option>
-              <a-select-option value="TIMESTAMP"> 日期时间 </a-select-option>
+              <a-select-option value="BIGINT">整数</a-select-option>
+              <a-select-option value="DOUBLE">小数</a-select-option>
+              <a-select-option value="VARCHAR">字符串</a-select-option>
+              <a-select-option value="DATE">日期</a-select-option>
+              <a-select-option value="TIMESTAMP">日期时间</a-select-option>
             </a-select>
           </a-form-model-item>
         </a-form-model>
       </template>
       <template v-else-if="setType === 'role'">
         <a-form-model :model="modalForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
-          <a-form-model-item label="字段属性" required>
+          <a-form-model-item label="数据属性" required>
             <a-radio-group name="batchRole" :default-value="1" v-model="modalForm.role">
-              <a-radio :value="1">
-                维度
-              </a-radio>
-              <a-radio :value="2">
-                度量
-              </a-radio>
+              <a-radio :value="1">维度</a-radio>
+              <a-radio :value="2">度量</a-radio>
             </a-radio-group>
           </a-form-model-item>
         </a-form-model>
@@ -89,12 +92,8 @@
         <a-form-model :model="modalForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
           <a-form-model-item label="是否可见" required>
             <a-radio-group name="batchVisible" :default-value="true" v-model="modalForm.visible">
-              <a-radio :value="true">
-                是
-              </a-radio>
-              <a-radio :value="false">
-                否
-              </a-radio>
+              <a-radio :value="true">是</a-radio>
+              <a-radio :value="false">否</a-radio>
             </a-radio-group>
           </a-form-model-item>
         </a-form-model>
@@ -136,8 +135,13 @@ export default {
       return this.selectedRows.length > 0
     },
     fieldSetable() {
-      // 相同的字段属性(维度度量)才能批量设置字段类型
-      return this.selectDrawer && !this.selectedRows.some((item, index, list) => list[0].role !== item.role)
+      // 相同的数据属性(维度度量)才能批量设置字段类型
+      return (
+        this.selectDrawer &&
+        !this.selectedRows.some(
+          (item, index, list) => list[0].role !== item.role
+        )
+      )
     }
   },
   watch: {
@@ -172,7 +176,9 @@ export default {
       pullAllBy(this.selectedRows, [record], 'id')
     },
     handleSelect(value, record, index) {
-      const has = Object.keys(this.cacheTables).some(item => (item === record.tableNo) || (item === `${record.tableNo}`))
+      const has = Object.keys(this.cacheTables).some(
+        (item) => item === record.tableNo || item === `${record.tableNo}`
+      )
       if (has) {
         this.cacheTables[record.tableNo].splice(index, 1, {
           ...record,
@@ -180,11 +186,11 @@ export default {
         })
       }
     },
-    handleCheckName: debounce(function(event) {
+    handleCheckName: debounce(function (event) {
       const value = event.target.value
       let hasSame = false
-      Object.values(this.tables).forEach(list => {
-        if (list.some(item => item.alias === value)) {
+      Object.values(this.tables).forEach((list) => {
+        if (list.some((item) => item.alias === value)) {
           hasSame = true
         }
       })
@@ -223,9 +229,9 @@ export default {
     },
     saveBatchFiled() {
       let value = this.modalForm[this.setType]
-      this.selectedRows.forEach(item => {
-        Object.keys(this.cacheTables).forEach(key => {
-          this.cacheTables[key].forEach(table => {
+      this.selectedRows.forEach((item) => {
+        Object.keys(this.cacheTables).forEach((key) => {
+          this.cacheTables[key].forEach((table) => {
             if (item.id === table.id) {
               table[this.setType] = value
             }

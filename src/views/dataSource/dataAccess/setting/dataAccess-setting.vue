@@ -17,7 +17,7 @@
               <a-icon slot="prefix" type="search" />
             </a-input>
             <a-button :disabled="!fieldSetable" v-on:click="handleShowSetting('convertType')">设置字段类型</a-button>
-            <a-button :disabled="!selectDrawer" v-on:click="handleShowSetting('role')">设置字段属性</a-button>
+            <a-button :disabled="!selectDrawer" v-on:click="handleShowSetting('role')">设置数据属性</a-button>
             <a-button :disabled="!selectDrawer" v-on:click="handleShowSetting('visible')">设置是否可见</a-button>
           </div>
           <div class="table">
@@ -100,7 +100,7 @@
             </template>
             <template v-else-if="setType === 'role'">
               <a-form-model :model="modalForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
-                <a-form-model-item label="字段属性" prop="role" required>
+                <a-form-model-item label="数据属性" prop="role" required>
                   <a-radio-group name="batchRole" :default-value="1" v-model="modalForm.role">
                     <a-radio :value="1">维度</a-radio>
                     <a-radio :value="2">度量</a-radio>
@@ -164,7 +164,7 @@ const columns = [
     scopedSlots: { customRender: 'convertType' }
   },
   {
-    title: '字段属性',
+    title: '数据属性',
     dataIndex: 'role',
     scopedSlots: { customRender: 'role' }
   },
@@ -262,7 +262,7 @@ export default {
       return this.selectedRows.length > 0
     },
     fieldSetable() {
-      // 相同的字段属性(维度度量)才能批量设置字段类型
+      // 相同的数据属性(维度度量)才能批量设置字段类型
       return (
         this.selectDrawer &&
         !this.selectedRows.some(

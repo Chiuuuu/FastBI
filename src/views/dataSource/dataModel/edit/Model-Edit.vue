@@ -6,9 +6,7 @@
       </div>
       <div class="selector">
         <a-select default-value="银行账户" style="width: 94%;">
-          <a-select-option value="SQL Server">
-            SQL Server
-          </a-select-option>
+          <a-select-option value="SQL Server">SQL Server</a-select-option>
         </a-select>
       </div>
       <a-divider />
@@ -29,7 +27,7 @@
           </a-select-option>
         </a-select>
       </div>
-      <a-divider /> -->
+      <a-divider />-->
       <div class="menu_search">
         <span class="search_span">表</span>
         <a-input placeholder="请输入关键词搜索" class="search_input">
@@ -41,34 +39,22 @@
       <div class="SQL_View">
         <!-- <div class="view-head">
           <span>自定义SQL视图</span>
-        </div> -->
+        </div>-->
         <div>
-          <a-menu
-            :default-selected-keys="['1']"
-            :open-keys.sync="openKeys"
-            mode="inline"
-          >
+          <a-menu :default-selected-keys="['1']" :open-keys.sync="openKeys" mode="inline">
             <a-sub-menu>
               <span slot="title">
                 <span class="view_title">自定义SQL视图</span>
               </span>
               <a-menu-item>
                 <a-dropdown :trigger="['contextmenu']">
-              <div>
-                银行账户
-                </div>
-              <a-menu slot="overlay">
-                <a-menu-item v-on:click="check">
-                  查看表
-                </a-menu-item>
-                <a-menu-item>
-                  编辑
-                </a-menu-item>
-                <a-menu-item>
-                  删除
-                </a-menu-item>
-              </a-menu>
-            </a-dropdown>
+                  <div>银行账户</div>
+                  <a-menu slot="overlay">
+                    <a-menu-item v-on:click="check">查看表</a-menu-item>
+                    <a-menu-item>编辑</a-menu-item>
+                    <a-menu-item>删除</a-menu-item>
+                  </a-menu>
+                </a-dropdown>
               </a-menu-item>
               <!-- <a-menu-item>
                 Option 10
@@ -78,7 +64,7 @@
               </a-menu-item>
               <a-menu-item>
                 Option 12
-              </a-menu-item> -->
+              </a-menu-item>-->
             </a-sub-menu>
           </a-menu>
         </div>
@@ -89,35 +75,25 @@
         <span class="data_con">数据模型1</span>
       </div>
       <div class="description">
-        <span class="d-s">描述： <a-icon type="edit" v-on:click="open"/></span>
+        <span class="d-s">
+          描述：
+          <a-icon type="edit" v-on:click="open" />
+        </span>
         <a-modal v-model="visible1" title="编辑描述" v-on:ok="close">
-          <a-textarea
-            placeholder="请输入描述内容"
-            :auto-size="{ minRows: 7, maxRows: 10 }"
-          />
+          <a-textarea placeholder="请输入描述内容" :auto-size="{ minRows: 7, maxRows: 10 }" />
         </a-modal>
       </div>
       <div class="draw_board">
-        <edit-right-top ref='rightTopRef'></edit-right-top>
+        <edit-right-top ref="rightTopRef"></edit-right-top>
       </div>
       <div class="detail">
         <div class="detail_header">
           <span>数据模型详情</span>
           <div class="detail_btn">
             <a-button v-on:click="check">查看表宽</a-button>
-            <a-modal
-              v-model="visible"
-              title="查看宽表"
-              v-on:ok="close"
-              width="854px"
-              okText="导出宽表"
-            >
+            <a-modal v-model="visible" title="查看宽表" v-on:ok="close" width="854px" okText="导出宽表">
               <div>
-                <a-table
-                  :columns="columns"
-                  :data-source="data"
-                  :scroll="{ x: 1000, y: 300 }"
-                >
+                <a-table :columns="columns" :data-source="data" :scroll="{ x: 1000, y: 300 }">
                   <a slot="action">action</a>
                 </a-table>
               </div>
@@ -132,7 +108,7 @@
             >
               <div class="drawer-btn">
                 <a-button style="width:110px">设置字段类型</a-button>
-                <a-button style="width:110px">设置字段属性</a-button>
+                <a-button style="width:110px">设置数据属性</a-button>
                 <a-button style="width:110px">设置是否可见</a-button>
               </div>
               <div class="drawer-menu">
@@ -149,28 +125,16 @@
                       </span>
                       <span slot="type">
                         <a-select default-value="数字" style="width:100px;">
-                          <a-select-option value="int">
-                            整数
-                          </a-select-option>
-                          <a-select-option value="date">
-                            日期时间
-                          </a-select-option>
-                          <a-select-option value="string">
-                            字符串
-                          </a-select-option>
-                          <a-select-option value="double">
-                            小数
-                          </a-select-option>
+                          <a-select-option value="int">整数</a-select-option>
+                          <a-select-option value="date">日期时间</a-select-option>
+                          <a-select-option value="string">字符串</a-select-option>
+                          <a-select-option value="double">小数</a-select-option>
                         </a-select>
                       </span>
                       <span slot="property">
                         <a-select default-value="维度">
-                          <a-select-option value="dim">
-                            维度
-                          </a-select-option>
-                          <a-select-option value="mea">
-                            度量
-                          </a-select-option>
+                          <a-select-option value="dim">维度</a-select-option>
+                          <a-select-option value="mea">度量</a-select-option>
                         </a-select>
                       </span>
                       <span slot="description">
@@ -178,12 +142,8 @@
                       </span>
                       <span slot="isShow">
                         <a-select default-value="是">
-                          <a-select-option value="yes">
-                            是
-                          </a-select-option>
-                          <a-select-option value="no">
-                            否
-                          </a-select-option>
+                          <a-select-option value="yes">是</a-select-option>
+                          <a-select-option value="no">否</a-select-option>
                         </a-select>
                       </span>
                     </a-table>
@@ -203,12 +163,8 @@
                   zIndex: 1
                 }"
               >
-                <a-button :style="{ marginRight: '8px' }">
-                  取消
-                </a-button>
-                <a-button type="primary" @click="onClose">
-                  保存
-                </a-button>
+                <a-button :style="{ marginRight: '8px' }">取消</a-button>
+                <a-button type="primary" @click="onClose">保存</a-button>
               </div>
             </a-drawer>
           </div>
@@ -218,19 +174,11 @@
             <span class="dim_span">维度</span>
             <div class="dim_operation">
               <a v-on:click="dim_mea" style="line-height:38px">新建计算维度</a>
-              <a-modal
-                v-model="visible2"
-                title="新建计算字段（维度）"
-                width="800px"
-              >
+              <a-modal v-model="visible2" title="新建计算字段（维度）" width="800px">
                 <div class="mod">
                   <div class="modal_l">
                     <div class="set">
-                      <a-form
-                        :form="form"
-                        :label-col="{ span: 5 }"
-                        :wrapper-col="{ span: 12 }"
-                      >
+                      <a-form :form="form" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
                         <a-form-item label="名称">
                           <a-input
                             style="width: 257px;"
@@ -261,12 +209,8 @@
                               ]"
                               placeholder="插入维度"
                             >
-                              <a-select-option value="aaa">
-                                aaa
-                              </a-select-option>
-                              <a-select-option value="bbb">
-                                bbb
-                              </a-select-option>
+                              <a-select-option value="aaa">aaa</a-select-option>
+                              <a-select-option value="bbb">bbb</a-select-option>
                             </a-select>
                             <a-select
                               style="width: 110px;"
@@ -280,12 +224,8 @@
                               ]"
                               placeholder="插入度量"
                             >
-                              <a-select-option value="ccc">
-                                ccc
-                              </a-select-option>
-                              <a-select-option value="ddd">
-                                ddd
-                              </a-select-option>
+                              <a-select-option value="ccc">ccc</a-select-option>
+                              <a-select-option value="ddd">ddd</a-select-option>
                             </a-select>
                           </div>
                         </a-form-item>
@@ -311,64 +251,36 @@
                         <a-select-option
                           v-for="express in expression"
                           :key="express.key"
-                        >
-                          {{ express.name }}
-                        </a-select-option>
+                        >{{ express.name }}</a-select-option>
                       </a-select>
                     </div>
-                    <div class="text">
-                      {{ expression[activeIndex].text }}
-                    </div>
+                    <div class="text">{{ expression[activeIndex].text }}</div>
                   </div>
                 </div>
               </a-modal>
               <a-divider type="vertical" />
               <a v-on:click="geography">设置地理位置</a>
-              <a-modal
-                v-model="visible4"
-                title="创建地理字段"
-                okText="确定"
-                width="750px"
-              >
+              <a-modal v-model="visible4" title="创建地理字段" okText="确定" width="750px">
                 <div class="cacsader">
-                  <span>国家： </span>
+                  <span>国家：</span>
                   <a-select
                     :default-value="countryData[0]"
                     style="width: 100px"
                     @change="handlecountryChange"
                   >
-                    <a-select-option
-                      v-for="country in countryData"
-                      :key="country"
-                    >
-                      {{ country }}
-                    </a-select-option>
+                    <a-select-option v-for="country in countryData" :key="country">{{ country }}</a-select-option>
                   </a-select>
-                  <span>省市： </span>
-                  <a-select
-                    v-model="province"
-                    style="width: 100px"
-                    @change="handleprovinceChange"
-                  >
-                    <a-select-option v-for="pro in provinces" :key="pro">
-                      {{ pro }}
-                    </a-select-option>
+                  <span>省市：</span>
+                  <a-select v-model="province" style="width: 100px" @change="handleprovinceChange">
+                    <a-select-option v-for="pro in provinces" :key="pro">{{ pro }}</a-select-option>
                   </a-select>
-                  <span>城市： </span>
-                  <a-select
-                    v-model="city"
-                    style="width: 100px"
-                    @change="handlecityChange"
-                  >
-                    <a-select-option v-for="city in cities" :key="city">
-                      {{ city }}
-                    </a-select-option>
+                  <span>城市：</span>
+                  <a-select v-model="city" style="width: 100px" @change="handlecityChange">
+                    <a-select-option v-for="city in cities" :key="city">{{ city }}</a-select-option>
                   </a-select>
-                  <span>区县： </span>
+                  <span>区县：</span>
                   <a-select v-model="area" style="width: 100px">
-                    <a-select-option v-for="area in areas" :key="area">
-                      {{ area }}
-                    </a-select-option>
+                    <a-select-option v-for="area in areas" :key="area">{{ area }}</a-select-option>
                   </a-select>
                 </div>
                 <div class="geo-contain">
@@ -380,13 +292,11 @@
                     </div>
                     <div class="set-select">
                       <div>
-                        <span class="s-s-s">请选择匹配字段: </span>
+                        <span class="s-s-s">请选择匹配字段:</span>
                       </div>
                       <div>
                         <a-select default-value="分公司" style="width: 390px">
-                          <a-select-option value="分公司">
-                            分公司
-                          </a-select-option>
+                          <a-select-option value="分公司">分公司</a-select-option>
                         </a-select>
                       </div>
                     </div>
@@ -404,36 +314,28 @@
             <div class="dim_menu scrollbar">
               <a-menu mode="inline">
                 <a-sub-menu>
-                  <span slot="title"><span>银行账户</span></span>
+                  <span slot="title">
+                    <span>银行账户</span>
+                  </span>
                   <a-menu-item>
-                    <img
-                      src="@/assets/images/icon_dimension.png"
-                      style="width:15px;height:15px"
-                    />
+                    <img src="@/assets/images/icon_dimension.png" style="width:15px;height:15px" />
                     aaa
                   </a-menu-item>
                   <a-menu-item>
-                    <img
-                      src="@/assets/images/icon_dimension.png"
-                      style="width:15px;height:15px"
-                    />
+                    <img src="@/assets/images/icon_dimension.png" style="width:15px;height:15px" />
                     bbb
                   </a-menu-item>
                 </a-sub-menu>
                 <a-sub-menu>
-                  <span slot="title"><span>统计需求</span></span>
+                  <span slot="title">
+                    <span>统计需求</span>
+                  </span>
                   <a-menu-item>
-                    <img
-                      src="@/assets/images/icon_dimension.png"
-                      style="width:15px;height:15px"
-                    />
+                    <img src="@/assets/images/icon_dimension.png" style="width:15px;height:15px" />
                     ccc
                   </a-menu-item>
                   <a-menu-item>
-                    <img
-                      src="@/assets/images/icon_dimension.png"
-                      style="width:15px;height:15px"
-                    />
+                    <img src="@/assets/images/icon_dimension.png" style="width:15px;height:15px" />
                     ddd
                   </a-menu-item>
                 </a-sub-menu>
@@ -448,36 +350,28 @@
             <div class="mea_menu scrollbar">
               <a-menu mode="inline">
                 <a-sub-menu>
-                  <span slot="title"><span>银行账户</span></span>
+                  <span slot="title">
+                    <span>银行账户</span>
+                  </span>
                   <a-menu-item>
-                    <img
-                      src="@/assets/images/icon_measure.png"
-                      style="width:15px;height:15px"
-                    />
+                    <img src="@/assets/images/icon_measure.png" style="width:15px;height:15px" />
                     aaa
                   </a-menu-item>
                   <a-menu-item>
-                    <img
-                      src="@/assets/images/icon_measure.png"
-                      style="width:15px;height:15px"
-                    />
+                    <img src="@/assets/images/icon_measure.png" style="width:15px;height:15px" />
                     bbb
                   </a-menu-item>
                 </a-sub-menu>
                 <a-sub-menu>
-                  <span slot="title"><span>统计需求</span></span>
+                  <span slot="title">
+                    <span>统计需求</span>
+                  </span>
                   <a-menu-item>
-                    <img
-                      src="@/assets/images/icon_measure.png"
-                      style="width:15px;height:15px"
-                    />
+                    <img src="@/assets/images/icon_measure.png" style="width:15px;height:15px" />
                     ccc
                   </a-menu-item>
                   <a-menu-item>
-                    <img
-                      src="@/assets/images/icon_measure.png"
-                      style="width:15px;height:15px"
-                    />
+                    <img src="@/assets/images/icon_measure.png" style="width:15px;height:15px" />
                     ddd
                   </a-menu-item>
                 </a-sub-menu>
@@ -586,7 +480,7 @@ const column = [
     }
   },
   {
-    title: '字段属性',
+    title: '数据属性',
     dataIndex: 'property',
     scopedSlots: {
       customRender: 'property'
@@ -867,7 +761,7 @@ export default {
     },
     onCellChange(key, dataIndex, value) {
       const dataSource = [...this.dataSource]
-      const target = dataSource.find(item => item.key === key)
+      const target = dataSource.find((item) => item.key === key)
       if (target) {
         target[dataIndex] = value
         this.dataSource = dataSource
@@ -875,7 +769,7 @@ export default {
     },
     onDelete(key) {
       const dataSource = [...this.dataSource]
-      this.dataSource = dataSource.filter(item => item.key !== key)
+      this.dataSource = dataSource.filter((item) => item.key !== key)
     },
     handleAdd() {
       const { count, dataSource } = this
@@ -893,5 +787,5 @@ export default {
 </script>
 
 <style lang="styl" scope>
-@import "./Model-Edit.styl";
+@import './Model-Edit.styl';
 </style>

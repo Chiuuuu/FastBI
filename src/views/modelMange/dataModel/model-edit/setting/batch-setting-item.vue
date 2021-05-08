@@ -6,13 +6,15 @@
     :scroll="{ y: 320 }"
     :pagination="false"
     rowKey="id"
-    bordered>
+    bordered
+  >
     <template #alias="text, record">
       <a-input
         v-model="record.alias"
         :maxLength="20"
         @change="handleCheckName"
-        style="width: 156px height: 32px" />
+        style="width: 156px height: 32px"
+      />
     </template>
     <template #dataType="text, record">
       <field-select
@@ -71,7 +73,7 @@ const column = [
     }
   },
   {
-    title: '字段属性',
+    title: '数据属性',
     dataIndex: 'role',
     scopedSlots: {
       customRender: 'role'
@@ -114,8 +116,8 @@ export default {
   },
   data() {
     return {
-        column,
-        fieldContenxtMenu: [
+      column,
+      fieldContenxtMenu: [
         {
           name: '转换为整数',
           dataType: 'BIGINT',
