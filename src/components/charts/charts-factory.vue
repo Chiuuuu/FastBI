@@ -37,6 +37,7 @@
       :extend="chartExtend"
       :options="chartOptions"
       :settings="chartSettings"
+      :after-set-option="afterSetOption"
     ></component>
     <!-- <div v-else class="dv-charts-null">
       <a-icon  type="pie-chart" style="font-size:50px;" />
@@ -90,7 +91,37 @@ export default {
     this.chartEvents = {
       click: function(e) {
         self.name = e.name
-        console.log(e)
+      },
+      mouseover: function(e) {
+        // 笔刷 -- 柱状图/饼图  -- 鼠标移入
+        if (!['v-pie', 'v-bar', 'v-histogram'].includes(self.chartType)) {
+          return
+        }
+        let option = self.chartObj.getOption()
+        let dataIndex = e.dataIndex
+        option.series.forEach((item, index) => {
+          item.itemStyle = {
+            opacity: 0.2
+          }
+          item.emphasis.itemStyle = {
+            opacity: 1
+          }
+        })
+        self.chartObj.setOption(option)
+      },
+      mouseout: function(e) {
+        // 笔刷 -- 柱状图/饼图  -- 鼠标移出
+        if (!['v-pie', 'v-bar', 'v-histogram'].includes(self.chartType)) {
+          return
+        }
+        let option = self.chartObj.getOption()
+        let dataIndex = e.dataIndex
+        option.series.forEach((item, index) => {
+          item.itemStyle = {
+            opacity: 1
+          }
+        })
+        self.chartObj.setOption(option)
       }
     }
     return {
@@ -109,7 +140,8 @@ export default {
       chartSettings: {},
       backgroundStyle: {},
       colors: [],
-      key: 0 // 修改颜色格式后重新渲染图表
+      key: 0, // 修改颜色格式后重新渲染图表
+      chartObj: {} //echart实例
     }
   },
   watch: {
@@ -165,15 +197,6 @@ export default {
           this.chartData.rows = val.rows
           // 折线图，柱状图，饼图，条形图考虑预警颜色
           this.setWarningColor(this.apiData)
-
-          // if (val.source) {
-          //   let data = formatData(val.source)
-          //   // let data = val.source
-          //   this.chartData.columns = [...data.columns]
-          //   this.chartData.rows = [...data.rows]
-          //   this.$log.primary('========>chartData')
-          //   this.$print(this.chartData)
-          // }
         }
       },
       deep: true,
@@ -318,6 +341,10 @@ export default {
             : DEFAULT_COLORS[params.dataIndex]
         }
       }
+    },
+    // 获取echarts实例
+    afterSetOption(chartObj) {
+      this.chartObj = chartObj
     }
   },
   computed: {
