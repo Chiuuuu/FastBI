@@ -139,24 +139,26 @@ const list = [
               show: true
             }
           },
-          series: {
-            type: 'line',
-            smooth: false, // 可选的
-            step: false, // step line
-            lineStyle: {
-              width: 1
-            },
-            label: {
-              show: false,
-              color: '#fff',
-              fontSize: 12,
-              position: 'top'
-            },
-            areaStyle: {
-              // 可选的
-              opacity: 0
+          series: [
+            {
+              type: 'line',
+              smooth: false, // 可选的
+              step: false, // step line
+              lineStyle: {
+                width: 1
+              },
+              label: {
+                show: false,
+                color: '#fff',
+                fontSize: 12,
+                position: 'top'
+              },
+              areaStyle: {
+                // 可选的
+                opacity: 0
+              }
             }
-          },
+          ],
           color: DEFAULT_COLORS
         },
         view: { width: 500, height: 400, x: 710, y: 340 } // 计算中间值(1920-500)*0.5,(1080-400)*0.5
@@ -439,7 +441,10 @@ const list = [
             },
             barWidth: '20%', // 可选
             barGap: '40%',
-            barCategoryGap: '40%'
+            barCategoryGap: '40%',
+            itemStyle: {
+              normal: {}
+            }
           },
           color: DEFAULT_COLORS
         },
@@ -548,7 +553,10 @@ const list = [
             },
             roseType: false, // 饼图可选玫瑰图
             center: ['50%', '50%'], // 饼图可选
-            radius: ['0', '70%'] // 饼图可选
+            radius: ['0', '70%'], // 饼图可选
+            itemStyle: {
+              normal: {}
+            }
           },
           color: DEFAULT_COLORS
         },
@@ -711,6 +719,7 @@ const list = [
             }
           },
           warningValue: 80,
+          targetValue: 80,
           selectedColor: '#f5c942',
           tooltip: {
             show: false
@@ -1178,6 +1187,150 @@ const list = [
           click: chartClick
         },
         view: { width: 400, height: 400, x: 760, y: 340 }
+      },
+      {
+        title: '柱状折线图',
+        chartType: 'v-histogramAndLine',
+        name: 've-histogram',
+        icon: 'icon_histogram.png',
+        type: '1',
+        modelId: '',
+        isEmpty: false,
+        api_data: {
+          columns: ['日期', '访问用户', '下单用户', '下单率'],
+          rows: [
+            { 日期: '1/1', 访问用户: 1393, 下单用户: 1093, 下单率: 0.32 },
+            { 日期: '1/2', 访问用户: 3530, 下单用户: 3230, 下单率: 0.26 },
+            { 日期: '1/3', 访问用户: 2923, 下单用户: 2623, 下单率: 0.76 },
+            { 日期: '1/4', 访问用户: 1723, 下单用户: 1423, 下单率: 0.49 },
+            { 日期: '1/5', 访问用户: 3792, 下单用户: 3492, 下单率: 0.323 },
+            { 日期: '1/6', 访问用户: 4593, 下单用户: 4293, 下单率: 0.78 }
+          ],
+          options: {}
+        },
+        apis: {
+          showLine: ['下单用户'],
+          yAxisName: [],
+          labelMap: {
+            x: '类目',
+            y: '值',
+            s: '系列1'
+          }
+        },
+        background: {
+          backgroundType: '1',
+          backgroundColor: '',
+          borderColor: '',
+          borderWidth: 0,
+          borderStyle: '',
+          borderRadius: 0
+        },
+        config: {
+          stack: false, // 是否是堆叠柱状图
+          mixed: false, // 是否是混合柱状图
+          title: {
+            show: true,
+            content: '柱状图',
+            textAlign: 'left',
+            textStyle: {
+              color: '#ffffff',
+              fontSize: 20
+            }
+          },
+          grid: { left: 50, top: 60, right: 50, bottom: 50 },
+          legend: {
+            show: true,
+            orient: 'horizontal',
+            textStyle: {
+              color: '#ffffff',
+              fontSize: 12
+            },
+            itemGap: 12,
+            icon: '',
+            left: 'center',
+            top: 'auto',
+            right: 'auto',
+            bottom: 'auto'
+          },
+          xAxis: {
+            name: '',
+            nameLocation: 'middle',
+            nameGap: 20,
+            nameTextStyle: {
+              color: '#fff',
+              fontSize: '12',
+              align: 'right',
+              padding: [30, 0, 0, 0]
+            },
+            axisLabel: {
+              color: '#ffffff',
+              fontSize: 12,
+              rotate: 0
+            },
+            axisLine: {
+              show: true,
+              lineStyle: {
+                color: '#fff'
+              }
+            },
+            splitLine: {
+              show: false,
+              lineStyle: {
+                type: 'solid',
+                color: '#fff'
+              }
+            },
+            axisTick: {
+              show: true
+            }
+          },
+          yAxis: {
+            name: '单位:个',
+            position: 'left',
+            nameLocation: 'middle',
+            nameTextStyle: {
+              color: '#fff',
+              fontSize: 12,
+              padding: [0, 0, 40, 0]
+            },
+            axisLabel: {
+              color: '#ffffff',
+              fontSize: 12
+            },
+            axisLine: {
+              show: false,
+              lineStyle: {
+                color: '#fff'
+              }
+            },
+            splitLine: {
+              show: true,
+              lineStyle: {
+                type: 'solid',
+                color: '#fff'
+              }
+            },
+            axisTick: {
+              show: true
+            }
+          },
+          series: {
+            label: {
+              show: false,
+              color: '#fff',
+              fontSize: 12,
+              position: 'top'
+            },
+            itemStyle: {
+              normal: {
+                barBorderRadius: [0]
+              }
+            },
+            barWidth: '20%' // 可选
+          },
+          color: DEFAULT_COLORS
+        },
+        view: { width: 500, height: 400, x: 710, y: 340 }
       }
     ]
   },
