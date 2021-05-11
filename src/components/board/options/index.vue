@@ -1903,6 +1903,21 @@
                 ></a-input-number>
               </gui-field>
             </a-collapse-panel>
+            <a-collapse-panel
+              key="targetvalue"
+              header="目标值"
+              v-if="this.chartType === 'v-gauge'"
+            >
+              <gui-field label="目标值">
+                <a-input-number
+                  v-model="selfConfig.targetValue"
+                  size="small"
+                  :min="0"
+                  :max="currSelected.setting.config.series.max"
+                  @change="setSelfProperty"
+                ></a-input-number>
+              </gui-field>
+            </a-collapse-panel>
           </a-collapse>
         </div>
         <div v-else-if="tabsType === 1">
@@ -2266,11 +2281,17 @@ export default {
       }
       // 混合柱状图
       if (val && type === 'mixed') {
-        this.apis.showLine = [
-          columns[columns.length - 2]
-            ? columns[columns.length - 2]
-            : columns[columns.length - 1]
-        ]
+        this.apis.showLine = apiData.source
+          ? [
+              apiData.source.columns[apiData.source.columns.length - 2]
+                ? apiData.source.columns[columns.length - 2]
+                : apiData.source.columns[columns.length - 1]
+            ]
+          : [
+              columns[columns.length - 2]
+                ? columns[columns.length - 2]
+                : columns[columns.length - 1]
+            ]
         // this.apis.axisSite = { right: columns[columns.length - 2] || [columns[columns.length - 1]] }
       } else {
         this.apis.showLine = []

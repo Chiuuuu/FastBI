@@ -18,6 +18,11 @@
         >预警值：{{ config.warningValue }}</span
       >
     </div>
+    <div class="warningvalue" v-show="chartType === 'v-gauge'">
+      <span :style="{ opacity: config.targetValue ? 1 : 0 }"
+        >目标值：{{ config.targetValue }}</span
+      >
+    </div>
     <component
       v-if="chartData.columns && chartData.columns.length > 0"
       v-bind:is="typeName"
@@ -46,6 +51,7 @@ import {
 } from 'bin-ui/src/utils/resize-event'
 import { formatData, convertData } from '../../utils/formatData'
 import { deepClone } from '@/utils/deepClone'
+import { DEFAULT_COLORS } from '@/utils/defaultColors'
 
 export default {
   name: 'ChartsFactory',
@@ -102,7 +108,8 @@ export default {
       chartOptions: {},
       chartSettings: {},
       backgroundStyle: {},
-      colors: []
+      colors: [],
+      key: 0 // 修改颜色格式后重新渲染图表
     }
   },
   watch: {
@@ -112,10 +119,6 @@ export default {
           // 图例
           this.legendVisible = val.legend && val.legend.show
           this.chartExtend = { ...val }
-
-          // this.colors = [...val.colors]
-          // this.$log.primary('========>chartExtend')
-          // this.$print(this.chartExtend)
         }
       },
       deep: true,
@@ -160,6 +163,8 @@ export default {
           }
           this.chartData.columns = val.columns
           this.chartData.rows = val.rows
+          // 折线图，柱状图，饼图，条形图考虑预警颜色
+          this.setWarningColor(this.apiData)
 
           // if (val.source) {
           //   let data = formatData(val.source)
@@ -207,6 +212,8 @@ export default {
   },
   mounted() {
     this._calcStyle()
+    // 折线图，柱状图，饼图，条形图考虑预警颜色
+    this.setWarningColor(this.apiData)
     addResizeListener(this.$refs.wrap, this._calcStyle)
   },
   beforeDestroy() {
@@ -231,6 +238,86 @@ export default {
       }
       this.width = width + 'px'
       this.height = height + 'px'
+    },
+    // 设置预警颜色
+    setWarningColor(val) {
+      if (
+        !this.chartType === 'v-line' &&
+        !this.chartType === 'v-histogram' &&
+        !this.chartType === 'v-pie' &&
+        !this.chartType === 'v-bar'
+      ) {
+        return
+      }
+      // 按预警格式化显示颜色
+      if (!val.warning) {
+        return
+      }
+      if (val.warning.length === 0) {
+        // 重置数据颜色样式
+        delete this.chartExtend.series.itemStyle.normal.color
+        // 强行渲染
+        this.key++
+        return
+      }
+      val.warning.forEach((item, index) => {
+        switch (item.condition) {
+          case 'range':
+            this.setColorFormatter(
+              item.warnColor,
+              val => val >= item.firstValue && val < item.secondValue
+            )
+            break
+          case 'more':
+            this.setColorFormatter(item.warnColor, val => val > item.firstValue)
+            break
+          case 'less':
+            this.setColorFormatter(item.warnColor, val => val < item.firstValue)
+            break
+          case 'moreOrEqual':
+            this.setColorFormatter(
+              item.warnColor,
+              val => val >= item.firstValue
+            )
+            break
+          case 'lessOrEqual':
+            this.setColorFormatter(
+              item.warnColor,
+              val => val <= item.firstValue
+            )
+            break
+          case 'equal':
+            this.setColorFormatter(
+              item.warnColor,
+              val => val === item.firstValue
+            )
+            break
+          case 'notEqual':
+            this.setColorFormatter(
+              item.warnColor,
+              val => val !== item.firstValue
+            )
+            break
+        }
+      })
+      // 强行渲染
+      this.key++
+    },
+    setColorFormatter(color, fn) {
+      // 符合条件变为预警颜色，其余保持原有颜色
+      if (this.typeName === 've-bar' || this.typeName === 've-histogram') {
+        // 柱状图折线图数据颜色体现在度量，用seriesIndex
+        this.chartExtend.series.itemStyle.normal.color = function(params) {
+          return fn(params.data) ? color : DEFAULT_COLORS[params.seriesIndex]
+        }
+      } else if (this.typeName === 've-pie') {
+        // 饼图数据颜色体现在维度，用dataIndex
+        this.chartExtend.series.itemStyle.normal.color = function(params) {
+          return fn(params.data.value)
+            ? color
+            : DEFAULT_COLORS[params.dataIndex]
+        }
+      }
     }
   },
   computed: {

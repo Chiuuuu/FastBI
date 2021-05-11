@@ -10,10 +10,23 @@
       </a-collapse-panel>
       <a-collapse-panel
         key="measures"
-        header="度量"
+        :header="
+          `度量${
+            currSelected.setting.chartType === 'v-histogramAndLine'
+              ? '（柱）'
+              : ''
+          }`
+        "
         v-if="chartType === '1' || chartType === '2'"
       >
         <drag-area type="measures" :fileList="fileObj.measures"></drag-area>
+      </a-collapse-panel>
+      <a-collapse-panel
+        key="measuresLine"
+        header="度量（折线）"
+        v-if="currSelected.setting.chartType === 'v-histogramAndLine'"
+      >
+        <dragAreaMixLine :fileList="fileObj.measures"></dragAreaMixLine>
       </a-collapse-panel>
       <a-collapse-panel key="tableList" header="列" v-if="chartType === '3'">
         <drag-area type="tableList" ref="table"></drag-area>
@@ -51,6 +64,30 @@
           </a-select>
         </div>
       </a-collapse-panel>
+      <a-collapse-panel
+        key="merge"
+        header="合并"
+        v-if="
+          (currSelected.setting.chartType === 'v-line' ||
+            currSelected.setting.chartType === 'v-histogram') &&
+            currSelected.setting.api_data.source
+        "
+      >
+        <merge />
+      </a-collapse-panel>
+      <!-- 预警规则，限折线图，柱状图，条形图，饼图 -->
+      <a-collapse-panel
+        key="warning"
+        header="数据预警"
+        v-if="
+          currSelected.setting.chartType === 'v-line' ||
+            currSelected.setting.chartType === 'v-histogram' ||
+            currSelected.setting.chartType === 'v-pie' ||
+            currSelected.setting.chartType === 'v-bar'
+        "
+      >
+        <Warning />
+      </a-collapse-panel>
       <a-collapse-panel key="refresh" header="定时刷新">
         <a-switch
           slot="extra"
@@ -83,15 +120,6 @@
           </a-select>
         </div>
       </a-collapse-panel>
-      <!-- <a-collapse-panel key="filter" header="数据筛选">
-        <div class="empty">拖入字段</div>
-      </a-collapse-panel>
-      <a-collapse-panel key="sort" header="排序">
-      </a-collapse-panel>
-      <a-collapse-panel key="tips" header="鼠标移入时提示">
-      </a-collapse-panel>
-      <a-collapse-panel key="refresh" header="定时刷新">
-      </a-collapse-panel>-->
     </a-collapse>
   </div>
 </template>
@@ -100,11 +128,17 @@
 import { mapGetters, mapActions } from 'vuex'
 import DragArea from './components/dragArea'
 import DragPick from './components/dragPick'
+import Merge from './components/merge'
+import Warning from './components/warning'
 import { deepClone } from '../../../utils/deepClone'
+import dragAreaMixLine from './components/dragAreaMixLine'
 export default {
   components: {
     DragArea,
-    DragPick
+    DragPick,
+    Merge,
+    Warning,
+    dragAreaMixLine
   },
   data() {
     return {
@@ -116,7 +150,10 @@ export default {
         'tips',
         'tableList',
         'refresh',
-        'pick'
+        'pick',
+        'merge',
+        'measuresLine',
+        'warning'
       ], // 所有面板默认打开
       fileObj: {
         dimensions: [],
@@ -313,4 +350,6 @@ export default {
 }
 </script>
 
-<style></style>
+<style>
+@import './components/merge.less';
+</style>

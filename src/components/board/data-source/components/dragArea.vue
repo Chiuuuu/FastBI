@@ -184,6 +184,17 @@ export default {
         this.currSelected.datamodelId !== dataFile.datamodelId
       ) {
         this.$message.error('一个图表只能拖入一个数据模型的字段')
+        this.isdrag = false
+        return false
+      }
+      if (
+        this.currSelected.setting.api_data.mixMeasures &&
+        this.currSelected.setting.api_data.measures.some(
+          item => item.alias === dataFile.alias
+        )
+      ) {
+        this.$message.error('数据重复')
+        this.isdrag = false
         return false
       }
       dataFile.showMore = false // 是否点击显示更多
@@ -386,7 +397,13 @@ export default {
         }
       }
 
-      let params = selected
+      let params = deepClone(selected)
+      if (params.setting.api_data.mixMeasures) {
+        // 折线度量合到度量做请求
+        params.setting.api_data.measures = params.setting.api_data.measures.concat(
+          params.setting.api_data.mixMeasures
+        )
+      }
       let apiData = deepClone(this.currSelected.setting.api_data)
       this.$server.screenManage.getData(params).then(res => {
         selected.setting.isEmpty = false
@@ -482,7 +499,15 @@ export default {
             }
 
             let measureKeys = [] // 度量key
-            for (let m of apiData.measures) {
+            let temMeasures = deepClone(apiData.measures)
+            // 柱状折线图合并折线部分度量
+            if (
+              this.currSelected.setting.chartType === 'v-histogramAndLine' &&
+              apiData.mixMeasures
+            ) {
+              temMeasures = temMeasures.concat(apiData.mixMeasures)
+            }
+            for (let m of temMeasures) {
               measureKeys.push(m.alias)
               columns.push(m.alias) // 默认columns第二项起为指标
             }
@@ -521,15 +546,12 @@ export default {
                 rows.push(obj)
                 // }
               })
-              console.log(columns)
-              console.log(rows)
             }
 
             apiData.source = {
               columns,
               rows
             }
-            console.log(apiData)
             this.$store.dispatch('SetSelfDataSource', apiData)
           }
           this.updateChartData()
