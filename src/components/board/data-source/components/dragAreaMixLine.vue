@@ -244,6 +244,8 @@ export default {
           this.currSelected.setting.apis.showLine = this.fileList.map(
             item => item.alias
           )
+          // 折线作为坐标
+          this.currSelected.setting.apis.axisSite.right = this.currSelected.setting.apis.showLine
           this.updateChartData()
         } else {
           this.$message.error(res.msg)

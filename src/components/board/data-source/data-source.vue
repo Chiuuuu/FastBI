@@ -191,13 +191,16 @@ export default {
           let apiData = deepClone(val.setting.api_data)
           this.apiData = apiData
           // 选中的维度度量组合成排序列表
-          if (apiData.dimensions && this.sortList.length === 1) {
+          if (apiData.dimensions) {
             this.sortList = this.sortList.concat(apiData.dimensions)
           }
-          if (apiData.measures && this.sortList.length === 1) {
+          if (apiData.measures) {
             this.sortList = this.sortList.concat(apiData.measures)
           }
-          if (val.setting.name === 've-tables' && this.sortList.length === 1) {
+          if (apiData.mixMeasures) {
+            this.sortList = this.sortList.concat(apiData.mixMeasures)
+          }
+          if (val.setting.name === 've-tables') {
             this.sortList = this.sortList.concat(apiData.tableList)
           }
           // 回显排序信息

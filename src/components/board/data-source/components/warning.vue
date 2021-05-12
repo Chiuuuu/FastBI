@@ -104,6 +104,7 @@
 </template>
 <script>
 import { DEFAULT_COLORS } from '@/utils/defaultColors'
+import setWarning from '@/utils/setWarningColor'
 import { mapGetters, mapActions } from 'vuex'
 import { Icon } from 'ant-design-vue'
 const IconFont = Icon.createFromIconfontCN({
@@ -221,67 +222,11 @@ export default {
         this.$store.dispatch('SetSelfProperty', config)
         return
       }
-      val.warning.forEach((item, index) => {
-        switch (item.condition) {
-          case 'range':
-            this.setColorFormatter(
-              item.warnColor,
-              val => val >= item.firstValue && val < item.secondValue
-            )
-            break
-          case 'more':
-            this.setColorFormatter(item.warnColor, val => val > item.firstValue)
-            break
-          case 'less':
-            this.setColorFormatter(item.warnColor, val => val < item.firstValue)
-            break
-          case 'moreOrEqual':
-            this.setColorFormatter(
-              item.warnColor,
-              val => val >= item.firstValue
-            )
-            break
-          case 'lessOrEqual':
-            this.setColorFormatter(
-              item.warnColor,
-              val => val <= item.firstValue
-            )
-            break
-          case 'equal':
-            this.setColorFormatter(
-              item.warnColor,
-              val => val === item.firstValue
-            )
-            break
-          case 'notEqual':
-            this.setColorFormatter(
-              item.warnColor,
-              val => val !== item.firstValue
-            )
-            break
-        }
-      })
+      config.series.itemStyle.normal.color = setWarning(
+        val,
+        this.currSelected.setting.name
+      )
       this.$store.dispatch('SetSelfProperty', config)
-    },
-    setColorFormatter(color, fn) {
-      let config = this.currSelected.setting.config
-      // 符合条件变为预警颜色，其余保持原有颜色
-      if (
-        this.currSelected.setting.name === 've-bar' ||
-        this.currSelected.setting.name === 've-histogram'
-      ) {
-        // 柱状图折线图数据颜色体现在度量，用seriesIndex
-        config.series.itemStyle.normal.color = function(params) {
-          return fn(params.data) ? color : DEFAULT_COLORS[params.seriesIndex]
-        }
-      } else if (this.currSelected.setting.name === 've-pie') {
-        // 饼图数据颜色体现在维度，用dataIndex
-        config.series.itemStyle.normal.color = function(params) {
-          return fn(params.data.value)
-            ? color
-            : DEFAULT_COLORS[params.dataIndex]
-        }
-      }
     }
   }
 }

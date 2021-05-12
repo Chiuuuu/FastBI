@@ -53,6 +53,7 @@ import {
 import { formatData, convertData } from '../../utils/formatData'
 import { deepClone } from '@/utils/deepClone'
 import { DEFAULT_COLORS } from '@/utils/defaultColors'
+import setWarning from '@/utils/setWarningColor'
 
 export default {
   name: 'ChartsFactory',
@@ -141,7 +142,7 @@ export default {
       backgroundStyle: {},
       colors: [],
       key: 0, // 修改颜色格式后重新渲染图表
-      chartObj: {} //echart实例
+      chartObj: {} // echart实例
     }
   },
   watch: {
@@ -283,64 +284,11 @@ export default {
         this.key++
         return
       }
-      val.warning.forEach((item, index) => {
-        switch (item.condition) {
-          case 'range':
-            this.setColorFormatter(
-              item.warnColor,
-              val => val >= item.firstValue && val < item.secondValue
-            )
-            break
-          case 'more':
-            this.setColorFormatter(item.warnColor, val => val > item.firstValue)
-            break
-          case 'less':
-            this.setColorFormatter(item.warnColor, val => val < item.firstValue)
-            break
-          case 'moreOrEqual':
-            this.setColorFormatter(
-              item.warnColor,
-              val => val >= item.firstValue
-            )
-            break
-          case 'lessOrEqual':
-            this.setColorFormatter(
-              item.warnColor,
-              val => val <= item.firstValue
-            )
-            break
-          case 'equal':
-            this.setColorFormatter(
-              item.warnColor,
-              val => val === item.firstValue
-            )
-            break
-          case 'notEqual':
-            this.setColorFormatter(
-              item.warnColor,
-              val => val !== item.firstValue
-            )
-            break
-        }
-      })
-      // 强行渲染
+      this.chartExtend.series.itemStyle.normal.color = setWarning(
+        val,
+        this.typeName
+      )
       this.key++
-    },
-    setColorFormatter(color, fn) {
-      // 符合条件变为预警颜色，其余保持原有颜色
-      if (this.typeName === 've-bar' || this.typeName === 've-histogram') {
-        // 柱状图折线图数据颜色体现在度量，用seriesIndex
-        this.chartExtend.series.itemStyle.normal.color = function(params) {
-          return fn(params.data) ? color : DEFAULT_COLORS[params.seriesIndex]
-        }
-      } else if (this.typeName === 've-pie') {
-        // 饼图数据颜色体现在维度，用dataIndex
-        this.chartExtend.series.itemStyle.normal.color = function(params) {
-          return fn(params.data.value)
-            ? color
-            : DEFAULT_COLORS[params.dataIndex]
-        }
-      }
     },
     // 获取echarts实例
     afterSetOption(chartObj) {
