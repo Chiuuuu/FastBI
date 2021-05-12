@@ -19,7 +19,7 @@
       <!--模型列表多选-->
       <div class="pick-checkbox-box">
         <b-scrollbar style="height:100%;">
-          <div class="data-title">{{ currentData || '没有符合的结果' }}</div>
+          <!-- <div class="data-title">{{ currentData || '没有符合的结果' }}</div> -->
           <a-radio-group class="f-flexcolumn" v-model="mergeId">
             <div
               class="f-flexcolumn"
@@ -79,22 +79,22 @@ export default {
         }
       })
       return list
-    },
-    // 当前图表对应的模型
-    currentData() {
-      // 没有使用数据文件
-      if (
-        !this.currSelected.datamodelId ||
-        this.currSelected.datamodelId === '0'
-      ) {
-        return ''
-      }
-      // 找到当前使用的数据信息
-      let obj = this.selectedModelList.find(
-        item => item.modelid === this.currSelected.datamodelId
-      )
-      return obj.modelname
     }
+    // // 当前图表对应的模型
+    // currentData() {
+    //   // 没有使用数据文件
+    //   if (
+    //     !this.currSelected.datamodelId ||
+    //     this.currSelected.datamodelId === '0'
+    //   ) {
+    //     return ''
+    //   }
+    //   // 找到当前使用的数据信息
+    //   let obj = this.selectedModelList.find(
+    //     item => item.modelid === this.currSelected.datamodelId
+    //   )
+    //   return obj.modelname
+    // }
   },
   methods: {
     ...mapActions(['updateChartData']),
@@ -157,12 +157,15 @@ export default {
       // 添加折线显示配置
       let showLine = apiData.mixMeasures.map(item => item.alias)
       this.currSelected.setting.apis.showLine = showLine
+      // 折线坐标轴
+      this.currSelected.setting.apis.axisSite = { right: showLine }
       this.$store.dispatch('SetApis', this.currSelected.setting.apis)
 
       // 生成混合图
       this.$set(this.currSelected.setting, 'chartType', 'v-histogramAndLine')
       this.$set(this.currSelected, 'name', '混合折线图')
       this.$set(this.currSelected.setting, 'name', 've-histogram')
+      this.$set(this.currSelected.setting, 'icon', 'icon_hybrid.png')
 
       // 保存合并图表
       this.updateChartData()

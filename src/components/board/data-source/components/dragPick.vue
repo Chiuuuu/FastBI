@@ -622,7 +622,14 @@ export default {
       let selected = this.canvasMap.find(
         item => item.id === this.currentSelected
       )
-      this.$server.screenManage.getData(this.currSelected).then(res => {
+      let params = deepClone(selected)
+      if (params.setting.api_data.mixMeasures) {
+        // 折线度量合到度量做请求
+        params.setting.api_data.measures = params.setting.api_data.measures.concat(
+          params.setting.api_data.mixMeasures
+        )
+      }
+      this.$server.screenManage.getData(params).then(res => {
         selected.setting.isEmpty = false
         // 数据源被删掉
         if (res.code === 500 && res.msg === 'IsChanged') {
@@ -722,7 +729,15 @@ export default {
             }
 
             let measureKeys = [] // 度量key
-            for (let m of apiData.measures) {
+            let temMeasures = deepClone(apiData.measures)
+            // 柱状折线图合并折线部分度量
+            if (
+              this.currSelected.setting.chartType === 'v-histogramAndLine' &&
+              apiData.mixMeasures
+            ) {
+              temMeasures = temMeasures.concat(apiData.mixMeasures)
+            }
+            for (let m of temMeasures) {
               measureKeys.push(m.alias)
               columns.push(m.alias) // 默认columns第二项起为指标
             }

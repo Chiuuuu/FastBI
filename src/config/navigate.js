@@ -28,7 +28,6 @@ const list = [
         api_data: {
           dimensions: [],
           measures: [],
-          source: {},
           columns: ['日期', '访问用户', '下单用户'],
           rows: [
             { 日期: '1/1', 访问用户: 1393, 下单用户: 1093 },
@@ -156,6 +155,8 @@ const list = [
             type: 'line',
             smooth: false, // 可选的
             step: false, // step line
+            symbol: 'circle',
+            symbolSize: 10,
             lineStyle: {
               width: 1
             },
@@ -171,6 +172,12 @@ const list = [
             },
             emphasis: {
               focus: 'series'
+            },
+            itemStyle: {
+              normal: {
+                borderColor: '#fff',
+                borderWidth: 2
+              }
             }
           },
           color: DEFAULT_COLORS
@@ -1223,7 +1230,7 @@ const list = [
         title: '柱状折线图',
         chartType: 'v-histogramAndLine',
         name: 've-histogram',
-        icon: 'icon_histogram.png',
+        icon: 'icon_hybrid.png',
         type: '1',
         modelId: '',
         isEmpty: false,
@@ -1241,6 +1248,8 @@ const list = [
         },
         apis: {
           showLine: ['下单用户'],
+          axisSite: { right: ['下单用户'] },
+          yAxisType: ['KMB', 'KMB'],
           yAxisName: [],
           labelMap: {
             x: '类目',
@@ -1261,14 +1270,14 @@ const list = [
           mixed: false, // 是否是混合柱状图
           title: {
             show: true,
-            content: '柱状图',
+            content: '柱状折线图',
             textAlign: 'left',
             textStyle: {
               color: '#ffffff',
               fontSize: 20
             }
           },
-          grid: { left: 50, top: 60, right: 50, bottom: 50 },
+          grid: { left: 50, top: 80, right: 50, bottom: 50 },
           legend: {
             show: true,
             orient: 'horizontal',
@@ -1317,12 +1326,12 @@ const list = [
           },
           yAxis: {
             name: '单位:个',
-            position: 'left',
-            nameLocation: 'middle',
+            // position: 'left',
+            // nameLocation: 'middle',
             nameTextStyle: {
               color: '#fff',
               fontSize: 12,
-              padding: [0, 0, 40, 0]
+              padding: [0, 0, 0, 0]
             },
             axisLabel: {
               color: '#ffffff',

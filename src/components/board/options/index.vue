@@ -344,9 +344,15 @@
                     @change="setSelfProperty"
                   ></a-switch>
                 </gui-field>
-                <!-- <gui-field label="标记点" v-if="isLine"> {{selfConfig.series.symbol}}
-                    <a-switch v-model="selfConfig.series.symbol" size="small" @change="setSelfProperty"></a-switch>
-                </gui-field>-->
+                <gui-field label="标记点尺寸" v-if="isLine">
+                  <a-input-number
+                    v-model="selfConfig.series.symbolSize"
+                    size="small"
+                    :max="20"
+                    :min="0"
+                    @change="setSelfProperty"
+                  ></a-input-number>
+                </gui-field>
                 <gui-field label="线宽" v-if="isLine">
                   <a-input-number
                     v-model="selfConfig.series.lineStyle.width"
@@ -1140,12 +1146,6 @@
                   @change="switchChange"
                   size="small"
                 />
-                <!-- <gui-field label="y1标题" v-if="isHistogram">
-                    <a-input v-model="apis.yAxisName[0]" @change="setApis" style="width:100px;" size="small"></a-input>
-                  </gui-field>
-                  <gui-field label="y2标题" v-if="isHistogram">
-                    <a-input v-model="apis.yAxisName[1]" @change="setApis" style="width:100px;" size="small"></a-input>
-                </gui-field>-->
                 <gui-field label="轴名称">
                   <a-input
                     v-model="selfConfig.yAxis.name"
@@ -1913,7 +1913,6 @@
                   v-model="selfConfig.targetValue"
                   size="small"
                   :min="0"
-                  :max="currSelected.setting.config.series.max"
                   @change="setSelfProperty"
                 ></a-input-number>
               </gui-field>
@@ -2443,19 +2442,25 @@ export default {
     isTables() {
       return this.chartType === 'v-tables'
     },
+    isMix() {
+      return this.chartType === 'v-histogramAndLine'
+    },
     showGrid() {
       return (
-        this.selfConfig.grid && (this.isLine || this.isHistogram || this.isBar)
+        this.selfConfig.grid &&
+        (this.isLine || this.isHistogram || this.isBar || this.isMix)
       )
     },
     showXAxis() {
       return (
-        this.selfConfig.xAxis && (this.isLine || this.isHistogram || this.isBar)
+        this.selfConfig.xAxis &&
+        (this.isLine || this.isHistogram || this.isBar || this.isMix)
       )
     },
     showYAxis() {
       return (
-        this.selfConfig.yAxis && (this.isLine || this.isHistogram || this.isBar)
+        this.selfConfig.yAxis &&
+        (this.isLine || this.isHistogram || this.isBar || this.isMix)
       )
     },
     showDataZoom() {
