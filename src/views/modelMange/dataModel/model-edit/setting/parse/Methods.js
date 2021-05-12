@@ -94,7 +94,7 @@ export class Methods {
     console.log('arg', arg)
     const { type, value } = arg
     if (!['integer', 'float', 'alias', 'neg'].includes(type)) {
-      throw new Error(`方法${methodName}参数：只能用数字类型或逻辑运算, ${value}是${type}`)
+      throw new Error(`方法${methodName}参数：只能用数字类型, ${value}是${type}`)
     }
 
     if (['integer', 'float', 'neg'].includes(type) && value === true) {
@@ -113,7 +113,7 @@ export class Methods {
           value: true
         }
       } else {
-        throw new Error(`方法${methodName}参数：只能用数字类型或逻辑运算`)
+        throw new Error(`方法${methodName}参数：只能用数字类型`)
       }
     }
 

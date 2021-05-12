@@ -156,29 +156,31 @@ export class Verify {
 
   // 由于目前只有逻辑运算才需要校验等式, 所以暂时单拎出来
   validateCaseAssign(expr) {
-    const left = this.validate(expr.left)
-    const right = this.validate(expr.right)
-    // 等式左边
-    if (!['integer', 'float', 'neg', 'alias'].includes(left.type) || left.value === false) {
-      throw Error(`聚合粒度错误: 等式左边必须为数字类型`)
-    }
-    if (left.type === 'alias') {
-      const type = left.value.dataType
-      if (type !== 'BIGINT' && type !== 'DOUBLE') {
-        throw Error(`聚合粒度错误: 等式左边必须为数字类型`)
-      }
-    }
-    // 等式右边
-    if (!['integer', 'float', 'neg', 'alias'].includes(right.type) || right.value === false) {
-      throw Error(`聚合粒度错误: 等式右边必须为数字类型`)
-    }
-    if (right.type === 'alias') {
-      const type = right.value.dataType
-      if (type !== 'BIGINT' && type !== 'DOUBLE') {
-        throw Error(`聚合粒度错误: 等式右边必须为数字类型`)
-      }
-    }
-    return right
+    // 目前仅支持数字类型, 所以遇到等式直接抛错
+    throw new Error('暂不支持等式')
+    // const left = this.validate(expr.left)
+    // const right = this.validate(expr.right)
+    // // 等式左边
+    // if (!['integer', 'float', 'neg', 'alias'].includes(left.type) || left.value === false) {
+    //   throw Error(`聚合粒度错误: 等式左边必须为数字类型`)
+    // }
+    // if (left.type === 'alias') {
+    //   const type = left.value.dataType
+    //   if (type !== 'BIGINT' && type !== 'DOUBLE') {
+    //     throw Error(`聚合粒度错误: 等式左边必须为数字类型`)
+    //   }
+    // }
+    // // 等式右边
+    // if (!['integer', 'float', 'neg', 'alias'].includes(right.type) || right.value === false) {
+    //   throw Error(`聚合粒度错误: 等式右边必须为数字类型`)
+    // }
+    // if (right.type === 'alias') {
+    //   const type = right.value.dataType
+    //   if (type !== 'BIGINT' && type !== 'DOUBLE') {
+    //     throw Error(`聚合粒度错误: 等式右边必须为数字类型`)
+    //   }
+    // }
+    // return right
   }
 
   evaluate(operator, left, right) {
