@@ -7,6 +7,7 @@
     :confirmLoading="confirmLoading"
     destroyOnClose
     :afterClose="handleAfterClose"
+    :maskClosable="false"
     @ok="handleSave"
     @cancel="handleClose"
   >
