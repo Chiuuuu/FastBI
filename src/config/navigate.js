@@ -139,26 +139,40 @@ const list = [
               show: true
             }
           },
-          series: [
-            {
-              type: 'line',
-              smooth: false, // 可选的
-              step: false, // step line
-              lineStyle: {
-                width: 1
-              },
-              label: {
-                show: false,
-                color: '#fff',
-                fontSize: 12,
-                position: 'top'
-              },
-              areaStyle: {
-                // 可选的
-                opacity: 0
-              }
+          dataZoom: {
+            show: true,
+            height: 25,
+            bottom: '6%',
+            handleSize: '110%',
+            handleStyle: {
+              color: '#d3dee5'
+            },
+            textStyle: {
+              color: '#fff'
+            },
+            borderColor: '#90979c'
+          },
+          series: {
+            type: 'line',
+            smooth: false, // 可选的
+            step: false, // step line
+            lineStyle: {
+              width: 1
+            },
+            label: {
+              show: false,
+              color: '#fff',
+              fontSize: 12,
+              position: 'top'
+            },
+            areaStyle: {
+              // 可选的
+              opacity: 0
+            },
+            emphasis: {
+              focus: 'series'
             }
-          ],
+          },
           color: DEFAULT_COLORS
         },
         view: { width: 500, height: 400, x: 710, y: 340 } // 计算中间值(1920-500)*0.5,(1080-400)*0.5
@@ -290,6 +304,19 @@ const list = [
             axisTick: {
               show: true
             }
+          },
+          dataZoom: {
+            show: true,
+            height: 25,
+            bottom: '6%',
+            handleSize: '110%',
+            handleStyle: {
+              color: '#d3dee5'
+            },
+            textStyle: {
+              color: '#fff'
+            },
+            borderColor: '#90979c'
           },
           series: {
             label: {
@@ -544,6 +571,10 @@ const list = [
             }
           },
           series: {
+            emphasis: {
+              //
+              focus: 'self'
+            },
             label: {
               show: true,
               color: '',
