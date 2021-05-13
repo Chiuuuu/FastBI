@@ -6,7 +6,7 @@ export default {
    * @param {Object} params 请求参数
    * @returns
    */
-  getLogList(params) {
-    return $axios.post('/platform/logger/checklog', params)
+  getLogList({ date, current }) {
+    return $axios.get(`/platform/logger/v2/checklog/${date}/${current}`)
   }
 }
