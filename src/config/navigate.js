@@ -73,7 +73,10 @@ const list = [
             left: 'center',
             top: 'auto',
             right: 'auto',
-            bottom: 'auto'
+            bottom: 'auto',
+            itemStyle: {
+              color: 'inherit'
+            }
           },
           xAxis: {
             name: '',
@@ -110,7 +113,7 @@ const list = [
           },
           yAxis: {
             name: '单位:个',
-            // position: 'left',
+            position: 'left',
             nameLocation: 'middle',
             nameTextStyle: {
               color: '#fff',
@@ -179,8 +182,8 @@ const list = [
                 borderWidth: 2
               }
             }
-          },
-          color: DEFAULT_COLORS
+          }
+          //   color: DEFAULT_COLORS
         },
         view: { width: 500, height: 400, x: 710, y: 340 } // 计算中间值(1920-500)*0.5,(1080-400)*0.5
       },
@@ -205,9 +208,9 @@ const list = [
           options: {}
         },
         apis: {
-          // stack: { '用户': ['系列1', '系列2'] },
-          // showLine: ['下单率'],
-          // axisSite: { right: ['下单率'] },
+          //   stack: { '用户': ['系列1', '系列2'] },
+          //   showLine: ['下单率'],
+          //   axisSite: { left: ['下单率'] },
           yAxisName: [],
           labelMap: {
             x: '类目',
@@ -284,7 +287,7 @@ const list = [
           },
           yAxis: {
             name: '单位:个',
-            // position: 'left',
+            position: 'left',
             nameLocation: 'middle',
             nameTextStyle: {
               color: '#fff',

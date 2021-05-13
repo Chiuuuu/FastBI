@@ -33,7 +33,8 @@ export default {
         { icon: 'md-arrow-round-up', text: '上移一层', order: 'up' },
         { icon: 'md-arrow-round-down', text: '下移一层', order: 'down' },
         { icon: 'ios-copy', text: '复制', order: 'copy' },
-        { icon: 'ios-trash', text: '删除', order: 'remove' }
+        { icon: 'ios-trash', text: '删除', order: 'remove' },
+        { icon: 'ios-share-alt', text: '图表推送', order: 'chartShare' }
       ]
     }
   },

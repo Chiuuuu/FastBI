@@ -152,6 +152,7 @@ export default {
           // 图例
           this.legendVisible = val.legend && val.legend.show
           this.chartExtend = { ...val }
+          this.setWarningColor(this.apiData)
         }
       },
       deep: true,
@@ -237,7 +238,7 @@ export default {
   mounted() {
     this._calcStyle()
     // 折线图，柱状图，饼图，条形图考虑预警颜色
-    this.setWarningColor(this.apiData)
+    // this.setWarningColor(this.apiData)
     addResizeListener(this.$refs.wrap, this._calcStyle)
   },
   beforeDestroy() {
@@ -280,19 +281,20 @@ export default {
       if (val.warning.length === 0) {
         // 重置数据颜色样式
         delete this.chartExtend.series.itemStyle.normal.color
-        // 强行渲染
-        this.key++
         return
       }
       this.chartExtend.series.itemStyle.normal.color = setWarning(
         val,
         this.typeName
       )
-      this.key++
+      //   if (this.chartType === 'v-line') {
+      //     this.chartExtend.series.lineStyle.color = '#60b8f6'
+      //   }
     },
     // 获取echarts实例
     afterSetOption(chartObj) {
       this.chartObj = chartObj
+      console.log(chartObj.getOption())
     }
   },
   computed: {
