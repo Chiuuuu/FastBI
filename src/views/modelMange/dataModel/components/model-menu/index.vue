@@ -72,6 +72,7 @@
         <a-icon class="icon_search" slot="suffix" type="search" />
       </a-input>
     </div>
+    <div class="model-map" @click="$emit('navigateToModelMap')">模型鸟瞰图</div>
     <a-empty v-if="modelResultList.length === 0" class="table_list-_empty">
       <span slot="description">暂无数据模型</span>
     </a-empty>

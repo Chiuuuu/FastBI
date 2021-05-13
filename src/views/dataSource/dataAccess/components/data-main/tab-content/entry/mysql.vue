@@ -234,6 +234,7 @@ export default {
      */
     handleResetForm() {
       this.$refs['dbForm'] && this.$refs.dbForm.resetFields()
+      this.form = this.$options.data().form
       this.connectStatus = false
     },
     /**

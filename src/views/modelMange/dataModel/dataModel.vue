@@ -1,18 +1,26 @@
 <template>
   <div class="data-model screen-manage">
-    <Menu @getModelInfo='handleEmitMainGetData'></Menu>
-    <Main ref='modelMainRef'></Main>
+    <Menu @getModelInfo='handleEmitMainGetData' @navigateToModelMap="navigateToModelMap"></Menu>
+    <ModelMap v-if="showMap" />
+    <Main v-else ref='modelMainRef'></Main>
   </div>
 </template>
 
 <script>
 import Menu from './components/model-menu'
 import Main from './components/model-main/main'
+import ModelMap from './components/model-map/model-map'
 import { mapState } from 'vuex'
 export default {
   components: {
     Menu,
-    Main
+    Main,
+    ModelMap
+  },
+  data() {
+    return {
+      showMap: false
+    }
   },
   computed: {
     ...mapState({
@@ -25,12 +33,22 @@ export default {
     }
   },
   beforeDestroy() {
-    this.$store.dispatch('modelMange/setModelId', -1)
-    this.$store.commit('modelMange/SET_MODELNAME', '')
+    this.clearModel()
   },
   methods: {
     handleEmitMainGetData(id) {
-      this.$refs.modelMainRef.handleGetData(id)
+      this.showMap = false
+      this.$nextTick(() => {
+        this.$refs.modelMainRef.handleGetData(id)
+      })
+    },
+    navigateToModelMap() {
+      this.clearModel()
+      this.showMap = true
+    },
+    clearModel() {
+      this.$store.dispatch('modelMange/setModelId', -1)
+      this.$store.commit('modelMange/SET_MODELNAME', '')
     }
   }
 }
