@@ -1146,10 +1146,24 @@
                   @change="switchChange"
                   size="small"
                 />
-                <gui-field label="轴名称">
+                <gui-field label="轴名称" v-if="!isMix">
                   <a-input
                     v-model="selfConfig.yAxis.name"
                     @change="setSelfProperty"
+                    size="small"
+                  ></a-input>
+                </gui-field>
+                <gui-field label="轴名称" v-if="isMix">
+                  <a-input
+                    v-model="apis.yAxisName[0]"
+                    @change="setApis"
+                    size="small"
+                  ></a-input>
+                </gui-field>
+                <gui-field label="右轴名称" v-if="isMix">
+                  <a-input
+                    v-model="apis.yAxisName[1]"
+                    @change="setApis"
                     size="small"
                   ></a-input>
                 </gui-field>

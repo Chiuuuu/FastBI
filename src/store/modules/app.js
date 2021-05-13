@@ -193,7 +193,7 @@ const app = {
             dispatch('saveScreenData')
             return true
           } else {
-            res.msg && message.error(res.msg)
+            !obj.noMsg && res.msg && message.error(res.msg)
             return false
           }
         })
@@ -203,7 +203,7 @@ const app = {
         })
     },
     // 删除图表
-    async deleteChartData({ dispatch, state, rootGetters }) {
+    async deleteChartData({ dispatch, state, rootGetters }, noMsg) {
       let chart = rootGetters.canvasMap.find(
         item => item.id === rootGetters.currentSelected
       )
@@ -220,7 +220,7 @@ const app = {
           dispatch('HideContextMenu')
           // 保存图层顺序
           dispatch('saveScreenData')
-          message.success('删除成功')
+          !noMsg && message.success('删除成功')
         }
       })
     },

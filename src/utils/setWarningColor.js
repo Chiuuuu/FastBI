@@ -1,45 +1,26 @@
 // 设置预警颜色
 import { DEFAULT_COLORS } from './defaultColors'
 // val:预警列表信息；typeName:图表类型标识
-export default function setWarningColor(val, typeName) {
-  let warningConditions = []
-  val.warning.forEach((item, index) => {
-    // 获取每行条件关系表达式
-    let expression = ''
-    switch (item.condition) {
-      case 'range':
-        expression = `val >= ${item.firstValue} && val < ${item.secondValue}`
-        break
-      case 'more':
-        expression = `val > ${item.firstValue}`
-        break
-      case 'less':
-        expression = `val < ${item.firstValue}`
-        break
-      case 'moreOrEqual':
-        expression = `val >= ${item.firstValue}`
-        break
-      case 'lessOrEqual':
-        expression = `val <= ${item.firstValue}`
-        break
-      case 'equal':
-        expression = `val === ${item.firstValue}`
-        break
-      case 'notEqual':
-        expression = `val !== ${item.firstValue}`
-        break
-    }
-    // 记录每一行条件的颜色和关系表达式
-    warningConditions.push({
-      color: item.warnColor,
-      fn: val => {
-        return eval(expression)
-      }
-    })
-  })
-  return setColorFormatter(warningConditions, typeName)
+function judgeCondition(item, data) {
+  // 获取每行条件关系表达式
+  switch (item.condition) {
+    case 'range':
+      return data >= item.firstValue && data < item.secondValue
+    case 'more':
+      return data > item.firstValue
+    case 'less':
+      return data < item.firstValue
+    case 'moreOrEqual':
+      return data >= item.firstValue
+    case 'lessOrEqual':
+      return data <= item.firstValue
+    case 'equal':
+      return data === item.firstValue
+    case 'notEqual':
+      return data !== item.firstValue
+  }
 }
-function setColorFormatter(list, typeName) {
+export default function setColorFormatter(val, typeName) {
   // 符合条件变为赌赢预警颜色，其余保持原有颜色
   // 除饼图用dataIndex其他图表数据颜色用seriesIndex
   return function(params) {
@@ -56,10 +37,8 @@ function setColorFormatter(list, typeName) {
       data = data[1]
     }
     // 根据条件获取对应预警颜色，冲突以后面条件为准
-    for (let item of list) {
-      if (item.fn(data)) {
-        temColor = item.color
-      }
+    for (let item of val.warning) {
+      temColor = judgeCondition(item, data) ? item.warnColor : temColor
     }
     return temColor
   }

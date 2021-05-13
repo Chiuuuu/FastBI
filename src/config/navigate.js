@@ -110,7 +110,7 @@ const list = [
           },
           yAxis: {
             name: '单位:个',
-            position: 'left',
+            // position: 'left',
             nameLocation: 'middle',
             nameTextStyle: {
               color: '#fff',
@@ -284,7 +284,7 @@ const list = [
           },
           yAxis: {
             name: '单位:个',
-            position: 'left',
+            // position: 'left',
             nameLocation: 'middle',
             nameTextStyle: {
               color: '#fff',
@@ -1250,7 +1250,7 @@ const list = [
           showLine: ['下单用户'],
           axisSite: { right: ['下单用户'] },
           yAxisType: ['KMB', 'KMB'],
-          yAxisName: [],
+          yAxisName: ['单位:个', ''],
           labelMap: {
             x: '类目',
             y: '值',
@@ -1325,7 +1325,7 @@ const list = [
             }
           },
           yAxis: {
-            name: '单位:个',
+            // name: '单位:个',
             // position: 'left',
             // nameLocation: 'middle',
             nameTextStyle: {

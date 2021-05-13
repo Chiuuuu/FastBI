@@ -44,6 +44,8 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import _ from 'lodash'
+import { deepClone } from '../../../../utils/deepClone'
+import navigateList from '@/config/navigate' // 导航条菜单
 export default {
   data() {
     return {
@@ -97,7 +99,7 @@ export default {
     // }
   },
   methods: {
-    ...mapActions(['updateChartData']),
+    ...mapActions(['updateChartData', 'addChartData', 'deleteChartData']),
     openBindWindow() {
       // 获取可选列表
       this.chartList = this.toBindList
@@ -120,8 +122,10 @@ export default {
         return
       }
 
+      // 原图数据信息
       let apiData = this.currSelected.setting.api_data
       let chart = this.toBindList.find(item => item.id === this.mergeId)
+      // 被合并图数据信息
       let chartApiData = chart.setting.api_data
 
       // 度量不能重复合并
@@ -154,21 +158,28 @@ export default {
       )
       apiData.source.columns = [...new Set(apiData.source.columns)]
 
-      // 添加折线显示配置
+      // 获取折线度量
       let showLine = apiData.mixMeasures.map(item => item.alias)
-      this.currSelected.setting.apis.showLine = showLine
-      // 折线坐标轴
-      this.currSelected.setting.apis.axisSite = { right: showLine }
-      this.$store.dispatch('SetApis', this.currSelected.setting.apis)
 
       // 生成混合图
-      this.$set(this.currSelected.setting, 'chartType', 'v-histogramAndLine')
-      this.$set(this.currSelected, 'name', '混合折线图')
-      this.$set(this.currSelected.setting, 'name', 've-histogram')
-      this.$set(this.currSelected.setting, 'icon', 'icon_hybrid.png')
+      // 获取混合图配置
+      let newChart =
+        navigateList[0].children[navigateList[0].children.length - 1]
+      newChart.api_data = apiData
+      newChart.view = this.currSelected.setting.view
+      // 添加折线显示配置
+      newChart.apis.showLine = showLine
+      // 折线坐标轴
+      newChart.apis.axisSite = { right: showLine }
 
       // 保存合并图表
-      this.updateChartData()
+      //   this.updateChartData()
+      this.deleteChartData(true)
+      this.addChartData({
+        tabId: this.$route.query.tabId,
+        setting: { ...newChart },
+        noMsg: true
+      })
       this.visible = false
     }
   }
