@@ -222,10 +222,6 @@ export default {
         this.$store.dispatch('SetSelfProperty', config)
         return
       }
-      config.series.itemStyle.normal.color = setWarning(
-        val,
-        this.currSelected.setting.name
-      )
       this.$store.dispatch('SetSelfProperty', config)
     }
   }
