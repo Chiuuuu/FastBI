@@ -29,30 +29,34 @@
                 <a-dropdown v-model="dimensionsVisible" :trigger="['click']">
                   <div class="dropdown">插入维度</div>
                   <div slot="overlay" class="dropOverlay">
-                    <a-input allowClear placeholder="请输入关键词" @change="handleSearch($event, 'dimensions')"></a-input>
+                    <a-input
+                      allowClear
+                      placeholder="请输入关键词"
+                      @change="handleSearch($event, 'dimensions')"
+                    ></a-input>
                     <a-menu>
                       <a-menu-item
                         v-for="item in (searchDimensions || dimensions)"
                         :key="item.id"
                         @click="handleSelect(item, 'dimensions')"
-                        >
-                        {{ item.alias }}
-                      </a-menu-item>
+                      >{{ item.alias }}</a-menu-item>
                     </a-menu>
                   </div>
                 </a-dropdown>
                 <a-dropdown v-model="measuresVisible" :trigger="['click']">
                   <div class="dropdown">插入度量</div>
                   <div slot="overlay" class="dropOverlay">
-                    <a-input allowClear placeholder="请输入关键词" @change="handleSearch($event, 'measures')"></a-input>
+                    <a-input
+                      allowClear
+                      placeholder="请输入关键词"
+                      @change="handleSearch($event, 'measures')"
+                    ></a-input>
                     <a-menu>
                       <a-menu-item
                         v-for="item in (searchMeasures || measures)"
                         :key="item.id"
                         @click="handleSelect(item, 'measures')"
-                        >
-                        {{ item.alias }}
-                      </a-menu-item>
+                      >{{ item.alias }}</a-menu-item>
                     </a-menu>
                   </div>
                 </a-dropdown>
@@ -78,15 +82,25 @@
       </div>
       <div class="modal_r">
         <div class="bar">
+          <a-select style="width: 100%" v-model="searchMethod" @change="handleChangeMethodType">
+            <a-select-option value="all">全部</a-select-option>
+            <a-select-option value="aggregator">聚合函数</a-select-option>
+            <a-select-option value="excel">Excel函数</a-select-option>
+            <a-select-option value="math">数学函数</a-select-option>
+            <a-select-option value="logic">逻辑函数</a-select-option>
+            <a-select-option value="string">文本函数</a-select-option>
+            <a-select-option value="date">日期函数</a-select-option>
+          </a-select>
           <a-input
             allowClear
             style="width: 140px"
             placeholder="请输入关键词"
+            v-model="searchValue"
             @change="handleSearch($event, 'expression')"
           ></a-input>
           <ul class="list">
             <li
-              v-for="(express, index) in (searchExpression || expression)"
+              v-for="(express, index) in searchExpression"
               class="list-item"
               :class="activeIndex === index ? 'active':''"
               :key="express.id"
@@ -96,11 +110,11 @@
           </ul>
         </div>
         <div class="text">
-          <div class="tit">{{expression[activeIndex].expression}}</div>
-          <div class="des">{{expression[activeIndex].description}}</div>
+          <div class="tit">{{searchExpression[activeIndex] ? searchExpression[activeIndex].expression : ''}}</div>
+          <div class="des">{{searchExpression[activeIndex] ? searchExpression[activeIndex].description : ''}}</div>
           <div class="example">
-            <span class="title">示例: </span>
-            <span v-html="explain"/>
+            <span class="title">示例:</span>
+            <span v-html="explain" />
           </div>
         </div>
       </div>
@@ -122,6 +136,7 @@ const expression = [
     description: '返回表达式中所有值的总和。SUM 只能用于数字字段。',
     example: 'SUM([销售额])',
     syntax: 'SUM(表达式)',
+    type: 'aggregator',
     groups: ['aggregator']
   },
   {
@@ -132,6 +147,7 @@ const expression = [
       '返回表达式在所有记录中的最大值。MAX只能用于数字、日期、日期时间字段。',
     example: 'MAX([访问量])',
     syntax: 'MAX(表达式)',
+    type: 'aggregator',
     groups: ['aggregator', 'date', 'logic']
   },
   {
@@ -142,7 +158,28 @@ const expression = [
       '返回表达式在所有记录中的最小值。MIN只能用于数字、日期、日期时间字段。',
     example: 'MIN([访问量])',
     syntax: 'MIN(表达式)',
+    type: 'aggregator',
     groups: ['aggregator', 'date', 'logic']
+  },
+  {
+    id: 'COUNT',
+    name: '计数',
+    expression: 'COUNT(表达式)',
+    description: '返回所有符合表达式的字段。COUNT 只能用于数字字段。',
+    example: 'COUNT([城市数量])',
+    syntax: 'COUNT(表达式)',
+    type: 'aggregator',
+    groups: ['calculation']
+  },
+  {
+    id: 'AVG',
+    name: '平均值',
+    expression: 'AVG(表达式1, 表达式2)',
+    description: '返回表达式中所有值的总和的平均值。AVG 只能用于数字字段。',
+    example: 'AVG([总人口], [城市数量])',
+    syntax: 'AVG(表达式1, 表达式2)',
+    type: 'aggregator',
+    groups: ['calculation']
   },
   {
     id: '+',
@@ -153,6 +190,7 @@ const expression = [
     example:
       '用法1，数值相加：[固定成本] + [非固定成本]；\n用法2，字符串连接：[省份] + "/" + [城市] ；\n用法3，日期\\\\日期时间增加天数：[订单日期]+10。',
     syntax: '表达式1 + 表达式2',
+    type: 'math',
     groups: ['string', 'calculation']
   },
   {
@@ -164,6 +202,7 @@ const expression = [
     example:
       '用法1，数值相减：[销售额] - [成本]；\n用法2，日期相减：[发货日期]-[订单日期]，得到日期天数；\n用法3，日期\\\\日期时间减少天数：[订单日期]-10。',
     syntax: '表达式1 - 表达式2',
+    type: 'math',
     groups: ['string', 'calculation']
   },
   {
@@ -173,6 +212,7 @@ const expression = [
     description: '* 作为乘法运算符，只能用于数字字段。',
     example: '[单价] * [个数]',
     syntax: '表达式1 * 表达式2',
+    type: 'math',
     groups: ['calculation']
   },
   {
@@ -182,24 +222,7 @@ const expression = [
     description: '/ 作为除法运算符，只能用于数字字段。',
     example: '[总人口] / [城市数量]',
     syntax: '表达式1 / 表达式2',
-    groups: ['calculation']
-  },
-  {
-    id: 'COUNT',
-    name: '计数',
-    expression: 'COUNT(表达式)',
-    description: '返回所有符合表达式的字段。COUNT 只能用于数字字段。',
-    example: 'COUNT([城市数量])',
-    syntax: 'COUNT(表达式)',
-    groups: ['calculation']
-  },
-  {
-    id: 'AVG',
-    name: '平均值',
-    expression: 'AVG(表达式1, 表达式2)',
-    description: '返回表达式中所有值的总和的平均值。AVG 只能用于数字字段。',
-    example: 'AVG([总人口], [城市数量])',
-    syntax: 'AVG(表达式1, 表达式2)',
+    type: 'math',
     groups: ['calculation']
   },
   {
@@ -209,6 +232,7 @@ const expression = [
     description: '返回表达式的绝对值。ABS 只能用于数字字段。',
     example: 'ABS([总人口])',
     syntax: 'ABS(表达式)',
+    type: 'excel',
     groups: ['calculation']
   },
   {
@@ -218,74 +242,84 @@ const expression = [
     description: '返回表达式四舍五入后的值。ROUND 只能用于数字字段。',
     example: 'ROUND([总人口])',
     syntax: 'ROUND(表达式)',
+    type: 'excel',
     groups: ['calculation']
   },
+  // {
+  //   id: 'INT',
+  //   name: '取整',
+  //   expression: 'INT(表达式)',
+  //   description: '返回表达式的整数值。INT 只能用于数字字段。',
+  //   example: 'INT([总人口])',
+  //   syntax: 'INT(表达式)',
+    // type: 'excel',
+  //   groups: ['calculation']
+  // },
   {
-    id: 'INT',
-    name: '取整',
-    expression: 'INT(表达式)',
-    description: '返回表达式的整数值。INT 只能用于数字字段。',
-    example: 'INT([总人口])',
-    syntax: 'INT(表达式)',
-    groups: ['calculation']
-  },
-  {
-    id: 'LEN',
+    id: 'LENGTH',
     name: '字符长度',
-    expression: 'LEN(表达式)',
-    description: '返回表达式的字符长度。LEN 只能用于字符字段。',
-    example: 'LEN([总人口])',
-    syntax: 'LEN(表达式)',
+    expression: 'LENGTH(表达式)',
+    description: '返回表达式的字符长度。LENGTH 只能用于字符字段。',
+    example: 'LENGTH([总人口])',
+    syntax: 'LENGTH(表达式)',
+    type: 'string',
     groups: ['calculation']
   },
   {
-    id: 'NOW',
+    id: 'CURRENT_TIMESTAMP',
     name: '当前时间',
-    expression: 'NOW()',
+    expression: 'CURRENT_TIMESTAMP()',
     description: '返回当前时间。',
-    example: 'NOW()',
-    syntax: 'NOW()',
+    example: 'CURRENT_TIMESTAMP()',
+    syntax: 'CURRENT_TIMESTAMP()',
+    type: 'date',
     groups: ['date']
   },
   {
-    id: 'TODAY',
+    id: 'CURRENT_DATE',
     name: '当前日期',
-    expression: 'TODAY()',
+    expression: 'CURRENT_DATE()',
     description: '返回当前日期。',
-    example: 'TODAY()',
-    syntax: 'TODAY()',
+    example: 'CURRENT_DATE()',
+    syntax: 'CURRENT_DATE()',
+    type: 'date',
     groups: ['date']
   },
+  // {
+  //   id: 'PMT',
+  //   name: '年金PMT',
+  //   expression: 'PMT(表达式1, 表达式2, 表达式3, 表达式4, 表达式5)',
+  //   description: `PMT(Rate, Nper, Pv, Fv, Type)
+  //   \\nRate贷款利率（期利率）。
+  //   \\nNper该项贷款的付款总期数(总年数或还租期数）。
+  //   \\nPv现值（租赁本金），或一系列未来付款的当前值的累积和，也称为本金。
+  //   \\nFv为未来值（余值），或在最后一次付款后希望得到的现金余额，如果省略Fv，则假设其值为零，也就是一笔贷款的未来值为零。
+  //   \\nType数字0或1，用以指定各期的付款时间是在期初还是期末。1代表期初（先付：每期的第一天付），不输入或输入0代表期末（后付：每期的最后一天付）。`,
+  //   example: 'PMT()',
+  //   syntax: 'PMT()',
+    // type: 'finance',
+  //   groups: ['calculation']
+  // },
   {
-    id: 'PMT',
-    name: '年金PMT',
-    expression: 'PMT(表达式1, 表达式2, 表达式3, 表达式4, 表达式5)',
-    description: `PMT(Rate, Nper, Pv, Fv, Type) 
-    \nRate贷款利率（期利率）。
-    \nNper该项贷款的付款总期数(总年数或还租期数）。
-    \nPv现值（租赁本金），或一系列未来付款的当前值的累积和，也称为本金。
-    \nFv为未来值（余值），或在最后一次付款后希望得到的现金余额，如果省略Fv，则假设其值为零，也就是一笔贷款的未来值为零。
-    \nType数字0或1，用以指定各期的付款时间是在期初还是期末。1代表期初（先付：每期的第一天付），不输入或输入0代表期末（后付：每期的最后一天付）。`,
-    example: 'PMT()',
-    syntax: 'PMT()',
-    groups: ['calculation']
-  },
-  {
-    id: 'LOGICAND',
+    id: 'AND',
     name: '逻辑与',
-    expression: 'LOGICAND(logic1, logic2, logic3)',
-    description: '检查所有参数是否为TRUE, 所有参数均为TRUE则返回TRUE, 否则返回FALSE。',
-    example: 'LOGICAND([城市数量], [及格人数] + [不及格人数] = [总人数], ...)',
-    syntax: 'LOGICAND(logic1, logic2, logic3)',
+    expression: '表达式1 AND 表达式2 AND 表达式3 ...',
+    description:
+      '检查所有参数是否为TRUE, 所有参数均为TRUE则返回TRUE, 否则返回FALSE。',
+    example: '[城市数量] AND [及格人数]',
+    syntax: '表达式1 AND 表达式2',
+    type: 'logic',
     groups: ['logic']
   },
   {
-    id: 'LOGICOR',
+    id: 'OR',
     name: '逻辑或',
-    expression: 'LOGICOR([城市数量], [及格人数] + [不及格人数] = [总人数], ...)',
-    description: '检查所有参数是否为TRUE, 任一参数均为TRUE则返回TRUE, 否则返回FALSE。',
-    example: 'LOGICOR(logic1, logic2, logic3)',
-    syntax: 'LOGICOR(logic1, logic2, logic3)',
+    expression: '表达式1 OR 表达式2 OR 表达式3 ...',
+    description:
+      '检查所有参数是否为TRUE, 任一参数均为TRUE则返回TRUE, 否则返回FALSE。',
+    example: '[城市数量] OR [及格人数]',
+    syntax: '表达式1 OR 表达式2',
+    type: 'logic',
     groups: ['logic']
   }
 ]
@@ -300,7 +334,9 @@ export default {
     return {
       cacheValidata: true, // 临时添加一个去校验判断
       expression,
-      searchExpression: '',
+      searchMethod: 'all', // 下拉框选择函数类型
+      searchExpression: expression, // 函数搜索结果
+      searchValue: '', // 函数搜索关键字
       activeIndex: 0,
       textareaValue: '',
       errorMessage: '',
@@ -328,18 +364,27 @@ export default {
       searchMeasures: ''
     }
   },
-  mounted () {
+  mounted() {
     this.debounceFn = debounce(this.check, 500)
   },
   computed: {
+    currentExpression() {
+      return this.searchMethod === 'all' ? this.expression : this.expression.filter(item => item.type === this.searchMethod)
+    },
     explain() {
-      return this.expression[this.activeIndex].example.replace(/\n/gm, '<br/>')
+      return this.searchExpression[this.activeIndex] ? this.searchExpression[this.activeIndex].example.replace(/\n/gm, '<br/>') : ''
     },
     sourceDimensions() {
-      return [...this.$parent.detailInfo.pivotSchema.dimensions, ...this.$parent.cacheDimensions]
+      return [
+        ...this.$parent.detailInfo.pivotSchema.dimensions,
+        ...this.$parent.cacheDimensions
+      ]
     },
     sourceMeasures() {
-      return [...this.$parent.detailInfo.pivotSchema.measures, ...this.$parent.cacheMeasures]
+      return [
+        ...this.$parent.detailInfo.pivotSchema.measures,
+        ...this.$parent.cacheMeasures
+      ]
     }
   },
   watch: {
@@ -367,7 +412,7 @@ export default {
   methods: {
     validateName(rule, value, callback) {
       const arry = [...this.sourceDimensions, ...this.sourceMeasures]
-      const item = arry.filter(item => item.alias === value).pop()
+      const item = arry.filter((item) => item.alias === value).pop()
       if (item) {
         callback(new Error('名称已存在'))
       } else {
@@ -376,10 +421,10 @@ export default {
     },
     /**
      * 获取维度度量
-    */
+     */
     getDM(list) {
       if (list && list.length) {
-        return list.filter(item => {
+        return list.filter((item) => {
           return item.visible && item.produceType === 0
         })
       }
@@ -401,30 +446,37 @@ export default {
     },
     /**
      * 获取activeIndex
-    */
+     */
     getActiveIndex(value) {
-      this.activeIndex = findIndex(this.expression, {
+      this.activeIndex = findIndex(this.currentExpression, {
         id: value
       })
     },
-    /**
-     * 搜索框
-    */
-    change(value) {
-      this.getActiveIndex(value)
-      this.handleSelectExpression(this.expression[this.activeIndex])
+    handleChangeMethodType(value) {
+      this.searchValue = ''
+      this.activeIndex = 0
+      this.$nextTick(() => {
+        this.searchExpression = this.currentExpression
+      })
     },
     /**
      * 维度度量关键词搜索
      */
-    handleSearch: debounce(function(event, type) {
+    handleSearch: debounce(function (event, type) {
       const value = event.target.value
+      this.searchValue = value
       if (type === 'dimensions') {
-        this.searchDimensions = value ? this.filterSearch(this.dimensions, value, 'alias') : ''
+        this.searchDimensions = value
+          ? this.filterSearch(this.dimensions, value, 'alias')
+          : ''
       } else if (type === 'measures') {
-        this.searchMeasures = value ? this.filterSearch(this.measures, value, 'alias') : ''
+        this.searchMeasures = value
+          ? this.filterSearch(this.measures, value, 'alias')
+          : ''
       } else if (type === 'expression') {
-        this.searchExpression = value ? this.filterSearch(this.expression, value, 'name') : ''
+        this.searchExpression = value
+          ? this.filterSearch(this.currentExpression, value, 'name')
+          : this.currentExpression
       }
     }, 500),
     /**
@@ -432,24 +484,32 @@ export default {
      */
     filterSearch(list, value, key) {
       if (list && list.length) {
-        return list.filter(item => item[key].toLowerCase().indexOf(value.toLowerCase()) >= 0)
+        return list.filter(
+          (item) => item[key].toLowerCase().indexOf(value.toLowerCase()) >= 0
+        )
       }
       return list
     },
     filterOption(value, option) {
-      return option.componentOptions.children[0].text.toLowerCase().indexOf(value.toLowerCase()) >= 0
+      return (
+        option.componentOptions.children[0].text
+          .toLowerCase()
+          .indexOf(value.toLowerCase()) >= 0
+      )
     },
     // 暂时使用的方法，把原生表达式的[]替换掉
     reverse(str) {
       const pairList = [...this.sourceDimensions, ...this.sourceMeasures]
       const matchArry = str.match(/(\[)(.*?)(\])/g)
       if (matchArry) {
-        matchArry.forEach(value => {
+        matchArry.forEach((value) => {
           const matchStr = value.match(/(\[)(.+)(\])/)
           const key = matchStr[2] ? matchStr[2] : ''
-          const item = pairList.filter(item => {
-            return item.alias === key
-          }).pop()
+          const item = pairList
+            .filter((item) => {
+              return item.alias === key
+            })
+            .pop()
           if (key && item) {
             // 要用三个$才能变成2个$
             str = str.replace(value, '$$$' + item.id)
@@ -470,15 +530,20 @@ export default {
             this.errorMessage = ''
             const params = {
               name: this.form.name,
-              datamodelId: this.$parent.model === 'add' ? this.$parent.addModelId : this.$parent.modelId,
+              datamodelId:
+                this.$parent.model === 'add'
+                  ? this.$parent.addModelId
+                  : this.$parent.modelId,
               role: this.computeType === '维度' ? 1 : 2,
               raw_expr: this.textareaValue,
               expr: this.reverse(this.textareaValue)
             }
             this.confirmLoading = true
-            const result = await this.$server.dataModel.addCustomizModelPivotschema(params).finally(() => {
-              this.confirmLoading = false
-            })
+            const result = await this.$server.dataModel
+              .addCustomizModelPivotschema(params)
+              .finally(() => {
+                this.confirmLoading = false
+              })
 
             if (result.code === 200) {
               this.$emit('success', result.data)
@@ -500,7 +565,7 @@ export default {
     },
     /**
      * 编辑器展示
-    */
+     */
     getExpshow(val) {
       const tokenStream = new TokenStream(val)
       const str = tokenStream.getTokenArray()
@@ -510,7 +575,7 @@ export default {
     },
     /**
      * 生成对应的词法
-    */
+     */
     generator(ary = []) {
       ary.forEach((element) => {
         const span = document.createElement('span')
@@ -521,18 +586,21 @@ export default {
     },
     /**
      * textarea模拟滚动
-    */
+     */
     handleScroll(event) {
       this.$refs['js-expshow'].scrollLeft = event.target.scrollLeft
       this.$refs['js-expshow'].scrollTop = event.target.scrollTop
     },
     /**
      * 校验和计算
-    */
+     */
     check(str) {
       try {
         this.cacheValidata = true
-        const parse = new Parse(str, [...this.sourceDimensions, ...this.sourceMeasures])
+        const parse = new Parse(str, [
+          ...this.sourceDimensions,
+          ...this.sourceMeasures
+        ])
         const ast = parse.parseAST()
         console.log('语法树', ast)
         const type = this.computeType === '维度' ? 'dimessions' : 'measures'
@@ -549,28 +617,31 @@ export default {
     },
     /**
      * 右侧栏选中
-    */
+     */
     handleSelectExpression(express) {
       this.insertText(this.$refs['js-textarea'], express.syntax)
     },
     /**
      * 插入到光标处
-    */
+     */
     insertText(el, text) {
       if (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA') {
         return
       }
       if (document.selection) {
-          el.focus()
-          var cr = document.selection.createRange()
-          cr.text = text
-          cr.collapse()
-          cr.select()
+        el.focus()
+        var cr = document.selection.createRange()
+        cr.text = text
+        cr.collapse()
+        cr.select()
       } else if (el.selectionStart || el.selectionStart === 0) {
-          var start = el.selectionStart
-          var end = el.selectionEnd
-          el.value = el.value.substring(0, start) + text + el.value.substring(end, el.value.length)
-          el.selectionStart = el.selectionEnd = start + text.length
+        var start = el.selectionStart
+        var end = el.selectionEnd
+        el.value =
+          el.value.substring(0, start) +
+          text +
+          el.value.substring(end, el.value.length)
+        el.selectionStart = el.selectionEnd = start + text.length
       } else {
         el.value += text
       }

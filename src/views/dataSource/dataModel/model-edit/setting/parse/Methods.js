@@ -149,37 +149,37 @@ export class Methods {
     return this.methods.numberCommon.call(this, arg, 'ROUND')
   }
   // 向下取整
-  INT(arg) {
-    return this.methods.numberCommon.call(this, arg, 'INT')
-  }
+  // INT(arg) {
+  //   return this.methods.numberCommon.call(this, arg, 'INT')
+  // }
   // 字符串长度
-  LEN(arg) {
-    return this.methods.stringCommon.call(this, arg, 'LEN')
+  LENGTH(arg) {
+    return this.methods.stringCommon.call(this, arg, 'LENGTH')
   }
   // 当前时间
-  NOW() {
+  CURRENT_TIMESTAMP() {
     return {
       type: 'dateLit',
       value: true
     }
   }
   // 今天日期
-  TODAY() {
+  CURRENT_DATE() {
     return {
       type: 'dateLit',
       value: true
     }
   }
-  // 逻辑与运算
-  LOGICAND(arg) {
-    return this.methods.logicCommon.call(this, arg, 'LOGICAND')
-  }
-  // 逻辑或预算
-  LOGICOR(arg) {
-    return this.methods.logicCommon.call(this, arg, 'LOGICOR')
-  }
-  // 财务运算-年金函数
-  PMT(arg) {
-    console.log('arg', arg)
-  }
+  // 逻辑与运算(规则不一致, 暂时屏蔽)
+  // AND(arg) {
+  //   return this.methods.logicCommon.call(this, arg, 'AND')
+  // }
+  // // 逻辑或预算(规则不一致, 暂时屏蔽)
+  // OR(arg) {
+  //   return this.methods.logicCommon.call(this, arg, 'OR')
+  // }
+  // 财务运算-年金函数(暂不支持)
+  // PMT(arg) {
+  //   console.log('arg', arg)
+  // }
 }
