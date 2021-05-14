@@ -38,7 +38,10 @@ export default function setColorFormatter(val, typeName) {
     }
     // 根据条件获取对应预警颜色，冲突以后面条件为准
     for (let item of val.warning) {
-      temColor = judgeCondition(item, data) ? item.warnColor : temColor
+      temColor =
+        item.measure === params.seriesIndex && judgeCondition(item, data)
+          ? item.warnColor
+          : temColor
     }
     return temColor
   }
