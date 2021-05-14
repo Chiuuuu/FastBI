@@ -102,7 +102,7 @@ export default {
         let dataIndex = e.dataIndex
         option.series.forEach((item, index) => {
           item.itemStyle = {
-            opacity: 0.2
+            opacity: 0.1
           }
           item.emphasis.itemStyle = {
             opacity: 1
@@ -293,8 +293,7 @@ export default {
     },
     // 获取echarts实例
     afterSetOption(chartObj) {
-      this.chartObj = chartObj
-      console.log(chartObj.getOption())
+      this.chartObj = chartObj;
     }
   },
   computed: {

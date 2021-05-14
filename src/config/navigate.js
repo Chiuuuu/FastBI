@@ -141,10 +141,12 @@ const list = [
               show: true
             }
           },
-          dataZoom: {
+          dataZoom: [{
+            type: 'slider',
             show: true,
+            xAxisIndex: [0],
             height: 12,
-            bottom: '9%',
+            bottom: 'auto',
             handleSize: '110%',
             handleStyle: {
               color: '#d3dee5'
@@ -153,7 +155,7 @@ const list = [
               color: '#fff'
             },
             borderColor: '#90979c'
-          },
+          }],
           series: {
             type: 'line',
             smooth: false, // 可选的
@@ -315,10 +317,12 @@ const list = [
               show: true
             }
           },
-          dataZoom: {
+          dataZoom: [{
+            type: 'slider',
             show: true,
+            xAxisIndex: [0],
             height: 12,
-            bottom: '9%',
+            bottom: 'auto',
             handleSize: '110%',
             handleStyle: {
               color: '#d3dee5'
@@ -327,7 +331,7 @@ const list = [
               color: '#fff'
             },
             borderColor: '#90979c'
-          },
+          }],
           series: {
             label: {
               show: false,
