@@ -12,7 +12,7 @@
     <a-modal
       v-model="visible"
       title="数据预警设置"
-      :width="560"
+      :width="610"
       @ok="submit"
       @click.native="closeDown"
     >
@@ -61,10 +61,23 @@
                 </div>
               </div>
             </div>
+            <!-- 度量选择 -->
+            <a-select
+              :class="['pick-select', 'has-margin']"
+              style="margin-left:10px;width:120px;"
+              v-model="item.measure"
+            >
+              <a-select-option
+                v-for="(measure, seriesIndex) in measureList"
+                :key="seriesIndex"
+                :value="seriesIndex"
+                >{{ measure.alias }}</a-select-option
+              >
+            </a-select>
             <!-- 范围选择 -->
             <a-select
               :class="['pick-select', 'has-margin']"
-              style="margin-left:10px"
+              style="margin-left:10px;width:100px;"
               v-model="item.condition"
               @change="changeCondition(item)"
             >
@@ -118,7 +131,11 @@ export default {
       'currSelected',
       'canvasMap',
       'selectedModelList'
-    ])
+    ]),
+    // 已拖入度量
+    measureList() {
+      return this.currSelected.setting.api_data.measures
+    }
   },
   data() {
     return {
@@ -151,6 +168,7 @@ export default {
           condition: 'range', // 条件选择，显示
           firstValue: '',
           secondValue: '',
+          measure: 0, // 条件对应度量
           showDown: false // 下拉框控制
         })
       } else {
