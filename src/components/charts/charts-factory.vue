@@ -293,7 +293,7 @@ export default {
     },
     // 获取echarts实例
     afterSetOption(chartObj) {
-      this.chartObj = chartObj;
+      this.chartObj = chartObj
     }
   },
   computed: {

@@ -80,10 +80,11 @@
         key="warning"
         header="数据预警"
         v-if="
-          currSelected.setting.chartType === 'v-line' ||
-            currSelected.setting.chartType === 'v-histogram' ||
-            currSelected.setting.chartType === 'v-pie' ||
-            currSelected.setting.chartType === 'v-bar'
+          currSelected.setting.api_data.source &&
+            (currSelected.setting.chartType === 'v-line' ||
+              currSelected.setting.chartType === 'v-histogram' ||
+              currSelected.setting.chartType === 'v-pie' ||
+              currSelected.setting.chartType === 'v-bar')
         "
       >
         <Warning />

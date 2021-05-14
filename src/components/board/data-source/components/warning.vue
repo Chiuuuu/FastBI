@@ -68,9 +68,9 @@
               v-model="item.measure"
             >
               <a-select-option
-                v-for="(measure, seriesIndex) in measureList"
-                :key="seriesIndex"
-                :value="seriesIndex"
+                v-for="measure in measureList"
+                :key="measure.alias"
+                :value="measure.alias"
                 >{{ measure.alias }}</a-select-option
               >
             </a-select>
@@ -168,7 +168,7 @@ export default {
           condition: 'range', // 条件选择，显示
           firstValue: '',
           secondValue: '',
-          measure: 0, // 条件对应度量
+          measure: this.measureList[0].alias, // 条件对应度量
           showDown: false // 下拉框控制
         })
       } else {

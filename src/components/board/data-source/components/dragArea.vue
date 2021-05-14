@@ -269,9 +269,16 @@ export default {
     },
     // 删除当前维度或者度量
     deleteFile(item, index) {
-      this.fileList.splice(index, 1)
-      this.getData()
+      let dels = this.fileList.splice(index, 1)
       let current = deepClone(this.currSelected)
+      // 存在预警设置的去掉对应度量条件
+      if (current.setting.api_data.warning) {
+        current.setting.api_data.warning = current.setting.api_data.warning.filter(
+          item => item.measure !== dels[0].alias
+        )
+        this.$store.dispatch('SetSelfDataSource', current.setting.api_data)
+      }
+      this.getData()
       // 维度度量删除完以后重置该图表数据
       if (this.chartType === '1' || this.chartType === '2') {
         if (
