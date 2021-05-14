@@ -85,7 +85,7 @@ import BoardOptions from './options/index' // 右侧栏(页面配置)
 import CanvasMain from './canvas' // 中间画板
 import ContextMenu from './context-menu/index' // 右键菜单
 import BoardModel from './model/index' // 8-14 新增数据模型
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions, mapState } from 'vuex'
 import moment from 'moment'
 
 const prefixCls = 'board'
@@ -97,12 +97,7 @@ export default {
       config: config,
       errorData: '',
       visible: false, // 推送弹窗
-      shareObj: {
-        pushTime: 'immediate',
-        pusher: '',
-        watermark: 'yes',
-        time: null
-      } // 推送信息
+      shareObj: {} // 推送信息
     }
   },
   provide() {
@@ -111,6 +106,9 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      userInfo: state => state.user.info
+    }),
     ...mapGetters(['optionsExpand', 'coverageExpand', 'modelExpand']),
     centerStyle() {
       return {
@@ -147,10 +145,24 @@ export default {
     },
     // 推送
     shareChart() {
+      if (!this.shareObj.pusher) {
+        this.$message.error('请输入推送人')
+        return
+      }
+      if (this.shareObj.pushTime === 'timing' && !this.shareObj.time) {
+        this.$message.error('请输入推送时间')
+        return
+      }
       this.visible = false
     },
     // 显示推送弹窗
     showPush() {
+      this.shareObj = {
+        pushTime: 'immediate',
+        pusher: this.userInfo.name,
+        watermark: 'yes',
+        time: null
+      }
       this.visible = true
       this.HideContextMenu()
     }
