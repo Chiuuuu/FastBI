@@ -1,17 +1,32 @@
 <template>
   <a-row class="navbar" type="flex" justify="end" align="middle">
     <a-select
-      :value='selectProject'
+      :value="selectProject"
       style="min-width: 120px;margin-right:20px;"
-      @change="handleChangeProject">
-      <a-select-option
-        v-for="item in projectList"
-        :key="item.id"
-      >{{ item.name }}</a-select-option>
+      @change="handleChangeProject"
+    >
+      <a-select-option v-for="item in projectList" :key="item.id">{{
+        item.name
+      }}</a-select-option>
     </a-select>
+    <!-- 图表推送 -->
+    <a-dropdown placement="bottomCenter">
+      <a-icon
+        type="bell"
+        style="font-size:20px;color:grey;margin-right:10px;"
+      />
+      <a-menu slot="overlay">
+        <a-menu-item v-for="(item, index) in shareChartList" :key="index">
+          <span @click="checkChartDetail">{{ item.title }}</span>
+        </a-menu-item>
+      </a-menu>
+    </a-dropdown>
     <div class="user">
       <a-dropdown>
-        <span>{{userInfo.name}}<img src="@/assets/images/icon_head_portrait.png" alt=""/></span>
+        <span
+          >{{ userInfo.name
+          }}<img src="@/assets/images/icon_head_portrait.png" alt=""
+        /></span>
         <a-menu slot="overlay">
           <a-menu-item>
             <a href="javascript:;" @click="clearBtn">清除缓存</a>
@@ -38,6 +53,13 @@ export default {
       projectList: state => state.user.projectList,
       userInfo: state => state.user.info
     })
+  },
+  data() {
+    return {
+      shareChartList: [
+        { title: '​统计饼图（我的电视大屏，王小明，2021-05-13 11:05:00）' }
+      ]
+    }
   },
   methods: {
     handleChangeProject(value) {
@@ -68,13 +90,15 @@ export default {
     },
     // 清除缓存
     clearBtn() {
-      const dely = Math.floor((Math.random() * 3) + 1) // 1~3
-      this.$message.success({
-        content: '正在清除缓存,完成后将跳转至登录',
-        duration: dely
-      }).then(() => {
-        this.quitBtn()
-      })
+      const dely = Math.floor(Math.random() * 3 + 1) // 1~3
+      this.$message
+        .success({
+          content: '正在清除缓存,完成后将跳转至登录',
+          duration: dely
+        })
+        .then(() => {
+          this.quitBtn()
+        })
     },
 
     // 点击收起展开侧边栏
@@ -84,6 +108,13 @@ export default {
       } else {
         this.$store.commit('common/set_sidebarUnfold', true)
       }
+    },
+    // 查看图表推送详情
+    checkChartDetail() {
+      let tempwindow = window.open('_blank')
+      // pdf测试
+      let url = 'https://web.stanford.edu/~xgzhou/zhou_book2017.pdf'
+      tempwindow.location = url
     }
   }
 }

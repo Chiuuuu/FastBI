@@ -26,3 +26,50 @@
     }
   }
 }
+.releace-box {
+  position: relative;
+  padding: 5px;
+  .releace-line {
+    margin-bottom: 20px;
+    height:34px;
+    line-height:34px;
+    .label {
+      width: 20%;
+    }
+    .errortext {
+      color: red;
+    }
+    .has-error{
+        border-color:red;
+        &:hover{
+             border-color:red;
+             box-shadow: none;
+        }
+        &:focus{
+            border-color:red;
+            box-shadow: none;
+        }
+    }
+  }
+  .indent {
+    margin-left: 15%;
+    margin-bottom: 10px;
+    .indent-text {
+      color: #617BFF;
+      cursor: pointer;
+    }
+    .qrcode {
+      margin-left: 8px;
+    }
+  }
+  .code-show {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate3d(-50%, -50%, 0);
+    z-index: 99;
+  }
+}
+.mod_input {
+  width: 310px;
+}

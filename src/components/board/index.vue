@@ -36,7 +36,43 @@
       </board-model>
     </div>
     <!--右键菜单-->
-    <context-menu></context-menu>
+    <context-menu @showPush="showPush"></context-menu>
+    <!--创建推送弹窗-->
+    <a-modal v-model="visible" title="图表推送" @ok="shareChart">
+      <div class="releace-box">
+        <div class="releace-line">
+          <span class="label">推送时间：</span>
+          <a-radio-group v-model="shareObj.pushTime">
+            <a-radio value="immediate">立即推送</a-radio>
+            <a-radio value="timing">定时推送</a-radio>
+            <!-- 定时推送时间 -->
+            <a-date-picker
+              v-show="shareObj.pushTime === 'timing'"
+              v-model="shareObj.time"
+              :disabled-date="disabledDate"
+              format="YYYY-MM-DD HH:mm:ss"
+              style="width:200px"
+              placeholder="请选择推送时间"
+            />
+          </a-radio-group>
+        </div>
+        <div class="releace-line">
+          <span class="label">推送人：</span
+          ><input
+            v-model="shareObj.pusher"
+            :class="['mod_input', 'ant-input']"
+            placeholder="请输入推送人"
+          />
+        </div>
+        <div class="releace-line">
+          <span class="label">是否加水印：</span>
+          <a-radio-group v-model="shareObj.watermark">
+            <a-radio value="yes">是</a-radio>
+            <a-radio value="no">否</a-radio>
+          </a-radio-group>
+        </div>
+      </div>
+    </a-modal>
   </div>
 </template>
 
@@ -50,6 +86,7 @@ import CanvasMain from './canvas' // 中间画板
 import ContextMenu from './context-menu/index' // 右键菜单
 import BoardModel from './model/index' // 8-14 新增数据模型
 import { mapGetters, mapActions } from 'vuex'
+import moment from 'moment'
 
 const prefixCls = 'board'
 export default {
@@ -58,7 +95,14 @@ export default {
     return {
       prefixCls: prefixCls,
       config: config,
-      errorData: ''
+      errorData: '',
+      visible: false, // 推送弹窗
+      shareObj: {
+        pushTime: 'immediate',
+        pusher: '',
+        watermark: 'yes',
+        time: null
+      } // 推送信息
     }
   },
   provide() {
@@ -92,10 +136,23 @@ export default {
     ...mapActions([
       'ToggleOptionsExpand',
       'ToggleCoverageExpand',
-      'ToggleModelExpand'
+      'ToggleModelExpand',
+      'HideContextMenu'
     ]),
     getErrorData(error) {
       this.errorData = error
+    },
+    disabledDate(current) {
+      return current && current < moment().endOf('hour')
+    },
+    // 推送
+    shareChart() {
+      this.visible = false
+    },
+    // 显示推送弹窗
+    showPush() {
+      this.visible = true
+      this.HideContextMenu()
     }
   },
   // 8-14 添加配置侧栏

@@ -80,8 +80,9 @@ export default {
     ...mapActions(['saveScreenData', 'deleteChartData']),
     //  执行菜单命令
     handleCommand(order) {
-      console.log(order)
-      if (order === 'remove') {
+      if (order === 'chartShare') {
+        this.$emit('showPush')
+      } else if (order === 'remove') {
         // 如果是删除操作则弹出一个对话框来确认
         // this.$EventBus.$emit('context/menu/delete')
         this.deleteOne()
