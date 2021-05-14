@@ -143,8 +143,8 @@ const list = [
           },
           dataZoom: {
             show: true,
-            height: 25,
-            bottom: '6%',
+            height: 12,
+            bottom: '9%',
             handleSize: '110%',
             handleStyle: {
               color: '#d3dee5'
@@ -317,8 +317,8 @@ const list = [
           },
           dataZoom: {
             show: true,
-            height: 25,
-            bottom: '6%',
+            height: 12,
+            bottom: '9%',
             handleSize: '110%',
             handleStyle: {
               color: '#d3dee5'
