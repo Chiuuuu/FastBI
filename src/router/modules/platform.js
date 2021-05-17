@@ -2,6 +2,7 @@ import PERMISSION_CODE from '@/config/permission'
 
 const RouteView = () => import('@/layout/routeView')
 const LogView = () => import('@/views/platform/log')
+const ScheduleView = () => import('@/views/platform/schedule')
 const SystemMonitoringView = () => import('@/views/platform/systemMonitoring')
 
 export default {
@@ -30,6 +31,14 @@ export default {
       meta: {
         title: '系统监控',
         permissions: [PERMISSION_CODE.PAGE.monitoring]
+      }
+    },
+    {
+      path: 'systemSchedule',
+      name: 'systemSchedule',
+      component: ScheduleView,
+      meta: {
+        title: '存储管理'
       }
     }
   ]

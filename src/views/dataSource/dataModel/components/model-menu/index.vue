@@ -2,27 +2,35 @@
   <div class="model-menu">
     <div class="menu_title">
       <span class="m-t-s">数据模型</span>
-      <a-dropdown v-if="hasPermissionSourceAdd || hasPermissionFolderAdd" :trigger="['click']" placement="bottomLeft">
+      <a-dropdown
+        v-if="hasPermissionSourceAdd || hasPermissionFolderAdd"
+        :trigger="['click']"
+        placement="bottomLeft"
+      >
         <a class="ant-dropdown-link">
           <a-icon type="plus-square" class="menu_icon" />
         </a>
         <a-menu slot="overlay" class="drow_menu">
-          <a-menu-item
-            v-if="hasPermissionSourceAdd"
-            v-on:click="showModal">
-            新建模型
-          </a-menu-item>
-          <a-menu-item v-if="hasPermissionFolderAdd" @click="handleAddNewFolder">
-            新建文件夹
-          </a-menu-item>
+          <a-menu-item v-if="hasPermissionSourceAdd" v-on:click="showModal">新建模型</a-menu-item>
+          <a-menu-item v-if="hasPermissionFolderAdd" @click="handleAddNewFolder">新建文件夹</a-menu-item>
         </a-menu>
       </a-dropdown>
     </div>
-    <a-modal v-model="visible" title="选择数据接入" :bodyStyle="{
+    <a-modal
+      v-model="visible"
+      title="选择数据接入"
+      :bodyStyle="{
       height: `300px`,
       overflowY: 'auto'
-    }" @ok="handleOk">
-      <a-input ref="userNameInput" v-model="search" placeholder="搜索数据接入" @input='handleSearchSource'>
+    }"
+      @ok="handleOk"
+    >
+      <a-input
+        ref="userNameInput"
+        v-model="search"
+        placeholder="搜索数据接入"
+        @input="handleSearchSource"
+      >
         <a-icon slot="prefix" type="search" />
       </a-input>
       <router-link to="/dataSource/dataAccess" class="modal-item hover">新建数据接入</router-link>
@@ -34,17 +42,13 @@
           :key="folder.id"
         >
           <template v-if="handleIsFolder(folder)">
-            <menu-folder
-              :folder="folder"
-              :index="index"
-              @fileDrop="handleFileDrop"
-            >
+            <menu-folder :folder="folder" :index="index" @fileDrop="handleFileDrop">
               <template v-slot:file="slotProps">
                 <menu-file
                   icon="dataSource"
                   :file="slotProps.file"
                   :index="slotProps.index"
-                  :isSelect='modalFileSelectId === slotProps.file.id'
+                  :isSelect="modalFileSelectId === slotProps.file.id"
                   :parent="folder"
                   @fileSelect="(file) => handleFileSelect(file, 'modal')"
                   @fileDrag="handleFileDrag"
@@ -58,69 +62,103 @@
                 icon="dataSource"
                 :file="folder"
                 :index="index"
-                :isSelect='modalFileSelectId === folder.id'
+                :isSelect="modalFileSelectId === folder.id"
                 @fileSelect="(file) => handleFileSelect(file, 'modal')"
-                  @fileDrag="handleFileDrag"
-              ></menu-file>
-            </ul>
-          </template>
-        </div>
-      </div>
-    </a-modal>
-    <div class="menu_search">
-      <a-input placeholder="搜索数据模型名称" @input="handleSearchModel">
-        <a-icon class="icon_search" slot="suffix" type="search" />
-      </a-input>
-    </div>
-    <a-empty v-if="modelResultList.length === 0" class="table_list-_empty">
-      <span slot="description">暂无数据模型</span>
-    </a-empty>
-    <template v-else>
-      <!-- <p class="menu_tips">右键文件夹或选项有添加，重命名等操作</p> -->
-      <div class="menu-wrap scrollbar" @dragover.stop="handleDragOver" @drop="handleWrapDrop">
-        <div
-          class="group"
-          :class="handleIsFolder(folder) ? 'is-folder' : ''"
-          v-for="(folder, index) in modelResultList"
-          :key="folder.id"
-        >
-          <template v-if="handleIsFolder(folder)">
-            <menu-folder
-              :folder="folder"
-              :index="index"
-              :contextmenus="folderContenxtMenu"
-              @fileDrop="handleFileDrop"
-            >
-              <template v-slot:file="slotProps">
-                <menu-file
-                  icon="dataModel"
-                  :file="slotProps.file"
-                  :index="slotProps.index"
-                  :parent="folder"
-                  :isSelect='fileSelectId === slotProps.file.id'
-                  :contextmenus="fileContenxtMenu"
-                  @fileSelect="handleFileSelect"
-                  @fileDrag="handleFileDrag"
-                ></menu-file>
-              </template>
-            </menu-folder>
-          </template>
-          <template v-else>
-            <ul class="items">
-              <menu-file
-                icon="dataModel"
-                :file="folder"
-                :index="index"
-                :isSelect='fileSelectId === folder.id'
-                :contextmenus="fileContenxtMenu"
-                @fileSelect="handleFileSelect"
                 @fileDrag="handleFileDrag"
               ></menu-file>
             </ul>
           </template>
         </div>
       </div>
-    </template>
+    </a-modal>
+    <!-- 菜单高级搜索弹窗 -->
+    <a-modal v-model="modelSearchVisible" title="高级筛选条件">
+      <a-form-model :model="modelSearchForm" :labelCol="{span: 6}" :wrapperCol="{span: 16}">
+        <a-form-model-item label="创建人" prop="createBy">
+          <a-select v-model="modelSearchForm.createBy" placeholder="请选择创建人">
+            <a-select-option
+              v-for="item in projectUserList"
+              :key="item.id"
+              :value="item.id"
+            >{{ item.name }}</a-select-option>
+          </a-select>
+        </a-form-model-item>
+        <a-form-model-item label="创建日期" prop="gmtCreate">
+          <a-date-picker
+            style="width: 100%"
+            v-model="modelSearchForm.gmtCreate"
+            placeholder="请选择创建日期"
+            valueFormat="YYYY-MM-DD HH:mm:ss"
+          ></a-date-picker>
+        </a-form-model-item>
+      </a-form-model>
+      <template #footer>
+        <a-button @click="handleResetSearch">重置</a-button>
+        <a-button type="primary" @click="handleGetModelSearchList">搜索</a-button>
+      </template>
+    </a-modal>
+    <!-- 搜索框 -->
+    <div class="menu_search">
+      <a-input placeholder="搜索数据模型名称" :value="modelSearchForm.keyword" @input="handleSearchModel">
+        <a-icon class="icon_search" slot="suffix" type="search" />
+        <a class="ant-dropdown-link" slot="addonAfter" @click="modelSearchVisible = true">
+          <a-icon type="filter" class="menu_icon"></a-icon>
+        </a>
+      </a-input>
+    </div>
+    <div class="menu-wrap scrollbar">
+      <a-spin :spinning="menuLoading">
+        <a-empty v-if="modelSearchList.length === 0" class="table_list-_empty">
+          <span slot="description">暂无数据模型</span>
+        </a-empty>
+        <template v-else>
+          <!-- <p class="menu_tips">右键文件夹或选项有添加，重命名等操作</p> -->
+          <div @dragover.stop="handleDragOver" @drop="handleWrapDrop">
+            <div
+              class="group"
+              :class="handleIsFolder(folder) ? 'is-folder' : ''"
+              v-for="(folder, index) in modelSearchList"
+              :key="folder.id"
+            >
+              <template v-if="handleIsFolder(folder)">
+                <menu-folder
+                  :folder="folder"
+                  :index="index"
+                  :contextmenus="folderContenxtMenu"
+                  @fileDrop="handleFileDrop"
+                >
+                  <template v-slot:file="slotProps">
+                    <menu-file
+                      icon="dataModel"
+                      :file="slotProps.file"
+                      :index="slotProps.index"
+                      :parent="folder"
+                      :isSelect="fileSelectId === slotProps.file.id"
+                      :contextmenus="fileContenxtMenu"
+                      @fileSelect="handleFileSelect"
+                      @fileDrag="handleFileDrag"
+                    ></menu-file>
+                  </template>
+                </menu-folder>
+              </template>
+              <template v-else>
+                <ul class="items">
+                  <menu-file
+                    icon="dataModel"
+                    :file="folder"
+                    :index="index"
+                    :isSelect="fileSelectId === folder.id"
+                    :contextmenus="fileContenxtMenu"
+                    @fileSelect="handleFileSelect"
+                    @fileDrag="handleFileDrag"
+                  ></menu-file>
+                </ul>
+              </template>
+            </div>
+          </div>
+        </template>
+      </a-spin>
+    </div>
     <reset-name-modal
       ref="resetNameForm"
       :visible="resetName.visible"
@@ -159,6 +197,7 @@ export default {
   data() {
     return {
       visible: false,
+      menuLoading: false,
       resetName: {
         visible: false,
         type: 'new',
@@ -168,7 +207,14 @@ export default {
       sourceList: [], // 数据源列表
       sourceSearch: '', // 数据源搜索关键词
       sourceSearchList: [], // 数据源搜索结果
-      modelSearch: '', // 模型搜索关键词
+      projectUserList: [], // 当前项目下的成员列表
+      modelSearchVisible: false, // 高级筛选弹窗控制
+      modelSearchForm: {
+        // 高级筛选表单
+        name: '', // 输入框关键字
+        createBy: undefined, // 创建人
+        gmtCreate: '' // 创建时间
+      },
       modelSearchList: [], // 模型搜索结果
       modelFolderList: [],
       modelFileList: [],
@@ -229,34 +275,39 @@ export default {
   },
   computed: {
     ...mapState({
-      modelList: state => state.dataModel.menuList
+      modelList: (state) => state.dataModel.menuList
     }),
     sourceResultList() {
       return this.sourceSearch ? this.sourceSearchList : this.sourceList
     },
-    modelResultList() {
-      return this.modelSearch ? this.modelSearchList : this.modelList
-    },
     folderList() {
-      return this.modelList.filter(item => item.fileType === 0)
+      return this.modelList.filter((item) => item.fileType === 0)
     },
     fileSelectId: {
-      get () {
+      get() {
         return this.$store.state.dataModel.modelId
       },
-      set (value) {
+      set(value) {
         this.$store.commit('dataModel/SET_MODELID', value)
       }
     },
     hasPermissionFolderAdd() {
-      return checkActionPermission(this.$PERMISSION_CODE.OBJECT.modelFolder, this.$PERMISSION_CODE.OPERATOR.add)
+      return checkActionPermission(
+        this.$PERMISSION_CODE.OBJECT.modelFolder,
+        this.$PERMISSION_CODE.OPERATOR.add
+      )
     },
     hasPermissionSourceAdd() {
-      return checkActionPermission(this.$PERMISSION_CODE.OBJECT.datamodel, this.$PERMISSION_CODE.OPERATOR.add)
+      return checkActionPermission(
+        this.$PERMISSION_CODE.OBJECT.datamodel,
+        this.$PERMISSION_CODE.OPERATOR.add
+      )
     }
   },
   created() {
-    this.handleGetMenuList()
+    // this.handleGetMenuList()
+    this.handleGetModelSearchList()
+    this.handleGetProjectUserList()
   },
   mounted() {
     this.$on('fileSelect', this.handleFileSelect)
@@ -264,10 +315,12 @@ export default {
   },
   methods: {
     /**
-    * 获取数据源数据
-    */
+     * 获取数据源数据
+     */
     async handleGetDataSourceList() {
-      const result = await this.$server.common.getMenuList('/datasource/catalog/list/1')
+      const result = await this.$server.common.getMenuList(
+        '/datasource/catalog/list/1'
+      )
 
       if (result.code === 200) {
         this.sourceList = result.rows
@@ -281,13 +334,30 @@ export default {
     async handleGetMenuList() {
       this.$store.dispatch('dataModel/getMenuList', this)
     },
+    // 获取项目成员list
+    handleGetProjectUserList() {
+      this.$server.projectCenter
+        .getList({
+          current: 1,
+          pageSize: 999,
+          name: '',
+          username: ''
+        })
+        .then((res) => {
+          if (res.code === 200) {
+            this.projectUserList = res.rows
+          } else {
+            this.projectUserList = []
+          }
+        })
+    },
     handleFolderNewModel(mouseEvent, event, { folder }) {
       this.$store.dispatch('dataModel/setParentId', folder.id)
       this.showModal()
     },
     /**
      * 打开弹窗
-    */
+     */
     showModal() {
       this.visible = true
       this.handleGetDataSourceList()
@@ -300,7 +370,7 @@ export default {
     },
     /**
      * 文件夹重命名
-    */
+     */
     handleFolderResetName(mouseEvent, event, { folder }) {
       console.log('文件夹重命名', folder)
       this.resetName.type = 'reset'
@@ -310,7 +380,7 @@ export default {
     },
     /**
      * 菜单重命名
-    */
+     */
     handleFileResetName(mouseEvent, event, { file, parent }) {
       console.log('菜单重命名', file, parent)
       this.resetName.type = 'reset'
@@ -319,16 +389,19 @@ export default {
       this.resetName.parentId = parent ? parent.id : 0
     },
     async _resetName(form) {
-      const result = await this.$server.common.putMenuFolderName('/model/catalog', {
-        fileType: this.resetName.item.fileType,
-        id: this.resetName.item.id,
-        name: form.name,
-        parentId: this.resetName.parentId || 0,
-        type: 2
-      })
+      const result = await this.$server.common.putMenuFolderName(
+        '/model/catalog',
+        {
+          fileType: this.resetName.item.fileType,
+          id: this.resetName.item.id,
+          name: form.name,
+          parentId: this.resetName.parentId || 0,
+          type: 2
+        }
+      )
 
       if (result.code === 200) {
-        this.handleGetMenuList()
+        this.handleGetModelSearchList()
         if (this.resetName.item.id === this.fileSelectId) {
           this.$store.commit('dataModel/SET_MODELNAME', form.name)
         }
@@ -339,7 +412,7 @@ export default {
     },
     /**
      * 文件夹删除
-    */
+     */
     handleFolderDelete(mouseEvent, event, { folder }) {
       if (folder.children && folder.children.length > 0) {
         return this.$message.error('文件夹下存在数据模型不可删除')
@@ -348,10 +421,12 @@ export default {
         title: '确认提示',
         content: '确定删除该文件夹?',
         onOk: async () => {
-          const result = await this.$server.common.deleMenuById('/model/catalog/' + folder.id)
+          const result = await this.$server.common.deleMenuById(
+            '/model/catalog/' + folder.id
+          )
 
           if (result.code === 200) {
-            this.handleGetMenuList()
+            this.handleGetModelSearchList()
             this.$store.dispatch('dataModel/setModelId', -1)
             this.$store.commit('dataModel/SET_MODELNAME', '')
             this.$message.success('删除成功')
@@ -373,15 +448,18 @@ export default {
      * 选择移动文件夹弹窗确认
      */
     async handleFileMoveCreate(parentId) {
-      const result = await this.$server.common.putMenuFolderName('/model/catalog', {
-        fileType: this.selectFile.fileType,
-        id: this.selectFile.id,
-        name: this.selectFile.name,
-        parentId: parentId,
-        type: 2
-      })
+      const result = await this.$server.common.putMenuFolderName(
+        '/model/catalog',
+        {
+          fileType: this.selectFile.fileType,
+          id: this.selectFile.id,
+          name: this.selectFile.name,
+          parentId: parentId,
+          type: 2
+        }
+      )
       if (result.code === 200) {
-        this.handleGetMenuList()
+        this.handleGetModelSearchList()
         this.$message.success('移动成功')
       } else {
         this.$message.error(result.msg)
@@ -391,17 +469,19 @@ export default {
     },
     /**
      * 文件删除
-    */
+     */
     handleFileDelete(mouseEvent, event, { file }) {
       this.$confirm({
         title: '确认提示',
         content: '确定删除该模型?',
         onOk: async () => {
-          const result = await this.$server.common.deleMenuById(`/model/catalog/${file.id}`)
+          const result = await this.$server.common.deleMenuById(
+            `/model/catalog/${file.id}`
+          )
 
           if (result.code === 200) {
             this.$message.success('删除成功')
-            this.handleGetMenuList()
+            this.handleGetModelSearchList()
             const isSame = file.id === this.fileSelectId
             if (isSame) {
               this.$store.dispatch('dataModel/setModelId', -1)
@@ -415,7 +495,7 @@ export default {
     },
     /**
      * 点击左侧菜单获取模型信息
-    */
+     */
     handleFileSelect(file, type) {
       if (type !== 'modal') {
         // '点击左侧菜单获取模型信息'
@@ -440,15 +520,18 @@ export default {
      */
     async handleFileDrop(folder) {
       if (!this.dragFile || this.dragFile.parentId === folder.id) return
-      const result = await this.$server.common.putMenuFolderName('/model/catalog', {
-        fileType: this.dragFile.fileType,
-        id: this.dragFile.id,
-        name: this.dragFile.name,
-        parentId: folder.id,
-        type: 2
-      })
+      const result = await this.$server.common.putMenuFolderName(
+        '/model/catalog',
+        {
+          fileType: this.dragFile.fileType,
+          id: this.dragFile.id,
+          name: this.dragFile.name,
+          parentId: folder.id,
+          type: 2
+        }
+      )
       if (result.code === 200) {
-        this.handleGetMenuList()
+        this.handleGetModelSearchList()
         this.$message.success('移动成功')
       } else {
         this.$message.error(result.msg)
@@ -463,15 +546,18 @@ export default {
     async handleWrapDrop(e) {
       const className = e.toElement.className
       if (className.indexOf('menu-wrap') > -1 && this.dragFile.parentId !== 0) {
-        const result = await this.$server.common.putMenuFolderName('/model/catalog', {
-          fileType: this.dragFile.fileType,
-          id: this.dragFile.id,
-          name: this.dragFile.name,
-          parentId: 0,
-          type: 2
-        })
+        const result = await this.$server.common.putMenuFolderName(
+          '/model/catalog',
+          {
+            fileType: this.dragFile.fileType,
+            id: this.dragFile.id,
+            name: this.dragFile.name,
+            parentId: 0,
+            type: 2
+          }
+        )
         if (result.code === 200) {
-          this.handleGetMenuList()
+          this.handleGetModelSearchList()
           this.$message.success('移动成功')
         } else {
           this.$message.error(result.msg)
@@ -497,7 +583,7 @@ export default {
     /**
      * 搜索目录列表
      */
-    handleSearchSource: debounce(function(event) {
+    handleSearchSource: debounce(function (event) {
       const value = event.target.value
       this.sourceSearch = value
       if (value) {
@@ -507,7 +593,7 @@ export default {
     }, 400),
     handleGetSourceSearchList(value) {
       let result = []
-      this.sourceList.map(item => {
+      this.sourceList.map((item) => {
         const newItem = menuSearchLoop(item, value)
         if (newItem) result.push(newItem)
       })
@@ -517,26 +603,35 @@ export default {
     /**
      * 搜索目录列表
      */
-    handleSearchModel: debounce(function(event) {
+    handleSearchModel: debounce(function (event) {
       const value = event.target.value
-      this.modelSearch = value
-      if (value) {
-        this.handleGetModelSearchList(value)
-        console.log('input', value)
-      }
+      this.modelSearchForm.name = value
+      this.handleGetModelSearchList()
     }, 400),
-    handleGetModelSearchList(value) {
-      let result = []
-      this.modelList.map(item => {
-        const newItem = menuSearchLoop(item, value)
-        if (newItem) result.push(newItem)
-      })
-      this.modelSearchList = result
-      console.log('搜索结果', this.modelSearchList)
+    async handleGetModelSearchList() {
+      this.modelSearchVisible = false
+      this.menuLoading = true
+      const res = await this.$server.dataModel
+        .getModelList(this.modelSearchForm)
+        .finally(() => {
+          this.menuLoading = false
+        })
+      if (res.code === 200) {
+        this.modelSearchList = res.data
+      } else {
+        this.$message.error(res.msg || '获取模型列表失败')
+      }
+    },
+    handleResetSearch() {
+      this.modelSearchForm = {
+        name: '',
+        createBy: undefined,
+        gmtCreate: ''
+      }
     },
     /**
      * 新增文件夹
-    */
+     */
     handleAddNewFolder() {
       this.resetName.visible = true
       this.resetName.type = 'new'
@@ -551,20 +646,20 @@ export default {
 
       if (result.code === 200) {
         this.$message.success('添加成功')
-        this.handleGetMenuList()
+        this.handleGetModelSearchList()
       } else {
         this.$message.error(result.msg)
       }
     },
     /**
      * 重命名取消
-    */
+     */
     handleResetNameCancel() {
       this.resetName.visible = false
     },
     /**
      * 重命名确定
-    */
+     */
     handleResetNameCreate(values) {
       if (this.resetName.type === 'reset') {
         this._resetName(values)
@@ -578,5 +673,5 @@ export default {
 </script>
 
 <style lang="styl" scoped>
-@import "./menu.styl";
+@import './menu.styl';
 </style>

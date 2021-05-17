@@ -8,13 +8,8 @@
         <div class="header">
           <span class="data_con">{{modelName}}</span>
           <div class="data_btn" v-show="currentView !== 'modelOperation'">
-            <a-button
-              v-if="hasEditPermission"
-              type="primary"
-              @click="edit">编辑模型</a-button>
-            <a-button
-              type="primary"
-              @click="handleGoToOperation">操作记录</a-button>
+            <a-button v-if="hasEditPermission" type="primary" @click="edit">编辑模型</a-button>
+            <a-button type="primary" @click="handleGoToOperation">操作记录</a-button>
             <a-button @click="handleGetData">刷新数据</a-button>
           </div>
           <div class="data_btn" v-show="currentView === 'modelOperation'">
@@ -23,7 +18,11 @@
         </div>
         <div class="scrollable scrollbar">
           <div class="description">
-              <span class="d-s" :title="detailInfo.description">描述：{{detailInfo.description}}</span>
+            <span class="d-s" :title="detailInfo.description">描述：{{detailInfo.description}}</span>
+            <div>
+              <span class="d-s">创建人：{{detailInfo.createBy}}</span>
+              <span class="d-s">创建时间：{{detailInfo.gmtCreate}}</span>
+            </div>
           </div>
           <!-- <p class="tips"><a-icon theme="filled" type="exclamation-circle" style="margin-right: 2px;" />下方表显示红色表示表在数据源已被删除，请您删除此表。表显示黄色表示表中列字段发生了变动，请您重新构建表关联关系。</p> -->
           <div class="draw_board scrollbar" v-show="currentView === 'modelShow'">
@@ -36,7 +35,7 @@
                   v-for="(item, index) in renderTables"
                   :key="index"
                   :node-data="item"
-                  title='name'
+                  title="name"
                 ></tree-node>
               </template>
             </div>
@@ -60,8 +59,13 @@
                     >
                       <div class="u-bitem" v-for="item in value" :key="item.id">
                         <div class="txt">
-                          <div class="icon"><img src="@/assets/images/icon_dimension.png" /></div>
-                          <div class="name" :class="{ 'line-through': !item.visible }">{{item.alias}}</div>
+                          <div class="icon">
+                            <img src="@/assets/images/icon_dimension.png" />
+                          </div>
+                          <div
+                            class="name"
+                            :class="{ 'line-through': !item.visible }"
+                          >{{item.alias}}</div>
                         </div>
                       </div>
                     </a-collapse-panel>
@@ -82,8 +86,13 @@
                     >
                       <div class="u-bitem" v-for="item in value" :key="item.id">
                         <div class="txt">
-                          <div class="icon"><img src="@/assets/images/icon_measure.png" /></div>
-                          <div class="name" :class="{ 'line-through': !item.visible }">{{item.alias}}</div>
+                          <div class="icon">
+                            <img src="@/assets/images/icon_measure.png" />
+                          </div>
+                          <div
+                            class="name"
+                            :class="{ 'line-through': !item.visible }"
+                          >{{item.alias}}</div>
                         </div>
                       </div>
                     </a-collapse-panel>
@@ -129,10 +138,10 @@ export default {
   },
   computed: {
     ...mapState({
-      modelId: state => state.dataModel.modelId,
-      modelName: state => state.dataModel.modelName,
-      privileges: state => state.common.privileges,
-      datasourceId: state => state.dataModel.datasourceId
+      modelId: (state) => state.dataModel.modelId,
+      modelName: (state) => state.dataModel.modelName,
+      privileges: (state) => state.common.privileges,
+      datasourceId: (state) => state.dataModel.datasourceId
     }),
     hasEditPermission() {
       return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.edit)
@@ -141,7 +150,7 @@ export default {
   methods: {
     /**
      * 获取数据
-    */
+     */
     async handleGetData(id) {
       this.handleModelOperationBack()
       this.spinning = true
@@ -152,7 +161,8 @@ export default {
       } else {
         modelId = this.modelId
       }
-      const result = await this.$server.dataModel.getDataModelDetailInfo(modelId)
+      const result = await this.$server.dataModel
+        .getDataModelDetailInfo(modelId)
         .finally(() => {
           this.spinning = false
         })
@@ -161,7 +171,10 @@ export default {
         this.$message.success('获取数据成功')
         this.detailInfo = result.data
         this.$store.commit('dataModel/SET_MODELNAME', result.data.name)
-        this.$store.commit('common/SET_PRIVILEGES', result.data.privileges || [])
+        this.$store.commit(
+          'common/SET_PRIVILEGES',
+          result.data.privileges || []
+        )
         this.handleDetailWithRoot()
         this.handleDimensions()
         this.handleMeasures()
@@ -174,27 +187,31 @@ export default {
      */
     async handleGetDataSource() {
       // 第一个数据库id
-      const datsource = await this.$server.dataModel.getDataSourceList(this.modelId)
+      const datsource = await this.$server.dataModel.getDataSourceList(
+        this.modelId
+      )
       console.log('根据modelId获取数据源', datsource)
-      this.$store.dispatch('dataModel/setDatasourceId', datsource.data[0].datasourceId)
+      this.$store.dispatch(
+        'dataModel/setDatasourceId',
+        datsource.data[0].datasourceId
+      )
       return datsource.data[0].datasourceId
     },
     /**
      * 跳转编辑状态
-    */
+     */
     edit() {
       // this.$router.push({ path: `/dataSource/Model-Edit/${this.modelId}` })
-      this.handleGetDataSource()
-        .then(id => {
-          this.$router.push({
-            name: 'modelEdit',
-            query: {
-              type: 'edit',
-              datasourceId: id,
-              modelId: this.modelId
-            }
-          })
+      this.handleGetDataSource().then((id) => {
+        this.$router.push({
+          name: 'modelEdit',
+          query: {
+            type: 'edit',
+            datasourceId: id,
+            modelId: this.modelId
+          }
         })
+      })
     },
     handleGoToOperation() {
       this.currentView = 'modelOperation'
@@ -208,7 +225,7 @@ export default {
     },
     /**
      * 处理树形组件
-    */
+     */
     handleDetailWithRoot() {
       if (this.detailInfo.config.tables.length === 0) {
         this.tablesEmpty = true
@@ -222,21 +239,24 @@ export default {
     },
     /**
      * 转换数据
-    */
+     */
     handleConversionTree(node) {
       conversionTree(node, this.detailInfo.config.tables.slice(1), 'tableNo')
       return node
     },
     /**
      * 维度数据处理
-    */
+     */
     handleDimensions() {
-      this.dimensions = groupBy(this.detailInfo.pivotSchema.dimensions, 'tableNo')
+      this.dimensions = groupBy(
+        this.detailInfo.pivotSchema.dimensions,
+        'tableNo'
+      )
       this.dimensionsActiveKey = [].concat(keys(this.dimensions))
     },
     /**
      * 度量数据处理
-    */
+     */
     handleMeasures() {
       this.measures = groupBy(this.detailInfo.pivotSchema.measures, 'tableNo')
       this.measuresActiveKey = [].concat(keys(this.measures))
@@ -246,5 +266,5 @@ export default {
 </script>
 
 <style lang="styl" scoped>
-  @import "./main.styl";
+@import './main.styl';
 </style>

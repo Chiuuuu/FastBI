@@ -1,6 +1,9 @@
 import $axios from '@/axios'
 
 export default {
+  getModelList(params) {
+    return $axios.post(`/model/catalog/advancedQuery`, params)
+  },
   /**
    * @description 新建状态, 获取一个空的数据模型
    * @returns

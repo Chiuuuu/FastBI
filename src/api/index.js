@@ -8,6 +8,7 @@ import corporateDomain from '@/api/modules/corporateDomain'
 import user from '@/api/modules/user'
 import log from '@/api/modules/log'
 import systemMonitoring from '@/api/modules/systemMonitoring'
+import systemSchedule from '@/api/modules/systemSchedule'
 import label from '@/api/modules/label'
 import dataDictionary from '@/api/modules/dataDictionary'
 
@@ -22,6 +23,7 @@ const server = {
   corporateDomain,
   log,
   systemMonitoring,
+  systemSchedule,
   label,
   dataDictionary
 }

@@ -108,7 +108,7 @@ export default {
     navigateToModelEdit(modelId) {
       this.handleGetDataSource(modelId).then((id) => {
         this.$router.push({
-          name: 'modelEdit',
+          name: 'mangeModelEdit',
           query: {
             type: 'edit',
             datasourceId: id,
