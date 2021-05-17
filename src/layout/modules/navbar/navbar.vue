@@ -11,15 +11,25 @@
     </a-select>
     <!-- 图表推送 -->
     <a-dropdown placement="bottomCenter">
-      <a-icon
-        type="bell"
-        style="font-size:20px;color:grey;margin-right:10px;"
-      />
-      <a-menu slot="overlay">
-        <a-menu-item v-for="(item, index) in shareChartList" :key="index">
-          <span @click="checkChartDetail">{{ item.title }}</span>
-        </a-menu-item>
-      </a-menu>
+      <a-icon type="bell" style="font-size:20px;color:grey;margin-right:10px" />
+      <vue-seamless-scroll
+        :data="shareChartList"
+        :class-option="defaultOption"
+        class="scroll-list"
+        style="max-height:300px;overflow:hidden;background:white"
+        slot="overlay"
+      >
+        <a-menu>
+          <a-menu-item
+            class="scroll-list-menu-item"
+            style="height:30px;line-height:30px;margin:0"
+            v-for="(item, index) in shareChartList"
+            :key="index"
+          >
+            <span @click="checkChartDetail">{{ item.title }}</span>
+          </a-menu-item>
+        </a-menu>
+      </vue-seamless-scroll>
     </a-dropdown>
     <div class="user">
       <a-dropdown>
@@ -52,7 +62,19 @@ export default {
       selectProject: state => state.user.selectProject,
       projectList: state => state.user.projectList,
       userInfo: state => state.user.info
-    })
+    }),
+    defaultOption() {
+      return {
+        step: 0.1, // 数值越大速度滚动越快
+        limitMoveNum: 10, // 开始无缝滚动的数据量 this.dataList.length
+        hoverStop: true, // 是否开启鼠标悬停stop
+        direction: 1, // 0向下 1向上 2向左 3向右
+        openWatch: true, // 开启数据实时监控刷新dom
+        singleHeight: 0, // 单步运动停止的高度(默认值0是无缝不停止的滚动) direction => 0/1
+        singleWidth: 0, // 单步运动停止的宽度(默认值0是无缝不停止的滚动) direction => 2/3
+        waitTime: 1000 // 单步运动停止的时间(默认值1000ms)
+      }
+    }
   },
   data() {
     return {

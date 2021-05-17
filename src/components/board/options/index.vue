@@ -1612,8 +1612,10 @@
                     :key="index + c"
                   >
                     <el-color-picker
+                      :key="colorKey"
                       v-model="selfConfig.color[index]"
                       :predefine="predefineColors"
+                      color-format="hex"
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-colors>
@@ -2037,7 +2039,8 @@ export default {
       refreshList: [
         { name: '分', value: 'min' },
         { name: '小时', value: 'hour' }
-      ]
+      ],
+      colorKey: 0
     }
   },
   mounted() {
@@ -2074,7 +2077,13 @@ export default {
       this.updateChartData()
     },
     // 设置自有属性
-    setSelfProperty() {
+    setSelfProperty(color) {
+      if (['#00008B', '#A52A2A', '#FFFF00', '#FF6347'].indexOf(color) > -1) {
+        this.$message.error('系列颜色不能是预警色')
+        this.selfConfig.color = this.currSelected.setting.config.color
+        this.colorKey++
+        return
+      }
       if (this.chartType === 'v-gauge') {
         this.selfConfig.series.axisLine.lineStyle.color[0][1] = this.selfConfig.selectedColor
         // 没有维度度量数据

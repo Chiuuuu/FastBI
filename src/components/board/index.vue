@@ -46,14 +46,23 @@
             <a-radio value="immediate">立即推送</a-radio>
             <a-radio value="timing">定时推送</a-radio>
             <!-- 定时推送时间 -->
-            <a-date-picker
+            <el-date-picker
+              v-show="shareObj.pushTime === 'timing'"
+              v-model="shareObj.time"
+              :picker-options="pickerOptions"
+              type="datetime"
+              style="width:200px"
+              laceholder="请选择推送时间"
+            >
+            </el-date-picker>
+            <!-- <a-date-picker
               v-show="shareObj.pushTime === 'timing'"
               v-model="shareObj.time"
               :disabled-date="disabledDate"
               format="YYYY-MM-DD HH:mm:ss"
               style="width:200px"
               placeholder="请选择推送时间"
-            />
+            /> -->
           </a-radio-group>
         </div>
         <div class="releace-line">
@@ -86,7 +95,7 @@ import CanvasMain from './canvas' // 中间画板
 import ContextMenu from './context-menu/index' // 右键菜单
 import BoardModel from './model/index' // 8-14 新增数据模型
 import { mapGetters, mapActions, mapState } from 'vuex'
-import moment from 'moment'
+// import moment from 'moment'
 
 const prefixCls = 'board'
 export default {
@@ -97,7 +106,12 @@ export default {
       config: config,
       errorData: '',
       visible: false, // 推送弹窗
-      shareObj: {} // 推送信息
+      shareObj: {}, // 推送信息
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() < Date.now() - 8.64e7
+        }
+      }
     }
   },
   provide() {
@@ -140,8 +154,19 @@ export default {
     getErrorData(error) {
       this.errorData = error
     },
-    disabledDate(current) {
-      return current && current < moment().endOf('hour')
+    // disabledDate(current) {
+    //   return current && current < moment().endOf('hour')
+    // },
+    // 显示推送弹窗
+    showPush() {
+      this.shareObj = {
+        pushTime: 'immediate',
+        pusher: this.userInfo.name,
+        watermark: 'yes',
+        time: null
+      }
+      this.visible = true
+      this.HideContextMenu()
     },
     // 推送
     shareChart() {
@@ -153,18 +178,11 @@ export default {
         this.$message.error('请输入推送时间')
         return
       }
-      this.visible = false
-    },
-    // 显示推送弹窗
-    showPush() {
-      this.shareObj = {
-        pushTime: 'immediate',
-        pusher: this.userInfo.name,
-        watermark: 'yes',
-        time: null
+      if (this.shareObj.time.getTime() <= Date.now()) {
+        this.$message.error('推送时间不能小于此刻')
+        return
       }
-      this.visible = true
-      this.HideContextMenu()
+      this.visible = false
     }
   },
   // 8-14 添加配置侧栏
