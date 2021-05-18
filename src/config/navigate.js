@@ -163,7 +163,7 @@ const list = [
             smooth: false, // 可选的
             step: false, // step line
             symbol: 'circle',
-            symbolSize: 10,
+            symbolSize: 5,
             lineStyle: {
               width: 1
             },

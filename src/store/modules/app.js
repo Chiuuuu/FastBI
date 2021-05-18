@@ -179,7 +179,7 @@ const app = {
         tabId: obj.tabId,
         name: obj.setting.config.title.content || '文本',
         screenId: state.screenId,
-        datamodelId: 0,
+        datamodelId: obj.datamodelId || 0,
         isPublish: 1,
         setting: obj.setting
       }
