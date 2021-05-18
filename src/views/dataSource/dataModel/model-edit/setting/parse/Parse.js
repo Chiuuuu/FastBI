@@ -427,14 +427,14 @@ export class Parse {
 
     this.skipSpecial(stop)
 
-    if (func && func.got && args.length !== func.got) {
+    if (func && 'got' in func && args.length !== func.got) {
       throw new Error(
         `参数个数错误：方法${func.value}，应该符合${func.got}个参数，而不是${
           args.length
         }个`
       )
     }
-    if (func && func.min && args.length < func.min) {
+    if (func && 'min' in func && args.length < func.min) {
       throw new Error(
         `参数个数错误：方法${func.value}，至少有${func.min}个参数，而不是${
           args.length
