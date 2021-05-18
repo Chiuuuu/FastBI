@@ -141,21 +141,23 @@ const list = [
               show: true
             }
           },
-          dataZoom: [{
-            type: 'slider',
-            show: true,
-            xAxisIndex: [0],
-            height: 12,
-            bottom: 'auto',
-            handleSize: '110%',
-            handleStyle: {
-              color: '#d3dee5'
-            },
-            textStyle: {
-              color: '#fff'
-            },
-            borderColor: '#90979c'
-          }],
+          dataZoom: [
+            {
+              type: 'slider',
+              show: true,
+              xAxisIndex: [0],
+              height: 12,
+              bottom: 'auto',
+              handleSize: '110%',
+              handleStyle: {
+                color: '#d3dee5'
+              },
+              textStyle: {
+                color: '#fff'
+              },
+              borderColor: '#90979c'
+            }
+          ],
           series: {
             type: 'line',
             smooth: false, // 可选的
@@ -317,21 +319,23 @@ const list = [
               show: true
             }
           },
-          dataZoom: [{
-            type: 'slider',
-            show: true,
-            xAxisIndex: [0],
-            height: 12,
-            bottom: 'auto',
-            handleSize: '110%',
-            handleStyle: {
-              color: '#d3dee5'
-            },
-            textStyle: {
-              color: '#fff'
-            },
-            borderColor: '#90979c'
-          }],
+          dataZoom: [
+            {
+              type: 'slider',
+              show: true,
+              xAxisIndex: [0],
+              height: 12,
+              bottom: 'auto',
+              handleSize: '110%',
+              handleStyle: {
+                color: '#d3dee5'
+              },
+              textStyle: {
+                color: '#fff'
+              },
+              borderColor: '#90979c'
+            }
+          ],
           series: {
             label: {
               show: false,
@@ -1335,6 +1339,8 @@ const list = [
             // name: '单位:个',
             // position: 'left',
             // nameLocation: 'middle',
+            min: 0,
+            splitNumber: 5,
             nameTextStyle: {
               color: '#fff',
               fontSize: 12,

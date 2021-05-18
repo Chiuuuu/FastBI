@@ -294,6 +294,27 @@ export default {
     // 获取echarts实例
     afterSetOption(chartObj) {
       this.chartObj = chartObj
+      // 控制双轴间隔一致
+      if (
+        this.chartType === 'v-histogramAndLine' &&
+        this.apis.showLine.length > 0 &&
+        this.apiData.source
+      ) {
+        let option = this.chartObj.getOption()
+        let leftDatas = this.apiData.source.rows.map(
+          item => item[this.apiData.measures[0].alias]
+        )
+        let rightDatas = this.apiData.source.rows.map(
+          item => item[this.apis.showLine[0]]
+        )
+        let leftMax = Math.max(...leftDatas)
+        let rightMax = Math.max(...rightDatas)
+        option.yAxis[0].max = leftMax
+        option.yAxis[0].interval = +(leftMax / 6).toFixed(0)
+        option.yAxis[1].max = rightMax
+        option.yAxis[1].interval = +(rightMax / 6).toFixed(0)
+        this.chartObj.setOption(option)
+      }
     }
   },
   computed: {

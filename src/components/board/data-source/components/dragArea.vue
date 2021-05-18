@@ -270,14 +270,7 @@ export default {
     // 删除当前维度或者度量
     deleteFile(item, index) {
       let dels = this.fileList.splice(index, 1)
-      let current = deepClone(this.currSelected)
-      // 存在预警设置的去掉对应度量条件
-      if (current.setting.api_data.warning) {
-        current.setting.api_data.warning = current.setting.api_data.warning.filter(
-          item => item.measure !== dels[0].alias
-        )
-        this.$store.dispatch('SetSelfDataSource', current.setting.api_data)
-      }
+      let current = this.currSelected
       this.getData()
       // 维度度量删除完以后重置该图表数据
       if (this.chartType === '1' || this.chartType === '2') {
@@ -288,6 +281,13 @@ export default {
           // 清空modelid
           //   current.packageJson.api_data.modelId = ''
           this.$store.dispatch('SetSelfDataSource', current.setting.api_data)
+          // 混合图apis恢复原始状态
+          if (current.setting.chartType === 'v-histogramAndLine') {
+            let apis = current.setting.apis
+            apis.showLine = ['下单用户']
+            apis.axisSite = { right: ['下单用户'] }
+            this.$store.dispatch('SetApis', apis)
+          }
           // 嵌套饼图apis恢复原始状态
           if (current.setting.chartType === 'v-multiPie') {
             let apis = {
@@ -324,6 +324,13 @@ export default {
           // current.setting.api_data.modelId = ''
           this.$store.dispatch('SetSelfDataSource', current.setting.api_data)
         }
+      }
+      // 存在预警设置的去掉对应度量条件
+      if (current.setting.api_data.warning) {
+        current.setting.api_data.warning = current.setting.api_data.warning.filter(
+          item => item.measure !== dels[0].alias
+        )
+        this.$store.dispatch('SetSelfDataSource', current.setting.api_data)
       }
     },
     // 根据维度度量获取数据
