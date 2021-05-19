@@ -146,7 +146,7 @@ const list = [
               type: 'slider',
               show: true,
               xAxisIndex: [0],
-              height: 12,
+              height: 18,
               bottom: 'auto',
               handleSize: '110%',
               handleStyle: {
@@ -324,7 +324,7 @@ const list = [
               type: 'slider',
               show: true,
               xAxisIndex: [0],
-              height: 12,
+              height: 18,
               bottom: 'auto',
               handleSize: '110%',
               handleStyle: {
