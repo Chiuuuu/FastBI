@@ -123,7 +123,13 @@ export default {
     ...mapState({
       userInfo: state => state.user.info
     }),
-    ...mapGetters(['optionsExpand', 'coverageExpand', 'modelExpand']),
+    ...mapGetters([
+      'optionsExpand',
+      'coverageExpand',
+      'modelExpand',
+      'currSelected',
+      'echartsInstance'
+    ]),
     centerStyle() {
       return {
         left: this.coverageExpand ? this.config.coverage.style.width : '50px',
@@ -178,10 +184,17 @@ export default {
         this.$message.error('请输入推送时间')
         return
       }
-      if (this.shareObj.time.getTime() <= Date.now()) {
+      if (
+        this.shareObj.pushTime === 'timing' &&
+        this.shareObj.time.getTime() <= Date.now()
+      ) {
         this.$message.error('推送时间不能小于此刻')
         return
       }
+      let img = this.echartsInstance.getDataURL({
+        pixelRatio: 2, // double pixel
+        backgroundColor: '#fff'
+      })
       this.visible = false
     }
   },

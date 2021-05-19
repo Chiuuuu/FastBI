@@ -47,7 +47,9 @@ const getters = {
 
   pageList: state => state.app.pageList, // 页签列表
 
-  isPublish: state => state.app.isPublish
+  isPublish: state => state.app.isPublish,
+
+  echartsInstance: state => state.app.echartsInstance // echarts实例
 }
 
 export default getters
