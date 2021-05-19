@@ -49,14 +49,15 @@
 import {
   addResizeListener,
   removeResizeListener
-} from 'bin-ui/src/utils/resize-event'
-import { formatData, convertData } from '../../utils/formatData'
-import { deepClone } from '@/utils/deepClone'
-import { DEFAULT_COLORS } from '@/utils/defaultColors'
-import setWarning from '@/utils/setWarningColor'
+} from "bin-ui/src/utils/resize-event"
+import { formatData, convertData } from "../../utils/formatData"
+import { deepClone } from "@/utils/deepClone"
+import { DEFAULT_COLORS } from "@/utils/defaultColors"
+import setWarning from "@/utils/setWarningColor"
+import { mapGetters, mapActions } from "vuex"
 
 export default {
-  name: 'ChartsFactory',
+  name: "ChartsFactory",
   props: {
     typeName: {
       type: String,
@@ -95,7 +96,7 @@ export default {
       },
       mouseover: function(e) {
         // 笔刷 -- 柱状图/饼图  -- 鼠标移入
-        if (!['v-pie', 'v-bar', 'v-histogram'].includes(self.chartType)) {
+        if (!["v-pie", "v-bar", "v-histogram"].includes(self.chartType)) {
           return
         }
         let option = self.chartObj.getOption()
@@ -112,7 +113,7 @@ export default {
       },
       mouseout: function(e) {
         // 笔刷 -- 柱状图/饼图  -- 鼠标移出
-        if (!['v-pie', 'v-bar', 'v-histogram'].includes(self.chartType)) {
+        if (!["v-pie", "v-bar", "v-histogram"].includes(self.chartType)) {
           return
         }
         let option = self.chartObj.getOption()
@@ -127,11 +128,11 @@ export default {
     }
     return {
       wrapStyle: {},
-      width: '500px',
-      height: '400px',
+      width: "500px",
+      height: "400px",
       chartData: {
-        columns: ['x', 'y'],
-        rows: [{ x: 'x', y: 100 }]
+        columns: ["x", "y"],
+        rows: [{ x: "x", y: 100 }]
       },
       tooltipVisible: true,
       legendVisible: true,
@@ -162,16 +163,16 @@ export default {
       handler(val) {
         if (val) {
           // 只有度量的情况
-          if (this.type === '2') {
+          if (this.type === "2") {
             if (val.measures && val.measures.length > 0) {
               if (!val.source) {
                 return
               }
               this.chartData = val.source
-              if (this.chartType === 'v-ring') {
+              if (this.chartType === "v-ring") {
                 this.chartExtend.chartTitle.text = val.source.rows
                   ? val.source.rows[0].value
-                  : ''
+                  : ""
               }
               return
             }
@@ -220,14 +221,14 @@ export default {
         if (val) {
           this.backgroundStyle = {
             background:
-              val.backgroundType === '1'
+              val.backgroundType === "1"
                 ? val.backgroundColor
                 : `url(${val.backgroundSrc})`,
             //  backgroundColor: val.backgroundColor,
             borderColor: val.borderColor,
-            borderWidth: val.borderWidth + 'px',
+            borderWidth: val.borderWidth + "px",
             borderStyle: val.borderStyle,
-            borderRadius: val.borderRadius + 'px'
+            borderRadius: val.borderRadius + "px"
           }
         }
       },
@@ -246,7 +247,7 @@ export default {
   },
   methods: {
     afterConfig(options) {
-      if (this.typeName === 've-map') {
+      if (this.typeName === "ve-map") {
         let data = [...options.series[0].data]
         options.series[0].data = convertData(data)
       }
@@ -261,16 +262,16 @@ export default {
       if (this.config.title && this.config.title.show) {
         height -= title.clientHeight
       }
-      this.width = width + 'px'
-      this.height = height + 'px'
+      this.width = width + "px"
+      this.height = height + "px"
     },
     // 设置预警颜色
     setWarningColor(val) {
       if (
-        !this.chartType === 'v-line' &&
-        !this.chartType === 'v-histogram' &&
-        !this.chartType === 'v-pie' &&
-        !this.chartType === 'v-bar'
+        !this.chartType === "v-line" &&
+        !this.chartType === "v-histogram" &&
+        !this.chartType === "v-pie" &&
+        !this.chartType === "v-bar"
       ) {
         return
       }
@@ -294,9 +295,10 @@ export default {
     // 获取echarts实例
     afterSetOption(chartObj) {
       this.chartObj = chartObj
+      this.SetEchartsInstance(chartObj)
       // 控制双轴间隔一致
       if (
-        this.chartType === 'v-histogramAndLine' &&
+        this.chartType === "v-histogramAndLine" &&
         this.apis.showLine.length > 0 &&
         this.apiData.source
       ) {
@@ -315,16 +317,17 @@ export default {
         option.yAxis[1].interval = +(rightMax / 6).toFixed(0)
         this.chartObj.setOption(option)
       }
-    }
+    },
+    ...mapActions(["SetEchartsInstance"])
   },
   computed: {
     titleStyle() {
       return {
-        padding: '20px 10px',
+        padding: "20px 10px",
         color: this.config.title.textStyle.color,
-        fontSize: this.config.title.textStyle.fontSize + 'px',
+        fontSize: this.config.title.textStyle.fontSize + "px",
         textAlign: this.config.title.textAlign,
-        height: 'auto'
+        height: "auto"
       }
     }
   }

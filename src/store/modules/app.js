@@ -1,19 +1,19 @@
-import router from '../../router'
-import screenManage from '../../api/modules/screenManage'
-import { message } from 'ant-design-vue'
-import { Loading } from 'element-ui'
-import { handleRefreshData } from '@/utils/handleRefreshData'
-import { messages } from 'bin-ui'
+import router from "../../router"
+import screenManage from "../../api/modules/screenManage"
+import { message } from "ant-design-vue"
+import { Loading } from "element-ui"
+import { handleRefreshData } from "@/utils/handleRefreshData"
+import { messages } from "bin-ui"
 
 let orginPageSettings = {
   width: 1920,
   height: 1080,
-  backgroundColor: '#0d2a42',
+  backgroundColor: "#0d2a42",
   gridStep: 1,
-  backgroundSrc: '',
-  backgroundType: '1',
+  backgroundSrc: "",
+  backgroundType: "1",
   opacity: 1,
-  refresh: { frequency: '', isRefresh: false }
+  refresh: { frequency: "", isRefresh: false }
 }
 const app = {
   state: {
@@ -25,13 +25,14 @@ const app = {
     modelExpand: true, // 8-14数据模型面板
     coverageExpand: false, // 图层面板打开关闭
     isScreen: false, // 是否全屏
-    screenId: '', // 大屏id
-    fileName: '',
-    parentId: '', // 大屏父id
+    screenId: "", // 大屏id
+    fileName: "",
+    parentId: "", // 大屏父id
     screenDataModels: [],
     pageList: [],
-    currentPageId: '',
-    isPublish: '' // 大屏是否已发布
+    currentPageId: "",
+    isPublish: "", // 大屏是否已发布
+    echartsInstance: null // echarts实例
   },
   mutations: {
     SET_CANVAS_RANGE: (state, val) => {
@@ -54,7 +55,7 @@ const app = {
       state.isScreen = val
     },
     SET_SCREEN_ID(state, res) {
-      console.log('screenId', res)
+      console.log("screenId", res)
       state.screenId = res
     },
     SET_FILE_NAME(state, val) {
@@ -71,54 +72,60 @@ const app = {
     },
     SET_IS_PUBLISH(state, isPublish) {
       state.isPublish = isPublish
+    },
+    SET_ECHARTS_INSTANCE(state, echartsInstance) {
+      state.echartsInstance = echartsInstance
     }
   },
   actions: {
     SetCanvasRange: ({ commit }, val) => {
-      commit('SET_CANVAS_RANGE', val)
+      commit("SET_CANVAS_RANGE", val)
     },
     ToggleOptionsExpand: ({ commit }) => {
-      commit('SET_OPTIONS_EXPAND')
+      commit("SET_OPTIONS_EXPAND")
     },
     ToggleModelExpand: ({ commit }) => {
-      commit('SET_MODEL_EXPAND')
+      commit("SET_MODEL_EXPAND")
     },
     ToggleCoverageExpand: ({ commit }) => {
-      commit('SET_COVERAGE_EXPAND')
+      commit("SET_COVERAGE_EXPAND")
     },
     SetPageSettings: ({ commit }, setting) => {
-      commit('SET_PAGE_SETTING', setting)
+      commit("SET_PAGE_SETTING", setting)
     },
     SetIsScreen: ({ commit }, val) => {
-      commit('SET_IS_SCREEN', val)
+      commit("SET_IS_SCREEN", val)
     },
     SetScreenId: ({ commit }, val) => {
-      commit('SET_SCREEN_ID', val)
+      commit("SET_SCREEN_ID", val)
     },
     SetFileName({ commit }, val) {
-      commit('SET_FILE_NAME', val)
+      commit("SET_FILE_NAME", val)
     },
     SetParentId({ commit }, id) {
-      commit('SET_PARENT_ID', id)
+      commit("SET_PARENT_ID", id)
     },
     SetPageList({ commit }, pages) {
-      commit('SET_PAGE_LIST', pages)
+      commit("SET_PAGE_LIST", pages)
     },
     SetPageId({ commit }, page) {
-      commit('SET_PAGE_ID', page)
+      commit("SET_PAGE_ID", page)
     },
     SetIsPublish({ commit }, isPublish) {
-      commit('SET_IS_PUBLISH', isPublish)
+      commit("SET_IS_PUBLISH", isPublish)
+    },
+    SetEchartsInstance({ commit }, echartsInstance) {
+      commit("SET_ECHARTS_INSTANCE", echartsInstance)
     },
     // 新建大屏
     async addScreenData({ commit, state }, obj) {
-      commit('SET_PAGE_SETTING', state.orginPageSettings)
-      commit('SET_PAGE_LIST', [])
+      commit("SET_PAGE_SETTING", state.orginPageSettings)
+      commit("SET_PAGE_LIST", [])
       let params = {
         name: obj && obj.name ? obj.name : router.history.current.query.name,
         // parentId: obj && obj.parentId ? obj.parentId : router.history.current.query.parentId,
         // 没有选目录默认在外面
-        parentId: obj && obj.parentId ? obj.parentId : '0',
+        parentId: obj && obj.parentId ? obj.parentId : "0",
         isSaved: 1,
         setting: state.pageSettings
       }
@@ -126,10 +133,10 @@ const app = {
         .addScreen(params)
         .then(res => {
           if (res.code === 200) {
-            commit('SET_SCREEN_ID', res.id)
+            commit("SET_SCREEN_ID", res.id)
             res.msg && message.success(res.msg)
             router.push({
-              name: 'screenEdit',
+              name: "screenEdit",
               query: { id: res.id }
             })
           } else {
@@ -177,7 +184,7 @@ const app = {
     async addChartData({ dispatch, state }, obj) {
       let params = {
         tabId: obj.tabId,
-        name: obj.setting.config.title.content || '文本',
+        name: obj.setting.config.title.content || "文本",
         screenId: state.screenId,
         datamodelId: obj.datamodelId || 0,
         isPublish: 1,
@@ -188,9 +195,9 @@ const app = {
         .then(res => {
           if (res.code === 200) {
             // res.msg && message.success(res.msg)
-            dispatch('AddCanvasMap', res.data)
+            dispatch("AddCanvasMap", res.data)
             // 保存图层顺序
-            dispatch('saveScreenData')
+            dispatch("saveScreenData")
             return true
           } else {
             !obj.noMsg && res.msg && message.error(res.msg)
@@ -215,12 +222,12 @@ const app = {
       }
       screenManage.deleteChart(params).then(res => {
         if (res.code === 200) {
-          dispatch('DelCanvasMap', chart.id)
-          dispatch('SingleSelected', null)
-          dispatch('HideContextMenu')
+          dispatch("DelCanvasMap", chart.id)
+          dispatch("SingleSelected", null)
+          dispatch("HideContextMenu")
           // 保存图层顺序
-          dispatch('saveScreenData')
-          !noMsg && message.success('删除成功')
+          dispatch("saveScreenData")
+          !noMsg && message.success("删除成功")
         }
       })
     },
@@ -244,17 +251,17 @@ const app = {
       return screenManage.getScreenDetailById(id, tabId).then(res => {
         if (res.code === 200) {
           this.screenData = res.data
-          dispatch('SetFileName', res.data ? res.data.name : '')
-          dispatch('SetPageSettings', res.data ? res.data.setting : {})
-          dispatch('InitCanvasMaps', {
+          dispatch("SetFileName", res.data ? res.data.name : "")
+          dispatch("SetPageSettings", res.data ? res.data.setting : {})
+          dispatch("InitCanvasMaps", {
             maps: res.data ? res.data.screenGraphs : [],
             idList: res.data ? res.data.setting.idList : []
           })
-          dispatch('dataModel/setSelectedModelList', res.list)
-          commit('common/SET_PRIVILEGES', res.data.privileges || [])
-          commit('SET_IS_PUBLISH', res.data.isPublish)
+          dispatch("dataModel/setSelectedModelList", res.list)
+          commit("common/SET_PRIVILEGES", res.data.privileges || [])
+          commit("SET_IS_PUBLISH", res.data.isPublish)
           if (needRefresh) {
-            return dispatch('refreshScreen', {
+            return dispatch("refreshScreen", {
               charSeted: false,
               globalSettings: false,
               needLoading: false
@@ -285,8 +292,8 @@ const app = {
       if (needLoading) {
         loadingInstance = Loading.service({
           lock: true,
-          text: '加载中...',
-          target: document.querySelector('.screen-manage')
+          text: "加载中...",
+          target: document.querySelector(".screen-manage")
         })
       }
       return screenManage
@@ -300,14 +307,14 @@ const app = {
             }
             for (let id of ids) {
               let chart = rootGetters.canvasMap.find(
-                chart => chart.id + '' === id
+                chart => chart.id + "" === id
               )
               let newData = dataItem[id].graphData
 
               // 找到chart的表示当前页
               if (chart) {
                 // 图表模型被删掉
-                if (dataItem[id] === 'IsChanged') {
+                if (dataItem[id] === "IsChanged") {
                   chart.setting.isEmpty = true
                   continue
                 }
@@ -335,7 +342,7 @@ const app = {
             }
             screenManage.saveAllChart(rootGetters.canvasMap)
             if (needLoading) {
-              message.success('刷新成功')
+              message.success("刷新成功")
             }
             return true
           } else {
