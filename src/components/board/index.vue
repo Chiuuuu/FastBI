@@ -95,6 +95,8 @@ import CanvasMain from './canvas' // 中间画板
 import ContextMenu from './context-menu/index' // 右键菜单
 import BoardModel from './model/index' // 8-14 新增数据模型
 import { mapGetters, mapActions, mapState } from 'vuex'
+// 引入截图工具
+import html2canvas from 'html2canvas'
 // import moment from 'moment'
 
 const prefixCls = 'board'
@@ -127,7 +129,7 @@ export default {
       'optionsExpand',
       'coverageExpand',
       'modelExpand',
-      'currSelected',
+      'currentSelected',
       'echartsInstance'
     ]),
     centerStyle() {
@@ -191,11 +193,22 @@ export default {
         this.$message.error('推送时间不能小于此刻')
         return
       }
-      let img = this.echartsInstance.getDataURL({
-        pixelRatio: 2, // double pixel
-        backgroundColor: '#fff'
+      //   let img = this.echartsInstance.getDataURL({
+      //     pixelRatio: 2, // double pixel
+      //     backgroundColor: '#fff'
+      //   })
+      let img = ''
+      const domObj = document.getElementById(this.currentSelected)
+      html2canvas(domObj, {
+        width: domObj.clientWidth, //dom 原始宽度
+        height: domObj.clientHeight,
+        scrollY: 0,
+        scrollX: 0,
+        useCORS: true // 【重要】开启跨域配置
+      }).then(canvas => {
+        img = canvas.toDataURL()
+        this.visible = false
       })
-      this.visible = false
     }
   },
   // 8-14 添加配置侧栏
