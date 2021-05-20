@@ -78,12 +78,20 @@ export class Verify {
             throw Error(`聚合粒度错误: 方法 ${expr.operator} 不能应用于 未聚合,已聚合`)
           }
         }
-        const re = this.evaluate(
-          expr.operator,
-          this.validate(expr.left),
-          this.validate(expr.right)
-        )
-        return re
+        // 如果是逻辑判断, 允许两端传入等式
+        if (expr.operator === 'AND' || expr.operator === 'OR') {
+          return this.evaluate(
+            expr.operator,
+            expr.left.type === 'assign' ? this.validateCaseAssign(expr.left) : this.validate(expr.left),
+            expr.right.type === 'assign' ? this.validateCaseAssign(expr.right) : this.validate(expr.right)
+          )
+        } else {
+          return this.evaluate(
+            expr.operator,
+            this.validate(expr.left),
+            this.validate(expr.right)
+          )
+        }
       }
       case 'if': {
         const cond = this.validate(expr.cond)
@@ -147,6 +155,38 @@ export class Verify {
       default:
         return this.validate(arg)
     }
+  }
+
+  // 暂时仅用于逻辑判断
+  validateCaseAssign(expr) {
+    if (expr.left.type === 'alias' && expr.left.value.role !== 2) {
+      throw Error(`逻辑判断暂不支持维度字段`)
+    } else if (expr.right.type === 'alias' && expr.right.value.role !== 2) {
+      throw Error(`逻辑判断暂不支持维度字段`)
+    }
+    const left = this.validate(expr.left)
+    const right = this.validate(expr.right)
+    // 等式左边
+    if (!['integer', 'float', 'neg', 'alias'].includes(left.type) || left.value === false) {
+      throw Error(`等式左边表达式结果必须为数字类型`)
+    }
+    if (left.type === 'alias') {
+      const type = left.value.dataType
+      if (type !== 'BIGINT' && type !== 'DOUBLE') {
+        throw Error(`等式左边表达式结果必须为数字类型`)
+      }
+    }
+    // 等式右边
+    if (!['integer', 'float', 'neg', 'alias'].includes(right.type) || right.value === false) {
+      throw Error(`等式右边表达式结果必须为数字类型`)
+    }
+    if (right.type === 'alias') {
+      const type = right.value.dataType
+      if (type !== 'BIGINT' && type !== 'DOUBLE') {
+        throw Error(`等式右边表达式结果必须为数字类型`)
+      }
+    }
+    return right
   }
 
   evaluate(operator, left, right) {
@@ -595,11 +635,43 @@ export class Verify {
           throw new Error(`无法解析类型`)
         }
       }
-      case 'AND': {
-        return left.value !== false && right.value
-      }
+      case 'AND':
       case 'OR': {
-        return left.value !== false ? left.value : right.value
+        return left.value !== false ? left : right
+      }
+      // 逻辑判断(仅支持度量)
+      case '>':
+      case '>=':
+      case '<':
+      case '<=':
+      case '!=': {
+        // 等式判断两边仅支持数字类型
+        const whiteList = ['integer', 'float', 'neg', 'alias']
+        const numberList = ['BIGINT', 'DOUBLE']
+        if (!whiteList.includes(rightType) || !whiteList.includes(leftType)) {
+          throw new Error(`等式判断两边仅支持数字类型`)
+        } else {
+          if (rightType === 'alias') {
+            if (!numberList.includes(right.value.dataType)) {
+              throw new Error(`等式判断两边仅支持数字类型`)
+            } else if (right.value.role !== 2) {
+              throw new Error(`逻辑判断暂不支持维度字段`)
+            }
+            return left
+          } else if (leftType === 'alias') {
+            if (!numberList.includes(left.value.dataType)) {
+              throw new Error(`等式判断两边仅支持数字类型`)
+            } else if (left.value.role !== 2) {
+              throw new Error(`逻辑判断暂不支持维度字段`)
+            }
+            return right
+          } else {
+            return {
+              type: 'integer',
+              value: true
+            }
+          }
+        }
       }
     }
     throw new Error("Can't apply operator " + operator)

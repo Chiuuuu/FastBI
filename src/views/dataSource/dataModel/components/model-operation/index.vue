@@ -40,6 +40,12 @@ const listColumn = [
     ellipsis: true
   },
   {
+    title: '版本号',
+    dataIndex: 'version',
+    width: 250,
+    ellipsis: true
+  },
+  {
     title: '操作账号',
     dataIndex: 'username',
     width: 80,
