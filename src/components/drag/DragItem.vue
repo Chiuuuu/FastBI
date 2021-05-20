@@ -1,7 +1,8 @@
 <template>
   <div
     class="dv-transform"
-    :class="{'selected':isSelected}"
+    :class="{ selected: isSelected }"
+    :id="currentSelected"
     :style="contentStyles"
     ref="dvTransform"
     @mousedown="handleMoveStart"
@@ -10,14 +11,20 @@
     <div class="navigator-line" v-show="isSelected">
       <div class="navigator-line-left" :style="lineLeft"></div>
       <div class="navigator-line-top" :style="lineTop"></div>
-      <div
-        class="navigator-line-account"
-        :style="lineAccountStyle"
-      >{{ transformData.x + ',' + transformData.y }}</div>
+      <div class="navigator-line-account" :style="lineAccountStyle">
+        {{ transformData.x + ',' + transformData.y }}
+      </div>
     </div>
     <div class="dv-scale" :style="dragScaleStyle">
-      <div class="dv-com" :class="{'hovered':comHover}" style="transform: rotate(0deg);">
-        <div class="transform-handler" :class="{'hide':!comHover&&!isSelected}">
+      <div
+        class="dv-com"
+        :class="{ hovered: comHover }"
+        style="transform: rotate(0deg);"
+      >
+        <div
+          class="transform-handler"
+          :class="{ hide: !comHover && !isSelected }"
+        >
           <div class="dv-wrapper" :style="dvWrapperStyles">
             <slot>我是块的标题</slot>
           </div>
@@ -174,13 +181,17 @@ export default {
         return {
           width: this.transformData.width / this.dragScale.x + 'px',
           height: this.transformData.height / this.dragScale.y + 'px',
-          transform: `translate3d(${this.transformData.x}px,${this.transformData.y}px,0)`
+          transform: `translate3d(${this.transformData.x}px,${
+            this.transformData.y
+          }px,0)`
         }
       }
       return {
         width: this.transformData.width + 'px',
         height: this.transformData.height + 'px',
-        transform: `translate3d(${this.transformData.x}px,${this.transformData.y}px,0)`
+        transform: `translate3d(${this.transformData.x}px,${
+          this.transformData.y
+        }px,0)`
       }
     },
     dvWrapperStyles() {

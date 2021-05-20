@@ -105,12 +105,16 @@ export default {
             opacity: 0.1
           }
           item.label.show = false
-          item.labelLine.show = false
+          if (item.labelLine) {
+            item.labelLine.show = false
+          }
           item.emphasis.itemStyle = {
             opacity: 1
           }
           item.emphasis.label.show = true
-          item.emphasis.labelLine.show = true
+          if (item.labelLine) {
+            item.emphasis.labelLine.show = true
+          }
         })
         self.chartObj.setOption(option)
       },
@@ -126,7 +130,9 @@ export default {
             opacity: 1
           }
           item.label.show = true
-          item.labelLine.show = true
+          if (item.labelLine) {
+            item.labelLine.show = true
+          }
         })
         self.chartObj.setOption(option)
       }
