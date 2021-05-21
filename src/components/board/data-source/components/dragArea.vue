@@ -550,11 +550,14 @@ export default {
               res.rows.map((item, index) => {
                 let obj = {}
                 for (let item2 of dimensionKeys) {
-                  obj[item2] = item[item2]
+                  if (item && item[item2]) {
+                    obj[item2] = item[item2]
+                  }
                 }
-                obj[dimensionKeys] = item[dimensionKeys]
                 for (let item2 of measureKeys) {
-                  obj[item2] = item[item2]
+                  if (item && item[item2]) {
+                    obj[item2] = item[item2]
+                  }
                 }
                 // if (obj[dimensionKeys]) {
                 rows.push(obj)

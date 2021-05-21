@@ -38,8 +38,10 @@ export default function setColorFormatter(val, typeName) {
     }
     // 根据条件获取对应预警颜色，冲突以后面条件为准
     for (let item of val.warning) {
+      // 饼图只有一个度量不需要比较度量名
       temColor =
-        item.measure === params.seriesName && judgeCondition(item, data)
+        (item.measure === params.seriesName || typeName === 've-pie') &&
+        judgeCondition(item, data)
           ? item.warnColor
           : temColor
     }
