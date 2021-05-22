@@ -2,7 +2,8 @@ import PERMISSION_CODE from '@/config/permission'
 
 const RouteView = () => import('@/layout/routeView')
 const LogView = () => import('@/views/platform/log')
-const ScheduleView = () => import('@/views/platform/schedule')
+const SystemScheduleView = () => import('@/views/platform/schedule')
+const SystemOperationView = () => import('@/views/platform/operation')
 const SystemMonitoringView = () => import('@/views/platform/systemMonitoring')
 
 export default {
@@ -36,9 +37,17 @@ export default {
     {
       path: 'systemSchedule',
       name: 'systemSchedule',
-      component: ScheduleView,
+      component: SystemScheduleView,
       meta: {
         title: '存储管理'
+      }
+    },
+    {
+      path: 'systemOperation',
+      name: 'systemOperation',
+      component: SystemOperationView,
+      meta: {
+        title: '运维管理'
       }
     }
   ]
