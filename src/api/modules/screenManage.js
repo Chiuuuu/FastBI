@@ -270,6 +270,31 @@ const screenManage = {
    */
   screenModuleTransform(params) {
     return $axios.post('/screen/pivotschema/ScreenModuleTransform', params)
+  },
+  // 图表推送
+  /**
+   * 选择推送人下拉框数据
+   */
+  getPusherList(projectId) {
+    return $axios.get(`/business/editRoleUser/listForProjectUsers/${projectId}`)
+  },
+  /**
+   * 图表推送信息记录
+   */
+  savePushData(params) {
+    return $axios.post(`/screen/graph/push/add`, params)
+  },
+  /**
+   * 列表推送信息列表查询创建
+   */
+  getPushDataList(projectId, userId) {
+    return $axios.get(`/screen/graph/push/list/${projectId}/${userId}`)
+  },
+  /**
+   * 阅后即焚（逻辑删除推送表记录）
+   */
+  delReadData(id) {
+    return $axios.delete(`/screen/graph/push/${id}`)
   }
 }
 

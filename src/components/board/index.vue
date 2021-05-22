@@ -43,11 +43,11 @@
         <div class="releace-line">
           <span class="label">推送时间：</span>
           <a-radio-group v-model="shareObj.pushTime">
-            <a-radio value="immediate">立即推送</a-radio>
-            <a-radio value="timing">定时推送</a-radio>
+            <a-radio :value="0">立即推送</a-radio>
+            <a-radio :value="1">定时推送</a-radio>
             <!-- 定时推送时间 -->
             <el-date-picker
-              v-show="shareObj.pushTime === 'timing'"
+              v-show="shareObj.pushTime === 1"
               v-model="shareObj.time"
               :picker-options="pickerOptions"
               type="datetime"
@@ -55,29 +55,28 @@
               laceholder="请选择推送时间"
             >
             </el-date-picker>
-            <!-- <a-date-picker
-              v-show="shareObj.pushTime === 'timing'"
-              v-model="shareObj.time"
-              :disabled-date="disabledDate"
-              format="YYYY-MM-DD HH:mm:ss"
-              style="width:200px"
-              placeholder="请选择推送时间"
-            /> -->
           </a-radio-group>
         </div>
         <div class="releace-line">
-          <span class="label">推送人：</span
-          ><input
+          <span class="label">推送人：</span>
+          <a-select
+            placeholder="选择推送人"
+            style="width:310px"
             v-model="shareObj.pusher"
-            :class="['mod_input', 'ant-input']"
-            placeholder="请输入推送人"
-          />
+          >
+            <a-select-option
+              v-for="(item, index) in userList"
+              :key="index"
+              :value="item.id"
+              >{{ item.name }}</a-select-option
+            >
+          </a-select>
         </div>
         <div class="releace-line">
           <span class="label">是否加水印：</span>
           <a-radio-group v-model="shareObj.watermark">
-            <a-radio value="yes">是</a-radio>
-            <a-radio value="no">否</a-radio>
+            <a-radio :value="1">是</a-radio>
+            <a-radio :value="0">否</a-radio>
           </a-radio-group>
         </div>
       </div>
@@ -97,7 +96,7 @@ import BoardModel from './model/index' // 8-14 新增数据模型
 import { mapGetters, mapActions, mapState } from 'vuex'
 // 引入截图工具
 import html2canvas from 'html2canvas'
-// import moment from 'moment'
+import moment from 'moment'
 
 const prefixCls = 'board'
 export default {
@@ -113,7 +112,8 @@ export default {
         disabledDate(time) {
           return time.getTime() < Date.now() - 8.64e7
         }
-      }
+      },
+      userList: [] // 推送人列表
     }
   },
   provide() {
@@ -123,14 +123,17 @@ export default {
   },
   computed: {
     ...mapState({
-      userInfo: state => state.user.info
+      userInfo: state => state.user.info,
+      selectProject: state => state.user.selectProject
     }),
     ...mapGetters([
       'optionsExpand',
       'coverageExpand',
       'modelExpand',
       'currentSelected',
-      'echartsInstance'
+      'currSelected',
+      'echartsInstance',
+      'fileName'
     ]),
     centerStyle() {
       return {
@@ -168,12 +171,20 @@ export default {
     // 显示推送弹窗
     showPush() {
       this.shareObj = {
-        pushTime: 'immediate',
-        pusher: this.userInfo.name,
-        watermark: 'yes',
+        pushTime: 0,
+        pusher: this.userInfo.id,
+        watermark: 1,
         time: null
       }
-      this.visible = true
+      // 获取推送人列表
+      this.$server.screenManage.getPusherList(this.selectProject).then(res => {
+        if (res.code === 200) {
+          this.userList = res.rows
+        } else {
+          this.$message.error(res.msg)
+        }
+      })
+      this.userList = this.visible = true
       this.HideContextMenu()
     },
     // 推送
@@ -182,32 +193,52 @@ export default {
         this.$message.error('请输入推送人')
         return
       }
-      if (this.shareObj.pushTime === 'timing' && !this.shareObj.time) {
+      if (this.shareObj.pushTime === 1 && !this.shareObj.time) {
         this.$message.error('请输入推送时间')
         return
       }
       if (
-        this.shareObj.pushTime === 'timing' &&
+        this.shareObj.pushTime === 1 &&
         this.shareObj.time.getTime() <= Date.now()
       ) {
         this.$message.error('推送时间不能小于此刻')
         return
       }
-      //   let img = this.echartsInstance.getDataURL({
-      //     pixelRatio: 2, // double pixel
-      //     backgroundColor: '#fff'
-      //   })
       let img = ''
       const domObj = document.getElementById(this.currentSelected)
       html2canvas(domObj, {
-        width: domObj.clientWidth, //dom 原始宽度
+        width: domObj.clientWidth, // dom 原始宽度
         height: domObj.clientHeight,
         scrollY: 0,
         scrollX: 0,
         useCORS: true // 【重要】开启跨域配置
       }).then(canvas => {
         img = canvas.toDataURL()
+        this.saveData(img)
         this.visible = false
+      })
+    },
+    // 保存推送信息
+    saveData(img) {
+      let params = {
+        graphData: img,
+        source: this.currSelected.setting.api_data.source,
+        graphName: this.currSelected.name,
+        projectId: this.selectProject,
+        sourceScreen: this.fileName,
+        pushType: this.shareObj.pushTime,
+        pushUserId: this.shareObj.pusher,
+        watermarkStatus: this.shareObj.watermark,
+        pushDateString: this.shareObj.time
+          ? moment(this.shareObj.time).format('YYYY-MM-DD HH:mm:ss')
+          : moment().format('YYYY-MM-DD HH:mm:ss')
+      }
+      this.$server.screenManage.savePushData(params).then(res => {
+        if (res.code === 200) {
+          this.$message.success('推送成功')
+        } else {
+          this.$message.error(res.msg)
+        }
       })
     }
   },
