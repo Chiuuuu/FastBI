@@ -285,7 +285,7 @@ const screenManage = {
     return $axios.post(`/screen/graph/push/add`, params)
   },
   /**
-   * 列表推送信息列表查询创 建
+   * 列表推送信息列表查询创建
    */
   getPushDataList(projectId, userId) {
     return $axios.get(`/screen/graph/push/list/${projectId}/${userId}`)

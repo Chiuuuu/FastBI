@@ -207,7 +207,7 @@ export default {
       let img = ''
       const domObj = document.getElementById(this.currentSelected)
       html2canvas(domObj, {
-        width: domObj.clientWidth, //dom 原始宽度
+        width: domObj.clientWidth, // dom 原始宽度
         height: domObj.clientHeight,
         scrollY: 0,
         scrollX: 0,
@@ -229,9 +229,9 @@ export default {
         pushType: this.shareObj.pushTime,
         pushUserId: this.shareObj.pusher,
         watermarkStatus: this.shareObj.watermark,
-        pushDateString:
-          moment(this.shareObj.time).format('YYYY-MM-DD HH:mm:ss') ||
-          moment().format('YYYY-MM-DD HH:mm:ss')
+        pushDateString: this.shareObj.time
+          ? moment(this.shareObj.time).format('YYYY-MM-DD HH:mm:ss')
+          : moment().format('YYYY-MM-DD HH:mm:ss')
       }
       this.$server.screenManage.savePushData(params).then(res => {
         if (res.code === 200) {
