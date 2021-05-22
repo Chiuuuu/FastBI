@@ -79,6 +79,27 @@ const listColumn = [
     scopedSlots: { customRender: 'name' }
   },
   {
+    title: '更新周期',
+    width: 200,
+    // ellipsis: true,
+    dataIndex: 'updateTime',
+    scopedSlots: { customRender: 'updateTime' }
+  },
+  {
+    title: '达标模型',
+    width: 200,
+    // ellipsis: true,
+    dataIndex: 'modelName',
+    scopedSlots: { customRender: 'modelName' }
+  },
+  {
+    title: '达标规则',
+    width: 200,
+    // ellipsis: true,
+    dataIndex: 'condition',
+    scopedSlots: { customRender: 'condition' }
+  },
+  {
     title: '标签描述',
     width: 300,
     // ellipsis: true,
@@ -151,6 +172,47 @@ export default {
     this.handleGetData()
   },
   methods: {
+    // 达标规则字段格式化
+    formatCondition(record) {
+      const { pivotType, field, conditionType, conditionValue } = record
+      const role = pivotType === 1 ? '维度' : '度量'
+      let condition = ''
+      switch (conditionType) {
+        case 0:
+          condition = '包含' + conditionValue
+          break
+        case 1:
+          condition = '不包含' + conditionValue
+          break
+        case 2: { // 范围
+          const value = conditionValue.split(',')
+          condition = value[0] + '————' + value[1]
+          break
+        }
+        case 3:
+          condition = '大于' + conditionValue
+          break
+        case 4:
+          condition = '小于' + conditionValue
+          break
+        case 5:
+          condition = '大于等于' + conditionValue
+          break
+        case 6:
+          condition = '小于等于' + conditionValue
+          break
+        case 7:
+          condition = '等于' + conditionValue
+          break
+        case 8:
+          condition = '不等于' + conditionValue
+          break
+        default:
+          condition = '-'
+          break
+      }
+      record.condition = `${role}【${field}】满足条件：${condition}`
+    },
     handleRowSelection(record, selected, selectedRows) {
       this.selectedRows = selectedRows
       this.selectedRowKeys = selectedRows.map(item => item.version)
@@ -216,6 +278,7 @@ export default {
         this.handleGetData()
       })
     },
+    // 切换页时渲染上次已勾选项
     renderSelectRows() {
       this.selectedRows = []
       this.selectedRowKeys = []
@@ -239,7 +302,27 @@ export default {
           this.listLoading = false
         })
       if (result.code === 200) {
-        this.listData = [].concat(result.rows)
+        this.listData = [].concat(result.rows.map(item => {
+          // 在这直接新建一个属性condition, 以免后面都要format
+          this.formatCondition(item)
+          switch (item.updateTime) {
+            case 0:
+              item.updateTime = '每天'
+              break
+            case 1:
+              item.updateTime = '每周'
+              break
+            case 2:
+              item.updateTime = '每月'
+              break
+            case 3:
+              item.updateTime = '不更新'
+              break
+            default:
+              break
+          }
+          return item
+        }))
         this.renderSelectRows()
 
         Object.assign(this.pagination, {

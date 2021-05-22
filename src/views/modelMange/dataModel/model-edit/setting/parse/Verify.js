@@ -69,6 +69,20 @@ export class Verify {
         return func
       }
       case 'binary': {
+        // 如果是逻辑判断, 允许两端传入等式
+        if (expr.operator === 'AND' || expr.operator === 'OR') {
+          if (expr.left.type !== 'assign' && expr.left.type !== 'binary') {
+            throw new Error('仅支持逻辑表达式判断')
+          } else if (expr.right.type !== 'assign' && expr.right.type !== 'binary') {
+            throw new Error('仅支持逻辑表达式判断')
+          }
+          return this.evaluate(
+            expr.operator,
+            expr.left.type === 'assign' ? this.validateCaseAssign(expr.left) : this.validate(expr.left),
+            expr.right.type === 'assign' ? this.validateCaseAssign(expr.right) : this.validate(expr.right)
+          )
+        }
+
         if (expr.left.type === 'fun' && expr.left.func.type === 'aggregator') {
           if (expr.right.type !== 'fun' && expr.right.type !== 'aggregator') {
             throw Error(`聚合粒度错误: 方法 ${expr.operator} 不能应用于 已聚合,未聚合`)
@@ -78,20 +92,11 @@ export class Verify {
             throw Error(`聚合粒度错误: 方法 ${expr.operator} 不能应用于 未聚合,已聚合`)
           }
         }
-        // 如果是逻辑判断, 允许两端传入等式
-        if (expr.operator === 'AND' || expr.operator === 'OR') {
-          return this.evaluate(
-            expr.operator,
-            expr.left.type === 'assign' ? this.validateCaseAssign(expr.left) : this.validate(expr.left),
-            expr.right.type === 'assign' ? this.validateCaseAssign(expr.right) : this.validate(expr.right)
-          )
-        } else {
-          return this.evaluate(
-            expr.operator,
-            this.validate(expr.left),
-            this.validate(expr.right)
-          )
-        }
+        return this.evaluate(
+          expr.operator,
+          this.validate(expr.left),
+          this.validate(expr.right)
+        )
       }
       case 'if': {
         const cond = this.validate(expr.cond)

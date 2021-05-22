@@ -10,6 +10,15 @@
       <template #name="text, record, index">
         <span v-html="text"></span>
       </template>
+      <template #updateTime="text, record, index">
+        <span v-html="text"></span>
+      </template>
+      <template #modelName="text, record, index">
+        <span v-html="text"></span>
+      </template>
+      <template #condition="text, record, index">
+        <span v-html="text"></span>
+      </template>
       <template #description="text, record, index">
         <span v-html="text"></span>
       </template>
@@ -50,16 +59,10 @@ export default {
   created () {
     if (this.diffData.length > 0) {
       this.listData = [].concat(this.diffData)
-      const sameName = this.textCompare(this.listData[0].name, this.listData[1].name)
-      const sameDesc = this.textCompare(this.listData[0].description, this.listData[1].description)
-      const sameModn = this.textCompare(this.listData[0].modUserName, this.listData[1].modUserName)
-      // this.underLine(sameName, sameDesc)
-      this.listData[0].name = sameName[0]
-      this.listData[1].name = sameName[1]
-      this.listData[0].description = sameDesc[0]
-      this.listData[1].description = sameDesc[1]
-      this.listData[0].modUserName = sameModn[0]
-      this.listData[1].modUserName = sameModn[1]
+      this.underLine('name')
+      this.underLine('updateTime')
+      this.underLine('description')
+      this.underLine('modUserName')
     }
   },
   methods: {
@@ -143,21 +146,10 @@ export default {
         return [longStr, shortStr]
       }
     },
-    underLine(nameList, descList) {
-      if (nameList.length > 0) {
-        nameList.map(item => {
-          const reg = new RegExp(item)
-          this.listData[0].name = this.listData[0].name.replace(reg, `<span style="text-decoration: underline">${item}</span>`)
-          this.listData[1].name = this.listData[1].name.replace(reg, `<span style="text-decoration: underline">${item}</span>`)
-        })
-      }
-      if (descList.length > 0) {
-        descList.map(item => {
-          const reg = new RegExp(item)
-          this.listData[0].description = this.listData[0].description.replace(reg, `<span style="text-decoration: underline">${item}</span>`)
-          this.listData[1].description = this.listData[1].description.replace(reg, `<span style="text-decoration: underline">${item}</span>`)
-        })
-      }
+    underLine(key) {
+      const result = this.textCompare(this.listData[0][key], this.listData[1][key])
+      this.listData[0][key] = result[0]
+      this.listData[1][key] = result[1]
     }
   }
 }

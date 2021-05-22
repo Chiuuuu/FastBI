@@ -29,7 +29,7 @@ export default {
   },
   /**
    * @description 查询标签信息
-   * @param {String} params.version 版本号
+   * @param {String} params.id 标签id
    * @returns
    */
   getLabel(id) {
@@ -165,5 +165,16 @@ export default {
    */
   getModelLabel(id) {
     return $axios.get(`/modelTag/${id}`)
+  },
+  /**
+   * @description 查询模型标签
+   * @param {Object} params
+   * @param {String} params.modelId
+   * @param {String} params.dimisionId
+   * @param {String} params.searchWord
+   * @returns
+   */
+  getFieldData(params) {
+    return $axios.get('/tag/selectDimisionsDistinct', { params })
   }
 }
