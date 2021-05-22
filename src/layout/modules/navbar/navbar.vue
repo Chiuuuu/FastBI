@@ -26,7 +26,7 @@
             v-for="(item, index) in shareChartList"
             :key="index"
           >
-            <span @click="checkChartDetail">{{ item.title }}</span>
+            <span @click="checkChartDetail(item)">{{ item.pushInfo }}</span>
           </a-menu-item>
         </a-menu>
       </vue-seamless-scroll>
@@ -78,10 +78,11 @@ export default {
   },
   data() {
     return {
-      shareChartList: [
-        { title: '​统计饼图（我的电视大屏，王小明，2021-05-13 11:05:00）' }
-      ]
+      shareChartList: []
     }
+  },
+  mounted() {
+    this.getPushList()
   },
   methods: {
     handleChangeProject(value) {
@@ -131,12 +132,37 @@ export default {
         this.$store.commit('common/set_sidebarUnfold', true)
       }
     },
+    // 获取推送列表
+    getPushList() {
+      this.$server.screenManage
+        .getPushDataList(this.selectProject, this.userInfo.id)
+        .then(res => {
+          if (res.code === 200) {
+            this.shareChartList = res.rows
+          } else {
+            this.$message.error(res.msg)
+          }
+        })
+    },
     // 查看图表推送详情
-    checkChartDetail() {
+    checkChartDetail(row) {
       let tempwindow = window.open('_blank')
       // pdf测试
-      let url = 'https://web.stanford.edu/~xgzhou/zhou_book2017.pdf'
-      tempwindow.location = url
+      //   let url = 'https://web.stanford.edu/~xgzhou/zhou_book2017.pdf'
+      console.log(process.env.VUE_APP_SERVICE_URL + row.pdfUrl)
+      tempwindow.location = `${process.env.VUE_APP_SERVICE_URL}/${row.pdfUrl}`
+      this.finishRead(row.id)
+    },
+    // 阅后即焚
+    finishRead(id) {
+      this.$server.screenManage.delReadData(id).then(res => {
+        if (res.code !== 200) {
+          this.$message.error(res.msg)
+        } else {
+          // 删除成功重新获取推送列表
+          this.getPushList()
+        }
+      })
     }
   }
 }
