@@ -2,7 +2,6 @@
   <div
     class="dv-transform"
     :class="{ selected: isSelected }"
-    :id="currentSelected"
     :style="contentStyles"
     ref="dvTransform"
     @mousedown="handleMoveStart"
@@ -25,7 +24,7 @@
           class="transform-handler"
           :class="{ hide: !comHover && !isSelected }"
         >
-          <div class="dv-wrapper" :style="dvWrapperStyles">
+          <div class="dv-wrapper" :id="item.id" :style="dvWrapperStyles">
             <slot>我是块的标题</slot>
           </div>
           <!--缩放辅助条-->

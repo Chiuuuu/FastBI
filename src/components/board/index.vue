@@ -204,7 +204,6 @@ export default {
         this.$message.error('推送时间不能小于此刻')
         return
       }
-      let img = ''
       const domObj = document.getElementById(this.currentSelected)
       html2canvas(domObj, {
         width: domObj.clientWidth, // dom 原始宽度
@@ -213,8 +212,7 @@ export default {
         scrollX: 0,
         useCORS: true // 【重要】开启跨域配置
       }).then(canvas => {
-        img = canvas.toDataURL()
-        this.saveData(img)
+        this.saveData(canvas.toDataURL())
         this.visible = false
       })
     },
