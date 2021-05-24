@@ -99,7 +99,7 @@
     </a-modal>
     <!-- 搜索框 -->
     <div class="menu_search">
-      <a-input placeholder="搜索数据模型名称" :value="modelSearchForm.keyword" @input="handleSearchModel">
+      <a-input placeholder="搜索数据模型名称" :value="modelSearchForm.name" @input="handleSearchModel">
         <a-icon class="icon_search" slot="suffix" type="search" />
         <a class="ant-dropdown-link" slot="addonAfter" @click="modelSearchVisible = true">
           <a-icon type="filter" class="menu_icon"></a-icon>

@@ -20,8 +20,13 @@
                   type="primary"
                   :loading="loading"
                   @click="handleSave"
-                >保 存</a-button>
-                <a-button class="main-button" @click="$router.push({ name: 'labelList' })">退 出</a-button>
+                  >保 存</a-button
+                >
+                <a-button
+                  class="main-button"
+                  @click="$router.push({ name: 'labelList' })"
+                  >退 出</a-button
+                >
               </div>
             </header>
 
@@ -29,14 +34,25 @@
             <div class="form-section section-1">
               <div class="title">基本信息</div>
               <a-form-model-item label="标签名称" prop="name">
-                <a-input style="width: 300px" v-model="form.name" placeholder="请输入标签名称"></a-input>
+                <a-input
+                  style="width: 300px"
+                  v-model="form.name"
+                  placeholder="请输入标签名称"
+                ></a-input>
               </a-form-model-item>
               <a-form-model-item label="版本号" prop="userVersion">
-                <a-input v-model="form.userVersion" placeholder="请输入版本号"></a-input>
+                <a-input
+                  v-model="form.userVersion"
+                  placeholder="请输入版本号"
+                ></a-input>
                 <!-- <span>{{ form.version }}</span> -->
               </a-form-model-item>
               <a-form-model-item label="标签描述" prop="description">
-                <a-input style="width: 600px" v-model="form.description" placeholder="请输入标签描述"></a-input>
+                <a-input
+                  style="width: 600px"
+                  v-model="form.description"
+                  placeholder="请输入标签描述"
+                ></a-input>
               </a-form-model-item>
               <a-form-model-item label="更新时间" prop="updateTime">
                 <a-radio-group v-model="form.updateTime">
@@ -51,7 +67,11 @@
             <!-- 标签规则模块 高度自适应 -->
             <div class="form-section section-2 scrollbar">
               <div class="title">标签规则</div>
-              <a-form-model-item class="block-model-item" label="达标模型" prop="modelId">
+              <a-form-model-item
+                class="block-model-item"
+                label="达标模型"
+                prop="modelId"
+              >
                 <div style="width: 500px">
                   <a-tree-select
                     v-model="form.modelId"
@@ -62,7 +82,7 @@
                     placeholder="请选择模型"
                     allow-clear
                     tree-default-expand-all
-                    @change="handleGetPivotSchema"
+                    @change="handleChangeModel"
                   >
                     <a-tree-select-node
                       v-for="model in modelList"
@@ -72,7 +92,11 @@
                       :selectable="model.fileType === 1"
                     >
                       <template
-                        v-if="model.children && model.children.length && model.children.length > 0"
+                        v-if="
+                          model.children &&
+                            model.children.length &&
+                            model.children.length > 0
+                        "
                       >
                         <a-tree-select-node
                           v-for="item in model.children"
@@ -86,7 +110,12 @@
                 </div>
               </a-form-model-item>
               <a-form-model-item label="达标条件" prop="pivotType">
-                <a-select v-model="form.pivotType" style="width: 134px" placeholder="请选择维度度量">
+                <a-select
+                  v-model="form.pivotType"
+                  style="width: 134px"
+                  placeholder="请选择维度度量"
+                  @change="handleResetField"
+                >
                   <a-select-option :value="1">维度</a-select-option>
                   <a-select-option :value="2">度量</a-select-option>
                 </a-select>
@@ -102,10 +131,15 @@
                     v-for="item in fieldList"
                     :key="item.id"
                     :value="item.alias"
-                  >{{ item.alias }}</a-select-option>
+                    >{{ item.alias }}</a-select-option
+                  >
                 </a-select>
               </a-form-model-item>
-              <a-form-model-item class="block-model-item" label="满足条件" prop="conditionType">
+              <a-form-model-item
+                class="block-model-item"
+                label="满足条件"
+                prop="conditionType"
+              >
                 <!-- 选择维度时的条件筛选 -->
                 <template v-if="form.pivotType === 1">
                   <a-radio-group v-model="form.conditionType">
@@ -116,7 +150,10 @@
 
                 <!-- 选择度量时的条件筛选 -->
                 <template v-else-if="form.pivotType === 2">
-                  <a-select style="width: 134px;margin-right: 16px" v-model="form.conditionType">
+                  <a-select
+                    style="width: 134px;margin-right: 16px"
+                    v-model="form.conditionType"
+                  >
                     <a-select-option :value="2">范围</a-select-option>
                     <a-select-option :value="3">大于</a-select-option>
                     <a-select-option :value="4">小于</a-select-option>
@@ -127,31 +164,48 @@
                   </a-select>
                 </template>
               </a-form-model-item>
-              <a-form-model-item class="block-model-item" label="达标范围" prop="conditionValue">
+              <a-form-model-item
+                class="block-model-item"
+                label="达标范围"
+                prop="conditionValue"
+              >
                 <template v-if="form.pivotType === 1">
                   <a-tree-select
                     v-model="form.conditionValue"
-                    style="width: 240px"
+                    style="width: 500px"
                     :tree-data="fieldData"
+                    :dropdown-style="{ maxHeight: '300px', overflow: 'auto' }"
                     placeholder="请输入搜索内容"
                     allow-clear
                     tree-checkable
                     tree-default-expand-all
                     show-search
-                    @search="handleGetFieldData"
+                    @search="handleSearchFieldData"
                   />
                 </template>
                 <template v-if="form.pivotType === 2">
                   <!-- 选择范围时的输入框 -->
                   <template v-if="form.conditionType === 2">
-                    <a-input v-model="conditionValueMin" style="width: 134px" placeholder="请输入数值"></a-input>
+                    <a-input
+                      v-model="conditionValueMin"
+                      style="width: 134px"
+                      placeholder="请输入数值"
+                    ></a-input>
                     <div class="cut-line">——</div>
-                    <a-input v-model="conditionValueMax" style="width: 134px" placeholder="请输入数值"></a-input>
+                    <a-input
+                      v-model="conditionValueMax"
+                      style="width: 134px"
+                      placeholder="请输入数值"
+                    ></a-input>
                   </template>
 
                   <!-- 选择其他选项时的输入框 -->
                   <template v-else>
-                    <a-input v-model="form.conditionValue" style="width: 134px" placeholder="请输入数值"></a-input>
+                    <a-input
+                      v-model="form.conditionValue"
+                      style="width: 134px"
+                      placeholder="请输入数值"
+                    ></a-input>
                   </template>
                 </template>
               </a-form-model-item>
@@ -175,6 +229,7 @@
 </template>
 
 <script>
+import debounce from 'lodash/debounce'
 export default {
   name: 'labelEdit',
   created() {
@@ -197,22 +252,23 @@ export default {
         pivotType: 1, // 维度or度量
         field: undefined, // 字段名
         conditionType: 0, // 达标条件类型
-        conditionValue: [], // 达标条件值
+        conditionValue: [] // 达标条件值
       },
+      // 达标范围值
       conditionValueMin: '',
       conditionValueMax: '',
       rules: {
         name: [
           { required: true, message: '请输入标签名称' },
-          { max: 10, message: '请输入小于10字的标签名称' },
+          { max: 10, message: '请输入小于10字的标签名称' }
         ],
         description: [
           { required: true, message: '请输入标签描述' },
-          { max: 50, message: '请输入小于50字的标签描述' },
+          { max: 50, message: '请输入小于50字的标签描述' }
         ],
         userVersion: [
           { required: true, message: '请输入版本号' },
-          { pattern: /^\d{1,8}$/, message: '请输入8位有效数字' },
+          { pattern: /^\d{1,8}$/, message: '请输入8位有效数字' }
         ],
         reason: [{ max: 50, message: '请输入小于50字的修改原因' }],
         updateTime: [{ required: true, message: '请选择更新时间' }],
@@ -220,7 +276,10 @@ export default {
         pivotType: [{ required: true, message: '请选择类型' }],
         field: [{ required: true, message: '请选择字段' }],
         conditionType: [{ required: true, message: '请选择满足条件' }],
-        conditionValue: [{ required: true, message: '请确认达标范围' }],
+        conditionValue: [
+          { required: true, message: '请确认达标范围' },
+          { validator: this.validateConditionValue, trigger: 'change' }
+        ]
       },
       labelData: {}, // 标签详情
       modelList: [], // 模型列表
@@ -228,8 +287,13 @@ export default {
       measures: [], // 当前度量列表
       fieldId: '', // 记录当前选中的维度id, 获取数据接口需要
       fieldSearchWord: '', // 搜索当前维度下的数据
-      fieldData: [], // 搜索结果
-      visible: false,
+      fieldData: [{
+        title: '全选',
+        value: '',
+        key: '0',
+        children: []
+      }], // 搜索结果
+      visible: false
     }
   },
   computed: {
@@ -240,7 +304,7 @@ export default {
     // 字段列表(维度 or 度量)
     fieldList() {
       return this.form.pivotType === 1 ? this.dimensions : this.measures
-    },
+    }
   },
   watch: {
     // 初始化维度度量选项改变后的值
@@ -268,7 +332,7 @@ export default {
         this.form.conditionValue =
           (this.conditionValueMin || '') + ',' + (newValue || '')
       }
-    },
+    }
   },
   methods: {
     // 获取标签详情
@@ -300,7 +364,7 @@ export default {
         }
         // 遍历列表找到id, 调用获取数据的接口
         const target = this.fieldList.find(
-          (item) => item.alias === this.form.field
+          item => item.alias === this.form.field
         )
         this.fieldId = target ? target.id : ''
         this.handleGetFieldData()
@@ -333,33 +397,86 @@ export default {
     },
     // 获取维度下的数据列表
     async handleGetFieldData() {
+      // 只在维度时调用
+      if (!this.form.modelId || this.form.pivotType === 2) return
       const res = await this.$server.label.getFieldData({
         modelId: this.form.modelId,
         dimisionId: this.fieldId,
-        searchWord: this.fieldSearchWord,
+        searchWord: this.fieldSearchWord
       })
       if (res.code === 200) {
-        const children = res.data.map((item, index) => {
-          const name = Object.values(item)[0]
-          return {
-            title: name,
-            value: name,
-            key: index + 1,
+        const children = []
+        res.data.map((item, index) => {
+          if (item) {
+            const name = Object.values(item)[0]
+            children.push({
+              title: name,
+              value: name,
+              key: index + 1
+            })
           }
         })
         this.fieldData = [
           {
             title: '全选',
-            value: '0',
+            value: '',
             key: '0',
-            children,
-          },
+            children
+          }
         ]
       } else {
         this.$message.error(res.msg || '获取数据失败')
-        this.fieldData = []
+        this.fieldData = [{
+          title: '全选',
+          value: '',
+          key: '0',
+          children: []
+        }]
       }
     },
+    handleSearchFieldData: debounce(function(value) {
+      this.fieldSearchWord = value
+      this.handleGetFieldData()
+    }, 400),
+    // 达标值校验
+    validateConditionValue(rule, value, callback) {
+      if (value !== undefined && value[0] === '') {
+        callback(new Error('请确认达标范围'))
+        return
+      }
+      let invalid = false
+      if (this.form.conditionType === 2) {
+        value.split(',').map(item => {
+          if (isNaN(item)) {
+            invalid = true
+          }
+        })
+      }
+      invalid ? callback(new Error('请输入数值')) : callback()
+    },
+    // 选各种模型事件
+    handleChangeModel() {
+      this.handleResetField()
+      this.handleGetPivotSchema()
+    },
+    // 重置字段数据
+    handleResetField() {
+      this.form = Object.assign({}, this.form, {
+        field: undefined, // 字段名
+        conditionValue: [] // 达标条件值
+      })
+      this.fieldId = ''
+      this.fieldSearchWord = ''
+      this.fieldData = [{
+        title: '全选',
+        value: '',
+        key: '0',
+        children: []
+      }]
+      this.conditionValueMin = ''
+      this.conditionValueMax = ''
+    },
+    // 选择字段事件
     handleFieldSelect(value, option) {
       this.fieldId = option.data.key
       this.handleGetFieldData()
@@ -379,7 +496,7 @@ export default {
             ...this.form,
             conditionValue: this.form.conditionValue.join
               ? this.form.conditionValue.join(',')
-              : this.form.conditionValue,
+              : this.form.conditionValue
           }
 
           let res = null
@@ -402,8 +519,8 @@ export default {
           }
         }
       })
-    },
-  },
+    }
+  }
 }
 </script>
 
