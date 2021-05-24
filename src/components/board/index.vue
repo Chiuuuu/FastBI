@@ -133,7 +133,8 @@ export default {
       'currentSelected',
       'currSelected',
       'echartsInstance',
-      'fileName'
+      'fileName',
+      'canvasRange'
     ]),
     centerStyle() {
       return {
@@ -206,8 +207,11 @@ export default {
       }
       const domObj = document.getElementById(this.currentSelected)
       html2canvas(domObj, {
-        width: domObj.clientWidth, // dom 原始宽度
-        height: domObj.clientHeight,
+        width: domObj.clientWidth * this.canvasRange, // dom 原始宽度
+        height: domObj.clientHeight * this.canvasRange,
+        scale: 1,
+        dpi: 300,
+        letterRendering: true,
         scrollY: 0,
         scrollX: 0,
         useCORS: true // 【重要】开启跨域配置

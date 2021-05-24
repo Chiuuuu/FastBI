@@ -47,6 +47,19 @@
         </a-menu>
       </a-dropdown>
     </div>
+    <a-modal
+      :width="800"
+      :dialog-style="{ top: '20px' }"
+      v-model="visible"
+      :footer="null"
+      @cancel="finishRead"
+    >
+      <iframe
+        style="width:100%;height:80vh;margin:20px auto"
+        ref="iframe"
+        :src="row.url"
+      ></iframe>
+    </a-modal>
   </a-row>
 </template>
 <script>
@@ -78,7 +91,9 @@ export default {
   },
   data() {
     return {
-      shareChartList: []
+      shareChartList: [],
+      visible: false,
+      row: {}
     }
   },
   mounted() {
@@ -146,16 +161,25 @@ export default {
     },
     // 查看图表推送详情
     checkChartDetail(row) {
-      let tempwindow = window.open('_blank')
+      //   let tempwindow = window.open('_blank')
       // pdf测试
       //   let url = 'https://web.stanford.edu/~xgzhou/zhou_book2017.pdf'
-      console.log(process.env.VUE_APP_SERVICE_URL + row.pdfUrl)
-      tempwindow.location = `${process.env.VUE_APP_SERVICE_URL}/${row.pdfUrl}`
-      this.finishRead(row.id)
+      //   tempwindow.location = `${process.env.VUE_APP_SERVICE_URL}/${row.pdfUrl}`
+      // 页面关闭的时候删除pdf链接
+      //   let self = this
+      //   tempwindow.onunload = function(e) {
+      //     self.finishRead(row.id)
+      //   }
+      this.visible = true
+      this.row = {
+        ...row,
+        url: `${process.env.VUE_APP_SERVICE_URL}/profile/${row.graphName}`
+      }
+      //   this.finishRead(row.id)
     },
     // 阅后即焚
-    finishRead(id) {
-      this.$server.screenManage.delReadData(id).then(res => {
+    finishRead() {
+      this.$server.screenManage.delReadData(this.row.id).then(res => {
         if (res.code !== 200) {
           this.$message.error(res.msg)
         } else {
