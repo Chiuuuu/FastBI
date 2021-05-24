@@ -440,6 +440,12 @@ export default {
     }, 400),
     // 达标值校验
     validateConditionValue(rule, value, callback) {
+      if (this.form.conditionType === 2) {
+        if (this.conditionValueMin >= this.conditionValueMax) {
+          callback(new Error('范围两端数值须从小到大'))
+          return
+        }
+      }
       if (value !== undefined && value[0] === '') {
         callback(new Error('请确认达标范围'))
         return
