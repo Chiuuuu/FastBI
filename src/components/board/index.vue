@@ -239,7 +239,11 @@ export default {
         if (res.code === 200) {
           this.$message.success('推送成功')
         } else {
-          this.$message.error(res.msg)
+          if (res.msg === '列表数据不能为空') {
+            this.$message.error('该图表未拖入维度/度量')
+          } else {
+            this.$message.error(res.msg)
+          }
         }
       })
     }
