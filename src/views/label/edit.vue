@@ -463,7 +463,7 @@ export default {
     handleResetField() {
       this.form = Object.assign({}, this.form, {
         field: undefined, // 字段名
-        conditionValue: [] // 达标条件值
+        conditionValue: this.form.pivotType === 1 ? [] : '' // 达标条件值
       })
       this.fieldId = ''
       this.fieldSearchWord = ''
@@ -479,6 +479,7 @@ export default {
     // 选择字段事件
     handleFieldSelect(value, option) {
       this.fieldId = option.data.key
+      this.form.conditionValue = this.form.pivotType === 1 ? [] : ''
       this.handleGetFieldData()
     },
     // 重置表单
