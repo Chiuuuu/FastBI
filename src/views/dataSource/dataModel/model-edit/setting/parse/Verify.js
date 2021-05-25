@@ -110,7 +110,7 @@ export class Verify {
       case 'tail':
         throw new Error(`语法错误`)
       default:
-        throw new Error("I don't know how to validate " + expr)
+        throw new Error('无法解析 ' + expr)
     }
   }
 
