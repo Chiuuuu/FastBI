@@ -234,9 +234,6 @@ export default {
   name: 'labelEdit',
   created() {
     this.handleGetModelList()
-    if (!this.isNew) {
-      this.handleGetData()
-    }
   },
   data() {
     return {
@@ -357,12 +354,26 @@ export default {
             this.conditionValueMax = value[1]
           }
         }
-        // 遍历列表找到id, 调用获取数据的接口
-        const target = this.fieldList.find(
-          item => item.alias === this.form.field
-        )
-        this.fieldId = target ? target.id : ''
-        this.handleGetFieldData()
+        if (!this.modelList.find(item => {
+          const id = this.labelData.modelId
+          if (item.fileType === 1) {
+            return item.id === id
+          } else if (item.fileType === 0) {
+            return item.children.find(child => child.id === id)
+          }
+        })) {
+          this.form.modelId = undefined
+          this.dimensions = []
+          this.measures = []
+          this.handleResetField()
+        } else {
+          // 遍历列表找到id, 调用获取数据的接口
+          const target = this.fieldList.find(
+            item => item.alias === this.form.field
+          )
+          this.fieldId = target ? target.id : ''
+          this.handleGetFieldData()
+        }
       } else {
         this.$message.error(res.msg || '获取详情失败')
       }
@@ -372,6 +383,11 @@ export default {
       const res = await this.$server.common.getMenuList('/model/catalog/list/2')
       if (res.code === 200) {
         this.modelList = res.data
+        if (!this.isNew) {
+          this.$nextTick(() => {
+            this.handleGetData()
+          })
+        }
       } else {
         this.$message.error(res.msg || '获取模型列表错误')
       }
@@ -383,8 +399,12 @@ export default {
       )
       if (result.code === 200) {
         // 过滤自定义维度度量
-        this.dimensions = result.data.pivotSchema.dimensions.filter(item => item.produceType === 0)
-        this.measures = result.data.pivotSchema.measures.filter(item => item.produceType === 0)
+        this.dimensions = result.data.pivotSchema.dimensions.filter(
+          item => item.produceType === 0
+        )
+        this.measures = result.data.pivotSchema.measures.filter(
+          item => item.produceType === 0
+        )
       } else {
         this.$message.error(result.msg || '获取维度度量失败')
         this.dimensions = []
