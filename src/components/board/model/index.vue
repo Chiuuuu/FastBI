@@ -367,7 +367,10 @@ export default {
       ) {
         this.modelId = this.currSelected.datamodelId
       } else {
-        this.modelId = this.selectedModelList[0].modelid
+        this.modelId =
+          this.selectedModelList.length > 0
+            ? this.selectedModelList[0].modelid
+            : ''
       }
       this.model = true
     },

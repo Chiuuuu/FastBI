@@ -550,21 +550,17 @@ export default {
               res.rows.map((item, index) => {
                 let obj = {}
                 for (let item2 of dimensionKeys) {
-                  if (item && item[item2]) {
-                    obj[item2] = item[item2]
-                  }
+                  obj[item2] = item[item2]
                 }
                 for (let item2 of measureKeys) {
-                  if (item && item[item2]) {
-                    obj[item2] = item[item2]
-                  }
+                  obj[item2] = item[item2]
                 }
                 // if (obj[dimensionKeys]) {
                 rows.push(obj)
                 // }
               })
             }
-
+            rows = rows.filter(item => !Object.values(item).includes(null))
             apiData.source = {
               columns,
               rows

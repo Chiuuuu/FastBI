@@ -323,9 +323,16 @@ export default {
         let leftMax = Math.max(...leftDatas)
         let rightMax = Math.max(...rightDatas)
         option.yAxis[0].max = leftMax
-        option.yAxis[0].interval = +(leftMax / 6).toFixed(0)
+        option.yAxis[0].interval = leftMax / 6
         option.yAxis[1].max = rightMax
-        option.yAxis[1].interval = +(rightMax / 6).toFixed(0)
+        option.yAxis[1].interval = rightMax / 6
+        // 显示整数，去掉小数
+        option.yAxis[0].axisLabel.formatter = function(value, index) {
+          return value.toFixed(0)
+        }
+        option.yAxis[1].axisLabel.formatter = function(value, index) {
+          return value.toFixed(0)
+        }
         this.chartObj.setOption(option)
       }
     },

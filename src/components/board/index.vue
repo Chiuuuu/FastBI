@@ -134,7 +134,8 @@ export default {
       'currSelected',
       'echartsInstance',
       'fileName',
-      'canvasRange'
+      'canvasRange',
+      'pageSettings'
     ]),
     centerStyle() {
       return {
@@ -206,6 +207,12 @@ export default {
         return
       }
       const domObj = document.getElementById(this.currentSelected)
+      let transparent = false
+      // 透明背景用大屏背景作为背景色
+      if (!domObj.style.backgroundColor) {
+        transparent = true
+        domObj.style.backgroundColor = this.pageSettings.backgroundColor
+      }
       html2canvas(domObj, {
         width: domObj.clientWidth * this.canvasRange, // dom 原始宽度
         height: domObj.clientHeight * this.canvasRange,
@@ -214,8 +221,12 @@ export default {
         letterRendering: true,
         scrollY: 0,
         scrollX: 0,
+        // background: 'blue',
         useCORS: true // 【重要】开启跨域配置
       }).then(canvas => {
+        if (transparent) {
+          domObj.style.backgroundColor = ''
+        }
         this.saveData(canvas.toDataURL())
         this.visible = false
       })
