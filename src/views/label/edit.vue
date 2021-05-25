@@ -519,14 +519,18 @@ export default {
 
 <style lang="less" scoped>
 @import url('./common');
+@deep: ~'>>>';
 .form-area {
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
 
-  .ant-form-item-with-help {
+  @{deep} .ant-form-item-with-help {
     margin-bottom: 0;
+  }
+  @{deep} .ant-form-item-children {
+    display: block;
   }
 
   header {
