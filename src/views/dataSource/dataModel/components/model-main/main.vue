@@ -20,7 +20,7 @@
           <div class="description">
             <span class="d-s" :title="detailInfo.description">描述：{{detailInfo.description}}</span>
             <div>
-              <span class="d-s">创建人：{{detailInfo.createBy}}</span>
+              <span class="d-s">创建人：{{detailInfo.createByName}}&nbsp;&nbsp;&nbsp;&nbsp;</span>
               <span class="d-s">创建时间：{{detailInfo.gmtCreate}}</span>
             </div>
           </div>
