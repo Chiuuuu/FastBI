@@ -22,7 +22,6 @@ export default {
       const res = await this.$server.systemSchedule.getRunningSchedules()
       if (res.code === 200) {
         this.list = res.data
-        this.init()
       } else {
         this.$message.error(res.msg || '获取列表失败')
       }

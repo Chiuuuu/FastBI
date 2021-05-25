@@ -74,42 +74,42 @@ const listColumn = [
   {
     title: '标签名称',
     width: 200,
-    // ellipsis: true,
+    ellipsis: true,
     dataIndex: 'name',
     scopedSlots: { customRender: 'name' }
   },
   {
     title: '更新周期',
     width: 200,
-    // ellipsis: true,
+    ellipsis: true,
     dataIndex: 'updateTime',
     scopedSlots: { customRender: 'updateTime' }
   },
   {
     title: '达标模型',
     width: 200,
-    // ellipsis: true,
+    ellipsis: true,
     dataIndex: 'modelName',
     scopedSlots: { customRender: 'modelName' }
   },
   {
     title: '达标规则',
     width: 200,
-    // ellipsis: true,
+    ellipsis: true,
     dataIndex: 'condition',
     scopedSlots: { customRender: 'condition' }
   },
   {
     title: '标签描述',
     width: 300,
-    // ellipsis: true,
+    ellipsis: true,
     dataIndex: 'description',
     scopedSlots: { customRender: 'description' }
   },
   {
     title: '操作人',
     width: 100,
-    // ellipsis: true,
+    ellipsis: true,
     dataIndex: 'modUserName',
     scopedSlots: { customRender: 'modUserName' }
   },

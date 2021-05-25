@@ -287,12 +287,7 @@ export default {
       measures: [], // 当前度量列表
       fieldId: '', // 记录当前选中的维度id, 获取数据接口需要
       fieldSearchWord: '', // 搜索当前维度下的数据
-      fieldData: [{
-        title: '全选',
-        value: '',
-        key: '0',
-        children: []
-      }], // 搜索结果
+      fieldData: [], // 搜索结果
       visible: false
     }
   },
@@ -387,8 +382,9 @@ export default {
         this.form.modelId
       )
       if (result.code === 200) {
-        this.dimensions = result.data.pivotSchema.dimensions
-        this.measures = result.data.pivotSchema.measures
+        // 过滤自定义维度度量
+        this.dimensions = result.data.pivotSchema.dimensions.filter(item => item.produceType === 0)
+        this.measures = result.data.pivotSchema.measures.filter(item => item.produceType === 0)
       } else {
         this.$message.error(result.msg || '获取维度度量失败')
         this.dimensions = []
@@ -426,12 +422,7 @@ export default {
         ]
       } else {
         this.$message.error(res.msg || '获取数据失败')
-        this.fieldData = [{
-          title: '全选',
-          value: '',
-          key: '0',
-          children: []
-        }]
+        this.fieldData = []
       }
     },
     handleSearchFieldData: debounce(function(value) {
@@ -473,12 +464,7 @@ export default {
       })
       this.fieldId = ''
       this.fieldSearchWord = ''
-      this.fieldData = [{
-        title: '全选',
-        value: '',
-        key: '0',
-        children: []
-      }]
+      this.fieldData = []
       this.conditionValueMin = ''
       this.conditionValueMax = ''
     },
