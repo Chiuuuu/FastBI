@@ -234,7 +234,7 @@ export default {
             }
             rows.push(obj)
           })
-
+          rows = rows.filter(item => !Object.values(item).includes(null))
           apiData.source = {
             columns,
             rows
