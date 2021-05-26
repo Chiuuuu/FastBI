@@ -37,6 +37,7 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import { deepClone } from '@/utils/deepClone'
+import { Loading } from 'element-ui'
 import { sum, summary } from '@/utils/summaryList'
 import navigateList from '@/config/navigate' // 导航条菜单
 
@@ -201,56 +202,67 @@ export default {
         params.setting.api_data.mixMeasures
       )
       let apiData = deepClone(this.currSelected.setting.api_data)
-      this.$server.screenManage.getData(params).then(res => {
-        // res.rows = res.rows.filter(item => !Object.values(item).includes(null))
-        selected.setting.isEmpty = false
-        // 数据源被删掉
-        if (res.code === 500 && res.msg === 'IsChanged') {
-          selected.setting.isEmpty = true
-          this.updateChartData()
-          return
-        }
-        if (res.code === 200) {
-          let columns = []
-          let rows = []
-          let dimensionKeys = [] // 度量key
-          for (let m of apiData.dimensions) {
-            dimensionKeys.push(m.alias)
-            columns.push(m.alias) // 默认columns第二项起为指标
-          }
-
-          let measureKeys = [] // 度量key
-          for (let m of apiData.measures.concat(apiData.mixMeasures)) {
-            measureKeys.push(m.alias)
-            columns.push(m.alias) // 默认columns第二项起为指标
-          }
-          res.rows.map((item, index) => {
-            let obj = {}
-            for (let item2 of dimensionKeys) {
-              obj[item2] = item[item2]
-            }
-            obj[dimensionKeys] = item[dimensionKeys]
-            for (let item2 of measureKeys) {
-              obj[item2] = item[item2]
-            }
-            rows.push(obj)
-          })
-          apiData.source = {
-            columns,
-            rows
-          }
-          this.$store.dispatch('SetSelfDataSource', apiData)
-          // 数据显示为折线
-          this.currSelected.setting.apis.showLine = this.fileList.map(
-            item => item.alias
-          )
-          // 折线作为坐标
-          this.currSelected.setting.apis.axisSite.right = this.currSelected.setting.apis.showLine
-          this.updateChartData()
-        } else {
-          this.$message.error(res.msg)
-        }
+      let loadingInstance = Loading.service({
+        lock: true,
+        text: '加载中...',
+        target: 'body',
+        background: 'rgb(255, 255, 255, 0.6)'
       })
+      this.$server.screenManage
+        .getData(params)
+        .then(res => {
+          // res.rows = res.rows.filter(item => !Object.values(item).includes(null))
+          selected.setting.isEmpty = false
+          // 数据源被删掉
+          if (res.code === 500 && res.msg === 'IsChanged') {
+            selected.setting.isEmpty = true
+            this.updateChartData()
+            return
+          }
+          if (res.code === 200) {
+            let columns = []
+            let rows = []
+            let dimensionKeys = [] // 度量key
+            for (let m of apiData.dimensions) {
+              dimensionKeys.push(m.alias)
+              columns.push(m.alias) // 默认columns第二项起为指标
+            }
+
+            let measureKeys = [] // 度量key
+            for (let m of apiData.measures.concat(apiData.mixMeasures)) {
+              measureKeys.push(m.alias)
+              columns.push(m.alias) // 默认columns第二项起为指标
+            }
+            res.rows.map((item, index) => {
+              let obj = {}
+              for (let item2 of dimensionKeys) {
+                obj[item2] = item[item2]
+              }
+              obj[dimensionKeys] = item[dimensionKeys]
+              for (let item2 of measureKeys) {
+                obj[item2] = item[item2]
+              }
+              rows.push(obj)
+            })
+            apiData.source = {
+              columns,
+              rows
+            }
+            this.$store.dispatch('SetSelfDataSource', apiData)
+            // 数据显示为折线
+            this.currSelected.setting.apis.showLine = this.fileList.map(
+              item => item.alias
+            )
+            // 折线作为坐标
+            this.currSelected.setting.apis.axisSite.right = this.currSelected.setting.apis.showLine
+            this.updateChartData()
+          } else {
+            this.$message.error(res.msg)
+          }
+        })
+        .finally(() => {
+          loadingInstance.close()
+        })
     }
   }
 }
