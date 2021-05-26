@@ -213,6 +213,9 @@ export default {
         transparent = true
         domObj.style.backgroundColor = this.pageSettings.backgroundColor
       }
+      // 添加文字间距，防止截图文字重叠
+      domObj.childNodes[0].style.letterSpacing =
+        this.currSelected.setting.config.title.textStyle.fontSize * 0.6 + 'px'
       html2canvas(domObj, {
         width: domObj.clientWidth * this.canvasRange, // dom 原始宽度
         height: domObj.clientHeight * this.canvasRange,
@@ -227,6 +230,8 @@ export default {
         if (transparent) {
           domObj.style.backgroundColor = ''
         }
+        domObj.childNodes[0].style.letterSpacing = ''
+        domObj.style.letterSpacing = ''
         this.saveData(canvas.toDataURL())
         this.visible = false
       })
