@@ -305,7 +305,7 @@ export default {
     }
   },
   created() {
-    // this.handleGetMenuList()
+    this.handleGetMenuList()
     this.handleGetModelSearchList()
     this.handleGetProjectUserList()
   },
