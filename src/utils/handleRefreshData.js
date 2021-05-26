@@ -1,6 +1,7 @@
 import { sum, summary } from '@/utils/summaryList'
 // 处理大屏刷新数据
 export function handleRefreshData({ chart, newData }) {
+  //   newData = newData.filter(item => !Object.values(item).includes(null))
   if (
     chart.setting.chartType === 'v-ring' ||
     chart.setting.chartType === 'v-gauge'

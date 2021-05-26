@@ -420,6 +420,7 @@ export default {
       }
       let apiData = deepClone(this.currSelected.setting.api_data)
       this.$server.screenManage.getData(params).then(res => {
+        // res.rows = res.rows.filter(item => !Object.values(item).includes(null))
         selected.setting.isEmpty = false
         // 数据源被删掉
         if (res.code === 500 && res.msg === 'IsChanged') {
@@ -560,7 +561,6 @@ export default {
                 // }
               })
             }
-            rows = rows.filter(item => !Object.values(item).includes(null))
             apiData.source = {
               columns,
               rows
