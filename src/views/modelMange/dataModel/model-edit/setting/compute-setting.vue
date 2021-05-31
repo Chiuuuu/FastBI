@@ -305,8 +305,8 @@ const expression = [
     name: '逻辑与',
     expression: '表达式1 AND 表达式2 AND 表达式3 ...',
     description:
-      '检查所有参数是否为TRUE, 所有参数均为TRUE则返回TRUE, 否则返回FALSE。',
-    example: '[城市数量] AND [及格人数]',
+      '检查所有等式判断是否为TRUE, 所有等式判断均为TRUE则返回TRUE, 否则返回FALSE。',
+    example: '([城市数量] = 100) AND [及格人数] > 10',
     syntax: '表达式1 AND 表达式2',
     type: 'logic',
     groups: ['logic']
@@ -316,8 +316,8 @@ const expression = [
     name: '逻辑或',
     expression: '表达式1 OR 表达式2 OR 表达式3 ...',
     description:
-      '检查所有参数是否为TRUE, 任一参数均为TRUE则返回TRUE, 否则返回FALSE。',
-    example: '[城市数量] OR [及格人数]',
+      '检查所有等式判断是否为TRUE, 任一等式判断均为TRUE则返回TRUE, 否则返回FALSE。',
+    example: '([城市数量] = 100) OR [及格人数] > 10',
     syntax: '表达式1 OR 表达式2',
     type: 'logic',
     groups: ['logic']
