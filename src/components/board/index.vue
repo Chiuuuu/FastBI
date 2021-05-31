@@ -97,6 +97,7 @@ import { mapGetters, mapActions, mapState } from 'vuex'
 // 引入截图工具
 import html2canvas from 'html2canvas'
 import moment from 'moment'
+import { deepClone } from '../../utils/deepClone'
 
 const prefixCls = 'board'
 export default {
@@ -162,7 +163,8 @@ export default {
       'ToggleOptionsExpand',
       'ToggleCoverageExpand',
       'ToggleModelExpand',
-      'HideContextMenu'
+      'HideContextMenu',
+      'SetCanvasRange'
     ]),
     getErrorData(error) {
       this.errorData = error
@@ -206,32 +208,48 @@ export default {
         this.$message.error('推送时间不能小于此刻')
         return
       }
-      const domObj = document.getElementById(this.currentSelected)
-      let transparent = false
-      // 透明背景用大屏背景作为背景色
-      if (!domObj.style.backgroundColor) {
-        transparent = true
-        domObj.style.backgroundColor = this.pageSettings.backgroundColor
+      let domObj = document.getElementById(this.currentSelected)
+      let width = domObj.clientWidth * this.canvasRange
+      let height = domObj.clientHeight * this.canvasRange
+      // 表格控件复制节点
+      if (this.currSelected.setting.chartType === 'v-tables') {
+        domObj = domObj.cloneNode(true)
+        if (!domObj.style.backgroundColor) {
+          domObj.style.backgroundColor = this.pageSettings.backgroundColor // 如果图表背景透明，按大屏背景色作为背景
+        }
+        document.body.appendChild(domObj)
+        width = domObj.clientWidth
+        height = domObj.clientHeight
       }
-      // 添加文字间距，防止截图文字重叠
-      domObj.childNodes[0].style.letterSpacing =
-        this.currSelected.setting.config.title.textStyle.fontSize * 0.6 + 'px'
       html2canvas(domObj, {
-        width: domObj.clientWidth * this.canvasRange, // dom 原始宽度
-        height: domObj.clientHeight * this.canvasRange,
+        width, //* this.canvasRange dom 原始宽度
+        height,
         scale: 1,
         dpi: 300,
         letterRendering: true,
         scrollY: 0,
         scrollX: 0,
-        // background: 'blue',
-        useCORS: true // 【重要】开启跨域配置
-      }).then(canvas => {
-        if (transparent) {
-          domObj.style.backgroundColor = ''
+        useCORS: true, // 【重要】开启跨域配置
+        onclone: documentClone => {
+          const cloneDom = documentClone.getElementById(this.currentSelected)
+          //   const pannalDom = documentClone.querySelector('.canvas-panel')
+          if (!cloneDom.style.backgroundColor) {
+            cloneDom.style.backgroundColor = this.pageSettings.backgroundColor // 如果图表背景透明，按大屏背景色作为背景
+          }
+          if (this.currSelected.setting.chartType !== 'v-tables') {
+            let fontSize =
+              this.currSelected.setting.config.title.textStyle.fontSize *
+              this.canvasRange
+            cloneDom.childNodes[0].style.letterSpacing =
+              fontSize * this.canvasRange + 'px'
+            cloneDom.childNodes[0].childNodes[0].style.fontSize =
+              Math.floor(fontSize) + 'px'
+          }
         }
-        domObj.childNodes[0].style.letterSpacing = ''
-        domObj.style.letterSpacing = ''
+      }).then(canvas => {
+        if (this.currSelected.setting.chartType === 'v-tables') {
+          document.body.removeChild(domObj)
+        }
         this.saveData(canvas.toDataURL())
         this.visible = false
       })
