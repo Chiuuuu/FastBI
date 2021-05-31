@@ -15,22 +15,22 @@ export default {
         {
           key: 1,
           title: '节点管理',
-          src: 'http://172.16.82.63:2122/#/node/list'
+          src: process.env.VUE_APP_OPERATION_URL + '/#/node/list'
         },
         {
           key: 2,
           title: 'SSH管理',
-          src: 'http://172.16.82.63:2122/#/node/ssh'
+          src: process.env.VUE_APP_OPERATION_URL + '/#/node/ssh'
         },
         {
           key: 3,
           title: '节点分发',
-          src: 'http://172.16.82.63:2122/#/dispatch/list'
+          src: process.env.VUE_APP_OPERATION_URL + '/#/dispatch/list'
         },
         {
           key: 4,
           title: '分发日志',
-          src: 'http://172.16.82.63:2122/#/dispatch/log'
+          src: process.env.VUE_APP_OPERATION_URL + '/#/dispatch/log'
         }
       ]
     }
