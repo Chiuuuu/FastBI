@@ -256,9 +256,24 @@ export default {
     },
     // 保存推送信息
     saveData(img) {
+      let source = this.currSelected.setting.api_data.source
+      if (this.currSelected.setting.type === '2') {
+        let columns = []
+        let rows = []
+        source.rows.forEach(item => {
+          columns.push(item.type)
+          rows.push({ [item.type]: item.value })
+        })
+        source = { columns, rows }
+      }
+      if (this.currSelected.setting.type === '3') {
+        if (source.rows.length > 0) {
+          source.columns = Object.keys(source.rows[0])
+        }
+      }
       let params = {
         graphData: img,
-        source: this.currSelected.setting.api_data.source,
+        source,
         graphName: this.currSelected.name,
         projectId: this.selectProject,
         sourceScreen: this.fileName,
