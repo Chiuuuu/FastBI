@@ -71,6 +71,7 @@ export default {
         let canBind =
           item.id !== excludeId && // 排除当前图表
           item.setting.api_data.source && // 有数据的图表
+          item.setting.api_data.dimensions.length > 0 && // 存在维度信息
           item.setting.api_data.dimensions[0].alias ===
             this.currSelected.setting.api_data.dimensions[0].alias // 相同维度
         // 柱状图折线图相互合并

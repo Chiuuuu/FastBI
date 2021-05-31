@@ -9,7 +9,7 @@
     >
       <div
         class="context-menu-item"
-        v-for="item in menuList"
+        v-for="item in menuListfilter"
         :key="item.order"
         @click="handleCommand(item.order)"
       >
@@ -39,7 +39,22 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['contextMenuInfo', 'pageSettings', 'canvasMap', 'screenId']),
+    ...mapGetters([
+      'contextMenuInfo',
+      'pageSettings',
+      'canvasMap',
+      'screenId',
+      'currSelected'
+    ]),
+    menuListfilter() {
+      if (
+        this.currSelected.setting.chartType === 'v-text' ||
+        this.currSelected.setting.chartType === 'v-image'
+      ) {
+        return this.menuList.filter(item => item.text !== '图表推送')
+      }
+      return this.menuList
+    },
     contextMenuStyle() {
       let x =
         this.contextMenuInfo.x !== undefined
