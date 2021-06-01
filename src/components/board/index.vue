@@ -257,6 +257,7 @@ export default {
     // 保存推送信息
     saveData(img) {
       let source = this.currSelected.setting.api_data.source
+      // 只有度量的图表
       if (this.currSelected.setting.type === '2') {
         let columns = []
         let rows = []
@@ -264,8 +265,28 @@ export default {
           columns.push(item.type)
           rows.push({ [item.type]: item.value })
         })
+        // 仪表盘添加最大值
+        if (this.currSelected.setting.chartType === 'v-ring') {
+          rows = [{ ...rows[0], ...rows[1] }]
+          if (columns.length === 2) {
+            rows[0][columns[1]] = rows[0][columns[1]] + rows[0][columns[0]]
+          }
+        }
+        // 仪表盘添加最大值
+        if (this.currSelected.setting.chartType === 'v-gauge') {
+          // 存在第二个度量
+          let secMeasure = this.currSelected.setting.api_data.measures[1]
+          if (secMeasure) {
+            columns.push(secMeasure.alias)
+            rows[0] = {
+              ...rows[0],
+              [secMeasure.alias]: this.currSelected.setting.config.series.max
+            }
+          }
+        }
         source = { columns, rows }
       }
+      // 表格，不区分维度度量
       if (this.currSelected.setting.type === '3') {
         if (source.rows.length > 0) {
           source.columns = Object.keys(source.rows[0])
