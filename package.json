@@ -21,6 +21,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "build:zjzl": "vue-cli-service build --mode zjzl",
+    "build:retire": "vue-cli-service build --mode retire",
     "build:test": "vue-cli-service build --mode test",
     "build:pre": "vue-cli-service build --mode pre",
     "lint": "vue-cli-service lint",
