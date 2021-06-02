@@ -256,7 +256,7 @@ export default {
     },
     // 保存推送信息
     saveData(img) {
-      let source = this.currSelected.setting.api_data.source
+      let source = deepClone(this.currSelected.setting.api_data.source)
       // 只有度量的图表
       if (this.currSelected.setting.type === '2') {
         let columns = []
