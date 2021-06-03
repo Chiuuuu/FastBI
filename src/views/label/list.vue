@@ -359,7 +359,7 @@ export default {
       )
     },
     handleEditLabel(row) {
-      if (row.status === 2) {
+      if (row && row.status === 2) {
         return this.$message.error('已上线的标签无法进行修改')
       }
       if (row) {
