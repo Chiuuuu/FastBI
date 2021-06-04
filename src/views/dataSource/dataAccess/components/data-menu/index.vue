@@ -154,6 +154,8 @@ export default {
     MenuFolder
   },
   data() {
+    // TODO: 暂时屏蔽hive
+    const list = ['mysql', 'oracle', 'excel', 'csv'] // ['mysql', 'oracle', 'hive', 'excel', 'csv']
     return {
       searchValue: '', // 关键词搜索
       searchList: [], // 搜索结果
