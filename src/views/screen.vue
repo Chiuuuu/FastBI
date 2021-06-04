@@ -179,6 +179,11 @@ export default {
         .showScreenRelease(this.screenId)
         .then(res => {
           if (res.code === 200) {
+            // TODO:把返回的地址手动修改成网页地址
+            let url = res.data && res.data.url
+            const index = url.indexOf('/share')
+            url = window.location.host + url.slice(index)
+            res.data.url = url
             this.$emit('getShareData', res.data)
             // this.releaseObj = res.data
             return true

@@ -845,7 +845,11 @@ export default {
     release() {
       if (this.isPublish === 0) {
         this.$server.screenManage.getScreenLink(this.screenId).then(res => {
-          this.releaseObj = { url: res.data, expired: 7, password: '' }
+          // TODO:把返回的地址手动修改成网页地址
+          let url = res.data
+          const index = url.indexOf('/share')
+          url = window.location.host + url.slice(index)
+          this.releaseObj = { url, expired: 7, password: '' }
           this.releaseVisible = true
         })
       } else {
