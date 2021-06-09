@@ -314,7 +314,9 @@ const list = [
                     barBorderRadius: [0]
                   }
                 },
-                barWidth: '20%'
+                barWidth: '20%',
+                barGap: '40%',
+                barCategoryGap: '40%'
               },
               color: DEFAULT_COLORS
             },
@@ -1298,7 +1300,38 @@ const list = [
               click: chartClick
             },
             view: { width: 400, height: 400, x: 760, y: 340 }
-          }
+          },
+        //   {
+        //     title: '高德地图',
+        //     name: 'a-map',
+        //     chartType: 'a-map',
+        //     type: '4',
+        //     icon: 'icon_map.png',
+        //     api_data: {},
+        //     apis: {},
+        //     modelId: '',
+        //     canEdit: true,
+        //     background: {
+        //       backgroundType: '1',
+        //       backgroundColor: '',
+        //       borderColor: '',
+        //       borderWidth: 0,
+        //       borderStyle: '',
+        //       borderRadius: 0
+        //     },
+        //     config: {
+        //       title: {
+        //         textAlign: 'left',
+        //         textStyle: {
+        //           color: '#ffffff',
+        //           fontSize: 20,
+        //           fontFamily: 'not specified',
+        //           fontWeight: 'normal'
+        //         }
+        //       }
+        //     },
+        //     view: { width: 500, height: 400, x: 710, y: 340 }
+        //   }
         ]
       }
     ]

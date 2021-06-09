@@ -340,15 +340,9 @@ export default {
     // 颜色转透明色，用于选中图表转换显示颜色
     hexToRgba(hex, opacity) {
       return hex && hex.replace(/\s+/g, '').length === 7
-        ? 'rgba(' +
-            parseInt('0x' + hex.slice(1, 3)) +
-            ',' +
-            parseInt('0x' + hex.slice(3, 5)) +
-            ',' +
-            parseInt('0x' + hex.slice(5, 7)) +
-            ',' +
-            opacity +
-            ')'
+        ? `rgba(${parseInt('0x' + hex.slice(1, 3))},${parseInt(
+            '0x' + hex.slice(3, 5)
+          )},${parseInt('0x' + hex.slice(5, 7))},${opacity})`
         : ''
     }
   },
