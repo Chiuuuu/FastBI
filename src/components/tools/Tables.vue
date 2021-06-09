@@ -14,16 +14,6 @@
       <span>{{ config.title.content }}</span>
     </div>
     <div class="tables">
-      <!-- <a-table
-        rowClassName="table-background"
-        :columns="columns"
-        :data-source="tableData"
-        :showHeader="showHeader"
-        :customRow="customRow"
-        :pagination="false"
-        :scroll="tableWidth"
-        size="middle"
-      >-->
       <div
         class="chart-table scroller"
         ref="charttable"
@@ -248,16 +238,17 @@ export default {
         return total + value
       })
 
-      // 计算显示尺寸-tablebody(比较表格的尺寸和缩放框的大小)
+      // 计算显示尺寸(比较表格内容的尺寸和缩放框的大小)
       this.showTableSize = {
         tableX: Math.min(this.tableWidth, this.chartSize.width),
         tableY:
           Math.min(
-            this.$refs.tablebody.clientHeight,
+            this.$refs.tablebody.clientHeight +
+              this.$refs.tableheader.clientHeight,
             this.chartSize.height - title.offsetHeight
           ) - 10 // 去掉滚动轴占高
       }
-      // 计算表格（不含表头）高度
+      // 获取表格内容高度
       this.bodyHeight =
         this.showTableSize.tableY - this.$refs.tableheader.clientHeight
     },
