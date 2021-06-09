@@ -744,6 +744,10 @@ export default {
               config.series.max = goalTotal
               this.$store.dispatch('SetSelfProperty', config)
             }
+            // 文本框
+            if (this.currSelected.setting.chartType === 'v-text') {
+              apiData.refreshData = res.rows[0]
+            }
             //   this.updateChartData()
             return
           }
@@ -796,8 +800,6 @@ export default {
               rows.push(obj)
               // }
             })
-            console.log(columns)
-            console.log(rows)
           }
 
           apiData.source = {

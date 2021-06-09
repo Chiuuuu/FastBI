@@ -255,10 +255,15 @@ const app = {
       })
     },
     // 保存图表
-    async updateChartData({ state, rootGetters }) {
+    async updateChartData({ state, rootGetters }, id) {
       let chart = rootGetters.currSelected
+      if (!chart) {
+        chart = rootGetters.canvasMap.find(item => item.id === id)
+      }
       // 图表联动数据selectData不保存后台
-      delete chart.setting.api_data.selectData
+      if (chart.setting.api_data.selectData) {
+        delete chart.setting.api_data.selectData
+      }
 
       let params = {
         id: chart.id,

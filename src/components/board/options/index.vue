@@ -233,14 +233,14 @@
                     @change="setSelfProperty"
                   ></a-input>
                 </gui-field>
-                <gui-field label="内容" v-if="isText">
+                <!-- <gui-field label="内容" v-if="isText">
                   <a-input
                     v-model="selfConfig.title.text"
                     size="small"
                     :maxLength="20"
                     @change="setSelfProperty"
                   ></a-input>
-                </gui-field>
+                </gui-field> -->
                 <gui-field label="文本">
                   <gui-inline label="字号">
                     <a-input-number
@@ -471,6 +471,22 @@
                       @change="setHistogram($event, 'radius')"
                     ></a-switch>
                   </gui-field>
+                  <gui-field label="柱条间隔(不同系列)">
+                    <a-input
+                      size="small"
+                      @change="setSelfProperty"
+                      v-model="selfConfig.series.barGap"
+                      clearable
+                    ></a-input>
+                  </gui-field>
+                  <!-- <gui-field label="柱条间隔(同系列)">
+                    <a-input
+                      size="small"
+                      @change="setSelfProperty"
+                      v-model="selfConfig.series.barCategoryGap"
+                      clearable
+                    ></a-input>
+                  </gui-field> -->
                   <gui-field label="堆叠柱状图">
                     <a-switch
                       v-model="selfConfig.stack"

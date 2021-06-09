@@ -9,9 +9,23 @@
         ></drag-area>
       </a-collapse-panel>
       <a-collapse-panel
+        key="areaMeasures"
+        header="度量(区域)"
+        v-if="currSelected.setting.chartType === 'v-map'"
+      >
+        <drag-area
+          type="measures"
+          :fileList="fileObj.measures"
+          ref="child"
+        ></drag-area>
+      </a-collapse-panel>
+      <a-collapse-panel
         key="measures"
         header="度量"
-        v-if="chartType === '1' || chartType === '2'"
+        v-if="
+          (chartType === '1' || chartType === '2') &&
+            currSelected.setting.chartType !== 'v-text'
+        "
       >
         <drag-area
           type="measures"
@@ -29,7 +43,7 @@
       >
         <drag-pick type="pick"></drag-pick>
       </a-collapse-panel>
-      <a-collapse-panel key="sort" header="排序">
+      <a-collapse-panel key="sort" header="排序" v-if="chartType !== '2'">
         <div style="display: flex;">
           <a-select
             v-model="sortData.pivotschemaId"
@@ -42,7 +56,7 @@
               v-for="item in sortList"
               :value="item.id"
               :key="item.id"
-              >{{ item.name }}</a-select-option
+              >{{ item.alias }}</a-select-option
             >
           </a-select>
           <a-select v-model="sortData.asc" class="f-flex1" @change="ascChange">
