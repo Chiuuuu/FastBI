@@ -112,7 +112,7 @@
             ></chart-tables>
 
             <!-- 高德地图-->
-            <AMap v-else-if="transform.setting.name === 'a-map'" />
+            <!-- <AMap v-else-if="transform.setting.name === 'a-map'" /> -->
 
             <!-- <chart-map
               v-else-if="transform.setting.name === 've-map'"
@@ -168,7 +168,7 @@ import ChartTables from '@/components/tools/Tables' // 表格模块
 import ChartNodata from '@/components/tools/Nodata' // 数据丢失
 import ChartMaterial from '@/components/tools/Material' // 素材库
 import SteepBar from '@/components/tools/SteepBar' // 进度条
-import AMap from '@/components/tools/aMap' // 进度条
+// import AMap from '@/components/tools/aMap' // 进度条
 import Screen from '@/views/screen' // 全屏
 
 import { Icon } from 'ant-design-vue'
@@ -354,7 +354,7 @@ export default {
     ChartMaterial,
     SteepBar,
     Screen,
-    AMap
+    // AMap
   },
   beforeDestroy() {
     off(document, 'keyup', this.handleKeyup)
