@@ -136,6 +136,7 @@
         :large-data="largeDataList"
         :has-change-data="hasChangeData"
         :is-check="isCheckRegular"
+        :all-table="data"
         @insertData="data => $refs.extract && $refs.extract.regData.push(data)"
         @updateData="data => $refs.extract && $refs.extract.updateRows(data)"
         @close="closeRegular" />
