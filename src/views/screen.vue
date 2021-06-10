@@ -49,7 +49,7 @@
               ></chart-tables>
 
               <!-- 高德地图-->
-              <AMap v-else-if="transform.setting.name === 'a-map'" />
+              <!-- <AMap v-else-if="transform.setting.name === 'a-map'" /> -->
               <charts-factory
                 v-else
                 :id="transform.id"
@@ -84,7 +84,7 @@ import ChartTables from '@/components/tools/Tables'
 import ChartNodata from '@/components/tools/Nodata'
 import ChartMaterial from '@/components/tools/Material'
 import SteepBar from '@/components/tools/SteepBar'
-import AMap from '@/components/tools/aMap' // 进度条
+// import AMap from '@/components/tools/aMap' // 进度条
 import { Loading } from 'element-ui'
 
 import {
@@ -105,7 +105,7 @@ export default {
     ChartNodata,
     ChartMaterial,
     SteepBar,
-    AMap
+    // AMap
   },
   props: {},
   data() {
