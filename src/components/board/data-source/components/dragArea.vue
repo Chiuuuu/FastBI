@@ -23,17 +23,12 @@
         >
           <a-icon class="icon-more" type="caret-down" />
           <a-menu slot="overlay">
-            <a-sub-menu
-              key="1"
-              title="聚合方式"
-              v-show="item.file === 'measures'"
-            >
+            <a-sub-menu key="1" title="聚合方式" v-show="item.file === 'measures'">
               <a-menu-item
                 v-for="(aggregator, index) in polymerizationData[strornum]"
                 :key="index"
                 @click.native="changePolymerization(aggregator, item)"
-                >{{ aggregator.name }}</a-menu-item
-              >
+              >{{ aggregator.name }}</a-menu-item>
             </a-sub-menu>
             <a-menu-item key="3"
               ><div @click.stop="deleteFile($event, item, index)">
@@ -149,9 +144,9 @@ export default {
           if (this.chartType === '1') {
             if (this.type === 'dimensions' && this.fileList) {
               // 维度
-              this.fileList.forEach(file => {
+              this.fileList.forEach((file) => {
                 let dimension = val.dimensions.find(
-                  item => item.alias === file.alias
+                  (item) => item.alias === file.alias
                 )
                 if (dimension && dimension.status === 1) {
                   file.status = dimension.status
@@ -160,9 +155,9 @@ export default {
             }
             if (this.type === 'measures' && this.fileList) {
               // 度量
-              this.fileList.forEach(file => {
+              this.fileList.forEach((file) => {
                 let measure = val.measures.find(
-                  item => item.alias === file.alias
+                  (item) => item.alias === file.alias
                 )
                 if (measure && measure.status === 1) {
                   file.status = measure.status
@@ -174,9 +169,9 @@ export default {
           // 只需要度量
           if (this.chartType === '2') {
             if (this.type === 'measures' && this.fileList) {
-              this.fileList.forEach(file => {
+              this.fileList.forEach((file) => {
                 let measure = val.measures.find(
-                  item => item.alias === file.alias
+                  (item) => item.alias === file.alias
                 )
                 if (measure && measure.status === 1) {
                   file.status = measure.status
@@ -189,8 +184,8 @@ export default {
           if (this.chartType === '3') {
             if (this.type === 'tableList' && this.fileList) {
               let list = val.dimensions.concat(val.measures)
-              this.fileList.forEach(file => {
-                let li = list.find(item => item.alias === file.alias)
+              this.fileList.forEach((file) => {
+                let li = list.find((item) => item.alias === file.alias)
                 if (li && li.status === 1) {
                   file.status = li.status
                 }
@@ -356,7 +351,7 @@ export default {
     // 对象数组去重,type表示对象里面的一个属性
     uniqueFun(arr, type) {
       const res = new Map()
-      return arr.filter(a => !res.has(a[type]) && res.set(a[type], 1))
+      return arr.filter((a) => !res.has(a[type]) && res.set(a[type], 1))
     },
     // 当可拖动的元素进入可放置的目标时
     dragenter(event) {
@@ -392,7 +387,7 @@ export default {
     // 抓取区中心点
     getCenterCoordinate(name) {
       let dataList = geoJson.features
-      let countryside = dataList.find(item => item.properties.name === name)
+      let countryside = dataList.find((item) => item.properties.name === name)
       if (!countryside) {
         return null
       }
@@ -550,7 +545,7 @@ export default {
     // 根据维度度量获取数据
     async getData() {
       let selected = this.canvasMap.find(
-        item => item.id === this.currentSelected
+        (item) => item.id === this.currentSelected
       )
       // 维度
       if (this.type === 'dimensions') {
@@ -565,7 +560,7 @@ export default {
         // 不区分默认都放在维度
         let di = []
         let me = []
-        this.fileList.forEach(item => {
+        this.fileList.forEach((item) => {
           if (item.file === 'dimensions') {
             di.push(item)
           }
@@ -603,8 +598,8 @@ export default {
           return
         }
         if (
-          data.dimensions.some(item => item.status === 1) ||
-          data.measures.some(item => item.status === 1)
+          data.dimensions.some((item) => item.status === 1) ||
+          data.measures.some((item) => item.status === 1)
         ) {
           return
         }
@@ -620,7 +615,7 @@ export default {
           this.updateChartData()
           return
         }
-        if (data.measures.some(item => item.status === 1)) {
+        if (data.measures.some((item) => item.status === 1)) {
           return
         }
       }
@@ -633,7 +628,7 @@ export default {
           this.updateChartData()
           return
         }
-        if (data.tableList.some(item => item.status === 1)) {
+        if (data.tableList.some((item) => item.status === 1)) {
           return
         }
       }

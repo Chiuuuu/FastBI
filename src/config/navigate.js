@@ -1,5 +1,5 @@
 import { DEFAULT_COLORS } from '../utils/defaultColors'
-import guangzhou from '../utils/guangdong.json'
+import guangzhou from '../utils/yunfu.json'
 
 function chartClick(e) {
   console.log(e)

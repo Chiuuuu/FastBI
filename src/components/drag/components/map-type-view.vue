@@ -43,7 +43,7 @@ export default {
         //   { key: 2, name: '湖南省' }
       ],
       cityList: [
-        { key: 1, name: '广州市' }
+        { key: 1, name: '云浮市' }
         //   { key: 2, name: '深圳市' }
       ],
       mapType: 3,

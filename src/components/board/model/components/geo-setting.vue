@@ -82,7 +82,7 @@
           >
             <template slot="config" slot-scope="text, record">
               <a @click="openMatchWindow(record.key)">{{
-                record.MathedVal || '请选择配置项'
+                record.MathedVal || "请选择配置项"
               }}</a>
             </template>
           </a-table>
@@ -100,57 +100,64 @@
 </template>
 
 <script>
-import optionObj from './mapOptions'
-import echarts from 'echarts'
-import guangZhouJson from '@/utils/guangdong.json'
-import matchWindow from './matchWindow'
+import optionObj from "./mapOptions";
+import echarts from "echarts";
+import guangZhouJson from "@/utils/yunfu.json";
+import matchWindow from "./matchWindow";
 const colu = [
   {
-    title: '您的数据',
-    dataIndex: 'data'
+    title: "您的数据",
+    dataIndex: "data"
   },
   {
-    title: '匹配到',
-    dataIndex: 'config',
+    title: "匹配到",
+    dataIndex: "config",
 
     scopedSlots: {
-      customRender: 'config'
+      customRender: "config"
     }
   }
-]
+];
 
-const datas = []
-const countryData = ['中国']
+const datas = [];
+const countryData = ["中国"];
 const proData = {
-  中国: ['广东省']
-}
+  中国: ["广东省"]
+};
 const cityData = {
-  广东省: ['广州市']
+  广东省: ["云浮市"]
   //   浙江省: ['宁波市', '温州市', '杭州市']
-}
+};
 const areaData = {
-  广州市: [
-    '海珠区',
-    '越秀区',
-    '荔湾区',
-    '增城区',
-    '天河区',
-    '白云区',
-    '黄埔区',
-    '番禺区',
-    '花都区',
-    '南沙区',
-    '从化区'
+  // 广州市: [
+  //   "海珠区",
+  //   "越秀区",
+  //   "荔湾区",
+  //   "增城区",
+  //   "天河区",
+  //   "白云区",
+  //   "黄埔区",
+  //   "番禺区",
+  //   "花都区",
+  //   "南沙区",
+  //   "从化区"
+  // ]
+  "云浮市": [
+    "罗定市",
+    "郁南县",
+    "云安区",
+    "云城区",
+    "新兴县"
   ]
   //   深圳市: ['罗湖区', '福田区', '南山区'],
   //   肇庆市: ['怀集县', '四会市', '封开县'],
   //   宁波市: ['镇海区', '宁海区', '象山区'],
   //   温州市: ['文成区', '苍南区', '平阳区'],
   //   杭州市: ['上城区', '下城区', '富阳区']
-}
+};
 export default {
   components: { matchWindow },
-  name: 'geoSetting',
+  name: "geoSetting",
   props: {
     isShow: Boolean,
     region: String,
@@ -172,7 +179,7 @@ export default {
       areas: areaData[cityData[proData[countryData[0]][0]][0]],
       area: areaData[cityData[proData[countryData[0]][0]][0]][0],
       visible: false,
-      currentKey: '',
+      currentKey: "",
       loading: false,
       condition: {}, // 返回的匹配字段
       provinceList: [
@@ -196,8 +203,8 @@ export default {
   },
   computed: {
     unmatchedLen() {
-      let umatcheds = this.datas.filter(item => !item.MathedVal)
-      return umatcheds.length
+      let umatcheds = this.datas.filter(item => !item.MathedVal);
+      return umatcheds.length;
     }
   },
   mounted() {
@@ -226,59 +233,59 @@ export default {
         province: '广东省',
         city: '广州市',
         pivotschemaId: this.dimensionsData.pivotschemaId
-      }
-      this.loading = true
-      let res = await this.$server.screenManage.getGeoData(params)
-      this.loading = false
+      };
+      this.loading = true;
+      let res = await this.$server.screenManage.getGeoData(params);
+      this.loading = false;
       // 模型数据被删
-      if (res.code === 500 && res.msg === 'IsChanged') {
-        this.$message.error('模型数据不存在')
-        return
+      if (res.code === 500 && res.msg === "IsChanged") {
+        this.$message.error("模型数据不存在");
+        return;
       }
       if (res.code === 200) {
         // 获取所有维度数据列表
-        this.condition = res.data.geoConfig.condition
-        let dataList = []
-        let keyList = Object.keys(this.condition)
+        this.condition = res.data.geoConfig.condition;
+        let dataList = [];
+        let keyList = Object.keys(this.condition);
         // 构造被匹配数据列表
         keyList.forEach((key, index) => {
           dataList.push({
-            key: index + '',
+            key: index + "",
             data: key,
             MathedVal: this.condition[key]
-          })
-        })
-        this.datas = dataList
+          });
+        });
+        this.datas = dataList;
       } else {
-        res.msg && this.$message.error(res.msg)
+        res.msg && this.$message.error(res.msg);
       }
     },
     drawMap() {
-      this.myChart = echarts.init(this.$refs.mapChart)
-      echarts.registerMap('guangzhou', guangZhouJson)
-      let option = optionObj
-      if (option && typeof option === 'object') {
-        this.myChart.setOption(option, true)
+      this.myChart = echarts.init(this.$refs.mapChart);
+      echarts.registerMap("guangzhou", guangZhouJson);
+      let option = optionObj;
+      if (option && typeof option === "object") {
+        this.myChart.setOption(option, true);
       }
     },
     openMatchWindow(key) {
-      this.keyword = ''
-      this.visible = true
-      this.currentKey = key
+      this.keyword = "";
+      this.visible = true;
+      this.currentKey = key;
     },
     handlecountryChange(value) {
-      this.provinces = proData[value]
-      this.province = proData[value][0]
-      this.handleprovinceChange(proData[value][0])
+      this.provinces = proData[value];
+      this.province = proData[value][0];
+      this.handleprovinceChange(proData[value][0]);
     },
     handleprovinceChange(value) {
-      this.cities = cityData[value]
-      this.city = cityData[value][0]
-      this.handlecityChange(cityData[value][0])
+      this.cities = cityData[value];
+      this.city = cityData[value][0];
+      this.handlecityChange(cityData[value][0]);
     },
     handlecityChange(value) {
-      this.areas = areaData[value]
-      this.area = areaData[value][0]
+      this.areas = areaData[value];
+      this.area = areaData[value][0];
     },
     async handleSave() {
       //   if (this.unmatchedLen > 0) {
@@ -296,29 +303,29 @@ export default {
         city: '广州市',
         pivotschemaId: this.dimensionsData.pivotschemaId,
         condition: this.condition
-      }
-      let res = await this.$server.screenManage.saveGeoData(params)
+      };
+      let res = await this.$server.screenManage.saveGeoData(params);
       if (res.code === 500) {
-        this.$message.error(res.msg)
-        return
+        this.$message.error(res.msg);
+        return;
       }
       if (res.code === 200) {
-        this.$message.success('保存成功')
-        this.$emit('close')
+        this.$message.success("保存成功");
+        this.$emit("close");
       }
     },
     // 匹配赋值
     selectArea(value) {
-      let area = this.datas.find(item => item.key === this.currentKey)
-      area.MathedVal = value
-      this.condition[area.data] = value
-      this.visible = false
+      let area = this.datas.find(item => item.key === this.currentKey);
+      area.MathedVal = value;
+      this.condition[area.data] = value;
+      this.visible = false;
     },
     handleClose() {
-      this.$emit('close')
+      this.$emit("close");
     }
   }
-}
+};
 </script>
 
 <style lang="less" scoped>
