@@ -663,8 +663,14 @@ export default {
             })
             this.measures = this.transData(measures)
             measures = measures.map(item => {
-              return { ...item, visible: true, produceType: 0 }
+              return {
+                ...item,
+                visible: true,
+                produceType: 0,
+                resourceType: this.resourceType
+              }
             })
+            this.$store.dispatch('SetModelMeasures', measures)
             this.searchList = [...dimensions, ...measures]
 
             this.detailInfo.pivotSchema = {

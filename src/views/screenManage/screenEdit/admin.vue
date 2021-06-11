@@ -89,7 +89,8 @@
               v-else-if="transform.setting.name === 've-text'"
               ref="veText"
               :id="transform.id"
-              :canEdit.sync="transform.setting.canEdit"
+              canEdit
+              :api-data="transform.setting.api_data"
               :config="transform.setting.config"
               :background="transform.setting.background"
             ></chart-text>
@@ -109,6 +110,9 @@
               :background="transform.setting.background"
               :chartSize="transform.setting.view"
             ></chart-tables>
+
+            <!-- 高德地图-->
+            <!-- <AMap v-else-if="transform.setting.name === 'a-map'" /> -->
 
             <!-- <chart-map
               v-else-if="transform.setting.name === 've-map'"
@@ -164,6 +168,7 @@ import ChartTables from '@/components/tools/Tables' // 表格模块
 import ChartNodata from '@/components/tools/Nodata' // 数据丢失
 import ChartMaterial from '@/components/tools/Material' // 素材库
 import SteepBar from '@/components/tools/SteepBar' // 进度条
+// import AMap from '@/components/tools/aMap' // 进度条
 import Screen from '@/views/screen' // 全屏
 
 import { Icon } from 'ant-design-vue'
@@ -293,17 +298,6 @@ export default {
     handleSelected(item) {
       this.$store.dispatch('SingleSelected', item.id)
       this.$store.dispatch('ToggleContextMenu')
-
-      // 点击文本可编辑
-      if (item.setting.name === 've-text') {
-        for (let el of this.$refs.veText) {
-          el.$el.disabled = true
-          if (this.currentSelected === el.id) {
-            el.$el.disabled = false
-            el.$el.focus()
-          }
-        }
-      }
     },
     // transform点击事件右键点击
     handleRightClickOnCanvas(item, event) {
@@ -359,7 +353,8 @@ export default {
     ChartNodata,
     ChartMaterial,
     SteepBar,
-    Screen
+    Screen,
+    // AMap
   },
   beforeDestroy() {
     off(document, 'keyup', this.handleKeyup)

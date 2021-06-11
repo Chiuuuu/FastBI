@@ -25,8 +25,10 @@
               <!-- 文本 -->
               <chart-text
                 v-else-if="transform.setting.name === 've-text'"
+                :id="transform.id"
                 :config="transform.setting.config"
                 :background="transform.setting.background"
+                :api-data="transform.setting.api_data"
               ></chart-text>
 
               <!-- 图片 -->
@@ -45,6 +47,9 @@
                 :background="transform.setting.background"
                 :chartSize="transform.setting.view"
               ></chart-tables>
+
+              <!-- 高德地图-->
+              <!-- <AMap v-else-if="transform.setting.name === 'a-map'" /> -->
               <charts-factory
                 v-else
                 :id="transform.id"
@@ -79,6 +84,7 @@ import ChartTables from '@/components/tools/Tables'
 import ChartNodata from '@/components/tools/Nodata'
 import ChartMaterial from '@/components/tools/Material'
 import SteepBar from '@/components/tools/SteepBar'
+// import AMap from '@/components/tools/aMap' // 进度条
 import { Loading } from 'element-ui'
 
 import {
@@ -98,7 +104,8 @@ export default {
     ChartTables,
     ChartNodata,
     ChartMaterial,
-    SteepBar
+    SteepBar,
+    // AMap
   },
   props: {},
   data() {
