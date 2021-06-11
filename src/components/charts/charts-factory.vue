@@ -184,15 +184,17 @@ export default {
           if (this.typeName === 've-map') {
             this.chartExtend = { ...omit(val, ['series']) }
             this.chartSeries = val.series
-            if (
-              !this.chartSeries[0].label.formatter ||
-              this.chartSeries[0].label.formatter === '{b} ：{c}'
-            ) {
-              // 添加标签格式回调
-              this.chartSeries[0].label.formatter = function(params) {
-                return params.data.value[2].toFixed(2)
+            this.chartSeries.forEach(item => {
+              if (
+                !item.label.formatter ||
+                item.label.formatter === '{b} ：{c}'
+              ) {
+                // 添加标签格式回调
+                item.label.formatter = function(params) {
+                  return params.data.value[2].toFixed(2)
+                }
               }
-            }
+            })
             this.geo = val.geo
             this.mapToolTip = val.tooltip
             if (
@@ -202,9 +204,8 @@ export default {
               // 添加格式回调函数
               this.mapToolTip.formatter = function(params) {
                 let data = params.data
-                return `${params.seriesName}<br />${data.name}：${
-                  data.value[2]
-                }`
+                return `${params.seriesName}<br />${data.name}：${data
+                  .value[2] || data.value}`
               }
             }
           } else {
@@ -308,6 +309,7 @@ export default {
   },
   methods: {
     afterConfig(options) {
+      console.log('op', options)
       return options
     },
     // 添加图表点击事件，可以点击非数据区域
