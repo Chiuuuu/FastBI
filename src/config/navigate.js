@@ -836,7 +836,8 @@ const list = [
             type: '1',
             isEmpty: false,
             chartType: 'v-map',
-            showType: 'dot', // area/dot
+            fillType: 'area', // area/dot
+            labelType: 'area',
             icon: 'icon_map.png',
             modelId: '',
             api_data: {
@@ -912,21 +913,21 @@ const list = [
                 bottom: 'auto',
                 data: ['人口']
               },
-              //   visualMap: {
-              //     show: false,
-              //     type: 'piecewise',
-              //     min: 0,
-              //     max: 403631060,
-              //     seriesIndex: [0],
-              //     inRange: {
-              //       color: ['#50a3ba', '#eac736', '#d94e5d'],
-              //       symbolSize: [10, 16]
-              //     },
-              //     textStyle: {
-              //       color: '#fff',
-              //       fontSize: 12
-              //     }
-              //   },
+              visualMap: {
+                show: false,
+                type: 'piecewise',
+                min: 0,
+                max: 403631060,
+                seriesIndex: [0],
+                inRange: {
+                  color: ['#50a3ba', '#eac736', '#d94e5d'],
+                  symbolSize: [10, 16]
+                },
+                textStyle: {
+                  color: '#fff',
+                  fontSize: 12
+                }
+              },
               xAxis: {
                 show: false,
                 axisLabel: {
@@ -1001,69 +1002,69 @@ const list = [
                 }
               },
               series: [
-                // {
-                //   type: 'map',
-                //   map: 'guangzhou',
-                //   aspectScale: 0.75,
-                //   showLegendSymbol: false,
-                //   zoom: 1.1,
-                //   roam: false,
-                //   mapLocation: {
-                //     x: 'left',
-                //     y: 'top'
-                //   },
-                //   label: {
-                //     normal: {
-                //       show: true,
-                //       color: '#fff'
-                //     },
-                //     emphasis: {
-                //       show: true
-                //     }
-                //   },
-                //   itemStyle: {
-                //     normal: {
-                //       areaColor: 'rgba(1, 33, 92, 0.45)',
-                //       borderColor: '#215495',
-                //       borderWidth: 1
-                //     },
-                //     emphasis: {
-                //       borderColor: '#073684',
-                //       areaColor: '#061E3D'
-                //     }
-                //   }
-                // }
                 {
-                  type: 'scatter', // scatter,effectScatter
-                  name: '人口',
-                  coordinateSystem: 'geo',
-                  symbol: 'circle',
-                  symbolSize: 10,
-                  //   aspectScale: 0.75,
-                  hoverAnimation: true,
-                  showEffectOn: 'render',
-                  rippleEffect: {
-                    brushType: 'stroke',
-                    scale: 3
+                  type: 'map',
+                  map: 'guangzhou',
+                  aspectScale: 0.75,
+                  showLegendSymbol: false,
+                  zoom: 1.1,
+                  roam: false,
+                  mapLocation: {
+                    x: 'left',
+                    y: 'top'
                   },
                   label: {
-                    show: false,
-                    formatter: '{b} ：{c}',
-                    color: DEFAULT_COLORS[0],
-                    fontSize: 12,
-                    position: 'right', // 可选inside
+                    normal: {
+                      show: true,
+                      color: '#fff'
+                    },
                     emphasis: {
                       show: true
                     }
                   },
                   itemStyle: {
-                    emphasis: {
-                      borderColor: '#fff',
+                    normal: {
+                      areaColor: 'rgba(1, 33, 92, 0.45)',
+                      borderColor: '#215495',
                       borderWidth: 1
+                    },
+                    emphasis: {
+                      borderColor: '#073684',
+                      areaColor: '#061E3D'
                     }
-                  },
-                  zlevel: 1
+                  }
                 }
+                // {
+                //   type: 'scatter', // scatter,effectScatter
+                //   name: '人口',
+                //   coordinateSystem: 'geo',
+                //   symbol: 'circle',
+                //   symbolSize: 10,
+                //   //   aspectScale: 0.75,
+                //   hoverAnimation: true,
+                //   showEffectOn: 'render',
+                //   rippleEffect: {
+                //     brushType: 'stroke',
+                //     scale: 3
+                //   },
+                //   label: {
+                //     show: false,
+                //     formatter: '{b} ：{c}',
+                //     color: DEFAULT_COLORS[0],
+                //     fontSize: 12,
+                //     position: 'right', // 可选inside
+                //     emphasis: {
+                //       show: true
+                //     }
+                //   },
+                //   itemStyle: {
+                //     emphasis: {
+                //       borderColor: '#fff',
+                //       borderWidth: 1
+                //     }
+                //   },
+                //   zlevel: 1
+                // }
               ],
               color: DEFAULT_COLORS
             },
@@ -1300,38 +1301,38 @@ const list = [
               click: chartClick
             },
             view: { width: 400, height: 400, x: 760, y: 340 }
-          },
-        //   {
-        //     title: '高德地图',
-        //     name: 'a-map',
-        //     chartType: 'a-map',
-        //     type: '4',
-        //     icon: 'icon_map.png',
-        //     api_data: {},
-        //     apis: {},
-        //     modelId: '',
-        //     canEdit: true,
-        //     background: {
-        //       backgroundType: '1',
-        //       backgroundColor: '',
-        //       borderColor: '',
-        //       borderWidth: 0,
-        //       borderStyle: '',
-        //       borderRadius: 0
-        //     },
-        //     config: {
-        //       title: {
-        //         textAlign: 'left',
-        //         textStyle: {
-        //           color: '#ffffff',
-        //           fontSize: 20,
-        //           fontFamily: 'not specified',
-        //           fontWeight: 'normal'
-        //         }
-        //       }
-        //     },
-        //     view: { width: 500, height: 400, x: 710, y: 340 }
-        //   }
+          }
+          //   {
+          //     title: '高德地图',
+          //     name: 'a-map',
+          //     chartType: 'a-map',
+          //     type: '4',
+          //     icon: 'icon_map.png',
+          //     api_data: {},
+          //     apis: {},
+          //     modelId: '',
+          //     canEdit: true,
+          //     background: {
+          //       backgroundType: '1',
+          //       backgroundColor: '',
+          //       borderColor: '',
+          //       borderWidth: 0,
+          //       borderStyle: '',
+          //       borderRadius: 0
+          //     },
+          //     config: {
+          //       title: {
+          //         textAlign: 'left',
+          //         textStyle: {
+          //           color: '#ffffff',
+          //           fontSize: 20,
+          //           fontFamily: 'not specified',
+          //           fontWeight: 'normal'
+          //         }
+          //       }
+          //     },
+          //     view: { width: 500, height: 400, x: 710, y: 340 }
+          //   }
         ]
       }
     ]
