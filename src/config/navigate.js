@@ -9,6 +9,19 @@ function chartClick(e) {
  * type = 1 维度度量都需要的图表
  * type = 2 只有度量的图表(仪表盘、环形图)
  * type = 3 不区分维度或者度量（表格）
+ * chatType: 用于判断v-chart图表类型(非v-chart则是自定义的组件)
+ * config: 即echarts的setOption(config)
+ * apis: v-charts封装的settings配置项
+ * api_data: 维度度量相关数据
+ *   .dimensions: 维度列表
+ *   .measures: 度量列表
+ *   .columns: coulumns[0]默认为维度, 剩下的是默认的度量
+ *   .rows: 默认的数据
+ *   .source: 具体的图表数据
+ *     .columns: key-value的映射
+ *     .rows: obj:{ key(类目): string, value(值): string | number }[]
+ * view: 视图宽高, 相对画布的位置
+ * background: 视图背景设置
  */
 
 const list = [
