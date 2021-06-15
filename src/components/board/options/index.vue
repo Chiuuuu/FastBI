@@ -1395,7 +1395,7 @@
               <a-collapse-panel
                 key="map"
                 header="视觉映射"
-                v-if="currSelected.showType === 'area'"
+                v-if="selfConfig.visualMap"
               >
                 <a-switch
                   slot="extra"
@@ -1772,7 +1772,8 @@
                     </gui-inline>
                   </gui-field>
                 </div>
-                <div v-if="currSelected.showType === 'area'">
+                <!-- 填充配置 -->
+                <div v-if="selfConfig.series[0] && selfConfig.series[0].type === 'map'">
                   <gui-field label="显示标记点">
                     <a-switch
                       v-model="selfConfig.series[0].showLegendSymbol"

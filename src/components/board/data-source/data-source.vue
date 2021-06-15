@@ -1,21 +1,14 @@
 <template>
   <div class="data-source">
     <a-collapse v-model="activeKey" :bordered="false">
-      <a-collapse-panel key="dimensions" header="维度" v-if="chartType === '1'">
+      <a-collapse-panel
+        key="dimensions"
+        header="维度"
+        v-if="chartType === '1' && currSelected.setting.chartType !== 'v-map'"
+      >
         <drag-area
           type="dimensions"
           :fileList="fileObj.dimensions"
-          ref="child"
-        ></drag-area>
-      </a-collapse-panel>
-      <a-collapse-panel
-        key="areaMeasures"
-        header="度量(区域)"
-        v-if="currSelected.setting.chartType === 'v-map'"
-      >
-        <drag-area
-          type="measures"
-          :fileList="fileObj.measures"
           ref="child"
         ></drag-area>
       </a-collapse-panel>
@@ -24,7 +17,8 @@
         header="度量"
         v-if="
           (chartType === '1' || chartType === '2') &&
-            currSelected.setting.chartType !== 'v-text'
+            currSelected.setting.chartType !== 'v-text' &&
+            currSelected.setting.chartType !== 'v-map'
         "
       >
         <drag-area
@@ -36,6 +30,111 @@
       <a-collapse-panel key="tableList" header="列" v-if="chartType === '3'">
         <drag-area type="tableList" ref="table"></drag-area>
       </a-collapse-panel>
+      <!-- 地图填充 -->
+      <a-collapse-panel
+        key="mapFill"
+        header="填充"
+        v-if="currSelected.setting.chartType === 'v-map'"
+      >
+        <a-collapse v-model="activeKey" :bordered="false">
+          <a-radio-group
+            class="radio-box"
+            v-model="currSelected.setting.fillType"
+          >
+            <a-radio
+              value="area"
+              @click.native.stop="
+                onRadioChange($event, currSelected.setting.fillType, 'fillType')
+              "
+              >地区</a-radio
+            >
+            <a-radio
+              value="dot"
+              @click.native.stop="
+                onRadioChange($event, currSelected.setting.fillType, 'fillType')
+              "
+              >经纬度</a-radio
+            >
+          </a-radio-group>
+          <a-collapse-panel
+            key="dimensions"
+            header="维度"
+            v-if="currSelected.setting.fillType === 'area'"
+          >
+            <dragAreaForMapFill
+              type="dimensions"
+              :fileList="fileObj.dimensions"
+              ref="fillDi"
+              :fillType="currSelected.setting.fillType"
+            ></dragAreaForMapFill>
+          </a-collapse-panel>
+          <a-collapse-panel key="measures" header="度量">
+            <dragAreaForMapFill
+              type="measures"
+              :fileList="fileObj.measures"
+              ref="fillMe"
+              :fillType="currSelected.setting.fillType"
+            ></dragAreaForMapFill>
+          </a-collapse-panel>
+        </a-collapse>
+      </a-collapse-panel>
+      <!-- 地图标记点 -->
+      <a-collapse-panel
+        key="mapLabel"
+        header="标记点"
+        v-if="currSelected.setting.chartType === 'v-map'"
+      >
+        <a-collapse v-model="activeKey" :bordered="false">
+          <a-radio-group
+            class="radio-box"
+            v-model="currSelected.setting.labelType"
+          >
+            <a-radio
+              value="area"
+              @click.native.stop="
+                onRadioChange(
+                  $event,
+                  currSelected.setting.labelType,
+                  'labelType'
+                )
+              "
+              >地区</a-radio
+            >
+            <a-radio
+              value="dot"
+              @click.native.stop="
+                onRadioChange(
+                  $event,
+                  currSelected.setting.labelType,
+                  'labelType'
+                )
+              "
+              >经纬度</a-radio
+            >
+          </a-radio-group>
+          <a-collapse-panel
+            key="dimensions"
+            header="维度"
+            v-if="currSelected.setting.labelType === 'area'"
+          >
+            <dragAreaForMapLabel
+              type="dimensions"
+              :fileList="fileObj.labelDimensions"
+              ref="labelDi"
+              :labelType="currSelected.setting.labelType"
+            ></dragAreaForMapLabel>
+          </a-collapse-panel>
+          <a-collapse-panel key="measures" header="度量">
+            <dragAreaForMapLabel
+              type="measures"
+              :fileList="fileObj.labelMeasures"
+              ref="labelMe"
+              :labelType="currSelected.setting.labelType"
+            ></dragAreaForMapLabel>
+          </a-collapse-panel>
+        </a-collapse>
+      </a-collapse-panel>
+      <!-- 数据筛选 -->
       <a-collapse-panel
         key="pick"
         header="数据筛选"
@@ -108,12 +207,16 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import DragArea from './components/dragArea'
+import dragAreaForMapFill from './components/dragAreaForMapFill'
+import dragAreaForMapLabel from './components/dragAreaForMapLabel'
 import DragPick from './components/dragPick'
 import { deepClone } from '../../../utils/deepClone'
 export default {
   components: {
     DragArea,
-    DragPick
+    DragPick,
+    dragAreaForMapFill,
+    dragAreaForMapLabel,
   },
   data() {
     return {
@@ -125,10 +228,12 @@ export default {
         'tips',
         'tableList',
         'refresh',
-        'pick'
+        'pick',
+        'mapFill',
+        'mapLabel'
       ], // 所有面板默认打开
       fileObj: {
-        dimensions: [],
+        labelDimensions: [],
         measures: []
       }, // 存储维度度量数据
       apiData: {},
@@ -162,8 +267,8 @@ export default {
           let apiData = deepClone(val.setting.api_data)
           this.apiData = apiData
           // 选中的维度度量组合成排序列表
-          if (apiData.dimensions) {
-            this.sortList = this.sortList.concat(apiData.dimensions)
+          if (apiData.labelDimensions) {
+            this.sortList = this.sortList.concat(apiData.labelDimensions)
           }
           if (apiData.measures) {
             this.sortList = this.sortList.concat(apiData.measures)
@@ -216,6 +321,23 @@ export default {
       } else {
         this.$refs.child.getData()
       }
+    },
+    onRadioChange(e, data, key) {
+      this.$set(data, key, e.target.value)
+      // 切换页签清空对应数据
+      if (key === 'fillType' && e.target.value === 'area') {
+        this.$refs.fillDi.clearData()
+      }
+      if (key === 'fillType' && e.target.value === 'dot') {
+        this.$refs.labelDi.clearData()
+      }
+      if (key === 'labelType' && e.target.value === 'area') {
+        this.$refs.fillMe.clearData()
+      }
+      if (key === 'labelType' && e.target.value === 'dot') {
+        this.$refs.labelMe.clearData()
+      }
+      this.updateChartData()
     },
     // 排序类型 升序 降序
     ascChange() {
