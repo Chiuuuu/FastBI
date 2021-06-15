@@ -391,7 +391,7 @@ export default {
       if (!countryside) {
         return null
       } else { // 调整中心点位置(仅限云浮)
-        countryside.properties.center[1] -= 0.05
+        countryside.properties.center[1] += 0.03
       }
       return countryside.properties.center
     },
