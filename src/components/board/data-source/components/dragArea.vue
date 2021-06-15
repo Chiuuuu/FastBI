@@ -390,6 +390,8 @@ export default {
       let countryside = dataList.find((item) => item.properties.name === name)
       if (!countryside) {
         return null
+      } else { // 调整中心点位置(仅限云浮)
+        countryside.properties.center[1] -= 0.05
       }
       return countryside.properties.center
     },
