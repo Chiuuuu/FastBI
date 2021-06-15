@@ -114,6 +114,10 @@ export default {
         this.$nextTick(() => {
           this.$refs.structure.tableKeyword = ''
           this.$refs.structure.handleGetData()
+          // 切换tab清空所有选中项
+          this.$refs.structure.selectedRows = []
+          this.$refs.structure.selectedRowKeys = []
+          this.$refs.structure.clickRows = []
         })
       } else if (activeKey === '3') {
         this.$nextTick(() => {
