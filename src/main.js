@@ -25,6 +25,10 @@ import server from '@/api/index'
 import permission from '@/directive/permission'
 import hasPermission from '@/directive/hasPermission'
 import PERMISSION_CODE from '@/config/permission'
+import highCharts from 'highcharts';
+import highcharts3d from 'highcharts/highcharts-3d';
+
+highcharts3d(highCharts);
 
 import './font/font.css'
 
@@ -49,6 +53,7 @@ Vue.prototype.$EventBus = new Vue()
 Vue.prototype.$base =
   process.env.NODE_ENV === 'production' ? '/bin-data-site' : ''
 Vue.prototype.$PERMISSION_CODE = PERMISSION_CODE
+Vue.prototype.$highCharts = highCharts;
 // if (sessionStorage.getItem('store')) {
 //   store.replaceState(
 //     Object.assign({}, store.state, JSON.parse(sessionStorage.getItem('store')))

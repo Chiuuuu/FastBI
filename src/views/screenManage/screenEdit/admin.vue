@@ -56,6 +56,7 @@
         <!--动态组件-->
         <template v-for="transform in canvasMap">
           <drag-item
+            ref="dratitem"
             :key="transform.id"
             :item="transform"
             :com-hover="hoverItem === transform.id"
@@ -118,6 +119,12 @@
               v-else-if="transform.setting.name === 've-map'"
               :config="transform.setting.config"
               :background="transform.setting.background"></chart-map> -->
+            <!-- 立体饼图 -->
+            <high-charts 
+              v-else-if="transform.setting.name==='high-pie'"
+              :setting='transform.setting'
+              :background="transform.setting.background"
+            ></high-charts>
 
             <charts-factory
               v-else
@@ -176,7 +183,8 @@ import { deepClone } from '@/utils/deepClone'
 
 const IconFont = Icon.createFromIconfontCN({
   scriptUrl: '//at.alicdn.com/t/font_2276651_71nv5th6v94.js'
-}) // 引入iconfont
+}) // 引入iconfont 
+import HighCharts from '@/components/charts/highcharts'
 export default {
   name: 'Admin',
   data() {
@@ -354,6 +362,7 @@ export default {
     ChartMaterial,
     SteepBar,
     Screen,
+    HighCharts,
     // AMap
   },
   beforeDestroy() {
