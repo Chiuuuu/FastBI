@@ -23,7 +23,7 @@ export function handleRefreshData({ chart, newData }) {
     // 重置series
     config.series = [config.series[0]]
     // 只有一个维度，唯一名称
-    let alias = apiData.dimensions[0].alias
+    let alias = apiData.dimensions[0] ? apiData.dimensions[0].alias : ''
     // 一个度量对应一个series.data
     apiData.measures.forEach((measure, index) => {
       // 添加series

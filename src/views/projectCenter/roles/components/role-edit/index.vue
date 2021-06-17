@@ -24,6 +24,7 @@
               @getChangeItem="getChangeItem"
               @getTablePermi="getTablePermi"
               @setBasePrivilege="getBasePrivilege"
+              @setSourceType="setSourceType"
               ></RoleTabeRole>
             <!-- <RolesTabDataPermission status="edit"></RolesTabDataPermission> -->
           </div>
@@ -79,6 +80,7 @@ export default {
           }
         ]
       },
+      sourceType: '',
       basePrivilege: [],
       screen: [],
       dataModel: [],
@@ -147,6 +149,7 @@ export default {
         }
       }
     },
+    // 设置数据源下的表格权限
     getTablePermi(role, item) {
       switch (role) {
         case 1:
@@ -167,6 +170,7 @@ export default {
         list.push(item)
       }
     },
+    // 设置业务权限
     getBasePrivilege(permissions, type) {
       const target = this.basePrivilege.find(item => item.type === type)
       if (target) {
@@ -178,6 +182,10 @@ export default {
         })
       }
     },
+    // 设置数据源类型
+    setSourceType(data) {
+      this.sourceType = data
+    },
     async handleSave() {
       this.loading = true
       const params = Object.assign({
@@ -187,16 +195,32 @@ export default {
         dataModel: this.dataModel,
         dataSource: this.dataSource
       }, this.form)
-      const res = await this.$server.projectCenter.updateRole(trimFormData(params))
+
+      const promiseall = [
+        this.$server.projectCenter.updateRole(trimFormData(params)),
+        this.$server.projectCenter.updateRoleSourceType({
+          roleId: this.roleId,
+          forbiddenType: this.sourceType
+        })
+      ]
+      Promise.all(promiseall.map(promise => promise.catch(err => err)))
+        .then(res => {
+          let isBack = true
+          if (!res[0] || res[0].code !== 200) {
+            isBack = false
+            this.$message.error(res[0].msg || '保存角色权限失败')
+          } else if (!res[1] || res[1].code !== 200) {
+            isBack = false
+            this.$message.error(res[1].msg || '保存数据源类型失败')
+          }
+          if (isBack) {
+            this.$message.success('保存成功')
+            this.back()
+          }
+        })
         .finally(() => {
           this.loading = false
         })
-      if (res.code === 200) {
-        this.$message.success('保存成功')
-        this.back()
-      } else {
-        this.$message.error(res.msg)
-      }
     }
   }
 }

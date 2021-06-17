@@ -25,7 +25,7 @@
         }"
       >
         <a-row :gutter="[8, 8]">
-          <a-col v-for="item in modelList" :key="item.id" :span="24 / 3">
+          <a-col v-for="item in modelList" :key="item.type" :span="24 / 3">
             <a-card
               hoverable
               :bodyStyle="{ padding: '10px 0', fontSize: '12px' }"
@@ -125,6 +125,14 @@ import { fetchTableInfo, fetchDeleteMenuById } from '../../../../../api/dataAcce
 import MenuFile from '@/components/dataSource/menu-group/file'
 import MenuFolder from '@/components/dataSource/menu-group/folder'
 import debounce from 'lodash/debounce'
+
+const modelList = [
+  { name: 'mysql', type: 1 },
+  { name: 'oracle', type: 2 },
+  { name: 'hive', type: 5 },
+  { name: 'excel', type: 11 },
+  { name: 'csv', type: 12 }
+]
 export default {
   name: 'dataMenu',
   props: {
@@ -141,14 +149,11 @@ export default {
   },
   data() {
     return {
-      modelList: ['mysql', 'oracle', 'hive', 'excel', 'csv'].map(function(item) {
-      // modelList: ['mysql', 'oracle', 'excel'].map(function(item) {
+      modelList: modelList.map(function(item) {
         // 弹窗选项列表
-        return {
-          imgurl: require(`@/assets/images/icon_${item}.png`),
-          name: item,
-          type: item
-        }
+        return Object.assign(item, {
+          imgurl: require(`@/assets/images/icon_${item.name}.png`)
+        })
       }),
       searchValue: '', // 关键词搜索
       searchList: [], // 搜索结果
@@ -487,9 +492,9 @@ export default {
      */
     handleSelectModelType(event, item) {
       event.stopPropagation()
-      console.log('model-type', item.type)
+      console.log('model-type', item.name)
       this.visible = false
-      this.$store.dispatch('dataAccess/setModelType', item.type)
+      this.$store.dispatch('dataAccess/setModelType', item.name)
       this.$store.dispatch('dataAccess/setFirstFinished', false)
       this.$store.dispatch('dataAccess/setModelId', 0)
       this.$store.dispatch('dataAccess/setModelInfo', {})

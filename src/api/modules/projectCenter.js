@@ -155,5 +155,22 @@ export default {
      */
     getRoleSourceTable(params) {
         return $axios.post('/user/RoleResourcePrivilege/dbPrivileges', params)
+    },
+    /**
+     * @description 获取数据源类型列表(权限勾选)
+     * @returns
+     */
+    getRoleSourceType(roleId) {
+        return $axios.get('/user/RoleResourcePrivilege/sourceBlackList/' + roleId)
+    },
+    /**
+     * @description 获取数据源类型列表(权限勾选)
+     * @param {Object} params
+     * @param {Array} params.roleId
+     * @param {String} params.forbiddenType // 将没勾选的类别传入
+     * @returns
+     */
+    updateRoleSourceType(params) {
+        return $axios.post('/user/RoleResourcePrivilege/sourceBlackList', params)
     }
 }
