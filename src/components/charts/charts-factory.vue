@@ -184,17 +184,19 @@ export default {
           if (this.typeName === 've-map') {
             this.chartExtend = { ...omit(val, ['series']) }
             this.chartSeries = val.series
-            this.chartSeries.forEach(item => {
-              if (
-                !item.label.formatter ||
-                item.label.formatter === '{b} ：{c}'
-              ) {
-                // 添加标签格式回调
-                item.label.formatter = function(params) {
-                  return params.data.value[2].toFixed(2)
+            if (this.chartSeries.length>0) {
+              this.chartSeries.forEach(item => {
+                if (
+                  !item.label.formatter ||
+                  item.label.formatter === '{b} ：{c}'
+                ) {
+                  // 添加标签格式回调
+                  item.label.formatter = function(params) {
+                    return params.data.value[2].toFixed(2)
+                  }
                 }
-              }
-            })
+              })
+            }
             this.geo = val.geo
             this.mapToolTip = val.tooltip
             if (

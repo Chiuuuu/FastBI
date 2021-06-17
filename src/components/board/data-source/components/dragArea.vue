@@ -452,15 +452,7 @@ export default {
 
       let params = selected
       let apiData = deepClone(this.currSelected.setting.api_data)
-      let res = ''
-      if (
-        (apiData.measures[0] && apiData.measures[0].resourceType === 8) ||
-        (apiData.tableList[0] && apiData.tableList[0].resourceType === 8)
-      ) {
-        res = await this.$server.screenManage.getData(params)
-      } else {
-        res = await this.$server.screenManage.getDataForSource(params)
-      }
+      let res = await this.$server.screenManage.getData(params)
       selected.setting.isEmpty = false
       // 数据源被删掉
       if (res.code === 500 && res.msg === 'IsChanged') {

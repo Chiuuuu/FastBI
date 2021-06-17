@@ -649,15 +649,7 @@ export default {
       let selected = this.canvasMap.find(
         item => item.id === this.currentSelected
       )
-      let res = ''
-      if (
-        (apiData.measures[0] && apiData.measures[0].resourceType === 8) ||
-        apiData.tableList[0].resourceType === 8
-      ) {
-        res = await this.$server.screenManage.getData(selected)
-      } else {
-        res = await this.$server.screenManage.getDataForSource(selected)
-      }
+      let res = await this.$server.screenManage.getData(selected)
       selected.setting.isEmpty = false
       // 数据源被删掉
       if (res.code === 500 && res.msg === 'IsChanged') {
