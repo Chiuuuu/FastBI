@@ -41,12 +41,8 @@
         </a-tooltip>
       </div>
     </div>
-    <div class="empty" :class="{ field: isdrag }">
-      {{
-        labelType === 'dot'
-          ? emptyText['dotMeasure'][fileList.length]
-          : emptyText[type]
-      }}
+    <div v-else class="empty" :class="{ field: isdrag }">
+      {{ emptyText[type][measureType] || emptyText[type] }}
     </div>
   </div>
 </template>
@@ -100,7 +96,12 @@ export default {
     labelType: {
       type: String,
       default: ''
-    } // 标记点:区域/经纬度
+    }, // 标记点:区域/经纬度
+    measureType: {
+      type: String,
+      required: false,
+      default: 'labelNormal'
+    }
   },
   data() {
     return {
@@ -108,8 +109,11 @@ export default {
       selected: {},
       emptyText: {
         dimensions: '拖入维度',
-        measures: '拖入度量',
-        dotMeasure: ['拖入经度', '拖入纬度', '拖入度量']
+        measures: {
+          labelNormal: '拖入度量',
+          labelLatitude: '拖入经度',
+          labelLongitude: '拖入纬度'
+        }
       },
       polymerizationData: [
         { name: '求和', value: 'SUM' },
@@ -143,9 +147,12 @@ export default {
             // 维度
             this.fileList = deepClone(val.setting.api_data.labelDimensions)
           }
-          if (this.type === 'measures' && val.setting.api_data.labelMeasures) {
+          if (
+            this.type === 'measures' &&
+            val.setting.api_data[this.measureType]
+          ) {
             // 度量
-            this.fileList = deepClone(val.setting.api_data.labelMeasures)
+            this.fileList = deepClone(val.setting.api_data[this.measureType])
           }
         }
       },
@@ -200,8 +207,11 @@ export default {
       // 清空显示列表
       this.fileList = []
       // 清空维度度量
-      this.$set(this.currSelected.setting.api_data, 'labelDimensions', [])
-      this.$set(this.currSelected.setting.api_data, 'labelMeasures', [])
+      this.$set(this.currSelected.setting, 'api_data', {
+        options: this.currSelected.setting.api_data.options
+      })
+      this.currSelected.datamodelId = 0
+      this.currSelected.isEmpty = false
       // 清空标记点图表数据
       let config = this.currSelected.setting.config
       this.$set(
@@ -227,19 +237,17 @@ export default {
       if (this.type === 'dimensions' && this.dragFile === this.type) {
         // 维度暂时只能拉入一个字段
         this.fileList[0] = dataFile
-        this.fileList = this.uniqueFun(this.fileList, 'alias')
         this.getData()
       }
       // 度量
       if (this.type === 'measures' && this.dragFile === this.type) {
         // 区域一个维度一个度量，经纬度度量经度维度值
-        if (
-          this.labelType === 'area' ||
-          (this.labelType === 'dot' && this.fileList.length < 2)
-        ) {
+        if (this.labelType === 'area') {
           this.fileList.push(dataFile)
+          this.fileList = this.uniqueFun(this.fileList, 'alias')
+        } else {
+          this.fileList[0] = dataFile
         }
-        this.fileList = this.uniqueFun(this.fileList, 'alias')
         this.getData()
       }
       this.isdrag = false
@@ -287,14 +295,15 @@ export default {
       // 重置地图样式配置对应的度量数据
       this.initTargetMeasure()
       if (
-        current.setting.api_data.labelDimensions.length === 0 &&
+        ((this.fillType === 'area' &&
+          current.setting.api_data.labelDimensions.length === 0) ||
+          this.fillType === 'dot') &&
         current.setting.api_data.labelMeasures.length === 0
       ) {
         // 清空数据
-        delete current.setting.api_data.source
-        this.$store.dispatch('SetSelfDataSource', current.setting.api_data)
-        current.series = current.series.filter(item => item.type === 'map')
-        this.$store.dispatch('SetSelfDataSource', current.setting.api_data)
+        current.setting.config.series = current.setting.config.series.filter(
+          item => item.type === 'map'
+        )
         this.$store.dispatch('SetSelfProperty', current.setting.config)
         this.updateChartData()
       }
@@ -310,8 +319,27 @@ export default {
       }
       // 度量
       if (this.type === 'measures') {
-        selected.setting.api_data.labelMeasures = this.fileList
+        selected.setting.api_data[this.measureType] = this.fileList
       }
+
+      // 构造度量列表
+      let measureList = []
+      if (selected.setting.api_data.labelNormal) {
+        measureList = [...measureList, ...selected.setting.api_data.labelNormal]
+      }
+      if (selected.setting.api_data.labelLatitude) {
+        measureList = [
+          ...measureList,
+          ...selected.setting.api_data.labelLatitude
+        ]
+      }
+      if (selected.setting.api_data.labelLongitude) {
+        measureList = [
+          ...measureList,
+          ...selected.setting.api_data.labelLongitude
+        ]
+      }
+      selected.setting.api_data.labelMeasures = measureList
 
       if (
         (!selected.datamodelId || selected.datamodelId === '0') &&
@@ -362,25 +390,16 @@ export default {
           this.updateChartData()
           return
         }
+        if (apiData.labelMeasures.length < 3) {
+          return
+        }
         if (apiData.labelMeasures.some(item => item.status === 1)) {
           return
         }
       }
 
       let params = deepClone(selected)
-      let res = ''
-      // 经纬度类型只有三个度量，传参的时候改图标type = 2
-      if (this.labelType === 'dot') {
-        params.type = 2
-      }
-      if (
-        apiData.labelMeasures[0] &&
-        apiData.labelMeasures[0].resourceType === 8
-      ) {
-        res = await this.$server.screenManage.getData(params)
-      } else {
-        res = await this.$server.screenManage.getDataForSource(params)
-      }
+      let res = await this.$server.screenManage.getData(params)
       selected.setting.isEmpty = false
       // 数据源被删掉
       if (res.code === 500 && res.msg === 'IsChanged') {
@@ -418,24 +437,23 @@ export default {
             )
           })
         } else {
-          let measures = apiData.labelMeasures.map(item => item.alias)
-          legend.push(measures[2])
+          legend.push(apiData.labelNormal[0])
           // 解析数据，获取经度，纬度，目标值
           let data = res.rows[0]
           // 获取位置信息
           let res = reverseAddressResolution([
-            data[measures[0]],
-            data[measures[1]]
+            data[apiData.labelLatitude[0]],
+            data[apiData.labelLongitude[0]]
           ])
           config.series.push(
             Object.assign(dotSeries, {
               data: [
                 {
                   name: res.direct,
-                  value: Object.values(data)
+                  value: data[apiData.labelNormal[0]]
                 }
               ],
-              name: measures[2]
+              name: apiData.labelNormal[0]
             })
           )
         }

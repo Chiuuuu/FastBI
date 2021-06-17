@@ -849,8 +849,8 @@ const list = [
             type: '1',
             isEmpty: false,
             chartType: 'v-map',
-            fillType: 'area', // area/dot
-            labelType: 'area',
+            // fillType: 'area', // area/dot
+            // labelType: 'area',
             icon: 'icon_map.png',
             modelId: '',
             api_data: {
@@ -860,18 +860,6 @@ const list = [
               //     { 位置: '白云区', 人口: 90 },
               //     { 位置: '南沙区', 人口: 100 }
               //   ],
-              data: [
-                // { name: '白云区', value: 110 },
-                // { name: '天河区', value: 190 }
-                // { name: '南沙区', value: 130 },
-                // { name: '南沙区', value: 20 }
-                [
-                  //   { name: '黄埔区', value: [113.450761, 23.103239, 10] }
-                  //   { name: '荔湾区', value: [113.243038, 23.124943, 200] },
-                  //   { name: '从化区', value: [113.587386, 23.545283, 10] },
-                  //   { name: '增城区', value: [113.764271, 23.341053, 200] }
-                ]
-              ]
             },
             apis: {
               mapOrigin: guangzhou,
@@ -1014,71 +1002,7 @@ const list = [
                   }
                 }
               },
-              series: [
-                {
-                  type: 'map',
-                  map: 'guangzhou',
-                  aspectScale: 0.75,
-                  showLegendSymbol: false,
-                  zoom: 1.1,
-                  roam: false,
-                  mapLocation: {
-                    x: 'left',
-                    y: 'top'
-                  },
-                  label: {
-                    normal: {
-                      show: true,
-                      color: '#fff'
-                    },
-                    emphasis: {
-                      show: true
-                    }
-                  },
-                  itemStyle: {
-                    normal: {
-                      areaColor: 'rgba(1, 33, 92, 0.45)',
-                      borderColor: '#215495',
-                      borderWidth: 1
-                    },
-                    emphasis: {
-                      borderColor: '#073684',
-                      areaColor: '#061E3D'
-                    }
-                  }
-                }
-                // {
-                //   type: 'scatter', // scatter,effectScatter
-                //   name: '人口',
-                //   coordinateSystem: 'geo',
-                //   symbol: 'circle',
-                //   symbolSize: 10,
-                //   //   aspectScale: 0.75,
-                //   hoverAnimation: true,
-                //   showEffectOn: 'render',
-                //   rippleEffect: {
-                //     brushType: 'stroke',
-                //     scale: 3
-                //   },
-                //   label: {
-                //     show: false,
-                //     formatter: '{b} ：{c}',
-                //     color: DEFAULT_COLORS[0],
-                //     fontSize: 12,
-                //     position: 'right', // 可选inside
-                //     emphasis: {
-                //       show: true
-                //     }
-                //   },
-                //   itemStyle: {
-                //     emphasis: {
-                //       borderColor: '#fff',
-                //       borderWidth: 1
-                //     }
-                //   },
-                //   zlevel: 1
-                // }
-              ],
+              series: [],
               color: DEFAULT_COLORS
             },
             view: { width: 300, height: 500, x: 710, y: 290 }
