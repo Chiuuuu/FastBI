@@ -268,14 +268,79 @@
         </a-select>
       </gui-field>
     </a-collapse-panel>
+
+    <a-collapse-panel key="indicator" header="指标设置">
+      <a-switch
+        slot="extra"
+        v-model="HighConfig.setting.config.plotOptions.pie.dataLabels.enabled"
+        default-checked
+        @change="switchChange"
+        size="small"
+      />
+      <!-- <gui-field label="显示内容"> -->
+      显示内容
+      <a-select
+        mode="tags"
+        placeholder="选择显示内容"
+        :default-value="['{point.name}：', '{y}', '({point.percentage:.1f}%)']"
+        style="width: 100%"
+        @change="onChange"
+      >
+        <a-select-option
+          v-for="i in formatList"
+          :key="i.label"
+          :value="i.value"
+        >
+          {{ i.label }}
+        </a-select-option>
+      </a-select>
+      <gui-field label="文本">
+        <gui-inline label="字号">
+          <a-input-number
+            class="longwidth"
+            v-model="HighConfig.setting.config.plotOptions.pie.dataLabels.style.fontSize"
+            size="small"
+            :min="12"
+            :max="40"
+            @change="setSelfProperty"
+          ></a-input-number>
+        </gui-inline>
+        <gui-inline label="颜色">
+          <el-color-picker
+            v-model="HighConfig.setting.config.plotOptions.pie.dataLabels.color"
+            @change="setSelfProperty"
+          ></el-color-picker>
+        </gui-inline>
+      </gui-field>
+      <!-- <gui-field label="显示位置">
+        <a-radio-group :value="HighConfig.setting.config.plotOptions.pie.dataLabels.distance" size="small">
+          <a-radio-button
+            value="-30%"
+            @click.native.stop="
+              onRadioChange('indicator','distance', '-30%')
+            "
+            >内部</a-radio-button
+          >
+          <a-radio-button
+            value="30%"
+            @click.native.stop="
+              onRadioChange('indicator','distance', '30%')
+            "
+            >外部</a-radio-button
+          >
+        </a-radio-group>
+      </gui-field> -->
+    </a-collapse-panel>
+
     <a-collapse-panel key="background" header="背景设置">
-      <a-radio-group v-model="HighConfig.setting.background.backgroundType" name="radioGroup">
+      <a-radio-group
+        v-model="HighConfig.setting.background.backgroundType"
+        name="radioGroup"
+      >
         <a-radio
           :style="radioStyle"
           value="1"
-          @click.native.stop="
-            onBgChange('backgroundType', '1')
-          "
+          @click.native.stop="onBgChange('backgroundType', '1')"
         >
           <gui-field label="背景颜色">
             <el-color-picker
@@ -288,9 +353,7 @@
         <a-radio
           :style="radioStyle"
           value="2"
-          @click.native.stop="
-            onBgChange('backgroundType', '2')
-          "
+          @click.native.stop="onBgChange('backgroundType', '2')"
         >
           <gui-field label="背景图片">
             <a-button
@@ -306,7 +369,7 @@
               name
               accept="image/png, image/jpeg, image/gif"
               style="display: none"
-              @change="selectPhoto($event,'plotBackgroundImage')"
+              @change="selectPhoto($event, 'plotBackgroundImage')"
             />
           </gui-field>
         </a-radio>
@@ -382,8 +445,13 @@ export default {
       ],
       radioStyle: {
         display: 'flex',
-        alignItems: 'center'
+        alignItems: 'center',
       }, // 单选radio样式
+      formatList: [
+        { label: '维度', value: '{point.name}：' },
+        { label: '度量', value: '{y}' },
+        { label: '占比', value: '({point.percentage:.1f}%)' }
+      ],
     }
   },
   computed: {
@@ -401,7 +469,11 @@ export default {
     },
     //图例点击
     onRadioChange(source, key, value) {
-      this.$set(this.HighConfig.setting.config[source], key, value)
+      if(source==='indicator'){
+        this.$set(this.HighConfig.setting.config.plotOptions.pie.dataLabels, key, value);
+      }else{
+        this.$set(this.HighConfig.setting.config[source], key, value);
+      }
       this.setSelfProperty()
     },
     // 点击显示/隐藏
@@ -410,8 +482,8 @@ export default {
       event.stopPropagation()
       this.setSelfProperty()
     },
-     // 图表 点击选择背景
-    onBgChange(key,val) {
+    // 图表 点击选择背景
+    onBgChange(key, val) {
       this.$set(this.HighConfig.setting, key, val)
       this.setBackGround()
     },
@@ -420,13 +492,12 @@ export default {
       document.getElementById('bgPhoto').click()
     },
     setBackGround(val) {
-      if(val){
+      if (val) {
         setBaseProperty(this.currentSelected)
         this.updateChartData()
       }
       // this.$store.dispatch('SetBackGround', this.backgroundApi)
       // 发送请求来保存数据
-     
     },
     // 选择上传图片
     selectPhoto(e, key) {
@@ -442,7 +513,7 @@ export default {
       form.append('avatarfile', e.target.files[0])
       this.$server.screenManage
         .actionUploadImage(form)
-        .then(res => {
+        .then((res) => {
           if (res.code === 200) {
             let imageUrl = process.env.VUE_APP_SERVICE_URL + res.imgUrl
             if (key === 'plotBackgroundImage') {
@@ -461,9 +532,15 @@ export default {
             this.$message.error(res.msg)
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err)
         })
+    },
+    onChange(checkedValues) {
+      // this.HighConfig.setting.config.plotOptions.pie.dataLabels.format = checkedValues.join('');
+      let source = this.HighConfig.setting.config.plotOptions.pie.dataLabels;
+      this.$set(source,'format',checkedValues.join(''));
+      this.setSelfProperty()
     },
   },
   watch: {},

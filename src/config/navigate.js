@@ -1557,7 +1557,7 @@ const list = [{
         {
           title: "立体饼图",
           name: 'high-pie',
-          chartType: 'high-pie',
+          chartType: 'high-charts',
           icon: 'icon_pie_chart.png',
           // iconFont: 'icon-Pie-chart',
           type: '1',
@@ -1670,11 +1670,12 @@ const list = [{
                 //数据引导线
                 dataLabels: {
                   enabled: true, //是否显示饼图的线形tip
-                  formatter: function() {     //设置字体与引导线和饼图颜色一致
-                      return  '<p style="color:'+ this.color+'">'+ this.point.name +'</p><br><p style="color:'+ this.color+'">'+ (this.percentage).toFixed(1)+'%</p>';
-                  },
+                  color: '#fff',
+                  distance: '30%',//显示位置，正数外部，负数在图形中
+                  format:'{point.name}：{point.y}（{point.percentage:.1f}%）',
                   style: {
-                      textOutline: 'none'        //去掉文字白边
+                    fontSize:12,
+                    textOutline: 'none'        //去掉文字白边
                   }
                 },
               },
@@ -1682,8 +1683,7 @@ const list = [{
             series: [
               {
                 type: 'pie',
-                name: '浏览器占比',
-                
+                name: '图形占比',
                 //模块名和所占比，也可以{name: '测试1',y: 12}
                 data: [
                   {

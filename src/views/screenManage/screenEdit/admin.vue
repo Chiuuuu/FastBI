@@ -122,9 +122,18 @@
             <!-- 立体饼图 -->
             <high-charts 
               v-else-if="transform.setting.name==='high-pie'"
+              :key="transform.id"
               :setting='transform.setting'
+              :api-data="transform.setting.api_data"
               :background="transform.setting.background"
             ></high-charts>
+             <!-- <component 
+              v-else-if="transform.setting.chartType==='high-charts'"
+              :is="transform.setting.name"
+              :key="transform.id"
+              :setting='transform.setting'
+              :background="transform.setting.background"
+            ></component> -->
 
             <charts-factory
               v-else

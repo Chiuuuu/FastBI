@@ -50,6 +50,15 @@
 
               <!-- 高德地图-->
               <!-- <AMap v-else-if="transform.setting.name === 'a-map'" /> -->
+              <!-- 立体饼图 -->
+              <high-charts 
+                v-else-if="transform.setting.name==='high-pie'"
+                :key="transform.id"
+                :setting='transform.setting'
+                :api-data="transform.setting.api_data"
+                :background="transform.setting.background"
+              ></high-charts>
+
               <charts-factory
                 v-else
                 :id="transform.id"
@@ -93,6 +102,7 @@ import {
 } from 'bin-ui/src/utils/resize-event'
 
 import throttle from 'lodash/throttle'
+import HighCharts from '@/components/charts/highcharts'
 
 export default {
   name: 'screen',
@@ -105,6 +115,7 @@ export default {
     ChartNodata,
     ChartMaterial,
     SteepBar,
+    HighCharts
     // AMap
   },
   props: {},

@@ -1,7 +1,7 @@
 <template>
   <!-- 3D饼图和柱形图 -->
   <div class="dvs-high">
-    <div id="container"></div>
+    <div class="container" ref="container"></div>
   </div>
 </template>
 <script>
@@ -10,17 +10,23 @@ export default {
     setting:{
       type: Object,
       required: true,
-    }
+    },
+    apiData: {
+      type: Object,
+      required: true
+    },
   },
   data() {
-    return {}
+    return {
+      
+    }
   },
   mounted() {
     this.init()
   },
   methods: {
     init() {
-      this.$highCharts.chart('container', this.setting.config)
+      this.$highCharts.chart(this.$refs.container, this.setting.config)
     },
   },
   watch: {
@@ -28,10 +34,28 @@ export default {
       handler(val){
         val.config.chart.width=val.view.width;
         val.config.chart.height=val.view.height;
-        this.$highCharts.chart('container', val.config)
+        this.$highCharts.chart(this.$refs.container, val.config)
       },
       deep:true,
       // immediate:true
+    },
+    apiData:{
+      handler(val){
+       /* 
+        dimensions //维度（name）
+        measures//度量(value)
+      */
+        let obj = {
+          key:val.dimensions[0].alias,
+          val:val.measures[0].alias
+        };
+        let _source = val.source.rows.map(item=>({
+          name:item[obj.key]==null?'':item[obj.key],
+          y:item[obj.val]==null?0:item[obj.val]
+        }));
+        this.setting.config.series[0].data = [..._source];
+        this.$highCharts.chart(this.$refs.container, this.setting.config)
+      }
     }
   },
 }
@@ -40,7 +64,7 @@ export default {
 .dvs-high {
   width: 100%;
   height: 100%;
-  #container {
+  .container {
     display: table-cell;
     position:absolute;
     width:100%;
