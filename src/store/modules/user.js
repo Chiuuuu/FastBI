@@ -8,6 +8,8 @@ const state = {
     objectModule: '',
     selectProject: '',
     projectList: [],
+    sourceType: [],
+    roles: [],
     info: ''
 }
 
@@ -33,6 +35,12 @@ const mutations = {
   },
   SET_INFO: (state, params) => {
     state.info = Object.assign({}, params)
+  },
+  SET_ROLES: (state, params) => {
+    state.roles = [].concat(params)
+  },
+  SET_SOURCE_TYPE: (state, params) => {
+    state.sourceType = [].concat(params)
   }
 }
 
@@ -49,7 +57,9 @@ const actions = {
       resolve()
     })
   },
-  getInfo({ commit }) {
+  getInfo({ commit, dispatch }) {
+    // 获取用户信息同时获取数据源类型权限
+    dispatch('getSourceType')
     return new Promise((resolve, reject) => {
       // 根据token获取对应的权限
       server.user.getUserInfo().then(respone => {
@@ -58,8 +68,23 @@ const actions = {
           commit('SET_OBJECT_MODULE', respone)
           commit('SET_PROJECTLIST', respone.projects)
           commit('SET_SELECTPROJECT', respone.projectId)
+          commit('SET_ROLES', respone.roles)
           commit('SET_INFO', respone.user)
           resolve(state)
+        } else {
+          message.error(respone.msg || '请求错误')
+        }
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  getSourceType({ commit }) {
+    return new Promise((resolve, reject) => {
+      // 根据token获取对应的权限
+      server.user.getSourceType().then(respone => {
+        if (respone.code === 200) {
+          commit('SET_SOURCE_TYPE', respone.data)
         } else {
           message.error(respone.msg || '请求错误')
         }

@@ -22,17 +22,19 @@
 </template>
 
 <script>
+// split之后都是字符串, 所以type写成字符串了
 const typeList = [
-  { name: 'mysql', type: 1 },
-  { name: 'oracle', type: 2 },
-  { name: 'hive', type: 5 },
-  { name: 'excel', type: 11 },
-  { name: 'csv', type: 12 }
+  { name: 'mysql', type: '1' },
+  { name: 'oracle', type: '2' },
+  { name: 'hive', type: '5' },
+  { name: 'excel', type: '11' },
+  { name: 'csv', type: '12' }
 ]
 export default {
   inject: [
     'status',
-    'getCurrentRoleTab'
+    'getCurrentRoleTab',
+    'getSourceTypeList'
   ],
   props: {
     visible: Boolean
@@ -43,7 +45,7 @@ export default {
       searchWord: '',
       checkedTypes: [],
       initialTypes: [],
-      isInitial: false,
+      isChange: false, // 是否修改过(决定了是否展示初始数据)
       typeList
     }
   },
@@ -51,19 +53,24 @@ export default {
     injectRoleTab() {
       return this.getCurrentRoleTab()
     },
+    initialTypeList() {
+      return this.getSourceTypeList()
+    },
     // 库组-树结构
     treeData() {
+      const children = []
+      this.typeList.map(item => {
+        if (item.name.toLowerCase().indexOf(this.searchWord.toLowerCase()) > -1) {
+          item.disabled = this.status === 'show'
+          children.push(item)
+        }
+      })
       return [
         {
           name: '添加类型',
           type: 0,
           disabled: this.status === 'show',
-          children: this.typeList.filter(
-            (item) =>
-              item.name
-                .toLowerCase()
-                .indexOf(this.searchWord.toLowerCase()) > -1
-          )
+          children
         }
       ]
     },
@@ -79,30 +86,25 @@ export default {
     }
   },
   methods: {
-    async handleGetSourceType() {
-      const res = await this.$server.projectCenter.getRoleSourceType(this.$store.state.projectRoles.roleId)
-      if (res && res.code === 200) {
-        let list = res.data.forbiddenType
-        if (list.split) {
-          if (list === 'all') {
-            list = []
-          } else {
-            list = list.split(',')
-          }
-        } else {
+    handleGetSourceType() {
+      let list = this.initialTypeList
+      // 格式化成数组
+      if (list.split) {
+        if (list === 'all') {
           list = []
+        } else {
+          list = list.split(',')
         }
-        // 取反选中
-        this.initialTypes = this.typeList.filter(item => list.indexOf(item.type) < 0).map(item => item.type)
-        this.checkedTypes = this.initialTypes
-        this.isInitial = true
       } else {
-        this.$message.error(res.msg || '请求错误')
+        list = []
       }
+      // 取反选中
+      this.initialTypes = this.typeList.filter(item => list.indexOf(item.type) < 0).map(item => item.type)
+      this.checkedTypes = this.initialTypes
     },
     handleSetVisibleSource() {
       this.$emit('update:visible', true)
-      if (!this.isInitial) {
+      if (!this.isChange) {
         this.handleGetSourceType()
       }
     },
@@ -122,6 +124,7 @@ export default {
       } else {
         checkedTypes = checkedTypes.toString()
       }
+      this.isChange = true
       this.$emit('setSourceType', checkedTypes) // 假如为空即全选, 传'all'
       this.$emit('update:visible', false)
     },
