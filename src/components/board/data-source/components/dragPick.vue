@@ -195,6 +195,7 @@ import { deepClone } from '@/utils/deepClone'
 import { sum, summary } from '@/utils/summaryList'
 import navigateList from '@/config/navigate' // 导航条菜单
 import _ from 'lodash'
+import { Loading } from 'element-ui'
 import { Icon } from 'ant-design-vue'
 const IconFont = Icon.createFromIconfontCN({
   scriptUrl: '//at.alicdn.com/t/font_2276651_kjhn0ldks1j.js'
@@ -649,7 +650,14 @@ export default {
       let selected = this.canvasMap.find(
         item => item.id === this.currentSelected
       )
+      let loadingInstance = Loading.service({
+        lock: true,
+        text: '加载中...',
+        target: 'body',
+        background: 'rgb(255, 255, 255, 0.6)'
+      })
       let res = await this.$server.screenManage.getData(selected)
+      loadingInstance.close()
       selected.setting.isEmpty = false
       // 数据源被删掉
       if (res.code === 500 && res.msg === 'IsChanged') {
