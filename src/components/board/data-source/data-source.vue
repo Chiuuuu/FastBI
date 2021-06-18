@@ -41,30 +41,26 @@
               >经纬度</a-radio
             >
           </a-radio-group>
-          <a-collapse-panel
-            key="dimensions"
-            header="维度"
-            v-if="fillType === 'area'"
-          >
+          <a-collapse-panel key="dimensions" header="维度">
             <dragAreaForMapFill
+              v-if="fillType === 'area'"
               type="dimensions"
-              ref="fillDi"
               :fillType="fillType"
+            ></dragAreaForMapFill>
+            <dragAreaForMapFill
+              v-if="fillType === 'dot'"
+              type="dimensions"
+              :fillType="fillType"
+              dimensionType="latitude"
+            ></dragAreaForMapFill>
+            <dragAreaForMapFill
+              v-if="fillType === 'dot'"
+              type="dimensions"
+              :fillType="fillType"
+              dimensionType="longitude"
             ></dragAreaForMapFill>
           </a-collapse-panel>
           <a-collapse-panel key="measures" header="度量">
-            <dragAreaForMapFill
-              v-if="fillType === 'dot'"
-              type="measures"
-              :fillType="fillType"
-              measureType="latitude"
-            ></dragAreaForMapFill>
-            <dragAreaForMapFill
-              v-if="fillType === 'dot'"
-              type="measures"
-              :fillType="fillType"
-              measureType="longitude"
-            ></dragAreaForMapFill>
             <dragAreaForMapFill
               type="measures"
               ref="fillMe"
@@ -92,30 +88,26 @@
               >经纬度</a-radio
             >
           </a-radio-group>
-          <a-collapse-panel
-            key="dimensions"
-            header="维度"
-            v-if="labelType === 'area'"
-          >
+          <a-collapse-panel key="dimensions" header="维度">
             <dragAreaForMapLabel
+              v-if="labelType === 'area'"
               type="dimensions"
-              ref="labelDi"
               :labelType="labelType"
+            ></dragAreaForMapLabel>
+            <dragAreaForMapLabel
+              v-if="labelType === 'dot'"
+              type="dimensions"
+              :labelType="labelType"
+              dimensionType="labelLatitude"
+            ></dragAreaForMapLabel>
+            <dragAreaForMapLabel
+              v-if="labelType === 'dot'"
+              type="dimensions"
+              :labelType="labelType"
+              dimensionType="labelLongitude"
             ></dragAreaForMapLabel>
           </a-collapse-panel>
           <a-collapse-panel key="measures" header="度量">
-            <dragAreaForMapLabel
-              v-if="labelType === 'dot'"
-              type="measures"
-              :labelType="labelType"
-              measureType="labelLatitude"
-            ></dragAreaForMapLabel>
-            <dragAreaForMapLabel
-              v-if="labelType === 'dot'"
-              type="measures"
-              :labelType="labelType"
-              measureType="labelLongitude"
-            ></dragAreaForMapLabel>
             <dragAreaForMapLabel
               type="measures"
               ref="labelMe"
@@ -128,11 +120,18 @@
       <a-collapse-panel
         key="pick"
         header="数据筛选"
-        v-if="chartType === '1' || chartType === '2' || chartType === '3'"
+        v-if="
+          (chartType === '1' || chartType === '2' || chartType === '3') &&
+            currSelected.setting.chartType !== 'v-map'
+        "
       >
         <drag-pick type="pick"></drag-pick>
       </a-collapse-panel>
-      <a-collapse-panel key="sort" header="排序" v-if="chartType !== '2'">
+      <a-collapse-panel
+        key="sort"
+        header="排序"
+        v-if="chartType !== '2' && currSelected.setting.chartType !== 'v-map'"
+      >
         <div style="display: flex;">
           <a-select
             v-model="sortData.pivotschemaId"
@@ -246,8 +245,8 @@ export default {
         { name: '分', value: 'min' },
         { name: '小时', value: 'hour' }
       ],
-      fillType: 'area',
-      labelType: 'area'
+      fillType: '',
+      labelType: ''
     }
   },
   mounted() {
@@ -325,21 +324,13 @@ export default {
         return
       }
       // 切换页签清空对应数据
-      if (key === 'fillType' && value === 'area') {
+      if (key === 'fillType') {
         // 清空填充经纬度
         this.$refs.fillMe.clearData()
       }
-      if (key === 'fillType' && value === 'dot') {
-        // 清空填充区域
-        this.$refs.fillDi.clearData()
-      }
-      if (key === 'labelType' && value === 'area') {
+      if (key === 'labelType') {
         // 清空标记点经纬度
         this.$refs.labelMe.clearData()
-      }
-      if (key === 'labelType' && value === 'dot') {
-        // 清空标记点区域
-        this.$refs.labelDi.clearData()
       }
       this[key] = value
       this.$set(this.currSelected.setting.api_data.options, key, value)
