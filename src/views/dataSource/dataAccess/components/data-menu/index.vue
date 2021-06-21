@@ -25,21 +25,24 @@
         }"
       >
         <a-row :gutter="[8, 8]">
-          <a-col v-for="item in modelList" :key="item.id" :span="24 / 3">
-            <a-card
-              hoverable
-              :bodyStyle="{ padding: '10px 0', fontSize: '12px' }"
-              @click="handleSelectModelType($event, item)"
-            >
-              <img
-                slot="cover"
-                :alt="item.name"
-                class="card-img"
-                :src="item.imgurl"
-              />
-              <div class="card-title">{{ item.name }}</div>
-            </a-card>
-          </a-col>
+          <template v-if="modelList.length > 0">
+            <a-col v-for="item in modelList" :key="item.type" :span="24 / 3">
+              <a-card
+                hoverable
+                :bodyStyle="{ padding: '10px 0', fontSize: '12px' }"
+                @click="handleSelectModelType($event, item)"
+              >
+                <img
+                  slot="cover"
+                  :alt="item.name"
+                  class="card-img"
+                  :src="item.imgurl"
+                />
+                <div class="card-title">{{ item.name }}</div>
+              </a-card>
+            </a-col>
+          </template>
+          <a-empty v-else description="暂无数据源类别权限"></a-empty>
         </a-row>
       </a-modal>
     </div>
@@ -125,6 +128,14 @@ import { fetchTableInfo, fetchDeleteMenuById } from '../../../../../api/dataAcce
 import MenuFile from '@/components/dataSource/menu-group/file'
 import MenuFolder from '@/components/dataSource/menu-group/folder'
 import debounce from 'lodash/debounce'
+
+const modelList = [
+  { name: 'mysql', type: '1' },
+  { name: 'oracle', type: '2' },
+  { name: 'hive', type: '5' },
+  { name: 'excel', type: '11' },
+  { name: 'csv', type: '12' }
+]
 export default {
   name: 'dataMenu',
   props: {
@@ -141,15 +152,6 @@ export default {
   },
   data() {
     return {
-      modelList: ['mysql', 'oracle', 'hive', 'excel', 'csv'].map(function(item) {
-      // modelList: ['mysql', 'oracle', 'excel'].map(function(item) {
-        // 弹窗选项列表
-        return {
-          imgurl: require(`@/assets/images/icon_${item}.png`),
-          name: item,
-          type: item
-        }
-      }),
       searchValue: '', // 关键词搜索
       searchList: [], // 搜索结果
       // fileSelectId: '', // 选中左侧菜单
@@ -224,8 +226,41 @@ export default {
   },
   computed: {
     ...mapState({
-      tableList: state => state.dataAccess.menuList
+      tableList: state => state.dataAccess.menuList,
+      sourceType: state => state.user.sourceType,
+      roles: state => state.user.roles
     }),
+    modelList() {
+      let isAll = false
+      let whiteList = []
+      // 有黑名单的列表长度<总角色长度, 说明有全类别权限的角色, 直接返回所有
+      if (this.sourceType.length !== this.roles.length) {
+        isAll = true
+      } else { // 否则先将黑名单转成白名单, 再取并集
+        for (const source of this.sourceType) {
+          if (typeof source === 'string') {
+            const white = source.split(',')
+            whiteList = whiteList.concat(modelList.filter(item => white.indexOf(item.type) < 0))
+          } else {
+            isAll = true
+            break
+          }
+        }
+      }
+      // 将并集去重
+      let list = []
+      if (isAll) {
+        list = modelList
+      } else {
+        list = whiteList.filter((item, index, self) => self.indexOf(item) === index)
+      }
+      return list.map(function(item) {
+        // 弹窗选项列表
+        return Object.assign(item, {
+          imgurl: require(`@/assets/images/icon_${item.name}.png`)
+        })
+      })
+    },
     menuList() {
       return this.searchValue ? this.searchList : this.tableList
     },
@@ -487,9 +522,9 @@ export default {
      */
     handleSelectModelType(event, item) {
       event.stopPropagation()
-      console.log('model-type', item.type)
+      console.log('model-type', item.name)
       this.visible = false
-      this.$store.dispatch('dataAccess/setModelType', item.type)
+      this.$store.dispatch('dataAccess/setModelType', item.name)
       this.$store.dispatch('dataAccess/setFirstFinished', false)
       this.$store.dispatch('dataAccess/setModelId', 0)
       this.$store.dispatch('dataAccess/setModelInfo', {})

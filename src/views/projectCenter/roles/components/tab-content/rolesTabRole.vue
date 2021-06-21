@@ -59,6 +59,7 @@ export default {
       getCurrentRoleTab: () => this.currentTab,
       getFolderHeader: () => this.folderHeader,
       getCurrentAllPermission: () => this.moduleListAll[this.currentTab],
+      getSourceTypeList: () => this.sourceTypeList,
       status: this.status
     }
   },
@@ -90,18 +91,21 @@ export default {
       spinning3: false,
       currentTab: 1,
       modulePermission: {}, // 模块权限
+      // 模块对应的业务权限
       moduleList: {
         1: [],
         2: [],
         3: []
-      }, // 模块对应的业务权限
+      },
+      // 模块对应的全选业务权限
       moduleListAll: {
         1: [],
         2: [],
         3: []
-      }, // 模块对应的全选业务权限
+      },
       treeList: {}, // 模块对应的树节点
-      folderHeader: [] // 文件夹权限
+      folderHeader: [], // 文件夹权限
+      sourceTypeList: 'all'
     }
   },
   mounted() {
@@ -126,6 +130,21 @@ export default {
           this.$message.error('获取文件夹权限失败')
         }
       })
+    },
+    handleGetSourceType() {
+      this.$server.projectCenter.getRoleSourceType(this.$store.state.projectRoles.roleId)
+        .then(res => {
+          if (res && res.code === 200) {
+            let list = 'all'
+            if (res.data && res.data.forbiddenType) {
+              list = res.data.forbiddenType || 'all'
+            }
+            this.sourceTypeList = list
+            this.$emit('setSourceType', list) // 先初始化类型
+          } else {
+            this.$message.error(res.msg || '请求错误')
+          }
+        })
     },
     handleReset() {
       this.data = this.$options.data()
@@ -183,6 +202,7 @@ export default {
     async handleGetData() {
       this.handleReset()
       await this.handleGetFolderPermissions()
+      await this.handleGetSourceType()
       // 顺序加载
       this.spinning1 = true
       this.spinning2 = true

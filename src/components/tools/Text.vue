@@ -126,20 +126,7 @@ export default {
       polymerizationList: [
         {
           name: '聚合方式',
-          children: [
-            {
-              name: '求和',
-              onClick: (event, handler, vm, measure) => {
-                changePolymerization(measure, handler.name)
-              }
-            },
-            {
-              name: '平均',
-              onClick: (event, handler, vm, measure) => {
-                changePolymerization(measure, handler.name)
-              }
-            }
-          ]
+          children: []
         },
         {
           name: '移除',
@@ -183,6 +170,9 @@ export default {
           }
         }
         let antor = document.getElementById('antor')
+        if (!antor) {
+          return
+        }
         var n = antor.getBoundingClientRect()
         self.contenxtmenu = new ContextMenu({
           vm: self,
@@ -291,6 +281,7 @@ export default {
       if (!matchList) {
         this.currSelected.datamodelId = '0'
         this.currSelected.setting.resourceType = ''
+        this.currSelected.setting.api_data.modelId = ''
       }
     }, 400),
     // 插入度量元素的点击事件，弹出聚合方式菜单
@@ -302,6 +293,16 @@ export default {
           target.onClick.apply(this, arguments)
         }
       }
+      // 构造聚合方式选择列表
+      let aggregatorList = Object.keys(aggregatorMap)
+      this.polymerizationList[0].children = aggregatorList.map(name => {
+        return {
+          name,
+          onClick: (event, handler, vm, measure) => {
+            changePolymerization(measure, handler.name)
+          }
+        }
+      })
       this.contenxtmenu = new ContextMenu({
         vm: this,
         target: e,
@@ -344,6 +345,7 @@ export default {
       wrap.selectNode(parseDom)
       // 锁定dataModelId
       this.currSelected.datamodelId = measure.screenTableId
+      this.currSelected.setting.api_data.modelId = measure.screenTableId
       this.currSelected.setting.resourceType = measure.resourceType
       // 选中插入的元素
       const t = window.getSelection()

@@ -52,6 +52,7 @@ import { mapGetters, mapActions } from 'vuex'
 import { deepClone } from '@/utils/deepClone'
 import { sum, summary } from '@/utils/summaryList'
 import geoJson from '@/utils/guangdong.json'
+import { Loading } from 'element-ui'
 
 export default {
   props: {
@@ -452,15 +453,14 @@ export default {
 
       let params = selected
       let apiData = deepClone(this.currSelected.setting.api_data)
-      let res = ''
-      if (
-        (apiData.measures[0] && apiData.measures[0].resourceType === 8) ||
-        (apiData.tableList[0] && apiData.tableList[0].resourceType === 8)
-      ) {
-        res = await this.$server.screenManage.getData(params)
-      } else {
-        res = await this.$server.screenManage.getDataForSource(params)
-      }
+      let loadingInstance = Loading.service({
+        lock: true,
+        text: '加载中...',
+        target: 'body',
+        background: 'rgb(255, 255, 255, 0.6)'
+      })
+      let res = await this.$server.screenManage.getData(params)
+      loadingInstance.close()
       selected.setting.isEmpty = false
       // 数据源被删掉
       if (res.code === 500 && res.msg === 'IsChanged') {

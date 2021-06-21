@@ -367,13 +367,19 @@ export default {
             this.resourceId = val.datamodelId
             this.resourceType = val.setting.resourceType
             this.dimensionsChecked = []
-            if (val.setting.api_data.dimensions.length > 0) {
+            if (
+              val.setting.api_data.dimensions &&
+              val.setting.api_data.dimensions.length > 0
+            ) {
               val.setting.api_data.dimensions.map(item => {
                 this.dimensionsChecked.push(item.id)
               })
             }
             this.measuresChecked = []
-            if (val.setting.api_data.measures.length > 0) {
+            if (
+              val.setting.api_data.measures &&
+              val.setting.api_data.measures.length > 0
+            ) {
               val.setting.api_data.measures.map(item => {
                 this.measuresChecked.push(item.id)
               })

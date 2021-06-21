@@ -1034,8 +1034,8 @@ const list = [{
           type: '1',
           isEmpty: false,
           chartType: 'v-map',
-          fillType: 'area', // area/dot
-          labelType: 'area',
+          // fillType: 'area', // area/dot
+          // labelType: 'area',
           icon: 'icon_map.png',
           modelId: '',
           api_data: {
@@ -1045,18 +1045,6 @@ const list = [{
             //     { 位置: '白云区', 人口: 90 },
             //     { 位置: '南沙区', 人口: 100 }
             //   ],
-            data: [
-              // { name: '白云区', value: 110 },
-              // { name: '天河区', value: 190 }
-              // { name: '南沙区', value: 130 },
-              // { name: '南沙区', value: 20 }
-              [
-                //   { name: '黄埔区', value: [113.450761, 23.103239, 10] }
-                //   { name: '荔湾区', value: [113.243038, 23.124943, 200] },
-                //   { name: '从化区', value: [113.587386, 23.545283, 10] },
-                //   { name: '增城区', value: [113.764271, 23.341053, 200] }
-              ]
-            ]
           },
           apis: {
             mapOrigin: guangzhou,
@@ -1204,70 +1192,7 @@ const list = [{
                 }
               }
             },
-            series: [{
-                type: 'map',
-                map: 'guangzhou',
-                aspectScale: 0.75,
-                showLegendSymbol: false,
-                zoom: 1.1,
-                roam: false,
-                mapLocation: {
-                  x: 'left',
-                  y: 'top'
-                },
-                label: {
-                  normal: {
-                    show: true,
-                    color: '#fff'
-                  },
-                  emphasis: {
-                    show: true
-                  }
-                },
-                itemStyle: {
-                  normal: {
-                    areaColor: 'rgba(1, 33, 92, 0.45)',
-                    borderColor: '#215495',
-                    borderWidth: 1
-                  },
-                  emphasis: {
-                    borderColor: '#073684',
-                    areaColor: '#061E3D'
-                  }
-                }
-              }
-              // {
-              //   type: 'scatter', // scatter,effectScatter
-              //   name: '人口',
-              //   coordinateSystem: 'geo',
-              //   symbol: 'circle',
-              //   symbolSize: 10,
-              //   //   aspectScale: 0.75,
-              //   hoverAnimation: true,
-              //   showEffectOn: 'render',
-              //   rippleEffect: {
-              //     brushType: 'stroke',
-              //     scale: 3
-              //   },
-              //   label: {
-              //     show: false,
-              //     formatter: '{b} ：{c}',
-              //     color: DEFAULT_COLORS[0],
-              //     fontSize: 12,
-              //     position: 'right', // 可选inside
-              //     emphasis: {
-              //       show: true
-              //     }
-              //   },
-              //   itemStyle: {
-              //     emphasis: {
-              //       borderColor: '#fff',
-              //       borderWidth: 1
-              //     }
-              //   },
-              //   zlevel: 1
-              // }
-            ],
+            series: [],
             color: DEFAULT_COLORS
           },
           view: {
@@ -1615,18 +1540,18 @@ const list = [{
             },
             //去掉右下角广告
             credits: {
-                enabled: false
+              enabled: false
             },
             // colors: ['#50B432', '#ED561B', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4'],
-            colors:['#058DC7', '#50B432', '#ED561B', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4'],
+            colors: ['#058DC7', '#50B432', '#ED561B', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4'],
             chart: {
               backgroundColor: 'rgba(0,0,0,0)', //背景透明
-              plotBackgroundImage:'',//背景图片
-              borderColor:'#335cad',//边框颜色
-              borderWidth:0,//边框宽度
-              borderRadius:0,//边框圆角
+              plotBackgroundImage: '', //背景图片
+              borderColor: '#335cad', //边框颜色
+              borderWidth: 0, //边框宽度
+              borderRadius: 0, //边框圆角
               type: 'pie',
-              reflow:true,
+              reflow: true,
               options3d: {
                 enabled: true, //使用3d功能
                 alpha: 60, //延y轴向内的倾斜角度
@@ -1636,166 +1561,80 @@ const list = [{
             //标题属性设置
             title: {
               text: '立体饼图',
-              align:'center',//对齐方式left center right
-              style:{//标题属性设置（字体、颜色、大小，粗细）
-                fontFamily:'微软雅黑',
+              align: 'center', //对齐方式left center right
+              style: { //标题属性设置（字体、颜色、大小，粗细）
+                fontFamily: '微软雅黑',
                 fontWeight: 'bold',
-                color:'#fff',
-                fontSize:'20'
+                color: '#fff',
+                fontSize: '20'
               },
             },
             //图例属性设置
-            legend:{
-              shadow:false,//图例阴影
-              enabled:true,//是否显示图例
-              layout:'horizontal',//horizontal(水平) vertical(垂直)
-              align:'center',//水平对齐，有left（左），centerr（中），右（right）
-              verticalAlign:'top',//垂直对齐，有top（上），middle（中），下（bottom）
-              itemStyle: { 
-                cursor: 'pointer', 
-                fontSize:'20',
-                color: '#fff' 
+            legend: {
+              shadow: false, //图例阴影
+              enabled: true, //是否显示图例
+              layout: 'horizontal', //horizontal(水平) vertical(垂直)
+              align: 'center', //水平对齐，有left（左），centerr（中），右（right）
+              verticalAlign: 'top', //垂直对齐，有top（上），middle（中），下（bottom）
+              itemStyle: {
+                cursor: 'pointer',
+                fontSize: '20',
+                color: '#fff'
               },
-            },  
+            },
             //图形种类配置
             plotOptions: {
               pie: {
                 allowPointSelect: true, //每个扇块能否选中
                 cursor: 'pointer', //鼠标指针
                 depth: 45, //饼图厚度
-                center: ['50%', '50%'],//图形中心位置
-                size:'80%',   //饼图外圈直径大小
-                innerSize: 0,  //饼图的内圈直径大小
-                showInLegend: true,//是否显示图利
+                center: ['50%', '50%'], //图形中心位置
+                size: '80%', //饼图外圈直径大小
+                innerSize: 0, //饼图的内圈直径大小
+                showInLegend: true, //是否显示图利
                 //数据引导线
                 dataLabels: {
                   enabled: true, //是否显示饼图的线形tip
                   color: '#fff',
-                  distance: '30%',//显示位置，正数外部，负数在图形中
-                  format:'{point.name}：{point.y}（{point.percentage:.1f}%）',
+                  distance: '30%', //显示位置，正数外部，负数在图形中
+                  format: '{point.name}：{point.y}（{point.percentage:.1f}%）',
                   style: {
-                    fontSize:12,
-                    textOutline: 'none'        //去掉文字白边
+                    fontSize: 12,
+                    textOutline: 'none' //去掉文字白边
                   }
                 },
               },
             },
-            series: [
-              {
-                type: 'pie',
-                name: '图形占比',
-                //模块名和所占比，也可以{name: '测试1',y: 12}
-                data: [
-                  {
-                    name: 'Chrome',
-                    y: 61.41,
-                  },
-                  {
-                    name: 'Internet Explorer',
-                    y: 11.84,
-                  },
-                  {
-                    name: 'Firefox',
-                    y: 10.85,
-                  },
-                  {
-                    name: 'Edge',
-                    y: 4.67,
-                  },
-                  {
-                    name: 'Safari',
-                    y: 4.18,
-                  },
-                  {
-                    name: 'Other',
-                    y: 7.05,
-                  },
-                ],
-              },
-            ],
-            // grid: {
-            //   left: 20,
-            //   top: 60,
-            //   right: 20,
-            //   bottom: 30
-            // },
-            // legend: {
-            //   show: true,
-            //   orient: 'horizontal',
-            //   textStyle: {
-            //     color: '#ffffff',
-            //     fontSize: 12
-            //   },
-            //   itemGap: 12,
-            //   icon: '',
-            //   left: 'center',
-            //   top: 'auto',
-            //   right: 'auto',
-            //   bottom: 'auto'
-            // },
-            // xAxis: {
-            //   show: false,
-            //   axisLabel: {
-            //     color: '#ffffff',
-            //     fontSize: 12,
-            //     rotate: 0
-            //   },
-            //   axisLine: {
-            //     show: false,
-            //     lineStyle: {
-            //       color: '#cccccc'
-            //     }
-            //   },
-            //   splitLine: {
-            //     show: false,
-            //     lineStyle: {
-            //       color: '#cccccc'
-            //     }
-            //   }
-            // },
-            // yAxis: {
-            //   show: false,
-            //   axisLabel: {
-            //     color: '#ffffff',
-            //     fontSize: 12
-            //   },
-            //   axisLine: {
-            //     show: false,
-            //     lineStyle: {
-            //       color: '#cccccc'
-            //     }
-            //   },
-            //   splitLine: {
-            //     show: false,
-            //     lineStyle: {
-            //       color: '#cccccc'
-            //     }
-            //   }
-            // },
-            // series: {
-            //   // selectedMode: 'single',
-            //   label: {
-            //     show: true,
-            //     color: '',
-            //     fontSize: 12,
-            //     position: 'outside', // 可选inside
-            //     formatter: '{b}: {@2012} ({d}%)',
-            //     formatterSelect: ['{b}', '{@2012}', '({d}%)']
-            //   },
-            //   // 选中时样式
-            //   select: {
-            //     itemStyle: {
-            //       normal: {}
-            //     }
-            //   },
-            //   roseType: false, // 饼图可选玫瑰图
-            //   center: ['50%', '50%'], // 饼图可选
-            //   radius: ['0', '70%'], // 饼图可选
-            //   itemStyle: {
-            //     normal: {}
-            //   }
-            // },
-            // color: DEFAULT_COLORS
+            series: [{
+              type: 'pie',
+              name: '图形占比',
+              //模块名和所占比，也可以{name: '测试1',y: 12}
+              data: [{
+                  name: 'Chrome',
+                  y: 61.41,
+                },
+                {
+                  name: 'Internet Explorer',
+                  y: 11.84,
+                },
+                {
+                  name: 'Firefox',
+                  y: 10.85,
+                },
+                {
+                  name: 'Edge',
+                  y: 4.67,
+                },
+                {
+                  name: 'Safari',
+                  y: 4.18,
+                },
+                {
+                  name: 'Other',
+                  y: 7.05,
+                },
+              ],
+            }, ],
           },
           chartEvents: {
             click: chartClick
