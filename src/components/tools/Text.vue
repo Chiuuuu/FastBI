@@ -4,7 +4,7 @@
       @mousedown="removeSelection"
       @dblclick="focusCurrent"
       :contenteditable="editable"
-      data-placeholder="请输入内容"
+      data-placeholder="请输入内容,输入*插入度量"
       :class="[
         'editor-text',
         { 'editor-text-placholder': isShowPlaceHolder },

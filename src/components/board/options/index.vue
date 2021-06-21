@@ -1812,14 +1812,6 @@
                         >
                       </a-select>
                     </gui-field> -->
-                    <gui-field label="显示标签">
-                      <a-switch
-                        v-model="selfConfig.series[targetMeasure].label.show"
-                        default-checked
-                        size="small"
-                        @change="switchChange"
-                      />
-                    </gui-field>
                     <gui-field
                       label="文本样式"
                       v-if="selfConfig.series[targetMeasure].label.show"
@@ -2465,8 +2457,8 @@ export default {
       // 地图删除维度的时候调用，重置样式指标设置选择的度量
       initTargetMeasure: () => {
         this.targetMeasure = this.selfConfig.series.filter(
-              item => item.type === 'map'
-            ).length
+          item => item.type === 'map'
+        ).length
       }
     }
   },
@@ -2881,10 +2873,10 @@ export default {
               this.scatterList = this.selfConfig.series.filter(
                 item => item.type === 'scatter'
               )
+              this.targetMeasure = this.selfConfig.series.filter(
+                item => item.type === 'map'
+              ).length
             }
-            this.targetMeasure = this.selfConfig.series.filter(
-              item => item.type === 'map'
-            )
           }
           if (val.setting.api_data) {
             this.apiData = deepClone(val.setting.api_data)

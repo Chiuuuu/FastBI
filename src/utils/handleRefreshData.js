@@ -187,7 +187,7 @@ async function setMapData(chart, newData) {
   } else {
     delete chart.setting.config.visualMap
   }
-  if (newData.labelData && newData.labelData.length) {
+  if (newData.labelList && newData.labelList.length) {
     const dotSeries = {
       type: 'scatter', // scatter,effectScatter
       name: '人口',
@@ -222,7 +222,7 @@ async function setMapData(chart, newData) {
       zlevel: 1
     }
     let config = chart.setting.config
-    if (this.labelType === 'area') {
+    if (apiData.options.labelType === 'area') {
       // 只有一个维度，唯一名称
       let alias = apiData.labelDimensions[0].alias
       // 一个度量对应一个series.data

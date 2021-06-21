@@ -892,6 +892,7 @@ const list = [
                 }
               },
               tooltip: {
+                show: false,
                 trigger: 'item',
                 confine: true,
                 formatter: '{b} ：{c}'

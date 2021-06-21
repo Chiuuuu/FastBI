@@ -25,7 +25,7 @@
       </b-scrollbar>
     </div>
     <edit-slider v-model="range"></edit-slider>
-    <pation></pation>
+    <pation canEdit></pation>
   </div>
 </template>
 
