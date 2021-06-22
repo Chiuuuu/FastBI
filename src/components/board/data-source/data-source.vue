@@ -115,6 +115,22 @@
             ></dragAreaForMapLabel>
           </a-collapse-panel>
         </a-collapse>
+        <GuiField label="指标显示">
+          <a-switch
+            v-model="labelShow"
+            default-checked
+            size="small"
+            @change="labelPointChange"
+          />
+        </GuiField>
+        <GuiField label="鼠标移入显示">
+          <a-switch
+            v-model="selfConfig.tooltip.show"
+            default-checked
+            size="small"
+            @change="switchChange"
+          />
+        </GuiField>
       </a-collapse-panel>
       <!-- 数据筛选 -->
       <a-collapse-panel
@@ -200,12 +216,14 @@ import dragAreaForMapFill from './components/dragAreaForMapFill'
 import dragAreaForMapLabel from './components/dragAreaForMapLabel'
 import DragPick from './components/dragPick'
 import { deepClone } from '../../../utils/deepClone'
+import GuiField from '../options/gui-field'
 export default {
   components: {
     DragArea,
     DragPick,
     dragAreaForMapFill,
-    dragAreaForMapLabel
+    dragAreaForMapLabel,
+    GuiField
   },
   data() {
     return {
@@ -246,14 +264,16 @@ export default {
         { name: '小时', value: 'hour' }
       ],
       fillType: '',
-      labelType: ''
+      labelType: '',
+      selfConfig: {},
+      labelShow: false
     }
   },
   mounted() {
-    if (this.currSelected.setting.chartType === 'v-map') {
-      this.fillType = this.currSelected.setting.api_data.options.fillType
-      this.labelType = this.currSelected.setting.api_data.options.labelType
-    }
+    // if (this.currSelected.setting.chartType === 'v-map') {
+    //   this.fillType = this.currSelected.setting.api_data.options.fillType
+    //   this.labelType = this.currSelected.setting.api_data.options.labelType
+    // }
   },
   watch: {
     currSelected: {
@@ -263,6 +283,18 @@ export default {
           this.sortData = {}
           let apiData = deepClone(val.setting.api_data)
           this.apiData = apiData
+          this.selfConfig = deepClone(val.setting.config)
+          if (val.setting.chartType === 'v-map') {
+            // 获取散点图层所在下标
+            this.fillType = this.currSelected.setting.api_data.options.fillType
+            this.labelType = this.currSelected.setting.api_data.options.labelType
+            let scatterLayout = this.selfConfig.series.find(
+              item => item.type === 'scatter'
+            )
+            if (scatterLayout) {
+              this.labelShow = scatterLayout.label.show
+            }
+          }
           // 选中的维度度量组合成排序列表
           if (apiData.labelDimensions) {
             this.sortList = this.sortList.concat(apiData.labelDimensions)
@@ -296,6 +328,11 @@ export default {
     ...mapGetters(['currSelected', 'currentSelected']),
     chartType() {
       return this.currSelected ? this.currSelected.setting.type : ''
+    },
+    hasScatter() {
+      return this.selfConfig.series
+        ? this.selfConfig.series.some(item => item.type === 'scatter')
+        : false
     }
   },
   methods: {
@@ -399,6 +436,19 @@ export default {
     // 单个图表的定时器设置
     setTimer() {
       this.$emit('setChartTimer', this.currentSelected)
+    },
+    labelPointChange(val) {
+      let scatterLayout = this.selfConfig.series.find(
+        item => item.type === 'scatter'
+      )
+      if (scatterLayout) {
+        scatterLayout.label.show = this.labelShow
+      }
+      this.switchChange()
+    },
+    switchChange() {
+      this.$store.dispatch('SetSelfProperty', this.selfConfig)
+      this.updateChartData()
     }
   }
 }

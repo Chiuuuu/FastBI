@@ -1114,17 +1114,14 @@ const list = [{
                 color: ['#50a3ba', '#eac736', '#d94e5d'],
                 symbolSize: [10, 16]
               },
-              textStyle: {
-                color: '#fff',
-                fontSize: 12
-              }
-            },
-            xAxis: {
-              show: false,
-              axisLabel: {
-                color: '#ffffff',
-                fontSize: 12,
-                rotate: 0
+              tooltip: {
+                show: false,
+                trigger: 'item',
+                confine: true,
+                formatter: '{b} ：{c}'
+                // formatter(params) {
+                //   return params.name
+                // }
               },
               axisLine: {
                 show: false,
