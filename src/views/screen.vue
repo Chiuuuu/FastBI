@@ -10,6 +10,10 @@
                 v-if="transform.setting.isEmpty"
                 :config="transform.setting.config"
               ></chart-nodata>
+              <ChartFigure
+                v-else-if="transform.setting.name === 'figure'"
+                :setting="transform.setting"
+              />
               <!--素材库-->
               <ChartMaterial
                 v-else-if="transform.setting.name === 'material'"
@@ -83,6 +87,7 @@ import ChartImage from '@/components/tools/Image'
 import ChartTables from '@/components/tools/Tables'
 import ChartNodata from '@/components/tools/Nodata'
 import ChartMaterial from '@/components/tools/Material'
+import ChartFigure from '@/components/tools/Figure'
 import SteepBar from '@/components/tools/SteepBar'
 // import AMap from '@/components/tools/aMap' // 进度条
 import { Loading } from 'element-ui'
@@ -104,6 +109,7 @@ export default {
     ChartTables,
     ChartNodata,
     ChartMaterial,
+    ChartFigure,
     SteepBar,
     // AMap
   },

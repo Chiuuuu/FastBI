@@ -169,7 +169,7 @@ const list = [
               },
               color: DEFAULT_COLORS
             },
-            view: { width: 500, height: 400, x: 710, y: 340 } // 计算中间值(1920-500)*0.5,(1080-400)*0.5
+            view: { width: 500, height: 400, x: 710, y: 340, rotate: 0 } // 计算中间值(1920-500)*0.5,(1080-400)*0.5
           },
           {
             title: '柱状图',
@@ -320,7 +320,7 @@ const list = [
               },
               color: DEFAULT_COLORS
             },
-            view: { width: 500, height: 400, x: 710, y: 340 }
+            view: { width: 500, height: 400, x: 710, y: 340, rotate: 0 }
           },
           {
             title: '条形图',
@@ -464,7 +464,7 @@ const list = [
               },
               color: DEFAULT_COLORS
             },
-            view: { width: 500, height: 450, x: 710, y: 340 }
+            view: { width: 500, height: 450, x: 710, y: 340, rotate: 0 }
           },
           {
             title: '饼图',
@@ -589,7 +589,7 @@ const list = [
             chartEvents: {
               click: chartClick
             },
-            view: { width: 400, height: 400, x: 760, y: 340 }
+            view: { width: 400, height: 400, x: 760, y: 340, rotate: 0 }
           },
           {
             title: '雷达图',
@@ -707,7 +707,7 @@ const list = [
               },
               color: DEFAULT_COLORS
             },
-            view: { width: 400, height: 400, x: 760, y: 340 }
+            view: { width: 400, height: 400, x: 760, y: 340, rotate: 0 }
           },
           {
             title: '仪表盘',
@@ -828,7 +828,7 @@ const list = [
               }
               // color: DEFAULT_COLORS
             },
-            view: { width: 400, height: 400, x: 760, y: 340 }
+            view: { width: 400, height: 400, x: 760, y: 340, rotate: 0 }
           },
           {
             title: '地图',
@@ -1067,7 +1067,7 @@ const list = [
               ],
               color: DEFAULT_COLORS
             },
-            view: { width: 300, height: 500, x: 710, y: 290 }
+            view: { width: 300, height: 500, x: 710, y: 290, rotate: 0 }
           },
           {
             title: '环形图',
@@ -1178,7 +1178,7 @@ const list = [
             chartEvents: {
               click: chartClick
             },
-            view: { width: 400, height: 400, x: 760, y: 340 }
+            view: { width: 400, height: 400, x: 760, y: 340, rotate: 0 }
           },
           {
             title: '嵌套饼图',
@@ -1299,39 +1299,39 @@ const list = [
             chartEvents: {
               click: chartClick
             },
-            view: { width: 400, height: 400, x: 760, y: 340 }
-          },
-        //   {
-        //     title: '高德地图',
-        //     name: 'a-map',
-        //     chartType: 'a-map',
-        //     type: '4',
-        //     icon: 'icon_map.png',
-        //     api_data: {},
-        //     apis: {},
-        //     modelId: '',
-        //     canEdit: true,
-        //     background: {
-        //       backgroundType: '1',
-        //       backgroundColor: '',
-        //       borderColor: '',
-        //       borderWidth: 0,
-        //       borderStyle: '',
-        //       borderRadius: 0
-        //     },
-        //     config: {
-        //       title: {
-        //         textAlign: 'left',
-        //         textStyle: {
-        //           color: '#ffffff',
-        //           fontSize: 20,
-        //           fontFamily: 'not specified',
-        //           fontWeight: 'normal'
-        //         }
-        //       }
-        //     },
-        //     view: { width: 500, height: 400, x: 710, y: 340 }
-        //   }
+            view: { width: 400, height: 400, x: 760, y: 340, rotate: 0 }
+          }
+          //   {
+          //     title: '高德地图',
+          //     name: 'a-map',
+          //     chartType: 'a-map',
+          //     type: '4',
+          //     icon: 'icon_map.png',
+          //     api_data: {},
+          //     apis: {},
+          //     modelId: '',
+          //     canEdit: true,
+          //     background: {
+          //       backgroundType: '1',
+          //       backgroundColor: '',
+          //       borderColor: '',
+          //       borderWidth: 0,
+          //       borderStyle: '',
+          //       borderRadius: 0
+          //     },
+          //     config: {
+          //       title: {
+          //         textAlign: 'left',
+          //         textStyle: {
+          //           color: '#ffffff',
+          //           fontSize: 20,
+          //           fontFamily: 'not specified',
+          //           fontWeight: 'normal'
+          //         }
+          //       }
+          //     },
+          //     view: { width: 500, height: 400, x: 710, y: 340 }
+          //   }
         ]
       }
     ]
@@ -1377,7 +1377,7 @@ const list = [
                 }
               }
             },
-            view: { width: 500, height: 400, x: 710, y: 340 }
+            view: { width: 500, height: 400, x: 710, y: 340, rotate: 0 }
           },
           {
             title: '图片',
@@ -1401,7 +1401,7 @@ const list = [
               borderStyle: '',
               borderRadius: 0
             },
-            view: { width: 400, height: 400, x: 760, y: 340 }
+            view: { width: 400, height: 400, x: 760, y: 340, rotate: 0 }
           },
           {
             title: '表格',
@@ -1531,7 +1531,7 @@ const list = [
                 ellipsis: true
               }
             },
-            view: { width: 500, height: 400, x: 710, y: 340 } // 计算中间值(1920-500)*0.5,(1080-400)*0.5
+            view: { width: 500, height: 400, x: 710, y: 340, rotate: 0 } // 计算中间值(1920-500)*0.5,(1080-400)*0.5
           },
           {
             title: '进度条',
@@ -1581,7 +1581,94 @@ const list = [
               borderStyle: '',
               borderRadius: 0
             },
-            view: { width: 400, height: 200, x: 760, y: 340 }
+            view: { width: 400, height: 200, x: 760, y: 340, rotate: 0 }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    type: 'Figure',
+    title: '添加图形',
+    hovered: false,
+    icon: 'scissor',
+    tabs: [
+      {
+        title: '添加图形',
+        children: [
+          {
+            key: 0,
+            name: 'figure',
+            title: '直线',
+            chartType: 'line',
+            icon: 'icon_addteb.png',
+            modelId: '',
+            config: {
+              title: '直线',
+              noTitle: true, // 默认写死没有标题
+              name: 'figure',
+              style: {
+                backgroundColor: 'transparent',
+                opacity: 1,
+                borderColor: '#fff',
+                borderRadius: 0,
+                borderWidth: 20,
+                borderStyle: 'solid',
+                shadowColor: '#fff',
+                showShadow: false
+              }
+            },
+            api_data: {},
+            apis: {},
+            view: { width: 400, height: 20, x: 760, y: 340, rotate: 0 }
+          },
+          {
+            key: 1,
+            name: 'figure',
+            title: '圆形',
+            chartType: 'circle',
+            icon: 'icon_addteb.png',
+            modelId: '',
+            config: {
+              title: '圆形',
+              noTitle: true, // 默认写死没有标题
+              name: 'figure',
+              style: {
+                backgroundColor: '#fff',
+                opacity: 1,
+                borderColor: '#000',
+                borderRadius: '50%',
+                borderWidth: 1,
+                borderStyle: 'solid'
+              }
+            },
+            api_data: {},
+            apis: {},
+            view: { width: 400, height: 400, x: 760, y: 340, rotate: 0 }
+          },
+          {
+            key: 2,
+            name: 'figure',
+            title: '矩形',
+            chartType: 'rectangle',
+            icon: 'icon_addteb.png',
+            modelId: '',
+            config: {
+              title: '矩形',
+              noTitle: true, // 默认写死没有标题
+              name: 'figure',
+              style: {
+                backgroundColor: '#fff',
+                opacity: 1,
+                borderColor: '#000',
+                borderRadius: 0,
+                borderWidth: 1,
+                borderStyle: 'solid'
+              }
+            },
+            api_data: {},
+            apis: {},
+            view: { width: 400, height: 400, x: 760, y: 340, rotate: 0 }
           }
         ]
       }
@@ -1608,7 +1695,7 @@ const list = [
             imgName: 'test',
             url:
               'http://192.168.0.38:8080/profile/avatar/2021/04/12/0f4667b1-34a6-44f6-a503-c815534a0efb.gif',
-            view: { width: 400, height: 400, x: 760, y: 340 }
+            view: { width: 400, height: 400, x: 760, y: 340, rotate: 0 }
           }
         ]
       }
