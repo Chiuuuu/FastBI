@@ -18,7 +18,7 @@ export default {
   },
   data() {
     return {
-      
+      chart:null,
     }
   },
   mounted() {
@@ -26,7 +26,7 @@ export default {
   },
   methods: {
     init() {
-      this.$highCharts.chart(this.$refs.container, this.setting.config)
+      this.chart = this.$highCharts.chart(this.$refs.container, this.setting.config);
     },
   },
   watch: {
@@ -34,7 +34,11 @@ export default {
       handler(val){
         val.config.chart.width=val.view.width;
         val.config.chart.height=val.view.height;
+        // this.chart.options.chart.width = val.view.width
+        // this.chart.options.chart.height = val.view.height
+        // this.chart.options = Object.assign(this.chart.options,val.config);
         this.$highCharts.chart(this.$refs.container, val.config)
+        // this.chart.redraw(false);
       },
       deep:true,
       // immediate:true

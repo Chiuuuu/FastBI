@@ -120,13 +120,6 @@
           @change="setSelfProperty"
         ></a-input>
       </gui-field>
-      <!-- <gui-field label="是否启用玫瑰图" v-if="isPie">
-            <a-switch
-            v-model="selfConfig.series.roseType"
-            size="small"
-            @change="switchChange"
-            ></a-switch>
-        </gui-field> -->
     </a-collapse-panel>
     <a-collapse-panel key="legend" header="图例设置">
       <a-switch
@@ -154,32 +147,6 @@
           ></el-color-picker>
         </gui-inline>
       </gui-field>
-      <!-- <gui-field label="样式">
-            <gui-inline label="图例间隔">
-                <a-input-number
-                    v-model="selfConfig.legend.itemGap"
-                    size="small"
-                    class="f-clear-width"
-                    :min="0"
-                    :max="50"
-                    @change="setSelfProperty"
-                ></a-input-number>
-            </gui-inline>
-            <gui-inline label="图标">
-            <a-select
-                v-model="selfConfig.legend.icon"
-                style="width: 90px"
-                size="small"
-                @change="setSelfProperty"
-            >
-                <a-select-option value>正常</a-select-option>
-                <a-select-option value="circle">圆形</a-select-option>
-                <a-select-option value="rect">矩形</a-select-option>
-                <a-select-option value="roundRect">圆矩形</a-select-option>
-                <a-select-option value="diamond">菱形</a-select-option>
-            </a-select>
-            </gui-inline>
-        </gui-field> -->
       <gui-field label="位置">
         <gui-inline>
           <a-radio-group
@@ -390,19 +357,6 @@
           @change="setBackGround"
         ></a-input-number>
       </gui-field>
-      <!-- <gui-field label="边框线型">
-        <a-select
-          style="width: 90px"
-          v-model="backgroundApi.borderStyle"
-          @change="setBackGround"
-          placeholder="无"
-          size="small"
-        >
-          <a-select-option value="solid">实线</a-select-option>
-          <a-select-option value="dotted">点状</a-select-option>
-          <a-select-option value="dashed">虚线</a-select-option>
-        </a-select>
-      </gui-field> -->
       <gui-field label="圆角大小">
         <a-input-number
           v-model="HighConfig.setting.config.chart.borderRadius"
@@ -421,6 +375,8 @@ import GuiInline from './gui-inline'
 import { setBaseProperty } from '@/api/canvasMaps/canvas-maps-request'
 
 import { mapGetters, mapActions } from 'vuex'
+
+import HighMinxins from '@/mixins/hight';
 export default {
   props: {
     HighConfig: {
@@ -428,114 +384,115 @@ export default {
       required: true,
     },
   },
+  mixins:[HighMinxins],
   components: { GuiField, GuiInline },
   data() {
     return {
-      fontFamilyList: [
-        { label: '默认', value: 'not specified' },
-        { label: 'simfang', value: 'simfang' },
-        { label: '仿宋_GB2312', value: 'fangsong' },
-        { label: 'times', value: 'times' },
-        { label: '微软雅黑', value: 'msyh' },
-        { label: 'simkai', value: 'simkai' },
-        { label: '庞门正道标题体', value: 'pangmenzhengdao' },
-        { label: 'HuXiaoBoNanShenTi-2', value: 'HuXiaoBoNanShenTi-2' },
-        { label: '优设标题黑', value: 'youshe' },
-        { label: 'digital-7-4', value: 'digital-7-4' },
-      ],
-      radioStyle: {
-        display: 'flex',
-        alignItems: 'center',
-      }, // 单选radio样式
-      formatList: [
-        { label: '维度', value: '{point.name}：' },
-        { label: '度量', value: '{y}' },
-        { label: '占比', value: '({point.percentage:.1f}%)' }
-      ],
+      // fontFamilyList: [
+      //   { label: '默认', value: 'not specified' },
+      //   { label: 'simfang', value: 'simfang' },
+      //   { label: '仿宋_GB2312', value: 'fangsong' },
+      //   { label: 'times', value: 'times' },
+      //   { label: '微软雅黑', value: 'msyh' },
+      //   { label: 'simkai', value: 'simkai' },
+      //   { label: '庞门正道标题体', value: 'pangmenzhengdao' },
+      //   { label: 'HuXiaoBoNanShenTi-2', value: 'HuXiaoBoNanShenTi-2' },
+      //   { label: '优设标题黑', value: 'youshe' },
+      //   { label: 'digital-7-4', value: 'digital-7-4' },
+      // ],
+      // radioStyle: {
+      //   display: 'flex',
+      //   alignItems: 'center',
+      // }, // 单选radio样式
+      // formatList: [
+      //   { label: '维度', value: '{point.name}：' },
+      //   { label: '度量', value: '{y}' },
+      //   { label: '占比', value: '({point.percentage:.1f}%)' }
+      // ],
     }
   },
   computed: {
-    ...mapGetters(['currentSelected']),
+    // ...mapGetters(['currentSelected']),
   },
   mounted() {},
   methods: {
-    ...mapActions(['saveScreenData', 'updateChartData', 'refreshScreen']),
+    // ...mapActions(['saveScreenData', 'updateChartData', 'refreshScreen']),
     // 设置自有属性
-    setSelfProperty() {
-      this.$store.dispatch('SetSelfProperty', this.HighConfig.setting.config)
-      // 发送请求来保存数据
-      setBaseProperty(this.currentSelected)
-      this.updateChartData()
-    },
-    //图例点击
-    onRadioChange(source, key, value) {
-      if(source==='indicator'){
-        this.$set(this.HighConfig.setting.config.plotOptions.pie.dataLabels, key, value);
-      }else{
-        this.$set(this.HighConfig.setting.config[source], key, value);
-      }
-      this.setSelfProperty()
-    },
-    // 点击显示/隐藏
-    switchChange(checked, event) {
-      // 阻止默认事件，取消收起
-      event.stopPropagation()
-      this.setSelfProperty()
-    },
+    // setSelfProperty() {
+    //   this.$store.dispatch('SetSelfProperty', this.HighConfig.setting.config)
+    //   // 发送请求来保存数据
+    //   setBaseProperty(this.currentSelected)
+    //   this.updateChartData()
+    // },
+    // //图例点击
+    // onRadioChange(source, key, value) {
+    //   if(source==='indicator'){
+    //     this.$set(this.HighConfig.setting.config.plotOptions.pie.dataLabels, key, value);
+    //   }else{
+    //     this.$set(this.HighConfig.setting.config[source], key, value);
+    //   }
+    //   this.setSelfProperty()
+    // },
+    // // 点击显示/隐藏
+    // switchChange(checked, event) {
+    //   // 阻止默认事件，取消收起
+    //   event.stopPropagation()
+    //   this.setSelfProperty()
+    // },
     // 图表 点击选择背景
-    onBgChange(key, val) {
-      this.$set(this.HighConfig.setting, key, val)
-      this.setBackGround()
-    },
+    // onBgChange(key, val) {
+    //   this.$set(this.HighConfig.setting, key, val)
+    //   this.setBackGround()
+    // },
     // 点击上传图形背景图
-    addbgPhoto() {
-      document.getElementById('bgPhoto').click()
-    },
-    setBackGround(val) {
-      if (val) {
-        setBaseProperty(this.currentSelected)
-        this.updateChartData()
-      }
-      // this.$store.dispatch('SetBackGround', this.backgroundApi)
-      // 发送请求来保存数据
-    },
+    // addbgPhoto() {
+    //   document.getElementById('bgPhoto').click()
+    // },
+    // setBackGround(val) {
+    //   if (val) {
+    //     setBaseProperty(this.currentSelected)
+    //     this.updateChartData()
+    //   }
+    //   // this.$store.dispatch('SetBackGround', this.backgroundApi)
+    //   // 发送请求来保存数据
+    // },
     // 选择上传图片
-    selectPhoto(e, key) {
-      if (!e.target.files[0]) {
-        return
-      }
-      const isLt2M = e.target.files[0].size / 1024 / 1024 < 5
-      if (!isLt2M) {
-        this.$message.error('图片大小不能超过5M!')
-        return
-      }
-      var form = new FormData()
-      form.append('avatarfile', e.target.files[0])
-      this.$server.screenManage
-        .actionUploadImage(form)
-        .then((res) => {
-          if (res.code === 200) {
-            let imageUrl = process.env.VUE_APP_SERVICE_URL + res.imgUrl
-            if (key === 'plotBackgroundImage') {
-              this.HighConfig.setting.config.chart[key] = imageUrl
-              this.setPageSetting()
-            }
-            // if (key === 'selfConfig') {
-            //   data['imageUrl'] = imageUrl
-            //   this.setSelfProperty()
-            // }
-            // if (key === 'backgroundApi') {
-            //   data['backgroundSrc'] = imageUrl
-            //   this.setBackGround()
-            // }
-          } else {
-            this.$message.error(res.msg)
-          }
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-    },
+    // selectPhoto(e, key) {
+    //   if (!e.target.files[0]) {
+    //     return
+    //   }
+    //   const isLt2M = e.target.files[0].size / 1024 / 1024 < 5
+    //   if (!isLt2M) {
+    //     this.$message.error('图片大小不能超过5M!')
+    //     return
+    //   }
+    //   var form = new FormData()
+    //   form.append('avatarfile', e.target.files[0])
+    //   this.$server.screenManage
+    //     .actionUploadImage(form)
+    //     .then((res) => {
+    //       if (res.code === 200) {
+    //         let imageUrl = process.env.VUE_APP_SERVICE_URL + res.imgUrl
+    //         if (key === 'plotBackgroundImage') {
+    //           this.HighConfig.setting.config.chart[key] = imageUrl
+    //           this.setPageSetting()
+    //         }
+    //         // if (key === 'selfConfig') {
+    //         //   data['imageUrl'] = imageUrl
+    //         //   this.setSelfProperty()
+    //         // }
+    //         // if (key === 'backgroundApi') {
+    //         //   data['backgroundSrc'] = imageUrl
+    //         //   this.setBackGround()
+    //         // }
+    //       } else {
+    //         this.$message.error(res.msg)
+    //       }
+    //     })
+    //     .catch((err) => {
+    //       console.log(err)
+    //     })
+    // },
     onChange(checkedValues) {
       // this.HighConfig.setting.config.plotOptions.pie.dataLabels.format = checkedValues.join('');
       let source = this.HighConfig.setting.config.plotOptions.pie.dataLabels;

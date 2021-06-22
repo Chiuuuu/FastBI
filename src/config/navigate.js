@@ -1479,7 +1479,7 @@ const list = [{
         {
           title: "立体饼图",
           name: 'high-pie',
-          chartType: 'high-charts',
+          chartType: 'high-pie',
           icon: 'icon_pie_chart.png',
           // iconFont: 'icon-Pie-chart',
           type: '1',
@@ -1524,17 +1524,17 @@ const list = [{
             borderRadius: 0
           },
           config: {
-            title: {
-              show: true,
-              content: '立体饼图',
-              textAlign: 'left',
-              textStyle: {
-                color: '#ffffff',
-                fontSize: 20,
-                fontFamily: 'not specified',
-                fontWeight: 'normal'
-              }
-            },
+            // title: {
+            //   show: true,
+            //   content: '立体饼图',
+            //   textAlign: 'left',
+              // textStyle: {
+              //   color: '#ffffff',
+              //   fontSize: 20,
+              //   fontFamily: 'not specified',
+              //   fontWeight: 'normal'
+              // }
+            // },
             //去掉右下角广告
             credits: {
               enabled: false
@@ -1558,6 +1558,7 @@ const list = [{
             //标题属性设置
             title: {
               text: '立体饼图',
+              content: '立体饼图',
               align: 'center', //对齐方式left center right
               style: { //标题属性设置（字体、颜色、大小，粗细）
                 fontFamily: '微软雅黑',
@@ -1632,6 +1633,190 @@ const list = [{
                 },
               ],
             }, ],
+          },
+          chartEvents: {
+            click: chartClick
+          },
+          view: {
+            width: 400,
+            height: 400,
+            x: 760,
+            y: 340
+          }
+        },
+        {
+          title: "立体柱形图",
+          name: 'high-pie',
+          chartType: 'high-column',
+          icon: 'icon_pie_chart.png',
+          // iconFont: 'icon-Pie-chart',
+          type: '1',
+          modelId: '',
+          isEmpty: false,
+          api_data: {
+            columns: ['日期', '访问用户'],
+            rows: [],
+            options: {}
+          },
+          apis: {},
+          background: {
+            backgroundType: '1',
+            backgroundColor: '',
+            borderColor: '',
+            borderWidth: 0,
+            borderStyle: '',
+            borderRadius: 0
+          },
+          config: {
+            //去掉右下角广告
+            credits: {
+              enabled: false
+            },
+            // colors: ['#50B432', '#ED561B', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4'],
+            colors: ['#058DC7', '#50B432', '#ED561B', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4'],
+            chart: {
+              backgroundColor: 'rgba(0,0,0,0)', //背景透明
+              plotBackgroundImage: '', //背景图片
+              borderColor: '#335cad', //边框颜色
+              borderWidth: 0, //边框宽度
+              borderRadius: 0, //边框圆角
+              type: 'column', //cylinder圆柱
+              reflow: true,
+              //图形边距
+              marginTop:100,
+              marginBottom:60,
+              marginLeft:60,
+              marginRight:60,
+
+              options3d: {
+                enabled: true,
+                alpha: 15,
+                beta: 30,
+                depth: 60,
+                viewDistance: 25
+              }
+            },
+            //标题属性设置
+            title: {
+              text: '立体柱形图',
+              content: '立体柱形图',
+              align: 'center', //对齐方式left center right
+              style: { //标题属性设置（字体、颜色、大小，粗细）
+                fontFamily: '微软雅黑',
+                fontWeight: 'bold',
+                color: '#fff',
+                fontSize: '20'
+              },
+            },
+            //图例属性设置
+            legend: {
+              shadow: false, //图例阴影
+              enabled: true, //是否显示图例
+              layout: 'horizontal', //horizontal(水平) vertical(垂直)
+              align: 'center', //水平对齐，有left（左），centerr（中），右（right）
+              verticalAlign: 'top', //垂直对齐，有top（上），middle（中），下（bottom）
+              itemStyle: {
+                cursor: 'pointer',
+                fontSize: '20',
+                color: '#fff'
+              },
+            },
+            xAxis: {
+              type:"category",
+              visible:true,
+              gridLineColor: '#fff',//网格线颜色
+		          gridLineWidth: 0, //纵向网格线宽度
+              labels: {
+                rotation:0,
+                style: {
+                  color: '#fff',
+                  fontSize:12,
+                  fontFamily:'微软雅黑'
+                }
+              },	  
+              title: {
+                text: '',
+                fontSize:12,
+                align: 'high',//"low"，"middle" 和 "high
+                style:{
+                  color:'#fff',
+                  fontSize:12,
+                }
+              }
+            },
+            yAxis: {
+              type:'value',
+              visible:true,
+              gridLineColor: '#fff',//网格线颜色
+              gridLineWidth: 1, //纵向网格线宽度
+              labels: {
+                style: {
+                  color: '#fff',
+                  fontSize:12,
+                  fontFamily:'微软雅黑'
+                }
+              },	  
+              title: {
+                text: '',
+                fontSize:12,
+                align: 'middle',//"low"，"middle" 和 "high
+                style:{
+                  color:'#fff',
+                  fontSize:12,
+                }
+              }
+            },
+            //图形种类配置
+            plotOptions: {
+              // series: {
+              //   depth: 25,
+              //   colorByPoint: true
+              // }
+              column: {
+                depth: 25,
+                //是否显示数值
+                dataLabels: {
+                  enabled: true, //设置显示对应y的值
+                  inside:false,//是否显示在内部
+                  color: '#fff',
+                  style: {
+                    fontSize:13,
+                    textOutline: 'none' //去掉文字白边
+                  },
+                },
+                stacking: null,//null（不进行堆叠）、"normal"（普通堆叠） 和 "percent"（百分比堆叠
+              }
+            },
+            series: [{
+              // type: 'pie',
+              name: '图形占比',
+              //模块名和所占比，也可以{name: '测试1',y: 12}
+              data: [{
+                  name: 'Chrome',
+                  y: 61.41,
+                },
+                {
+                  name: 'Internet Explorer',
+                  y: 11.84,
+                },
+                {
+                  name: 'Firefox',
+                  y: 10.85,
+                },
+                {
+                  name: 'Edge',
+                  y: 4.67,
+                },
+                {
+                  name: 'Safari',
+                  y: 4.18,
+                },
+                {
+                  name: 'Other',
+                  y: 7.05,
+                },
+              ],
+            }],
           },
           chartEvents: {
             click: chartClick

@@ -213,9 +213,10 @@
             </gui-inline>
           </gui-field>
           
-          <high-chart :HighConfig='currSelected' v-if="currSelected.setting.name==='high-pie'"></high-chart>
-
-          <a-collapse v-model="collapseActive" v-else>
+          <high-chart-pie :HighConfig='currSelected' v-if="currSelected.setting.chartType==='high-pie'"></high-chart-pie>
+          <high-chart-bar :HighConfig='currSelected' v-if="currSelected.setting.chartType==='high-column'"></high-chart-bar>
+          
+          <a-collapse v-model="collapseActive" v-if="currSelected.setting.chartType!=='high-pie'&currSelected.setting.chartType!=='high-column'">
             <!--标题 noTitle图片没有标题-->
             <template v-if="selfConfig.title && !selfConfig.noTitle">
               <a-collapse-panel key="title" :header="isText ? '文本' : '标题'">
@@ -2324,7 +2325,8 @@ import Interactive from './interactive'
 import { DEFAULT_COLORS } from '../../../utils/defaultColors'
 import { deepClone } from '../../../utils/deepClone'
 import throttle from 'lodash/throttle';
-import HighChart from '@/components/board/options/highchart'
+import HighChartPie from '@/components/board/options/highchart-pie';
+import HighChartBar from '@/components/board/options/highchart-bar';
 
 export default {
   name: 'BoardOptions',
@@ -2401,7 +2403,7 @@ export default {
         { label: 'digital-7-4', value: 'digital-7-4' }
       ],
       scatterList: [], // 地图里散点图配置列表
-      targetMeasure: 0 // 地图指标设置对应度量
+      targetMeasure: 0, // 地图指标设置对应度量
     }
   },
   mounted() {
@@ -2738,7 +2740,7 @@ export default {
         leading: true,
         trailing: false
       }
-    )
+    ),
   },
   watch: {
     currSelected: {
@@ -2878,6 +2880,6 @@ export default {
       )
     }
   },
-  components: { GuiField, GuiInline, GuiColors, DataSource, Interactive,HighChart }
+  components: { GuiField, GuiInline, GuiColors, DataSource, Interactive,HighChartPie,HighChartBar }
 }
 </script>

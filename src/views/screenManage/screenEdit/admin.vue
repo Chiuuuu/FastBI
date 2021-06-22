@@ -124,6 +124,7 @@
               v-else-if="transform.setting.name==='high-pie'"
               :key="transform.id"
               :setting='transform.setting'
+              :view="transform.setting.view"
               :api-data="transform.setting.api_data"
               :background="transform.setting.background"
             ></high-charts>
