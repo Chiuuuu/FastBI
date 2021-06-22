@@ -372,6 +372,7 @@ export default {
             })
             this.$store.dispatch('dataAccess/setFirstFinished', false)
           }
+          console.log(this.fileList, this.operation)
           this.$nextTick(() => {
             this.handleGetDataBase(this.fileInfoList.length - 1)
           })
@@ -547,6 +548,7 @@ export default {
 
         const currentIndex = this.fileInfoList.length - 1
         const database = new MapSheet(result.rows[0].mapSheet)
+        console.log(this.fileList, this.operation)
 
         // 新增文件未保存前不能查看库表结构
         this.$store.dispatch('dataAccess/setFirstFinished', false)
@@ -568,10 +570,6 @@ export default {
         formData.append('file', file)
         this.spinning = true
         result = await this.$server.dataAccess.actionUploadExcelFile(formData)
-          .then(() => {
-            this.$message.success('替换成功')
-            this.$store.dispatch('dataAccess/setFirstFinished', false)
-          })
           .catch(() => {
             this.clearReplaceFile()
           })
@@ -625,6 +623,7 @@ export default {
           })
         }
 
+        console.log(this.fileList, this.operation)
         const database = new MapSheet(result.rows[0].mapSheet)
         this.$set(this.databaseList, currentIndex, database)
         this.$nextTick(() => {
@@ -735,7 +734,6 @@ export default {
 
           this.$server.dataAccess.saveExcelInfo(formData)
             .then(result => {
-              console.log(result)
               if (result.code === 200) {
                 this.$message.success('保存成功')
                 this.$store.dispatch('dataAccess/getMenuList')

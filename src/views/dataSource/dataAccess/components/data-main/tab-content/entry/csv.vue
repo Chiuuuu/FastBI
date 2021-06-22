@@ -432,10 +432,6 @@ export default {
         formData.append('delimiter', this.queryDelimiter)
         this.spinning = true
         result = await this.$server.dataAccess.actionUploadCsvFile(formData)
-          .then(() => {
-            this.$message.success('替换成功')
-            this.$store.dispatch('dataAccess/setFirstFinished', false)
-          })
           .catch(() => {
             this.clearReplaceFile()
           })
@@ -660,10 +656,12 @@ export default {
                 this.$store.dispatch('dataAccess/setModelName', this.form.name)
                 this.$store.dispatch('dataAccess/setModelId', result.data.datasource.id)
                 this.$store.commit('common/SET_PRIVILEGES', result.data.datasource.privileges || [])
+                this.fileInfoList = result.data.sourceDatabases
                 // this.$store.dispatch('dataAccess/setParentId', 0)
                 // 保存后清空列表
                 this.fileList = []
                 this.deleteIdList = []
+                this.operation = []
                 // 刷新文件id(替换成数据库生成的真实id)
                 const databases = result.data.sourceDatabases
                 this.fileInfoList.map(item => {
