@@ -199,7 +199,7 @@ export default {
         return $axios({
             method: 'post',
             headers: { 'Content-Type': 'multipart/form-data' },
-            url: '/datasource/excel/save',
+            url: '/datasource/excel/batchsave',
             data
         })
     },
