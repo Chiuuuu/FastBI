@@ -15,7 +15,7 @@
         </div>
         <div
           class="tab-item"
-          v-if="currSelected.setting.name !== 've-image'"
+          v-if="currSelected.setting.name !== 've-image' && currSelected.setting.name !== 'figure'"
           :class="{ active: tabsType === 1 }"
           @click="tabsTypeChange(1)"
         >
@@ -492,6 +492,18 @@
                 <!-- <gui-field label="混合状图" v-if="isHistogram && selfConfig.mixed">
                             <a-switch v-model="selfConfig.mixed" size="small" @change="setHistogram($event, 'mixed')"></a-switch>
                         </gui-field>-->
+              </a-collapse-panel>
+            </template>
+
+            <!-- 图形独有 -->
+            <template v-if="selfConfig.name === 'figure'">
+              <a-collapse-panel key="properties" header="图形属性">
+                <Figure
+                  :config.sync="selfConfig"
+                  :view.sync="baseProperty"
+                  @refreshSelf="setSelfProperty"
+                  @refreshBase="setBaseProperty"
+                />
               </a-collapse-panel>
             </template>
 
@@ -2195,8 +2207,16 @@
                 </gui-field>
               </a-collapse-panel>
             </template>
-            <a-collapse-panel key="background" header="背景设置" v-if="!isMaterial">
-              <a-radio-group v-model="backgroundApi.backgroundType" name="radioGroup">
+            <!-- 背景设置-除素材库和图形外 -->
+            <a-collapse-panel
+              key="background"
+              header="背景设置"
+              v-if="!isMaterial && selfConfig.name !== 'figure'"
+            >
+              <a-radio-group
+                v-model="backgroundApi.backgroundType"
+                name="radioGroup"
+              >
                 <a-radio
                   :style="radioStyle"
                   value="1"
@@ -2329,6 +2349,7 @@ import GuiInline from './gui-inline'
 import GuiColors from './gui-colors'
 import DataSource from '../data-source/data-source'
 import Interactive from './interactive'
+import Figure from './figure'
 import { DEFAULT_COLORS } from '../../../utils/defaultColors'
 import { deepClone } from '../../../utils/deepClone'
 import throttle from 'lodash/throttle';
@@ -2371,7 +2392,7 @@ export default {
         backgroundType: 1,
         opacity: 1
       },
-      baseProperty: { width: 0, height: 0, x: 0, y: 0 }, // 配置-基础属性,
+      baseProperty: { width: 0, height: 0, x: 0, y: 0, rotate: 0 }, // 配置-基础属性,
       collapseActive: [],
       mapActive: [],
       selfConfig: {},
@@ -2886,6 +2907,6 @@ export default {
       )
     }
   },
-  components: { GuiField, GuiInline, GuiColors, DataSource, Interactive,HighChart }
+  components: { GuiField, GuiInline, GuiColors, DataSource, Interactive, Figure, HighChart }
 }
 </script>

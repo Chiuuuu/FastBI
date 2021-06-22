@@ -40,7 +40,7 @@
           transform: 'translateZ(0)',
           width: this.transformData.width + 'px',
           height: this.transformData.height + 'px',
-          padding: '10px 0'
+          // padding: '10px 0'
         }
       }
     }

@@ -1952,6 +1952,93 @@ const list = [{
     }]
   },
   {
+    type: 'Figure',
+    title: '添加图形',
+    hovered: false,
+    icon: 'scissor',
+    tabs: [
+      {
+        title: '添加图形',
+        children: [
+          {
+            key: 0,
+            name: 'figure',
+            title: '直线',
+            chartType: 'line',
+            icon: 'icon_addteb.png',
+            modelId: '',
+            config: {
+              title: '直线',
+              noTitle: true, // 默认写死没有标题
+              name: 'figure',
+              style: {
+                backgroundColor: 'transparent',
+                opacity: 1,
+                borderColor: '#fff',
+                borderRadius: 0,
+                borderWidth: 20,
+                borderStyle: 'solid',
+                shadowColor: '#fff',
+                showShadow: false
+              }
+            },
+            api_data: {},
+            apis: {},
+            view: { width: 400, height: 20, x: 760, y: 340, rotate: 0 }
+          },
+          {
+            key: 1,
+            name: 'figure',
+            title: '圆形',
+            chartType: 'circle',
+            icon: 'icon_addteb.png',
+            modelId: '',
+            config: {
+              title: '圆形',
+              noTitle: true, // 默认写死没有标题
+              name: 'figure',
+              style: {
+                backgroundColor: '#fff',
+                opacity: 1,
+                borderColor: '#000',
+                borderRadius: '50%',
+                borderWidth: 1,
+                borderStyle: 'solid'
+              }
+            },
+            api_data: {},
+            apis: {},
+            view: { width: 400, height: 400, x: 760, y: 340, rotate: 0 }
+          },
+          {
+            key: 2,
+            name: 'figure',
+            title: '矩形',
+            chartType: 'rectangle',
+            icon: 'icon_addteb.png',
+            modelId: '',
+            config: {
+              title: '矩形',
+              noTitle: true, // 默认写死没有标题
+              name: 'figure',
+              style: {
+                backgroundColor: '#fff',
+                opacity: 1,
+                borderColor: '#000',
+                borderRadius: 0,
+                borderWidth: 1,
+                borderStyle: 'solid'
+              }
+            },
+            api_data: {},
+            apis: {},
+            view: { width: 400, height: 400, x: 760, y: 340, rotate: 0 }
+          }
+        ]
+      }
+    ]
+  },
+  {
     type: 'Base',
     title: '素材库',
     hovered: false,

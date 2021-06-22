@@ -25,16 +25,18 @@
               style="width:18px;heigth:18px;"
               :src="require(`@/assets/images/chart/${transform.setting.icon}`)"
             />
-            <a-tooltip v-if="transform.setting.config.title.content.length > 7">
-              <template slot="title">{{
-                transform.setting.config.title.content
-              }}</template>
-              {{
-                transform.setting.config.title.content.substring(0, 7) + '...'
-              }}
-            </a-tooltip>
-            <span v-else>{{ transform.setting.config.title.content }}</span>
-            <!-- <span v-else> {{ transform.setting.title }}</span> -->
+            <template v-if="transform.setting.config.title.content">
+              <a-tooltip v-if="transform.setting.config.title.content.length > 7">
+                <template slot="title">{{
+                  transform.setting.config.title.content
+                }}</template>
+                {{
+                  transform.setting.config.title.content.substring(0, 7) + '...'
+                }}
+              </a-tooltip>
+              <span v-else>{{ transform.setting.config.title.content }}</span>
+            </template>
+            <span v-else> {{ transform.setting.title }}</span>
           </div>
           <div v-else flex="main:center" style="padding:5px 0">
             <!-- <a-icon
@@ -73,6 +75,11 @@
               v-if="transform.setting.isEmpty"
               :config="transform.setting.config"
             ></chart-nodata>
+            <!-- 图形 -->
+            <ChartFigure
+              v-else-if="transform.setting.name === 'figure'"
+              :setting="transform.setting"
+            />
             <!--素材库-->
             <ChartMaterial
               v-else-if="transform.setting.name === 'material'"
@@ -183,6 +190,7 @@ import ChartImage from '@/components/tools/Image' // 图片模块
 import ChartTables from '@/components/tools/Tables' // 表格模块
 import ChartNodata from '@/components/tools/Nodata' // 数据丢失
 import ChartMaterial from '@/components/tools/Material' // 素材库
+import ChartFigure from '@/components/tools/Figure' // 素材库
 import SteepBar from '@/components/tools/SteepBar' // 进度条
 // import AMap from '@/components/tools/aMap' // 进度条
 import Screen from '@/views/screen' // 全屏
@@ -266,7 +274,8 @@ export default {
     // 获取素材库
     async getMaterial() {
       let res = await this.$server.screenManage.getMaterialGroupList()
-      this.navigate[2].tabs = res.data
+      const base = this.navigate.find(item => item.type === 'Base')
+      base.tabs = res.data
     },
     // 获取大屏页签
     async getScreenTabs() {
@@ -369,6 +378,7 @@ export default {
     ChartTables,
     ChartNodata,
     ChartMaterial,
+    ChartFigure,
     SteepBar,
     Screen,
     HighCharts,
