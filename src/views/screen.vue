@@ -82,6 +82,12 @@
         </div>
       </div>
     </b-scrollbar>
+    <pation
+      v-if="isScreen"
+      :style="{ opacity: showPageTab ? 1 : 0 }"
+      @mouseenter.native="handleTabShow"
+      @mouseleave.native="handleTabShow"
+    ></pation>
   </div>
 </template>
 
@@ -98,6 +104,7 @@ import ChartNodata from '@/components/tools/Nodata'
 import ChartMaterial from '@/components/tools/Material'
 import ChartFigure from '@/components/tools/Figure'
 import SteepBar from '@/components/tools/SteepBar'
+import Pation from '@/components/board/pation/index' // 分页栏
 // import AMap from '@/components/tools/aMap' // 进度条
 import { Loading } from 'element-ui'
 
@@ -121,16 +128,17 @@ export default {
     ChartMaterial,
     ChartFigure,
     SteepBar,
+    Pation,
     HighCharts
     // AMap
   },
-  props: {},
   data() {
     return {
       wrapStyle: {},
       range: '',
       chartTimer: null,
-      timer: null
+      timer: null,
+      showPageTab: false // 页签显示/隐藏
     }
   },
   computed: {
@@ -139,7 +147,8 @@ export default {
       'pageSettings',
       'screenId',
       'orginPageSettings',
-      'isPublish'
+      'isPublish',
+      'isScreen'
     ]),
     // 画布面板的样式
     canvasPanelStyle() {
@@ -188,6 +197,24 @@ export default {
   },
   methods: {
     ...mapActions(['getScreenDetail', 'refreshScreen']),
+    changeTab(pageId) {
+      let loadingInstance = Loading.service({
+        lock: true,
+        text: '加载中...',
+        target: document.querySelector('.screen-manage')
+      })
+      // 切换页签数据
+      this.getScreenDetail({
+        id: this.screenId,
+        tabId: pageId,
+        needRefresh: true
+      }).then(res => {
+        loadingInstance.close()
+        if (res) {
+          this.setTimer()
+        }
+      })
+    },
     getTableSize(transform) {
       return {
         x: transform.setting.view.width,
@@ -410,6 +437,10 @@ export default {
         // 删除联动数据
         this.$delete(apiData, 'selectData')
       }
+    },
+    // 显示/隐藏页签栏
+    handleTabShow() {
+      this.showPageTab = !this.showPageTab
     }
   }
 }

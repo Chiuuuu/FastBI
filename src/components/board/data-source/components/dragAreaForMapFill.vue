@@ -408,6 +408,7 @@ export default {
       if (res.code === 500 && res.msg === 'IsChanged') {
         selected.setting.isEmpty = true
         this.updateChartData()
+        loadingInstance.close()
         return
       }
       if (res.code === 200) {
@@ -476,6 +477,7 @@ export default {
         this.updateChartData()
       } else {
         this.$message.error(res.msg)
+        loadingInstance.close()
       }
     }
   }

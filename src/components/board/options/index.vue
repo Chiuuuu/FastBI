@@ -213,9 +213,10 @@
             </gui-inline>
           </gui-field>
           
-          <high-chart :HighConfig='currSelected' v-if="currSelected.setting.name==='high-pie'"></high-chart>
-
-          <a-collapse v-model="collapseActive" v-else>
+          <high-chart-pie :HighConfig='currSelected' v-if="currSelected.setting.chartType==='high-pie'"></high-chart-pie>
+          <high-chart-bar :HighConfig='currSelected' v-if="currSelected.setting.chartType==='high-column'"></high-chart-bar>
+          
+          <a-collapse v-model="collapseActive" v-if="currSelected.setting.chartType!=='high-pie'&currSelected.setting.chartType!=='high-column'">
             <!--标题 noTitle图片没有标题-->
             <template v-if="selfConfig.title && !selfConfig.noTitle">
               <a-collapse-panel key="title" :header="isText ? '文本' : '标题'">
@@ -1753,14 +1754,6 @@
                         >
                       </a-select>
                     </gui-field> -->
-                    <gui-field label="显示标签">
-                      <a-switch
-                        v-model="selfConfig.series[targetMeasure].label.show"
-                        default-checked
-                        size="small"
-                        @change="switchChange"
-                      />
-                    </gui-field>
                     <gui-field
                       label="文本样式"
                       v-if="selfConfig.series[targetMeasure].label.show"
@@ -2353,7 +2346,8 @@ import Figure from './figure'
 import { DEFAULT_COLORS } from '../../../utils/defaultColors'
 import { deepClone } from '../../../utils/deepClone'
 import throttle from 'lodash/throttle';
-import HighChart from '@/components/board/options/highchart'
+import HighChartPie from '@/components/board/options/highchart-pie';
+import HighChartBar from '@/components/board/options/highchart-bar';
 
 export default {
   name: 'BoardOptions',
@@ -2368,8 +2362,8 @@ export default {
       // 地图删除维度的时候调用，重置样式指标设置选择的度量
       initTargetMeasure: () => {
         this.targetMeasure = this.selfConfig.series.filter(
-              item => item.type === 'map'
-            ).length
+          item => item.type === 'map'
+        ).length
       }
     }
   },
@@ -2430,7 +2424,7 @@ export default {
         { label: 'digital-7-4', value: 'digital-7-4' }
       ],
       scatterList: [], // 地图里散点图配置列表
-      targetMeasure: 0 // 地图指标设置对应度量
+      targetMeasure: 0, // 地图指标设置对应度量
     }
   },
   mounted() {
@@ -2767,7 +2761,7 @@ export default {
         leading: true,
         trailing: false
       }
-    )
+    ),
   },
   watch: {
     currSelected: {
@@ -2784,10 +2778,10 @@ export default {
               this.scatterList = this.selfConfig.series.filter(
                 item => item.type === 'scatter'
               )
+              this.targetMeasure = this.selfConfig.series.filter(
+                item => item.type === 'map'
+              ).length
             }
-            this.targetMeasure = this.selfConfig.series.filter(
-              item => item.type === 'map'
-            )
           }
           if (val.setting.api_data) {
             this.apiData = deepClone(val.setting.api_data)
@@ -2907,6 +2901,6 @@ export default {
       )
     }
   },
-  components: { GuiField, GuiInline, GuiColors, DataSource, Interactive, Figure, HighChart }
+  components: { GuiField, GuiInline, GuiColors, DataSource, Interactive,Figure,HighChartPie,HighChartBar }
 }
 </script>
