@@ -4,12 +4,13 @@
       @mousedown="removeSelection"
       @dblclick="focusCurrent"
       :contenteditable="editable"
-      data-placeholder="请输入内容,输入*插入度量"
+      data-placeholder="双击输入内容,输入*插入度量"
       :class="[
         'editor-text',
         { 'editor-text-placholder': isShowPlaceHolder },
         { 'cursor-text': editable }
       ]"
+      :style="contentStyle"
       ref="editorText"
     ></div>
   </div>
@@ -31,7 +32,7 @@ const aggregatorMap = {
   最小值: 'MIN',
   统计: 'CNT'
 }
-const reg = /<span class="edit-alias" contenteditable="false">(.*?)\(.*?\)(&nbsp;){3}<\/span>/g // 字符串替换模板
+const reg =/<span class="edit-alias" contenteditable="false">(.*?)<\/span>/g // /<span class="edit-alias" contenteditable="false">(.*?)\(.*?\)(&nbsp;){3}<\/span>/g // 字符串替换模板
 export default {
   name: 'mediumEidtor',
   props: {
@@ -252,18 +253,18 @@ export default {
       // 显示切换富文本
       this.$refs.editorText.innerHTML = this.htmlText
       // 富文本度量添加点击事件
-      let spanList = document.querySelectorAll('.edit-alias')
-      spanList.forEach(span => {
-        span.addEventListener('click', this.clickMeasure)
-        // 验证度量更改
-        // 去掉空格
-        let alias = span.innerHTML.replace(/&nbsp;/gi, '')
-        let measure = this.modelMeasures.find(item => item.alias === alias)
-        // 度量不存在飘红
-        if (measure.status === 1) {
-          span.style.color = 'red'
-        }
-      })
+      //   let spanList = document.querySelectorAll('.edit-alias')
+      //   spanList.forEach(span => {
+      //     span.addEventListener('click', this.clickMeasure)
+      //     // 验证度量更改
+      //     // 去掉空格
+      //     let alias = span.innerHTML.replace(/&nbsp;/gi, '')
+      //     let measure = this.modelMeasures.find(item => item.alias === alias)
+      //     // 度量不存在飘红
+      //     if (measure.status === 1) {
+      //       span.style.color = 'red'
+      //     }
+      //   })
       // 防止拖动
       this.$refs.textBox.onmousedown = e => {
         e.stopPropagation()
@@ -329,9 +330,9 @@ export default {
       const span = document.createElement('span')
       span.className = 'edit-alias'
       span.contentEditable = false
-      span.innerHTML = `${arg}(求和)&nbsp;&nbsp;&nbsp;` // 给下拉三角样式留空
+      span.innerHTML = `${arg}` //  `${arg}(求和)&nbsp;&nbsp;&nbsp;` // 给下拉三角样式留空
       // 添加点击事件
-      span.onclick = this.clickMeasure
+      // span.onclick = this.clickMeasure
       return span
     },
     // 插入度量数据
@@ -392,19 +393,19 @@ export default {
     },
     // 添加度量数据
     getMeasureDatas() {
-      let reg = /<span class="edit-alias" contenteditable="false">(.*?)(&nbsp;){3}<\/span>/g
+      let reg = /<span class="edit-alias" contenteditable="false">.*?<\/span>/g // /<span class="edit-alias" contenteditable="false">(.*?)(&nbsp;){3}<\/span>/g
       let measures = []
       let matchList = this.htmlText.match(reg)
       if (matchList) {
         for (let matchStr of matchList) {
-          let aliasArr = matchStr.match(/>(.*?)\((.*?)\)(&nbsp;){3}</)
+          let aliasArr = matchStr.match(/>(.*?)</)// />(.*?)\((.*?)\)(&nbsp;){3}</
           let alias = aliasArr[1]
           // 验重
           if (!measures.some(item => item.alias === alias)) {
             // 添加度量到图表数据
             let measure = this.modelMeasures.find(item => item.alias === alias)
             // 添加聚合方式值
-            measure.defaultAggregator = aggregatorMap[aliasArr[2]]
+            // measure.defaultAggregator = aggregatorMap[aliasArr[2]]
             measures.push(measure)
           }
         }
@@ -495,25 +496,25 @@ export default {
 .edit-alias {
   position: relative;
   display: inline-block;
-  cursor: pointer;
+  //   cursor: pointer;
   border: 1px solid grey;
-  &:after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 2px;
-    width: 0;
-    height: 0;
-    margin: auto 0;
-    border: 8px solid;
-    border-bottom-width: 0;
-    border-bottom-color: transparent;
-    border-left-color: transparent;
-    border-right-color: transparent;
-    color: grey;
-    cursor: pointer;
-  }
+  //   &:after {
+  //     content: '';
+  //     position: absolute;
+  //     top: 0;
+  //     bottom: 0;
+  //     right: 2px;
+  //     width: 0;
+  //     height: 0;
+  //     margin: auto 0;
+  //     border: 8px solid;
+  //     border-bottom-width: 0;
+  //     border-bottom-color: transparent;
+  //     border-left-color: transparent;
+  //     border-right-color: transparent;
+  //     color: grey;
+  //     cursor: pointer;
+  //   }
 }
 </style>
 <style lang="less" scoped>
@@ -532,6 +533,8 @@ export default {
     &:after {
       content: attr(data-placeholder) !important;
       position: absolute;
+      font-size: 20px;
+      color: white;
       top: 5px;
       left: 5px;
     }
