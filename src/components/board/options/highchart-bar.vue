@@ -203,6 +203,21 @@
           clearable
         ></a-switch>
       </gui-field>
+      <gui-field label="主题类型">
+        <a-select
+          v-model="chooseTheme"
+          style="width: 164px"
+          size="small"
+          @change="getThemeColor"
+        >
+          <a-select-option
+            :value="theme.colors"
+            v-for="(theme, index) in themes"
+            :key="index"
+            >{{ theme.title }}</a-select-option
+          >
+        </a-select>
+      </gui-field>
     </a-collapse-panel>
 
     <a-collapse-panel key="legend" header="图例设置">
@@ -348,9 +363,7 @@
         >
           <a-radio-button
             value="middle"
-            @click.native.stop="
-              getBtnRadio('xAxis', 'middle')
-            "
+            @click.native.stop="getBtnRadio('xAxis', 'middle')"
             >中部</a-radio-button
           >
           <a-radio-button
@@ -445,9 +458,7 @@
         >
           <a-radio-button
             value="middle"
-            @click.native.stop="
-              getBtnRadio('xAxis', 'middle')
-            "
+            @click.native.stop="getBtnRadio('xAxis', 'middle')"
             >中部</a-radio-button
           >
           <a-radio-button
@@ -655,10 +666,10 @@ export default {
       }
       this.setSelfProperty()
     },
-    getBtnRadio(key,val){
-        this.$set(this.HighConfig.setting.config[key].title, 'align', val);
-        this.setSelfProperty()
-    }
+    getBtnRadio(key, val) {
+      this.$set(this.HighConfig.setting.config[key].title, 'align', val)
+      this.setSelfProperty()
+    },
     // // 点击显示/隐藏
     // switchChange(checked, event) {
     //   // 阻止默认事件，取消收起

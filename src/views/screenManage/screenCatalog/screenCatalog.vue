@@ -10,8 +10,11 @@
         >
           <a-icon type="plus-square" class="menu_icon" />
           <a-menu slot="overlay" class="drow_menu">
+            <a-menu-item @click="choose=true">
+              选择大屏模版
+            </a-menu-item>
             <a-menu-item v-on:click="addScreen" v-if="hasPermissionSourceAdd">
-              新建大屏
+              新建空白大屏
             </a-menu-item>
             <a-menu-item
               v-if="hasPermissionFolderAdd"
@@ -269,6 +272,22 @@
       @cancel="hideFolder"
       @create="creatFolder"
     ></new-folder>
+
+    <!-- 选择大屏模版 -->
+    <a-drawer
+      title="选择大屏模版"
+      placement="bottom"
+      :closable="false"
+      :visible="choose"
+      @close="choose=false"
+    >
+      <p>Some contents...</p>
+      <p>Some contents...</p>
+      <p>Some contents...</p>
+    </a-drawer>
+    <!-- <a-modal v-model="choose" title="选择大屏模版" @ok="getChooseOk">
+      333
+    </a-modal> -->
   </div>
 </template>
 
@@ -371,7 +390,8 @@ export default {
         }
       ],
       searchName: '', // 搜索名称
-      componentKey: 0 // 通过改变key实现子组件强制更新,数值在0,1之间变化
+      componentKey: 0, // 通过改变key实现子组件强制更新,数值在0,1之间变化
+      choose:false,
     }
   },
   watch: {
@@ -948,7 +968,8 @@ export default {
           }
         }
       })
-    }
+    },
+    getChooseOk(e){}
   },
   // 跳出大屏模块清除screenId
   beforeRouteLeave(to, from, next) {

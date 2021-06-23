@@ -217,9 +217,15 @@ export default {
       }
       dataFile.showMore = false // 是否点击显示更多
       if (this.type === 'dimensions' && this.dragFile === this.type) {
-        // 嵌套饼图可以有多个维度
+        // 嵌套饼图可以有多个维度（最多只能2个）
         if (this.currSelected.setting.chartType === 'v-multiPie') {
-          this.fileList.push(dataFile)
+          if(this.fileList.length<2){
+            this.fileList.push(dataFile)
+          }
+          if(this.fileList.length==2){
+            this.fileList.splice(1,1,dataFile);
+          }
+          
         } else {
           // 维度暂时只能拉入一个字段
           this.fileList[0] = dataFile
@@ -233,8 +239,8 @@ export default {
         this.dragFile === this.type &&
         this.chartType === '1'
       ) {
-        // 饼图类型只能拉入一个度量
-        if (this.currSelected.setting.name === 've-pie') {
+        // 饼图类型只能拉入一个度量（包含3d）
+        if (this.currSelected.setting.name === 've-pie'|this.currSelected.setting.chartType==='high-pie') {
           this.fileList[0] = dataFile
         } else if (this.currSelected.setting.name === 've-map') {
           // 地图类型暂时只能拉入一个度量

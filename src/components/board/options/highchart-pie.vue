@@ -120,6 +120,21 @@
           @change="setSelfProperty"
         ></a-input>
       </gui-field>
+      <gui-field label="主题类型">
+        <a-select
+          v-model="chooseTheme"
+          style="width: 164px"
+          size="small"
+          @change="getThemeColor"
+        >
+          <a-select-option
+            :value="theme.colors"
+            v-for="(theme, index) in themes"
+            :key="index"
+            >{{ theme.title }}</a-select-option
+          >
+        </a-select>
+      </gui-field>
     </a-collapse-panel>
     <a-collapse-panel key="legend" header="图例设置">
       <a-switch
@@ -221,18 +236,6 @@
             >
           </a-radio-group>
         </gui-inline>
-      </gui-field>
-      <gui-field label="主题">
-        <a-select
-          v-model="HighConfig.setting.config.colors"
-          style="width: 164px"
-          size="small"
-          @change="setSelfProperty"
-        >
-          <a-select-option value="normal">正常</a-select-option>
-          <a-select-option value="bolder">加粗</a-select-option>
-          <a-select-option value="lighter">更细</a-select-option>
-        </a-select>
       </gui-field>
     </a-collapse-panel>
 
