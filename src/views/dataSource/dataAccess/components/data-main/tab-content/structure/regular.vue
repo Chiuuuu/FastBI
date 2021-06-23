@@ -197,6 +197,10 @@ export default {
       type: Boolean,
       default: false
     },
+    isCheck: {
+      type: Boolean,
+      default: false
+    },
     hasChangeData: {
       // 字段有变动的表
       type: Boolean,

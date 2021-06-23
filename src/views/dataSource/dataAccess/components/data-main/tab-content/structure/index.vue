@@ -224,6 +224,7 @@ export default {
       database: '', // 当前数据库名
       databaseId: '', // 当前数据库id
       verifying: false,
+      isCheckRegular: false, // 是否为查看状态(定时任务详情)
       regData: [], // 定时任务详情
       largeDataList: [], // 所选表是否含有大量数据
       hasChangeData: false, // 所选表是否有字段变动
@@ -659,6 +660,7 @@ export default {
       this.regData = []
       this.largeDataList = []
       this.hasChangeData = false
+      this.isCheckRegular = false
     },
     // 关闭定时任务列表窗口
     closeRegularList() {
@@ -684,6 +686,7 @@ export default {
           return code
         } else {
           this.regData = res.data
+          this.isCheckRegular = true
         }
       } else {
         this.$message.error(res.msg)
