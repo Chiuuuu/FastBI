@@ -4,7 +4,6 @@ import guangzhou from '../utils/guangdong.json'
 function chartClick(e) {
   console.log(e)
 }
-
 /**
  * type = 1 维度度量都需要的图表
  * type = 2 只有度量的图表(仪表盘、环形图)
@@ -1294,6 +1293,247 @@ const list = [
                 },
                 center: ['50%', '50%'] // 饼图可选
               },
+              color: DEFAULT_COLORS
+            },
+            chartEvents: {
+              click: chartClick
+            },
+            view: { width: 400, height: 400, x: 760, y: 340 }
+          },
+          {
+            title: '散点图',
+            name: 've-scatter',
+            chartType: 'v-scatter',
+            icon: 'icon_pie_chart.png',
+            type: '1',
+            modelId: '',
+            isEmpty: false,
+            api_data: {
+              dimensions: [],
+              measures: [],
+              source: {},
+              columns: [
+                // 'x','y','日期'
+              ],
+              rows: [
+                // { 日期: '1/1', x: 1393, y: 1093 },
+                // { 日期: '1/2', x: 3530, y: 3230 },
+                // { 日期: '1/3', x: 2923, y: 2623 },
+                // { 日期: '1/4', x: 1723, y: 1423 },
+                // { 日期: '1/5', x: 3792, y: 3492 },
+                // { 日期: '1/6', x: 4593, y: 4293 }
+              ],
+              options: {},
+            },
+            apis: {
+              // level: [['1/1', '1/2', '1/3'], ['1/4', '1/5']],
+              labelMap: {
+                x: '值',
+                y: '值',
+                s: '类目'
+              },
+              radius: 100,
+              scatterColor:'',//散点颜色
+              scatterSize:'',//散点大小
+              scatterLabel:[],//指标-显示内容
+              arrange:'horizontal',//指标-排列 horizontal水平  vertical垂直
+            },
+            background: {
+              backgroundType: '1',
+              backgroundColor: '',
+              borderColor: '',
+              borderWidth: 0,
+              borderStyle: '',
+              borderRadius: 0
+            },
+            config: {
+              title: {
+                show: true,
+                content: '散点图',
+                textAlign: 'left',
+                textStyle: {
+                  color: '#ffffff',
+                  fontSize: 20,
+                  fontFamily: 'not specified',
+                  fontWeight: 'normal'
+                }
+              },
+              tooltip: {
+                show: true ,
+                trigger: 'item',
+                confine: true,
+                // formatter: '{c5}：{c2}'+'<br/>'+'{c3}：{c0[1]}'+'<br/>'+'{c4}：{c1}'+'<br/>'
+              },
+              grid: { left: 50, top: 60, right: 50, bottom: 50 },
+              legend: {
+                // show: false,
+                orient: 'horizontal',
+                textStyle: {
+                  color: '#ffffff',
+                  fontSize: 12
+                },
+                itemGap: 12,
+                icon: '',
+                left: 'center',
+                top: 'auto',
+                right: 'auto',
+                bottom: 'auto',
+              },
+              xAxis: {
+                type: 'value',
+                name: '',
+                nameLocation: 'middle',
+                nameGap: 20,
+                nameTextStyle: {
+                  color: '#fff',
+                  fontSize: '12',
+                  align: 'right',
+                  padding: [30, 0, 0, 0]
+                },
+                axisLabel: {
+                  color: '#ffffff',
+                  fontSize: 12,
+                  rotate: 0
+                },
+                axisLine: {
+                  show: true,
+                  lineStyle: {
+                    color: '#fff'
+                  }
+                },
+                splitLine: {
+                  show: false,
+                  lineStyle: {
+                    type: 'solid',
+                    color: '#fff'
+                  }
+                },
+                axisTick: {
+                  show: true
+                }
+              },
+              yAxis: {
+                type: 'value',
+                name: '',
+                position: 'left',
+                nameLocation: 'middle',
+                nameTextStyle: {
+                  color: '#fff',
+                  fontSize: 12,
+                  padding: [0, 0, 40, 0]
+                },
+                axisLabel: {
+                  color: '#ffffff',
+                  fontSize: 12
+                },
+                axisLine: {
+                  show: false,
+                  lineStyle: {
+                    color: '#fff'
+                  }
+                },
+                splitLine: {
+                  show: false,
+                  lineStyle: {
+                    type: 'solid',
+                    color: '#fff'
+                  }
+                },
+                axisTick: {
+                  show: false
+                }
+              },
+              // dataset: [
+              //   {
+              //     dimensions: [
+              //       'x',
+              //       'y',
+              //       '地区',
+              //     ],
+              //     source: [
+              //       [399,428,'广州1','x','y','地区'],
+              //       [299,100,'广州2','x','y','地区'],
+              //       [500,884,'广州3','x','y','地区'],
+              //       [199,228,'广州1','x','y','地区'],
+              //       [149,100,'广州2','x','y','地区'],
+              //       [100,284,'广州3','x','y','地区'],
+              //     ]
+              //   },{
+              //     transform: {
+              //       type: 'filter',
+              //       print: true,
+              //       config: {
+              //         // clusterCount: 3,
+              //         // outputType: 'single',
+              //         dimension:2,
+              //         value:'广州2'
+              //       }
+              //     }
+              //   }
+              // ],
+              series: 
+                {
+                  name:'',
+                  type:'scatter',
+                  label: {
+                    show: false,
+                    color: '',
+                    fontSize: 12,
+                    position: 'outside', // 可选inside
+                    align:'left',
+                    offset:[-10,0]
+                  },
+                  dimensions: [
+                    'x',
+                    'y',
+                    '地区',
+                  ],
+                  encode: {
+                    tooltip: [2,0,1],// 表示维度 2,0,1 会在 tooltip 中显示。
+                  },
+                  data:[
+                    {
+                      name:'',
+                      value:[1000,1000,'广州1','x','y','地区'],
+                    },
+                    [399,428,'广州1','x','y','地区'],
+                    [299,100,'广州1','x','y','地区'],
+                    [500,884,'广州1','x','y','地区'],
+                    [199,228,'广州1','x','y','地区'],
+                    [149,100,'广州1','x','y','地区'],
+                    [100,284,'广州1','x','y','地区'],
+                  ],
+                  // data:[
+                  //   // {name:'广州1',value:[399,428]},
+                  //   // {name:'广州2',value:[299,100]},
+                  //   // {name:'广州3',value:[500,884]},
+                  //   // {name:'广州1',value:[199,228]},
+                  //   // {name:'广州2',value:[149,100]},
+                  //   // {name:'广州3',value:[100,284]},
+                  //   // 后三个分别是前三个值对应的别名
+                  //   // {
+                  //   //   name:'',
+                  //   //   value:[399,428,'广州1'],
+                  //   //   aliasX:'x', //度量 -- x轴别名
+                  //   //   aliasY:'y', //度量 -- y轴别名
+                  //   //   aliasD:'地区',//维度 -- 别名
+                  //   // },
+                  //   {
+                  //     name:'',
+                  //     value:[500,884,'广州2'],
+                  //     aliasX:'x', //度量 -- x轴别名
+                  //     aliasY:'y', //度量 -- y轴别名
+                  //     aliasD:'地区',//维度 -- 别名
+                  //   },
+                  //   // [399,428,'广州1','x','y','地区'],
+                  //   // [299,100,'广州2','x','y','地区'],
+                  //   // [500,884,'广州3','x','y','地区'],
+                  //   // [199,228,'广州1','x','y','地区'],
+                  //   // [149,100,'广州2','x','y','地区'],
+                  //   // [100,284,'广州3','x','y','地区'],
+  
+                  // ]
+                },
               color: DEFAULT_COLORS
             },
             chartEvents: {

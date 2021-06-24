@@ -399,7 +399,7 @@
                     @change="setSelfProperty"
                   ></a-input-number>
                 </gui-field>
-                <gui-field label="展示数值">
+                <gui-field label="展示数值" v-if="!isScatter">
                   <a-switch
                     v-model="selfConfig.series.label.show"
                     size="small"
@@ -437,7 +437,7 @@
                     </a-radio-group>
                   </gui-inline>
                 </gui-field>
-                <gui-field label="文本">
+                <gui-field label="文本" v-if="!isScatter">
                   <gui-inline label="字号">
                     <a-input-number
                       class="longwidth"
@@ -502,10 +502,203 @@
                     ></a-switch>
                   </gui-field>
                 </div>
-
+                <!-- 散点图 -->
+                <div v-if="isScatter">
+                  <gui-field label="散点颜色">
+                    <a-select
+                      v-model="apis.scatterSize"
+                      style="width: 164px"
+                      size="small"
+                      @change="scatterColorChange"
+                    >
+                      <a-select-option
+                        :value="font.value"
+                        v-for="(font, index) in scatterColorList"
+                        :key="index"
+                        >{{ font.label }}</a-select-option
+                      >
+                    </a-select>
+                  </gui-field>
+                  <gui-field label="散点大小">
+                    <a-select
+                      v-model="apis.scatterSize"
+                      style="width: 164px"
+                      size="small"
+                      @change="scatterSizeChange"
+                    >
+                      <a-select-option
+                        :value="font.value"
+                        v-for="(font, index) in scatterSizeList"
+                        :key="index"
+                        >{{ font.label }}</a-select-option
+                      >
+                    </a-select>
+                  </gui-field>
+                </div>
                 <!-- <gui-field label="混合状图" v-if="isHistogram && selfConfig.mixed">
                     <a-switch v-model="selfConfig.mixed" size="small" @change="setHistogram($event, 'mixed')"></a-switch>
                 </gui-field>-->
+              </a-collapse-panel>
+            </template>
+            <!-- 散点图独有 -->
+            <template>
+              <a-collapse-panel
+                key="indicator"
+                header="指标设置"
+                v-if="isScatter"
+              >
+                <a-switch
+                  slot="extra"
+                  v-if="collapseActive.indexOf('indicator') > -1"
+                  v-model="selfConfig.series.label.show"
+                  default-checked
+                  @change="switchChange"
+                  size="small"
+                />
+                指标颜色
+                <div>
+                  <!-- 指标颜色 -->
+                  <a-radio-group
+                    :value="selfConfig.series.label.position"
+                    size="small"
+                  >
+                    <a-radio
+                      value="inside"
+                      @click.native.stop="
+                        onRadioChange(
+                          $event,
+                          selfConfig.series.label,
+                          'position'
+                        )
+                      "
+                      >使用图例</a-radio
+                    >
+                    <a-radio
+                      value="outside"
+                      @click.native.stop="
+                        onRadioChange(
+                          $event,
+                          selfConfig.series.label,
+                          'position'
+                        )
+                      "
+                      >自定义</a-radio
+                    >
+                  </a-radio-group>
+                  <el-color-picker
+                    v-model="selfConfig.series.label.color"
+                    @change="setSelfProperty"
+                  ></el-color-picker>
+                </div>
+                <gui-field label="文本">
+                  <gui-inline label="字号">
+                    <a-input-number
+                      class="longwidth"
+                      v-model="selfConfig.series.label.fontSize"
+                      style="width: 70px"
+                      size="small"
+                      :min="12"
+                      :max="40"
+                      @change="setSelfProperty"
+                    ></a-input-number>
+                  </gui-inline>
+                  <gui-inline label="字体">
+                    <!-- <el-color-picker
+                      v-model="selfConfig.series.label.color"
+                      @change="setSelfProperty"
+                    ></el-color-picker> -->
+                    <a-select
+                      v-model="selfConfig.title.textStyle.fontFamily"
+                      style="width: 100px"
+                      size="small"
+                      @change="setSelfProperty"
+                    >
+                      <a-select-option
+                        :value="font.value"
+                        v-for="(font, index) in fontFamilyList"
+                        :key="index"
+                        >{{ font.label }}</a-select-option
+                      >
+                    </a-select>
+                  </gui-inline>
+                </gui-field>
+                <!-- <gui-field label="字体">
+                  <a-select
+                    v-model="selfConfig.title.textStyle.fontFamily"
+                    style="width: 164px"
+                    size="small"
+                    @change="setSelfProperty"
+                  >
+                    <a-select-option
+                      :value="font.value"
+                      v-for="(font, index) in fontFamilyList"
+                      :key="index"
+                      >{{ font.label }}</a-select-option
+                    >
+                  </a-select>
+                </gui-field> -->
+                <!-- <gui-field label="显示内容"> -->
+                显示内容
+                <a-select
+                  mode="tags"
+                  v-model="apis.scatterLabel"
+                  placeholder="选择显示内容"
+                  style="width: 100%"
+                  @change="onChange"
+                >
+                  <a-select-option
+                    v-for="i in scatterFormatList"
+                    :key="i.label"
+                    :value="i.value"
+                  >
+                    {{ i.label }}
+                  </a-select-option>
+                </a-select>
+                
+                <gui-field label="显示位置">
+                  <a-radio-group
+                    :value="selfConfig.series.label.position"
+                    size="small"
+                  >
+                    <a-radio-button
+                      value="top"
+                      @click.native.stop="
+                        onRadioChange(
+                          $event,
+                          selfConfig.series.label,
+                          'position'
+                        )
+                      "
+                      >顶部</a-radio-button
+                    >
+                    <a-radio-button
+                      value="bottom"
+                      @click.native.stop="
+                        onRadioChange(
+                          $event,
+                          selfConfig.series.label,
+                          'position'
+                        )
+                      "
+                      >底部</a-radio-button
+                    >
+                  </a-radio-group>
+                </gui-field>
+                <gui-field label="排列">
+                  <a-radio-group
+                    :value="apis.arrange"
+                    size="small"
+                  >
+                    <a-radio-button 
+                      value="vertical"
+                      @click.native.stop="scatterArrangeChange($event)"
+                    >垂直</a-radio-button>
+                    <a-radio-button
+                      value="horizontal"
+                      @click.native.stop="scatterArrangeChange($event)"
+                    >水平</a-radio-button>
+                  </a-radio-group>
+                </gui-field>
               </a-collapse-panel>
             </template>
             <!-- 饼图独有 -->
@@ -2499,7 +2692,23 @@ export default {
         { label: '优设标题黑', value: 'youshe' },
         { label: 'digital-7-4', value: 'digital-7-4' }
       ],
-      targetMeasure: 0 // 地图指标设置对应度量
+      targetMeasure: 0, // 地图指标设置对应度量
+      scatterColorList:[ //散点颜色
+        { label: '单色', value: '' },
+        { label: '按维度', value: '1' },
+      ],
+      scatterSizeList:[ //散点大小
+        { label: '无', value: '' },
+        { label: '按度量1', value: '0' },
+        { label: '按度量2', value: '1' },
+      ],
+      scatterFormatList: [
+        { label: '无', value: '{@5}' },
+        { label: '维度1', value: '{@5}：{@2}' },
+        { label: '度量1', value: '{@3}：{@0}' },
+        { label: '度量2', value: '{@4}：{@1}' },
+        { label: '度量组', value: '({@0},{@1})' },
+      ],
     }
   },
   mounted() {
@@ -2540,7 +2749,17 @@ export default {
       this.updateChartData()
     },
     onChange(checkedValues) {
-      this.selfConfig.series.label.formatter = checkedValues.join('')
+      if(this.isScatter){
+        // 散点图
+        if(this.apis.arrange == 'horizontal'){
+          this.selfConfig.series.label.formatter = checkedValues.join(' ')
+        }else{
+          this.selfConfig.series.label.formatter = checkedValues.join('\n\r')
+        }
+        this.setApis();
+      }else{
+        this.selfConfig.series.label.formatter = checkedValues.join('')
+      }
       this.setSelfProperty()
     },
     changeAreaColor(color) {
@@ -2823,6 +3042,46 @@ export default {
         }, count)
       }
     },
+    // 散点图 -- 散点图大小设置
+    scatterColorChange(val){
+      // if(val === ''){
+      //   delete this.selfConfig.series.symbolSize;
+      // }else{
+      //   this.selfConfig.series.symbolSize = function (data) {
+      //     return Math.sqrt(data[val]) / 5e2 * 1000;
+      //   }
+      // }
+      this.setApis();
+      this.setSelfProperty();
+    },
+    // 散点图 -- 散点图大小设置
+    scatterSizeChange(val){
+      if(val === ''){
+        delete this.selfConfig.series.symbolSize;
+      }else{
+        this.selfConfig.series.symbolSize = function (data) {
+          return Math.sqrt(data[val]) / 5e2 * 1000;
+        }
+      }
+      this.setApis();
+      this.setSelfProperty();
+    },
+    //散点图 -- 指标排序
+    scatterArrangeChange(e){
+      let val = e.target.value;
+      // if(!val){ return; }
+      if(val){
+        if(val == 'horizontal'){
+        this.selfConfig.series.label.formatter = this.apis.scatterLabel.join(' ')
+      }else{
+        this.selfConfig.series.label.formatter = this.apis.scatterLabel.join('\n\r')
+      }
+      this.apis.arrange = val;
+      this.setApis();
+      this.setSelfProperty();
+      }
+      
+    },
     // 刷新大屏
     refreshData: throttle(
       function() {
@@ -2841,6 +3100,7 @@ export default {
   watch: {
     currSelected: {
       handler(val) {
+        console.log(val,'val')
         if (val) {
           if (val.setting.name === 've-image') {
             this.tabsType = 0
@@ -2951,19 +3211,22 @@ export default {
     isSteepBar() {
       return this.chartType === 'steepBar'
     },
+    isScatter(){
+      return this.chartType === 'v-scatter'
+    },
     showGrid() {
       return (
-        this.selfConfig.grid && (this.isLine || this.isHistogram || this.isBar)
+        this.selfConfig.grid && (this.isLine || this.isHistogram || this.isBar || this.isScatter)
       )
     },
     showXAxis() {
       return (
-        this.selfConfig.xAxis && (this.isLine || this.isHistogram || this.isBar)
+        this.selfConfig.xAxis && (this.isLine || this.isHistogram || this.isBar || this.isScatter)
       )
     },
     showYAxis() {
       return (
-        this.selfConfig.yAxis && (this.isLine || this.isHistogram || this.isBar)
+        this.selfConfig.yAxis && (this.isLine || this.isHistogram || this.isBar || this.isScatter)
       )
     }
   },

@@ -235,7 +235,10 @@ export default {
         // 饼图类型只能拉入一个度量
         if (this.currSelected.setting.name === 've-pie') {
           this.fileList[0] = dataFile
-        } else if (this.currSelected.setting.name === 've-map') {
+        }else if (this.currSelected.setting.name === 've-scatter' && this.fileList.length>=2) {
+          // 散点图只能拉入两个度量
+          this.fileList[1] = dataFile
+        }else if (this.currSelected.setting.name === 've-map') {
           // 地图类型暂时只能拉入一个度量
           this.fileList[0] = dataFile
         } else {
@@ -449,9 +452,13 @@ export default {
           return
         }
       }
-
       let params = selected
       let apiData = deepClone(this.currSelected.setting.api_data)
+      // 散点图，拖入一个维度和两个度量时才请求数据
+      if(this.currSelected.setting.chartType == 'v-scatter' && (apiData.dimensions.length == 0 || apiData.measures.length <= 1 ) ){
+        return;
+      }
+
       let res = ''
       if (
         (apiData.measures[0] && apiData.measures[0].resourceType === 8) ||
@@ -585,6 +592,7 @@ export default {
               config.series.max = goalTotal
               this.$store.dispatch('SetSelfProperty', config)
             }
+            
             this.updateChartData()
             return
           }
@@ -638,11 +646,42 @@ export default {
             })
           }
 
-          apiData.source = {
-            columns,
-            rows
+          // 散点图，两个度量分别是x，y轴的值
+          if(this.currSelected.setting.chartType === 'v-scatter'){
+            let scatterData = [];
+            rows.forEach(item=>{
+              // scatterData.push({
+              //   name:item[columns[0]],
+              //   value:[ item[columns[1]],item[columns[2]] ]
+              // })
+              scatterData.push( 
+                {
+                  name:'',
+                  value:[ 
+                    item[columns[1]], //度量1
+                    item[columns[2]], //度量2
+                    item[columns[0]], //维度
+                    columns[1],
+                    columns[2],
+                    columns[0],
+                  ]
+                }
+              )
+            })
+            let config = deepClone(this.currSelected.setting.config)
+            config.series.data = scatterData;
+            config.series.dimensions = [columns[1], columns[2], columns[0]]
+            this.$store.dispatch('SetSelfProperty', config)
           }
-          this.$store.dispatch('SetSelfDataSource', apiData)
+
+          if(this.currSelected.setting.chartType !== 'v-scatter'){
+            apiData.source = {
+              columns,
+              rows
+            }
+            this.$store.dispatch('SetSelfDataSource', apiData)
+          }
+          
         }
         this.updateChartData()
       } else {
