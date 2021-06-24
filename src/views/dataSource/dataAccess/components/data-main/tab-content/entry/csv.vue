@@ -645,9 +645,14 @@ export default {
         if (pass) {
           this.loading = true
           const formData = new FormData()
+          let maxSize = 0
           this.fileList.forEach((file, index) => {
             formData.append('csvDatabaseList[' + index + '].file', file)
+            maxSize += file.size
           })
+          if (maxSize > 50 * 1024 * 1024) {
+            return this.$message.error('单次保存文件总量需小于50M')
+          }
           formData.append('databaseName', this.databaseName)
           formData.append('delimiter', this.queryDelimiter)
           formData.append('name', this.form.name)

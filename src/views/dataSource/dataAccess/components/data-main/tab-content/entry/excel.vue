@@ -730,9 +730,14 @@ export default {
         if (pass) {
           this.loading = true
           const formData = new FormData()
+          let maxSize = 0
           this.fileList.map((file, index) => {
             formData.append('excelFileList[' + index + ']', file)
+            maxSize += file.size
           })
+          if (maxSize > 9 * 1024 * 1024) {
+            return this.$message.error('单次保存文件总量需小于9M')
+          }
           formData.append('databaseName', this.databaseName)
           formData.append('sourceDatasource.name', this.form.name)
           formData.append('sourceDatasource.type', 11)
