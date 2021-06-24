@@ -49,7 +49,9 @@ const getters = {
 
   isPublish: state => state.app.isPublish,
 
-  modelMeasures: state => state.options.modelMeasures // 当前度量列表
+  modelMeasures: state => state.options.modelMeasures, // 当前度量列表
+
+  currentPageId: state => state.app.currentPageId // 当前度量列表
 }
 
 export default getters

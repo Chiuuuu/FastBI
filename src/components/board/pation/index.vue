@@ -14,7 +14,7 @@
           :class="[
             'page',
             {
-              'current-select': $route.query.tabId === page.id
+              'current-select': currentPageId === page.id
             }
           ]"
           draggable
@@ -46,7 +46,12 @@
         </a-menu>
       </a-dropdown>
     </div>
-    <a-icon class="page-icon" @click="addPage" type="plus-square" />
+    <a-icon
+      v-if="canEdit"
+      class="page-icon"
+      @click="addPage"
+      type="plus-square"
+    />
   </div>
 </template>
 
@@ -58,6 +63,13 @@ import {
 import { mapActions, mapGetters } from 'vuex'
 
 export default {
+  props: {
+    canEdit: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
+  },
   data() {
     return {
       showName: '',
@@ -69,17 +81,22 @@ export default {
     // 页签跳转
     toOtherPage(id) {
       // 当前页已经选中不需要跳转
-      if (id === this.$route.query.tabId) {
+      if (id === this.currentPageId) {
         return
       }
       this.SetPageId(id)
-      this.$router.replace({
-        name: 'screenEdit',
-        query: {
-          id: this.screenId,
-          tabId: id
-        }
-      })
+      if (!this.canEdit && this.isScreen) {
+        this.$parent.changeTab(id) // screen全屏下重置数据
+      } else {
+        // 编辑页面跳转
+        this.$router.replace({
+          name: 'screenEdit',
+          query: {
+            id: this.screenId,
+            tabId: id
+          }
+        })
+      }
     },
     getTabsData() {
       return this.$server.screenManage
@@ -210,7 +227,7 @@ export default {
             // 删除的不是选中的直接删除不跳转
             this.pages.splice(index, 1)
           } else {
-            res.msg && this.$message.error(result.msg)
+            res.msg && this.$message.error(res.msg)
           }
         }
       })
@@ -222,7 +239,7 @@ export default {
       })
 
       this.$server.screenManage.orderScreenTab(this.pages).then(res => {
-        if (res.code != 200) {
+        if (res.code !== 200) {
           res.msg && this.$message.error(res.msg)
         }
       })
@@ -239,7 +256,7 @@ export default {
       e.dataTransfer.dropEffect = 'move'
     },
     handleDragEnter(e, item) {
-      //为需要移动的元素设置dragstart事件
+      // 为需要移动的元素设置dragstart事件
       e.dataTransfer.effectAllowed = 'move'
       if (item === this.dragItem) {
         return
@@ -255,7 +272,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['screenId', 'pageList']),
+    ...mapGetters(['screenId', 'pageList', 'currentPageId', 'isScreen']),
     pages: {
       get() {
         return this.pageList

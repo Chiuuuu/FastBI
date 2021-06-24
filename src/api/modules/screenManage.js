@@ -207,14 +207,6 @@ const screenManage = {
     return $axios.post('/screen/graph/dataLink', params)
   },
   /**
-   * @description 根据维度度量获取数据(数据接入)
-   * @param {*} params
-   * @returns
-   */
-  getDataForSource(params) {
-    return $axios.post('/screen/graph/getDataFromSource', params)
-  },
-  /**
    * @description 度量原始数据类型是否数值类型
    * @param {*} params
    * @returns

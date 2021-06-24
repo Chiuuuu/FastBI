@@ -1,56 +1,46 @@
 import { sum, summary } from '@/utils/summaryList'
+import reverseAddressResolution from '@/utils/reverseAddressResolution'
 import geoJson from '@/utils/guangdong.json'
+import { message } from 'ant-design-vue'
 // 处理大屏刷新数据
 export function handleRefreshData({ chart, newData }) {
-  // if (chart.setting.chartType === 'v-map') {
-  //   let measure = chart.setting.api_data.measures[0].alias
-  //   let dimension = chart.setting.api_data.dimensions[0].alias
-  //   let rows = chart.setting.config.series[0].data
-  //   for (let row of rows) {
-  //     let data = newData.find(item => item[dimension] === row.name)
-  //     if (!data) {
-  //       continue
-  //     }
-  //     row.value[2] = data[measure]
-  //   }
-  //   return
-  // }
   let apiData = chart.setting.api_data
   if (chart.setting.chartType === 'v-map') {
-    let config = chart.setting.config
-    let legend = []
-    let datas = []
-    // 重置series
-    config.series = [config.series[0]]
-    // 只有一个维度，唯一名称
-    let alias = apiData.dimensions[0].alias
-    // 一个度量对应一个series.data
-    apiData.measures.forEach((measure, index) => {
-      // 添加series
-      if (index > 0) {
-        config.series[index] = Object.assign({}, config.series[0])
-      }
-      config.series[index].name = measure.alias
-      legend.push(measure.alias)
-      let data = []
-      for (let item of newData) {
-        // 抓取区域坐标
-        let center = getCenterCoordinate(item[alias])
-        // 找不到对应坐标跳过
-        if (!center) {
-          continue
-        }
-        data.push({
-          name: item[alias],
-          value: center.concat(item[measure.alias]) // 链接数组，坐标和值
-        })
-      }
-      config.series[index].data = data
-      datas.push(data)
-    })
-    config.legend.data = legend
-    apiData.data = datas
-    return
+    // let config = chart.setting.config
+    // let legend = []
+    // let datas = []
+    // // 重置series
+    // config.series = [config.series[0]]
+    // // 只有一个维度，唯一名称
+    // let alias = apiData.dimensions[0].alias
+    // // 一个度量对应一个series.data
+    // apiData.measures.forEach((measure, index) => {
+    //   // 添加series
+    //   if (index > 0) {
+    //     config.series[index] = Object.assign({}, config.series[0])
+    //   }
+    //   config.series[index].name = measure.alias
+    //   legend.push(measure.alias)
+    //   let data = []
+    //   for (let item of newData) {
+    //     // 抓取区域坐标
+    //     let center = getCenterCoordinate(item[alias])
+    //     // 找不到对应坐标跳过
+    //     if (!center) {
+    //       continue
+    //     }
+    //     data.push({
+    //       name: item[alias],
+    //       value: center.concat(item[measure.alias]) // 链接数组，坐标和值
+    //     })
+    //   }
+    //   config.series[index].data = data
+    //   datas.push(data)
+    // })
+    // config.legend.data = legend
+    // apiData.data = datas
+    // return
+    setMapData(chart, newData)
   }
   let source = chart.setting.api_data.source
   if (!source) {
@@ -103,172 +93,193 @@ export function handleRefreshData({ chart, newData }) {
       chart.setting.api_data.source.rows = newData
     }
   }
-  //   let apiData = chart.setting.api_data
-  //   if (chart.setting.chartType === 'v-map') {
-  //     let config = chart.setting.config
-  //     let legend = []
-  //     let datas = []
-  //     // 重置series
-  //     config.series = [config.series[0]]
-  //     // 只有一个维度，唯一名称
-  //     let alias = apiData.dimensions[0].alias
-  //     // 一个度量对应一个series.data
-  //     apiData.measures.forEach((measure, index) => {
-  //       // 添加series
-  //       if (index > 0) {
-  //         config.series[index] = Object.assign({}, config.series[0])
-  //       }
-  //       config.series[index].name = measure.alias
-  //       legend.push(measure.alias)
-  //       let data = []
-  //       for (let item of newData) {
-  //         // 抓取区域坐标
-  //         let center = getCenterCoordinate(item[alias])
-  //         // 找不到对应坐标跳过
-  //         if (!center) {
-  //           continue
-  //         }
-  //         data.push({
-  //           name: item[alias],
-  //           value: center.concat(item[measure.alias]) // 链接数组，坐标和值
-  //         })
-  //       }
-  //       config.series[index].data = data
-  //       datas.push(data)
-  //     })
-  //     config.legend.data = legend
-  //     apiData.data = datas
-  //     return
-  //   }
-  //   if (chart.setting.chartType === 'v-text') {
-  //     let fileList = chart.setting.api_data.measures.concat(
-  //       chart.setting.api_data.dimensions
-  //     )
-  //     let config = chart.setting.config
-  //     let str = ''
-  //     for (let item of fileList) {
-  //       str += newData[0][item.alias] + ' '
-  //     }
-  //     config.title.content = str
-  //   }
-  //   // 表格
-  //   if (chart.setting.type === 3) {
-  //     let columns = []
-  //     let fileList = chart.setting.api_data.measures.concat(
-  //       chart.setting.api_data.dimensions
-  //     )
-  //     for (let item of fileList) {
-  //       columns.push({
-  //         title: item.alias,
-  //         dataIndex: item.alias,
-  //         key: item.alias
-  //       })
-  //     }
-  //     let rows = newData
-  //     if (rows.length > 10) {
-  //       rows.length = 10
-  //     }
-  //     apiData.source = {
-  //       columns,
-  //       rows
-  //     }
-  //   } else {
-  //     // 仪表盘/环形图 只显示度量
-  //     if (chart.setting.chartType === '2') {
-  //       let columns = ['type', 'value'] // 维度固定
-  //       for (let m of apiData.measures) {
-  //         columns.push(m.alias) // 默认columns第二项起为指标
-  //       }
-  //       // 对返回的数据列进行求和
-  //       let total = sum(newData, apiData.measures[0].alias)
-  //       let rows = [
-  //         {
-  //           type: apiData.measures[0].alias,
-  //           value: total
-  //         }
-  //       ]
-  //       // 环形图第二度量(指针值)
-  //       if (chart.setting.chartType === 'v-ring' && apiData.measures[1]) {
-  //         let currentTotal = sum(newData, apiData.measures[1].alias)
-  //         rows[0] = {
-  //           type: apiData.measures[1].alias,
-  //           value: currentTotal
-  //         }
-  //         rows.push({
-  //           type: apiData.measures[0].alias,
-  //           value: total - currentTotal
-  //         })
-  //       }
-  //       apiData.source = {
-  //         columns,
-  //         rows
-  //       }
-  //       // 保存apidata数据
-  //       let config = chart.setting.config
-  //       if (chart.setting.chartType === 'v-ring') {
-  //         config.chartTitle.text = rows[1] ? rows[1].value : rows[0].value
-  //       }
-  //       // 如果是仪表盘，第二个度量是目标值（进度条最大值）
-  //       if (chart.setting.chartType === 'v-gauge' && apiData.measures[1]) {
-  //         let goalTotal = sum(newData, apiData.measures[1].alias)
-  //         config.series.max = goalTotal
-  //       }
-  //       return
-  //     }
-
-  //     let columns = []
-  //     let rows = []
-  //     let dimensionKeys = [] // 度量key
-  //     for (let m of apiData.dimensions) {
-  //       dimensionKeys.push(m.alias)
-  //       columns.push(m.alias) // 默认columns第二项起为指标
-  //     }
-
-  //     let measureKeys = [] // 度量key
-  //     for (let m of apiData.measures) {
-  //       measureKeys.push(m.alias)
-  //       columns.push(m.alias) // 默认columns第二项起为指标
-  //     }
-
-  //     // 嵌套饼图设置apis
-  //     if (chart.setting.chartType === 'v-multiPie') {
-  //       // name是各维度数据拼接，value是分类汇总过的数值
-  //       columns = ['name', 'value']
-  //       let result = newData
-  //       let level = []
-  //       // 一个维度是一层饼
-  //       dimensionKeys.forEach(item => {
-  //         // 根据当前维度分类得到的列表
-  //         let list = summary(result, item, measureKeys[0]) // 嵌套饼图度量只有一个，直接取第一个数
-  //         rows = rows.concat(list) // 把所有维度分类出来的数组进行拼接（v-charts配置格式要求）
-
-  //         level.push(list.map(obj => obj.name)) // 按维度分层
-  //       })
-
-  //       let apis = {
-  //         level
-  //       }
-  //     } else {
-  //       newData.map((item, index) => {
-  //         let obj = {}
-  //         for (let item2 of dimensionKeys) {
-  //           obj[item2] = item[item2]
-  //         }
-  //         obj[dimensionKeys] = item[dimensionKeys]
-  //         for (let item2 of measureKeys) {
-  //           obj[item2] = item[item2]
-  //         }
-  //         // if (obj[dimensionKeys]) {
-  //         rows.push(obj)
-  //         // }
-  //       })
-  //     }
-
-  //     apiData.source = {
-  //       columns,
-  //       rows
-  //     }
-  //   }
+}
+async function setMapData(chart, newData) {
+  let apiData = chart.setting.api_data
+  let name = apiData.measures[0].alias
+  let legend = []
+  let series = []
+  // 判断添加填充层
+  if (newData.fillList && newData.fillList.length) {
+    series.push({
+      name,
+      type: 'map',
+      map: 'guangzhou',
+      aspectScale: 0.75,
+      showLegendSymbol: false,
+      zoom: 1.1,
+      roam: false,
+      mapLocation: {
+        x: 'left',
+        y: 'top'
+      },
+      label: {
+        normal: {
+          show: true,
+          color: '#fff'
+        },
+        emphasis: {
+          show: true
+        }
+      },
+      itemStyle: {
+        normal: {
+          areaColor: 'rgba(1, 33, 92, 0.45)',
+          borderColor: '#215495',
+          borderWidth: 1
+        },
+        emphasis: {
+          borderColor: '#073684',
+          areaColor: '#061E3D'
+        },
+        data: []
+      }
+    })
+    let datas = []
+    if (apiData.options.fillType === 'area') {
+      for (let item of newData.fillList) {
+        datas.push({
+          name: item[apiData.dimensions[0].alias],
+          value: item[name]
+        })
+      }
+    } else {
+      for (let item of newData.fillList) {
+        let positionMsg = ''
+        try {
+          positionMsg = await reverseAddressResolution([
+            item[apiData.latitude[0].alias],
+            item[apiData.longitude[0].alias]
+          ])
+        } catch (err) {
+          continue
+        }
+        datas.push({
+          name: positionMsg.direct,
+          value: item[name]
+        })
+      }
+      if (datas.length === 0) {
+        message.error('经纬度解析失败')
+        return
+      }
+    }
+    series[0].data = datas
+    chart.setting.config.legend.data = [name]
+    chart.setting.config.series = series
+    if (!chart.setting.config.visualMap) {
+      chart.setting.config.visualMap = {
+        show: false,
+        type: 'piecewise',
+        min: 0,
+        max: 403631060,
+        seriesIndex: [0],
+        inRange: {
+          color: ['#50a3ba', '#eac736', '#d94e5d'],
+          symbolSize: [10, 16]
+        },
+        textStyle: {
+          color: '#fff',
+          fontSize: 12
+        }
+      }
+    }
+  } else {
+    delete chart.setting.config.visualMap
+  }
+  if (newData.labelList && newData.labelList.length) {
+    const dotSeries = {
+      type: 'scatter', // scatter,effectScatter
+      name: '人口',
+      coordinateSystem: 'geo',
+      symbol: 'circle',
+      symbolSize: 10,
+      //   aspectScale: 0.75,
+      hoverAnimation: true,
+      showEffectOn: 'render',
+      rippleEffect: {
+        brushType: 'stroke',
+        scale: 3
+      },
+      label: {
+        show: false,
+        // formatter: '{b} ：{c}',
+        formatter: function(params) {
+          return params.data.value[2].toFixed(2)
+        },
+        fontSize: 12,
+        position: 'right', // 可选inside
+        emphasis: {
+          show: true
+        }
+      },
+      itemStyle: {
+        emphasis: {
+          borderColor: '#fff',
+          borderWidth: 1
+        }
+      },
+      zlevel: 1
+    }
+    let config = chart.setting.config
+    if (apiData.options.labelType === 'area') {
+      // 只有一个维度，唯一名称
+      let alias = apiData.labelDimensions[0].alias
+      // 一个度量对应一个series.data
+      apiData.labelMeasures.forEach((measure, index) => {
+        legend.push(measure.alias)
+        let data = []
+        for (let item of newData.labelList) {
+          // 抓取区域坐标
+          let center = getCenterCoordinate(item[alias])
+          // 找不到对应坐标跳过
+          if (!center) {
+            continue
+          }
+          data.push({
+            name: item[alias],
+            value: center.concat(item[measure.alias]) // 链接数组，坐标和值
+          })
+        }
+        config.series.push(
+          Object.assign(dotSeries, { data, name: measure.alias })
+        )
+      })
+    } else {
+      let alias = apiData.labelMeasures[0].alias
+      legend.push(alias)
+      let datas = []
+      // 解析数据，获取经度，纬度，目标值
+      for (let data of newData.labelList) {
+        let positionMsg = ''
+        try {
+          // 获取位置信息
+          positionMsg = await reverseAddressResolution([
+            data[apiData.labelLatitude[0].alias],
+            data[apiData.labelLongitude[0].alias]
+          ])
+        } catch (err) {
+          continue
+        }
+        datas.push(
+          Object.assign(dotSeries, {
+            data: [
+              {
+                name: positionMsg.direct,
+                value: data[alias]
+              }
+            ],
+            name: alias
+          })
+        )
+      }
+      if (datas.length === 0) {
+        message.error('经纬点解析失败')
+        return
+      }
+      config.series.push(Object.assign(dotSeries, { data: datas, name: alias }))
+    }
+  }
 }
 function getCenterCoordinate(name) {
   let dataList = geoJson.features
