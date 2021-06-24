@@ -12,38 +12,40 @@
           <a-input placeholder="请输入数据源名称" v-model="form.name" @change="handleSetTableName" />
         </a-form-model-item>
         <a-form-model-item label="Excel文件" required>
-          <div
-            class="excel-list scrollbar"
-            ref="files"
-            @dragenter.stop="fileDragEnter"
-          >
+          <a-spin :spinning="spinning" :tip="uploadProgress">
             <div
-              class="mask"
-              v-show="isDragenter"
-              @dragleave.stop="fileDragLeave"
-              @dragover.stop.prevent
-              @drop.stop="fileDrop"
-            ></div>
-            <template v-if="fileInfoList.length > 0">
+              class="excel-list scrollbar"
+              ref="files"
+              @dragenter.stop="fileDragEnter"
+            >
               <div
-                class="excel-list-item"
-                :class="{ active: currentFileIndex === index }"
-                v-for="(item, index) in fileInfoList"
-                :key="item.id"
-                :title="item.name"
-                @click="handleGetDataBase(index)"
-              >
-                <div class="text">{{ item.name }}</div>
-                <div>
-                  <a-icon type="retweet" style="margin-right:10px" @click.stop="handleReplaceFile(item, index)" />
-                  <a-icon type="delete" @click.stop="handleRemove(item)"></a-icon>
+                class="mask"
+                v-show="isDragenter"
+                @dragleave.stop="fileDragLeave"
+                @dragover.stop.prevent
+                @drop.stop="fileDrop"
+              ></div>
+              <template v-if="fileInfoList.length > 0">
+                <div
+                  class="excel-list-item"
+                  :class="{ active: currentFileIndex === index }"
+                  v-for="(item, index) in fileInfoList"
+                  :key="item.id"
+                  :title="item.name"
+                  @click="handleGetDataBase(index)"
+                >
+                  <div class="text">{{ item.name }}</div>
+                  <div>
+                    <a-icon type="retweet" style="margin-right:10px" @click.stop="handleReplaceFile(item, index)" />
+                    <a-icon type="delete" @click.stop="handleRemove(item)"></a-icon>
+                  </div>
                 </div>
-              </div>
-            </template>
-            <a-empty style="margin-top:35px" v-else>
-              <span slot="description">点击添加或将文件拖拽至此上传</span>
-            </a-empty>
-          </div>
+              </template>
+              <a-empty style="margin-top:35px" v-else>
+                <span slot="description">点击添加或将文件拖拽至此上传</span>
+              </a-empty>
+            </div>
+          </a-spin>
           <a-upload
             accept=".xlsx, .xls"
             name="file"
@@ -52,7 +54,7 @@
             :before-upload="beforeFileUpload"
             @change="handleFileChange"
           >
-            <a-button ref="uploader" type="primary" :loading="loading">
+            <a-button ref="uploader" type="primary" :loading="spinning || loading">
               添加文件
             </a-button>
           </a-upload>
@@ -116,7 +118,7 @@
       type="primary"
       class="btn_sub"
       @click="handleSaveForm"
-      :loading="loading"
+      :loading="spinning || loading"
       v-if="hasPermission"
     >
       保存
@@ -135,6 +137,15 @@ export default {
       btnPermission: [this.$PERMISSION_CODE.OPERATOR.edit, this.$PERMISSION_CODE.OPERATOR.add],
       loading: false,
       spinning: false,
+      uploadProgress: '文件上传中',
+      uploadCallback: (num) => {
+        // 使用本地 progress 事件
+        if (num < 100) {
+          this.uploadProgress = num + '%'
+        } else {
+          this.uploadProgress = '文件解析中'
+        }
+      },
       isDragenter: false,
       form: {
         name: ''
@@ -242,6 +253,7 @@ export default {
     },
     // 清空当前表格内容
     handleClearTable() {
+      this.uploadProgress = '文件上传中'
       this.currentColumns = []
       this.currentFieldList = []
       this.deleteIdList = []
@@ -310,6 +322,7 @@ export default {
     },
     // 清空替换文件
     clearReplaceFile() {
+      this.uploadProgress = '文件上传中'
       this.replaceFile = {
         isReplace: false,
         index: -1,
@@ -372,7 +385,6 @@ export default {
             })
             this.$store.dispatch('dataAccess/setFirstFinished', false)
           }
-          console.log(this.fileList, this.operation)
           this.$nextTick(() => {
             this.handleGetDataBase(this.fileInfoList.length - 1)
           })
@@ -432,9 +444,9 @@ export default {
       //   isValid = false
       // }
       // 校验大小
-      if (isValid && file.size > 3 * 1024 * 1024) {
+      if (isValid && file.size > 100 * 1024 * 1024) {
         isValid = false
-        this.$message.error('文件大于3M, 无法上传')
+        this.$message.error('文件大于100M, 无法上传')
       }
 
       // 校验命名规则(中英数字下划线)
@@ -522,9 +534,10 @@ export default {
       const formData = new FormData()
       formData.append('file', file)
       this.spinning = true
-      const result = await this.$server.dataAccess.actionUploadExcelFile(formData)
-        .catch(() => {
+      const result = await this.$server.dataAccess.actionUploadExcelFile(formData, this.uploadCallback)
+        .finally(() => {
           this.spinning = false
+          this.uploadProgress = '文件上传中'
         })
       if (result.code === 200) {
         if (result.rows && result.rows.length === 0) {
@@ -532,6 +545,7 @@ export default {
           return this.$message.error('解析失败')
         }
         this.$message.success('解析成功')
+        console.log(result.rows)
 
         let name = file.name
         name = name.slice(0, name.lastIndexOf('.')) // 处理掉文件后缀
@@ -548,7 +562,6 @@ export default {
 
         const currentIndex = this.fileInfoList.length - 1
         const database = new MapSheet(result.rows[0].mapSheet)
-        console.log(this.fileList, this.operation)
 
         // 新增文件未保存前不能查看库表结构
         this.$store.dispatch('dataAccess/setFirstFinished', false)
@@ -569,23 +582,25 @@ export default {
       if (flag) {
         formData.append('file', file)
         this.spinning = true
-        result = await this.$server.dataAccess.actionUploadExcelFile(formData)
+        result = await this.$server.dataAccess.actionUploadExcelFile(formData, this.uploadCallback)
           .catch(() => {
             this.clearReplaceFile()
           })
           .finally(() => {
             this.spinning = false
+            this.uploadProgress = '文件上传中'
           })
       } else {
         formData.append('fileList[0]', file)
         formData.append('replaceDatabaseId', this.replaceFile.info.id)
         this.spinning = true
-        result = await this.$server.dataAccess.actionReplaceExcelFile(formData)
+        result = await this.$server.dataAccess.actionReplaceExcelFile(formData, this.uploadCallback)
           .catch(() => {
             this.clearReplaceFile()
           })
           .finally(() => {
             this.spinning = false
+            this.uploadProgress = '文件上传中'
           })
       }
       if (result.code === 200) {
@@ -623,7 +638,6 @@ export default {
           })
         }
 
-        console.log(this.fileList, this.operation)
         const database = new MapSheet(result.rows[0].mapSheet)
         this.$set(this.databaseList, currentIndex, database)
         this.$nextTick(() => {

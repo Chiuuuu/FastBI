@@ -12,38 +12,40 @@
           <a-input placeholder="请输入数据源名称" v-model="form.name" />
         </a-form-model-item>
         <a-form-model-item :label="modelType + '文件'" required>
-          <div
-            class="excel-list scrollbar"
-            ref="files"
-            @dragenter.stop="fileDragEnter"
-          >
+          <a-spin :spinning="spinning" :tip="uploadProgress">
             <div
-              class="mask"
-              v-show="isDragenter"
-              @dragleave.stop="fileDragLeave"
-              @dragover.stop.prevent
-              @drop.stop="fileDrop"
-            ></div>
-            <template v-if="fileInfoList.length > 0">
+              class="excel-list scrollbar"
+              ref="files"
+              @dragenter.stop="fileDragEnter"
+            >
               <div
-                class="excel-list-item"
-                :class="{ active: currentFileIndex === index }"
-                v-for="(item, index) in fileInfoList"
-                :key="item.id"
-                :title="item.name"
-                @click="handleGetDataBase(index)"
-              >
-                <div class="text">{{ item.name }}</div>
-                <div>
-                  <a-icon type="retweet" style="margin-right:10px" @click.stop="handleReplaceFile(item, index)" />
-                  <a-icon type="delete" @click.stop="handleRemove(item)"></a-icon>
+                class="mask"
+                v-show="isDragenter"
+                @dragleave.stop="fileDragLeave"
+                @dragover.stop.prevent
+                @drop.stop="fileDrop"
+              ></div>
+              <template v-if="fileInfoList.length > 0">
+                <div
+                  class="excel-list-item"
+                  :class="{ active: currentFileIndex === index }"
+                  v-for="(item, index) in fileInfoList"
+                  :key="item.id"
+                  :title="item.name"
+                  @click="handleGetDataBase(index)"
+                >
+                  <div class="text">{{ item.name }}</div>
+                  <div>
+                    <a-icon type="retweet" style="margin-right:10px" @click.stop="handleReplaceFile(item, index)" />
+                    <a-icon type="delete" @click.stop="handleRemove(item)"></a-icon>
+                  </div>
                 </div>
-              </div>
-            </template>
-            <a-empty style="margin-top:35px" v-else>
-              <span slot="description">点击添加或将文件拖拽至此上传</span>
-            </a-empty>
-          </div>
+              </template>
+              <a-empty style="margin-top:35px" v-else>
+                <span slot="description">点击添加或将文件拖拽至此上传</span>
+              </a-empty>
+            </div>
+          </a-spin>
           <a-upload
             accept=".csv"
             name="file"
@@ -52,7 +54,7 @@
             :before-upload="beforeFileUpload"
             @change="handleFileChange"
           >
-            <a-button ref="uploader" type="primary" :loading="loading">
+            <a-button ref="uploader" type="primary" :loading="spinning || loading">
               添加文件
             </a-button>
           </a-upload>
@@ -123,7 +125,7 @@
       type="primary"
       class="btn_sub"
       @click="handleSaveForm"
-      :loading="loading"
+      :loading="spinning || loading"
       v-if="hasPermission"
     >
       保存
@@ -142,6 +144,15 @@ export default {
     return {
       loading: false,
       spinning: false,
+      uploadProgress: '文件上传中',
+      uploadCallback: (num) => {
+        // 使用本地 progress 事件
+        if (num < 100) {
+          this.uploadProgress = num + '%'
+        } else {
+          this.uploadProgress = '文件解析中'
+        }
+      },
       isDragenter: false,
       form: {
         name: '',
@@ -219,6 +230,7 @@ export default {
       this.fileInfoList = []
       this.databaseList = []
       this.handleClearTable()
+      this.clearReplaceFile()
     },
     // 渲染表单
     handleSetFormData() {
@@ -313,9 +325,9 @@ export default {
       //   isValid = false
       // }
       // 校验大小
-      if (isValid && file.size > 3 * 1024 * 1024) {
+      if (isValid && file.size > 100 * 1024 * 1024) {
         isValid = false
-        this.$message.error('文件大于3M, 无法上传')
+        this.$message.error('文件大于100M, 无法上传')
       }
 
       // 校验重名
@@ -383,9 +395,10 @@ export default {
       formData.append('csvFile', file)
       formData.append('delimiter', this.queryDelimiter)
       this.spinning = true
-      const result = await this.$server.dataAccess.actionUploadCsvFile(formData)
+      const result = await this.$server.dataAccess.actionUploadCsvFile(formData, this.uploadCallback)
         .catch(() => {
           this.spinning = false
+          this.uploadProgress = '文件上传中'
         })
       if (result.code === 200) {
         if (result.rows && result.rows.length === 0) {
@@ -431,24 +444,26 @@ export default {
         formData.append('csvFile', file)
         formData.append('delimiter', this.queryDelimiter)
         this.spinning = true
-        result = await this.$server.dataAccess.actionUploadCsvFile(formData)
+        result = await this.$server.dataAccess.actionUploadCsvFile(formData, this.uploadCallback)
           .catch(() => {
             this.clearReplaceFile()
           })
           .finally(() => {
             this.spinning = false
+            this.uploadProgress = '文件上传中'
           })
       } else { // 已入库文件
         formData.append('fileList[0]', file)
         formData.append('replaceDatabaseId', this.replaceFile.info.id)
         formData.append('delimiter', this.queryDelimiter)
         this.spinning = true
-        result = await this.$server.dataAccess.actionReplaceCsvFile(formData)
+        result = await this.$server.dataAccess.actionReplaceCsvFile(formData, this.uploadCallback)
           .catch(() => {
             this.clearReplaceFile()
           })
           .finally(() => {
             this.spinning = false
+            this.uploadProgress = '文件上传中'
           })
       }
       if (result.code === 200) {
