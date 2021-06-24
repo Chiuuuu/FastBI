@@ -444,9 +444,9 @@ export default {
       //   isValid = false
       // }
       // 校验大小
-      if (isValid && file.size > 100 * 1024 * 1024) {
+      if (isValid && file.size > 9 * 1024 * 1024) {
         isValid = false
-        this.$message.error('文件大于100M, 无法上传')
+        this.$message.error('文件大于9M, 无法上传')
       }
 
       // 校验命名规则(中英数字下划线)
