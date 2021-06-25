@@ -749,55 +749,47 @@ export default {
       this.folderTitle = '新建文件夹'
     },
     // 创建文件夹
-    creatFolder() {
-      const form = this.$refs.newFolderForm.form
-      form.validateFields((err, values) => {
-        if (err) {
-          return
+    creatFolder(values) {
+      if (this.isAdd === 1) {
+        // 新增
+        let params = {
+          fileType: 0, // 0-文件夹,1-文件
+          ...values,
+          parentId: 0,
+          type: 3 // 0-无类型,1-数据接入，2-数据建模,3-数据大屏
         }
-        console.log('Received values of form: ', values)
-        if (this.isAdd === 1) {
-          // 新增
-          let params = {
-            fileType: 0, // 0-文件夹,1-文件
-            ...values,
-            parentId: 0,
-            type: 3 // 0-无类型,1-数据接入，2-数据建模,3-数据大屏
-          }
-          this.$server.common
-            .addMenuFolder('/screen/catalog', params)
-            .then(res => {
-              if (res.code === 200) {
-                this.$message.success(res.msg)
-                this.getList()
-                // 新建文件夹后 返回空页面 不显示大屏
-                this.fileSelectId = ''
-                this.fileSelectName = ''
-              } else {
-                this.$message.error(res.msg)
-              }
-            })
-        } else {
-          // 修改
-          let params = {
-            fileType: 0,
-            id: this.id,
-            ...values
-          }
-          this.$server.common
-            .putMenuFolderName('/screen/catalog/update', params)
-            .then(res => {
-              if (res.code === 200) {
-                this.$message.success(res.msg)
-                this.getList()
-              } else {
-                this.$message.error(res.msg)
-              }
-            })
+        this.$server.common
+          .addMenuFolder('/screen/catalog', params)
+          .then(res => {
+            if (res.code === 200) {
+              this.$message.success(res.msg)
+              this.getList()
+              // 新建文件夹后 返回空页面 不显示大屏
+              this.fileSelectId = ''
+              this.fileSelectName = ''
+            } else {
+              this.$message.error(res.msg)
+            }
+          })
+      } else {
+        // 修改
+        let params = {
+          fileType: 0,
+          id: this.id,
+          ...values
         }
-        form.resetFields()
-        this.folderVisible = false
-      })
+        this.$server.common
+          .putMenuFolderName('/screen/catalog/update', params)
+          .then(res => {
+            if (res.code === 200) {
+              this.$message.success(res.msg)
+              this.getList()
+            } else {
+              this.$message.error(res.msg)
+            }
+          })
+      }
+      this.folderVisible = false
     },
     // 关闭新建文件夹弹窗
     hideFolder() {
