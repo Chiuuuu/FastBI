@@ -493,7 +493,7 @@
                 <div v-if="isScatter">
                   <gui-field label="散点颜色">
                     <a-select
-                      v-model="apis.scatterSize"
+                      v-model="apis.scatterColor"
                       style="width: 164px"
                       size="small"
                       @change="scatterColorChange"
@@ -546,35 +546,24 @@
                 <div>
                   <!-- 指标颜色 -->
                   <a-radio-group
-                    :value="selfConfig.series.label.position"
+                    :value="apis.scatterTargetColor"
                     size="small"
                   >
                     <a-radio
-                      value="inside"
-                      @click.native.stop="
-                        onRadioChange(
-                          $event,
-                          selfConfig.series.label,
-                          'position'
-                        )
-                      "
+                      value="0"
+                      @click.native.stop="scatterTargetColorChange($event)"
                       >使用图例</a-radio
                     >
                     <a-radio
-                      value="outside"
-                      @click.native.stop="
-                        onRadioChange(
-                          $event,
-                          selfConfig.series.label,
-                          'position'
-                        )
-                      "
+                      value="1"
+                      @click.native.stop="scatterTargetColorChange($event)"
                       >自定义</a-radio
                     >
                   </a-radio-group>
                   <el-color-picker
                     v-model="selfConfig.series.label.color"
                     @change="setSelfProperty"
+                    v-show="apis.scatterTargetColor == '1'"
                   ></el-color-picker>
                 </div>
                 <gui-field label="文本">
@@ -609,22 +598,6 @@
                     </a-select>
                   </gui-inline>
                 </gui-field>
-                <!-- <gui-field label="字体">
-                  <a-select
-                    v-model="selfConfig.title.textStyle.fontFamily"
-                    style="width: 164px"
-                    size="small"
-                    @change="setSelfProperty"
-                  >
-                    <a-select-option
-                      :value="font.value"
-                      v-for="(font, index) in fontFamilyList"
-                      :key="index"
-                      >{{ font.label }}</a-select-option
-                    >
-                  </a-select>
-                </gui-field> -->
-                <!-- <gui-field label="显示内容"> -->
                 显示内容
                 <a-select
                   mode="tags"
@@ -2618,7 +2591,7 @@ export default {
       ],
       targetMeasure: 0, // 地图指标设置对应度量
       scatterColorList:[ //散点颜色
-        { label: '单色', value: '' },
+        { label: '单色', value: '0' },
         { label: '按维度', value: '1' },
       ],
       scatterSizeList:[ //散点大小
@@ -2627,7 +2600,7 @@ export default {
         { label: '按度量2', value: '1' },
       ],
       scatterFormatList: [
-        { label: '无', value: '{@5}' },
+        { label: '无', value: '' },
         { label: '维度1', value: '{@5}：{@2}' },
         { label: '度量1', value: '{@3}：{@0}' },
         { label: '度量2', value: '{@4}：{@1}' },
@@ -2983,12 +2956,22 @@ export default {
     // 散点图 -- 散点图大小设置
     scatterSizeChange(val){
       if(val === ''){
-        delete this.selfConfig.series.symbolSize;
+        this.selfConfig.series.symbolSize = 15;
       }else{
-        this.selfConfig.series.symbolSize = function (data) {
-          return Math.sqrt(data[val]) / 5e2 * 1000;
-        }
+        // this.selfConfig.series.symbolSize = function (data) {
+        //   console.log(data)
+        //   return Math.sqrt(data[val]) / 5e2 * 1000;
+        // }
       }
+      this.setApis();
+      this.setSelfProperty();
+    },
+    scatterTargetColorChange(e){
+      let val = e.target.value;
+      if(val === '0'){
+        this.selfConfig.series.label.color  = null;
+      }
+      this.apis.scatterTargetColor = val;
       this.setApis();
       this.setSelfProperty();
     },

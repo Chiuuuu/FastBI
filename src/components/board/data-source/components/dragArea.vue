@@ -654,30 +654,46 @@ export default {
 
           // 散点图，两个度量分别是x，y轴的值
           if(this.currSelected.setting.chartType === 'v-scatter'){
-            let scatterData = [];
+            let scatterData = {}, legendData = [], list = [],xMax = 0,yMax = 0;
             rows.forEach(item=>{
-              // scatterData.push({
-              //   name:item[columns[0]],
-              //   value:[ item[columns[1]],item[columns[2]] ]
-              // })
-              scatterData.push( 
-                {
-                  name:'',
-                  value:[ 
-                    item[columns[1]], //度量1
-                    item[columns[2]], //度量2
-                    item[columns[0]], //维度
-                    columns[1],
-                    columns[2],
-                    columns[0],
-                  ]
-                }
-              )
+              if(xMax<item[columns[1]]){
+                xMax = item[columns[1]]
+              }
+              if(xMax<item[columns[2]]){
+                yMax = item[columns[2]]
+              }
+              if(!scatterData[item[columns[0]]]){
+                scatterData[item[columns[0]]] = [];
+                legendData.push(item[columns[0]])
+              }
+              scatterData[item[columns[0]]].push({
+                name:'',
+                value:[ 
+                  item[columns[1]], //度量1
+                  item[columns[2]], //度量2
+                  item[columns[0]], //维度
+                  columns[1],
+                  columns[2],
+                  columns[0],
+                ]
+              }) 
             })
+            for(let i in scatterData){
+              list.push({
+                label:i,
+                data:scatterData[i]
+              })
+            }
             let config = deepClone(this.currSelected.setting.config)
-            config.series.data = scatterData;
+            config.series.data = list;
             config.series.dimensions = [columns[1], columns[2], columns[0]]
+            config.legend.data = legendData;
             this.$store.dispatch('SetSelfProperty', config)
+
+            let apis = deepClone(this.currSelected.setting.apis)
+            apis.xMax = xMax;
+            apis.yMax = yMax;
+            this.$store.dispatch('SetApis', apis)
           }
 
           if(this.currSelected.setting.chartType !== 'v-scatter'){
