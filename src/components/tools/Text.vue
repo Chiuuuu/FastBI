@@ -32,7 +32,7 @@ const aggregatorMap = {
   最小值: 'MIN',
   统计: 'CNT'
 }
-const reg =/<span class="edit-alias" contenteditable="false">(.*?)<\/span>/g // /<span class="edit-alias" contenteditable="false">(.*?)\(.*?\)(&nbsp;){3}<\/span>/g // 字符串替换模板
+const reg = /<span class="edit-alias" contenteditable="false">(.*?)<\/span>/g // /<span class="edit-alias" contenteditable="false">(.*?)\(.*?\)(&nbsp;){3}<\/span>/g // 字符串替换模板
 export default {
   name: 'mediumEidtor',
   props: {
@@ -116,6 +116,8 @@ export default {
         // 转换文本
         this.getContent().then(res => {
           this.$refs.editorText.innerHTML = res
+          this.selfConfig.title.text = res
+          this.updateChartData(this.id)
         })
         // 关闭防止冒泡，开启拖动
         this.$refs.textBox.onmousedown = null
@@ -147,17 +149,22 @@ export default {
     this.$nextTick(() => {
       // 进入页面获取计算文本
       //   if (this.canEdit) {
-      // 初始化显示数据，true:不需要匹配度量数据
-      this.getContent(true).then(res => {
-        this.$refs.editorText.innerHTML = res
-      })
+      // 使用缓存文本，进大屏不获取度量数据
+      if (this.config.title.text) {
+        this.$refs.editorText.innerHTML = this.config.title.text
+      } else {
+        // 初始化显示数据，true:不需要匹配度量数据
+        this.getContent(true).then(res => {
+          this.$refs.editorText.innerHTML = res
+        })
+      }
       //   }
     })
     var ContextMenuExtension = MediumEditor.Extension.extend({
       name: 'context-menu',
 
       init: function() {
-        this.subscribe('editableKeyup', this.handleKeydownEnter.bind(this))
+        this.subscribe('editableKeydown', this.handleKeydownEnter.bind(this))
         this.subscribe('editableKeydownDelete', this.keydownDel.bind(this))
       },
 
@@ -201,12 +208,16 @@ export default {
       },
 
       handleKeydownEnter(event) {
-        const isStar = event.keyCode === 56 || event.keyCode === 106
+        const isStar =
+          (event.keyCode === 56 && event.shiftKey) ||
+          event.keyCode === 106 ||
+          (event.keyCode === 229 && event.code === 'Digit8')
+        // console.log('test', event.keyCode, ' ', event.shiftKey, '', event.code)
         if (isStar) {
           // 阻断原处理流程
           event.preventDefault()
           const wrap = MediumEditor.selection.getSelectionRange(document)
-          document.execCommand('delete')
+          //   document.execCommand('delete')
           const span = document.createElement('span')
           span.id = 'antor'
           span.innerHTML = '*'
@@ -368,13 +379,18 @@ export default {
       if (this.apiData.measures.length > 0) {
         let selected = this.canvasMap.find(item => item.id === this.id)
         let self = this
-        let loadingInstance = Loading.service({
-          lock: true,
-          text: '加载中...',
-          target: self.$refs.textBox
-        })
+        let loadingInstance = ''
+        if (!isInit) {
+          loadingInstance = Loading.service({
+            lock: true,
+            text: '加载中...',
+            target: self.$refs.textBox
+          })
+        }
         let res = await this.$server.screenManage.getData(selected)
-        loadingInstance.close()
+        if (loadingInstance) {
+          loadingInstance.close()
+        }
         // 数据源被删掉
         if (res.code === 500 && res.msg === 'IsChanged') {
           selected.setting.isEmpty = true
@@ -398,7 +414,7 @@ export default {
       let matchList = this.htmlText.match(reg)
       if (matchList) {
         for (let matchStr of matchList) {
-          let aliasArr = matchStr.match(/>(.*?)</)// />(.*?)\((.*?)\)(&nbsp;){3}</
+          let aliasArr = matchStr.match(/>(.*?)</) // />(.*?)\((.*?)\)(&nbsp;){3}</
           let alias = aliasArr[1]
           // 验重
           if (!measures.some(item => item.alias === alias)) {
