@@ -651,6 +651,7 @@ export default {
             maxSize += file.size
           })
           if (maxSize > 50 * 1024 * 1024) {
+            this.loading = false
             return this.$message.error('单次保存文件总量需小于50M')
           }
           formData.append('databaseName', this.databaseName)

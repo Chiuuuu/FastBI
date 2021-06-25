@@ -228,7 +228,8 @@ export default {
             method: 'post',
             headers: { 'Content-Type': 'multipart/form-data' },
             url: '/datasource/excel/batchsave',
-            data
+            data,
+            timeout: 300000
         })
     },
     /**
@@ -262,7 +263,8 @@ export default {
             method: 'post',
             headers: { 'Content-Type': 'multipart/form-data' },
             url: '/datasource/csv/save',
-            data
+            data,
+            timeout: 300000
         })
     },
     /**
