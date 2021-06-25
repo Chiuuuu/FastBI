@@ -137,7 +137,7 @@ export default {
       btnPermission: [this.$PERMISSION_CODE.OPERATOR.edit, this.$PERMISSION_CODE.OPERATOR.add],
       loading: false,
       spinning: false,
-      uploadProgress: '文件上传中',
+      uploadProgress: '加载中',
       uploadCallback: (num) => {
         // 使用本地 progress 事件
         if (num < 100) {
@@ -253,7 +253,7 @@ export default {
     },
     // 清空当前表格内容
     handleClearTable() {
-      this.uploadProgress = '文件上传中'
+      this.uploadProgress = '加载中'
       this.currentColumns = []
       this.currentFieldList = []
       this.deleteIdList = []
@@ -322,7 +322,7 @@ export default {
     },
     // 清空替换文件
     clearReplaceFile() {
-      this.uploadProgress = '文件上传中'
+      this.uploadProgress = '加载中'
       this.replaceFile = {
         isReplace: false,
         index: -1,
@@ -537,7 +537,7 @@ export default {
       const result = await this.$server.dataAccess.actionUploadExcelFile(formData, this.uploadCallback)
         .finally(() => {
           this.spinning = false
-          this.uploadProgress = '文件上传中'
+          this.uploadProgress = '加载中'
         })
       if (result.code === 200) {
         if (result.rows && result.rows.length === 0) {
@@ -588,7 +588,7 @@ export default {
           })
           .finally(() => {
             this.spinning = false
-            this.uploadProgress = '文件上传中'
+            this.uploadProgress = '加载中'
           })
       } else {
         formData.append('fileList[0]', file)
@@ -600,7 +600,7 @@ export default {
           })
           .finally(() => {
             this.spinning = false
-            this.uploadProgress = '文件上传中'
+            this.uploadProgress = '加载中'
           })
       }
       if (result.code === 200) {

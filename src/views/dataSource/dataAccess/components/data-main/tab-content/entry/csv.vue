@@ -144,7 +144,7 @@ export default {
     return {
       loading: false,
       spinning: false,
-      uploadProgress: '文件上传中',
+      uploadProgress: '加载中',
       uploadCallback: (num) => {
         // 使用本地 progress 事件
         if (num < 100) {
@@ -398,7 +398,7 @@ export default {
       const result = await this.$server.dataAccess.actionUploadCsvFile(formData, this.uploadCallback)
         .catch(() => {
           this.spinning = false
-          this.uploadProgress = '文件上传中'
+          this.uploadProgress = '加载中'
         })
       if (result.code === 200) {
         if (result.rows && result.rows.length === 0) {
@@ -450,7 +450,7 @@ export default {
           })
           .finally(() => {
             this.spinning = false
-            this.uploadProgress = '文件上传中'
+            this.uploadProgress = '加载中'
           })
       } else { // 已入库文件
         formData.append('fileList[0]', file)
@@ -463,7 +463,7 @@ export default {
           })
           .finally(() => {
             this.spinning = false
-            this.uploadProgress = '文件上传中'
+            this.uploadProgress = '加载中'
           })
       }
       if (result.code === 200) {
