@@ -114,12 +114,19 @@ export default {
     * @param {Object} data.fileList 文件
     * @param {Object} data.replaceDatabaseId 文件id
     */
-    actionReplaceExcelFile(data) {
+    actionReplaceExcelFile(data, callback = () => {}) {
         return $axios({
             method: 'post',
             headers: { 'Content-Type': 'multipart/form-data' },
             url: '/datasource/excel/checkout',
-            data
+            data,
+            onUploadProgress: (progressEvent) => {
+                if (progressEvent.lengthComputable) {
+                    let num = Math.round((progressEvent.loaded / progressEvent.total) * 100)
+                    callback(num)
+                }
+            },
+            timeout: 600000
         })
     },
     /**
@@ -129,24 +136,38 @@ export default {
     * @param {Object} data.replaceDatabaseId 文件id
     * @param {String} data.delimiter 分隔符
     */
-    actionReplaceCsvFile(data) {
+    actionReplaceCsvFile(data, callback = () => {}) {
         return $axios({
             method: 'post',
             headers: { 'Content-Type': 'multipart/form-data' },
             url: '/datasource/csv/checkout',
-            data
+            data,
+            onUploadProgress: (progressEvent) => {
+                if (progressEvent.lengthComputable) {
+                    let num = Math.round((progressEvent.loaded / progressEvent.total) * 100)
+                    callback(num)
+                }
+            },
+            timeout: 600000
         })
     },
     /**
      * @description 上传excel文件
      * @param {Object} file 文件
      */
-    actionUploadExcelFile(data) {
+    actionUploadExcelFile(data, callback = () => {}) {
         return $axios({
             method: 'post',
             headers: { 'Content-Type': 'multipart/form-data' },
             url: '/datasource/excel/read',
-            data
+            data,
+            onUploadProgress: (progressEvent) => {
+                if (progressEvent.lengthComputable) {
+                    let num = Math.round((progressEvent.loaded / progressEvent.total) * 100)
+                    callback(num)
+                }
+            },
+            timeout: 600000
         })
     },
     /**
@@ -155,12 +176,19 @@ export default {
      * @param {Object} data.file 文件
      * @param {String} data.delimiter 分隔符
      */
-    actionUploadCsvFile(data) {
+    actionUploadCsvFile(data, callback = () => {}) {
         return $axios({
             method: 'post',
             headers: { 'Content-Type': 'multipart/form-data' },
             url: '/datasource/csv/read',
-            data
+            data,
+            onUploadProgress: (progressEvent) => {
+                if (progressEvent.lengthComputable) {
+                    let num = Math.round((progressEvent.loaded / progressEvent.total) * 100)
+                    callback(num)
+                }
+            },
+            timeout: 600000
         })
     },
     /**
@@ -199,8 +227,9 @@ export default {
         return $axios({
             method: 'post',
             headers: { 'Content-Type': 'multipart/form-data' },
-            url: '/datasource/excel/save',
-            data
+            url: '/datasource/excel/batchsave',
+            data,
+            timeout: 300000
         })
     },
     /**
@@ -234,7 +263,8 @@ export default {
             method: 'post',
             headers: { 'Content-Type': 'multipart/form-data' },
             url: '/datasource/csv/save',
-            data
+            data,
+            timeout: 300000
         })
     },
     /**
