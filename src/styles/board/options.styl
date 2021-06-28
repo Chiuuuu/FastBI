@@ -549,3 +549,24 @@
         }
 
 }
+.color-select-bar{
+    display:flex;
+    justify-content:space-between;
+    width:90px;
+    .select-color{
+       width:20px;
+       height:20px;
+       border:1px solid black;
+       background:blue;
+       cursor:pointer;
+       &:first-child{
+           background: yellow;
+       }
+       &:last-child{
+           background: green;
+       }
+       &.selected{
+           border:3px solid red
+       }
+    }
+}

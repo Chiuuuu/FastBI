@@ -183,59 +183,8 @@ export default {
           this.legendVisible = val.legend && val.legend.show
           if (this.typeName === 've-map') {
             this.chartExtend = { ...omit(val, ['series']) }
-            this.chartSeries = val.series
-            if (this.chartSeries.length>0) {
-              this.chartSeries.forEach(item => {
-                if (
-                  !item.label.formatter ||
-                  item.label.formatter === '{b} ：{c}'
-                ) {
-                  // 添加标签格式回调
-                  item.label.formatter = function(params) {
-                    return params.data.value[2].toFixed(2)
-                  }
-                }
-              })
-            }
-            this.geo = val.geo
-            this.mapToolTip = val.tooltip
-            if (
-              !this.mapToolTip.formatter ||
-              this.mapToolTip.formatter === '{b} ：{c}'
-            ) {
-              // 添加格式回调函数
-              this.mapToolTip.formatter = function(params) {
-                let data = params.data
-                return `${params.seriesName}<br />${data.name}：${data
-                  .value[2] || data.value}`
-              }
-            }
-          } else if(this.typeName === 've-scatter'){ //散点图
-            this.chartExtend = { ...omit(val, ['series','legend']) }
-            this.chartLegend = val.legend; //图例
-            // series设置
-            let series = deepClone(val.series)
-            let data = series.data;
-            let list = [];
-            data.map(item=>{
-              list.push(deepClone(series))
-              list[list.length-1].data = item.data;
-              list[list.length-1].name = item.label;
-            })
-            this.chartSeries = list;
-            
-            // tooltip显示  -- 不生效
-            // this.chartExtend.tooltip.formatter = function(params){
-            //   let val= params.value;
-            //   if(val.length<6){ return ''};
-            //   console.log(params)
-            //   return `${params.marker}<br/>
-            //           ${val[5]}：${val[2]}<br/>
-            //           ${val[3]}：${val[0]}<br/>
-            //           ${val[4]}：${val[1]}<br/>
-            //           `;
-            // }
-
+            this.chartSeries = deepClone(val.series)
+            this.setMapFormatter()
           } else {
             this.chartExtend = { ...val }
           }
@@ -386,6 +335,34 @@ export default {
           }
         })
       })
+    },
+    // 地图显示内容格式拼接
+    setMapFormatter() {
+      for (let series of this.chartSeries) {
+        // 指标内容
+        let orient = series.label.normal.orient
+        series.label.normal.formatter = function(params) {
+          if (!params.data) {
+            return params.name
+          }
+          let str = []
+          series.pointShowList.forEach(item => {
+            str.push(params.data[item])
+          })
+          str = orient === 'vertical' ? str.join('\n') : str.join(':')
+          return str
+        }
+        series.tooltip.formatter = function(params) {
+          if (!params.data) {
+            return params.name
+          }
+          let str = []
+          series.tooltipShowList.forEach(item => {
+            str.push(params.data[item])
+          })
+          return str.join(':')
+        }
+      }
     },
     _calcStyle() {
       const wrap = this.$refs.wrap

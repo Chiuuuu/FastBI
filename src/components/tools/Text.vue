@@ -4,12 +4,13 @@
       @mousedown="removeSelection"
       @dblclick="focusCurrent"
       :contenteditable="editable"
-      data-placeholder="请输入内容,输入*插入度量"
+      data-placeholder="双击输入内容,输入*插入度量"
       :class="[
         'editor-text',
         { 'editor-text-placholder': isShowPlaceHolder },
         { 'cursor-text': editable }
       ]"
+      :style="contentStyle"
       ref="editorText"
     ></div>
   </div>
@@ -31,7 +32,7 @@ const aggregatorMap = {
   最小值: 'MIN',
   统计: 'CNT'
 }
-const reg = /<span class="edit-alias" contenteditable="false">(.*?)\(.*?\)(&nbsp;){3}<\/span>/g // 字符串替换模板
+const reg = /<span class="edit-alias" contenteditable="false">(.*?)<\/span>/g // /<span class="edit-alias" contenteditable="false">(.*?)\(.*?\)(&nbsp;){3}<\/span>/g // 字符串替换模板
 export default {
   name: 'mediumEidtor',
   props: {
@@ -115,6 +116,8 @@ export default {
         // 转换文本
         this.getContent().then(res => {
           this.$refs.editorText.innerHTML = res
+          this.selfConfig.title.text = res
+          this.updateChartData(this.id)
         })
         // 关闭防止冒泡，开启拖动
         this.$refs.textBox.onmousedown = null
@@ -146,17 +149,22 @@ export default {
     this.$nextTick(() => {
       // 进入页面获取计算文本
       //   if (this.canEdit) {
-      // 初始化显示数据，true:不需要匹配度量数据
-      this.getContent(true).then(res => {
-        this.$refs.editorText.innerHTML = res
-      })
+      // 使用缓存文本，进大屏不获取度量数据
+      if (this.config.title.text) {
+        this.$refs.editorText.innerHTML = this.config.title.text
+      } else {
+        // 初始化显示数据，true:不需要匹配度量数据
+        this.getContent(true).then(res => {
+          this.$refs.editorText.innerHTML = res
+        })
+      }
       //   }
     })
     var ContextMenuExtension = MediumEditor.Extension.extend({
       name: 'context-menu',
 
       init: function() {
-        this.subscribe('editableKeyup', this.handleKeydownEnter.bind(this))
+        this.subscribe('editableKeydown', this.handleKeydownEnter.bind(this))
         this.subscribe('editableKeydownDelete', this.keydownDel.bind(this))
       },
 
@@ -200,12 +208,16 @@ export default {
       },
 
       handleKeydownEnter(event) {
-        const isStar = event.keyCode === 56 || event.keyCode === 106
+        const isStar =
+          (event.keyCode === 56 && event.shiftKey) ||
+          event.keyCode === 106 ||
+          (event.keyCode === 229 && event.code === 'Digit8')
+        // console.log('test', event.keyCode, ' ', event.shiftKey, '', event.code)
         if (isStar) {
           // 阻断原处理流程
           event.preventDefault()
           const wrap = MediumEditor.selection.getSelectionRange(document)
-          document.execCommand('delete')
+          //   document.execCommand('delete')
           const span = document.createElement('span')
           span.id = 'antor'
           span.innerHTML = '*'
@@ -252,18 +264,18 @@ export default {
       // 显示切换富文本
       this.$refs.editorText.innerHTML = this.htmlText
       // 富文本度量添加点击事件
-      let spanList = document.querySelectorAll('.edit-alias')
-      spanList.forEach(span => {
-        span.addEventListener('click', this.clickMeasure)
-        // 验证度量更改
-        // 去掉空格
-        let alias = span.innerHTML.replace(/&nbsp;/gi, '')
-        let measure = this.modelMeasures.find(item => item.alias === alias)
-        // 度量不存在飘红
-        if (measure.status === 1) {
-          span.style.color = 'red'
-        }
-      })
+      //   let spanList = document.querySelectorAll('.edit-alias')
+      //   spanList.forEach(span => {
+      //     span.addEventListener('click', this.clickMeasure)
+      //     // 验证度量更改
+      //     // 去掉空格
+      //     let alias = span.innerHTML.replace(/&nbsp;/gi, '')
+      //     let measure = this.modelMeasures.find(item => item.alias === alias)
+      //     // 度量不存在飘红
+      //     if (measure.status === 1) {
+      //       span.style.color = 'red'
+      //     }
+      //   })
       // 防止拖动
       this.$refs.textBox.onmousedown = e => {
         e.stopPropagation()
@@ -329,9 +341,9 @@ export default {
       const span = document.createElement('span')
       span.className = 'edit-alias'
       span.contentEditable = false
-      span.innerHTML = `${arg}(求和)&nbsp;&nbsp;&nbsp;` // 给下拉三角样式留空
+      span.innerHTML = `${arg}` //  `${arg}(求和)&nbsp;&nbsp;&nbsp;` // 给下拉三角样式留空
       // 添加点击事件
-      span.onclick = this.clickMeasure
+      // span.onclick = this.clickMeasure
       return span
     },
     // 插入度量数据
@@ -367,13 +379,18 @@ export default {
       if (this.apiData.measures.length > 0) {
         let selected = this.canvasMap.find(item => item.id === this.id)
         let self = this
-        let loadingInstance = Loading.service({
-          lock: true,
-          text: '加载中...',
-          target: self.$refs.textBox
-        })
+        let loadingInstance = ''
+        if (!isInit) {
+          loadingInstance = Loading.service({
+            lock: true,
+            text: '加载中...',
+            target: self.$refs.textBox
+          })
+        }
         let res = await this.$server.screenManage.getData(selected)
-        loadingInstance.close()
+        if (loadingInstance) {
+          loadingInstance.close()
+        }
         // 数据源被删掉
         if (res.code === 500 && res.msg === 'IsChanged') {
           selected.setting.isEmpty = true
@@ -392,19 +409,19 @@ export default {
     },
     // 添加度量数据
     getMeasureDatas() {
-      let reg = /<span class="edit-alias" contenteditable="false">(.*?)(&nbsp;){3}<\/span>/g
+      let reg = /<span class="edit-alias" contenteditable="false">.*?<\/span>/g // /<span class="edit-alias" contenteditable="false">(.*?)(&nbsp;){3}<\/span>/g
       let measures = []
       let matchList = this.htmlText.match(reg)
       if (matchList) {
         for (let matchStr of matchList) {
-          let aliasArr = matchStr.match(/>(.*?)\((.*?)\)(&nbsp;){3}</)
+          let aliasArr = matchStr.match(/>(.*?)</) // />(.*?)\((.*?)\)(&nbsp;){3}</
           let alias = aliasArr[1]
           // 验重
           if (!measures.some(item => item.alias === alias)) {
             // 添加度量到图表数据
             let measure = this.modelMeasures.find(item => item.alias === alias)
             // 添加聚合方式值
-            measure.defaultAggregator = aggregatorMap[aliasArr[2]]
+            // measure.defaultAggregator = aggregatorMap[aliasArr[2]]
             measures.push(measure)
           }
         }
@@ -495,25 +512,25 @@ export default {
 .edit-alias {
   position: relative;
   display: inline-block;
-  cursor: pointer;
+  //   cursor: pointer;
   border: 1px solid grey;
-  &:after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 2px;
-    width: 0;
-    height: 0;
-    margin: auto 0;
-    border: 8px solid;
-    border-bottom-width: 0;
-    border-bottom-color: transparent;
-    border-left-color: transparent;
-    border-right-color: transparent;
-    color: grey;
-    cursor: pointer;
-  }
+  //   &:after {
+  //     content: '';
+  //     position: absolute;
+  //     top: 0;
+  //     bottom: 0;
+  //     right: 2px;
+  //     width: 0;
+  //     height: 0;
+  //     margin: auto 0;
+  //     border: 8px solid;
+  //     border-bottom-width: 0;
+  //     border-bottom-color: transparent;
+  //     border-left-color: transparent;
+  //     border-right-color: transparent;
+  //     color: grey;
+  //     cursor: pointer;
+  //   }
 }
 </style>
 <style lang="less" scoped>
@@ -532,6 +549,8 @@ export default {
     &:after {
       content: attr(data-placeholder) !important;
       position: absolute;
+      font-size: 20px;
+      color: white;
       top: 5px;
       left: 5px;
     }
