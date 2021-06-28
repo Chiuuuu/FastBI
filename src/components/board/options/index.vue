@@ -208,6 +208,7 @@
               <a-input-number
                 v-model="baseProperty.height"
                 size="small"
+                :max="selfConfig.title === '直线' ? 20 : Infinity"
                 :formatter="value => `H ${value}`"
                 :parser="value => value.replace(/\H\s?|(,*)/g, '')"
                 class="f-clear-width"
