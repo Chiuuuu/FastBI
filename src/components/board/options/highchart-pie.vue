@@ -82,6 +82,14 @@
       </gui-field>
     </a-collapse-panel>
     <a-collapse-panel key="properties" header="图形属性">
+      <gui-field label="是否3d图">
+        <a-switch
+          v-model="HighConfig.setting.config.chart.options3d.enabled"
+          default-checked
+          @change="setSelfProperty"
+          size="small"
+        />
+      </gui-field>
       <gui-field label="中心坐标">
         <gui-inline>
           <a-input

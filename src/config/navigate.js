@@ -1477,6 +1477,216 @@ const list = [{
           }
         },
         {
+          title: '旭日图',
+          name: 've-sun',
+          chartType: 'v-sun',
+          icon: 'icon_pie_chart.png',
+          // iconFont: 'icon-Pie-chart',
+          type: '1',
+          modelId: '',
+          isEmpty: false,
+          api_data: {
+            columns: ['日期', '访问用户'],
+            rows: [],
+            options: {}
+          },
+          apis: {
+
+          },
+          background: {
+            backgroundType: '1',
+            backgroundColor: '',
+            borderColor: '',
+            borderWidth: 0,
+            borderStyle: '',
+            borderRadius: 0
+          },
+          config: {
+            title: {
+              show: true,
+              content: '旭日图',
+              textAlign: 'left',
+              textStyle: {
+                color: '#ffffff',
+                fontSize: 20,
+                fontFamily: 'not specified',
+                fontWeight: 'normal'
+              }
+            },
+            grid: {
+              left: 20,
+              top: 60,
+              right: 20,
+              bottom: 30
+            },
+            legend: {
+              show: true,
+              orient: 'horizontal',
+              textStyle: {
+                color: '#ffffff',
+                fontSize: 12
+              },
+              itemGap: 12,
+              icon: '',
+              left: 'center',
+              top: 'auto',
+              right: 'auto',
+              bottom: 'auto'
+            },
+            xAxis: {
+              show: false,
+              axisLabel: {
+                color: '#ffffff',
+                fontSize: 12,
+                rotate: 0
+              },
+              axisLine: {
+                show: false,
+                lineStyle: {
+                  color: '#cccccc'
+                }
+              },
+              splitLine: {
+                show: false,
+                lineStyle: {
+                  color: '#cccccc'
+                }
+              }
+            },
+            yAxis: {
+              show: false,
+              axisLabel: {
+                color: '#ffffff',
+                fontSize: 12
+              },
+              axisLine: {
+                show: false,
+                lineStyle: {
+                  color: '#cccccc'
+                }
+              },
+              splitLine: {
+                show: false,
+                lineStyle: {
+                  color: '#cccccc'
+                }
+              }
+            },
+            series: {
+              label: {
+                show: true,
+                color: '',
+                fontSize: 12,
+                position: 'outside', // 可选inside
+                formatter: '{b}: {@2012} ({d}%)'
+              },
+              center: ['50%', '50%'] // 饼图可选
+            },
+            color: DEFAULT_COLORS
+          },
+          chartEvents: {
+            click: chartClick
+          },
+          view: {
+            width: 400,
+            height: 400,
+            x: 760,
+            y: 340
+          }
+        },
+        {
+          title: '矩形热力图',
+          name: 'e-heat',
+          chartType: 'e-heat',
+          icon: 'icon_pie_chart.png',
+          // iconFont: 'icon-Pie-chart',
+          type: '1',
+          modelId: '',
+          isEmpty: false,
+          api_data: {
+            columns: ['日期', '访问用户'],
+            rows: [],
+            options: {}
+          },
+          apis: {
+
+          },
+          background: {
+            backgroundType: '1',
+            backgroundColor: '',
+            borderColor: '',
+            borderWidth: 0,
+            borderStyle: '',
+            borderRadius: 0
+          },
+          config: {
+            title: {
+              show: true,
+              content: '矩形热力图',
+              textAlign: 'left',
+              textStyle: {
+                color: '#ffffff',
+                fontSize: 20,
+                fontFamily: 'not specified',
+                fontWeight: 'normal'
+              }
+            },
+            tooltip: {
+              position: 'top'
+            },
+            grid: {
+              height: '50%',
+              top: '10%'
+            },
+            xAxis: {
+              type: 'category',
+              data: hours,
+              splitArea: {
+                show: true
+              }
+            },
+            yAxis: {
+              type: 'category',
+              // data: days,
+              splitArea: {
+                show: true
+              }
+            },
+            visualMap: {
+              min: 0,
+              max: 10,
+              calculable: true,
+              orient: 'horizontal',
+              left: 'center',
+              bottom: '15%'
+            },
+            series: [{
+              name: 'Punch Card',
+              type: 'heatmap',
+              data: data,
+              label: {
+                show: true
+              },
+              emphasis: {
+                itemStyle: {
+                  shadowBlur: 10,
+                  shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+              }
+            }],
+            color: DEFAULT_COLORS
+          },
+          chartEvents: {
+            click: chartClick
+          },
+          view: {
+            width: 400,
+            height: 400,
+            x: 760,
+            y: 340
+          }
+        },
+        {
           title: "立体饼图",
           name: 'high-pie',
           chartType: 'high-pie',
@@ -1528,12 +1738,12 @@ const list = [{
             //   show: true,
             //   content: '立体饼图',
             //   textAlign: 'left',
-              // textStyle: {
-              //   color: '#ffffff',
-              //   fontSize: 20,
-              //   fontFamily: 'not specified',
-              //   fontWeight: 'normal'
-              // }
+            // textStyle: {
+            //   color: '#ffffff',
+            //   fontSize: 20,
+            //   fontFamily: 'not specified',
+            //   fontWeight: 'normal'
+            // }
             // },
             //去掉右下角广告
             credits: {
@@ -1681,10 +1891,10 @@ const list = [{
               type: 'column', //cylinder圆柱
               reflow: true,
               //图形边距
-              marginTop:100,
-              marginBottom:60,
-              marginLeft:60,
-              marginRight:60,
+              marginTop: 100,
+              marginBottom: 60,
+              marginLeft: 60,
+              marginRight: 60,
 
               options3d: {
                 enabled: true,
@@ -1720,47 +1930,47 @@ const list = [{
               },
             },
             xAxis: {
-              type:"category",
-              visible:true,
-              gridLineColor: '#fff',//网格线颜色
-		          gridLineWidth: 0, //纵向网格线宽度
+              type: "category",
+              visible: true,
+              gridLineColor: '#fff', //网格线颜色
+              gridLineWidth: 0, //纵向网格线宽度
               labels: {
-                rotation:0,
+                rotation: 0,
                 style: {
                   color: '#fff',
-                  fontSize:12,
-                  fontFamily:'微软雅黑'
+                  fontSize: 12,
+                  fontFamily: '微软雅黑'
                 }
-              },	  
+              },
               title: {
                 text: '',
-                fontSize:12,
-                align: 'high',//"low"，"middle" 和 "high
-                style:{
-                  color:'#fff',
-                  fontSize:12,
+                fontSize: 12,
+                align: 'high', //"low"，"middle" 和 "high
+                style: {
+                  color: '#fff',
+                  fontSize: 12,
                 }
               }
             },
             yAxis: {
-              type:'value',
-              visible:true,
-              gridLineColor: '#fff',//网格线颜色
+              type: 'value',
+              visible: true,
+              gridLineColor: '#fff', //网格线颜色
               gridLineWidth: 1, //纵向网格线宽度
               labels: {
                 style: {
                   color: '#fff',
-                  fontSize:12,
-                  fontFamily:'微软雅黑'
+                  fontSize: 12,
+                  fontFamily: '微软雅黑'
                 }
-              },	  
+              },
               title: {
                 text: '',
-                fontSize:12,
-                align: 'middle',//"low"，"middle" 和 "high
-                style:{
-                  color:'#fff',
-                  fontSize:12,
+                fontSize: 12,
+                align: 'middle', //"low"，"middle" 和 "high
+                style: {
+                  color: '#fff',
+                  fontSize: 12,
                 }
               }
             },
@@ -1775,14 +1985,14 @@ const list = [{
                 //是否显示数值
                 dataLabels: {
                   enabled: true, //设置显示对应y的值
-                  inside:false,//是否显示在内部
+                  inside: false, //是否显示在内部
                   color: '#fff',
                   style: {
-                    fontSize:13,
+                    fontSize: 13,
                     textOutline: 'none' //去掉文字白边
                   },
                 },
-                stacking: null,//null（不进行堆叠）、"normal"（普通堆叠） 和 "percent"（百分比堆叠
+                stacking: null, //null（不进行堆叠）、"normal"（普通堆叠） 和 "percent"（百分比堆叠
               }
             },
             series: [{
@@ -1825,7 +2035,8 @@ const list = [{
             x: 760,
             y: 340
           }
-        }
+        },
+
         //   {
         //     title: '高德地图',
         //     name: 'a-map',
@@ -2136,87 +2347,102 @@ const list = [{
     title: '添加图形',
     hovered: false,
     icon: 'scissor',
-    tabs: [
-      {
-        title: '添加图形',
-        children: [
-          {
-            key: 0,
-            name: 'figure',
+    tabs: [{
+      title: '添加图形',
+      children: [{
+          key: 0,
+          name: 'figure',
+          title: '直线',
+          chartType: 'line',
+          icon: 'icon_addteb.png',
+          modelId: '',
+          config: {
             title: '直线',
-            chartType: 'line',
-            icon: 'icon_addteb.png',
-            modelId: '',
-            config: {
-              title: '直线',
-              noTitle: true, // 默认写死没有标题
-              name: 'figure',
-              style: {
-                backgroundColor: 'transparent',
-                opacity: 1,
-                borderColor: '#fff',
-                borderRadius: 0,
-                borderWidth: 20,
-                borderStyle: 'solid',
-                shadowColor: '#fff',
-                showShadow: false
-              }
-            },
-            api_data: {},
-            apis: {},
-            view: { width: 400, height: 20, x: 760, y: 340, rotate: 0 }
-          },
-          {
-            key: 1,
+            noTitle: true, // 默认写死没有标题
             name: 'figure',
-            title: '圆形',
-            chartType: 'circle',
-            icon: 'icon_addteb.png',
-            modelId: '',
-            config: {
-              title: '圆形',
-              noTitle: true, // 默认写死没有标题
-              name: 'figure',
-              style: {
-                backgroundColor: '#fff',
-                opacity: 1,
-                borderColor: '#000',
-                borderRadius: '50%',
-                borderWidth: 1,
-                borderStyle: 'solid'
-              }
-            },
-            api_data: {},
-            apis: {},
-            view: { width: 400, height: 400, x: 760, y: 340, rotate: 0 }
+            style: {
+              backgroundColor: 'transparent',
+              opacity: 1,
+              borderColor: '#fff',
+              borderRadius: 0,
+              borderWidth: 20,
+              borderStyle: 'solid',
+              shadowColor: '#fff',
+              showShadow: false
+            }
           },
-          {
-            key: 2,
-            name: 'figure',
-            title: '矩形',
-            chartType: 'rectangle',
-            icon: 'icon_addteb.png',
-            modelId: '',
-            config: {
-              title: '矩形',
-              noTitle: true, // 默认写死没有标题
-              name: 'figure',
-              style: {
-                backgroundColor: '#fff',
-                opacity: 1,
-                borderColor: '#000',
-                borderRadius: 0,
-                borderWidth: 1,
-                borderStyle: 'solid'
-              }
-            },
-            api_data: {},
-            apis: {},
-            view: { width: 400, height: 400, x: 760, y: 340, rotate: 0 }
+          api_data: {},
+          apis: {},
+          view: {
+            width: 400,
+            height: 20,
+            x: 760,
+            y: 340,
+            rotate: 0
           }
-        ]
-      }
-    ]
+        },
+        {
+          key: 1,
+          name: 'figure',
+          title: '圆形',
+          chartType: 'circle',
+          icon: 'icon_addteb.png',
+          modelId: '',
+          config: {
+            title: '圆形',
+            noTitle: true, // 默认写死没有标题
+            name: 'figure',
+            style: {
+              backgroundColor: '#fff',
+              opacity: 1,
+              borderColor: '#000',
+              borderRadius: '50%',
+              borderWidth: 1,
+              borderStyle: 'solid'
+            }
+          },
+          api_data: {},
+          apis: {},
+          view: {
+            width: 400,
+            height: 400,
+            x: 760,
+            y: 340,
+            rotate: 0
+          }
+        },
+        {
+          key: 2,
+          name: 'figure',
+          title: '矩形',
+          chartType: 'rectangle',
+          icon: 'icon_addteb.png',
+          modelId: '',
+          config: {
+            title: '矩形',
+            noTitle: true, // 默认写死没有标题
+            name: 'figure',
+            style: {
+              backgroundColor: '#fff',
+              opacity: 1,
+              borderColor: '#000',
+              borderRadius: 0,
+              borderWidth: 1,
+              borderStyle: 'solid'
+            }
+          },
+          api_data: {},
+          apis: {},
+          view: {
+            width: 400,
+            height: 400,
+            x: 760,
+            y: 340,
+            rotate: 0
+          }
+        }
+      ]
+    }]
   },
   {
     type: 'Base',

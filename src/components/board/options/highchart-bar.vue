@@ -164,13 +164,6 @@
           ></el-color-picker>
         </gui-inline>
       </gui-field>
-      <!-- <gui-field label="是否圆柱">
-        <a-switch
-          v-model="bartype.isyz"
-          size="small"
-          @change="a=>setHistogram(a,'chart')"
-        ></a-switch>
-      </gui-field> -->
       <gui-field label="内旋转角">
         <a-slider
           :default-value="HighConfig.setting.config.chart.options3d.alpha"
@@ -195,6 +188,13 @@
           @change="setSelfProperty"
         />
       </gui-field>
+      <!-- <gui-field label="是否圆柱">
+        <a-switch
+          v-model="bartype.isyz"
+          size="small"
+          @change="a=>setHistogram(a,'chart')"
+        ></a-switch>
+      </gui-field> -->
       <gui-field label="堆叠柱形图">
         <a-switch
           size="small"
@@ -591,6 +591,7 @@ export default {
       type: Object,
       required: true,
     },
+   
   },
   mixins: [HighMinxins],
   components: { GuiField, GuiInline },
