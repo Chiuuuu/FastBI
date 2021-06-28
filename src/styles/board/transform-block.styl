@@ -6,6 +6,7 @@
   position: absolute;
   top: 0;
   left: 0;
+  transform-origin: 0 0;
   will-change: transform;
   .dv-com {
     outline: 0;
@@ -16,10 +17,11 @@
     &.hovered {
       background: rgba(0, 231, 255, .11);
     }
+  }
     .dv-wrapper {
       pointer-events: none !important;
+      position: relative;
     }
-  }
   .transform-handler {
     width: 100%;
     height: 100%;
@@ -52,6 +54,7 @@
   left: 0;
   pointer-events: none;
   box-sizing: content-box;
+  transform-origin: left 0;
   .navigator-line-left {
     position: absolute;
     border-top: 1px dashed $color-navigator-line;
@@ -327,6 +330,23 @@
         background: #fff;
       }
     }
+  }
+
+  .line-left-point,
+  .line-right-point {
+    position: absolute;  
+    top: -14px;
+    background: transparent;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: move;
+  }
+  .line-left-point {
+    left: -25px;  
+  }
+  .line-right-point {
+    left: calc(100% - 25px);
   }
   // .control-rotate {
   //   display: block;
