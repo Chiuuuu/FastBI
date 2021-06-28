@@ -9,16 +9,20 @@ export default {
   props: {
     setting: {
       type: Object,
-      required: true,
+      required: true
     },
     apiData: {
       type: Object,
-      required: true,
+      required: true
     },
+    config: {
+      type: Object
+      // required: true,
+    }
   },
   data() {
     return {
-      chart: null,
+      chart: null
     }
   },
   mounted() {
@@ -30,21 +34,22 @@ export default {
         this.$refs.container,
         this.setting.config
       )
-    },
+    }
   },
   watch: {
     setting: {
       handler(val) {
         val.config.chart.width = val.view.width
         val.config.chart.height = val.view.height
-        // this.chart.options.chart.width = val.view.width
-        // this.chart.options.chart.height = val.view.height
-        // this.chart.options = Object.assign(this.chart.options,val.config);
-        this.$highCharts.chart(this.$refs.container, val.config)
-        // this.chart.redraw(false);
+        // this.$highCharts.chart(this.$refs.container, val.config);
+        this.chart.update(val.config)
       },
-      deep: true,
+      deep: true
       // immediate:true
+    },
+    config: {
+      handler(val) {},
+      deep: true
     },
     apiData: {
       handler(val) {
@@ -53,34 +58,36 @@ export default {
         measures//度量(value)
       */
         //单维度
+        if (!val.source) {
+          return
+        }
         let _dimensions = val.dimensions[0].alias
         //判断是否单度量和多度量
-        let _measure = val.measures.map((item) => item.alias),
+        let _measure = val.measures.map(item => item.alias),
           series = []
 
-        _measure.forEach((key) => {
+        _measure.forEach(key => {
           series.push({
             name: key,
-            data: val.source.rows.map((x) => ({
+            data: val.source.rows.map(x => ({
               name: x[_dimensions],
-              y: x[key],
-            })),
+              y: x[key]
+            }))
           })
         })
-
-        // let obj = {
-        //   key:val.dimensions[0].alias,
-        //   val:val.measures[0].alias
-        // };
-        // let _source = val.source.rows.map(item=>({
-        //   name:item[obj.key]==null?'':item[obj.key],
-        //   y:item[obj.val]==null?0:item[obj.val]
-        // }));
+        if (series.length == 0) {
+          return
+        }
         this.setting.config.series = [...series]
-        this.$highCharts.chart(this.$refs.container, this.setting.config)
+        this.chart = this.$highCharts.chart(
+          this.$refs.container,
+          this.setting.config
+        )
+        //this.chart.update(this.setting.config);//只能更新原来的一个或两个series，哪怕多加series，也不会起作用
       },
-    },
-  },
+      deep: true
+    }
+  }
 }
 </script>
 <style lang="less" scoped>

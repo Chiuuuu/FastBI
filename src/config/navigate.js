@@ -4,6 +4,7 @@ import guangzhou from '../utils/guangdong.json'
 function chartClick(e) {
   console.log(e)
 }
+
 /**
  * type = 1 维度度量都需要的图表
  * type = 2 只有度量的图表(仪表盘、环形图)
@@ -1455,6 +1456,474 @@ const list = [
             }
           },
           {
+            title: '散点图',
+            name: 've-scatter',
+            chartType: 'v-scatter',
+            icon: 'icon_pie_chart.png',
+            type: '1',
+            modelId: '',
+            isEmpty: false,
+            api_data: {
+              dimensions: [],
+              measures: [],
+              source: {},
+              columns: [
+                // 'x','y','日期'
+              ],
+              rows: [
+                // { 日期: '1/1', x: 1393, y: 1093 },
+                // { 日期: '1/2', x: 3530, y: 3230 },
+                // { 日期: '1/3', x: 2923, y: 2623 },
+                // { 日期: '1/4', x: 1723, y: 1423 },
+                // { 日期: '1/5', x: 3792, y: 3492 },
+                // { 日期: '1/6', x: 4593, y: 4293 }
+              ],
+              options: {}
+            },
+            apis: {
+              // level: [['1/1', '1/2', '1/3'], ['1/4', '1/5']],
+              labelMap: {
+                x: '值',
+                y: '值',
+                s: '类目'
+              },
+              radius: 100,
+              // 自定义参数
+              scatterColor: '1', //散点颜色 0单色 1按维度
+              scatterSize: '', //散点大小  0：按度量1  1：按度量2  默认空，为无
+              scatterLabel: [], //指标-显示内容
+              arrange: 'horizontal', //指标-排列 horizontal水平  vertical垂直
+              scatterTargetColor: '0', //0使用图例 1：自定义
+              xMax: 1000, //度量1 最大值
+              yMax: 1000 //度量2 最大值
+            },
+            background: {
+              backgroundType: '1',
+              backgroundColor: '',
+              borderColor: '',
+              borderWidth: 0,
+              borderStyle: '',
+              borderRadius: 0
+            },
+            config: {
+              title: {
+                show: true,
+                content: '散点图',
+                textAlign: 'left',
+                textStyle: {
+                  color: '#ffffff',
+                  fontSize: 20,
+                  fontFamily: 'not specified',
+                  fontWeight: 'normal'
+                }
+              },
+              tooltip: {
+                show: true,
+                trigger: 'item',
+                confine: true,
+                formatter: ''
+              },
+              grid: {
+                left: 50,
+                top: 60,
+                right: 50,
+                bottom: 50
+              },
+              legend: {
+                show: true,
+                orient: 'horizontal',
+                textStyle: {
+                  color: '#ffffff',
+                  fontSize: 12
+                },
+                itemGap: 12,
+                icon: '',
+                left: 'center',
+                top: 'auto',
+                right: 'auto',
+                bottom: 'auto',
+                data: ['广州1', '广州2', '广州3']
+              },
+              xAxis: {
+                type: 'value',
+                name: '',
+                nameLocation: 'middle',
+                nameGap: 20,
+                nameTextStyle: {
+                  color: '#fff',
+                  fontSize: '12',
+                  align: 'right',
+                  padding: [30, 0, 0, 0]
+                },
+                axisLabel: {
+                  color: '#ffffff',
+                  fontSize: 12,
+                  rotate: 0
+                },
+                axisLine: {
+                  show: true,
+                  lineStyle: {
+                    color: '#fff'
+                  }
+                },
+                splitLine: {
+                  show: false,
+                  lineStyle: {
+                    type: 'solid',
+                    color: '#fff'
+                  }
+                },
+                axisTick: {
+                  show: true
+                }
+              },
+              yAxis: {
+                type: 'value',
+                name: '',
+                position: 'left',
+                nameLocation: 'middle',
+                nameTextStyle: {
+                  color: '#fff',
+                  fontSize: 12,
+                  padding: [0, 0, 40, 0]
+                },
+                axisLabel: {
+                  color: '#ffffff',
+                  fontSize: 12
+                },
+                axisLine: {
+                  show: false,
+                  lineStyle: {
+                    color: '#fff'
+                  }
+                },
+                splitLine: {
+                  show: false,
+                  lineStyle: {
+                    type: 'solid',
+                    color: '#fff'
+                  }
+                },
+                axisTick: {
+                  show: false
+                }
+              },
+              series: {
+                name: '',
+                type: 'scatter',
+                symbolSize: 15,
+                label: {
+                  show: false,
+                  color: '',
+                  fontSize: 12,
+                  position: 'outside', // 可选inside
+                  align: 'left',
+                  offset: [-10, 0]
+                },
+                data: [
+                  {
+                    label: '广州1',
+                    data: [
+                      {
+                        name: '',
+                        value: [1000, 1000, '广州1', 'x', 'y', '地区']
+                      },
+                      {
+                        name: '',
+                        value: [130, 1050, '广州1', 'x', 'y', '地区']
+                      }
+                    ]
+                  },
+                  {
+                    label: '广州2',
+                    data: [
+                      {
+                        name: '',
+                        value: [550, 700, '广州2', 'x', 'y', '地区']
+                      },
+                      {
+                        name: '',
+                        value: [660, 120, '广州2', 'x', 'y', '地区']
+                      }
+                    ]
+                  },
+                  {
+                    label: '广州3',
+                    data: [
+                      {
+                        name: '',
+                        value: [660, 700, '广州3', 'x', 'y', '地区']
+                      },
+                      {
+                        name: '',
+                        value: [880, 120, '广州3', 'x', 'y', '地区']
+                      }
+                    ]
+                  }
+                ]
+              },
+              color: DEFAULT_COLORS
+            },
+            chartEvents: {
+              click: chartClick
+            },
+            view: {
+              width: 400,
+              height: 400,
+              x: 760,
+              y: 340
+            }
+          },
+          {
+            title: '旭日图',
+            name: 've-sun',
+            chartType: 'v-sun',
+            icon: 'icon_pie_chart.png',
+            // iconFont: 'icon-Pie-chart',
+            type: '1',
+            modelId: '',
+            isEmpty: false,
+            api_data: {
+              columns: ['日期', '访问用户'],
+              rows: [],
+              options: {}
+            },
+            apis: {},
+            background: {
+              backgroundType: '1',
+              backgroundColor: '',
+              borderColor: '',
+              borderWidth: 0,
+              borderStyle: '',
+              borderRadius: 0
+            },
+            config: {
+              title: {
+                show: true,
+                content: '旭日图',
+                textAlign: 'left',
+                textStyle: {
+                  color: '#ffffff',
+                  fontSize: 20,
+                  fontFamily: 'not specified',
+                  fontWeight: 'normal'
+                }
+              },
+              grid: {
+                left: 20,
+                top: 60,
+                right: 20,
+                bottom: 30
+              },
+              legend: {
+                show: true,
+                orient: 'horizontal',
+                textStyle: {
+                  color: '#ffffff',
+                  fontSize: 12
+                },
+                itemGap: 12,
+                icon: '',
+                left: 'center',
+                top: 'auto',
+                right: 'auto',
+                bottom: 'auto'
+              },
+              xAxis: {
+                show: false,
+                axisLabel: {
+                  color: '#ffffff',
+                  fontSize: 12,
+                  rotate: 0
+                },
+                axisLine: {
+                  show: false,
+                  lineStyle: {
+                    color: '#cccccc'
+                  }
+                },
+                splitLine: {
+                  show: false,
+                  lineStyle: {
+                    color: '#cccccc'
+                  }
+                }
+              },
+              yAxis: {
+                show: false,
+                axisLabel: {
+                  color: '#ffffff',
+                  fontSize: 12
+                },
+                axisLine: {
+                  show: false,
+                  lineStyle: {
+                    color: '#cccccc'
+                  }
+                },
+                splitLine: {
+                  show: false,
+                  lineStyle: {
+                    color: '#cccccc'
+                  }
+                }
+              },
+              series: {
+                label: {
+                  show: true,
+                  color: '',
+                  fontSize: 12,
+                  position: 'outside', // 可选inside
+                  formatter: '{b}: {@2012} ({d}%)'
+                },
+                center: ['50%', '50%'] // 饼图可选
+              },
+              color: DEFAULT_COLORS
+            },
+            chartEvents: {
+              click: chartClick
+            },
+            view: {
+              width: 400,
+              height: 400,
+              x: 760,
+              y: 340
+            }
+          },
+          {
+            title: '矩形热力图',
+            name: 've-heatmap',
+            chartType: 'e-heat',
+            icon: 'icon_pie_chart.png',
+            // iconFont: 'icon-Pie-chart',
+            type: '1',
+            modelId: '',
+            isEmpty: false,
+            api_data: {
+              dimensions: [],
+              measures: [],
+              source: {},
+              columns: [],
+              rows: [],
+              options: {}
+            },
+            apis: {
+              labelMap: {
+                x: '值',
+                y: '值',
+                s: '类目'
+              }
+            },
+            background: {
+              backgroundType: '1',
+              backgroundColor: '',
+              borderColor: '',
+              borderWidth: 0,
+              borderStyle: '',
+              borderRadius: 0
+            },
+            config: {
+              title: {
+                show: true,
+                content: '矩形热力图',
+                textAlign: 'left',
+                textStyle: {
+                  color: '#ffffff',
+                  fontSize: 20,
+                  fontFamily: 'not specified',
+                  fontWeight: 'normal'
+                }
+              },
+              tooltip: {
+                position: 'top'
+              },
+              grid: {
+                height: '50%',
+                top: '10%'
+              },
+              xAxis: {
+                type: 'category',
+                data: [
+                  '1a',
+                  '2a',
+                  '3a',
+                  '4a',
+                  '5a',
+                  '6a',
+                  '7a',
+                  '8a',
+                  '9a',
+                  '10a',
+                  '11a',
+                  '12a'
+                ],
+                splitArea: {
+                  show: true
+                }
+              },
+              yAxis: {
+                type: 'category',
+                data: [
+                  'Saturday',
+                  'Friday',
+                  'Thursday',
+                  'Wednesday',
+                  'Tuesday',
+                  'Monday',
+                  'Sunday'
+                ],
+                splitArea: {
+                  show: true
+                }
+              },
+              visualMap: {
+                min: 0,
+                max: 10,
+                calculable: true,
+                orient: 'horizontal',
+                left: 'center',
+                bottom: '15%'
+              },
+              series: {
+                name: 'Punch Card',
+                type: 'heatmap',
+                data: [
+                  ['1a', 'Sunday', 2],
+                  ['2a', 'Saturday', 4],
+                  ['3a', 'Friday', 6],
+                  ['4a', 'Saturday', 8],
+                  ['5a', 'Thursday', 10],
+                  ['6a', 'Saturday', 1],
+                  ['7a', 'Wednesday', 2],
+                  ['8a', 'Saturday', 3],
+                  ['9a', 'Tuesday', 24],
+                  ['10a', 'Saturday', 5],
+                  ['11a', 'Monday', 20],
+                  ['12a', 'Saturday', 12]
+                ],
+                label: {
+                  show: true
+                }
+                // emphasis: {
+                //   itemStyle: {
+                //     shadowBlur: 10,
+                //     shadowColor: 'rgba(0, 0, 0, 0.5)'
+                //   }
+                // }
+              },
+              color: DEFAULT_COLORS
+            },
+            chartEvents: {
+              click: chartClick
+            },
+            view: {
+              width: 400,
+              height: 400,
+              x: 760,
+              y: 340
+            }
+          },
+          {
             title: '立体饼图',
             name: 'high-pie',
             chartType: 'high-pie',
@@ -1807,217 +2276,18 @@ const list = [
                   ]
                 }
               ]
-            }
-          },
-          {
-            title: '散点图',
-            name: 've-scatter',
-            chartType: 'v-scatter',
-            icon: 'icon_pie_chart.png',
-            type: '1',
-            modelId: '',
-            isEmpty: false,
-            api_data: {
-              dimensions: [],
-              measures: [],
-              source: {},
-              columns: [
-                // 'x','y','日期'
-              ],
-              rows: [
-                // { 日期: '1/1', x: 1393, y: 1093 },
-                // { 日期: '1/2', x: 3530, y: 3230 },
-                // { 日期: '1/3', x: 2923, y: 2623 },
-                // { 日期: '1/4', x: 1723, y: 1423 },
-                // { 日期: '1/5', x: 3792, y: 3492 },
-                // { 日期: '1/6', x: 4593, y: 4293 }
-              ],
-              options: {}
-            },
-            apis: {
-              // level: [['1/1', '1/2', '1/3'], ['1/4', '1/5']],
-              labelMap: {
-                x: '值',
-                y: '值',
-                s: '类目'
-              },
-              radius: 100,
-              // 自定义参数
-              scatterColor: '1', //散点颜色 0单色 1按维度
-              scatterSize: '', //散点大小  0：按度量1  1：按度量2  默认空，为无
-              scatterLabel: [], //指标-显示内容
-              arrange: 'horizontal', //指标-排列 horizontal水平  vertical垂直
-              scatterTargetColor: '0', //0使用图例 1：自定义
-              xMax: 1000, //度量1 最大值
-              yMax: 1000 //度量2 最大值
-            },
-            background: {
-              backgroundType: '1',
-              backgroundColor: '',
-              borderColor: '',
-              borderWidth: 0,
-              borderStyle: '',
-              borderRadius: 0
-            },
-            config: {
-              title: {
-                show: true,
-                content: '散点图',
-                textAlign: 'left',
-                textStyle: {
-                  color: '#ffffff',
-                  fontSize: 20,
-                  fontFamily: 'not specified',
-                  fontWeight: 'normal'
-                }
-              },
-              tooltip: {
-                show: true,
-                trigger: 'item',
-                confine: true,
-                formatter: ''
-              },
-              grid: { left: 50, top: 60, right: 50, bottom: 50 },
-              legend: {
-                show: true,
-                orient: 'horizontal',
-                textStyle: {
-                  color: '#ffffff',
-                  fontSize: 12
-                },
-                itemGap: 12,
-                icon: '',
-                left: 'center',
-                top: 'auto',
-                right: 'auto',
-                bottom: 'auto',
-                data: ['广州1', '广州2', '广州3']
-              },
-              xAxis: {
-                type: 'value',
-                name: '',
-                nameLocation: 'middle',
-                nameGap: 20,
-                nameTextStyle: {
-                  color: '#fff',
-                  fontSize: '12',
-                  align: 'right',
-                  padding: [30, 0, 0, 0]
-                },
-                axisLabel: {
-                  color: '#ffffff',
-                  fontSize: 12,
-                  rotate: 0
-                },
-                axisLine: {
-                  show: true,
-                  lineStyle: {
-                    color: '#fff'
-                  }
-                },
-                splitLine: {
-                  show: false,
-                  lineStyle: {
-                    type: 'solid',
-                    color: '#fff'
-                  }
-                },
-                axisTick: {
-                  show: true
-                }
-              },
-              yAxis: {
-                type: 'value',
-                name: '',
-                position: 'left',
-                nameLocation: 'middle',
-                nameTextStyle: {
-                  color: '#fff',
-                  fontSize: 12,
-                  padding: [0, 0, 40, 0]
-                },
-                axisLabel: {
-                  color: '#ffffff',
-                  fontSize: 12
-                },
-                axisLine: {
-                  show: false,
-                  lineStyle: {
-                    color: '#fff'
-                  }
-                },
-                splitLine: {
-                  show: false,
-                  lineStyle: {
-                    type: 'solid',
-                    color: '#fff'
-                  }
-                },
-                axisTick: {
-                  show: false
-                }
-              },
-              series: {
-                name: '',
-                type: 'scatter',
-                symbolSize: 15,
-                label: {
-                  show: false,
-                  color: '',
-                  fontSize: 12,
-                  position: 'outside', // 可选inside
-                  align: 'left',
-                  offset: [-10, 0]
-                },
-                data: [
-                  {
-                    label: '广州1',
-                    data: [
-                      {
-                        name: '',
-                        value: [1000, 1000, '广州1', 'x', 'y', '地区']
-                      },
-                      {
-                        name: '',
-                        value: [130, 1050, '广州1', 'x', 'y', '地区']
-                      }
-                    ]
-                  },
-                  {
-                    label: '广州2',
-                    data: [
-                      {
-                        name: '',
-                        value: [550, 700, '广州2', 'x', 'y', '地区']
-                      },
-                      {
-                        name: '',
-                        value: [660, 120, '广州2', 'x', 'y', '地区']
-                      }
-                    ]
-                  },
-                  {
-                    label: '广州3',
-                    data: [
-                      {
-                        name: '',
-                        value: [660, 700, '广州3', 'x', 'y', '地区']
-                      },
-                      {
-                        name: '',
-                        value: [880, 120, '广州3', 'x', 'y', '地区']
-                      }
-                    ]
-                  }
-                ]
-              },
-              color: DEFAULT_COLORS
             },
             chartEvents: {
               click: chartClick
             },
-            view: { width: 400, height: 400, x: 760, y: 340 }
+            view: {
+              width: 400,
+              height: 400,
+              x: 760,
+              y: 340
+            }
           }
+
           //   {
           //     title: '高德地图',
           //     name: 'a-map',
@@ -2362,7 +2632,13 @@ const list = [
             },
             api_data: {},
             apis: {},
-            view: { width: 400, height: 20, x: 760, y: 340, rotate: 0 }
+            view: {
+              width: 400,
+              height: 20,
+              x: 760,
+              y: 340,
+              rotate: 0
+            }
           },
           {
             key: 1,
@@ -2386,7 +2662,13 @@ const list = [
             },
             api_data: {},
             apis: {},
-            view: { width: 400, height: 400, x: 760, y: 340, rotate: 0 }
+            view: {
+              width: 400,
+              height: 400,
+              x: 760,
+              y: 340,
+              rotate: 0
+            }
           },
           {
             key: 2,
@@ -2410,7 +2692,13 @@ const list = [
             },
             api_data: {},
             apis: {},
-            view: { width: 400, height: 400, x: 760, y: 340, rotate: 0 }
+            view: {
+              width: 400,
+              height: 400,
+              x: 760,
+              y: 340,
+              rotate: 0
+            }
           }
         ]
       }
