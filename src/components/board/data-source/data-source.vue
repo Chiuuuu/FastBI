@@ -422,14 +422,14 @@ export default {
       // 清空填充/标记点数据
       Object.assign(
         this.currSelected.setting.api_data,
-        clearMap[key][clearData]
+        clearMap[key].clearData
       )
       // 清空图表数据
       let config = this.currSelected.setting.config
       this.$set(
         config,
         'series',
-        config.series.filter(item => item.type === clearMap[key][seriesType])
+        config.series.filter(item => item.type === clearMap[key].seriesType)
       )
       // 填充数据清除要去掉视觉映射
       if (key === 'fillType') {

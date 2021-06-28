@@ -48,8 +48,6 @@
       :options="chartOptions"
       :settings="chartSettings"
       :series="chartSeries"
-      :geo="geo"
-      :tooltip="mapToolTip"
     ></component>
     <!-- <div v-else class="dv-charts-null">
       <a-icon  type="pie-chart" style="font-size:50px;" />
