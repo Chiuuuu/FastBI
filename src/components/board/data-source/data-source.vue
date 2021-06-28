@@ -63,10 +63,35 @@
           <a-collapse-panel key="measures" header="度量">
             <dragAreaForMapFill
               type="measures"
-              ref="fillMe"
               :fillType="fillType"
             ></dragAreaForMapFill>
           </a-collapse-panel>
+          <!-- 开关移到样式，不需要拖数据，暂时保留 -->
+          <!-- <GuiField label="指标显示">
+            <a-switch
+              v-model="fillShow"
+              default-checked
+              size="small"
+              @change="fillPointChange"
+          /></GuiField>
+          <dragAreaForMapFill
+            type="label"
+            :fillType="fillType"
+            showType="point"
+          ></dragAreaForMapFill>
+
+          <GuiField label="鼠标移入显示">
+            <a-switch
+              v-model="fillOverShow"
+              default-checked
+              size="small"
+              @change="fillOverChange"
+          /></GuiField>
+          <dragAreaForMapFill
+            type="label"
+            :fillType="fillType"
+            showType="over"
+          ></dragAreaForMapFill> -->
         </a-collapse>
       </a-collapse-panel>
       <!-- 地图标记点 -->
@@ -110,12 +135,12 @@
           <a-collapse-panel key="measures" header="度量">
             <dragAreaForMapLabel
               type="measures"
-              ref="labelMe"
               :labelType="labelType"
             ></dragAreaForMapLabel>
           </a-collapse-panel>
         </a-collapse>
-        <GuiField label="指标显示">
+        <!-- 开关移到样式，不需要拖数据，暂时保留 -->
+        <!-- <GuiField label="指标显示">
           <a-switch
             v-model="labelShow"
             default-checked
@@ -125,12 +150,12 @@
         </GuiField>
         <GuiField label="鼠标移入显示">
           <a-switch
-            v-model="selfConfig.tooltip.show"
+            v-model="labelOverShow"
             default-checked
             size="small"
-            @change="switchChange"
+            @change="labelOverChange"
           />
-        </GuiField>
+        </GuiField> -->
       </a-collapse-panel>
       <!-- 数据筛选 -->
       <a-collapse-panel
@@ -216,14 +241,14 @@ import dragAreaForMapFill from './components/dragAreaForMapFill'
 import dragAreaForMapLabel from './components/dragAreaForMapLabel'
 import DragPick from './components/dragPick'
 import { deepClone } from '../../../utils/deepClone'
-import GuiField from '../options/gui-field'
+// import GuiField from '../options/gui-field'
 export default {
   components: {
     DragArea,
     DragPick,
     dragAreaForMapFill,
-    dragAreaForMapLabel,
-    GuiField
+    dragAreaForMapLabel
+    // GuiField
   },
   data() {
     return {
@@ -239,10 +264,6 @@ export default {
         'mapFill',
         'mapLabel'
       ], // 所有面板默认打开
-      fileObj: {
-        labelDimensions: [],
-        measures: []
-      }, // 存储维度度量数据
       apiData: {},
       sortList: [], // 排序列表
       ascList: [
@@ -266,7 +287,12 @@ export default {
       fillType: '',
       labelType: '',
       selfConfig: {},
-      labelShow: false
+      mapLayout: null, // 填充图层
+      scatterLayout: null, // 散点图层
+      fillShow: false, // 填充指标显示
+      fillOverShow: false, // 填充悬浮提示
+      labelShow: false, // 标记点指标显示
+      labelOverShow: false // 标记点悬浮提示
     }
   },
   mounted() {
@@ -288,16 +314,25 @@ export default {
             // 获取散点图层所在下标
             this.fillType = this.currSelected.setting.api_data.options.fillType
             this.labelType = this.currSelected.setting.api_data.options.labelType
-            let scatterLayout = this.selfConfig.series.find(
-              item => item.type === 'scatter'
-            )
-            if (scatterLayout) {
-              this.labelShow = scatterLayout.label.show
-            }
+            // 移到样式配置，不知道还有没用，先保留
+            // this.mapLayout = this.selfConfig.series.find(
+            //   item => item.type === 'map'
+            // )
+            // if (this.mapLayout) {
+            //   this.fillShow = this.mapLayout.label.normal.show
+            //   this.fillOverShow = this.mapLayout.tooltip.show
+            // }
+            // this.scatterLayout = this.selfConfig.series.find(
+            //   item => item.type === 'scatter'
+            // )
+            // if (this.scatterLayout) {
+            //   this.labelShow = this.scatterLayout.label.show
+            //   this.labelOverShow = this.scatterLayout.tooltip.show
+            // }
           }
           // 选中的维度度量组合成排序列表
-          if (apiData.labelDimensions) {
-            this.sortList = this.sortList.concat(apiData.labelDimensions)
+          if (apiData.dimensions) {
+            this.sortList = this.sortList.concat(apiData.dimensions)
           }
           if (apiData.measures) {
             this.sortList = this.sortList.concat(apiData.measures)
@@ -360,14 +395,56 @@ export default {
       if (this[key] === value) {
         return
       }
-      // 切换页签清空对应数据
-      if (key === 'fillType') {
-        // 清空填充经纬度
-        this.$refs.fillMe.clearData()
+      // 类型对应关系
+      const clearMap = {
+        fillType: {
+          seriesType: 'map',
+          clearData: {
+            normal: [],
+            latitude: [],
+            longitude: [],
+            measures: [],
+            point: [],
+            over: []
+          }
+        },
+        labelType: {
+          seriesType: 'scatter',
+          clearData: {
+            labelNormal: [],
+            labelLatitude: [],
+            labelLongitude: [],
+            labelMeasures: []
+          }
+        }
       }
-      if (key === 'labelType') {
-        // 清空标记点经纬度
-        this.$refs.labelMe.clearData()
+      // 切换页签清空对应数据
+      // 清空填充/标记点数据
+      Object.assign(
+        this.currSelected.setting.api_data,
+        clearMap[key][clearData]
+      )
+      // 清空图表数据
+      let config = this.currSelected.setting.config
+      this.$set(
+        config,
+        'series',
+        config.series.filter(item => item.type === clearMap[key][seriesType])
+      )
+      // 填充数据清除要去掉视觉映射
+      if (key === 'fillType') {
+        this.$delete(this.currSelected.setting.config, 'visualMap')
+      }
+      //数据全空清除模型id
+      let apidata = this.currSelected.setting.api_data
+      if (
+        !apidata.dimensions.length &&
+        !apidata.measures.length &&
+        !apidata.labelDimensions.length &&
+        !apidata.labelMeasures.length
+      ) {
+        this.currSelected.datamodelId = 0
+        this.currSelected.isEmpty = false
       }
       this[key] = value
       this.$set(this.currSelected.setting.api_data.options, key, value)
@@ -437,12 +514,27 @@ export default {
     setTimer() {
       this.$emit('setChartTimer', this.currentSelected)
     },
+    fillPointChange(val) {
+      if (this.mapLayout) {
+        this.mapLayout.label.normal.show = val
+      }
+      this.switchChange()
+    },
+    fillOverChange(val) {
+      if (this.mapLayout) {
+        this.mapLayout.tooltip.show = val
+      }
+      this.switchChange()
+    },
     labelPointChange(val) {
-      let scatterLayout = this.selfConfig.series.find(
-        item => item.type === 'scatter'
-      )
-      if (scatterLayout) {
-        scatterLayout.label.show = this.labelShow
+      if (this.scatterLayout) {
+        this.scatterLayout.label.show = val
+      }
+      this.switchChange()
+    },
+    labelOverChange(val) {
+      if (this.scatterLayout) {
+        this.scatterLayout.tooltip.show = val
       }
       this.switchChange()
     },

@@ -891,15 +891,6 @@ const list = [
                   fontWeight: 'normal'
                 }
               },
-              tooltip: {
-                show: false,
-                trigger: 'item',
-                confine: true,
-                formatter: '{b} ：{c}'
-                // formatter(params) {
-                //   return params.name
-                // }
-              },
               grid: { left: 0, top: 10, right: 0, bottom: 10 },
               legend: {
                 show: false,
@@ -907,28 +898,17 @@ const list = [
                   color: '#ffffff',
                   fontSize: 12
                 },
+                itemStyle: {
+                  color: DEFAULT_COLORS[0]
+                },
                 itemGap: 12,
                 icon: '',
                 left: 'center',
                 top: 'auto',
                 right: 'auto',
                 bottom: 'auto',
+                orient: 'horizontal',
                 data: ['人口']
-              },
-              visualMap: {
-                show: false,
-                type: 'piecewise',
-                min: 0,
-                max: 403631060,
-                seriesIndex: [0],
-                inRange: {
-                  color: ['#50a3ba', '#eac736', '#d94e5d'],
-                  symbolSize: [10, 16]
-                },
-                textStyle: {
-                  color: '#fff',
-                  fontSize: 12
-                }
               },
               xAxis: {
                 show: false,
@@ -976,17 +956,17 @@ const list = [
                 aspectScale: 0.75,
                 zoom: 1.1,
                 roam: false,
-                mapLocation: {
-                  x: 'left',
-                  y: 'top'
-                },
+                // mapLocation: {
+                //   x: 'left',
+                //   y: 'top'
+                // },
                 label: {
                   normal: {
-                    show: true,
+                    show: false,
                     color: '#fff'
                   },
                   emphasis: {
-                    show: true
+                    show: false
                   }
                 },
                 itemStyle: {
@@ -1003,8 +983,8 @@ const list = [
                   }
                 }
               },
-              series: [],
-              color: DEFAULT_COLORS
+              series: []
+              //   color: DEFAULT_COLORS
             },
             view: { width: 300, height: 500, x: 710, y: 290 }
           },
