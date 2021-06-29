@@ -20,7 +20,7 @@
         </a-col>
         <a-col :span="14">
           <a-row type="flex" justify="end" align="middle">
-            <a-button type="primary" class="select_button" @click="() => handleGetTableList()" :loading="spinning">刷新数据</a-button>
+            <a-button type="primary" class="select_button" @click="() => handleGetTableList(pagination)" :loading="spinning">刷新数据</a-button>
             <a-button
               v-if="hasBtnPermissionEdit || hasBtnPermissionSchedule"
               v-show="showExtractBtn"
