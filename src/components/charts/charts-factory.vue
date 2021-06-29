@@ -312,6 +312,29 @@ export default {
   methods: {
     afterConfig(options) {
       console.log('op', options)
+      // 保留两位小数
+      if (
+        this.typeName !== 've-map' &&
+        this.typeName !== 've-gauge' &&
+        this.typeName !== 've-ring'
+      ) {
+        // 按不同图表数据结构格式化保留两位小数
+        let type = this.typeName
+        options.series.forEach(item => {
+          item.label.formatter = function(params) {
+            if (type === 've-line') {
+              return params.data[1].toFixed(2)
+            } else if (type === 've-pie') {
+              return params.data.value.toFixed(2)
+            } else if (type === 've-radar') {
+              return params.value.toFixed(2)
+            }
+            {
+              return params.data.toFixed(2)
+            }
+          }
+        })
+      }
       return options
     },
     // 添加图表点击事件，可以点击非数据区域

@@ -149,15 +149,14 @@ export default {
     this.$nextTick(() => {
       // 进入页面获取计算文本
       //   if (this.canEdit) {
-      // 使用缓存文本，进大屏不获取度量数据
+      // 使用缓存文本,再更新
       if (this.config.title.text) {
         this.$refs.editorText.innerHTML = this.config.title.text
-      } else {
-        // 初始化显示数据，true:不需要匹配度量数据
-        this.getContent(true).then(res => {
-          this.$refs.editorText.innerHTML = res
-        })
       }
+      // 初始化显示数据，true:不需要匹配度量数据
+      this.getContent(true).then(res => {
+        this.$refs.editorText.innerHTML = res
+      })
       //   }
     })
     var ContextMenuExtension = MediumEditor.Extension.extend({
@@ -260,25 +259,27 @@ export default {
     },
     // 双击开启编辑并聚焦
     focusCurrent() {
-      this.canEditByDblClick = true
-      // 显示切换富文本
-      this.$refs.editorText.innerHTML = this.htmlText
-      // 富文本度量添加点击事件
-      //   let spanList = document.querySelectorAll('.edit-alias')
-      //   spanList.forEach(span => {
-      //     span.addEventListener('click', this.clickMeasure)
-      //     // 验证度量更改
-      //     // 去掉空格
-      //     let alias = span.innerHTML.replace(/&nbsp;/gi, '')
-      //     let measure = this.modelMeasures.find(item => item.alias === alias)
-      //     // 度量不存在飘红
-      //     if (measure.status === 1) {
-      //       span.style.color = 'red'
-      //     }
-      //   })
-      // 防止拖动
-      this.$refs.textBox.onmousedown = e => {
-        e.stopPropagation()
+      if (this.canEdit) {
+        this.canEditByDblClick = true
+        // 显示切换富文本
+        this.$refs.editorText.innerHTML = this.htmlText
+        // 富文本度量添加点击事件
+        //   let spanList = document.querySelectorAll('.edit-alias')
+        //   spanList.forEach(span => {
+        //     span.addEventListener('click', this.clickMeasure)
+        //     // 验证度量更改
+        //     // 去掉空格
+        //     let alias = span.innerHTML.replace(/&nbsp;/gi, '')
+        //     let measure = this.modelMeasures.find(item => item.alias === alias)
+        //     // 度量不存在飘红
+        //     if (measure.status === 1) {
+        //       span.style.color = 'red'
+        //     }
+        //   })
+        // 防止拖动
+        this.$refs.textBox.onmousedown = e => {
+          e.stopPropagation()
+        }
       }
       // 全选文本内容
       setTimeout(() => {
@@ -402,7 +403,7 @@ export default {
         //   return 'isChanged'
         // }
         str = this.htmlText.replace(reg, (match, alias) => {
-          return res.rows[0][alias]
+          return res.rows[0][alias].toFixed(2)
         })
       }
       return str
