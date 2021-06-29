@@ -182,7 +182,7 @@ export default {
           if (this.typeName === 've-map') {
             this.chartExtend = { ...omit(val, ['series']) }
             this.chartSeries = deepClone(val.series)
-            this.setMapFormatter()
+            // this.setMapFormatter()
           } else {
             this.chartExtend = { ...val }
           }
@@ -285,6 +285,29 @@ export default {
   methods: {
     afterConfig(options) {
       console.log('op', options)
+      // 保留两位小数
+      if (
+        this.typeName !== 've-map' &&
+        this.typeName !== 've-gauge' &&
+        this.typeName !== 've-ring'
+      ) {
+        // 按不同图表数据结构格式化保留两位小数
+        let type = this.typeName
+        options.series.forEach(item => {
+          item.label.formatter = function(params) {
+            if (type === 've-line') {
+              return params.data[1].toFixed(2)
+            } else if (type === 've-pie') {
+              return params.data.value.toFixed(2)
+            } else if (type === 've-radar') {
+              return params.value.toFixed(2)
+            }
+            {
+              return params.data.toFixed(2)
+            }
+          }
+        })
+      }
       return options
     },
     // 添加图表点击事件，可以点击非数据区域
@@ -313,7 +336,11 @@ export default {
           }
           let str = []
           series.pointShowList.forEach(item => {
-            str.push(params.data[item])
+            let val = params.data[item]
+            if (typeof val === 'number') {
+              val = +parseFloat(val).toFixed(2)
+            }
+            str.push(val)
           })
           str = orient === 'vertical' ? str.join('\n') : str.join(':')
           return str
@@ -324,7 +351,11 @@ export default {
           }
           let str = []
           series.tooltipShowList.forEach(item => {
-            str.push(params.data[item])
+            let val = params.data[item]
+            if (typeof val === 'number') {
+              val = +parseFloat(val).toFixed(2)
+            }
+            str.push(val)
           })
           return str.join(':')
         }
