@@ -302,7 +302,6 @@ export default {
     async handleDropOnFilesWD(event) {
       this.isExist = false
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
-      console.log('tt', dataFile)
 
       // 验重
       if (this.fileList.some(item => dataFile.alias === item.alias)) {
@@ -743,10 +742,6 @@ export default {
               let goalTotal = sum(res.rows, apiData.measures[1].alias)
               config.series.max = goalTotal
               this.$store.dispatch('SetSelfProperty', config)
-            }
-            // 文本框
-            if (this.currSelected.setting.chartType === 'v-text') {
-              apiData.refreshData = res.rows[0]
             }
             //   this.updateChartData()
             return

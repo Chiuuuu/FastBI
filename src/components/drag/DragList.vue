@@ -188,7 +188,7 @@ export default {
       component.api_data.dimensions = []
       component.api_data.measures = []
       component.api_data.tableList = []
-      component.api_data.options = null
+      component.api_data.options = { sort: [] }
       component.api_data.refresh = {}
       component.api_data.modelId = ''
       if (component.chartType === 'v-ring') {
