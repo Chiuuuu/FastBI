@@ -55,13 +55,23 @@
               <!-- 高德地图-->
               <!-- <AMap v-else-if="transform.setting.name === 'a-map'" /> -->
               <!-- 立体饼图 -->
-              <high-charts 
-                v-else-if="transform.setting.name==='high-pie'"
+              <high-charts
+                v-else-if="transform.setting.name === 'high-pie'"
                 :key="transform.id"
-                :setting='transform.setting'
+                :setting="transform.setting"
                 :api-data="transform.setting.api_data"
                 :background="transform.setting.background"
               ></high-charts>
+
+              <!-- 矩形热力图 -->
+              <chart-heart
+                v-if="transform.setting.name === 've-heatmap'"
+                :key="transform.id"
+                :config="transform.setting.config"
+                :view="transform.setting.view"
+                :api-data="transform.setting.api_data"
+                :background="transform.setting.background"
+              ></chart-heart>
 
               <charts-factory
                 v-else
@@ -110,11 +120,12 @@ import { Loading } from 'element-ui'
 
 import {
   addResizeListener,
-  removeResizeListener
+  removeResizeListener,
 } from 'bin-ui/src/utils/resize-event'
 
 import throttle from 'lodash/throttle'
 import HighCharts from '@/components/charts/highcharts'
+import ChartHeart from '@/components/charts/chart-heat'
 
 export default {
   name: 'screen',
@@ -129,7 +140,8 @@ export default {
     ChartFigure,
     SteepBar,
     Pation,
-    HighCharts
+    HighCharts,
+    ChartHeart
     // AMap
   },
   data() {
@@ -138,7 +150,7 @@ export default {
       range: '',
       chartTimer: null,
       timer: null,
-      showPageTab: false // 页签显示/隐藏
+      showPageTab: false, // 页签显示/隐藏
     }
   },
   computed: {
@@ -148,7 +160,7 @@ export default {
       'screenId',
       'orginPageSettings',
       'isPublish',
-      'isScreen'
+      'isScreen',
     ]),
     // 画布面板的样式
     canvasPanelStyle() {
@@ -160,18 +172,16 @@ export default {
         background:
           this.pageSettings.backgroundType === '1'
             ? this.pageSettings.backgroundColor
-            : `url(${
-                this.pageSettings.backgroundSrc
-              }) 0% 0% / 100% 100% no-repeat`
+            : `url(${this.pageSettings.backgroundSrc}) 0% 0% / 100% 100% no-repeat`,
       }
     },
     scrollBoxStyle() {
       return {
         width: `${this.pageSettings.width * this.range}px`,
         height: `${this.pageSettings.height * this.range}px`,
-        overFlow: 'hidden'
+        overFlow: 'hidden',
       }
-    }
+    },
   },
   watch: {
     screenId: {
@@ -181,8 +191,8 @@ export default {
         }
       },
       deep: true,
-      immediate: true
-    }
+      immediate: true,
+    },
   },
   mounted() {
     this.$nextTick(this._calcStyle)
@@ -201,14 +211,14 @@ export default {
       let loadingInstance = Loading.service({
         lock: true,
         text: '加载中...',
-        target: document.querySelector('.screen-manage')
+        target: document.querySelector('.screen-manage'),
       })
       // 切换页签数据
       this.getScreenDetail({
         id: this.screenId,
         tabId: pageId,
-        needRefresh: true
-      }).then(res => {
+        needRefresh: true,
+      }).then((res) => {
         loadingInstance.close()
         if (res) {
           this.setTimer()
@@ -218,7 +228,7 @@ export default {
     getTableSize(transform) {
       return {
         x: transform.setting.view.width,
-        y: transform.setting.view.height
+        y: transform.setting.view.height,
       }
     },
     // 获取大屏数据
@@ -229,12 +239,12 @@ export default {
       let loadingInstance = Loading.service({
         lock: true,
         text: '加载中...',
-        target: document.querySelector('.screen-manage')
+        target: document.querySelector('.screen-manage'),
       })
       // 先获取大屏对应的页签信息
-      this.$server.screenManage.getScreenTabs(this.screenId).then(res => {
+      this.$server.screenManage.getScreenTabs(this.screenId).then((res) => {
         if (res.code === 200) {
-          let pages = res.rows.map(item =>
+          let pages = res.rows.map((item) =>
             Object.assign(item, { showDropDown: false, isFocus: false })
           )
           this.$store.dispatch('SetPageList', pages)
@@ -247,8 +257,8 @@ export default {
           this.getScreenDetail({
             id: this.screenId,
             tabId: pages[0].id,
-            needRefresh: true
-          }).then(res => {
+            needRefresh: true,
+          }).then((res) => {
             loadingInstance.close()
             if (res) {
               this.setTimer()
@@ -301,7 +311,7 @@ export default {
             count = refresh.frequency * 60 * 60 * 1000
           }
           let self = this
-          this.chartTimer = (function() {
+          this.chartTimer = (function () {
             setInterval(() => {
               self.refreshData()
             }, count)
@@ -316,7 +326,7 @@ export default {
       }
       return this.$server.screenManage
         .showScreenRelease(this.screenId)
-        .then(res => {
+        .then((res) => {
           if (res.code === 200) {
             this.$emit('getShareData', res.data)
             // this.releaseObj = res.data
@@ -333,7 +343,7 @@ export default {
       // 计算wrap样式
       this.wrapStyle = {
         width: wrap.clientWidth + 'px',
-        height: wrap.clientHeight + 'px'
+        height: wrap.clientHeight + 'px',
       }
       // 计算缩放比例(当前元素占位跟画板默认长度的比例,也就是大小画板的比例)
       let range = wrap.clientWidth / this.orginPageSettings.width
@@ -345,21 +355,21 @@ export default {
     },
     // 刷新大屏
     refreshData: throttle(
-      function() {
+      function () {
         this.refreshScreen({
           charSeted: false,
-          needLoading: true
+          needLoading: true,
         })
       },
       1000,
       {
         leading: true,
-        trailing: false
+        trailing: false,
       }
     ),
     // 设置联动的图标的数据
     async setLinkageData(id, e) {
-      let selected = this.canvasMap.find(item => item.id === id)
+      let selected = this.canvasMap.find((item) => item.id === id)
       let apiData = selected.setting.api_data
       let bindCharts = apiData.interactive.bindedList
       // 没有关联图表不需要联动
@@ -371,7 +381,7 @@ export default {
       dimensionData.value = [e.name]
       // 关联的每个图表进行数据筛选
       for (let chartId of bindCharts) {
-        let chart = this.canvasMap.find(item => item.id === chartId)
+        let chart = this.canvasMap.find((item) => item.id === chartId)
         if (!chart) {
           continue
         }
@@ -418,7 +428,7 @@ export default {
         // 构造联动选择的数据
         this.$set(apiData, 'selectData', {
           columns,
-          rows
+          rows,
         })
       } else {
         this.$message.error(res.msg)
@@ -426,10 +436,10 @@ export default {
     },
     // 重置被联动的图标数据
     resetOriginData(id) {
-      let selected = this.canvasMap.find(item => item.id === id)
+      let selected = this.canvasMap.find((item) => item.id === id)
       let bindCharts = selected.setting.api_data.interactive.bindedList
       for (let chartId of bindCharts) {
-        let chart = this.canvasMap.find(item => item.id === chartId)
+        let chart = this.canvasMap.find((item) => item.id === chartId)
         if (!chart) {
           continue
         }
@@ -441,7 +451,7 @@ export default {
     // 显示/隐藏页签栏
     handleTabShow() {
       this.showPageTab = !this.showPageTab
-    }
-  }
+    },
+  },
 }
 </script>

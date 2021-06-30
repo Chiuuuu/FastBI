@@ -131,11 +131,18 @@
               v-else-if="transform.setting.name==='high-pie'"
               :key="transform.id"
               :setting='transform.setting'
-              :config='transform.setting.config'
-              :view="transform.setting.view"
               :api-data="transform.setting.api_data"
               :background="transform.setting.background"
             ></high-charts>
+            <!-- 矩形热力图 -->
+            <chart-heart
+              v-else-if="transform.setting.name==='ve-heatmap'"
+              :key="transform.id"
+              :view="transform.setting.view"
+              :config='transform.setting.config'
+              :api-data="transform.setting.api_data"
+              :background="transform.setting.background"
+            ></chart-heart>
              <!-- <component 
               v-else-if="transform.setting.chartType==='high-charts'"
               :is="transform.setting.name"
@@ -204,6 +211,8 @@ const IconFont = Icon.createFromIconfontCN({
   scriptUrl: '//at.alicdn.com/t/font_2276651_71nv5th6v94.js'
 }) // 引入iconfont 
 import HighCharts from '@/components/charts/highcharts'
+import ChartHeart from '@/components/charts/chart-heat'
+
 export default {
   name: 'Admin',
   data() {
@@ -384,6 +393,7 @@ export default {
     SteepBar,
     Screen,
     HighCharts,
+    ChartHeart
     // AMap
   },
   beforeDestroy() {

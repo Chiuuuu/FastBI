@@ -580,9 +580,6 @@
 <script>
 import GuiField from './gui-field'
 import GuiInline from './gui-inline'
-import { setBaseProperty } from '@/api/canvasMaps/canvas-maps-request'
-
-import { mapGetters, mapActions } from 'vuex'
 import HighMinxins from '@/mixins/hight'
 
 export default {
@@ -597,59 +594,15 @@ export default {
   components: { GuiField, GuiInline },
   data() {
     return {
-      //   fontFamilyList: [
-      //     { label: '默认', value: 'not specified' },
-      //     { label: 'simfang', value: 'simfang' },
-      //     { label: '仿宋_GB2312', value: 'fangsong' },
-      //     { label: 'times', value: 'times' },
-      //     { label: '微软雅黑', value: 'msyh' },
-      //     { label: 'simkai', value: 'simkai' },
-      //     { label: '庞门正道标题体', value: 'pangmenzhengdao' },
-      //     { label: 'HuXiaoBoNanShenTi-2', value: 'HuXiaoBoNanShenTi-2' },
-      //     { label: '优设标题黑', value: 'youshe' },
-      //     { label: 'digital-7-4', value: 'digital-7-4' },
-      //   ],
-      //   radioStyle: {
-      //     display: 'flex',
-      //     alignItems: 'center',
-      //   }, // 单选radio样式
-      //   formatList: [
-      //     { label: '维度', value: '{point.name}：' },
-      //     { label: '度量', value: '{y}' },
-      //     { label: '占比', value: '({point.percentage:.1f}%)' },
-      //   ],
       bartype: {
         isyz: false, //是否圆柱图
         isdd: false, //是否堆叠图
       },
     }
   },
-  computed: {
-    // ...mapGetters(['currentSelected']),
-  },
+  computed: {},
   mounted() {},
   methods: {
-    // ...mapActions(['saveScreenData', 'updateChartData', 'refreshScreen']),
-    // // 设置自有属性
-    // setSelfProperty() {
-    //   this.$store.dispatch('SetSelfProperty', this.HighConfig.setting.config)
-    //   // 发送请求来保存数据
-    //   setBaseProperty(this.currentSelected)
-    //   this.updateChartData()
-    // },
-    // //图例点击
-    // onRadioChange(source, key, value) {
-    //   if (source === 'indicator') {
-    //     this.$set(
-    //       this.HighConfig.setting.config.plotOptions.pie.dataLabels,
-    //       key,
-    //       value
-    //     )
-    //   } else {
-    //     this.$set(this.HighConfig.setting.config[source], key, value)
-    //   }
-    //   this.setSelfProperty()
-    // },
     setHistogram(val, key) {
       //圆柱
       if (key === 'chart') {
@@ -671,25 +624,6 @@ export default {
       this.$set(this.HighConfig.setting.config[key].title, 'align', val)
       this.setSelfProperty()
     },
-    // // 点击显示/隐藏
-    // switchChange(checked, event) {
-    //   // 阻止默认事件，取消收起
-    //   event.stopPropagation()
-    //   this.setSelfProperty()
-    // },
-    //图例点击
-    // onRadioChange(source, key, value) {
-    //   if (source === 'indicator') {
-    //     this.$set(
-    //       this.HighConfig.setting.config.plotOptions.pie.dataLabels,
-    //       key,
-    //       value
-    //     )
-    //   } else {
-    //     this.$set(this.HighConfig.setting.config[source], key, value)
-    //   }
-    //   this.setSelfProperty()
-    // },
   },
   watch: {},
 }

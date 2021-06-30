@@ -1803,7 +1803,7 @@ const list = [{
         {
           title: '矩形热力图',
           name: 've-heatmap',
-          chartType: 'e-heat',
+          chartType: 'v-heatmap',
           icon: 'icon_pie_chart.png',
           // iconFont: 'icon-Pie-chart',
           type: '1',
@@ -1836,7 +1836,8 @@ const list = [{
             title: {
               show: true,
               content: '矩形热力图',
-              textAlign: 'left',
+              text: '矩形热力图',
+              left: 'center',
               textStyle: {
                 color: '#ffffff',
                 fontSize: 20,
@@ -1844,23 +1845,82 @@ const list = [{
                 fontWeight: 'normal'
               }
             },
+
             tooltip: {
               position: 'top'
             },
             grid: {
-              height: '50%',
-              top: '10%'
+              left: 60,
+              top: 60,
+              right: 50,
+              bottom: 60
             },
             xAxis: {
               type: 'category',
-              data: ['1a', '2a', '3a', '4a', '5a', '6a','7a', '8a', '9a','10a','11a','12a'],
+              // data: ['1a', '2a', '3a', '4a', '5a', '6a', '7a', '8a', '9a', '10a', '11a', '12a'],
+              nameLocation: 'middle',
+              nameGap: 20,
+              nameTextStyle: {
+                color: '#fff',
+                fontSize: '12',
+                align: 'right',
+                padding: [30, 0, 0, 0]
+              },
+              axisLabel: {
+                color: '#ffffff',
+                fontSize: 12,
+                rotate: 0
+              },
+              axisLine: {
+                show: true,
+                lineStyle: {
+                  color: '#fff'
+                }
+              },
+              splitLine: {
+                show: false,
+                lineStyle: {
+                  type: 'solid',
+                  color: '#fff'
+                }
+              },
+              axisTick: {
+                show: true
+              },
               splitArea: {
                 show: true
               }
             },
             yAxis: {
               type: 'category',
-              data: ['Saturday', 'Friday', 'Thursday','Wednesday', 'Tuesday', 'Monday', 'Sunday'],
+              // data: ['Saturday', 'Friday', 'Thursday', 'Wednesday', 'Tuesday', 'Monday', 'Sunday'],
+              position: 'left',
+              nameLocation: 'middle',
+              nameTextStyle: {
+                color: '#fff',
+                fontSize: 12,
+                padding: [0, 0, 40, 0]
+              },
+              axisLabel: {
+                color: '#ffffff',
+                fontSize: 12
+              },
+              axisLine: {
+                show: false,
+                lineStyle: {
+                  color: '#fff'
+                }
+              },
+              splitLine: {
+                show: false,
+                lineStyle: {
+                  type: 'solid',
+                  color: '#fff'
+                }
+              },
+              axisTick: {
+                show: false
+              },
               splitArea: {
                 show: true
               }
@@ -1868,45 +1928,54 @@ const list = [{
             visualMap: {
               min: 0,
               max: 10,
+              show:true,
               calculable: true,
-              orient: 'horizontal',
-              left: 'center',
-              bottom: '15%'
+              orient: 'horizontal',//vertical
+              left: 'center', //左 中 右
+              top:'bottom',//上 中 下
+              bottom: '5%',
+              textStyle:{
+                color:"#fff",
+                fontSize:15,
+                fontFamily:"not specified"
+              }
             },
             series: {
-              name: 'Punch Card',
+              name: '',
               type: 'heatmap',
               data: [
-                ['1a','Sunday',2],
-                ['2a','Saturday',4],
-                ['3a','Friday',6],
-                ['4a','Saturday',8],
-                ['5a','Thursday',10],
-                ['6a','Saturday',1],
-                ['7a','Wednesday',2],
-                ['8a','Saturday',3],
-                ['9a','Tuesday',24],
-                ['10a','Saturday',5],
-                ['11a','Monday',20],
-                ['12a','Saturday',12],
+                ['1a', 'Sunday', 2],
+                ['2a', 'Saturday', 4],
+                ['3a', 'Friday', 6],
+                ['4a', 'Saturday', 8],
+                ['5a', 'Thursday', 10],
+                ['6a', 'Saturday', 1],
+                ['7a', 'Wednesday', 2],
+                ['8a', 'Saturday', 3],
+                ['9a', 'Tuesday', 24],
+                ['10a', 'Saturday', 5],
+                ['11a', 'Monday', 20],
+                ['12a', 'Saturday', 12],
               ],
               label: {
-                show: true
+                show: true,
+                color:'#fff',
+                position:'inside'
               },
-              // emphasis: {
-              //   itemStyle: {
-              //     shadowBlur: 10,
-              //     shadowColor: 'rgba(0, 0, 0, 0.5)'
-              //   }
-              // }
+              emphasis: {
+                itemStyle: {
+                  shadowBlur: 10,
+                  shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+              }
             },
-            color: DEFAULT_COLORS
+            // color: DEFAULT_COLORS
           },
           chartEvents: {
             click: chartClick
           },
           view: {
-            width: 400,
+            width: 500,
             height: 400,
             x: 760,
             y: 340

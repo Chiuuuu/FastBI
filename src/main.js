@@ -25,6 +25,7 @@ import server from '@/api/index'
 import permission from '@/directive/permission'
 import hasPermission from '@/directive/hasPermission'
 import PERMISSION_CODE from '@/config/permission'
+import Echarts from 'echarts';
 import highCharts from 'highcharts';
 import highcharts3d from 'highcharts/highcharts-3d';
 
@@ -54,6 +55,7 @@ Vue.prototype.$base =
   process.env.NODE_ENV === 'production' ? '/bin-data-site' : ''
 Vue.prototype.$PERMISSION_CODE = PERMISSION_CODE
 Vue.prototype.$highCharts = highCharts;
+Vue.prototype.$echarts = Echarts;
 // if (sessionStorage.getItem('store')) {
 //   store.replaceState(
 //     Object.assign({}, store.state, JSON.parse(sessionStorage.getItem('store')))

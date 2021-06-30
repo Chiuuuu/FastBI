@@ -15,7 +15,10 @@
         </div>
         <div
           class="tab-item"
-          v-if="currSelected.setting.name !== 've-image' && currSelected.setting.name !== 'figure'"
+          v-if="
+            currSelected.setting.name !== 've-image' &&
+            currSelected.setting.name !== 'figure'
+          "
           :class="{ active: tabsType === 1 }"
           @click="tabsTypeChange(1)"
         >
@@ -26,8 +29,8 @@
           class="tab-item"
           v-if="
             currSelected.setting.type === '1' &&
-              currSelected.setting.name !== 've-map' &&
-              currSelected.setting.chartType !== 'v-multiPie'
+            currSelected.setting.name !== 've-map' &&
+            currSelected.setting.chartType !== 'v-multiPie'
           "
           :class="{ active: tabsType === 2 }"
           @click="tabsTypeChange(2)"
@@ -44,7 +47,7 @@
             <a-input-number
               v-model="globalSettings.width"
               size="small"
-              :formatter="value => `宽 ${value}`"
+              :formatter="(value) => `宽 ${value}`"
               class="f-clear-width"
               @change="setPageSetting"
             ></a-input-number>
@@ -53,7 +56,7 @@
             <a-input-number
               v-model="globalSettings.height"
               size="small"
-              :formatter="value => `高 ${value}`"
+              :formatter="(value) => `高 ${value}`"
               class="f-clear-width"
               @change="setPageSetting"
             ></a-input-number>
@@ -104,7 +107,7 @@
                     type="file"
                     name
                     accept="image/png, image/jpeg, image/gif"
-                    style="display:none"
+                    style="display: none"
                     @change="
                       selectPhoto($event, globalSettings, 'globalSettings')
                     "
@@ -133,14 +136,14 @@
               @change="refreshChange"
               size="small"
             />
-            <div style="display: flex;">
+            <div style="display: flex">
               <a-input-number
                 v-model="globalSettings.refresh.frequency"
                 :min="1"
                 @change="frequencyChange"
                 size="small"
                 class="f-flex1"
-                style="margin-right:10px"
+                style="margin-right: 10px"
               />
               <a-select
                 v-model="globalSettings.refresh.unit"
@@ -169,34 +172,34 @@
       <div class="block-config" v-else>
         <div v-if="tabsType === 0">
           <gui-field label="位置" hasPadding>
-              <gui-inline>
-                <a-input-number
-                  v-model="baseProperty.x"
-                  size="small"
-                  :formatter="value => `X ${value}`"
-                  :parser="value => value.replace(/\X\s?|(,*)/g, '')"
-                  class="f-clear-width"
-                  @change="setBaseProperty"
-                ></a-input-number>
-              </gui-inline>
-              <gui-inline>
-                <a-input-number
-                  v-model="baseProperty.y"
-                  size="small"
-                  :formatter="value => `Y ${value}`"
-                  :parser="value => value.replace(/\Y\s?|(,*)/g, '')"
-                  class="f-clear-width"
-                  @change="setBaseProperty"
-                ></a-input-number>
-              </gui-inline>
+            <gui-inline>
+              <a-input-number
+                v-model="baseProperty.x"
+                size="small"
+                :formatter="(value) => `X ${value}`"
+                :parser="(value) => value.replace(/\X\s?|(,*)/g, '')"
+                class="f-clear-width"
+                @change="setBaseProperty"
+              ></a-input-number>
+            </gui-inline>
+            <gui-inline>
+              <a-input-number
+                v-model="baseProperty.y"
+                size="small"
+                :formatter="(value) => `Y ${value}`"
+                :parser="(value) => value.replace(/\Y\s?|(,*)/g, '')"
+                class="f-clear-width"
+                @change="setBaseProperty"
+              ></a-input-number>
+            </gui-inline>
           </gui-field>
           <gui-field label="尺寸" hasPadding>
             <gui-inline>
               <a-input-number
                 v-model="baseProperty.width"
                 size="small"
-                :formatter="value => `W ${value}`"
-                :parser="value => value.replace('W', '')"
+                :formatter="(value) => `W ${value}`"
+                :parser="(value) => value.replace('W', '')"
                 class="f-clear-width"
                 @change="setBaseProperty"
               ></a-input-number>
@@ -205,18 +208,30 @@
               <a-input-number
                 v-model="baseProperty.height"
                 size="small"
-                :formatter="value => `H ${value}`"
-                :parser="value => value.replace(/\H\s?|(,*)/g, '')"
+                :formatter="(value) => `H ${value}`"
+                :parser="(value) => value.replace(/\H\s?|(,*)/g, '')"
                 class="f-clear-width"
                 @change="setBaseProperty"
               ></a-input-number>
             </gui-inline>
           </gui-field>
-          
-          <high-chart-pie :HighConfig='currSelected' v-if="currSelected.setting.chartType==='high-pie'"></high-chart-pie>
-          <high-chart-bar :HighConfig='currSelected' v-if="currSelected.setting.chartType==='high-column'"></high-chart-bar>
-          
-          <a-collapse v-model="collapseActive" v-if="currSelected.setting.chartType!=='high-pie'&currSelected.setting.chartType!=='high-column'">
+
+          <high-chart-pie
+            :HighConfig="currSelected"
+            v-if="currSelected.setting.chartType === 'high-pie'"
+          ></high-chart-pie>
+          <high-chart-bar
+            :HighConfig="currSelected"
+            v-if="currSelected.setting.chartType === 'high-column'"
+          ></high-chart-bar>
+
+          <a-collapse
+            v-model="collapseActive"
+            v-if="
+              (currSelected.setting.chartType !== 'high-pie') &
+              (currSelected.setting.chartType !== 'high-column')
+            "
+          >
             <!--标题 noTitle图片没有标题-->
             <template v-if="selfConfig.title && !selfConfig.noTitle">
               <a-collapse-panel key="title" :header="isText ? '文本' : '标题'">
@@ -290,22 +305,31 @@
                   </a-select>
                 </gui-field>
                 <gui-field label="对齐方式">
-                  <a-radio-group :value="selfConfig.title.textAlign" size="small">
+                  <a-radio-group
+                    :value="selfConfig.title.textAlign || selfConfig.title.left"
+                    size="small"
+                  >
                     <a-radio-button
                       value="left"
-                      @click.native.stop="onAlignChange(selfConfig.title, $event)"
+                      @click.native.stop="
+                        onAlignChange(selfConfig.title, 'left')
+                      "
                     >
                       <a-icon type="align-left" value="left" />
                     </a-radio-button>
                     <a-radio-button
                       value="center"
-                      @click.native.stop="onAlignChange(selfConfig.title, $event)"
+                      @click.native.stop="
+                        onAlignChange(selfConfig.title, 'center')
+                      "
                     >
                       <a-icon type="align-center" value="center" />
                     </a-radio-button>
                     <a-radio-button
                       value="right"
-                      @click.native.stop="onAlignChange(selfConfig.title, $event)"
+                      @click.native.stop="
+                        onAlignChange(selfConfig.title, 'right')
+                      "
                     >
                       <a-icon type="align-right" value="right" />
                     </a-radio-button>
@@ -410,14 +434,22 @@
                       <a-radio-button
                         value="inside"
                         @click.native.stop="
-                          onRadioChange($event, selfConfig.series.label, 'position')
+                          onRadioChange(
+                            $event,
+                            selfConfig.series.label,
+                            'position'
+                          )
                         "
                         >中</a-radio-button
                       >
                       <a-radio-button
                         value="right"
                         @click.native.stop="
-                          onRadioChange($event, selfConfig.series.label, 'position')
+                          onRadioChange(
+                            $event,
+                            selfConfig.series.label,
+                            'position'
+                          )
                         "
                         >右</a-radio-button
                       >
@@ -545,10 +577,7 @@
                 指标颜色
                 <div>
                   <!-- 指标颜色 -->
-                  <a-radio-group
-                    :value="apis.scatterTargetColor"
-                    size="small"
-                  >
+                  <a-radio-group :value="apis.scatterTargetColor" size="small">
                     <a-radio
                       value="0"
                       @click.native.stop="scatterTargetColorChange($event)"
@@ -614,7 +643,7 @@
                     {{ i.label }}
                   </a-select-option>
                 </a-select>
-                
+
                 <gui-field label="显示位置">
                   <a-radio-group
                     :value="selfConfig.series.label.position"
@@ -632,6 +661,17 @@
                       >顶部</a-radio-button
                     >
                     <a-radio-button
+                      value="inside"
+                      @click.native.stop="
+                        onRadioChange(
+                          $event,
+                          selfConfig.series.label,
+                          'position'
+                        )
+                      "
+                      >内部</a-radio-button
+                    >
+                    <a-radio-button
                       value="bottom"
                       @click.native.stop="
                         onRadioChange(
@@ -644,19 +684,18 @@
                     >
                   </a-radio-group>
                 </gui-field>
-                <gui-field label="排列">
-                  <a-radio-group
-                    :value="apis.arrange"
-                    size="small"
-                  >
-                    <a-radio-button 
+                <gui-field label="排列" v-if="this.chartType !== 'v-heatmap'">
+                  <a-radio-group :value="apis.arrange" size="small">
+                    <a-radio-button
                       value="vertical"
                       @click.native.stop="scatterArrangeChange($event)"
-                    >垂直</a-radio-button>
+                      >垂直</a-radio-button
+                    >
                     <a-radio-button
                       value="horizontal"
                       @click.native.stop="scatterArrangeChange($event)"
-                    >水平</a-radio-button>
+                      >水平</a-radio-button
+                    >
                   </a-radio-group>
                 </gui-field>
               </a-collapse-panel>
@@ -784,18 +823,29 @@
                   </gui-inline>
                 </gui-field>
                 <gui-field label="显示位置">
-                  <a-radio-group :value="selfConfig.series.label.position" size="small">
+                  <a-radio-group
+                    :value="selfConfig.series.label.position"
+                    size="small"
+                  >
                     <a-radio-button
                       value="inside"
                       @click.native.stop="
-                        onRadioChange($event, selfConfig.series.label, 'position')
+                        onRadioChange(
+                          $event,
+                          selfConfig.series.label,
+                          'position'
+                        )
                       "
                       >内部</a-radio-button
                     >
                     <a-radio-button
                       value="outside"
                       @click.native.stop="
-                        onRadioChange($event, selfConfig.series.label, 'position')
+                        onRadioChange(
+                          $event,
+                          selfConfig.series.label,
+                          'position'
+                        )
                       "
                       >外部</a-radio-button
                     >
@@ -854,7 +904,9 @@
                       <a-select-option value>正常</a-select-option>
                       <a-select-option value="circle">圆形</a-select-option>
                       <a-select-option value="rect">矩形</a-select-option>
-                      <a-select-option value="roundRect">圆矩形</a-select-option>
+                      <a-select-option value="roundRect"
+                        >圆矩形</a-select-option
+                      >
                       <a-select-option value="diamond">菱形</a-select-option>
                     </a-select>
                   </gui-inline>
@@ -915,7 +967,10 @@
                 </gui-field>
                 <gui-field label="排列">
                   <gui-inline>
-                    <a-radio-group :value="selfConfig.legend.orient" size="small">
+                    <a-radio-group
+                      :value="selfConfig.legend.orient"
+                      size="small"
+                    >
                       <a-radio-button
                         value="horizontal"
                         @click.native.stop="
@@ -932,6 +987,117 @@
                       >
                     </a-radio-group>
                   </gui-inline>
+                </gui-field>
+              </a-collapse-panel>
+            </template>
+
+            <!-- 视觉映射（图例） -->
+            <template v-if="selfConfig.visualMap">
+              <a-collapse-panel key="visual" header="图例设置">
+                <a-switch
+                  slot="extra"
+                  v-model="selfConfig.visualMap.show"
+                  @change="switchChange"
+                  size="small"
+                />
+                <gui-field label="字号">
+                  <gui-inline label="字号">
+                    <a-input-number
+                      class="longwidth"
+                      v-model="selfConfig.visualMap.textStyle.fontSize"
+                      style="width: 70px"
+                      size="small"
+                      :min="12"
+                      :max="40"
+                      @change="setSelfProperty"
+                    ></a-input-number>
+                  </gui-inline>
+                  <gui-inline label="颜色">
+                    <el-color-picker
+                      v-model="selfConfig.visualMap.textStyle.color"
+                      @change="setSelfProperty"
+                    ></el-color-picker>
+                  </gui-inline>
+                </gui-field>
+                <gui-field label="字体">
+                  <a-select
+                    v-model="selfConfig.visualMap.textStyle.fontFamily"
+                    style="width: 100px"
+                    size="small"
+                    @change="setSelfProperty"
+                  >
+                    <a-select-option
+                      :value="font.value"
+                      v-for="(font, index) in fontFamilyList"
+                      :key="index"
+                      >{{ font.label }}</a-select-option
+                    >
+                  </a-select>
+                </gui-field>
+                <gui-field label="水平位置">
+                   <gui-inline label="">
+                    <a-radio-group
+                      :value="selfConfig.visualMap.left"
+                      size="small"
+                    >
+                      <a-radio-button
+                        value="left"
+                        @click.native.stop="onRadioChange($event,selfConfig.visualMap,'left')"
+                        >左</a-radio-button
+                      >
+                      <a-radio-button
+                        value="center"
+                        @click.native.stop="onRadioChange($event,selfConfig.visualMap,'left')"
+                        >中</a-radio-button
+                      >
+                      <a-radio-button
+                        value="right"
+                        @click.native.stop="onRadioChange($event,selfConfig.visualMap,'left')"
+                        >右</a-radio-button
+                      >
+                    </a-radio-group>
+                   </gui-inline>
+                </gui-field>
+                <gui-field label="垂直位置">
+                  <gui-inline label="">
+                     <a-radio-group
+                      :value="selfConfig.visualMap.top"
+                      size="small"
+                    >
+                      <a-radio-button
+                        value="top"
+                        @click.native.stop="onRadioChange($event,selfConfig.visualMap,'top')"
+                        >顶部</a-radio-button
+                      >
+                      <a-radio-button
+                        value="middle"
+                        @click.native.stop="onRadioChange($event,selfConfig.visualMap,'top')"
+                        >居中</a-radio-button
+                      >
+                      <a-radio-button
+                        value="bottom"
+                        @click.native.stop="onRadioChange($event,selfConfig.visualMap,'top')"
+                        >底部</a-radio-button
+                      >
+                    </a-radio-group>
+                   </gui-inline>
+                </gui-field>
+                <gui-field label="排列">
+                  <a-radio-group
+                    :value="selfConfig.visualMap.orient"
+                    size="small"
+                  >
+                    <a-radio-button
+                      value="vertical"
+                      @click.native.stop="onRadioChange($event,selfConfig.visualMap,'orient')"
+                      >垂直</a-radio-button
+                    >
+                    <a-radio-button
+                      value="horizontal"
+                      @click.native.stop="onRadioChange($event,selfConfig.visualMap,'orient')"
+                      >水平</a-radio-button
+                    >
+                  </a-radio-group>
                 </gui-field>
               </a-collapse-panel>
             </template>
@@ -1011,18 +1177,29 @@
                   </gui-inline>
                 </gui-field>
                 <gui-field label="指标位置" v-if="selfConfig.series.label.show">
-                  <a-radio-group :value="selfConfig.series.label.position" size="small">
+                  <a-radio-group
+                    :value="selfConfig.series.label.position"
+                    size="small"
+                  >
                     <a-radio-button
                       value="inside"
                       @click.native.stop="
-                        onRadioChange($event, selfConfig.series.label, 'position')
+                        onRadioChange(
+                          $event,
+                          selfConfig.series.label,
+                          'position'
+                        )
                       "
                       >内部</a-radio-button
                     >
                     <a-radio-button
                       value="top"
                       @click.native.stop="
-                        onRadioChange($event, selfConfig.series.label, 'position')
+                        onRadioChange(
+                          $event,
+                          selfConfig.series.label,
+                          'position'
+                        )
                       "
                       >顶部</a-radio-button
                     >
@@ -1100,7 +1277,10 @@
                     @change="switchChange"
                   ></a-switch>
                 </gui-field>
-                <gui-field label="刻度值文本" v-if="selfConfig.series.axisLabel.show">
+                <gui-field
+                  label="刻度值文本"
+                  v-if="selfConfig.series.axisLabel.show"
+                >
                   <gui-inline label="字号">
                     <a-input-number
                       v-model="selfConfig.series.axisLabel.textStyle.fontSize"
@@ -1196,8 +1376,14 @@
                     ></el-color-picker>
                   </gui-inline>
                 </gui-field>
-                <gui-field label="标题位置" v-if="selfConfig.xAxis.nameLocation">
-                  <a-radio-group :value="selfConfig.xAxis.nameLocation" size="small">
+                <gui-field
+                  label="标题位置"
+                  v-if="selfConfig.xAxis.nameLocation"
+                >
+                  <a-radio-group
+                    :value="selfConfig.xAxis.nameLocation"
+                    size="small"
+                  >
                     <a-radio-button
                       value="middle"
                       @click.native.stop="
@@ -1313,7 +1499,10 @@
                     size="small"
                   />
                 </gui-field>
-                <gui-field label="网格线颜色" v-if="selfConfig.xAxis.splitLine.show">
+                <gui-field
+                  label="网格线颜色"
+                  v-if="selfConfig.xAxis.splitLine.show"
+                >
                   <el-color-picker
                     v-model="selfConfig.xAxis.splitLine.lineStyle.color"
                     show-alpha
@@ -1377,8 +1566,14 @@
                     ></el-color-picker>
                   </gui-inline>
                 </gui-field>
-                <gui-field label="标题位置" v-if="selfConfig.yAxis.nameLocation">
-                  <a-radio-group :value="selfConfig.yAxis.nameLocation" size="small">
+                <gui-field
+                  label="标题位置"
+                  v-if="selfConfig.yAxis.nameLocation"
+                >
+                  <a-radio-group
+                    :value="selfConfig.yAxis.nameLocation"
+                    size="small"
+                  >
                     <a-radio-button
                       value="middle"
                       @click.native.stop="
@@ -1485,14 +1680,20 @@
                     size="small"
                   />
                 </gui-field>
-                <gui-field label="网格线颜色" v-if="selfConfig.yAxis.splitLine.show">
+                <gui-field
+                  label="网格线颜色"
+                  v-if="selfConfig.yAxis.splitLine.show"
+                >
                   <el-color-picker
                     v-model="selfConfig.yAxis.splitLine.lineStyle.color"
                     show-alpha
                     @change="setSelfProperty"
                   ></el-color-picker>
                 </gui-field>
-                <gui-field label="网格线线型" v-if="selfConfig.yAxis.splitLine.show">
+                <gui-field
+                  label="网格线线型"
+                  v-if="selfConfig.yAxis.splitLine.show"
+                >
                   <a-select
                     style="width: 90px"
                     v-model="selfConfig.yAxis.splitLine.lineStyle.type"
@@ -1510,7 +1711,11 @@
 
             <!--地图独有-->
             <template v-if="isMap">
-              <a-collapse-panel key="map" header="视觉映射" v-if="selfConfig.visualMap">
+              <a-collapse-panel
+                key="map"
+                header="视觉映射"
+                v-if="selfConfig.visualMap"
+              >
                 <a-switch
                   slot="extra"
                   v-if="collapseActive.indexOf('map') > -1"
@@ -1520,7 +1725,10 @@
                   @change="switchChange"
                 />
                 <gui-field label="类型">
-                  <a-radio-group :value="selfConfig.visualMap.type" size="small">
+                  <a-radio-group
+                    :value="selfConfig.visualMap.type"
+                    size="small"
+                  >
                     <a-radio-button
                       value="piecewise"
                       @click.native.stop="
@@ -1622,7 +1830,10 @@
                     @change="switchChange"
                   ></a-switch>
                 </gui-field>
-                <gui-field label="文本样式" v-if="selfConfig.geo.label.normal.show">
+                <gui-field
+                  label="文本样式"
+                  v-if="selfConfig.geo.label.normal.show"
+                >
                   <gui-inline label="字号">
                     <a-input-number
                       v-model="selfConfig.geo.label.normal.fontSize"
@@ -1753,7 +1964,7 @@
                     header="填充层设置"
                     v-if="
                       selfConfig.series[0] &&
-                        selfConfig.series[0].type === 'map'
+                      selfConfig.series[0].type === 'map'
                     "
                   >
                     <gui-field label="显示标记点">
@@ -1827,7 +2038,7 @@
                       </gui-inline>
                     </gui-field>
                     <gui-field label="多边形">
-                      <gui-inline label="区域" style="width:auto;">
+                      <gui-inline label="区域" style="width: auto">
                         <el-color-picker
                           ref="areaColor"
                           show-alpha
@@ -1837,7 +2048,7 @@
                           @change="changeAreaColor"
                         ></el-color-picker>
                       </gui-inline>
-                      <gui-inline label="边框" style="width:auto;">
+                      <gui-inline label="边框" style="width: auto">
                         <el-color-picker
                           v-model="
                             selfConfig.series[0].itemStyle.normal.borderColor
@@ -1847,7 +2058,7 @@
                       </gui-inline>
                     </gui-field>
                     <gui-field label="阴影">
-                      <gui-inline label="颜色" style="width:auto;">
+                      <gui-inline label="颜色" style="width: auto">
                         <el-color-picker
                           ref="areaColor"
                           show-alpha
@@ -1857,7 +2068,7 @@
                           @change="setSelfProperty"
                         ></el-color-picker>
                       </gui-inline>
-                      <gui-inline label="模糊大小" style="width:auto;">
+                      <gui-inline label="模糊大小" style="width: auto">
                         <a-input-number
                           v-model="
                             selfConfig.series[0].itemStyle.normal.shadowBlur
@@ -1882,7 +2093,7 @@
                       ></a-input-number>
                     </gui-field>
                     <gui-field label="多边形悬停">
-                      <gui-inline label="区域" style="width:auto;">
+                      <gui-inline label="区域" style="width: auto">
                         <el-color-picker
                           v-model="
                             selfConfig.series[0].itemStyle.emphasis.areaColor
@@ -1890,7 +2101,7 @@
                           @change="setSelfProperty"
                         ></el-color-picker>
                       </gui-inline>
-                      <gui-inline label="边框" style="width:auto;">
+                      <gui-inline label="边框" style="width: auto">
                         <el-color-picker
                           v-model="
                             selfConfig.series[0].itemStyle.emphasis.borderColor
@@ -1986,7 +2197,7 @@
                       label="涟漪动画"
                       v-if="
                         selfConfig.series[targetMeasure].type ===
-                          'effectScatter'
+                        'effectScatter'
                       "
                     >
                       <gui-inline label="最大缩放比">
@@ -2001,7 +2212,7 @@
                       </gui-inline>
                       <gui-inline label="波纹方式">
                         <a-select
-                          style="width:70px"
+                          style="width: 70px"
                           v-model="
                             selfConfig.series[targetMeasure].rippleEffect
                               .brushType
@@ -2029,7 +2240,7 @@
                           @change="setSelfProperty"
                         ></a-input-number>
                       </gui-inline>
-                      <gui-inline label="边框颜色" style="width:auto;">
+                      <gui-inline label="边框颜色" style="width: auto">
                         <el-color-picker
                           v-model="
                             selfConfig.series[targetMeasure].itemStyle.emphasis
@@ -2047,7 +2258,10 @@
             <template v-if="selfConfig.color">
               <a-collapse-panel key="colors" header="颜色设置">
                 <div style="padding: 5px 13px">
-                  <gui-colors v-for="(c, index) of selfConfig.color" :key="index + c">
+                  <gui-colors
+                    v-for="(c, index) of selfConfig.color"
+                    :key="index + c"
+                  >
                     <el-color-picker
                       v-model="selfConfig.color[index]"
                       :predefine="predefineColors"
@@ -2118,7 +2332,11 @@
                     <a-radio-button
                       value="left"
                       @click.native.stop="
-                        onRadioChange($event, selfConfig.header.textStyle, 'textAlign')
+                        onRadioChange(
+                          $event,
+                          selfConfig.header.textStyle,
+                          'textAlign'
+                        )
                       "
                     >
                       <a-icon type="align-left" value="left" />
@@ -2126,7 +2344,11 @@
                     <a-radio-button
                       value="center"
                       @click.native.stop="
-                        onRadioChange($event, selfConfig.header.textStyle, 'textAlign')
+                        onRadioChange(
+                          $event,
+                          selfConfig.header.textStyle,
+                          'textAlign'
+                        )
                       "
                     >
                       <a-icon type="align-center" value="center" />
@@ -2134,7 +2356,11 @@
                     <a-radio-button
                       value="right"
                       @click.native.stop="
-                        onRadioChange($event, selfConfig.header.textStyle, 'textAlign')
+                        onRadioChange(
+                          $event,
+                          selfConfig.header.textStyle,
+                          'textAlign'
+                        )
                       "
                     >
                       <a-icon type="align-right" value="right" />
@@ -2168,7 +2394,11 @@
                     <a-radio-button
                       value="left"
                       @click.native.stop="
-                        onRadioChange($event, selfConfig.table.textStyle, 'textAlign')
+                        onRadioChange(
+                          $event,
+                          selfConfig.table.textStyle,
+                          'textAlign'
+                        )
                       "
                     >
                       <a-icon type="align-left" value="left" />
@@ -2176,7 +2406,11 @@
                     <a-radio-button
                       value="center"
                       @click.native.stop="
-                        onRadioChange($event, selfConfig.table.textStyle, 'textAlign')
+                        onRadioChange(
+                          $event,
+                          selfConfig.table.textStyle,
+                          'textAlign'
+                        )
                       "
                     >
                       <a-icon type="align-center" value="center" />
@@ -2184,7 +2418,11 @@
                     <a-radio-button
                       value="right"
                       @click.native.stop="
-                        onRadioChange($event, selfConfig.table.textStyle, 'textAlign')
+                        onRadioChange(
+                          $event,
+                          selfConfig.table.textStyle,
+                          'textAlign'
+                        )
                       "
                     >
                       <a-icon type="align-right" value="right" />
@@ -2307,7 +2545,11 @@
                       :style="radioStyle"
                       value="1"
                       @click.native.stop="
-                        onRadioChange($event, selfConfig.valueBar, 'backgroundType')
+                        onRadioChange(
+                          $event,
+                          selfConfig.valueBar,
+                          'backgroundType'
+                        )
                       "
                     >
                       <gui-field label="单色">
@@ -2322,7 +2564,11 @@
                       :style="radioStyle"
                       value="2"
                       @click.native.stop="
-                        onRadioChange($event, selfConfig.valueBar, 'backgroundType')
+                        onRadioChange(
+                          $event,
+                          selfConfig.valueBar,
+                          'backgroundType'
+                        )
                       "
                     >
                       <gui-field label="线性渐变">
@@ -2344,7 +2590,11 @@
                       :style="radioStyle"
                       value="3"
                       @click.native.stop="
-                        onRadioChange($event, selfConfig.valueBar, 'backgroundType')
+                        onRadioChange(
+                          $event,
+                          selfConfig.valueBar,
+                          'backgroundType'
+                        )
                       "
                     >
                       <gui-field label="径向渐变">
@@ -2412,7 +2662,9 @@
                       name
                       accept="image/png, image/jpeg, image/gif"
                       style="display: none"
-                      @change="selectPhoto($event, backgroundApi, 'backgroundApi')"
+                      @change="
+                        selectPhoto($event, backgroundApi, 'backgroundApi')
+                      "
                     />
                   </gui-field>
                 </a-radio>
@@ -2456,6 +2708,7 @@
                 ></a-input-number>
               </gui-field>
             </a-collapse-panel>
+
           </a-collapse>
         </div>
         <div v-else-if="tabsType === 1">
@@ -2499,7 +2752,7 @@ import { mapGetters, mapActions } from 'vuex'
 import { setBaseProperty } from '../../../api/canvasMaps/canvas-maps-request'
 import {
   resetPageSettings,
-  setPageSettings
+  setPageSettings,
 } from '../../../api/app/app-request'
 import GuiGroup from './gui-group'
 import GuiWrap from './gui-wrap'
@@ -2511,26 +2764,26 @@ import Interactive from './interactive'
 import Figure from './figure'
 import { DEFAULT_COLORS } from '../../../utils/defaultColors'
 import { deepClone } from '../../../utils/deepClone'
-import throttle from 'lodash/throttle';
-import HighChartPie from '@/components/board/options/highchart-pie';
-import HighChartBar from '@/components/board/options/highchart-bar';
+import throttle from 'lodash/throttle'
+import HighChartPie from '@/components/board/options/highchart-pie'
+import HighChartBar from '@/components/board/options/highchart-bar'
 
 export default {
   name: 'BoardOptions',
   props: {
     config: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   provide() {
     return {
       // 地图删除维度的时候调用，重置样式指标设置选择的度量
       initTargetMeasure: () => {
         this.targetMeasure = this.selfConfig.series.filter(
-          item => item.type === 'map'
+          (item) => item.type === 'map'
         ).length
-      }
+      },
     }
   },
   data() {
@@ -2538,7 +2791,7 @@ export default {
       formatList: [
         { label: '维度', value: '{b}' },
         { label: '度量', value: '{@2012}' },
-        { label: '占比', value: '({d}%)' }
+        { label: '占比', value: '({d}%)' },
       ],
       plainOptions: ['a', 'b', 'c'],
       formatShow: [],
@@ -2550,7 +2803,7 @@ export default {
         gridStep: 1,
         backgroundSrc: '',
         backgroundType: 1,
-        opacity: 1
+        opacity: 1,
       },
       baseProperty: { width: 0, height: 0, x: 0, y: 0, rotate: 0 }, // 配置-基础属性,
       collapseActive: [],
@@ -2565,14 +2818,14 @@ export default {
       activeKey: ['1'],
       radioStyle: {
         display: 'flex',
-        alignItems: 'center'
+        alignItems: 'center',
       }, // 单选radio样式
       showSlide: false, // 显示透明滑动条
       imageUrl: '', // 上传图片url
       loading: false, // 是否上传图片中
       refreshList: [
         { name: '分', value: 'min' },
-        { name: '小时', value: 'hour' }
+        { name: '小时', value: 'hour' },
       ],
       timer: null,
       chartTimers: {},
@@ -2587,14 +2840,16 @@ export default {
         { label: '庞门正道标题体', value: 'pangmenzhengdao' },
         { label: 'HuXiaoBoNanShenTi-2', value: 'HuXiaoBoNanShenTi-2' },
         { label: '优设标题黑', value: 'youshe' },
-        { label: 'digital-7-4', value: 'digital-7-4' }
+        { label: 'digital-7-4', value: 'digital-7-4' },
       ],
       targetMeasure: 0, // 地图指标设置对应度量
-      scatterColorList:[ //散点颜色
+      scatterColorList: [
+        //散点颜色
         { label: '单色', value: '0' },
         { label: '按维度', value: '1' },
       ],
-      scatterSizeList:[ //散点大小
+      scatterSizeList: [
+        //散点大小
         { label: '无', value: '' },
         { label: '按度量1', value: '0' },
         { label: '按度量2', value: '1' },
@@ -2622,7 +2877,7 @@ export default {
     clearInterval(this.timer)
     this.timer = null
     let keys = Object.keys(this.chartTimers)
-    keys.forEach(id => {
+    keys.forEach((id) => {
       clearInterval(this.chartTimers[id])
     })
     this.chartTimers = {}
@@ -2648,15 +2903,15 @@ export default {
       this.updateChartData()
     },
     onChange(checkedValues) {
-      if(this.isScatter){
+      if (this.isScatter) {
         // 散点图
-        if(this.apis.arrange == 'horizontal'){
+        if (this.apis.arrange == 'horizontal') {
           this.selfConfig.series.label.formatter = checkedValues.join(' ')
-        }else{
+        } else {
           this.selfConfig.series.label.formatter = checkedValues.join('\n\r')
         }
-        this.setApis();
-      }else{
+        this.setApis()
+      } else {
         this.selfConfig.series.label.formatter = checkedValues.join('')
       }
       this.setSelfProperty()
@@ -2790,7 +3045,7 @@ export default {
       form.append('avatarfile', e.target.files[0])
       this.$server.screenManage
         .actionUploadImage(form)
-        .then(res => {
+        .then((res) => {
           if (res.code === 200) {
             let imageUrl = process.env.VUE_APP_SERVICE_URL + res.imgUrl
             if (key === 'globalSettings') {
@@ -2803,13 +3058,14 @@ export default {
             }
             if (key === 'backgroundApi') {
               data['backgroundSrc'] = imageUrl
+              data['backgroundImage'] = imageUrl
               this.setBackGround()
             }
           } else {
             this.$message.error(res.msg)
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err)
         })
     },
@@ -2831,8 +3087,12 @@ export default {
     },
 
     // 点击选择对齐方式
-    onAlignChange(data, event) {
-      this.$set(data, 'textAlign', event.target.value)
+    onAlignChange(data, value) {
+      if (this.selfConfig.title.textAlign) {
+        this.$set(data, 'textAlign', value)
+      } else {
+        this.$set(data, 'left', value)
+      }
       this.setSelfProperty()
     },
 
@@ -2866,7 +3126,7 @@ export default {
       // 堆叠柱状图
       if (val && type === 'stack') {
         this.apis.stack = {
-          用户: []
+          用户: [],
         }
         // 堆叠了把数值显示在右边防止挤在一起
         this.selfConfig.series.label.position = 'insideBottom'
@@ -2885,7 +3145,7 @@ export default {
         this.apis.showLine = [
           columns[columns.length - 2]
             ? columns[columns.length - 2]
-            : columns[columns.length - 1]
+            : columns[columns.length - 1],
         ]
         // this.apis.axisSite = { right: columns[columns.length - 2] || [columns[columns.length - 1]] }
       } else {
@@ -2926,7 +3186,7 @@ export default {
         clearInterval(this.chartTimers[id])
         this.chartTimers[id] = null
       }
-      let selected = this.canvasMap.find(item => item.id === id)
+      let selected = this.canvasMap.find((item) => item.id === id)
       let refresh = selected.setting.api_data.refresh
       // 所有条件都满足才开始倒计时刷新
       if (refresh.isRefresh && refresh.unit && refresh.frequency > 0) {
@@ -2942,7 +3202,7 @@ export default {
       }
     },
     // 散点图 -- 散点图大小设置
-    scatterColorChange(val){
+    scatterColorChange(val) {
       // if(val === ''){
       //   delete this.selfConfig.series.symbolSize;
       // }else{
@@ -2950,66 +3210,67 @@ export default {
       //     return Math.sqrt(data[val]) / 5e2 * 1000;
       //   }
       // }
-      this.setApis();
-      this.setSelfProperty();
+      this.setApis()
+      this.setSelfProperty()
     },
     // 散点图 -- 散点图大小设置
-    scatterSizeChange(val){
-      if(val === ''){
-        this.selfConfig.series.symbolSize = 15;
-      }else{
+    scatterSizeChange(val) {
+      if (val === '') {
+        this.selfConfig.series.symbolSize = 15
+      } else {
         // this.selfConfig.series.symbolSize = function (data) {
         //   console.log(data)
         //   return Math.sqrt(data[val]) / 5e2 * 1000;
         // }
       }
-      this.setApis();
-      this.setSelfProperty();
+      this.setApis()
+      this.setSelfProperty()
     },
-    scatterTargetColorChange(e){
-      let val = e.target.value;
-      if(val === '0'){
-        this.selfConfig.series.label.color  = null;
+    scatterTargetColorChange(e) {
+      let val = e.target.value
+      if (val === '0') {
+        this.selfConfig.series.label.color = null
       }
-      this.apis.scatterTargetColor = val;
-      this.setApis();
-      this.setSelfProperty();
+      this.apis.scatterTargetColor = val
+      this.setApis()
+      this.setSelfProperty()
     },
     //散点图 -- 指标排序
-    scatterArrangeChange(e){
-      let val = e.target.value;
+    scatterArrangeChange(e) {
+      let val = e.target.value
       // if(!val){ return; }
-      if(val){
-        if(val == 'horizontal'){
-        this.selfConfig.series.label.formatter = this.apis.scatterLabel.join(' ')
-      }else{
-        this.selfConfig.series.label.formatter = this.apis.scatterLabel.join('\n\r')
+      if (val) {
+        if (val == 'horizontal') {
+          this.selfConfig.series.label.formatter =
+            this.apis.scatterLabel.join(' ')
+        } else {
+          this.selfConfig.series.label.formatter =
+            this.apis.scatterLabel.join('\n\r')
+        }
+        this.apis.arrange = val
+        this.setApis()
+        this.setSelfProperty()
       }
-      this.apis.arrange = val;
-      this.setApis();
-      this.setSelfProperty();
-      }
-      
     },
     // 刷新大屏
     refreshData: throttle(
-      function() {
+      function () {
         this.refreshScreen({
           charSeted: false,
-          needLoading: true
+          needLoading: true,
         })
       },
       1000,
       {
         leading: true,
-        trailing: false
+        trailing: false,
       }
     ),
   },
   watch: {
     currSelected: {
       handler(val) {
-        console.log(val,'val')
+        console.log(val, 'val')
         if (val) {
           if (val.setting.name === 've-image') {
             this.tabsType = 0
@@ -3020,10 +3281,10 @@ export default {
             if (val.setting.chartType === 'v-map') {
               // 地图里散点图配置列表
               this.scatterList = this.selfConfig.series.filter(
-                item => item.type === 'scatter'
+                (item) => item.type === 'scatter'
               )
               this.targetMeasure = this.selfConfig.series.filter(
-                item => item.type === 'map'
+                (item) => item.type === 'map'
               ).length
             }
           }
@@ -3041,7 +3302,7 @@ export default {
           }
         }
       },
-      deep: true
+      deep: true,
     },
     pageSettings: {
       handler(val) {
@@ -3050,7 +3311,7 @@ export default {
           if (!setting.refresh) {
             setting.refresh = {
               frequency: '',
-              isRefresh: false
+              isRefresh: false,
             }
           }
           this.globalSettings = deepClone(setting)
@@ -3070,7 +3331,7 @@ export default {
         }
       },
       deep: true,
-      immediate: true
+      immediate: true,
     },
   },
   computed: {
@@ -3082,7 +3343,7 @@ export default {
       'currSelected',
       'screenId',
       'canvasMap',
-      'orginPageSettings'
+      'orginPageSettings',
     ]),
     chartType() {
       return this.currSelected ? this.currSelected.setting.chartType : ''
@@ -3129,25 +3390,49 @@ export default {
     isSteepBar() {
       return this.chartType === 'steepBar'
     },
-    isScatter(){
-      return this.chartType === 'v-scatter'
+    isScatter() {
+      return (this.chartType === 'v-scatter') | (this.chartType === 'v-heatmap')
     },
     showGrid() {
-      return (
-        this.selfConfig.grid && (this.isLine || this.isHistogram || this.isBar || this.isScatter)
-      )
+      if (this.chartType === 'v-heatmap') {
+        return true
+      } else {
+        return (
+          this.selfConfig.grid &&
+          (this.isLine || this.isHistogram || this.isBar || this.isScatter)
+        )
+      }
     },
     showXAxis() {
-      return (
-        this.selfConfig.xAxis && (this.isLine || this.isHistogram || this.isBar || this.isScatter)
-      )
+      if (this.chartType === 'v-heatmap') {
+        return true
+      } else {
+        return (
+          this.selfConfig.xAxis &&
+          (this.isLine || this.isHistogram || this.isBar || this.isScatter)
+        )
+      }
     },
     showYAxis() {
-      return (
-        this.selfConfig.yAxis && (this.isLine || this.isHistogram || this.isBar || this.isScatter)
-      )
-    }
+      if (this.chartType === 'v-heatmap') {
+        return true
+      } else {
+        return (
+          this.selfConfig.yAxis &&
+          (this.isLine || this.isHistogram || this.isBar || this.isScatter)
+        )
+      }
+    },
   },
-  components: { GuiField, GuiInline, GuiColors, DataSource, Interactive,Figure,HighChartPie,HighChartBar }
+  components: {
+    GuiField,
+    GuiInline,
+    GuiColors,
+    DataSource,
+    Interactive,
+    Figure,
+    HighChartPie,
+    HighChartBar
+  },
 }
 </script>

@@ -218,15 +218,15 @@ export default {
       dataFile.showMore = false // 是否点击显示更多
       if (this.type === 'dimensions' && this.dragFile === this.type) {
         // 嵌套饼图可以有多个维度（最多只能2个）
-        if (this.currSelected.setting.chartType === 'v-multiPie') {
+        //矩形热力图必须2个维度一个度量(v-heatmap)
+        if (this.currSelected.setting.chartType === 'v-multiPie'||this.currSelected.setting.chartType==='v-heatmap') {
           if(this.fileList.length<2){
             this.fileList.push(dataFile)
           }
           if(this.fileList.length==2){
             this.fileList.splice(1,1,dataFile);
           }
-          
-        } else {
+        }else {
           // 维度暂时只能拉入一个字段
           this.fileList[0] = dataFile
         }
@@ -239,8 +239,8 @@ export default {
         this.dragFile === this.type &&
         this.chartType === '1'
       ) {
-        // 饼图类型只能拉入一个度量（包含3d）
-        if (this.currSelected.setting.name === 've-pie'|this.currSelected.setting.chartType==='high-pie') {
+        // 饼图类型只能拉入一个度量（包含3d和矩形热力图）
+        if (this.currSelected.setting.name === 've-pie'|this.currSelected.setting.chartType==='high-pie'|this.currSelected.setting.chartType==='v-heatmap') {
           this.fileList[0] = dataFile
         }else if (this.currSelected.setting.name === 've-scatter' && this.fileList.length>=2) {
           // 散点图只能拉入两个度量
@@ -374,6 +374,7 @@ export default {
       let selected = this.canvasMap.find(
         item => item.id === this.currentSelected
       )
+      
       // 维度
       if (this.type === 'dimensions') {
         selected.setting.api_data.dimensions = this.fileList
@@ -463,6 +464,11 @@ export default {
       let apiData = deepClone(this.currSelected.setting.api_data)
       // 散点图，拖入一个维度和两个度量时才请求数据
       if(this.currSelected.setting.chartType == 'v-scatter' && (apiData.dimensions.length == 0 || apiData.measures.length <= 1 ) ){
+        return;
+      }
+
+      //矩形热力图只有在2个维度和一个度量的时候，才能请求数据
+      if(this.currSelected.setting.chartType == 'v-heatmap'&&(apiData.dimensions.length<=1||apiData.measures.length==0) ){
         return;
       }
 
