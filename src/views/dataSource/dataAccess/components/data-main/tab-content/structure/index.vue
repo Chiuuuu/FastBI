@@ -583,13 +583,13 @@ export default {
           tableList: this.data
         }).finally(() => {
           this.extractSping = false
-          this.handleGetTableList()
+          this.handleGetTableList(this.pagination)
         })
       } else if (this.tableType === 1) { // 自定义表抽取
         this.extractSping = true
         result = await this.$server.dataAccess.actionCustomExtract(this.selectedRows.map(item => item.id)).finally(() => {
           this.extractSping = false
-          this.handleGetTableList()
+          this.handleGetTableList(this.pagination)
         })
       }
       if (result.code === 200) {
