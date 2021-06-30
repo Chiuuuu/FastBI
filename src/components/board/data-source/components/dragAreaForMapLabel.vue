@@ -53,41 +53,8 @@ import { deepClone } from '@/utils/deepClone'
 import { sum, summary } from '@/utils/summaryList'
 import geoJson from '@/utils/guangdong.json'
 import reverseAddressResolution from '@/utils/reverseAddressResolution'
+import { dotSeries } from '@/config/mapSeries'
 import { Loading } from 'element-ui'
-const dotSeries = {
-  type: 'scatter', // scatter,effectScatter
-  name: '人口',
-  coordinateSystem: 'geo',
-  symbol: 'circle',
-  symbolSize: 10,
-  //   aspectScale: 0.75,
-  hoverAnimation: true,
-  showEffectOn: 'render',
-  rippleEffect: {
-    brushType: 'stroke',
-    scale: 3
-  },
-  label: {
-    show: false,
-    // formatter: '{b} ：{c}',
-    formatter: function(params) {
-      return params.data.value[2].toFixed(2)
-    },
-    fontSize: 12,
-    position: 'right', // 可选inside
-    emphasis: {
-      show: true
-    }
-  },
-  itemStyle: {
-    emphasis: {
-      borderColor: '#fff',
-      borderWidth: 1
-    }
-  },
-  zlevel: 1
-}
-
 export default {
   props: {
     type: {
@@ -200,27 +167,6 @@ export default {
   },
   methods: {
     ...mapActions(['saveScreenData', 'updateChartData']),
-    // 切换labelType清空数据
-    clearData() {
-      // 清空显示列表
-      this.fileList = []
-      // 清空维度度量
-      Object.assign(this.currSelected.setting.api_data, {
-        labelNormal: [],
-        labelLatitude: [],
-        labelLongitude: [],
-        labelMeasures: []
-      })
-      this.currSelected.datamodelId = 0
-      this.currSelected.isEmpty = false
-      // 清空标记点图表数据
-      let config = this.currSelected.setting.config
-      this.$set(
-        this.currSelected.setting.config,
-        'series',
-        config.series.filter(item => item.type === 'map')
-      )
-    },
     // 将拖动的维度到所选择的放置目标节点中
     handleDropOnFilesWD(event) {
       // h5 api
@@ -417,7 +363,6 @@ export default {
       }
       if (res.code === 200) {
         let config = deepClone(this.currSelected.setting.config)
-        let legend = []
         // 重置series
         config.series = config.series.filter(item => item.type === 'map')
         // 类型为区域
@@ -426,7 +371,7 @@ export default {
           let alias = apiData.labelDimensions[0].alias
           // 一个度量对应一个series.data
           apiData.labelMeasures.forEach((measure, index) => {
-            legend.push(measure.alias)
+            let showName = `地区名/${alias}` // 指标显示用
             let datas = []
             for (let item of res.data.labelList) {
               // 抓取区域坐标
@@ -437,40 +382,52 @@ export default {
               }
               datas.push({
                 name: item[alias],
-                value: center.concat(item[measure.alias]) // 链接数组，坐标和值
+                value: center.concat(item[measure.alias]), // 链接数组，坐标和值
+                // 构造映射数据，给指标提示框内容显示
+                [showName]: item[alias], // 地区名/维度
+                [alias]: item[alias], // 维度
+                [measure.alias]: item[measure.alias] // 度量
               })
             }
             config.series.push(
-              Object.assign(dotSeries, { data: datas, name: measure.alias })
+              Object.assign(dotSeries, {
+                data: datas,
+                name: measure.alias,
+                pointShowList: [showName],
+                tooltipShowList: [alias, measure.alias]
+              })
             )
           })
         } else {
           let alias = apiData.labelMeasures[0].alias
-          legend.push(alias)
           let datas = []
           // 解析数据，获取经度，纬度，目标值
           for (let data of res.data.labelList) {
             let positionMsg = ''
             try {
               // 获取位置信息
-              positionMsg = await reverseAddressResolution([
+              let position = [
                 data[apiData.labelLatitude[0].alias],
                 data[apiData.labelLongitude[0].alias]
-              ])
+              ]
+              positionMsg = await reverseAddressResolution(position)
+              datas.push({
+                name: positionMsg.district,
+                value: [
+                  parseFloat(position[0]),
+                  parseFloat(position[1])
+                ].concat(data[alias]),
+                // 构造映射数据，给指标提示框内容显示
+                [apiData.labelLatitude[0].alias]:
+                  data[apiData.labelLatitude[0].alias], // 经度
+                [apiData.labelLongitude[0].alias]:
+                  data[apiData.labelLongitude[0].alias], // 维度
+                地区名: positionMsg.district, // 地区名
+                [alias]: data[alias] // 度量
+              })
             } catch (err) {
               continue
             }
-            datas.push(
-              Object.assign(dotSeries, {
-                data: [
-                  {
-                    name: positionMsg.direct,
-                    value: data[alias]
-                  }
-                ],
-                name: alias
-              })
-            )
           }
           if (datas.length === 0) {
             this.$message.error('经纬点解析失败')
@@ -478,11 +435,21 @@ export default {
             return
           }
           config.series.push(
-            Object.assign(dotSeries, { data: datas, name: alias })
+            Object.assign(dotSeries, {
+              data: datas,
+              name: alias,
+              pointShowList: ['地区名'],
+              tooltipShowList: [
+                apiData.labelLatitude[0].alias,
+                apiData.labelLongitude[0].alias,
+                alias
+              ]
+            })
           )
         }
         loadingInstance.close()
-        config.legend.data = legend
+        let scatters = config.series.filter(item => item.type === 'scatter')
+        config.legend.data = scatters.map(item => item.name)
         this.$store.dispatch('SetSelfProperty', config)
         this.$store.dispatch('SetSelfDataSource', apiData)
         this.updateChartData()

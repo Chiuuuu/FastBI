@@ -31,41 +31,8 @@
       ></el-color-picker>
     </GuiField>
     <GuiField label="旋转角度">
-      <a-input-number :min="0" :max="360" :value="view.rotate" @change="setView" />
+      <a-input-number :min="0" :max="360" :value="view.rotate" @change="setView($event, 'rotate')" />
     </GuiField>
-    <!-- <GuiField label="左端点">
-      <a-select
-        :value="config.left.type"
-        style="width: 90px"
-        size="small"
-        @change="setLeftStyle($event, 'type')"
-      >
-        <a-select-option :value="0">无</a-select-option>
-        <a-select-option :value="1">箭头</a-select-option>
-        <a-select-option :value="2">三角</a-select-option>
-        <a-select-option :value="3">圆形</a-select-option>
-        <a-select-option :value="4"><div class="circle"></div></a-select-option>
-      </a-select>
-      <el-color-picker
-        :value="config.left.backgroundColor"
-        @change="setLeftStyle($event, 'backgroundColor')"></el-color-picker>
-    </GuiField>
-    <GuiField label="右端点">
-      <a-select
-        :value="config.right.type"
-        style="width: 90px"
-        size="small"
-        @change="setRightStyle($event, 'type')"
-      >
-        <a-select-option :value="0">无</a-select-option>
-        <a-select-option :value="1">箭头</a-select-option>
-        <a-select-option :value="2">三角</a-select-option>
-        <a-select-option :value="3">圆形</a-select-option>
-      </a-select>
-      <el-color-picker
-        :value="config.right.backgroundColor"
-        @change="setRightStyle($event, 'backgroundColor')"></el-color-picker>
-    </GuiField> -->
   </div>
   <div v-else-if="config.title === '圆形'">
     <GuiField label="填充颜色">
@@ -104,9 +71,9 @@
         <a-select-option value="dotted">点线</a-select-option>
       </a-select>
     </GuiField>
-    <GuiField label="旋转角度">
-      <a-input-number :min="0" :max="360" :value="view.rotate" @change="setView" />
-    </GuiField>
+    <!-- <GuiField label="旋转角度">
+      <a-input-number :min="0" :max="360" :value="view.rotate" @change="setView($event, 'rotate')" />
+    </GuiField> -->
   </div>
   <div v-else-if="config.title === '矩形'">
     <GuiField label="填充颜色">
@@ -148,9 +115,9 @@
         <a-select-option value="dotted">点线</a-select-option>
       </a-select>
     </GuiField>
-    <GuiField label="旋转角度">
-      <a-input-number :min="0" :max="360" :value="view.rotate" @change="setView" />
-    </GuiField>
+    <!-- <GuiField label="旋转角度">
+      <a-input-number :min="0" :max="360" :value="view.rotate" @change="setView($event, 'rotate')" />
+    </GuiField> -->
   </div>
 </template>
 
@@ -181,10 +148,9 @@ export default {
       const { width, height } = this.$store.getters.currSelected.setting.view
       let res = Math.min(width, height) / 2
       if (this.config.title === '直线') {
-        res = Math.min(width, height)
+        res = 20
       }
-      // return res > 20 ? 20 : res
-      return res
+      return res > 20 ? 20 : res
     }
   },
   components: {
@@ -199,9 +165,9 @@ export default {
       this.$emit('refreshSelf')
     },
     // 设置图形样式
-    setView(value) {
+    setView(value, key) {
       const view = deepClone(this.view)
-      view.rotate = value
+      view[key] = value
       this.$emit('update:view', view)
       this.$emit('refreshBase')
     }

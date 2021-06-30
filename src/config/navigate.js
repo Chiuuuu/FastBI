@@ -1801,6 +1801,232 @@ const list = [{
           }
         },
         {
+          title: '矩形树图',
+          name: 've-tree',
+          chartType: 'v-treemap',
+          icon: 'icon_pie_chart.png',
+          // iconFont: 'icon-Pie-chart',
+          type: '1',
+          modelId: '',
+          isEmpty: false,
+          api_data: {
+            dimensions: [],
+            measures: [],
+            source: {},
+            columns: [],
+            rows: [],
+            options: {}
+          },
+          apis: {
+            labelMap: {
+              x: '值',
+              y: '值',
+              s: '类目'
+            }
+          },
+          background: {
+            backgroundType: '1',
+            backgroundColor: '',
+            borderColor: '',
+            borderWidth: 0,
+            borderStyle: '',
+            borderRadius: 0
+          },
+          config: {
+            title: {
+              show: true,
+              content: '矩形树图',
+              textAlign: 'left',
+              textStyle: {
+                color: '#ffffff',
+                fontSize: 20,
+                fontFamily: 'not specified',
+                fontWeight: 'normal'
+              }
+            },
+            grid: {
+              left: 50,
+              top: 60,
+              right: 50,
+              bottom: 50
+            },
+            legend: {
+              show: true,
+              orient: 'horizontal',
+              textStyle: {
+                color: '#ffffff',
+                fontSize: 12
+              },
+              itemGap: 12,
+              icon: '',
+              left: 'center',
+              top: 'auto',
+              right: 'auto',
+              bottom: 'auto'
+            },
+            xAxis: {
+              type: 'value',
+              name: '',
+              nameLocation: 'middle',
+              nameGap: 20,
+              nameTextStyle: {
+                color: '#fff',
+                fontSize: '12',
+                align: 'right',
+                padding: [30, 0, 0, 0]
+              },
+              axisLabel: {
+                color: '#ffffff',
+                fontSize: 12,
+                rotate: 0
+              },
+              axisLine: {
+                show: false
+              },
+              splitLine: {
+                show: false
+              },
+              axisTick: {
+                show: false
+              }
+            },
+            yAxis: {
+              type: 'value',
+              name: '',
+              position: 'left',
+              nameLocation: 'middle',
+              nameTextStyle: {
+                color: '#fff',
+                fontSize: 12,
+                padding: [0, 0, 40, 0]
+              },
+              axisLabel: {
+                color: '#ffffff',
+                fontSize: 12
+              },
+              axisLine: {
+                show: false
+              },
+              splitLine: {
+                show: false
+              },
+              axisTick: {
+                show: false
+              }
+            },
+            series: {
+              name: '矩形树图',
+              type: 'treemap',
+              recSize: 'value', // 矩形大小依据度量等比或所有矩形等大(none)
+              // visibleMin: 300,
+              tooltip: {
+                show: true,
+                formatter: '{b} {c}'
+              },
+              label: {
+                show: true,
+                align: 'center',
+                position: 'inside',
+                ellipsis: true,
+                formatter: '{b}'
+              },
+              upperLabel: {
+                show: true,
+                align: 'center',
+                position: 'inside',
+                ellipsis: true,
+                height: 30,
+                formatter: '{b}'
+              },
+              emphasis: {
+                upperLabel: {
+                  show: true,
+                  align: 'center',
+                  position: 'inside',
+                  height: 30
+                }
+              },
+              // itemStyle: {
+              //   borderColor: '#555'
+              // },
+              levels: [
+                {
+                  upperLabel: {
+                    show: false
+                  },
+                  itemStyle: {
+                    borderColorSaturation: 0.25,
+                    borderWidth: 2,
+                    gapWidth: 1
+                  }
+                },
+                {
+                  itemStyle: {
+                    borderColorSaturation: 0.3,
+                    borderWidth: 2,
+                    gapWidth: 1
+                  }
+                },
+                {
+                  itemStyle: {
+                    borderColorSaturation: 0.35,
+                    borderWidth: 2,
+                    gapWidth: 1
+                  }
+                }
+              ],
+              data: [
+                {
+                  name: '广东省',
+                  value: [1000],
+                  children: [
+                    {
+                      name: '广州市',
+                      value: [800]
+                    },
+                    {
+                      name: '深圳市',
+                      value: [100]
+                    },
+                    {
+                      name: '东莞市',
+                      value: [100]
+                    }
+                  ]
+                },
+                {
+                  name: '江苏省',
+                  value: [1000],
+                  children: [
+                    {
+                      name: '南京市',
+                      value: [700]
+                    },
+                    {
+                      name: '苏州市',
+                      value: [200]
+                    },
+                    {
+                      name: '无锡市',
+                      value: [100]
+                    }
+                  ]
+                }
+              ]
+            },
+            // color: DEFAULT_COLORS
+          },
+          chartEvents: {
+            click: chartClick
+          },
+          view: {
+            width: 400,
+            height: 400,
+            x: 760,
+            y: 340
+          }
+        },
+        {
           title: '矩形热力图',
           name: 've-heatmap',
           chartType: 'v-heatmap',

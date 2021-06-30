@@ -276,7 +276,10 @@
         <gui-inline label="字号">
           <a-input-number
             class="longwidth"
-            v-model="HighConfig.setting.config.plotOptions.pie.dataLabels.style.fontSize"
+            v-model="
+              HighConfig.setting.config.plotOptions.pie.dataLabels.style
+                .fontSize
+            "
             size="small"
             :min="12"
             :max="40"
@@ -363,8 +366,8 @@
         <a-input-number
           v-model="HighConfig.setting.config.chart.borderWidth"
           size="small"
-          :formatter="(value) => `${value}px`"
-          :parser="(value) => value.replace('px', '')"
+          :formatter="value => `${value}px`"
+          :parser="value => value.replace('px', '')"
           @change="setBackGround"
         ></a-input-number>
       </gui-field>
@@ -372,8 +375,8 @@
         <a-input-number
           v-model="HighConfig.setting.config.chart.borderRadius"
           size="small"
-          :formatter="(value) => `${value}px`"
-          :parser="(value) => value.replace('px', '')"
+          :formatter="value => `${value}px`"
+          :parser="value => value.replace('px', '')"
           @change="setBackGround"
         ></a-input-number>
       </gui-field>
@@ -387,15 +390,15 @@ import { setBaseProperty } from '@/api/canvasMaps/canvas-maps-request'
 
 import { mapGetters, mapActions } from 'vuex'
 
-import HighMinxins from '@/mixins/hight';
+import HighMinxins from '@/mixins/hight'
 export default {
   props: {
     HighConfig: {
       type: Object,
-      required: true,
-    },
+      required: true
+    }
   },
-  mixins:[HighMinxins],
+  mixins: [HighMinxins],
   components: { GuiField, GuiInline },
   data() {
     return {
@@ -407,13 +410,12 @@ export default {
   methods: {
     onChange(checkedValues) {
       // this.HighConfig.setting.config.plotOptions.pie.dataLabels.format = checkedValues.join('');
-      let source = this.HighConfig.setting.config.plotOptions.pie.dataLabels;
-      this.$set(source,'format',checkedValues.join(''));
+      let source = this.HighConfig.setting.config.plotOptions.pie.dataLabels
+      this.$set(source, 'format', checkedValues.join(''))
       this.setSelfProperty()
-    },
+    }
   },
-  watch: {},
+  watch: {}
 }
 </script>
-<style lang="less" scoped>
-</style>
+<style lang="less" scoped></style>

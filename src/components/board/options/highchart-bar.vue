@@ -88,8 +88,8 @@
           <a-input-number
             v-model="HighConfig.setting.config.chart.marginTop"
             size="small"
-            :formatter="(value) => `上 ${value}`"
-            :parser="(value) => value.replace(/\上\s?|(,*)/g, '')"
+            :formatter="value => `上 ${value}`"
+            :parser="value => value.replace(/\上\s?|(,*)/g, '')"
             class="f-clear-width"
             :min="0"
             :max="120"
@@ -100,7 +100,7 @@
           <a-input-number
             v-model="HighConfig.setting.config.chart.marginBottom"
             size="small"
-            :formatter="(value) => `下 ${value}`"
+            :formatter="value => `下 ${value}`"
             class="f-clear-width"
             :min="0"
             :max="60"
@@ -113,7 +113,7 @@
           <a-input-number
             v-model="HighConfig.setting.config.chart.marginLeft"
             size="small"
-            :formatter="(value) => `左 ${value}`"
+            :formatter="value => `左 ${value}`"
             class="f-clear-width"
             :min="0"
             :max="60"
@@ -124,7 +124,7 @@
           <a-input-number
             v-model="HighConfig.setting.config.chart.marginRight"
             size="small"
-            :formatter="(value) => `右 ${value}`"
+            :formatter="value => `右 ${value}`"
             class="f-clear-width"
             :min="0"
             :max="200"
@@ -198,7 +198,7 @@
       <gui-field label="堆叠柱形图">
         <a-switch
           size="small"
-          @change="(a) => setHistogram(a, 'plotOptions')"
+          @change="a => setHistogram(a, 'plotOptions')"
           v-model="bartype.isdd"
           clearable
         ></a-switch>
@@ -560,8 +560,8 @@
         <a-input-number
           v-model="HighConfig.setting.config.chart.borderWidth"
           size="small"
-          :formatter="(value) => `${value}px`"
-          :parser="(value) => value.replace('px', '')"
+          :formatter="value => `${value}px`"
+          :parser="value => value.replace('px', '')"
           @change="setBackGround"
         ></a-input-number>
       </gui-field>
@@ -569,8 +569,8 @@
         <a-input-number
           v-model="HighConfig.setting.config.chart.borderRadius"
           size="small"
-          :formatter="(value) => `${value}px`"
-          :parser="(value) => value.replace('px', '')"
+          :formatter="value => `${value}px`"
+          :parser="value => value.replace('px', '')"
           @change="setBackGround"
         ></a-input-number>
       </gui-field>
@@ -586,9 +586,8 @@ export default {
   props: {
     HighConfig: {
       type: Object,
-      required: true,
-    },
-   
+      required: true
+    }
   },
   mixins: [HighMinxins],
   components: { GuiField, GuiInline },
@@ -596,8 +595,8 @@ export default {
     return {
       bartype: {
         isyz: false, //是否圆柱图
-        isdd: false, //是否堆叠图
-      },
+        isdd: false //是否堆叠图
+      }
     }
   },
   computed: {},
@@ -625,7 +624,7 @@ export default {
       this.setSelfProperty()
     },
   },
-  watch: {},
+  watch: {}
 }
 </script>
 <style lang="less" scoped>

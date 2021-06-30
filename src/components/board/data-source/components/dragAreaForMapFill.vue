@@ -53,56 +53,8 @@ import { deepClone } from '@/utils/deepClone'
 import { sum, summary } from '@/utils/summaryList'
 import geoJson from '@/utils/guangdong.json'
 import reverseAddressResolution from '@/utils/reverseAddressResolution'
+import { visualMapConfig, mapSeries } from '@/config/mapSeries'
 import { Loading } from 'element-ui'
-
-const visualMapConfig = {
-  show: false,
-  type: 'piecewise',
-  min: 0,
-  max: 403631060,
-  seriesIndex: [0],
-  inRange: {
-    color: ['#50a3ba', '#eac736', '#d94e5d'],
-    symbolSize: [10, 16]
-  },
-  textStyle: {
-    color: '#fff',
-    fontSize: 12
-  }
-}
-
-const mapSeries = {
-  type: 'map',
-  map: 'guangzhou',
-  aspectScale: 0.75,
-  showLegendSymbol: false,
-  zoom: 1.1,
-  roam: false,
-  mapLocation: {
-    x: 'left',
-    y: 'top'
-  },
-  label: {
-    normal: {
-      show: true,
-      color: '#fff'
-    },
-    emphasis: {
-      show: true
-    }
-  },
-  itemStyle: {
-    normal: {
-      areaColor: 'rgba(1, 33, 92, 0.45)',
-      borderColor: '#215495',
-      borderWidth: 1
-    },
-    emphasis: {
-      borderColor: '#073684',
-      areaColor: '#061E3D'
-    }
-  }
-}
 export default {
   props: {
     type: {
@@ -117,6 +69,12 @@ export default {
       type: String,
       required: false,
       default: 'normal'
+    },
+    // 指标/鼠标移入提示
+    showType: {
+      type: String,
+      required: false,
+      default: ''
     }
   },
   data() {
@@ -129,7 +87,8 @@ export default {
           latitude: '拖入经度',
           longitude: '拖入纬度'
         },
-        measures: '拖入度量'
+        measures: '拖入度量',
+        label: '拖入维度/度量'
       },
       polymerizationData: [
         { name: '求和', value: 'SUM' },
@@ -166,6 +125,10 @@ export default {
           if (this.type === 'measures' && val.setting.api_data.measures) {
             // 度量
             this.fileList = deepClone(val.setting.api_data.measures)
+          }
+          if (this.type === 'label' && val.setting.api_data[this.showType]) {
+            // 标签
+            this.fileList = deepClone(val.setting.api_data[this.showType])
           }
         }
       },
@@ -213,28 +176,6 @@ export default {
   },
   methods: {
     ...mapActions(['saveScreenData', 'updateChartData']),
-    // 切换fillType清空数据
-    clearData() {
-      this.fileList = []
-      Object.assign(this.currSelected.setting.api_data, {
-        normal: [],
-        latitude: [],
-        longitude: [],
-        measures: []
-      })
-      this.currSelected.datamodelId = 0
-      this.currSelected.isEmpty = false
-      //   this.$set(this.currSelected, 'datamodelId', 0)
-      //   this.$set(this.currSelected, 'isEmpty', false)
-      // 清空填充图表数据
-      let config = this.currSelected.setting.config
-      this.$set(
-        config,
-        'series',
-        config.series.filter(item => item.type === 'scatter')
-      )
-      this.$delete(this.currSelected.setting.config, 'visualMap')
-    },
     // 将拖动的维度到所选择的放置目标节点中
     handleDropOnFilesWD(event) {
       // h5 api
@@ -256,6 +197,11 @@ export default {
       }
       // 度量
       if (this.type === 'measures' && this.dragFile === this.type) {
+        this.fileList[0] = dataFile
+        this.getData()
+      }
+      // 标签
+      if (this.type === 'label') {
         this.fileList[0] = dataFile
         this.getData()
       }
@@ -308,9 +254,31 @@ export default {
           item => item.type === 'scatter'
         )
         this.$delete(current.setting.config, 'visualMap')
-        this.$store.dispatch('SetSelfProperty', current.setting.config)
-        this.updateChartData()
       }
+      // 清空标签悬浮内容
+      if (
+        current.setting.config.series[0] &&
+        current.setting.config.series[0].type === 'map'
+      ) {
+        if (
+          current.setting.api_data.point &&
+          current.setting.api_data.point.length === 0
+        ) {
+          current.setting.config.series[0].data.forEach(item => {
+            delete item[current.setting.api_data.point[0].alias]
+          })
+        }
+        if (
+          current.setting.api_data.over &&
+          current.setting.api_data.over.length === 0
+        ) {
+          current.setting.config.series[0].data.forEach(item => {
+            delete item[current.setting.api_data.over[0].alias]
+          })
+        }
+      }
+      this.$store.dispatch('SetSelfProperty', current.setting.config)
+      this.updateChartData()
     },
     // 根据维度度量获取数据
     async getData() {
@@ -324,6 +292,10 @@ export default {
       // 度量
       if (this.type === 'measures') {
         selected.setting.api_data.measures = this.fileList
+      }
+      // 度量
+      if (this.type === 'label') {
+        selected.setting.api_data[this.showType] = this.fileList
       }
 
       // 构造度量列表
@@ -358,7 +330,7 @@ export default {
       }
       this.updateChartData()
 
-      let apiData = deepClone(this.currSelected.setting.api_data)
+      let apiData = this.currSelected.setting.api_data
 
       if (
         apiData.dimensions.length === 0 &&
@@ -402,6 +374,23 @@ export default {
       })
       let params = deepClone(selected)
       delete params.setting.apis.mapOrigin
+      // 传参添加标签悬浮的维度/度量
+      if (
+        params.setting.api_data.point &&
+        params.setting.api_data.point.length > 0
+      ) {
+        params.setting.api_data[selected.setting.api_data.point[0].file].push(
+          selected.setting.api_data.point[0]
+        )
+      }
+      if (
+        params.setting.api_data.over &&
+        params.setting.api_data.over.length > 0
+      ) {
+        params.setting.api_data[selected.setting.api_data.over[0].file].push(
+          selected.setting.api_data.over[0]
+        )
+      }
       let res = await this.$server.screenManage.getData(params)
       selected.setting.isEmpty = false
       // 数据源被删掉
@@ -412,12 +401,10 @@ export default {
         return
       }
       if (res.code === 200) {
-        let config = deepClone(this.currSelected.setting.config)
-        // 区域填充加上视觉映射控制
-        config.visualMap = visualMapConfig
-        let legend = []
+        let config = this.currSelected.setting.config
         // 重置series
         config.series = config.series.filter(item => item.type === 'scatter')
+        let valueList = [] // 数据列表，计算视觉映射最大最小值
         // 类型为区域
         if (this.fillType === 'area') {
           // 只有一个维度，唯一名称
@@ -425,21 +412,39 @@ export default {
 
           // 一个度量对应一个series.data
           apiData.measures.forEach((measure, index) => {
-            legend.push(measure.alias)
+            let showName = `地区名/${alias}` // 指标显示用
             let datas = []
-            for (let item of res.data.fillList) {
-              datas.push({
-                name: item[alias],
-                value: item[measure.alias]
-              })
+            for (let data of res.data.fillList) {
+              let datacontent = {
+                name: data[alias],
+                value: data[measure.alias],
+                // 构造映射数据，给指标提示框内容显示
+                [showName]: data[alias], // 地区名/维度
+                [alias]: data[alias], // 维度
+                [measure.alias]: data[measure.alias] // 度量
+              }
+              // 存在标签数据加上标签数据
+              //   if (apiData.point && apiData.point[0]) {
+              //     datacontent[apiData.point[0].alias] =
+              //       data[apiData.point[0].alias]
+              //   }
+              //   if (apiData.over && apiData.over[0]) {
+              //     datacontent[apiData.over[0].alias] = data[apiData.over[0].alias]
+              //   }
+              datas.push(datacontent)
             }
             config.series.unshift(
-              Object.assign(mapSeries, { data: datas, name: measure.alias })
+              Object.assign(mapSeries, {
+                data: datas,
+                name: measure.alias,
+                pointShowList: [showName],
+                tooltipShowList: [alias, measure.alias]
+              })
             )
+            valueList = datas.map(item => item.value)
           })
         } else {
           let alias = apiData.measures[0].alias
-          legend.push(alias)
           let datas = []
           // 解析数据，获取经度，纬度，目标值
           for (let data of res.data.fillList) {
@@ -450,13 +455,27 @@ export default {
                 data[apiData.latitude[0].alias],
                 data[apiData.longitude[0].alias]
               ])
+
+              let datacontent = {
+                name: positionMsg.district,
+                value: data[alias],
+                // 构造映射数据，给指标提示框内容显示
+                [apiData.latitude[0].alias]: data[apiData.latitude[0].alias], // 经度
+                [apiData.longitude[0].alias]: data[apiData.longitude[0].alias], // 维度
+                地区名: positionMsg.district, // 地区名
+                [alias]: data[alias] // 度量
+              }
+              // 存在标签数据加上标签数据
+              // if (apiData.point && apiData.point[0]) {
+              //   datacontent[apiData.point[0].alias] = data[apiData.point[0].alias]
+              // }
+              // if (apiData.over && apiData.over[0]) {
+              //   datacontent[apiData.over[0].alias] = data[apiData.over[0].alias]
+              // }
+              datas.push(datacontent)
             } catch (err) {
               continue
             }
-            datas.push({
-              name: positionMsg.direct,
-              value: data[alias]
-            })
           }
           if (datas.length === 0) {
             this.$message.error('经纬点解析失败')
@@ -466,12 +485,22 @@ export default {
           config.series.unshift(
             Object.assign(mapSeries, {
               data: datas,
-              name: alias
+              name: alias,
+              pointShowList: ['地区名'],
+              tooltipShowList: [
+                apiData.latitude[0].alias,
+                apiData.longitude[0].alias,
+                alias
+              ]
             })
           )
+          valueList = datas.map(item => item.value)
         }
+        // 区域填充加上视觉映射控制
+        config.visualMap = visualMapConfig
+        config.visualMap.max = Math.max(...valueList)
+        config.visualMap.min = Math.min(...valueList)
         loadingInstance.close()
-        config.legend.data = legend
         this.$store.dispatch('SetSelfProperty', config)
         this.$store.dispatch('SetSelfDataSource', apiData)
         this.updateChartData()
