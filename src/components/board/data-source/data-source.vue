@@ -141,9 +141,20 @@
             currSelected.setting.chartType !== 'v-map'
         "
       >
-        <drag-pick type="pick"></drag-pick>
+        <DragPick type="pick"></DragPick>
       </a-collapse-panel>
+      <!-- 排序 -->
       <a-collapse-panel
+        key="sort"
+        header="排序"
+        v-if="
+          (chartType === '1' || chartType === '2' || chartType === '3') &&
+            currSelected.setting.chartType !== 'v-map'
+        "
+      >
+        <DragSort type="sort"></DragSort>
+      </a-collapse-panel>
+      <!-- <a-collapse-panel
         key="sort"
         header="排序"
         v-if="chartType !== '2' && currSelected.setting.chartType !== 'v-map'"
@@ -172,7 +183,7 @@
             >
           </a-select>
         </div>
-      </a-collapse-panel>
+      </a-collapse-panel> -->
       <a-collapse-panel key="refresh" header="定时刷新">
         <a-switch
           slot="extra"
@@ -215,6 +226,7 @@ import DragArea from './components/dragArea'
 import dragAreaForMapFill from './components/dragAreaForMapFill'
 import dragAreaForMapLabel from './components/dragAreaForMapLabel'
 import DragPick from './components/dragPick'
+import DragSort from './components/dragSort'
 import { deepClone } from '../../../utils/deepClone'
 import GuiField from '../options/gui-field'
 export default {
@@ -223,7 +235,8 @@ export default {
     DragPick,
     dragAreaForMapFill,
     dragAreaForMapLabel,
-    GuiField
+    DragSort
+    // GuiField
   },
   data() {
     return {
