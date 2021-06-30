@@ -18,7 +18,7 @@
       >
         <a-dropdown :trigger="['click', 'contextmenu']" v-model="item.showMore">
           <a-icon class="icon-more" type="caret-down" />
-          <a-menu slot="overlay" @click="deleteFile(item, index)">
+          <a-menu slot="overlay">
             <a-sub-menu
               key="1"
               title="聚合方式"
@@ -27,17 +27,19 @@
               <a-menu-item
                 v-for="(aggregator, index) in item.polymerizationShow"
                 :key="index"
-                @click.stop.native="changePolymerization(aggregator, item)"
+                @click.native="changePolymerization(aggregator, item)"
                 >{{ aggregator.name }}</a-menu-item
               >
             </a-sub-menu>
-            <a-menu-item key="2" @click.stop.native="changeAsc(item, 1)"
+            <a-menu-item key="2" @click.native="changeAsc(item, 1)"
               >升序</a-menu-item
             >
-            <a-menu-item key="3" @click.stop.native="changeAsc(item, 2)"
+            <a-menu-item key="3" @click.native="changeAsc(item, 2)"
               >降序</a-menu-item
             >
-            <a-menu-item key="4">移除</a-menu-item>
+            <a-menu-item key="4" @click.native="deleteFile(item, index)"
+              >移除</a-menu-item
+            >
           </a-menu>
         </a-dropdown>
         <a-tooltip :title="item.alias">

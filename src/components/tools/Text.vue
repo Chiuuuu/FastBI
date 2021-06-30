@@ -57,16 +57,6 @@ export default {
     }
   },
   watch: {
-    config: {
-      handler(val) {
-        if (val) {
-          this.selfConfig = val
-          this.htmlText = this.selfConfig.title.htmlText || ''
-        }
-      },
-      deep: true,
-      immediate: true
-    },
     // 如果存在刷新数据，非编辑模式下重新计算显示文本
     'apiData.refreshData'(val) {
       if (val && !this.editable) {
@@ -149,6 +139,9 @@ export default {
     this.$nextTick(() => {
       // 进入页面获取计算文本
       //   if (this.canEdit) {
+      // 获取配置,富文本
+      this.selfConfig = this.config
+      this.htmlText = this.config.title.htmlText || ''
       // 使用缓存文本,再更新
       if (this.config.title.text) {
         this.$refs.editorText.innerHTML = this.config.title.text
@@ -288,9 +281,10 @@ export default {
     },
     // 检验当前使用datamodel
     checkDataModelId: debounce(function() {
-      let regStr = /<span class="edit-alias" contenteditable="false">(.*?)(&nbsp;){3}<\/span>/g
+      //   let regStr = /<span class="edit-alias" contenteditable="false">(.*?)(&nbsp;){3}<\/span>/g
+      let regStr = /<span class="edit-alias" contenteditable="false">(.*?)<\/span>/g
       let matchList = this.htmlText.match(regStr)
-      // 度量已经删完，清楚图表datamodelId
+      // 度量已经删完，清除图表datamodelId
       if (!matchList) {
         this.currSelected.datamodelId = '0'
         this.currSelected.setting.resourceType = ''
@@ -385,7 +379,9 @@ export default {
           loadingInstance = Loading.service({
             lock: true,
             text: '加载中...',
-            target: self.$refs.textBox
+            // target: 'body',
+            target: self.$refs.textBox,
+            background: 'rgb(255, 255, 255, 0.6)'
           })
         }
         let res = await this.$server.screenManage.getData(selected)
@@ -395,13 +391,15 @@ export default {
         // 数据源被删掉
         if (res.code === 500 && res.msg === 'IsChanged') {
           selected.setting.isEmpty = true
-          this.updateChartData()
           return 'isChanged'
         }
         // if (res.code !== 200) {
         //   this.$message.error(res.msg)
         //   return 'isChanged'
         // }
+        if (res.code === 500) {
+          return res.msg
+        }
         str = this.htmlText.replace(reg, (match, alias) => {
           return res.rows[0][alias].toFixed(2)
         })
@@ -428,14 +426,14 @@ export default {
         }
       }
       this.apiData.measures = measures
-      this.$store.dispatch('SetSelfDataSource', this.apiData)
+      //   this.$store.dispatch('SetSelfDataSource', this.apiData)
     },
     // 保存富文本
     saveText() {
       this.htmlText = this.$refs.editorText.innerHTML
       this.selfConfig.title.htmlText = this.htmlText
-      this.$store.dispatch('SetSelfProperty', this.selfConfig)
-      this.updateChartData(this.id)
+      //   this.$store.dispatch('SetSelfProperty', this.selfConfig)
+      //   this.updateChartData(this.id)
     }
   },
   computed: {

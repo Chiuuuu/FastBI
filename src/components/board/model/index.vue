@@ -354,7 +354,9 @@ export default {
             this.model = true
           }
         } else {
+          // 模型列表为空清空当前度量列表(文本框选择度量列表)
           this.resourceId = ''
+          this.$store.dispatch('SetModelMeasures', [])
         }
         this.disableId = val.map(item => item.tableId)
       },
