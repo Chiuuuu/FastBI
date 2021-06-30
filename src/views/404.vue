@@ -1,8 +1,8 @@
 <template>
   <a-result
     status="404"
-    title="404"
-    sub-title="非常抱歉，您所访问的页面不存在。"
+    title="非常抱歉，您无权限查看该界面/该界面不存在。"
+    sub-title=""
   >
     <template #extra>
       <a-button type="primary" @click="handleGoBackHome">
