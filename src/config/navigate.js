@@ -2061,7 +2061,7 @@ const list = [{
           config: {
             title: {
               show: true,
-              content: '矩形热力图',
+              content: '',
               text: '矩形热力图',
               left: 'center',
               textStyle: {
@@ -2288,7 +2288,7 @@ const list = [{
             //标题属性设置
             title: {
               text: '立体饼图',
-              content: '立体饼图',
+              content: '',
               align: 'center', //对齐方式left center right
               style: { //标题属性设置（字体、颜色、大小，粗细）
                 fontFamily: '微软雅黑',
@@ -2428,7 +2428,7 @@ const list = [{
             //标题属性设置
             title: {
               text: '立体柱形图',
-              content: '立体柱形图',
+              content: '',
               align: 'center', //对齐方式left center right
               style: { //标题属性设置（字体、颜色、大小，粗细）
                 fontFamily: '微软雅黑',
