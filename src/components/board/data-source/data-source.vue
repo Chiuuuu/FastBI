@@ -166,9 +166,20 @@
             currSelected.setting.chartType !== 'v-map'
         "
       >
-        <drag-pick type="pick"></drag-pick>
+        <DragPick type="pick"></DragPick>
       </a-collapse-panel>
+      <!-- 排序 -->
       <a-collapse-panel
+        key="sort"
+        header="排序"
+        v-if="
+          (chartType === '1' || chartType === '2' || chartType === '3') &&
+            currSelected.setting.chartType !== 'v-map'
+        "
+      >
+        <DragSort type="sort"></DragSort>
+      </a-collapse-panel>
+      <!-- <a-collapse-panel
         key="sort"
         header="排序"
         v-if="chartType !== '2' && currSelected.setting.chartType !== 'v-map'"
@@ -197,7 +208,7 @@
             >
           </a-select>
         </div>
-      </a-collapse-panel>
+      </a-collapse-panel> -->
       <a-collapse-panel key="refresh" header="定时刷新">
         <a-switch
           slot="extra"
@@ -240,6 +251,7 @@ import DragArea from './components/dragArea'
 import dragAreaForMapFill from './components/dragAreaForMapFill'
 import dragAreaForMapLabel from './components/dragAreaForMapLabel'
 import DragPick from './components/dragPick'
+import DragSort from './components/dragSort'
 import { deepClone } from '../../../utils/deepClone'
 // import GuiField from '../options/gui-field'
 export default {
@@ -247,7 +259,8 @@ export default {
     DragArea,
     DragPick,
     dragAreaForMapFill,
-    dragAreaForMapLabel
+    dragAreaForMapLabel,
+    DragSort
     // GuiField
   },
   data() {
@@ -420,10 +433,7 @@ export default {
       }
       // 切换页签清空对应数据
       // 清空填充/标记点数据
-      Object.assign(
-        this.currSelected.setting.api_data,
-        clearMap[key].clearData
-      )
+      Object.assign(this.currSelected.setting.api_data, clearMap[key].clearData)
       // 清空图表数据
       let config = this.currSelected.setting.config
       this.$set(
@@ -435,7 +445,7 @@ export default {
       if (key === 'fillType') {
         this.$delete(this.currSelected.setting.config, 'visualMap')
       }
-      //数据全空清除模型id
+      // 数据全空清除模型id
       let apidata = this.currSelected.setting.api_data
       if (
         !apidata.dimensions.length &&
