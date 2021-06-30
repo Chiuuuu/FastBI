@@ -152,6 +152,7 @@
           <a-select
             :disabled="isCheck"
             v-if="record.extractType === 1"
+            :value="record.incrementalColumn"
             style="width: 150px"
             :default-value="list[0].name"
             placeholder="请选择字段"

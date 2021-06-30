@@ -20,7 +20,7 @@
         </a-col>
         <a-col :span="14">
           <a-row type="flex" justify="end" align="middle">
-            <a-button type="primary" class="select_button" @click="() => handleGetTableList()" :loading="spinning">刷新数据</a-button>
+            <a-button type="primary" class="select_button" @click="() => handleGetTableList(pagination)" :loading="spinning">刷新数据</a-button>
             <a-button
               v-if="hasBtnPermissionEdit || hasBtnPermissionSchedule"
               v-show="showExtractBtn"
@@ -583,13 +583,13 @@ export default {
           tableList: this.data
         }).finally(() => {
           this.extractSping = false
-          this.handleGetTableList()
+          this.handleGetTableList(this.pagination)
         })
       } else if (this.tableType === 1) { // 自定义表抽取
         this.extractSping = true
         result = await this.$server.dataAccess.actionCustomExtract(this.selectedRows.map(item => item.id)).finally(() => {
           this.extractSping = false
-          this.handleGetTableList()
+          this.handleGetTableList(this.pagination)
         })
       }
       if (result.code === 200) {
