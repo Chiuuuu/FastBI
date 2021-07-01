@@ -65,7 +65,7 @@
 
               <!-- 矩形热力图 -->
               <chart-heart
-                v-if="transform.setting.name === 've-heatmap'"
+                v-if="transform.setting.name === 've-heatmap'|transform.setting.name==='ve-sun'"
                 :key="transform.id"
                 :config="transform.setting.config"
                 :view="transform.setting.view"

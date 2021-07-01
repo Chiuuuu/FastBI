@@ -17,7 +17,7 @@
           class="tab-item"
           v-if="
             currSelected.setting.name !== 've-image' &&
-              currSelected.setting.name !== 'figure'
+            currSelected.setting.name !== 'figure'
           "
           :class="{ active: tabsType === 1 }"
           @click="tabsTypeChange(1)"
@@ -176,8 +176,8 @@
               <a-input-number
                 v-model="baseProperty.x"
                 size="small"
-                :formatter="value => `X ${value}`"
-                :parser="value => value.replace(/\X\s?|(,*)/g, '')"
+                :formatter="(value) => `X ${value}`"
+                :parser="(value) => value.replace(/\X\s?|(,*)/g, '')"
                 class="f-clear-width"
                 @change="setBaseProperty"
               ></a-input-number>
@@ -186,8 +186,8 @@
               <a-input-number
                 v-model="baseProperty.y"
                 size="small"
-                :formatter="value => `Y ${value}`"
-                :parser="value => value.replace(/\Y\s?|(,*)/g, '')"
+                :formatter="(value) => `Y ${value}`"
+                :parser="(value) => value.replace(/\Y\s?|(,*)/g, '')"
                 class="f-clear-width"
                 @change="setBaseProperty"
               ></a-input-number>
@@ -209,8 +209,8 @@
                 v-model="baseProperty.height"
                 size="small"
                 :max="selfConfig.title === '直线' ? 20 : Infinity"
-                :formatter="value => `H ${value}`"
-                :parser="value => value.replace(/\H\s?|(,*)/g, '')"
+                :formatter="(value) => `H ${value}`"
+                :parser="(value) => value.replace(/\H\s?|(,*)/g, '')"
                 class="f-clear-width"
                 @change="setBaseProperty"
               ></a-input-number>
@@ -247,7 +247,7 @@
                 <gui-field label="标题名">
                   <a-input
                     v-model="selfConfig.title.content"
-                    v-if="selfConfig.title.content!=''"
+                    v-if="selfConfig.title.content != ''"
                     size="small"
                     :maxLength="20"
                     @change="setSelfProperty"
@@ -355,8 +355,8 @@
                     <a-input-number
                       v-model="selfConfig.grid.top"
                       size="small"
-                      :formatter="value => `上 ${value}`"
-                      :parser="value => value.replace(/\上\s?|(,*)/g, '')"
+                      :formatter="(value) => `上 ${value}`"
+                      :parser="(value) => value.replace(/\上\s?|(,*)/g, '')"
                       class="f-clear-width"
                       :min="0"
                       :max="60"
@@ -367,7 +367,7 @@
                     <a-input-number
                       v-model="selfConfig.grid.bottom"
                       size="small"
-                      :formatter="value => `下 ${value}`"
+                      :formatter="(value) => `下 ${value}`"
                       class="f-clear-width"
                       :min="0"
                       :max="60"
@@ -380,7 +380,7 @@
                     <a-input-number
                       v-model="selfConfig.grid.left"
                       size="small"
-                      :formatter="value => `左 ${value}`"
+                      :formatter="(value) => `左 ${value}`"
                       class="f-clear-width"
                       :min="0"
                       :max="60"
@@ -391,7 +391,7 @@
                     <a-input-number
                       v-model="selfConfig.grid.right"
                       size="small"
-                      :formatter="value => `右 ${value}`"
+                      :formatter="(value) => `右 ${value}`"
                       class="f-clear-width"
                       :min="0"
                       :max="200"
@@ -1044,52 +1044,64 @@
                   </a-select>
                 </gui-field>
                 <gui-field label="水平位置">
-                   <gui-inline label="">
+                  <gui-inline label="">
                     <a-radio-group
                       :value="selfConfig.visualMap.left"
                       size="small"
                     >
                       <a-radio-button
                         value="left"
-                        @click.native.stop="onRadioChange($event,selfConfig.visualMap,'left')"
+                        @click.native.stop="
+                          onRadioChange($event, selfConfig.visualMap, 'left')
+                        "
                         >左</a-radio-button
                       >
                       <a-radio-button
                         value="center"
-                        @click.native.stop="onRadioChange($event,selfConfig.visualMap,'left')"
+                        @click.native.stop="
+                          onRadioChange($event, selfConfig.visualMap, 'left')
+                        "
                         >中</a-radio-button
                       >
                       <a-radio-button
                         value="right"
-                        @click.native.stop="onRadioChange($event,selfConfig.visualMap,'left')"
+                        @click.native.stop="
+                          onRadioChange($event, selfConfig.visualMap, 'left')
+                        "
                         >右</a-radio-button
                       >
                     </a-radio-group>
-                   </gui-inline>
+                  </gui-inline>
                 </gui-field>
                 <gui-field label="垂直位置">
                   <gui-inline label="">
-                     <a-radio-group
+                    <a-radio-group
                       :value="selfConfig.visualMap.top"
                       size="small"
                     >
                       <a-radio-button
                         value="top"
-                        @click.native.stop="onRadioChange($event,selfConfig.visualMap,'top')"
+                        @click.native.stop="
+                          onRadioChange($event, selfConfig.visualMap, 'top')
+                        "
                         >顶部</a-radio-button
                       >
                       <a-radio-button
                         value="middle"
-                        @click.native.stop="onRadioChange($event,selfConfig.visualMap,'top')"
+                        @click.native.stop="
+                          onRadioChange($event, selfConfig.visualMap, 'top')
+                        "
                         >居中</a-radio-button
                       >
                       <a-radio-button
                         value="bottom"
-                        @click.native.stop="onRadioChange($event,selfConfig.visualMap,'top')"
+                        @click.native.stop="
+                          onRadioChange($event, selfConfig.visualMap, 'top')
+                        "
                         >底部</a-radio-button
                       >
                     </a-radio-group>
-                   </gui-inline>
+                  </gui-inline>
                 </gui-field>
                 <gui-field label="排列">
                   <a-radio-group
@@ -1098,12 +1110,16 @@
                   >
                     <a-radio-button
                       value="vertical"
-                      @click.native.stop="onRadioChange($event,selfConfig.visualMap,'orient')"
+                      @click.native.stop="
+                        onRadioChange($event, selfConfig.visualMap, 'orient')
+                      "
                       >垂直</a-radio-button
                     >
                     <a-radio-button
                       value="horizontal"
-                      @click.native.stop="onRadioChange($event,selfConfig.visualMap,'orient')"
+                      @click.native.stop="
+                        onRadioChange($event, selfConfig.visualMap, 'orient')
+                      "
                       >水平</a-radio-button
                     >
                   </a-radio-group>
@@ -1311,7 +1327,7 @@
                     <a-input-number
                       v-model="selfConfig.series.splitLine.length"
                       size="small"
-                      :formatter="value => `长 ${value}`"
+                      :formatter="(value) => `长 ${value}`"
                       class="f-clear-width"
                       @change="setSelfProperty"
                     ></a-input-number>
@@ -1320,7 +1336,7 @@
                     <a-input-number
                       v-model="selfConfig.series.splitLine.lineStyle.width"
                       size="small"
-                      :formatter="value => `宽 ${value}`"
+                      :formatter="(value) => `宽 ${value}`"
                       class="f-clear-width"
                       @change="setSelfProperty"
                     ></a-input-number>
@@ -1331,7 +1347,7 @@
                     <a-input-number
                       v-model="selfConfig.series.startAngle"
                       size="small"
-                      :formatter="value => `起 ${value}`"
+                      :formatter="(value) => `起 ${value}`"
                       class="f-clear-width"
                       @change="setSelfProperty"
                     ></a-input-number>
@@ -1340,7 +1356,7 @@
                     <a-input-number
                       v-model="selfConfig.series.endAngle"
                       size="small"
-                      :formatter="value => `终 ${value}`"
+                      :formatter="(value) => `终 ${value}`"
                       class="f-clear-width"
                       @change="setSelfProperty"
                     ></a-input-number>
@@ -1415,7 +1431,7 @@
                   </gui-inline>
                 </gui-field>
                 <gui-field label="多边形">
-                  <gui-inline label="区域" style="width:auto;">
+                  <gui-inline label="区域" style="width: auto">
                     <el-color-picker
                       ref="areaColor"
                       show-alpha
@@ -1423,7 +1439,7 @@
                       @change="changeAreaColor"
                     ></el-color-picker>
                   </gui-inline>
-                  <gui-inline label="边框" style="width:auto;">
+                  <gui-inline label="边框" style="width: auto">
                     <el-color-picker
                       v-model="selfConfig.geo.itemStyle.normal.borderColor"
                       @change="setSelfProperty"
@@ -1431,7 +1447,7 @@
                   </gui-inline>
                 </gui-field>
                 <gui-field label="阴影">
-                  <gui-inline label="颜色" style="width:auto;">
+                  <gui-inline label="颜色" style="width: auto">
                     <el-color-picker
                       ref="areaColor"
                       show-alpha
@@ -1439,7 +1455,7 @@
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-inline>
-                  <gui-inline label="模糊大小" style="width:auto;">
+                  <gui-inline label="模糊大小" style="width: auto">
                     <a-input-number
                       v-model="selfConfig.geo.itemStyle.normal.shadowBlur"
                       size="small"
@@ -1475,13 +1491,13 @@
                   ></a-input-number>
                 </gui-field>
                 <gui-field label="多边形悬停">
-                  <gui-inline label="区域" style="width:auto;">
+                  <gui-inline label="区域" style="width: auto">
                     <el-color-picker
                       v-model="selfConfig.geo.itemStyle.emphasis.areaColor"
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-inline>
-                  <gui-inline label="边框" style="width:auto;">
+                  <gui-inline label="边框" style="width: auto">
                     <el-color-picker
                       v-model="selfConfig.geo.itemStyle.emphasis.borderColor"
                       @change="setSelfProperty"
@@ -1499,8 +1515,8 @@
                     <a-input-number
                       v-model="selfConfig.grid.top"
                       size="small"
-                      :formatter="value => `上 ${value}`"
-                      :parser="value => value.replace(/\上\s?|(,*)/g, '')"
+                      :formatter="(value) => `上 ${value}`"
+                      :parser="(value) => value.replace(/\上\s?|(,*)/g, '')"
                       class="f-clear-width"
                       :min="0"
                       :max="60"
@@ -1511,7 +1527,7 @@
                     <a-input-number
                       v-model="selfConfig.grid.bottom"
                       size="small"
-                      :formatter="value => `下 ${value}`"
+                      :formatter="(value) => `下 ${value}`"
                       class="f-clear-width"
                       :min="0"
                       :max="60"
@@ -1524,7 +1540,7 @@
                     <a-input-number
                       v-model="selfConfig.grid.left"
                       size="small"
-                      :formatter="value => `左 ${value}`"
+                      :formatter="(value) => `左 ${value}`"
                       class="f-clear-width"
                       :min="0"
                       :max="60"
@@ -1535,7 +1551,7 @@
                     <a-input-number
                       v-model="selfConfig.grid.right"
                       size="small"
-                      :formatter="value => `右 ${value}`"
+                      :formatter="(value) => `右 ${value}`"
                       class="f-clear-width"
                       :min="0"
                       :max="200"
@@ -1595,8 +1611,8 @@
                             'select-color',
                             {
                               selected:
-                                color === selfConfig.series[0].themeColor
-                            }
+                                color === selfConfig.series[0].themeColor,
+                            },
                           ]"
                           @click="selectThemeColor(color)"
                         ></div>
@@ -2060,8 +2076,8 @@
                     <a-input-number
                       v-model="selfConfig.xAxis.nameTextStyle.padding[0]"
                       size="small"
-                      :formatter="value => `上 ${value}`"
-                      :parser="value => value.replace(/\上\s?|(,*)/g, '')"
+                      :formatter="(value) => `上 ${value}`"
+                      :parser="(value) => value.replace(/\上\s?|(,*)/g, '')"
                       class="f-clear-width"
                       :min="0"
                       :max="60"
@@ -2072,7 +2088,7 @@
                     <a-input-number
                       v-model="selfConfig.xAxis.nameTextStyle.padding[2]"
                       size="small"
-                      :formatter="value => `下 ${value}`"
+                      :formatter="(value) => `下 ${value}`"
                       class="f-clear-width"
                       :min="0"
                       :max="60"
@@ -2085,7 +2101,7 @@
                     <a-input-number
                       v-model="selfConfig.xAxis.nameTextStyle.padding[3]"
                       size="small"
-                      :formatter="value => `左 ${value}`"
+                      :formatter="(value) => `左 ${value}`"
                       class="f-clear-width"
                       :min="0"
                       :max="60"
@@ -2096,7 +2112,7 @@
                     <a-input-number
                       v-model="selfConfig.xAxis.nameTextStyle.padding[1]"
                       size="small"
-                      :formatter="value => `右 ${value}`"
+                      :formatter="(value) => `右 ${value}`"
                       class="f-clear-width"
                       :min="0"
                       :max="200"
@@ -2250,8 +2266,8 @@
                     <a-input-number
                       v-model="selfConfig.yAxis.nameTextStyle.padding[0]"
                       size="small"
-                      :formatter="value => `上 ${value}`"
-                      :parser="value => value.replace(/\上\s?|(,*)/g, '')"
+                      :formatter="(value) => `上 ${value}`"
+                      :parser="(value) => value.replace(/\上\s?|(,*)/g, '')"
                       class="f-clear-width"
                       :min="0"
                       :max="60"
@@ -2262,7 +2278,7 @@
                     <a-input-number
                       v-model="selfConfig.yAxis.nameTextStyle.padding[2]"
                       size="small"
-                      :formatter="value => `下 ${value}`"
+                      :formatter="(value) => `下 ${value}`"
                       class="f-clear-width"
                       :min="0"
                       :max="60"
@@ -2275,7 +2291,7 @@
                     <a-input-number
                       v-model="selfConfig.yAxis.nameTextStyle.padding[3]"
                       size="small"
-                      :formatter="value => `左 ${value}`"
+                      :formatter="(value) => `左 ${value}`"
                       class="f-clear-width"
                       :min="0"
                       :max="60"
@@ -2286,7 +2302,7 @@
                     <a-input-number
                       v-model="selfConfig.yAxis.nameTextStyle.padding[1]"
                       size="small"
-                      :formatter="value => `右 ${value}`"
+                      :formatter="(value) => `右 ${value}`"
                       class="f-clear-width"
                       :min="0"
                       :max="200"
@@ -2788,8 +2804,8 @@
                 <a-input-number
                   v-model="backgroundApi.borderWidth"
                   size="small"
-                  :formatter="value => `${value}px`"
-                  :parser="value => value.replace('px', '')"
+                  :formatter="(value) => `${value}px`"
+                  :parser="(value) => value.replace('px', '')"
                   @change="setBackGround"
                 ></a-input-number>
               </gui-field>
@@ -2810,13 +2826,12 @@
                 <a-input-number
                   v-model="backgroundApi.borderRadius"
                   size="small"
-                  :formatter="value => `${value}px`"
-                  :parser="value => value.replace('px', '')"
+                  :formatter="(value) => `${value}px`"
+                  :parser="(value) => value.replace('px', '')"
                   @change="setBackGround"
                 ></a-input-number>
               </gui-field>
             </a-collapse-panel>
-
           </a-collapse>
         </div>
         <div v-else-if="tabsType === 1">
@@ -2879,7 +2894,7 @@ import HighChartBar from '@/components/board/options/highchart-bar'
 const themeColorNMap = {
   yellow: ['rgb(249,217,96)', 'rgb(249,159,61)', 'rgb(247,107,28)'],
   blue: ['rgb(79,174,255)', 'rgb(55,115,205)', 'rgb(32,56,156)'],
-  green: ['rgb(180,236,81)', 'rgb(120,189,55)', 'rgb(66,147,33)']
+  green: ['rgb(180,236,81)', 'rgb(120,189,55)', 'rgb(66,147,33)'],
 }
 export default {
   name: 'BoardOptions',
@@ -2959,20 +2974,20 @@ export default {
       scatterColorList: [
         //散点颜色
         { label: '单色', value: '0' },
-        { label: '按维度', value: '1' }
+        { label: '按维度', value: '1' },
       ],
       scatterSizeList: [
         //散点大小
         { label: '无', value: '' },
         { label: '按度量1', value: '0' },
-        { label: '按度量2', value: '1' }
+        { label: '按度量2', value: '1' },
       ],
       scatterFormatList: [
         { label: '无', value: '' },
         { label: '维度1', value: '{@5}：{@2}' },
         { label: '度量1', value: '{@3}：{@0}' },
         { label: '度量2', value: '{@4}：{@1}' },
-        { label: '度量组', value: '({@0},{@1})' }
+        { label: '度量组', value: '({@0},{@1})' },
       ],
       scatterList: [], // 地图里散点图配置列表
       targetMeasure: 0, // 地图指标设置对应度量
@@ -2980,7 +2995,7 @@ export default {
       mapFillPointSelectList: [], // 地图填充指标选择列表
       mapFillTooltipSelectList: [], // 地图填充提示框选择列表
       mapLabelPointSelectList: [], // 地图标记层指标选择列表
-      mapLabelTooltipSelectList: [] // 地图标记层提示框内容选择列表
+      mapLabelTooltipSelectList: [], // 地图标记层提示框内容选择列表
     }
   },
   mounted() {
@@ -3359,13 +3374,11 @@ export default {
       // if(!val){ return; }
       if (val) {
         if (val == 'horizontal') {
-          this.selfConfig.series.label.formatter = this.apis.scatterLabel.join(
-            ' '
-          )
+          this.selfConfig.series.label.formatter =
+            this.apis.scatterLabel.join(' ')
         } else {
-          this.selfConfig.series.label.formatter = this.apis.scatterLabel.join(
-            '\n\r'
-          )
+          this.selfConfig.series.label.formatter =
+            this.apis.scatterLabel.join('\n\r')
         }
         this.apis.arrange = val
         this.setApis()
@@ -3400,7 +3413,7 @@ export default {
         leading: true,
         trailing: false,
       }
-    )
+    ),
   },
   watch: {
     currSelected: {
@@ -3430,7 +3443,8 @@ export default {
               this.mapFillPointSelectList = this.apiData.measures.concat()
               this.mapFillTooltipSelectList = this.apiData.measures.concat()
               this.mapLabelPointSelectList = this.apiData.labelMeasures.concat()
-              this.mapLabelTooltipSelectList = this.apiData.labelMeasures.concat()
+              this.mapLabelTooltipSelectList =
+                this.apiData.labelMeasures.concat()
               if (this.apiData.options.fillType === 'area') {
                 // 地区添加地区名/维度
                 let di = this.apiData.dimensions[0]
@@ -3449,7 +3463,7 @@ export default {
                   ? this.apiData.labelDimensions[0].alias
                   : ''
                 this.mapLabelPointSelectList.unshift({
-                  alias: `地区名/${labelDi}`
+                  alias: `地区名/${labelDi}`,
                 })
               } else {
                 this.mapLabelPointSelectList = this.apiData.dimensions.concat(
@@ -3499,8 +3513,8 @@ export default {
         }
       },
       deep: true,
-      immediate: true
-    }
+      immediate: true,
+    },
   },
   computed: {
     ...mapGetters([
@@ -3600,7 +3614,7 @@ export default {
     Interactive,
     Figure,
     HighChartPie,
-    HighChartBar
+    HighChartBar,
   },
 }
 </script>

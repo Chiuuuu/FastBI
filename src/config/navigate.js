@@ -1710,8 +1710,9 @@ const list = [{
           config: {
             title: {
               show: true,
-              content: '旭日图',
-              textAlign: 'left',
+              content: '',
+              text: '旭日图',
+              let: 'left',
               textStyle: {
                 color: '#ffffff',
                 fontSize: 20,
@@ -1719,76 +1720,168 @@ const list = [{
                 fontWeight: 'normal'
               }
             },
-            grid: {
-              left: 20,
-              top: 60,
-              right: 20,
-              bottom: 30
-            },
-            legend: {
+            // grid: {
+            //   left: 20,
+            //   top: 60,
+            //   right: "20%",
+            //   bottom: 30
+            // },
+            visualMap: {
+              type: 'continuous',
+              min: 0,
+              max: 100,
               show: true,
-              orient: 'horizontal',
+              calculable: true,
+              orient: 'vertical', //vertical
+              left: 'right', //左 中 右
+              top: 'bottom', //上 中 下
+              // bottom: '5%',
               textStyle: {
-                color: '#ffffff',
-                fontSize: 12
-              },
-              itemGap: 12,
-              icon: '',
-              left: 'center',
-              top: 'auto',
-              right: 'auto',
-              bottom: 'auto'
-            },
-            xAxis: {
-              show: false,
-              axisLabel: {
-                color: '#ffffff',
-                fontSize: 12,
-                rotate: 0
-              },
-              axisLine: {
-                show: false,
-                lineStyle: {
-                  color: '#cccccc'
-                }
-              },
-              splitLine: {
-                show: false,
-                lineStyle: {
-                  color: '#cccccc'
-                }
-              }
-            },
-            yAxis: {
-              show: false,
-              axisLabel: {
-                color: '#ffffff',
-                fontSize: 12
-              },
-              axisLine: {
-                show: false,
-                lineStyle: {
-                  color: '#cccccc'
-                }
-              },
-              splitLine: {
-                show: false,
-                lineStyle: {
-                  color: '#cccccc'
-                }
+                color: "#fff",
+                fontSize: 15,
+                fontFamily: "not specified"
               }
             },
             series: {
+              type: 'sunburst',
+              emphasis: {
+                focus: 'ancestor'
+              },
+              data: [{
+                  "children": [{
+                      "children": [{
+                        "children": [],
+                        "name": "NULL",
+                        "value": 1
+                      }],
+                      "name": "公众客户",
+                      "value": 2
+                    },
+                    {
+                      "children": [{
+                        "children": [],
+                        "name": "NULL",
+                        "value": 22
+                      }],
+                      "name": "政企客户",
+                      "value": 33
+                    }
+                  ],
+                  "name": "白云有线",
+                  "value": 34
+                },
+                {
+                  "children": [{
+                      "children": [{
+                        "children": [],
+                        "name": "NULL",
+                        "value": 45
+                      }],
+                      "name": "公众客户",
+                      "value": 55
+                    },
+                    {
+                      "children": [{
+                        "children": [],
+                        "name": "NULL",
+                        "value": 55
+                      }],
+                      "name": "政企客户",
+                      "value": 62
+                    }
+                  ],
+                  "name": "从化",
+                  "value": 73
+                },
+
+                {
+                  "children": [{
+                    "children": [{
+                        "children": [],
+                        "name": "白云金沙001网格",
+                        "value": 0
+                      },
+                      {
+                        "children": [],
+                        "name": "东湖东片5网格(代)",
+                        "value": 0
+                      },
+                      {
+                        "children": [],
+                        "name": "周门2片2网格(代)",
+                        "value": 90
+                      },
+                      {
+                        "children": [],
+                        "name": "NULL",
+                        "value": 100
+                      }
+                    ],
+                    "name": "公众客户",
+                    "value": 40
+                  }],
+                  "name": "客服中心",
+                  "value": 40
+                },
+                {
+                  "children": [{
+                      "children": [{
+                          "children": [],
+                          "name": "大岗聚豪格网格",
+                          "value": 25
+                        },
+                        {
+                          "children": [],
+                          "name": "NULL",
+                          "value": 32
+                        }
+                      ],
+                      "name": "公众客户",
+                      "value": 72
+                    },
+                    {
+                      "children": [{
+                        "children": [],
+                        "name": "NULL",
+                        "value": 91
+                      }],
+                      "name": "政企客户",
+                      "value": 82
+                    }
+                  ],
+                  "name": "南沙三镇",
+                  "value": 81
+                },
+                {
+                  "children": [{
+                    "children": [{
+                      "children": [],
+                      "name": "NULL",
+                      "value": 0
+                    }],
+                    "name": "公众客户",
+                    "value": 0
+                  }],
+                  "name": "未知分公司",
+                  "value": 0
+                }
+              ],
+              radius: [0, '90%'],
               label: {
                 show: true,
-                color: '',
-                fontSize: 12,
-                position: 'outside', // 可选inside
-                formatter: '{b}: {@2012} ({d}%)'
-              },
-              center: ['50%', '50%'] // 饼图可选
+                rotate: 'radial',
+              }
             },
-            color: DEFAULT_COLORS
+            // series: {
+            //   label: {
+            //     show: true,
+            //     color: '',
+            //     fontSize: 12,
+            //     position: 'outside', // 可选inside
+            //     formatter: '{b}: {@2012} ({d}%)'
+            //   },
+            //   center: ['50%', '50%'] // 饼图可选
+            // },
           },
           chartEvents: {
             click: chartClick
@@ -1949,8 +2042,7 @@ const list = [{
               // itemStyle: {
               //   borderColor: '#555'
               // },
-              levels: [
-                {
+              levels: [{
                   upperLabel: {
                     show: false
                   },
@@ -1975,12 +2067,10 @@ const list = [{
                   }
                 }
               ],
-              data: [
-                {
+              data: [{
                   name: '广东省',
                   value: [1000],
-                  children: [
-                    {
+                  children: [{
                       name: '广州市',
                       value: [800]
                     },
@@ -1997,8 +2087,7 @@ const list = [{
                 {
                   name: '江苏省',
                   value: [1000],
-                  children: [
-                    {
+                  children: [{
                       name: '南京市',
                       value: [700]
                     },
@@ -2154,16 +2243,16 @@ const list = [{
             visualMap: {
               min: 0,
               max: 10,
-              show:true,
+              show: true,
               calculable: true,
-              orient: 'horizontal',//vertical
+              orient: 'horizontal', //vertical
               left: 'center', //左 中 右
-              top:'bottom',//上 中 下
+              top: 'bottom', //上 中 下
               bottom: '5%',
-              textStyle:{
-                color:"#fff",
-                fontSize:15,
-                fontFamily:"not specified"
+              textStyle: {
+                color: "#fff",
+                fontSize: 15,
+                fontFamily: "not specified"
               }
             },
             series: {
@@ -2185,8 +2274,8 @@ const list = [{
               ],
               label: {
                 show: true,
-                color:'#fff',
-                position:'inside'
+                color: '#fff',
+                position: 'inside'
               },
               emphasis: {
                 itemStyle: {

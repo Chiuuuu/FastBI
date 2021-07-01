@@ -56,7 +56,7 @@ export default {
     },
     apiData: {
       handler(val) {
-        if (val.source.rows) {
+        if (val.source&val.source.rows) {
           //维度
           let dim = val.dimensions.map((x) => x.alias)
           //度量
