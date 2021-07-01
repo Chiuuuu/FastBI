@@ -362,6 +362,7 @@ export default {
         return
       }
       if (res.code === 200) {
+        apiData.returnDataLabel = res.data.labelList
         let config = deepClone(this.currSelected.setting.config)
         // 重置series
         config.series = config.series.filter(item => item.type === 'map')

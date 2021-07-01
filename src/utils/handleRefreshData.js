@@ -18,6 +18,7 @@ export function handleRefreshData({ chart, newData }) {
     return
   }
   if (chart.setting.type === '2') {
+    chart.setting.api_data.returnData = newData // 记录返回的键值对，方便展示图表数据直接用
     sourceRows.forEach((row, index) => {
       // 按对应key重新取值
       if (index === 0) {
@@ -186,7 +187,7 @@ async function setMapData(chart, newData) {
             data[apiData.labelLatitude[0].alias],
             data[apiData.labelLongitude[0].alias]
           ]
-          positionMsg = await reverseAddressResolution(positon)
+          positionMsg = await reverseAddressResolution(position)
 
           datas.push({
             name: positionMsg.district,
