@@ -48,9 +48,6 @@
       :options="chartOptions"
       :settings="chartSettings"
       :series="chartSeries"
-      :legend="chartLegend"
-      :geo="geo"
-      :tooltip="mapToolTip"
     ></component>
     <!-- <div v-else class="dv-charts-null">
       <a-icon  type="pie-chart" style="font-size:50px;" />
@@ -184,9 +181,41 @@ export default {
           if (this.typeName === 've-map') {
             this.chartExtend = { ...omit(val, ['series']) }
             this.chartSeries = deepClone(val.series)
-            this.setMapFormatter()
+            // this.setMapFormatter()
           } else {
-            this.chartExtend = { ...val }
+            this.chartExtend = deepClone(val)
+            // 保留两位小数
+            if (this.typeName !== 've-gauge' && this.typeName !== 've-ring') {
+              let type = this.typeName
+              let chartType = this.chartType
+              this.chartExtend.series.label.formatter = function(params) {
+                if (type === 've-line') {
+                  return params.data[1].toFixed(2)
+                } else if (type === 've-pie') {
+                  // 嵌套饼图不需要拼接显示内容
+                  if (chartType === 'v-multiPie') {
+                    return params.data.value.toFixed(2)
+                  }
+                  let list = val.series.label.formatterSelect
+                  let str = []
+                  list.forEach(item => {
+                    let val = params[item]
+                    if (typeof val === 'number') {
+                      val = +parseFloat(val).toFixed(2)
+                    }
+                    if (item === 'percent') {
+                      val += '%'
+                    }
+                    str.push(val)
+                  })
+                  return str.join(' ')
+                } else if (type === 've-radar') {
+                  return params.value.toFixed(2)
+                } else {
+                  return params.data.toFixed(2)
+                }
+              }
+            }
           }
           // this.colors = [...val.colors]
           this.$log.primary('========>chartExtend')
@@ -347,7 +376,11 @@ export default {
           }
           let str = []
           series.pointShowList.forEach(item => {
-            str.push(params.data[item])
+            let val = params.data[item]
+            if (typeof val === 'number') {
+              val = +parseFloat(val).toFixed(2)
+            }
+            str.push(val)
           })
           str = orient === 'vertical' ? str.join('\n') : str.join(':')
           return str
@@ -358,7 +391,11 @@ export default {
           }
           let str = []
           series.tooltipShowList.forEach(item => {
-            str.push(params.data[item])
+            let val = params.data[item]
+            if (typeof val === 'number') {
+              val = +parseFloat(val).toFixed(2)
+            }
+            str.push(val)
           })
           return str.join(':')
         }

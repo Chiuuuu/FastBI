@@ -29,8 +29,8 @@
           class="tab-item"
           v-if="
             currSelected.setting.type === '1' &&
-            currSelected.setting.name !== 've-map' &&
-            currSelected.setting.chartType !== 'v-multiPie'
+              currSelected.setting.name !== 've-map' &&
+              currSelected.setting.chartType !== 'v-multiPie'
           "
           :class="{ active: tabsType === 2 }"
           @click="tabsTypeChange(2)"
@@ -47,7 +47,7 @@
             <a-input-number
               v-model="globalSettings.width"
               size="small"
-              :formatter="(value) => `宽 ${value}`"
+              :formatter="value => `宽 ${value}`"
               class="f-clear-width"
               @change="setPageSetting"
             ></a-input-number>
@@ -56,7 +56,7 @@
             <a-input-number
               v-model="globalSettings.height"
               size="small"
-              :formatter="(value) => `高 ${value}`"
+              :formatter="value => `高 ${value}`"
               class="f-clear-width"
               @change="setPageSetting"
             ></a-input-number>
@@ -198,8 +198,8 @@
               <a-input-number
                 v-model="baseProperty.width"
                 size="small"
-                :formatter="(value) => `W ${value}`"
-                :parser="(value) => value.replace('W', '')"
+                :formatter="value => `W ${value}`"
+                :parser="value => value.replace('W', '')"
                 class="f-clear-width"
                 @change="setBaseProperty"
               ></a-input-number>
@@ -230,7 +230,7 @@
             v-model="collapseActive"
             v-if="
               (currSelected.setting.chartType !== 'high-pie') &
-              (currSelected.setting.chartType !== 'high-column')
+                (currSelected.setting.chartType !== 'high-column')
             "
           >
             <!--标题 noTitle图片没有标题-->
@@ -767,12 +767,38 @@
                     @change="setSelfProperty"
                   ></a-input>
                 </gui-field>
-                <gui-field label="是否启用玫瑰图" v-if="isPie">
-                  <a-switch
+                <gui-field label="玫瑰图" v-if="isPie">
+                  <!-- <a-switch
                     v-model="selfConfig.series.roseType"
                     size="small"
                     @change="switchChange"
-                  ></a-switch>
+                  ></a-switch> -->
+                  <a-radio-group
+                    :value="selfConfig.series.roseType"
+                    size="small"
+                  >
+                    <a-radio-button
+                      :value="false"
+                      @click.native.stop="
+                        onRadioChange($event, selfConfig.series, 'roseType')
+                      "
+                      >无</a-radio-button
+                    >
+                    <a-radio-button
+                      value="radius"
+                      @click.native.stop="
+                        onRadioChange($event, selfConfig.series, 'roseType')
+                      "
+                      >半径</a-radio-button
+                    >
+                    <a-radio-button
+                      value="area"
+                      @click.native.stop="
+                        onRadioChange($event, selfConfig.series, 'roseType')
+                      "
+                      >区域</a-radio-button
+                    >
+                  </a-radio-group>
                 </gui-field>
                 <gui-field label="外径大小" v-if="isMultiPie">
                   <a-input
@@ -801,14 +827,14 @@
                 <a-select
                   mode="tags"
                   placeholder="选择显示内容"
-                  :default-value="['{b}', '{@2012}', '({d}%)']"
+                  :default-value="['name', 'value', 'percent']"
                   style="width: 100%"
                   @change="onChange"
                 >
                   <a-select-option
                     v-for="i in formatList"
                     :key="i.label"
-                    :value="i.value"
+                    :value="i.alias"
                   >
                     {{ i.label }}
                   </a-select-option>
@@ -1566,7 +1592,7 @@
                     header="填充层设置"
                     v-if="
                       selfConfig.series[0] &&
-                      selfConfig.series[0].type === 'map'
+                        selfConfig.series[0].type === 'map'
                     "
                   >
                     <!-- <gui-field label="显示标记点">
@@ -2875,7 +2901,7 @@ import { mapGetters, mapActions } from 'vuex'
 import { setBaseProperty } from '../../../api/canvasMaps/canvas-maps-request'
 import {
   resetPageSettings,
-  setPageSettings,
+  setPageSettings
 } from '../../../api/app/app-request'
 import GuiGroup from './gui-group'
 import GuiWrap from './gui-wrap'
@@ -2901,25 +2927,25 @@ export default {
   props: {
     config: {
       type: Object,
-      required: true,
-    },
+      required: true
+    }
   },
   provide() {
     return {
       // 地图删除维度的时候调用，重置样式指标设置选择的度量
       initTargetMeasure: () => {
         this.targetMeasure = this.selfConfig.series.filter(
-          (item) => item.type === 'map'
+          item => item.type === 'map'
         ).length
-      },
+      }
     }
   },
   data() {
     return {
       formatList: [
-        { label: '维度', value: '{b}' },
-        { label: '度量', value: '{@2012}' },
-        { label: '占比', value: '({d}%)' },
+        { label: '维度', value: '{b}', alias: 'name' },
+        { label: '度量', value: '{@2012}', alias: 'value' },
+        { label: '占比', value: '({d}%)', alias: 'percent' }
       ],
       plainOptions: ['a', 'b', 'c'],
       formatShow: [],
@@ -2931,7 +2957,7 @@ export default {
         gridStep: 1,
         backgroundSrc: '',
         backgroundType: 1,
-        opacity: 1,
+        opacity: 1
       },
       baseProperty: { width: 0, height: 0, x: 0, y: 0, rotate: 0 }, // 配置-基础属性,
       collapseActive: [],
@@ -2946,14 +2972,14 @@ export default {
       activeKey: ['1'],
       radioStyle: {
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'center'
       }, // 单选radio样式
       showSlide: false, // 显示透明滑动条
       imageUrl: '', // 上传图片url
       loading: false, // 是否上传图片中
       refreshList: [
         { name: '分', value: 'min' },
-        { name: '小时', value: 'hour' },
+        { name: '小时', value: 'hour' }
       ],
       timer: null,
       chartTimers: {},
@@ -2968,16 +2994,16 @@ export default {
         { label: '庞门正道标题体', value: 'pangmenzhengdao' },
         { label: 'HuXiaoBoNanShenTi-2', value: 'HuXiaoBoNanShenTi-2' },
         { label: '优设标题黑', value: 'youshe' },
-        { label: 'digital-7-4', value: 'digital-7-4' },
+        { label: 'digital-7-4', value: 'digital-7-4' }
       ],
       targetMeasure: 0, // 地图指标设置对应度量
       scatterColorList: [
-        //散点颜色
+        // 散点颜色
         { label: '单色', value: '0' },
         { label: '按维度', value: '1' },
       ],
       scatterSizeList: [
-        //散点大小
+        // 散点大小
         { label: '无', value: '' },
         { label: '按度量1', value: '0' },
         { label: '按度量2', value: '1' },
@@ -2990,7 +3016,6 @@ export default {
         { label: '度量组', value: '({@0},{@1})' },
       ],
       scatterList: [], // 地图里散点图配置列表
-      targetMeasure: 0, // 地图指标设置对应度量
       themeColors: ['yellow', 'blue', 'green'], // 地图填充色色系选择
       mapFillPointSelectList: [], // 地图填充指标选择列表
       mapFillTooltipSelectList: [], // 地图填充提示框选择列表
@@ -3010,7 +3035,7 @@ export default {
     clearInterval(this.timer)
     this.timer = null
     let keys = Object.keys(this.chartTimers)
-    keys.forEach((id) => {
+    keys.forEach(id => {
       clearInterval(this.chartTimers[id])
     })
     this.chartTimers = {}
@@ -3038,14 +3063,14 @@ export default {
     onChange(checkedValues) {
       if (this.isScatter) {
         // 散点图
-        if (this.apis.arrange == 'horizontal') {
+        if (this.apis.arrange === 'horizontal') {
           this.selfConfig.series.label.formatter = checkedValues.join(' ')
         } else {
           this.selfConfig.series.label.formatter = checkedValues.join('\n\r')
         }
         this.setApis()
       } else {
-        this.selfConfig.series.label.formatter = checkedValues.join('')
+        this.selfConfig.series.label.formatterSelect = checkedValues
       }
       this.setSelfProperty()
     },
@@ -3178,7 +3203,7 @@ export default {
       form.append('avatarfile', e.target.files[0])
       this.$server.screenManage
         .actionUploadImage(form)
-        .then((res) => {
+        .then(res => {
           if (res.code === 200) {
             let imageUrl = process.env.VUE_APP_SERVICE_URL + res.imgUrl
             if (key === 'globalSettings') {
@@ -3198,7 +3223,7 @@ export default {
             this.$message.error(res.msg)
           }
         })
-        .catch((err) => {
+        .catch(err => {
           console.log(err)
         })
     },
@@ -3248,7 +3273,11 @@ export default {
     },
 
     onRadioChange(e, data, key) {
-      this.$set(data, key, e.target.value)
+      let val = e.target.value
+      if (val === 'false') {
+        val = false
+      }
+      this.$set(data, key, val)
       this.setSelfProperty()
     },
 
@@ -3259,7 +3288,7 @@ export default {
       // 堆叠柱状图
       if (val && type === 'stack') {
         this.apis.stack = {
-          用户: [],
+          用户: []
         }
         // 堆叠了把数值显示在右边防止挤在一起
         this.selfConfig.series.label.position = 'insideBottom'
@@ -3278,7 +3307,7 @@ export default {
         this.apis.showLine = [
           columns[columns.length - 2]
             ? columns[columns.length - 2]
-            : columns[columns.length - 1],
+            : columns[columns.length - 1]
         ]
         // this.apis.axisSite = { right: columns[columns.length - 2] || [columns[columns.length - 1]] }
       } else {
@@ -3319,7 +3348,7 @@ export default {
         clearInterval(this.chartTimers[id])
         this.chartTimers[id] = null
       }
-      let selected = this.canvasMap.find((item) => item.id === id)
+      let selected = this.canvasMap.find(item => item.id === id)
       let refresh = selected.setting.api_data.refresh
       // 所有条件都满足才开始倒计时刷新
       if (refresh.isRefresh && refresh.unit && refresh.frequency > 0) {
@@ -3368,14 +3397,15 @@ export default {
       this.setApis()
       this.setSelfProperty()
     },
-    //散点图 -- 指标排序
+    // 散点图 -- 指标排序
     scatterArrangeChange(e) {
       let val = e.target.value
       // if(!val){ return; }
       if (val) {
-        if (val == 'horizontal') {
-          this.selfConfig.series.label.formatter =
-            this.apis.scatterLabel.join(' ')
+        if (val === 'horizontal') {
+          this.selfConfig.series.label.formatter = this.apis.scatterLabel.join(
+            ' '
+          )
         } else {
           this.selfConfig.series.label.formatter =
             this.apis.scatterLabel.join('\n\r')
@@ -3402,16 +3432,16 @@ export default {
     },
     // 刷新大屏
     refreshData: throttle(
-      function () {
+      function() {
         this.refreshScreen({
           charSeted: false,
-          needLoading: true,
+          needLoading: true
         })
       },
       1000,
       {
         leading: true,
-        trailing: false,
+        trailing: false
       }
     ),
   },
@@ -3429,10 +3459,10 @@ export default {
             if (val.setting.chartType === 'v-map') {
               // 地图里散点图配置列表
               this.scatterList = this.selfConfig.series.filter(
-                (item) => item.type === 'scatter'
+                item => item.type === 'scatter'
               )
               this.targetMeasure = this.selfConfig.series.filter(
-                (item) => item.type === 'map'
+                item => item.type === 'map'
               ).length
             }
           }
@@ -3484,7 +3514,7 @@ export default {
           }
         }
       },
-      deep: true,
+      deep: true
     },
     pageSettings: {
       handler(val) {
@@ -3493,7 +3523,7 @@ export default {
           if (!setting.refresh) {
             setting.refresh = {
               frequency: '',
-              isRefresh: false,
+              isRefresh: false
             }
           }
           this.globalSettings = deepClone(setting)
@@ -3525,7 +3555,7 @@ export default {
       'currSelected',
       'screenId',
       'canvasMap',
-      'orginPageSettings',
+      'orginPageSettings'
     ]),
     chartType() {
       return this.currSelected ? this.currSelected.setting.chartType : ''
@@ -3604,7 +3634,7 @@ export default {
           (this.isLine || this.isHistogram || this.isBar || this.isScatter)
         )
       }
-    },
+    }
   },
   components: {
     GuiField,
@@ -3614,7 +3644,7 @@ export default {
     Interactive,
     Figure,
     HighChartPie,
-    HighChartBar,
-  },
+    HighChartBar
+  }
 }
 </script>

@@ -53,6 +53,7 @@ import { deepClone } from '@/utils/deepClone'
 import { sum, summary } from '@/utils/summaryList'
 import geoJson from '@/utils/guangdong.json'
 import { Loading } from 'element-ui'
+import _ from 'lodash'
 
 export default {
   props: {
@@ -270,9 +271,6 @@ export default {
         if (this.currSelected.setting.name === 'steepBar') {
           this.fileList[0] = dataFile
         } else {
-          if (this.currSelected.setting.chartType === 'v-text') {
-            dataFile.alias = dataFile.alias + '(求和)'
-          }
           if (this.fileList.length < 2) {
             this.fileList.push(dataFile)
           }
@@ -308,15 +306,6 @@ export default {
       item.defaultAggregator = i.value
       this.getData()
     },
-    // 抓取区中心点
-    getCenterCoordinate(name) {
-      let dataList = geoJson.features
-      let countryside = dataList.find(item => item.properties.name === name)
-      if (!countryside) {
-        return null
-      }
-      return countryside.properties.center
-    },
     // 删除当前维度或者度量
     deleteFile(item, index) {
       this.fileList.splice(index, 1)
@@ -324,10 +313,6 @@ export default {
       let current = deepClone(this.currSelected)
       // 维度度量删除完以后重置该图表数据
       if (this.chartType === '1' || this.chartType === '2') {
-        if (current.setting.chartType === 'v-map') {
-          // 重置地图样式配置对应的度量数据
-          this.initTargetMeasure()
-        }
         if (
           current.setting.api_data.dimensions.length === 0 &&
           current.setting.api_data.measures.length === 0
@@ -335,14 +320,6 @@ export default {
           // 清空数据
           delete current.setting.api_data.source
           this.$store.dispatch('SetSelfDataSource', current.setting.api_data)
-          // 地图数据还原
-          if (current.setting.chartType === 'v-map') {
-            current.setting.api_data.data = [[]]
-            current.setting.config.series[0].data = [[]]
-            this.$store.dispatch('SetSelfDataSource', current.setting.api_data)
-            this.$store.dispatch('SetSelfProperty', current.setting.config)
-            this.updateChartData()
-          }
           // 嵌套饼图apis恢复原始状态
           if (current.setting.chartType === 'v-multiPie') {
             let apis = {
@@ -488,53 +465,14 @@ export default {
         return
       }
       if (res.code === 200) {
-        if (this.currSelected.setting.chartType === 'v-map') {
-          let config = deepClone(this.currSelected.setting.config)
-          let legend = []
-          let datas = []
-          // 重置series
-          config.series = [config.series[0]]
-          // 只有一个维度，唯一名称
-          let alias = apiData.dimensions[0].alias
-          // 一个度量对应一个series.data
-          apiData.measures.forEach((measure, index) => {
-            // 添加series
-            if (index > 0) {
-              config.series[index] = Object.assign({}, config.series[0])
-            }
-            config.series[index].name = measure.alias
-            legend.push(measure.alias)
-            let data = []
-            for (let item of res.rows) {
-              // 抓取区域坐标
-              let center = this.getCenterCoordinate(item[alias])
-              // 找不到对应坐标跳过
-              if (!center) {
-                continue
-              }
-              data.push({
-                name: item[alias],
-                value: center.concat(item[measure.alias]) // 链接数组，坐标和值
-              })
-            }
-            config.series[index].data = data
-            datas.push(data)
+        let datas = res.rows
+        // 去掉排序的数据
+        if (apiData.options.sort.length) {
+          let filterArr = []
+          apiData.options.sort.forEach(item => {
+            filterArr.push(`sort_${item.alias}`)
           })
-          config.legend.data = legend
-          apiData.data = datas
-          this.$store.dispatch('SetSelfProperty', config)
-          this.$store.dispatch('SetSelfDataSource', apiData)
-          this.updateChartData()
-          return
-        }
-        if (this.currSelected.setting.chartType === 'v-text') {
-          let config = deepClone(this.currSelected.setting.config)
-          let str = ''
-          for (let item of this.fileList) {
-            str += res.rows[0][item.alias] + ' '
-          }
-          config.title.text = str
-          this.$store.dispatch('SetSelfProperty', config)
+          datas = datas.map(item => _.omit(item, filterArr))
         }
         if (this.type === 'tableList') {
           let columns = []
@@ -545,7 +483,7 @@ export default {
               key: item.alias
             })
           }
-          let rows = res.rows
+          let rows = datas
           if (rows.length > 10) {
             rows.length = 10
           }
@@ -557,12 +495,13 @@ export default {
         } else {
           // 仪表盘/环形图 只显示度量
           if (this.chartType === '2') {
+            apiData.returnData = datas // 记录返回的键值对，方便展示图表数据直接用
             let columns = ['type', 'value'] // 维度固定
             for (let m of apiData.measures) {
               columns.push(m.alias) // 默认columns第二项起为指标
             }
             // 对返回的数据列进行求和
-            let total = sum(res.rows, apiData.measures[0].alias)
+            let total = sum(datas, apiData.measures[0].alias)
             let rows = [
               {
                 type: apiData.measures[0].alias,
@@ -574,7 +513,7 @@ export default {
               this.currSelected.setting.chartType === 'v-ring' &&
               apiData.measures[1]
             ) {
-              let currentTotal = sum(res.rows, apiData.measures[1].alias)
+              let currentTotal = sum(datas, apiData.measures[1].alias)
               rows[0] = {
                 type: apiData.measures[1].alias,
                 value: currentTotal
@@ -600,7 +539,7 @@ export default {
               this.currSelected.setting.chartType === 'v-gauge' &&
               apiData.measures[1]
             ) {
-              let goalTotal = sum(res.rows, apiData.measures[1].alias)
+              let goalTotal = sum(datas, apiData.measures[1].alias)
               config.series.max = goalTotal
               this.$store.dispatch('SetSelfProperty', config)
             }
@@ -627,12 +566,11 @@ export default {
           if (this.currSelected.setting.chartType === 'v-multiPie') {
             // name是各维度数据拼接，value是分类汇总过的数值
             columns = ['name', 'value']
-            let result = res.rows
             let level = []
             // 一个维度是一层饼
             dimensionKeys.forEach(item => {
               // 根据当前维度分类得到的列表
-              let list = summary(result, item, measureKeys[0]) // 嵌套饼图度量只有一个，直接取第一个数
+              let list = summary(datas, item, measureKeys[0]) // 嵌套饼图度量只有一个，直接取第一个数
               rows = rows.concat(list) // 把所有维度分类出来的数组进行拼接（v-charts配置格式要求）
 
               level.push(list.map(obj => obj.name)) // 按维度分层
@@ -643,7 +581,7 @@ export default {
             }
             this.$store.dispatch('SetApis', apis)
           } else {
-            res.rows.map((item, index) => {
+            datas.map((item, index) => {
               let obj = {}
               for (let item2 of dimensionKeys) {
                 obj[item2] = item[item2]

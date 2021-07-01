@@ -166,37 +166,18 @@
             currSelected.setting.chartType !== 'v-map'
         "
       >
-        <drag-pick type="pick"></drag-pick>
+        <DragPick type="pick"></DragPick>
       </a-collapse-panel>
+      <!-- 排序 -->
       <a-collapse-panel
         key="sort"
         header="排序"
-        v-if="chartType !== '2' && currSelected.setting.chartType !== 'v-map'"
+        v-if="
+          (chartType === '1' || chartType === '2' || chartType === '3') &&
+            currSelected.setting.chartType !== 'v-map'
+        "
       >
-        <div style="display: flex;">
-          <a-select
-            v-model="sortData.pivotschemaId"
-            placeholder="选择字段"
-            class="f-flex1"
-            style="margin-right:10px;width:50%"
-            @change="sortFileChange"
-          >
-            <a-select-option
-              v-for="item in sortList"
-              :value="item.id"
-              :key="item.id"
-              >{{ item.alias }}</a-select-option
-            >
-          </a-select>
-          <a-select v-model="sortData.asc" class="f-flex1" @change="ascChange">
-            <a-select-option
-              v-for="(item, index) in ascList"
-              :key="index"
-              :value="item.value"
-              >{{ item.name }}</a-select-option
-            >
-          </a-select>
-        </div>
+        <DragSort type="sort"></DragSort>
       </a-collapse-panel>
       <a-collapse-panel key="refresh" header="定时刷新">
         <a-switch
@@ -240,6 +221,7 @@ import DragArea from './components/dragArea'
 import dragAreaForMapFill from './components/dragAreaForMapFill'
 import dragAreaForMapLabel from './components/dragAreaForMapLabel'
 import DragPick from './components/dragPick'
+import DragSort from './components/dragSort'
 import { deepClone } from '../../../utils/deepClone'
 // import GuiField from '../options/gui-field'
 export default {
@@ -247,7 +229,8 @@ export default {
     DragArea,
     DragPick,
     dragAreaForMapFill,
-    dragAreaForMapLabel
+    dragAreaForMapLabel,
+    DragSort
     // GuiField
   },
   data() {
@@ -265,16 +248,6 @@ export default {
         'mapLabel'
       ], // 所有面板默认打开
       apiData: {},
-      sortList: [], // 排序列表
-      ascList: [
-        { name: '无', value: '' },
-        { name: '升序', value: 1 },
-        { name: '降序', value: 0 }
-      ],
-      sortData: {
-        pivotschemaId: '', // 排序的字段
-        asc: '' // 字段排序 升序true 降序false
-      },
       refresh: {
         isRefresh: false, // 是否启用定时刷新
         frequency: 1, // 刷新频率
@@ -295,18 +268,10 @@ export default {
       labelOverShow: false // 标记点悬浮提示
     }
   },
-  mounted() {
-    // if (this.currSelected.setting.chartType === 'v-map') {
-    //   this.fillType = this.currSelected.setting.api_data.options.fillType
-    //   this.labelType = this.currSelected.setting.api_data.options.labelType
-    // }
-  },
   watch: {
     currSelected: {
       handler(val) {
         if (val.setting.api_data) {
-          this.sortList = [{ name: '选择字段', id: '' }]
-          this.sortData = {}
           let apiData = deepClone(val.setting.api_data)
           this.apiData = apiData
           this.selfConfig = deepClone(val.setting.config)
@@ -329,23 +294,6 @@ export default {
             //   this.labelShow = this.scatterLayout.label.show
             //   this.labelOverShow = this.scatterLayout.tooltip.show
             // }
-          }
-          // 选中的维度度量组合成排序列表
-          if (apiData.dimensions) {
-            this.sortList = this.sortList.concat(apiData.dimensions)
-          }
-          if (apiData.measures) {
-            this.sortList = this.sortList.concat(apiData.measures)
-          }
-          //   if (val.setting.name === 've-tables') {
-          //     this.sortList = this.sortList.concat(apiData.tableList)
-          //   }
-          // 回显排序信息
-          if (apiData.options && apiData.options.sort) {
-            this.sortData = {
-              pivotschemaId: apiData.options.sort.id,
-              asc: apiData.options.sort.asc
-            }
           }
           // 回显定时信息
           if (apiData.refresh) {
@@ -372,25 +320,7 @@ export default {
   },
   methods: {
     ...mapActions(['saveScreenData', 'handleRefreshData', 'updateChartData']),
-    // 排序筛选字段选择
-    sortFileChange(val) {
-      if (!val || (val && this.sortData.asc === undefined)) {
-        this.sortData.asc = ''
-      }
-      let data = this.sortList.filter(item => item.id === val)
-      data[0].asc = this.sortData.asc
-
-      let options = {
-        sort: data[0]
-      }
-      this.apiData.options = { ...this.apiData.options, ...options }
-      this.$store.dispatch('SetSelfDataSource', this.apiData)
-      if (this.currSelected.setting.name === 've-tables') {
-        this.$refs.table.getData()
-      } else {
-        this.$refs.child.getData()
-      }
-    },
+    // 修改地图类型
     onRadioChange(value, key) {
       if (this[key] === value) {
         return
@@ -403,6 +333,7 @@ export default {
             normal: [],
             latitude: [],
             longitude: [],
+            dimensions: [],
             measures: [],
             point: [],
             over: []
@@ -414,16 +345,14 @@ export default {
             labelNormal: [],
             labelLatitude: [],
             labelLongitude: [],
+            labelDimensions: [],
             labelMeasures: []
           }
         }
       }
       // 切换页签清空对应数据
       // 清空填充/标记点数据
-      Object.assign(
-        this.currSelected.setting.api_data,
-        clearMap[key].clearData
-      )
+      Object.assign(this.currSelected.setting.api_data, clearMap[key].clearData)
       // 清空图表数据
       let config = this.currSelected.setting.config
       this.$set(
@@ -435,7 +364,7 @@ export default {
       if (key === 'fillType') {
         this.$delete(this.currSelected.setting.config, 'visualMap')
       }
-      //数据全空清除模型id
+      // 数据全空清除模型id
       let apidata = this.currSelected.setting.api_data
       if (
         !apidata.dimensions.length &&
@@ -449,18 +378,6 @@ export default {
       this[key] = value
       this.$set(this.currSelected.setting.api_data.options, key, value)
       this.updateChartData()
-    },
-    // 排序类型 升序 降序
-    ascChange() {
-      if (this.sortData.pivotschemaId) {
-        this.apiData.options.sort.asc = this.sortData.asc
-        this.$store.dispatch('SetSelfDataSource', this.apiData)
-        if (this.currSelected.setting.name === 've-tables') {
-          this.$refs.table.getData()
-        } else {
-          this.$refs.child.getData()
-        }
-      }
     },
     // 定时刷新开关
     refreshChange(checked, event) {

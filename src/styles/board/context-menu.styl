@@ -11,9 +11,16 @@
     height: 28px;
     border-left: 2px solid transparent;
     cursor: pointer;
-    overflow: hidden;
+    // overflow: hidden;
     padding-right: 3em;
-    display: flex;
+    position:relative;
+    color: $color-admin-context-menu-color;
+    .context-menu-item-children{
+      background: $color-admin-context-menu;
+      position:absolute;
+      right: -80px;
+      top: 0;
+    }
     .iconfont {
       margin-right: 3px;
       line-height: 28px;
@@ -26,3 +33,17 @@
     }
   }
 }
+  .chartdata-table{
+      table-layout:fixed;
+        border-collapse: collapse;
+        border-spacing: 0px;
+        overflow:scroll;
+        border-left:1px solid black;
+        border-top:1px solid black;
+        .table-td{
+            padding:10px;
+            text-align:center;
+            border-right:1px solid black;
+            border-bottom:1px solid black;
+        }
+  }
