@@ -187,10 +187,15 @@ export default {
             // 保留两位小数
             if (this.typeName !== 've-gauge' && this.typeName !== 've-ring') {
               let type = this.typeName
+              let chartType = this.chartType
               this.chartExtend.series.label.formatter = function(params) {
                 if (type === 've-line') {
                   return params.data[1].toFixed(2)
                 } else if (type === 've-pie') {
+                  // 嵌套饼图不需要拼接显示内容
+                  if (chartType === 'v-multiPie') {
+                    return params.data.value.toFixed(2)
+                  }
                   let list = val.series.label.formatterSelect
                   let str = []
                   list.forEach(item => {
