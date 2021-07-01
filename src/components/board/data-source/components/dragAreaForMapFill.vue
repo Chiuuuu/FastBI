@@ -375,23 +375,24 @@ export default {
       let params = deepClone(selected)
       delete params.setting.apis.mapOrigin
       // 传参添加标签悬浮的维度/度量
-      if (
-        params.setting.api_data.point &&
-        params.setting.api_data.point.length > 0
-      ) {
-        params.setting.api_data[selected.setting.api_data.point[0].file].push(
-          selected.setting.api_data.point[0]
-        )
-      }
-      if (
-        params.setting.api_data.over &&
-        params.setting.api_data.over.length > 0
-      ) {
-        params.setting.api_data[selected.setting.api_data.over[0].file].push(
-          selected.setting.api_data.over[0]
-        )
-      }
+      //   if (
+      //     params.setting.api_data.point &&
+      //     params.setting.api_data.point.length > 0
+      //   ) {
+      //     params.setting.api_data[selected.setting.api_data.point[0].file].push(
+      //       selected.setting.api_data.point[0]
+      //     )
+      //   }
+      //   if (
+      //     params.setting.api_data.over &&
+      //     params.setting.api_data.over.length > 0
+      //   ) {
+      //     params.setting.api_data[selected.setting.api_data.over[0].file].push(
+      //       selected.setting.api_data.over[0]
+      //     )
+      //   }
       let res = await this.$server.screenManage.getData(params)
+
       selected.setting.isEmpty = false
       // 数据源被删掉
       if (res.code === 500 && res.msg === 'IsChanged') {
@@ -401,6 +402,7 @@ export default {
         return
       }
       if (res.code === 200) {
+        apiData.returnDataFill = res.data.fillList
         let config = this.currSelected.setting.config
         // 重置series
         config.series = config.series.filter(item => item.type === 'scatter')

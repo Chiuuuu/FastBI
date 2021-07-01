@@ -29,16 +29,31 @@
                 :class="disableList.includes(item2.id) ? 'disable' : ''"
                 @click.native="fileHandle(item2)"
               >
-                <div style="margin-left:25px;cursor: pointer;">
-                  <p
-                    @click="fileHandle(item3)"
-                    v-for="item3 in item2.children"
-                    :key="item3.id"
-                    :class="disableList.includes(item3.id) ? 'disable' : ''"
-                  >
-                    {{ item3.name }}
-                  </p>
-                </div>
+                <a-collapse v-model="thrModelKey" :bordered="false">
+                  <template v-for="item3 in item2.children">
+                    <a-collapse-panel
+                      :showArrow="false"
+                      :key="item3.id"
+                      :header="item3.name"
+                      :style="customStyle"
+                      :class="disableList.includes(item3.id) ? 'disable' : ''"
+                      @click.native="fileHandle(item3)"
+                    >
+                      <div style="margin-left:25px;cursor: pointer;">
+                        <p
+                          @click="fileHandle(item4)"
+                          v-for="item4 in item3.children"
+                          :key="item4.id"
+                          :class="
+                            disableList.includes(item4.id) ? 'disable' : ''
+                          "
+                        >
+                          {{ item4.name }}
+                        </p>
+                      </div>
+                    </a-collapse-panel>
+                  </template>
+                </a-collapse>
               </a-collapse-panel>
             </template>
           </a-collapse>
@@ -59,6 +74,7 @@
   </div>
 </template>
 <script>
+import { registerMap } from 'echarts'
 export default {
   props: {
     dataList: {
@@ -80,6 +96,7 @@ export default {
         'background: #ffffff;border-radius: 4px;border: 0;overflow: hidden;color:red !important;',
       modelKey: [],
       secModelKey: [],
+      thrModelKey: [],
       menuList: []
     }
   },
@@ -95,9 +112,15 @@ export default {
   methods: {
     fileHandle(item) {
       // 数据接入没有datasourceId不是三级数据，往下请求三级数据
-      if (this.type === 3 && !item.datasourceId) {
-        this.getTableList(item)
-        return
+      if (this.type === 3) {
+        if (item.fileType === 2) {
+          this.getTableList(item)
+          return
+        }
+        if (item.fileType === 1) {
+          this.getGroupList(item)
+          return
+        }
       }
       if (item.fileType !== 0 && !this.disableList.includes(item.id)) {
         item.resourceType = this.type
@@ -105,7 +128,7 @@ export default {
       }
     },
     // 获取数据接入表格列表
-    async getTableList(item) {
+    async getGroupList(item) {
       // 三级数据不需要请求
       if (!item.children) {
         return
@@ -123,12 +146,25 @@ export default {
         this.$message.error(res.msg)
         return
       }
+      // 库组列表
+      const groupList = res.data.map(group => {
+        return { ...group, fileType: 2, children: [] }
+      })
+      item.children = groupList
+    },
+    async getTableList(item) {
+      // 表列表已经存在的不用再请求一次
+      if (item.children.length > 0) {
+        return
+      }
       // 根据库组id查询已抽取的表
-      const tableList = await this.$server.dataModel.getTableListById(
-        res.data[0].id
-      )
-      let list = tableList.data
-      item.children = list
+      const res = await this.$server.dataModel.getTableListById(item.id)
+      if (res.code === 500) {
+        this.$message.error(res.msg)
+        return
+      }
+      let tableList = res.data
+      item.children = tableList
     }
   }
 }
