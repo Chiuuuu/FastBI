@@ -685,14 +685,13 @@ export default {
         }
         if (this.currSelected.setting.chartType === 'v-tables') {
           let columns = []
-          let keys = Object.keys(datas[0])
-          for (let alias of keys) {
+          apiData.tableList.forEach(item => {
             columns.push({
-              title: alias,
-              dataIndex: alias,
-              key: alias
+              title: item.alias,
+              dataIndex: item.alias,
+              key: item.alias
             })
-          }
+          })
           let rows = datas
           if (rows.length > 10) {
             rows.length = 10
