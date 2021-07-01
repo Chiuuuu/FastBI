@@ -553,12 +553,38 @@
                     @change="setSelfProperty"
                   ></a-input>
                 </gui-field>
-                <gui-field label="是否启用玫瑰图" v-if="isPie">
-                  <a-switch
+                <gui-field label="玫瑰图" v-if="isPie">
+                  <!-- <a-switch
                     v-model="selfConfig.series.roseType"
                     size="small"
                     @change="switchChange"
-                  ></a-switch>
+                  ></a-switch> -->
+                  <a-radio-group
+                    :value="selfConfig.series.roseType"
+                    size="small"
+                  >
+                    <a-radio-button
+                      :value="false"
+                      @click.native.stop="
+                        onRadioChange($event, selfConfig.series, 'roseType')
+                      "
+                      >无</a-radio-button
+                    >
+                    <a-radio-button
+                      value="radius"
+                      @click.native.stop="
+                        onRadioChange($event, selfConfig.series, 'roseType')
+                      "
+                      >半径</a-radio-button
+                    >
+                    <a-radio-button
+                      value="area"
+                      @click.native.stop="
+                        onRadioChange($event, selfConfig.series, 'roseType')
+                      "
+                      >区域</a-radio-button
+                    >
+                  </a-radio-group>
                 </gui-field>
                 <gui-field label="外径大小" v-if="isMultiPie">
                   <a-input
@@ -587,14 +613,14 @@
                 <a-select
                   mode="tags"
                   placeholder="选择显示内容"
-                  :default-value="['{b}', '{@2012}', '({d}%)']"
+                  :default-value="['name', 'value', 'percent']"
                   style="width: 100%"
                   @change="onChange"
                 >
                   <a-select-option
                     v-for="i in formatList"
                     :key="i.label"
-                    :value="i.value"
+                    :value="i.alias"
                   >
                     {{ i.label }}
                   </a-select-option>
@@ -2465,9 +2491,9 @@ export default {
   data() {
     return {
       formatList: [
-        { label: '维度', value: '{b}' },
-        { label: '度量', value: '{@2012}' },
-        { label: '占比', value: '({d}%)' }
+        { label: '维度', value: '{b}', alias: 'name' },
+        { label: '度量', value: '{@2012}', alias: 'value' },
+        { label: '占比', value: '({d}%)', alias: 'percent' }
       ],
       plainOptions: ['a', 'b', 'c'],
       formatShow: [],
@@ -2560,7 +2586,7 @@ export default {
       this.updateChartData()
     },
     onChange(checkedValues) {
-      this.selfConfig.series.label.formatter = checkedValues.join('')
+      this.selfConfig.series.label.formatterSelect = checkedValues
       this.setSelfProperty()
     },
     changeAreaColor(color) {
@@ -2757,7 +2783,11 @@ export default {
     },
 
     onRadioChange(e, data, key) {
-      this.$set(data, key, e.target.value)
+      let val = e.target.value
+      if (val === 'false') {
+        val = false
+      }
+      this.$set(data, key, val)
       this.setSelfProperty()
     },
 
