@@ -183,10 +183,10 @@ export default {
         dataFile.polymerizationShow = this.polymerizationData.numberType
         dataFile.alias += '(求和)'
         dataFile.defaultAggregator = 'SUM'
+      } else {
+        dataFile.alias += '(计数)'
+        dataFile.polymerizationShow = this.polymerizationData.stringType
       }
-      //   else {
-      //     dataFile.polymerizationShow = this.polymerizationData.stringType
-      //   }
       // 设置默认排序
       // 1：升序；2：降序
       dataFile.asc = 1
@@ -203,6 +203,7 @@ export default {
 
       this.fileList.push(dataFile)
       this.fileList = this.uniqueFun(this.fileList, 'alias')
+      //   this.fileList[0] = dataFile
       this.handleSort()
 
       this.isdrag = false
@@ -318,10 +319,18 @@ export default {
           this.updateChartData()
           return
         }
-        let rows = res.rows
+        let datas = res.rows
+        // 去掉排序的数据
+        if (apiData.options.sort.length) {
+          let filterArr = []
+          apiData.options.sort.forEach(item => {
+            filterArr.push(`sort_${item.alias}`)
+          })
+          datas = datas.map(item => _.omit(item, filterArr))
+        }
         if (this.currSelected.setting.chartType === 'v-tables') {
           let columns = []
-          let keys = Object.keys(rows[0])
+          let keys = Object.keys(datas[0])
           for (let alias of keys) {
             columns.push({
               title: alias,
@@ -329,6 +338,7 @@ export default {
               key: alias
             })
           }
+          let rows = datas
           if (rows.length > 10) {
             rows.length = 10
           }
@@ -345,7 +355,7 @@ export default {
               columns.push(m.alias) // 默认columns第二项起为指标
             }
             // 对返回的数据列进行求和
-            let total = sum(res.rows, apiData.measures[0].alias)
+            let total = sum(datas, apiData.measures[0].alias)
             let rows = [
               {
                 type: apiData.measures[0].alias,
@@ -357,7 +367,7 @@ export default {
               this.currSelected.setting.chartType === 'v-ring' &&
               apiData.measures[1]
             ) {
-              let currentTotal = sum(res.rows, apiData.measures[1].alias)
+              let currentTotal = sum(datas, apiData.measures[1].alias)
               rows[0] = {
                 type: apiData.measures[1].alias,
                 value: currentTotal
@@ -383,7 +393,7 @@ export default {
               this.currSelected.setting.chartType === 'v-gauge' &&
               apiData.measures[1]
             ) {
-              let goalTotal = sum(res.rows, apiData.measures[1].alias)
+              let goalTotal = sum(datas, apiData.measures[1].alias)
               config.series.max = goalTotal
               this.$store.dispatch('SetSelfProperty', config)
             }
@@ -409,12 +419,11 @@ export default {
           if (this.currSelected.setting.chartType === 'v-multiPie') {
             // name是各维度数据拼接，value是分类汇总过的数值
             columns = ['name', 'value']
-            let result = res.rows
             let level = []
             // 一个维度是一层饼
             dimensionKeys.forEach(item => {
               // 根据当前维度分类得到的列表
-              let list = summary(result, item, measureKeys[0]) // 嵌套饼图度量只有一个，直接取第一个数
+              let list = summary(datas, item, measureKeys[0]) // 嵌套饼图度量只有一个，直接取第一个数
               rows = rows.concat(list) // 把所有维度分类出来的数组进行拼接（v-charts配置格式要求）
 
               level.push(list.map(obj => obj.name)) // 按维度分层
@@ -426,7 +435,7 @@ export default {
             console.log(apis)
             this.$store.dispatch('SetApis', apis)
           } else {
-            res.rows.map((item, index) => {
+            datas.map((item, index) => {
               let obj = {}
               for (let item2 of dimensionKeys) {
                 obj[item2] = item[item2]
