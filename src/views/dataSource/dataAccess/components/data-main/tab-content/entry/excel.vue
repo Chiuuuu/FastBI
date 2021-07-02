@@ -776,7 +776,7 @@ export default {
                   }
                 })
               } else {
-                this.$message.error(result.msg)
+                this.$message.error(result.data || result.msg || '保存错误')
               }
             })
             .finally(() => {
