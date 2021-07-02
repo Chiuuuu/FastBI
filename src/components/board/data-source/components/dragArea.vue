@@ -227,6 +227,8 @@ export default {
           if(this.fileList.length==2){
             this.fileList.splice(1,1,dataFile);
           }
+        }else if(this.currSelected.setting.chartType==='v-sun'){
+          this.fileList.push(dataFile);
         }else {
           // 维度暂时只能拉入一个字段
           this.fileList[0] = dataFile
@@ -580,6 +582,8 @@ export default {
               level
             }
             this.$store.dispatch('SetApis', apis)
+          }else if(this.currSelected.setting.chartType ==='v-sun'){
+            rows = [...datas];
           } else {
             datas.map((item, index) => {
               let obj = {}

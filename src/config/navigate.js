@@ -1712,7 +1712,7 @@ const list = [{
               show: true,
               content: '',
               text: '旭日图',
-              let: 'left',
+              left: 'left',
               textStyle: {
                 color: '#ffffff',
                 fontSize: 20,
@@ -1726,6 +1726,9 @@ const list = [{
             //   right: "20%",
             //   bottom: 30
             // },
+            tooltip: {
+              show: true,
+            },
             visualMap: {
               type: 'continuous',
               min: 0,
@@ -1736,6 +1739,9 @@ const list = [{
               left: 'right', //左 中 右
               top: 'bottom', //上 中 下
               // bottom: '5%',
+              inRange: {
+                color: ['#ffc53d','#13c2c2','#1890ff','#73d13d']
+              },
               textStyle: {
                 color: "#fff",
                 fontSize: 15,
@@ -1746,6 +1752,15 @@ const list = [{
               type: 'sunburst',
               emphasis: {
                 focus: 'ancestor'
+              },
+              center:['50%','50%'],
+              radius: [0, '80%'],
+              label: {
+                show: true,
+                rotate: 'radial',
+              },
+              itemStyle: {
+                borderWidth: 1
               },
               data: [{
                   "children": [{
@@ -1866,11 +1881,6 @@ const list = [{
                   "value": 0
                 }
               ],
-              radius: [0, '90%'],
-              label: {
-                show: true,
-                rotate: 'radial',
-              }
             },
             // series: {
             //   label: {
@@ -2249,6 +2259,9 @@ const list = [{
               left: 'center', //左 中 右
               top: 'bottom', //上 中 下
               bottom: '5%',
+              inRange:{
+                color:['#FF85A9','#FF3976','#CC2D5D']
+              },
               textStyle: {
                 color: "#fff",
                 fontSize: 15,

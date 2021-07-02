@@ -1153,6 +1153,11 @@
               </a-collapse-panel>
             </template>
 
+            <!-- 单独的旭日图 -->
+            <template v-if="currSelected.setting.chartType=='v-sun'">
+              <a-collapse-panel key="sun-tuxin" header='图形属性'></a-collapse-panel>
+            </template>
+
             <!--雷达图独有-->
             <template v-if="isRadar">
               <a-collapse-panel key="radar" header="图形属性">

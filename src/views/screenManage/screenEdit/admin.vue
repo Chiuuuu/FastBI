@@ -152,7 +152,7 @@
               :setting='transform.setting'
               :background="transform.setting.background"
             ></component> -->
-
+            <!-- <span>{{transform.setting.background}}</span> -->
             <charts-factory
               v-else
               :key="transform.id"

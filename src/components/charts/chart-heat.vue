@@ -56,28 +56,41 @@ export default {
     },
     apiData: {
       handler(val) {
-        if (val.source&val.source.rows) {
-          //维度
-          let dim = val.dimensions.map((x) => x.alias)
-          //度量
-          let mea = val.measures.map((y) => y.alias)
-          //获取度量数组
-          let meaarr = val.source.rows.map(h=>h[mea[0]]);
-          let _series = val.source.rows.map((item) => [
-            item[dim[0]],
-            item[dim[1]],
-            item[mea[0]],
-          ])
-          if (this.mychart != null) {
-            //   this.option.xAxis.data = val.source.rows.map(x=>(x[dim[0]]));
-            this.option.visualMap.max = Math.max(...meaarr);  
-            this.option.series.data = [..._series]
-            this.mychart.setOption(this.option)
+        if (val.source) {
+          if (!val.source.rows) {
+            return
+          }
+          let list = val.source.rows
+          //判断是否为旭日图
+          if (this.config.title.text === '旭日图') {
+            debugger
+            let max = list.map(item=>item.value);
+            this.option.visualMap.max = Math.max(...max)
+            this.option.series.data = [...list];
+            this.mychart.setOption(this.option);
+          } else {
+            //维度
+            let dim = val.dimensions.map((x) => x.alias)
+            //度量
+            let mea = val.measures.map((y) => y.alias)
+            //获取度量数组
+            let meaarr = list.map((h) => h[mea[0]])
+            let _series = list.map((item) => [
+              item[dim[0]],
+              item[dim[1]],
+              item[mea[0]],
+            ])
+            if (this.mychart != null) {
+              //   this.option.xAxis.data = val.source.rows.map(x=>(x[dim[0]]));
+              this.option.visualMap.max = Math.max(...meaarr)
+              this.option.series.data = [..._series]
+              this.mychart.setOption(this.option);
+            }
           }
         }
       },
       deep: true,
-      immediate: true,
+      // immediate: true,
     },
     background: {
       handler(val) {
@@ -87,8 +100,12 @@ export default {
             .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
             .replace(/([a-z\d])([A-Z])/g, '$1_$2')
             .replace(/_/g, '-')
-            .toLowerCase()
-          this.$set(this.styleObj, _key, key=='backgroundImage'?`url(${val[key]})`:val[key])
+            .toLowerCase();
+          this.$set(
+            this.styleObj,
+            _key,
+            key == 'backgroundImage' ? `url(${val[key]})` : (typeof val[key])==='number'?`${val[key]}px`:val[key]
+          )
           // this.styleObj[_key] = val[key];
         }
       },
