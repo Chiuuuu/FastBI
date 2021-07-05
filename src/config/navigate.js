@@ -718,7 +718,7 @@ const list = [{
                 fontSize: 12,
                 position: 'outside', // 可选inside
                 formatter: '{b}: {@2012} ({d}%)',
-                formatterSelect: ['{b}', '{@2012}', '({d}%)']
+                formatterSelect: ['name', 'value', 'percent']
               },
               // 选中时样式
               select: {
@@ -1757,9 +1757,14 @@ const list = [{
               radius: [0, '80%'],
               label: {
                 show: true,
+                fontSize:12,
+                color:"#fff",
+                formatter:"{b}",
+                position:'inside',
                 rotate: 'radial',
               },
               itemStyle: {
+                borderColor: '#fff',
                 borderWidth: 1
               },
               data: [{
@@ -2271,6 +2276,7 @@ const list = [{
             series: {
               name: '',
               type: 'heatmap',
+              center:['50%','50%'],
               data: [
                 ['1a', 'Sunday', 2],
                 ['2a', 'Saturday', 4],
@@ -2396,7 +2402,7 @@ const list = [{
                 fontFamily: '微软雅黑',
                 fontWeight: 'bold',
                 color: '#fff',
-                fontSize: '20'
+                fontSize: 20
               },
             },
             //图例属性设置
@@ -2464,7 +2470,7 @@ const list = [{
                   y: 7.05,
                 },
               ],
-            }, ],
+            }],
           },
           chartEvents: {
             click: chartClick

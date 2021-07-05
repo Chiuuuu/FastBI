@@ -2,6 +2,13 @@
   <!-- highechart 样式设置 -->
   <a-collapse>
     <a-collapse-panel key="title" header="标题">
+      <!-- <a-switch
+        slot="extra"
+        v-model="HighConfig.setting.config.title"
+        default-checked
+        @change="switchChange"
+        size="small"
+      /> -->
       <gui-field label="标题名">
         <a-input
           v-model="HighConfig.setting.config.title.text"

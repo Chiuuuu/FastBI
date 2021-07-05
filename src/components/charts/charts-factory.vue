@@ -210,6 +210,7 @@ export default {
             // }
 
           } else {
+          
             this.chartExtend = deepClone(val)
             // 保留两位小数
             if (this.typeName !== 've-gauge' && this.typeName !== 've-ring') {

@@ -63,7 +63,6 @@ export default {
           let list = val.source.rows
           //判断是否为旭日图
           if (this.config.title.text === '旭日图') {
-            debugger
             let max = list.map(item=>item.value);
             this.option.visualMap.max = Math.max(...max)
             this.option.series.data = [...list];
