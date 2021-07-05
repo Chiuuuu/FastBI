@@ -20,11 +20,18 @@
         <div class="context-menu-item-children" v-show="item.showChildren">
           <div
             class="context-menu-item"
-            v-for="menu in item.children"
+            v-for="(menu, i) in item.children"
             :key="menu.order"
-            @click.stop="handleCommand(menu.order)"
+            @click.stop="handleCommand(menu.order, item)"
           >
-            <span>{{ menu.text }}</span>
+            <JsonExcel
+              v-show="i < 2"
+              :fetch="setChartData"
+              :name="currSelected.name || ''"
+              :type="i === 0 ? 'xls' : 'csv'"
+              >{{ menu.text }}</JsonExcel
+            >
+            <span v-show="i === 2">{{ menu.text }}</span>
           </div>
         </div>
       </div>
@@ -33,43 +40,84 @@
 </template>
 
 <script>
+import JsonExcel from 'vue-json-excel'
+import exportImg from '@/utils/exportImg'
 import { mapGetters, mapActions } from 'vuex'
+const exportChartList = [
+  { icon: 'ios-share', text: '查看数据', order: 'showChartData' },
+  {
+    icon: 'ios-download',
+    text: '导出',
+    order: 'export',
+    showChildren: false,
+    children: [
+      { text: 'excel', order: 'toexcel' },
+      { text: 'csv', order: 'tocsv' },
+      { text: '图片', order: 'exportImg' }
+    ]
+  }
+]
+const chartMenuList = [
+  { icon: 'ios-share', text: '查看数据', order: 'showChartData' },
+  {
+    icon: 'ios-download',
+    text: '导出',
+    order: 'export',
+    showChildren: false,
+    children: [
+      { text: 'excel', order: 'toexcel' },
+      { text: 'csv', order: 'tocsv' },
+      { text: '图片', order: 'exportImg' }
+    ]
+  },
+  { icon: 'ios-share', text: '置顶', order: 'top' },
+  { icon: 'ios-download', text: '置底', order: 'bottom' },
+  { icon: 'md-arrow-round-up', text: '上移一层', order: 'up' },
+  { icon: 'md-arrow-round-down', text: '下移一层', order: 'down' },
+  { icon: 'ios-copy', text: '复制', order: 'copy' },
+  { icon: 'ios-trash', text: '删除', order: 'remove' }
+]
+const screenMenuList = [
+  { icon: 'ios-share', text: '导出当前大屏', order: 'exportScreen' },
+  { icon: 'ios-download', text: '取消', order: 'cancel' }
+]
 
 export default {
   name: 'ContextMenu',
+  components: { JsonExcel },
   data() {
     return {
-      menuList: [
-        { icon: 'ios-share', text: '查看数据', order: 'showChartData' },
-        {
-          icon: 'ios-download',
-          text: '导出',
-          order: 'export',
-          showChildren: false,
-          children: [
-            { text: 'excel', order: 'toexcel' },
-            { text: 'csv', order: 'tocsv' },
-            { text: '图片', order: 'exportImg' }
-          ]
-        },
-        { icon: 'ios-share', text: '置顶', order: 'top' },
-        { icon: 'ios-download', text: '置底', order: 'bottom' },
-        { icon: 'md-arrow-round-up', text: '上移一层', order: 'up' },
-        { icon: 'md-arrow-round-down', text: '下移一层', order: 'down' },
-        { icon: 'ios-copy', text: '复制', order: 'copy' },
-        { icon: 'ios-trash', text: '删除', order: 'remove' }
-      ],
-      show: false // 图表数据弹窗
+      menuList: chartMenuList, // 菜单列表
+      chartData: { rows: [] }, // 图表数据(按最后展示格式)
+      chartDataForMap: null // 同上(地图标记层)
     }
   },
-  inject: ['showChartData', 'exportImg'],
+  inject: ['showChartData'],
+  watch: {
+    // currentSelected(val) {
+    //   if (val) {
+    //     this.setChartData()
+    //   }
+    // },
+    'contextMenuInfo.listType'(val) {
+      if (val) {
+        this.$nextTick(() => {
+          this.menuList = eval(val)
+        })
+      }
+    }
+  },
   computed: {
     ...mapGetters([
       'contextMenuInfo',
       'pageSettings',
       'canvasMap',
       'screenId',
-      'currSelected'
+      'currSelected',
+      'currentSelected',
+      'pageSettings',
+      'canvasRange',
+      'isScreen'
     ]),
     contextMenuStyle() {
       let x =
@@ -110,7 +158,10 @@ export default {
   methods: {
     ...mapActions(['saveScreenData', 'deleteChartData']),
     //  执行菜单命令
-    handleCommand(order) {
+    handleCommand(order, item) {
+      if (item) {
+        item.showChildren = false
+      }
       if (order === 'export') {
         return
       }
@@ -121,13 +172,19 @@ export default {
       } else if (order === 'showChartData') {
         // 查看图表数据
         if (this.currSelected.setting.api_data.source) {
-          this.showChartData()
+          this.setChartData()
+          this.showChartData(this.chartData, this.chartDataForMap)
           this.$store.dispatch('ToggleContextMenu')
         } else {
           this.$message.error('该图表没有拖入图表数据')
         }
       } else if (order === 'exportImg') {
-        this.exportImg()
+        exportImg(
+          this.currentSelected,
+          this.currSelected,
+          this.pageSettings,
+          this.canvasRange
+        )
         this.$store.dispatch('ToggleContextMenu')
       } else {
         this.$store.dispatch('ContextMenuCommand', order)
@@ -136,6 +193,36 @@ export default {
     // 删除图表
     deleteOne() {
       this.deleteChartData()
+    },
+    // 构造查看数据/导出表格
+    setChartData() {
+      if (!this.currSelected.setting.api_data.source) {
+        this.$message.error('该图表没有拖入图表数据')
+        return
+      }
+      let type = this.currSelected.setting.type
+      if (this.currSelected.setting.chartType === 'v-map') {
+        let fillrows = this.currSelected.setting.api_data.returnDataFill || []
+        let labelrows = this.currSelected.setting.api_data.returnDataLabel || []
+        if (fillrows.length) {
+          this.chartData = { columns: Object.keys(fillrows[0]), fillrows }
+        }
+        if (labelrows.length) {
+          this.chartDataForMap = {
+            columns: Object.keys(labelrows[0]),
+            labelrows
+          }
+        }
+      } else if (type === '1') {
+        this.chartData = this.currSelected.setting.api_data.source
+      } else if (type === '2') {
+        let rows = this.currSelected.setting.api_data.returnData
+        this.chartData = { columns: Object.keys(rows[0]), rows }
+      } else {
+        let rows = this.currSelected.setting.api_data.source.rows
+        this.chartData = { columns: Object.keys(rows[0]), rows }
+      }
+      return this.chartData.rows
     }
   }
 }
