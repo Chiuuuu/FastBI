@@ -353,7 +353,7 @@ export default {
     ChartNodata,
     ChartMaterial,
     SteepBar,
-    Screen,
+    Screen
     // AMap
   },
   beforeDestroy() {

@@ -850,18 +850,10 @@ const list = [
             type: '1',
             isEmpty: false,
             chartType: 'v-map',
-            // fillType: 'area', // area/dot
-            // labelType: 'area',
+            showType: 'dot', // area/dot
             icon: 'icon_map.png',
             modelId: '',
-            api_data: {
-              //   columns: ['位置', '人口'],
-              //   rows: [
-              //     { 位置: '从化区', 人口: 50 },
-              //     { 位置: '白云区', 人口: 90 },
-              //     { 位置: '南沙区', 人口: 100 }
-              //   ],
-            },
+            api_data: {},
             apis: {
               mapOrigin: guangzhou,
               position: 'guangzhou',
@@ -893,7 +885,6 @@ const list = [
                 }
               },
               tooltip: {
-                show: false,
                 trigger: 'item',
                 confine: true,
                 formatter: '{b} ：{c}'
@@ -915,21 +906,6 @@ const list = [
                 right: 'auto',
                 bottom: 'auto',
                 data: ['人口']
-              },
-              visualMap: {
-                show: false,
-                type: 'piecewise',
-                min: 0,
-                max: 403631060,
-                seriesIndex: [0],
-                inRange: {
-                  color: ['#50a3ba', '#eac736', '#d94e5d'],
-                  symbolSize: [10, 16]
-                },
-                textStyle: {
-                  color: '#fff',
-                  fontSize: 12
-                }
               },
               xAxis: {
                 show: false,
@@ -1008,117 +984,6 @@ const list = [
               color: DEFAULT_COLORS
             },
             view: { width: 300, height: 500, x: 710, y: 290 }
-          },
-          {
-            title: '环形图',
-            name: 've-pie',
-            chartType: 'v-ring',
-            icon: 'CHART-环形图.png',
-            type: '2',
-            modelId: '',
-            api_data: {
-              columns: ['日期', '访问用户'],
-              rows: [
-                { 日期: '1/1', 访问用户: 3530 },
-                { 日期: '1/2', 访问用户: 1393 }
-              ],
-              options: {}
-            },
-            apis: {
-              hoverAnimation: false,
-              labelMap: {
-                x: '类目',
-                y: '值',
-                s: '系列1'
-              }
-            },
-            background: {
-              backgroundType: '1',
-              backgroundColor: '',
-              borderColor: '',
-              borderWidth: 0,
-              borderStyle: '',
-              borderRadius: 0
-            },
-            config: {
-              title: {
-                show: true,
-                content: '环形图',
-                textAlign: 'left',
-                textStyle: {
-                  color: '#ffffff',
-                  fontSize: 20,
-                  fontFamily: 'not specified',
-                  fontWeight: 'normal'
-                }
-              },
-              chartTitle: {
-                show: true,
-                text: '70%',
-                x: 'center',
-                y: 'center',
-                itemGap: 20,
-                textStyle: {
-                  color: '#ffffff',
-                  fontFamily: 'not specified',
-                  fontSize: 20,
-                  fontWeight: 'normal'
-                }
-              },
-              tooltip: {
-                show: false
-              },
-              grid: { left: 20, top: 20, right: 20, bottom: 30 },
-              legend: {
-                show: false,
-                orient: 'horizontal',
-                data: [],
-                textStyle: {
-                  color: '#ffffff',
-                  fontSize: 12
-                },
-                itemGap: 12,
-                icon: '',
-                left: 'center',
-                top: 'auto',
-                right: 'auto',
-                bottom: 'auto'
-              },
-              xAxis: {
-                show: false
-              },
-              yAxis: {
-                show: false
-              },
-              series: {
-                radius: ['60%', '70%'],
-                center: ['50%', '50%'],
-                label: {
-                  normal: {
-                    show: false,
-                    position: 'center',
-                    textStyle: {
-                      fontSize: '30'
-                    }
-                  },
-                  emphasis: {
-                    show: false,
-                    textStyle: {
-                      fontSize: '30',
-                      fontWeight: 'bold'
-                    }
-                  }
-                },
-                itemStyle: {
-                  normal: {}
-                }
-              },
-              color: ['#0185FE', '#9ED1FF']
-            },
-            chartEvents: {
-              click: chartClick
-            },
-            view: { width: 400, height: 400, x: 760, y: 340 }
           },
           {
             title: '嵌套饼图',
@@ -1235,6 +1100,117 @@ const list = [
                 center: ['50%', '50%'] // 饼图可选
               },
               color: DEFAULT_COLORS
+            },
+            chartEvents: {
+              click: chartClick
+            },
+            view: { width: 400, height: 400, x: 760, y: 340 }
+          },
+          {
+            title: '环形图',
+            name: 've-pie',
+            chartType: 'v-ring',
+            icon: 'CHART-环形图.png',
+            type: '2',
+            modelId: '',
+            api_data: {
+              columns: ['日期', '访问用户'],
+              rows: [
+                { 日期: '1/1', 访问用户: 3530 },
+                { 日期: '1/2', 访问用户: 1393 }
+              ],
+              options: {}
+            },
+            apis: {
+              hoverAnimation: false,
+              labelMap: {
+                x: '类目',
+                y: '值',
+                s: '系列1'
+              }
+            },
+            background: {
+              backgroundType: '1',
+              backgroundColor: '',
+              borderColor: '',
+              borderWidth: 0,
+              borderStyle: '',
+              borderRadius: 0
+            },
+            config: {
+              title: {
+                show: true,
+                content: '环形图',
+                textAlign: 'left',
+                textStyle: {
+                  color: '#ffffff',
+                  fontSize: 20,
+                  fontFamily: 'not specified',
+                  fontWeight: 'normal'
+                }
+              },
+              chartTitle: {
+                show: true,
+                text: '70%',
+                x: 'center',
+                y: 'center',
+                itemGap: 20,
+                textStyle: {
+                  color: '#ffffff',
+                  fontFamily: 'not specified',
+                  fontSize: 20,
+                  fontWeight: 'normal'
+                }
+              },
+              tooltip: {
+                show: false
+              },
+              grid: { left: 20, top: 20, right: 20, bottom: 30 },
+              legend: {
+                show: false,
+                orient: 'horizontal',
+                data: [],
+                textStyle: {
+                  color: '#ffffff',
+                  fontSize: 12
+                },
+                itemGap: 12,
+                icon: '',
+                left: 'center',
+                top: 'auto',
+                right: 'auto',
+                bottom: 'auto'
+              },
+              xAxis: {
+                show: false
+              },
+              yAxis: {
+                show: false
+              },
+              series: {
+                radius: ['60%', '70%'],
+                center: ['50%', '50%'],
+                label: {
+                  normal: {
+                    show: false,
+                    position: 'center',
+                    textStyle: {
+                      fontSize: '30'
+                    }
+                  },
+                  emphasis: {
+                    show: false,
+                    textStyle: {
+                      fontSize: '30',
+                      fontWeight: 'bold'
+                    }
+                  }
+                },
+                itemStyle: {
+                  normal: {}
+                }
+              },
+              color: ['#0185FE', '#9ED1FF']
             },
             chartEvents: {
               click: chartClick

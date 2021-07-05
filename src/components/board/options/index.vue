@@ -1662,303 +1662,139 @@
               <a-collapse-panel
                 key="mapIndicator"
                 header="指标设置"
-                v-if="selfConfig.series.length > 0"
+                v-if="selfConfig.series.length"
               >
-                <!-- 填充配置 -->
-                <a-collapse v-model="mapActive">
-                  <a-collapse-panel
-                    key="fill"
-                    header="填充层设置"
-                    v-if="
-                      selfConfig.series[0] &&
-                        selfConfig.series[0].type === 'map'
-                    "
+                <!-- <gui-field label="对应度量">
+                    <a-select
+                      style="width: 120px"
+                      v-model="targetMeasure"
+                      size="small"
+                    >
+                      <a-select-option
+                        v-for="(series, index) in selfConfig.series"
+                        :key="index"
+                        :value="index"
+                        >第{{ index + 1 }}个度量</a-select-option
+                      >
+                    </a-select>
+                  </gui-field> -->
+                <gui-field label="显示数值">
+                  <a-switch
+                    v-model="selfConfig.series[targetMeasure].label.show"
+                    default-checked
+                    size="small"
+                    @change="switchChange"
+                  />
+                </gui-field>
+                <gui-field
+                  label="文本样式"
+                  v-if="selfConfig.series[targetMeasure].label.show"
+                >
+                  <gui-inline label="字号">
+                    <a-input-number
+                      v-model="selfConfig.series[targetMeasure].label.fontSize"
+                      size="small"
+                      :min="12"
+                      :max="40"
+                      @change="setSelfProperty"
+                    ></a-input-number>
+                  </gui-inline>
+                  <gui-inline label="颜色">
+                    <el-color-picker
+                      v-model="selfConfig.series[targetMeasure].label.color"
+                      @change="setSelfProperty"
+                    ></el-color-picker>
+                  </gui-inline>
+                </gui-field>
+                <gui-field label="形状">
+                  <a-select
+                    style="width: 120px"
+                    v-model="selfConfig.series[targetMeasure].symbol"
+                    size="small"
+                    @change="setSelfProperty"
                   >
-                    <gui-field label="显示标记点">
-                      <a-switch
-                        v-model="selfConfig.series[0].showLegendSymbol"
-                        size="small"
-                        @change="switchChange"
-                      ></a-switch>
-                    </gui-field>
-                    <gui-field label="视角缩放">
-                      <a-input-number
-                        v-model="selfConfig.series[0].zoom"
-                        size="small"
-                        :min="0"
-                        :step="0.1"
-                        @change="setSelfProperty"
-                      ></a-input-number>
-                    </gui-field>
-                    <gui-field label="文本">
-                      <a-switch
-                        v-model="selfConfig.series[0].label.normal.show"
-                        size="small"
-                        @change="switchChange"
-                      ></a-switch>
-                    </gui-field>
-                    <gui-field
-                      label="文本样式"
-                      v-if="selfConfig.series[0].label.normal.show"
-                    >
-                      <gui-inline label="字号">
-                        <a-input-number
-                          v-model="selfConfig.series[0].label.normal.fontSize"
-                          size="small"
-                          :min="12"
-                          :max="40"
-                          @change="setSelfProperty"
-                        ></a-input-number>
-                      </gui-inline>
-                      <gui-inline label="颜色">
-                        <el-color-picker
-                          v-model="selfConfig.series[0].label.normal.color"
-                          @change="setSelfProperty"
-                        ></el-color-picker>
-                      </gui-inline>
-                    </gui-field>
-                    <gui-field label="文本悬停">
-                      <a-switch
-                        v-model="selfConfig.series[0].label.emphasis.show"
-                        size="small"
-                        @change="switchChange"
-                      ></a-switch>
-                    </gui-field>
-                    <gui-field
-                      label="文本悬停样式"
-                      v-if="selfConfig.series[0].label.emphasis.show"
-                    >
-                      <gui-inline label="字号">
-                        <a-input-number
-                          v-model="selfConfig.series[0].label.emphasis.fontSize"
-                          size="small"
-                          :min="12"
-                          :max="40"
-                          @change="setSelfProperty"
-                        ></a-input-number>
-                      </gui-inline>
-                      <gui-inline label="颜色">
-                        <el-color-picker
-                          v-model="selfConfig.series[0].label.emphasis.color"
-                          @change="setSelfProperty"
-                        ></el-color-picker>
-                      </gui-inline>
-                    </gui-field>
-                    <gui-field label="多边形">
-                      <gui-inline label="区域" style="width:auto;">
-                        <el-color-picker
-                          ref="areaColor"
-                          show-alpha
-                          v-model="
-                            selfConfig.series[0].itemStyle.normal.areaColor
-                          "
-                          @change="changeAreaColor"
-                        ></el-color-picker>
-                      </gui-inline>
-                      <gui-inline label="边框" style="width:auto;">
-                        <el-color-picker
-                          v-model="
-                            selfConfig.series[0].itemStyle.normal.borderColor
-                          "
-                          @change="setSelfProperty"
-                        ></el-color-picker>
-                      </gui-inline>
-                    </gui-field>
-                    <gui-field label="阴影">
-                      <gui-inline label="颜色" style="width:auto;">
-                        <el-color-picker
-                          ref="areaColor"
-                          show-alpha
-                          v-model="
-                            selfConfig.series[0].itemStyle.normal.shadowColor
-                          "
-                          @change="setSelfProperty"
-                        ></el-color-picker>
-                      </gui-inline>
-                      <gui-inline label="模糊大小" style="width:auto;">
-                        <a-input-number
-                          v-model="
-                            selfConfig.series[0].itemStyle.normal.shadowBlur
-                          "
-                          size="small"
-                          :min="0"
-                          :max="200"
-                          @change="setSelfProperty"
-                        ></a-input-number>
-                      </gui-inline>
-                    </gui-field>
-                    <gui-field label="边框宽度">
-                      <a-input-number
-                        v-model="
-                          selfConfig.series[0].itemStyle.normal.borderWidth
-                        "
-                        size="small"
-                        :max="10"
-                        :min="0"
-                        :step="1"
-                        @change="setSelfProperty"
-                      ></a-input-number>
-                    </gui-field>
-                    <gui-field label="多边形悬停">
-                      <gui-inline label="区域" style="width:auto;">
-                        <el-color-picker
-                          v-model="
-                            selfConfig.series[0].itemStyle.emphasis.areaColor
-                          "
-                          @change="setSelfProperty"
-                        ></el-color-picker>
-                      </gui-inline>
-                      <gui-inline label="边框" style="width:auto;">
-                        <el-color-picker
-                          v-model="
-                            selfConfig.series[0].itemStyle.emphasis.borderColor
-                          "
-                          @change="setSelfProperty"
-                        ></el-color-picker>
-                      </gui-inline>
-                    </gui-field>
-                  </a-collapse-panel>
-                  <!-- 标记点配置 -->
-                  <a-collapse-panel
-                    key="label"
-                    header="标记层设置"
-                    v-if="scatterList.length > 0"
+                    <a-select-option value="circle">圆形</a-select-option>
+                    <a-select-option value="rent">方形</a-select-option>
+                    <a-select-option value="pin">水滴</a-select-option>
+                    <a-select-option value="triangle">三角形</a-select-option>
+                    <a-select-option value="arrow">箭头</a-select-option>
+                  </a-select>
+                </gui-field>
+                <gui-field label="大小">
+                  <a-input-number
+                    v-model="selfConfig.series[targetMeasure].symbolSize"
+                    size="small"
+                    :min="0"
+                    :max="40"
+                    @change="setSelfProperty"
+                  ></a-input-number>
+                </gui-field>
+                <gui-field label="类型">
+                  <a-select
+                    style="width: 120px"
+                    v-model="selfConfig.series[targetMeasure].type"
+                    size="small"
+                    @change="setSelfProperty"
                   >
-                    <!-- <gui-field label="对应度量">
-                      <a-select
-                        style="width: 120px"
-                        v-model="targetMeasure"
-                        size="small"
-                      >
-                        <a-select-option
-                          v-for="(series, index) in scatterList"
-                          :key="index"
-                          :value="scatterList.length + index"
-                          >第{{ index + 1 }}个标记层</a-select-option
-                        >
-                      </a-select>
-                    </gui-field> -->
-                    <gui-field
-                      label="文本样式"
-                      v-if="selfConfig.series[targetMeasure].label.show"
+                    <a-select-option value="scatter">散点/气泡</a-select-option>
+                    <a-select-option value="effectScatter"
+                      >动画气泡</a-select-option
                     >
-                      <gui-inline label="字号">
-                        <a-input-number
-                          v-model="
-                            selfConfig.series[targetMeasure].label.fontSize
-                          "
-                          size="small"
-                          :min="12"
-                          :max="40"
-                          @change="setSelfProperty"
-                        ></a-input-number>
-                      </gui-inline>
-                      <gui-inline label="颜色">
-                        <el-color-picker
-                          v-model="selfConfig.series[targetMeasure].label.color"
-                          @change="setSelfProperty"
-                        ></el-color-picker>
-                      </gui-inline>
-                    </gui-field>
-                    <gui-field label="形状">
-                      <a-select
-                        style="width: 120px"
-                        v-model="selfConfig.series[targetMeasure].symbol"
-                        size="small"
-                        @change="setSelfProperty"
-                      >
-                        <a-select-option value="circle">圆形</a-select-option>
-                        <a-select-option value="rent">方形</a-select-option>
-                        <a-select-option value="pin">水滴</a-select-option>
-                        <a-select-option value="triangle"
-                          >三角形</a-select-option
-                        >
-                        <a-select-option value="arrow">箭头</a-select-option>
-                      </a-select>
-                    </gui-field>
-                    <gui-field label="大小">
-                      <a-input-number
-                        v-model="selfConfig.series[targetMeasure].symbolSize"
-                        size="small"
-                        :min="0"
-                        :max="40"
-                        @change="setSelfProperty"
-                      ></a-input-number>
-                    </gui-field>
-                    <gui-field label="类型">
-                      <a-select
-                        style="width: 120px"
-                        v-model="selfConfig.series[targetMeasure].type"
-                        size="small"
-                        @change="setSelfProperty"
-                      >
-                        <a-select-option value="scatter"
-                          >散点/气泡</a-select-option
-                        >
-                        <a-select-option value="effectScatter"
-                          >动画气泡</a-select-option
-                        >
-                      </a-select>
-                    </gui-field>
-                    <gui-field
-                      label="涟漪动画"
-                      v-if="
-                        selfConfig.series[targetMeasure].type ===
-                          'effectScatter'
+                  </a-select>
+                </gui-field>
+                <gui-field
+                  label="涟漪动画"
+                  v-if="
+                    selfConfig.series[targetMeasure].type === 'effectScatter'
+                  "
+                >
+                  <gui-inline label="最大缩放比">
+                    <a-input-number
+                      v-model="
+                        selfConfig.series[targetMeasure].rippleEffect.scale
                       "
+                      size="small"
+                      :step="0.5"
+                      @change="setSelfProperty"
+                    ></a-input-number>
+                  </gui-inline>
+                  <gui-inline label="波纹方式">
+                    <a-select
+                      style="width:70px"
+                      v-model="
+                        selfConfig.series[targetMeasure].rippleEffect.brushType
+                      "
+                      size="small"
+                      @change="setSelfProperty"
                     >
-                      <gui-inline label="最大缩放比">
-                        <a-input-number
-                          v-model="
-                            selfConfig.series[targetMeasure].rippleEffect.scale
-                          "
-                          size="small"
-                          :step="0.5"
-                          @change="setSelfProperty"
-                        ></a-input-number>
-                      </gui-inline>
-                      <gui-inline label="波纹方式">
-                        <a-select
-                          style="width:70px"
-                          v-model="
-                            selfConfig.series[targetMeasure].rippleEffect
-                              .brushType
-                          "
-                          size="small"
-                          @change="setSelfProperty"
-                        >
-                          <a-select-option value="stroke"
-                            >stroke</a-select-option
-                          >
-                          <a-select-option value="fill">fill</a-select-option>
-                        </a-select>
-                      </gui-inline>
-                    </gui-field>
-                    <gui-field label="气泡悬停">
-                      <gui-inline label="边框宽度">
-                        <a-input-number
-                          v-model="
-                            selfConfig.series[targetMeasure].itemStyle.emphasis
-                              .borderWidth
-                          "
-                          size="small"
-                          :min="0"
-                          :max="2"
-                          @change="setSelfProperty"
-                        ></a-input-number>
-                      </gui-inline>
-                      <gui-inline label="边框颜色" style="width:auto;">
-                        <el-color-picker
-                          v-model="
-                            selfConfig.series[targetMeasure].itemStyle.emphasis
-                              .borderColor
-                          "
-                          @change="setSelfProperty"
-                        ></el-color-picker>
-                      </gui-inline>
-                    </gui-field>
-                  </a-collapse-panel>
-                </a-collapse>
+                      <a-select-option value="stroke">stroke</a-select-option>
+                      <a-select-option value="fill">fill</a-select-option>
+                    </a-select>
+                  </gui-inline>
+                </gui-field>
+                <gui-field label="气泡悬停">
+                  <gui-inline label="边框宽度">
+                    <a-input-number
+                      v-model="
+                        selfConfig.series[targetMeasure].itemStyle.emphasis
+                          .borderWidth
+                      "
+                      size="small"
+                      :min="0"
+                      :max="2"
+                      @change="setSelfProperty"
+                    ></a-input-number>
+                  </gui-inline>
+                  <gui-inline label="边框颜色" style="width:auto;">
+                    <el-color-picker
+                      v-model="
+                        selfConfig.series[targetMeasure].itemStyle.emphasis
+                          .borderColor
+                      "
+                      @change="setSelfProperty"
+                    ></el-color-picker>
+                  </gui-inline>
+                </gui-field>
               </a-collapse-panel>
             </template>
             <!--颜色数组-->
