@@ -4,7 +4,13 @@
       <div :style="scrollBoxStyle">
         <div class="canvas-panel" :style="canvasPanelStyle">
           <template v-for="transform in canvasMap">
-            <preview-box :key="transform.id" :item="transform">
+            <preview-box
+              :key="transform.id"
+              :item="transform"
+              @contextmenu.native.stop.prevent="
+                handleRightClickOnCanvas(transform, $event)
+              "
+            >
               <!--数据模型不存在-->
               <chart-nodata
                 v-if="transform.setting.isEmpty"
@@ -75,6 +81,7 @@
       @mouseenter.native="handleTabShow"
       @mouseleave.native="handleTabShow"
     ></pation>
+    <context-menu></context-menu>
   </div>
 </template>
 
@@ -91,6 +98,7 @@ import ChartNodata from '@/components/tools/Nodata'
 import ChartMaterial from '@/components/tools/Material'
 import SteepBar from '@/components/tools/SteepBar'
 import Pation from '@/components/board/pation/index' // 分页栏
+import ContextMenu from '@/components/board/context-menu/index' // 右键菜单
 // import AMap from '@/components/tools/aMap' // 进度条
 import { Loading } from 'element-ui'
 
@@ -112,7 +120,8 @@ export default {
     ChartNodata,
     ChartMaterial,
     SteepBar,
-    Pation
+    Pation,
+    ContextMenu
     // AMap
   },
   data() {
@@ -122,6 +131,11 @@ export default {
       chartTimer: null,
       timer: null,
       showPageTab: false // 页签显示/隐藏
+    }
+  },
+  provide() {
+    return {
+      showChartData: this.showChartData
     }
   },
   computed: {
@@ -424,6 +438,21 @@ export default {
     // 显示/隐藏页签栏
     handleTabShow() {
       this.showPageTab = !this.showPageTab
+    },
+    // 点击事件右键点击
+    handleRightClickOnCanvas(item, event) {
+      // 全屏下图表查看数据&导出
+      if (this.isScreen) {
+        let info = { x: event.pageX + 10, y: event.pageY + 10 }
+        this.$store.dispatch('ToggleContextMenu', info)
+        this.$store.dispatch('SingleSelected', item.id)
+      }
+    },
+    // 设置图表数据
+    showChartData(chartData, chartDataForMap) {
+      this.chartData = chartData
+      this.chartDataForMap = chartDataForMap
+      this.show = true
     }
   }
 }

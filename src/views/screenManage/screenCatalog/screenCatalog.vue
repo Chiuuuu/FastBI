@@ -461,6 +461,7 @@ export default {
         // 全屏下按键esc后要执行的动作
         this.componentKey -= 1
         this.$store.dispatch('SetIsScreen', false)
+        this.$store.dispatch('ToggleContextMenu')
       }
     }
   },

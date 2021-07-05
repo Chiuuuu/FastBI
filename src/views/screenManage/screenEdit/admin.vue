@@ -1,5 +1,5 @@
 <template>
-  <div class="dv-admin" @click.stop.prevent="hideContextMenu">
+  <div class="dv-admin" @click.stop.prevent="hideContextMenu()">
     <board v-if="!isScreen" :screenData="screenData">
       <!--头部嵌套可拖拽物品-->
       <template v-slot:headerBox>
@@ -168,6 +168,7 @@ import ChartTables from '@/components/tools/Tables' // 表格模块
 import ChartNodata from '@/components/tools/Nodata' // 数据丢失
 import ChartMaterial from '@/components/tools/Material' // 素材库
 import SteepBar from '@/components/tools/SteepBar' // 进度条
+import ContextMenu from '@/components/board/context-menu/index' // 右键菜单
 // import AMap from '@/components/tools/aMap' // 进度条
 import Screen from '@/views/screen' // 全屏
 
@@ -241,6 +242,7 @@ export default {
       if (!this.checkFull()) {
         // 全屏下按键esc后要执行的动作
         this.$store.dispatch('SetIsScreen', false)
+        this.$store.dispatch('ToggleContextMenu')
       }
     }
   },
@@ -301,7 +303,11 @@ export default {
     },
     // transform点击事件右键点击
     handleRightClickOnCanvas(item, event) {
-      let info = { x: event.pageX + 10, y: event.pageY + 10 }
+      let info = {
+        x: event.pageX + 10,
+        y: event.pageY + 10,
+        listType: 'chartMenuList'
+      }
       this.$store.dispatch('ToggleContextMenu', info)
       this.$store.dispatch('SingleSelected', item.id)
     },
@@ -353,7 +359,8 @@ export default {
     ChartNodata,
     ChartMaterial,
     SteepBar,
-    Screen
+    Screen,
+    ContextMenu
     // AMap
   },
   beforeDestroy() {
@@ -368,6 +375,5 @@ export default {
       next()
     }
   }
-  // test
 }
 </script>
