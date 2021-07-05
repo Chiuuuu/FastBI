@@ -13,29 +13,26 @@
         @mouseleave="category.hovered = false"
       >
         <!-- <b-icon v-if="category.icon" :name="category.icon" size="18"></b-icon> -->
-        <a-icon
-          v-if="category.icon"
-          :type="category.icon"
-          style="font-size:18px;"
-        />
+        <a-icon v-if="category.icon" :type="category.icon" style="font-size:18px;" />
         <span>{{ category.title }}</span>
       </div>
       <!--素材库下拉窗尺寸变大-->
       <div
         class="list-group-body"
-        :style="i === 2 ? 'height:500px' : ''"
+        :style="category.type === 'Base' ? 'height:500px' : ''"
         flex
         v-show="category.hovered"
         @mouseenter="category.hovered = true"
         @mouseleave="category.hovered = false"
       >
-        <!-- 列表左侧 --><!--素材库下拉窗尺寸变大-->
-        <div class="left" :style="i === 2 ? 'width:100px' : ''">
+        <!-- 列表左侧 -->
+        <!--素材库下拉窗尺寸变大-->
+        <div class="left" :style="category.type === 'Base' ? 'width:100px' : ''">
           <div
             v-for="(tab, index) in category.tabs"
             :key="tab.title"
             :class="{ selected: index === selectedIndex }"
-            @mouseenter="selectTab(tab, index, i)"
+            @mouseenter="selectTab(tab, index, category.title)"
           >
             <p class="tab-title">{{ tab.title || tab.name }}</p>
           </div>
@@ -50,9 +47,7 @@
                   v-for="component in category.tabs[selectedIndex].children"
                   :key="component.key"
                 >
-                  <p class="material-text">
-                    {{ component.imgName }}
-                  </p>
+                  <p class="material-text">{{ component.imgName }}</p>
                   <img
                     class="material-img"
                     :src="component.url"
@@ -103,17 +98,13 @@
                 style="width:18px;heigth:18px;"
                 :src="require(`@/assets/images/chart/${component.icon}`)"
               />
-              <span> {{ component.title }}</span>
+              <span>{{ component.title }}</span>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <map-type-view
-      :visible="visible"
-      @ok="handleOk"
-      @close="visible = false"
-    ></map-type-view>
+    <map-type-view :visible="visible" @ok="handleOk" @close="visible = false"></map-type-view>
   </div>
 </template>
 
@@ -124,7 +115,7 @@ import MapTypeView from './components/map-type-view.vue'
 import { Loading } from 'element-ui'
 
 const IconFont = Icon.createFromIconfontCN({
-  scriptUrl: '//at.alicdn.com/t/font_2276651_71nv5th6v94.js'
+  scriptUrl: '//at.alicdn.com/t/font_2276651_71nv5th6v94.js',
 }) // 引入iconfont
 export default {
   name: 'DragList',
@@ -133,8 +124,11 @@ export default {
       type: Array,
       default() {
         return []
-      }
-    }
+      },
+    },
+  },
+  created() {
+    console.log(111, this.dragList)
   },
   data() {
     return {
@@ -142,7 +136,7 @@ export default {
       visible: false,
       com: {},
       selectedIndex: 0, // 当前选择的页签,只对多个页签生效
-      materialList: [] // 预留素材库页签子列表
+      materialList: [], // 预留素材库页签子列表
     }
   },
   computed: {
@@ -154,7 +148,7 @@ export default {
         return this.cityList
       }
       return []
-    }
+    },
   },
   mounted() {},
   methods: {
@@ -176,7 +170,7 @@ export default {
         // 唯一标识
         // id: 'node-' + ((new Date()).getTime()),
         id: new Date().getTime(),
-        setting: { ...component }
+        setting: { ...component },
       }
       event.dataTransfer.setData('node', JSON.stringify(nodeInfo))
       this.$print('drag nodeInfo', 'success')
@@ -206,7 +200,7 @@ export default {
         // id: 'node-' + ((new Date()).getTime()),
         // id: (new Date()).getTime(),
         tabId: this.$route.query.tabId,
-        setting: { ...component }
+        setting: { ...component },
       }
       // todo: 地图选择类型弹窗
       if (component.chartType === 'v-map') {
@@ -225,7 +219,7 @@ export default {
       category.hovered = true
       this.selectedIndex = 0
       // 素材库加载第一页图片
-      if (i === 2) {
+      if (category.type === 'Base') {
         let tab = category.tabs[0]
         // 没有加载数据过才请求
         if (tab.children.length === 0) {
@@ -234,8 +228,8 @@ export default {
       }
     },
     // 切换子列表
-    selectTab(tab, index, i) {
-      if (i < 2) {
+    selectTab(tab, index, title) {
+      if (title !== '素材库') {
         return
       }
       this.selectedIndex = index
@@ -250,13 +244,13 @@ export default {
       let params = {
         id: tab.id,
         current: tab.current || 1, // 默认第一页
-        pageSize: tab.pageSize || 5 // 默认5条/页
+        pageSize: tab.pageSize || 5, // 默认5条/页
       }
       let loadingInstance = Loading.service({
         lock: true,
         text: '加载中...',
         target: document.querySelector('.material'),
-        background: 'rgb(255, 255, 255, 0.6)'
+        background: 'rgb(255, 255, 255, 0.6)',
       })
       let res = await this.$server.screenManage.getMaterials(params)
       // 构造大屏控件配置
@@ -272,7 +266,7 @@ export default {
           isEmpty: false,
           imgName: imgData.name,
           url: process.env.VUE_APP_SERVICE_URL + imgData.filePath,
-          view: { width: 400, height: 400, x: 760, y: 340 }
+          view: { width: 400, height: 400, x: 760, y: 340, rotate: 0 }
         })
       }
       // 素材内容，分页信息赋值
@@ -289,7 +283,7 @@ export default {
     handleAddForMaterial(component) {
       let nodeInfo = {
         tabId: this.$route.query.tabId,
-        setting: { ...component }
+        setting: { ...component },
       }
       this.addChartData(nodeInfo)
     },
@@ -297,11 +291,11 @@ export default {
       // 拖拽的节点数据
       let nodeInfo = {
         id: new Date().getTime(),
-        setting: { ...component }
+        setting: { ...component },
       }
       event.dataTransfer.setData('node', JSON.stringify(nodeInfo))
-    }
+    },
   },
-  components: { MapTypeView }
+  components: { MapTypeView },
 }
 </script>

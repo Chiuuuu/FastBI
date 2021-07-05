@@ -25,16 +25,20 @@
               style="width:18px;heigth:18px;"
               :src="require(`@/assets/images/chart/${transform.setting.icon}`)"
             />
-            <a-tooltip v-if="transform.setting.config.title.content.length > 7">
-              <template slot="title">{{
-                transform.setting.config.title.content
-              }}</template>
-              {{
-                transform.setting.config.title.content.substring(0, 7) + '...'
-              }}
-            </a-tooltip>
-            <span v-else>{{ transform.setting.config.title.content }}</span>
-            <!-- <span v-else> {{ transform.setting.title }}</span> -->
+            <template v-if="transform.setting.config.title.content">
+              <a-tooltip
+                v-if="transform.setting.config.title.content.length > 7"
+              >
+                <template slot="title">{{
+                  transform.setting.config.title.content
+                }}</template>
+                {{
+                  transform.setting.config.title.content.substring(0, 7) + '...'
+                }}
+              </a-tooltip>
+              <span v-else>{{ transform.setting.config.title.content }}</span>
+            </template>
+            <span v-else> {{ transform.setting.title }}</span>
           </div>
           <div v-else flex="main:center" style="padding:5px 0">
             <!-- <a-icon
@@ -56,6 +60,7 @@
         <!--动态组件-->
         <template v-for="transform in canvasMap">
           <drag-item
+            ref="dratitem"
             :key="transform.id"
             :item="transform"
             :com-hover="hoverItem === transform.id"
@@ -72,6 +77,11 @@
               v-if="transform.setting.isEmpty"
               :config="transform.setting.config"
             ></chart-nodata>
+            <!-- 图形 -->
+            <ChartFigure
+              v-else-if="transform.setting.name === 'figure'"
+              :setting="transform.setting"
+            />
             <!--素材库-->
             <ChartMaterial
               v-else-if="transform.setting.name === 'material'"
@@ -118,6 +128,30 @@
               v-else-if="transform.setting.name === 've-map'"
               :config="transform.setting.config"
               :background="transform.setting.background"></chart-map> -->
+            <!-- 立体饼图 -->
+            <high-charts
+              v-else-if="transform.setting.name === 'high-pie'"
+              :key="transform.id"
+              :setting="transform.setting"
+              :api-data="transform.setting.api_data"
+              :background="transform.setting.background"
+            ></high-charts>
+            <!-- 矩形热力图 -->
+            <chart-heart
+              v-else-if="transform.setting.name === 've-heatmap'"
+              :key="transform.id"
+              :view="transform.setting.view"
+              :config="transform.setting.config"
+              :api-data="transform.setting.api_data"
+              :background="transform.setting.background"
+            ></chart-heart>
+            <!-- <component 
+              v-else-if="transform.setting.chartType==='high-charts'"
+              :is="transform.setting.name"
+              :key="transform.id"
+              :setting='transform.setting'
+              :background="transform.setting.background"
+            ></component> -->
 
             <charts-factory
               v-else
@@ -167,6 +201,7 @@ import ChartImage from '@/components/tools/Image' // 图片模块
 import ChartTables from '@/components/tools/Tables' // 表格模块
 import ChartNodata from '@/components/tools/Nodata' // 数据丢失
 import ChartMaterial from '@/components/tools/Material' // 素材库
+import ChartFigure from '@/components/tools/Figure' // 素材库
 import SteepBar from '@/components/tools/SteepBar' // 进度条
 import ContextMenu from '@/components/board/context-menu/index' // 右键菜单
 // import AMap from '@/components/tools/aMap' // 进度条
@@ -178,6 +213,9 @@ import { deepClone } from '@/utils/deepClone'
 const IconFont = Icon.createFromIconfontCN({
   scriptUrl: '//at.alicdn.com/t/font_2276651_71nv5th6v94.js'
 }) // 引入iconfont
+import HighCharts from '@/components/charts/highcharts'
+import ChartHeart from '@/components/charts/chart-heat'
+
 export default {
   name: 'Admin',
   data() {
@@ -251,7 +289,8 @@ export default {
     // 获取素材库
     async getMaterial() {
       let res = await this.$server.screenManage.getMaterialGroupList()
-      this.navigate[2].tabs = res.data
+      const base = this.navigate.find(item => item.type === 'Base')
+      base.tabs = res.data
     },
     // 获取大屏页签
     async getScreenTabs() {
@@ -358,8 +397,11 @@ export default {
     ChartTables,
     ChartNodata,
     ChartMaterial,
+    ChartFigure,
     SteepBar,
     Screen,
+    HighCharts,
+    ChartHeart,
     ContextMenu
     // AMap
   },

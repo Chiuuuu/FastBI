@@ -180,10 +180,13 @@ const app = {
       if (obj.setting.name === 've-map') {
         obj.setting.apis.mapOrigin = ''
       }
-      // 素材库不需要config
-      let name = obj.setting.config
-        ? obj.setting.config.title.content
-        : obj.setting.name
+      let name = ''
+      // 数据格式不一样的特殊处理
+      if (obj.setting.name === 'material' || obj.setting.name === 'figure') { // 素材库and图形
+        name = obj.setting.name
+      } else {
+        name = obj.setting.config.title.content
+      }
       let params = {
         tabId: obj.tabId,
         name: name || '文本',

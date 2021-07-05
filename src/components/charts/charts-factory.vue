@@ -167,6 +167,7 @@ export default {
       colors: [],
       geo: {},
       mapToolTip: {},
+      chartLegend:{},
       key: 0,
       currentIndex: '' // 记录当前选择的度量数据(图表联动)
     }
@@ -177,8 +178,6 @@ export default {
         if (val) {
           // 图例
           this.legendVisible = val.legend && val.legend.show
-          // this.chartExtend = { ...val }
-
           if (this.typeName === 've-map') {
             this.chartExtend = { ...omit(val, ['series']) }
             this.chartSeries = deepClone(val.series)
@@ -278,6 +277,7 @@ export default {
           this.chartSettings = { ...val }
           this.$log.primary('========>chartSettings')
           this.$print(this.chartSettings)
+          
         }
       },
       deep: true,
@@ -316,7 +316,38 @@ export default {
   },
   methods: {
     afterConfig(options) {
+      options = deepClone(options);
       console.log('op', options)
+      // 散点图
+      if(this.typeName === 've-scatter'){
+        // tooltip显示
+        options.tooltip.formatter = function(params){
+          let val= params.value;
+          if(val.length<6){ return ''};
+          return `${params.marker}<br/>
+                  ${val[5]}：${val[2]}<br/>
+                  ${val[3]}：${val[0]}<br/>
+                  ${val[4]}：${val[1]}<br/>
+                  `;
+        }
+        options.series.forEach(item=>{
+          // 图形属性 -- 散点颜色 -- 单色
+          this.apis.scatterColor === '0' ? item.color = '#68ABDA' : delete item.color
+
+          // 散点图大小设置
+          let scatterSize = this.apis.scatterSize;
+          if(scatterSize){
+            let max = scatterSize === '0' ? this.apis.xMax:this.apis.yMax;
+            item.symbolSize = function(val){
+              let num = val[scatterSize];
+              return max === 0 ? 8:(20/max)*num+8;
+            }
+          }
+        })
+        
+      }
+      
+      
       return options
     },
     // 添加图表点击事件，可以点击非数据区域

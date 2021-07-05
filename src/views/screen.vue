@@ -16,6 +16,10 @@
                 v-if="transform.setting.isEmpty"
                 :config="transform.setting.config"
               ></chart-nodata>
+              <ChartFigure
+                v-else-if="transform.setting.name === 'figure'"
+                :setting="transform.setting"
+              />
               <!--素材库-->
               <ChartMaterial
                 v-else-if="transform.setting.name === 'material'"
@@ -56,6 +60,25 @@
 
               <!-- 高德地图-->
               <!-- <AMap v-else-if="transform.setting.name === 'a-map'" /> -->
+              <!-- 立体饼图 -->
+              <high-charts
+                v-else-if="transform.setting.name === 'high-pie'"
+                :key="transform.id"
+                :setting="transform.setting"
+                :api-data="transform.setting.api_data"
+                :background="transform.setting.background"
+              ></high-charts>
+
+              <!-- 矩形热力图 -->
+              <chart-heart
+                v-if="transform.setting.name === 've-heatmap'"
+                :key="transform.id"
+                :config="transform.setting.config"
+                :view="transform.setting.view"
+                :api-data="transform.setting.api_data"
+                :background="transform.setting.background"
+              ></chart-heart>
+
               <charts-factory
                 v-else
                 :id="transform.id"
@@ -96,6 +119,7 @@ import ChartImage from '@/components/tools/Image'
 import ChartTables from '@/components/tools/Tables'
 import ChartNodata from '@/components/tools/Nodata'
 import ChartMaterial from '@/components/tools/Material'
+import ChartFigure from '@/components/tools/Figure'
 import SteepBar from '@/components/tools/SteepBar'
 import Pation from '@/components/board/pation/index' // 分页栏
 import ContextMenu from '@/components/board/context-menu/index' // 右键菜单
@@ -108,6 +132,8 @@ import {
 } from 'bin-ui/src/utils/resize-event'
 
 import throttle from 'lodash/throttle'
+import HighCharts from '@/components/charts/highcharts'
+import ChartHeart from '@/components/charts/chart-heat'
 
 export default {
   name: 'screen',
@@ -119,8 +145,11 @@ export default {
     ChartTables,
     ChartNodata,
     ChartMaterial,
+    ChartFigure,
     SteepBar,
     Pation,
+    HighCharts,
+    ChartHeart,
     ContextMenu
     // AMap
   },
