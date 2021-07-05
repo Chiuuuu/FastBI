@@ -1,5 +1,5 @@
 <template>
-  <div class="dv-admin" @click.stop.prevent="hideContextMenu">
+  <div class="dv-admin" @click.stop.prevent="hideContextMenu()">
     <board v-if="!isScreen" :screenData="screenData">
       <!--头部嵌套可拖拽物品-->
       <template v-slot:headerBox>
@@ -132,7 +132,7 @@
             <high-charts
               v-else-if="transform.setting.name === 'high-pie'"
               :key="transform.id"
-              :setting='transform.setting'
+              :setting="transform.setting"
               :api-data="transform.setting.api_data"
               :background="transform.setting.background"
             ></high-charts>
@@ -141,11 +141,11 @@
               v-else-if="transform.setting.name==='ve-heatmap'|transform.setting.name==='ve-sun'"
               :key="transform.id"
               :view="transform.setting.view"
-              :config='transform.setting.config'
+              :config="transform.setting.config"
               :api-data="transform.setting.api_data"
               :background="transform.setting.background"
             ></chart-heart>
-             <!-- <component 
+            <!-- <component 
               v-else-if="transform.setting.chartType==='high-charts'"
               :is="transform.setting.name"
               :key="transform.id"
@@ -203,6 +203,7 @@ import ChartNodata from '@/components/tools/Nodata' // 数据丢失
 import ChartMaterial from '@/components/tools/Material' // 素材库
 import ChartFigure from '@/components/tools/Figure' // 素材库
 import SteepBar from '@/components/tools/SteepBar' // 进度条
+import ContextMenu from '@/components/board/context-menu/index' // 右键菜单
 // import AMap from '@/components/tools/aMap' // 进度条
 import Screen from '@/views/screen' // 全屏
 
@@ -279,6 +280,7 @@ export default {
       if (!this.checkFull()) {
         // 全屏下按键esc后要执行的动作
         this.$store.dispatch('SetIsScreen', false)
+        this.$store.dispatch('ToggleContextMenu')
       }
     }
   },
@@ -340,7 +342,11 @@ export default {
     },
     // transform点击事件右键点击
     handleRightClickOnCanvas(item, event) {
-      let info = { x: event.pageX + 10, y: event.pageY + 10 }
+      let info = {
+        x: event.pageX + 10,
+        y: event.pageY + 10,
+        listType: 'chartMenuList'
+      }
       this.$store.dispatch('ToggleContextMenu', info)
       this.$store.dispatch('SingleSelected', item.id)
     },
@@ -395,7 +401,8 @@ export default {
     SteepBar,
     Screen,
     HighCharts,
-    ChartHeart
+    ChartHeart,
+    ContextMenu
     // AMap
   },
   beforeDestroy() {
@@ -410,6 +417,5 @@ export default {
       next()
     }
   }
-  // test
 }
 </script>

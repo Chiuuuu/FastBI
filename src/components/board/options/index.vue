@@ -3453,7 +3453,6 @@ export default {
   watch: {
     currSelected: {
       handler(val) {
-        console.log(val, 'val')
         if (val) {
           if (val.setting.name === 've-image') {
             this.tabsType = 0
