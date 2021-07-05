@@ -196,7 +196,10 @@ export default {
       }
       // 地图添加类型初始值
       if (component.chartType === 'v-map') {
-        component.api_data.options = { fillType: 'area', labelType: 'area' }
+        component.api_data.options = {
+          fillType: 'area',
+          labelType: 'area'
+        }
       }
       // 拖拽的节点数据
       let nodeInfo = {
