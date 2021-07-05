@@ -578,7 +578,7 @@
               >
                 <a-switch
                   slot="extra"
-                  v-if="collapseActive.indexOf('indicator') > -1"
+                  v-if="collapseActive.indexOf('indicatorscatter') > -1"
                   v-model="selfConfig.series.label.show"
                   default-checked
                   @change="switchChange"
