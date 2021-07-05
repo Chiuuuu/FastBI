@@ -1,147 +1,36 @@
 <template>
   <div class="data-source">
     <a-collapse v-model="activeKey" :bordered="false">
-      <a-collapse-panel
-        key="dimensions"
-        header="维度"
-        v-if="chartType === '1' && currSelected.setting.chartType !== 'v-map'"
-      >
-        <drag-area type="dimensions" ref="child"></drag-area>
+      <a-collapse-panel key="dimensions" header="维度" v-if="chartType === '1'">
+        <drag-area
+          type="dimensions"
+          :fileList="fileObj.dimensions"
+          ref="child"
+        ></drag-area>
       </a-collapse-panel>
       <a-collapse-panel
         key="measures"
         header="度量"
         v-if="
           (chartType === '1' || chartType === '2') &&
-            currSelected.setting.chartType !== 'v-text' &&
-            currSelected.setting.chartType !== 'v-map'
+            currSelected.setting.chartType !== 'v-text'
         "
       >
-        <drag-area type="measures" ref="child"></drag-area>
+        <drag-area
+          type="measures"
+          :fileList="fileObj.measures"
+          ref="child"
+        ></drag-area>
       </a-collapse-panel>
       <a-collapse-panel key="tableList" header="列" v-if="chartType === '3'">
         <drag-area type="tableList" ref="table"></drag-area>
       </a-collapse-panel>
-      <!-- 地图填充 -->
-      <a-collapse-panel
-        key="mapFill"
-        header="填充"
-        v-if="currSelected.setting.chartType === 'v-map'"
-      >
-        <a-collapse v-model="activeKey" :bordered="false">
-          <a-radio-group class="radio-box" v-model="fillType">
-            <a-radio
-              value="area"
-              @click.native.stop="onRadioChange('area', 'fillType')"
-              >地区</a-radio
-            >
-            <a-radio
-              value="dot"
-              @click.native.stop="onRadioChange('dot', 'fillType')"
-              >经纬度</a-radio
-            >
-          </a-radio-group>
-          <a-collapse-panel key="dimensions" header="维度">
-            <dragAreaForMapFill
-              v-if="fillType === 'area'"
-              type="dimensions"
-              :fillType="fillType"
-            ></dragAreaForMapFill>
-            <dragAreaForMapFill
-              v-if="fillType === 'dot'"
-              type="dimensions"
-              :fillType="fillType"
-              dimensionType="latitude"
-            ></dragAreaForMapFill>
-            <dragAreaForMapFill
-              v-if="fillType === 'dot'"
-              type="dimensions"
-              :fillType="fillType"
-              dimensionType="longitude"
-            ></dragAreaForMapFill>
-          </a-collapse-panel>
-          <a-collapse-panel key="measures" header="度量">
-            <dragAreaForMapFill
-              type="measures"
-              ref="fillMe"
-              :fillType="fillType"
-            ></dragAreaForMapFill>
-          </a-collapse-panel>
-        </a-collapse>
-      </a-collapse-panel>
-      <!-- 地图标记点 -->
-      <a-collapse-panel
-        key="mapLabel"
-        header="标记点"
-        v-if="currSelected.setting.chartType === 'v-map'"
-      >
-        <a-collapse v-model="activeKey" :bordered="false">
-          <a-radio-group class="radio-box" v-model="labelType">
-            <a-radio
-              value="area"
-              @click.native.stop="onRadioChange('area', 'labelType')"
-              >地区</a-radio
-            >
-            <a-radio
-              value="dot"
-              @click.native.stop="onRadioChange('dot', 'labelType')"
-              >经纬度</a-radio
-            >
-          </a-radio-group>
-          <a-collapse-panel key="dimensions" header="维度">
-            <dragAreaForMapLabel
-              v-if="labelType === 'area'"
-              type="dimensions"
-              :labelType="labelType"
-            ></dragAreaForMapLabel>
-            <dragAreaForMapLabel
-              v-if="labelType === 'dot'"
-              type="dimensions"
-              :labelType="labelType"
-              dimensionType="labelLatitude"
-            ></dragAreaForMapLabel>
-            <dragAreaForMapLabel
-              v-if="labelType === 'dot'"
-              type="dimensions"
-              :labelType="labelType"
-              dimensionType="labelLongitude"
-            ></dragAreaForMapLabel>
-          </a-collapse-panel>
-          <a-collapse-panel key="measures" header="度量">
-            <dragAreaForMapLabel
-              type="measures"
-              ref="labelMe"
-              :labelType="labelType"
-            ></dragAreaForMapLabel>
-          </a-collapse-panel>
-        </a-collapse>
-        <GuiField label="指标显示">
-          <a-switch
-            v-model="labelShow"
-            default-checked
-            size="small"
-            @change="labelPointChange"
-          />
-        </GuiField>
-        <GuiField label="鼠标移入显示">
-          <a-switch
-            v-model="selfConfig.tooltip.show"
-            default-checked
-            size="small"
-            @change="switchChange"
-          />
-        </GuiField>
-      </a-collapse-panel>
-      <!-- 数据筛选 -->
       <a-collapse-panel
         key="pick"
         header="数据筛选"
-        v-if="
-          (chartType === '1' || chartType === '2' || chartType === '3') &&
-            currSelected.setting.chartType !== 'v-map'
-        "
+        v-if="chartType === '1' || chartType === '2' || chartType === '3'"
       >
-        <DragPick type="pick"></DragPick>
+        <drag-pick type="pick"></drag-pick>
       </a-collapse-panel>
       <!-- 排序 -->
       <a-collapse-panel
@@ -154,36 +43,6 @@
       >
         <DragSort type="sort"></DragSort>
       </a-collapse-panel>
-      <!-- <a-collapse-panel
-        key="sort"
-        header="排序"
-        v-if="chartType !== '2' && currSelected.setting.chartType !== 'v-map'"
-      >
-        <div style="display: flex;">
-          <a-select
-            v-model="sortData.pivotschemaId"
-            placeholder="选择字段"
-            class="f-flex1"
-            style="margin-right:10px;width:50%"
-            @change="sortFileChange"
-          >
-            <a-select-option
-              v-for="item in sortList"
-              :value="item.id"
-              :key="item.id"
-              >{{ item.alias }}</a-select-option
-            >
-          </a-select>
-          <a-select v-model="sortData.asc" class="f-flex1" @change="ascChange">
-            <a-select-option
-              v-for="(item, index) in ascList"
-              :key="index"
-              :value="item.value"
-              >{{ item.name }}</a-select-option
-            >
-          </a-select>
-        </div>
-      </a-collapse-panel> -->
       <a-collapse-panel key="refresh" header="定时刷新">
         <a-switch
           slot="extra"
@@ -223,20 +82,14 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import DragArea from './components/dragArea'
-import dragAreaForMapFill from './components/dragAreaForMapFill'
-import dragAreaForMapLabel from './components/dragAreaForMapLabel'
 import DragPick from './components/dragPick'
-import DragSort from './components/dragSort'
 import { deepClone } from '../../../utils/deepClone'
-import GuiField from '../options/gui-field'
+import DragSort from './components/dragSort'
 export default {
   components: {
     DragArea,
     DragPick,
-    dragAreaForMapFill,
-    dragAreaForMapLabel,
     DragSort
-    // GuiField
   },
   data() {
     return {
@@ -248,12 +101,10 @@ export default {
         'tips',
         'tableList',
         'refresh',
-        'pick',
-        'mapFill',
-        'mapLabel'
+        'pick'
       ], // 所有面板默认打开
       fileObj: {
-        labelDimensions: [],
+        dimensions: [],
         measures: []
       }, // 存储维度度量数据
       apiData: {},
@@ -275,18 +126,8 @@ export default {
       refreshList: [
         { name: '分', value: 'min' },
         { name: '小时', value: 'hour' }
-      ],
-      fillType: '',
-      labelType: '',
-      selfConfig: {},
-      labelShow: false
+      ]
     }
-  },
-  mounted() {
-    // if (this.currSelected.setting.chartType === 'v-map') {
-    //   this.fillType = this.currSelected.setting.api_data.options.fillType
-    //   this.labelType = this.currSelected.setting.api_data.options.labelType
-    // }
   },
   watch: {
     currSelected: {
@@ -296,21 +137,9 @@ export default {
           this.sortData = {}
           let apiData = deepClone(val.setting.api_data)
           this.apiData = apiData
-          this.selfConfig = deepClone(val.setting.config)
-          if (val.setting.chartType === 'v-map') {
-            // 获取散点图层所在下标
-            this.fillType = this.currSelected.setting.api_data.options.fillType
-            this.labelType = this.currSelected.setting.api_data.options.labelType
-            let scatterLayout = this.selfConfig.series.find(
-              item => item.type === 'scatter'
-            )
-            if (scatterLayout) {
-              this.labelShow = scatterLayout.label.show
-            }
-          }
           // 选中的维度度量组合成排序列表
-          if (apiData.labelDimensions) {
-            this.sortList = this.sortList.concat(apiData.labelDimensions)
+          if (apiData.dimensions) {
+            this.sortList = this.sortList.concat(apiData.dimensions)
           }
           if (apiData.measures) {
             this.sortList = this.sortList.concat(apiData.measures)
@@ -341,11 +170,6 @@ export default {
     ...mapGetters(['currSelected', 'currentSelected']),
     chartType() {
       return this.currSelected ? this.currSelected.setting.type : ''
-    },
-    hasScatter() {
-      return this.selfConfig.series
-        ? this.selfConfig.series.some(item => item.type === 'scatter')
-        : false
     }
   },
   methods: {
@@ -368,23 +192,6 @@ export default {
       } else {
         this.$refs.child.getData()
       }
-    },
-    onRadioChange(value, key) {
-      if (this[key] === value) {
-        return
-      }
-      // 切换页签清空对应数据
-      if (key === 'fillType') {
-        // 清空填充经纬度
-        this.$refs.fillMe.clearData()
-      }
-      if (key === 'labelType') {
-        // 清空标记点经纬度
-        this.$refs.labelMe.clearData()
-      }
-      this[key] = value
-      this.$set(this.currSelected.setting.api_data.options, key, value)
-      this.updateChartData()
     },
     // 排序类型 升序 降序
     ascChange() {
@@ -449,19 +256,6 @@ export default {
     // 单个图表的定时器设置
     setTimer() {
       this.$emit('setChartTimer', this.currentSelected)
-    },
-    labelPointChange(val) {
-      let scatterLayout = this.selfConfig.series.find(
-        item => item.type === 'scatter'
-      )
-      if (scatterLayout) {
-        scatterLayout.label.show = this.labelShow
-      }
-      this.switchChange()
-    },
-    switchChange() {
-      this.$store.dispatch('SetSelfProperty', this.selfConfig)
-      this.updateChartData()
     }
   }
 }
