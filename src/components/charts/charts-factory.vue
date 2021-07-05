@@ -45,6 +45,7 @@
       :after-config="afterConfig"
       :title="chartType === 'v-ring' ? config.chartTitle : {}"
       :extend="chartExtend"
+      :legend="chartLegend"
       :options="chartOptions"
       :settings="chartSettings"
       :series="chartSeries"
@@ -182,6 +183,32 @@ export default {
             this.chartExtend = { ...omit(val, ['series']) }
             this.chartSeries = deepClone(val.series)
             // this.setMapFormatter()
+          } else if(this.typeName === 've-scatter'){ //散点图
+            this.chartExtend = { ...omit(val, ['series','legend']) }
+            this.chartLegend = val.legend; //图例
+            // series设置
+            let series = deepClone(val.series)
+            let data = series.data;
+            let list = [];
+            data.map(item=>{
+              list.push(deepClone(series))
+              list[list.length-1].data = item.data;
+              list[list.length-1].name = item.label;
+            })
+            this.chartSeries = list;
+            
+            // tooltip显示  -- 不生效
+            // this.chartExtend.tooltip.formatter = function(params){
+            //   let val= params.value;
+            //   if(val.length<6){ return ''};
+            //   console.log(params)
+            //   return `${params.marker}<br/>
+            //           ${val[5]}：${val[2]}<br/>
+            //           ${val[3]}：${val[0]}<br/>
+            //           ${val[4]}：${val[1]}<br/>
+            //           `;
+            // }
+
           } else {
             this.chartExtend = deepClone(val)
             // 保留两位小数
@@ -259,13 +286,26 @@ export default {
               if (!val.source) {
                 return
               }
-              // 如果有联动，显示联动的数据
-              this.chartData = val.selectData ? val.selectData : val.source
+              if(this.chartType === 'v-scatter'){ //散点图的数据自定义显示
+                this.chartData.columns = []
+                this.chartData.rows = []
+              }else{
+                // 如果有联动，显示联动的数据
+                this.chartData = val.selectData ? val.selectData : val.source
+              }
               return
             }
           }
-          this.chartData.columns = val.columns
-          this.chartData.rows = val.rows
+
+          if (this.chartType !== 'v-scatter') { //散点图的数据自定义显示
+            this.chartData.columns = []
+            this.chartData.rows = []
+          }else{
+            this.chartData.columns = val.columns
+            this.chartData.rows = val.rows
+          }
+          
+          
         }
       },
       deep: true,

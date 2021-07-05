@@ -640,13 +640,13 @@ export default {
             this.$store.dispatch('SetApis', apis)
           }
 
-          if(this.currSelected.setting.chartType !== 'v-scatter'){
+          // if(this.currSelected.setting.chartType !== 'v-scatter'){
             apiData.source = {
               columns,
               rows
             }
             this.$store.dispatch('SetSelfDataSource', apiData)
-          }
+          // }
           
         }
         this.updateChartData()

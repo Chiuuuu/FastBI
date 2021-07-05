@@ -171,7 +171,7 @@ export default {
         this.deleteOne()
       } else if (order === 'showChartData') {
         // 查看图表数据
-        if (this.currSelected.setting.api_data.source) {
+        if (this.currSelected.setting.api_data.source && JSON.stringify(this.currSelected.setting.api_data.source)!='{}') {
           this.setChartData()
           this.showChartData(this.chartData, this.chartDataForMap)
           this.$store.dispatch('ToggleContextMenu')
