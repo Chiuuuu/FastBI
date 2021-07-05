@@ -297,7 +297,7 @@ export default {
             }
           }
 
-          if (this.chartType !== 'v-scatter') { //散点图的数据自定义显示
+          if (this.chartType === 'v-scatter') { //散点图的数据自定义显示
             this.chartData.columns = []
             this.chartData.rows = []
           }else{
