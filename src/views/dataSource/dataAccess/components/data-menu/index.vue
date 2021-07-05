@@ -234,9 +234,9 @@ export default {
       let isAll = false
       let whiteList = []
       // 有黑名单的列表长度<总角色长度, 说明有全类别权限的角色, 直接返回所有
-      if (this.sourceType.length !== this.roles.length) {
-        isAll = true
-      } else { // 否则先将黑名单转成白名单, 再取并集
+      // if (this.sourceType.length !== this.roles.length) {
+      //   isAll = true
+      // } else { // 否则先将黑名单转成白名单, 再取并集
         for (const source of this.sourceType) {
           if (typeof source === 'string') {
             const white = source.split(',')
@@ -246,7 +246,7 @@ export default {
             break
           }
         }
-      }
+      // }
       // 将并集去重
       let list = []
       if (isAll) {

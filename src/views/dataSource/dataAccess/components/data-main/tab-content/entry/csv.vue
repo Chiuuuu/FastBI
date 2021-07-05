@@ -325,9 +325,9 @@ export default {
       //   isValid = false
       // }
       // 校验大小
-      if (isValid && file.size > 50 * 1024 * 1024) {
+      if (isValid && file.size > 30 * 1024 * 1024) {
         isValid = false
-        this.$message.error('文件大于50M, 无法上传')
+        this.$message.error('文件大于30M, 无法上传')
       }
 
       // 校验重名
@@ -650,9 +650,9 @@ export default {
             formData.append('csvDatabaseList[' + index + '].file', file)
             maxSize += file.size
           })
-          if (maxSize > 50 * 1024 * 1024) {
+          if (maxSize > 30 * 1024 * 1024) {
             this.loading = false
-            return this.$message.error('单次保存文件总量需小于50M')
+            return this.$message.error('单次保存文件总量需小于30M')
           }
           formData.append('databaseName', this.databaseName)
           formData.append('delimiter', this.queryDelimiter)
@@ -692,7 +692,7 @@ export default {
                   }
                 })
               } else {
-                this.$message.error(result.msg)
+                this.$message.error(result.data || result.msg || '保存错误')
               }
               this.loading = false
             })

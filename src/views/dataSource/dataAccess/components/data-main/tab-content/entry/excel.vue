@@ -444,9 +444,9 @@ export default {
       //   isValid = false
       // }
       // 校验大小
-      if (isValid && file.size > 9 * 1024 * 1024) {
+      if (isValid && file.size > 3 * 1024 * 1024) {
         isValid = false
-        this.$message.error('文件大于9M, 无法上传')
+        this.$message.error('文件大于3M, 无法上传')
       }
 
       // 校验命名规则(中英数字下划线)
@@ -735,9 +735,9 @@ export default {
             formData.append('excelFileList[' + index + ']', file)
             maxSize += file.size
           })
-          if (maxSize > 9 * 1024 * 1024) {
+          if (maxSize > 3 * 1024 * 1024) {
             this.loading = false
-            return this.$message.error('单次保存文件总量需小于9M')
+            return this.$message.error('单次保存文件总量需小于3M')
           }
           formData.append('databaseName', this.databaseName)
           formData.append('sourceDatasource.name', this.form.name)
@@ -776,7 +776,7 @@ export default {
                   }
                 })
               } else {
-                this.$message.error(result.msg)
+                this.$message.error(result.data || result.msg || '保存错误')
               }
             })
             .finally(() => {
