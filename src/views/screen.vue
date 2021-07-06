@@ -452,6 +452,7 @@ export default {
     },
     // 重置被联动的图标数据
     resetOriginData(id) {
+      debugger
       let selected = this.canvasMap.find(item => item.id === id)
       let bindCharts = selected.setting.api_data.interactive.bindedList
       for (let chartId of bindCharts) {
