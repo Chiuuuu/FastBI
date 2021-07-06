@@ -3025,7 +3025,7 @@ const list = [
             isEmpty: false,
             imgName: 'test',
             url:
-              'http://192.168.0.38:8080/profile/avatar/2021/04/12/0f4667b1-34a6-44f6-a503-c815534a0efb.gif',
+              'http://10.10.20.66:8080/profile/avatar/2021/04/12/0f4667b1-34a6-44f6-a503-c815534a0efb.gif',
             view: {
               width: 400,
               height: 400,

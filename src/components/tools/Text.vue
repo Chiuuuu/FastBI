@@ -44,7 +44,7 @@ export default {
       type: Object,
       required: true
     },
-    id: {
+    chartId: {
       default: 0
     },
     apiData: {
@@ -91,7 +91,7 @@ export default {
     },
     currentSelected(val) {
       // 是否取消选中文本框
-      if (val !== this.id && this.canEdit) {
+      if (val !== this.chartId && this.canEdit) {
         // 关闭可编辑
         this.canEditByDblClick = false
       }
@@ -107,7 +107,7 @@ export default {
         this.getContent().then(res => {
           this.$refs.editorText.innerHTML = res
           this.selfConfig.title.text = res
-          this.updateChartData(this.id)
+          this.updateChartData(this.chartId)
         })
         // 关闭防止冒泡，开启拖动
         this.$refs.textBox.onmousedown = null
@@ -372,7 +372,7 @@ export default {
       }
       let str = this.htmlText
       if (this.apiData.measures.length > 0) {
-        let selected = this.canvasMap.find(item => item.id === this.id)
+        let selected = this.canvasMap.find(item => item.id === this.chartId)
         let self = this
         let loadingInstance = ''
         if (!isInit) {

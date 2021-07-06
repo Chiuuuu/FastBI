@@ -98,7 +98,7 @@
             <chart-text
               v-else-if="transform.setting.name === 've-text'"
               ref="veText"
-              :id="transform.id"
+              :chart-id="transform.id"
               canEdit
               :api-data="transform.setting.api_data"
               :config="transform.setting.config"

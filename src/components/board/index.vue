@@ -37,7 +37,6 @@
     </div>
     <!--右键菜单-->
     <context-menu></context-menu>
-    <chartTableData :show="show" :chart-data="chartData" @cancel="show = false"></chartTableData>
   </div>
 </template>
 

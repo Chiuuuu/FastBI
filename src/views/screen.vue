@@ -1,10 +1,17 @@
 <template>
-  <div class="dv-screen" ref="dvScreen">
+  <div
+    class="dv-screen"
+    :id="screenId"
+    ref="dvScreen"
+    @contextmenu.stop.prevent="poupExportMenu($event)"
+    @mousedown="cancelSelect"
+  >
     <b-scrollbar :style="wrapStyle">
       <div :style="scrollBoxStyle">
         <div class="canvas-panel" :style="canvasPanelStyle">
           <template v-for="transform in canvasMap">
             <preview-box
+              :id="transform.id"
               :key="transform.id"
               :item="transform"
               @contextmenu.native.stop.prevent="
@@ -35,7 +42,7 @@
               <!-- 文本 -->
               <chart-text
                 v-else-if="transform.setting.name === 've-text'"
-                :id="transform.id"
+                :chart-id="transform.id"
                 :config="transform.setting.config"
                 :background="transform.setting.background"
                 :api-data="transform.setting.api_data"
@@ -71,7 +78,7 @@
 
               <!-- 矩形热力图 -->
               <chart-heart
-                v-if="transform.setting.name === 've-heatmap'"
+                v-else-if="transform.setting.name === 've-heatmap'"
                 :key="transform.id"
                 :config="transform.setting.config"
                 :view="transform.setting.view"
@@ -81,7 +88,7 @@
 
               <charts-factory
                 v-else
-                :id="transform.id"
+                :chart-id="transform.id"
                 ref="chart"
                 :type-name="transform.setting.name"
                 :chart-type="transform.setting.chartType"
@@ -174,7 +181,8 @@ export default {
       'screenId',
       'orginPageSettings',
       'isPublish',
-      'isScreen'
+      'isScreen',
+      'currentSelected'
     ]),
     // 画布面板的样式
     canvasPanelStyle() {
@@ -408,7 +416,7 @@ export default {
     async getBindData(chart, dimensionData) {
       let apiData = chart.setting.api_data
       // 进行过数据筛选的不再执行联动
-      if (apiData.options) {
+      if (apiData.options.fileList) {
         return
       }
       let { pivotschemaId, dataType, value, name } = dimensionData
@@ -472,7 +480,11 @@ export default {
     handleRightClickOnCanvas(item, event) {
       // 全屏下图表查看数据&导出
       if (this.isScreen) {
-        let info = { x: event.pageX + 10, y: event.pageY + 10 }
+        let info = {
+          x: event.pageX + 10,
+          y: event.pageY + 10,
+          listType: 'exportChartList'
+        }
         this.$store.dispatch('ToggleContextMenu', info)
         this.$store.dispatch('SingleSelected', item.id)
       }
@@ -482,6 +494,19 @@ export default {
       this.chartData = chartData
       this.chartDataForMap = chartDataForMap
       this.show = true
+    },
+    cancelSelect() {
+      this.$store.dispatch('SingleSelected', null)
+    },
+    poupExportMenu(event) {
+      if (this.isScreen) {
+        let info = {
+          x: event.pageX + 10,
+          y: event.pageY + 10,
+          listType: 'screenMenuList'
+        }
+        this.$store.dispatch('ToggleContextMenu', info)
+      }
     }
   }
 }
