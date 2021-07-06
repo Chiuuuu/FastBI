@@ -127,9 +127,6 @@ export default {
       },
     },
   },
-  created() {
-    console.log(111, this.dragList)
-  },
   data() {
     return {
       hovered: false,

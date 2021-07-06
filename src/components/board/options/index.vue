@@ -890,8 +890,37 @@
               </a-collapse-panel>
             </template>
 
+            <!-- 矩形树图独有 -->
+            <template v-if="isTreemap">
+              <a-collapse-panel key="treemap1" header="图形属性">
+                <Treemap1 :self-config="selfConfig" />
+              </a-collapse-panel>
+              <a-collapse-panel key="treemap2" header="鼠标移入提示">
+                <a-switch
+                  slot="extra"
+                  v-if="collapseActive.indexOf('treemap2') > -1"
+                  v-model="selfConfig.series.tooltip.show"
+                  default-checked
+                  @change="switchChange"
+                  size="small"
+                />
+                <Treemap2 :self-config="selfConfig" />
+              </a-collapse-panel>
+              <a-collapse-panel key="treemap3" header="图例设置">
+                <a-switch
+                  slot="extra"
+                  v-if="collapseActive.indexOf('treemap3') > -1"
+                  v-model="selfConfig.visualMap.show"
+                  default-checked
+                  @change="switchChange"
+                  size="small"
+                />
+                <Treemap3 :self-config="selfConfig" />
+              </a-collapse-panel>
+            </template>
+
             <!--图例-->
-            <template v-if="selfConfig.legend && !isRing && !isGauge && !isMap">
+            <template v-if="selfConfig.legend && !isRing && !isGauge && !isMap && !isTreemap">
               <a-collapse-panel key="legend" header="图例设置">
                 <a-switch
                   slot="extra"
@@ -2867,6 +2896,9 @@ import Figure from './figure'
 import { DEFAULT_COLORS } from '../../../utils/defaultColors'
 import { deepClone } from '../../../utils/deepClone'
 import throttle from 'lodash/throttle'
+import Treemap1 from './treemap/treemap-1.vue'
+import Treemap2 from './treemap/treemap-2.vue'
+import Treemap3 from './treemap/treemap-3.vue'
 import HighChartPie from '@/components/board/options/highchart-pie'
 import HighChartBar from '@/components/board/options/highchart-bar'
 
@@ -2891,6 +2923,9 @@ export default {
           (item) => item.type === 'map'
         ).length
       },
+      switchChange: this.switchChange,
+      setSelfProperty: this.setSelfProperty,
+      onRadioChange: this.onRadioChange
     }
   },
   data() {
@@ -2949,7 +2984,6 @@ export default {
         { label: '优设标题黑', value: 'youshe' },
         { label: 'digital-7-4', value: 'digital-7-4' },
       ],
-      targetMeasure: 0, // 地图指标设置对应度量
       scatterColorList: [
         // 散点颜色
         { label: '单色', value: '0' },
@@ -3563,6 +3597,10 @@ export default {
       // return (this.chartType === 'v-scatter') | (this.chartType === 'v-heatmap')
       return this.chartType === 'v-scatter' || this.chartType === 'v-heatmap'
     },
+    // 是否为矩形树图
+    isTreemap() {
+      return this.chartType === 'v-treemap'
+    },
     showGrid() {
       // return (
       //   this.selfConfig.grid &&
@@ -3605,6 +3643,9 @@ export default {
     DataSource,
     Interactive,
     Figure,
+    Treemap1,
+    Treemap2,
+    Treemap3,
     HighChartPie,
     HighChartBar,
   },
