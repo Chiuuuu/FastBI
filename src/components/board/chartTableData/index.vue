@@ -5,6 +5,7 @@
     width="750px"
     :footer="null"
     @cancel="$emit('cancel')"
+    :getContainer="getContainer"
   >
     <div style="width:100%">
       <table class="chartdata-table">
@@ -40,6 +41,17 @@ export default {
     show: {
       type: Boolean,
       required: true
+    }
+  },
+  inject:{
+    dvScreenDom:{
+      default:''
+    }
+  },
+  methods:{
+    // 全屏下，内容挂在dvScreen元素下（screen.vue）可显示，默认挂在body下
+    getContainer(e){
+      return this.dvScreenDom ? this.dvScreenDom() : document.body;
     }
   }
 }
