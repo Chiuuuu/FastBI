@@ -215,7 +215,10 @@ export default {
             // 保留两位小数
             if (this.typeName !== 've-gauge' && this.typeName !== 've-ring') {
               let type = this.typeName
-              let chartType = this.chartType
+              let chartType = this.chartType;
+              if(chartType=='high-pie'||chartType=='high-column'){
+                return
+              }
               this.chartExtend.series.label.formatter = function(params) {
                 if (type === 've-line') {
                   return params.data[1].toFixed(2)
