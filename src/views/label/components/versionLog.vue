@@ -11,8 +11,25 @@
   >
     <div class="main main-padding">
       <a-row type="flex" justify="end">
-        <a-button v-if="mode === 'list'" type="primary" @click="handleToDiff">对比</a-button>
-        <a-button v-else-if="mode === 'diff'" type="default" @click="handleBackToList">返回</a-button>
+        <!-- :data="listData" -->
+        <download-excel
+          v-if="mode === 'list'"
+          :fetch="getXlsxTabelData"
+          :fields="getXlsxColOption()"
+          :name="getXlsxName()"
+        >
+          <a-button type="primary" class="mr_10">导出</a-button>
+        </download-excel>
+
+        <a-button v-if="mode === 'list'" type="primary" @click="handleToDiff"
+          >对比</a-button
+        >
+        <a-button
+          v-else-if="mode === 'diff'"
+          type="default"
+          @click="handleBackToList"
+          >返回</a-button
+        >
       </a-row>
 
       <template v-if="mode === 'list'">
@@ -38,7 +55,7 @@
             :current="pagination.current"
             :pageSize="pagination.pageSize"
             :total="pagination.total"
-            :show-total="total => `共${total}条记录`"
+            :show-total="(total) => `共${total}条记录`"
             @change="handlePageChange"
             @showSizeChange="handleSizeChange"
           ></a-pagination>
@@ -63,88 +80,90 @@
 <script>
 import paginationMixin from '../mixins/pagination'
 import TextCompare from './textCompare'
+import downloadExcel from 'vue-json-excel'
 
 const listColumn = [
   {
     title: '版本号',
     width: 100,
     ellipsis: true,
-    dataIndex: 'userVersion'
+    dataIndex: 'userVersion',
   },
   {
     title: '标签名称',
     width: 200,
     ellipsis: true,
     dataIndex: 'name',
-    scopedSlots: { customRender: 'name' }
+    scopedSlots: { customRender: 'name' },
   },
   {
     title: '更新周期',
     width: 200,
     ellipsis: true,
     dataIndex: 'updateTime',
-    scopedSlots: { customRender: 'updateTime' }
+    scopedSlots: { customRender: 'updateTime' },
   },
   {
     title: '达标模型',
     width: 200,
     ellipsis: true,
     dataIndex: 'modelName',
-    scopedSlots: { customRender: 'modelName' }
+    scopedSlots: { customRender: 'modelName' },
   },
   {
     title: '达标规则',
     width: 200,
     ellipsis: true,
     dataIndex: 'condition',
-    scopedSlots: { customRender: 'condition' }
+    scopedSlots: { customRender: 'condition' },
   },
   {
     title: '标签描述',
     width: 300,
     ellipsis: true,
     dataIndex: 'description',
-    scopedSlots: { customRender: 'description' }
+    scopedSlots: { customRender: 'description' },
   },
   {
     title: '操作人',
     width: 100,
     ellipsis: true,
     dataIndex: 'modUserName',
-    scopedSlots: { customRender: 'modUserName' }
+    scopedSlots: { customRender: 'modUserName' },
   },
   {
     title: '修改原因',
     width: 300,
     ellipsis: true,
     dataIndex: 'reason',
-    scopedSlots: { customRender: 'reason' }
+    scopedSlots: { customRender: 'reason' },
   },
   {
     title: '操作时间',
     dataIndex: 'gmtModified',
     width: 180,
-    ellipsis: true
-  }
+    ellipsis: true,
+  },
 ]
 
 export default {
   name: 'versionLog',
   mixins: [paginationMixin],
   components: {
-    TextCompare
+    TextCompare,
+    downloadExcel,
   },
   props: {
     visible: {
       type: Boolean,
-      default: false
+      default: false,
     },
     rowData: {
       type: Object,
       default() {
         return {}
-      }
-    }
+      },
+    },
   },
   computed: {
     rowSelection() {
@@ -152,26 +171,88 @@ export default {
         // fixed: true, // 高度不统一, 暂时先屏蔽
         selectedRowKeys: this.selectedRowKeys,
         onSelect: this.handleRowSelection,
-        onSelectAll: this.handleRowSelectionAll
+        onSelectAll: this.handleRowSelectionAll,
       }
-    }
+    },
   },
   data() {
     return {
       mode: 'list',
-      bodyStyle: { padding: '0', width: '70vw', height: 'calc(100vh - 240px)', 'overflow-y': 'auto' },
+      bodyStyle: {
+        padding: '0',
+        width: '70vw',
+        height: 'calc(100vh - 240px)',
+        'overflow-y': 'auto',
+      },
       listLoading: false,
       listColumn,
       listData: [],
       selectedRows: [],
       selectedRowKeys: [],
-      diffData: []
+      diffData: [],
+
+      json_fields: {
+        'Complete name': 'name',
+        City: 'city',
+        Telephone: 'phone.mobile',
+        'Telephone 2': {
+          field: 'phone.landline',
+          callback: (value) => {
+            return `Landline Phone - ${value}`
+          },
+        },
+      },
+      json_data: [
+        {
+          name: '1',
+          city: '2',
+          country: '3',
+          birthdate: '4',
+          phone: {
+            mobile: '1-541-754-3010',
+            landline: '(541) 754-3010',
+          },
+        },
+        {
+          name: '11',
+          city: '22',
+          country: '33',
+          birthdate: '44',
+          phone: {
+            mobile: '55',
+            landline: '(66',
+          },
+        },
+      ],
     }
   },
   mounted() {
     this.handleGetData()
+    console.log(this.rowData.name)
   },
   methods: {
+    // 获取Xlsx表格列数据
+    getXlsxColOption() {
+      let xlsxData = {}
+      for (let item of this.listColumn) {
+        if (item.dataIndex && item.title) {
+          xlsxData[item.title] = item.dataIndex
+        }
+      }
+      return xlsxData
+    },
+    getXlsxTabelData() {
+      if (this.diffData.length == 0) {
+        return this.$message.error('请选记录进行导出')
+      }
+      return this.diffData
+    },
+    //获取Xlsx文件名称
+    getXlsxName() {
+      return this.rowData.name
+        ? this.rowData.name + '-版本对比.xls'
+        : '版本对比.xls'
+    },
     // 达标规则字段格式化
     formatCondition(record) {
       const { pivotType, field, conditionType, conditionValue } = record
@@ -184,7 +265,8 @@ export default {
         case 1:
           condition = '不包含' + conditionValue
           break
-        case 2: { // 范围
+        case 2: {
+          // 范围
           const value = conditionValue.split(',')
           condition = value[0] + '————' + value[1]
           break
@@ -215,7 +297,7 @@ export default {
     },
     handleRowSelection(record, selected, selectedRows) {
       this.selectedRows = selectedRows
-      this.selectedRowKeys = selectedRows.map(item => item.version)
+      this.selectedRowKeys = selectedRows.map((item) => item.version)
       if (!selected) {
         for (let i = 0; i < this.diffData.length; i++) {
           const item = this.diffData[i]
@@ -225,7 +307,7 @@ export default {
           }
         }
       } else {
-        if (!this.diffData.some(item => item.version === record.version)) {
+        if (!this.diffData.some((item) => item.version === record.version)) {
           this.diffData.push(record)
           this.diffData = this.diffData.sort((a, b) => a.version - b.version)
         }
@@ -233,9 +315,9 @@ export default {
     },
     handleRowSelectionAll(selected, selectedRows, changeRows) {
       this.selectedRows = selectedRows
-      this.selectedRowKeys = selectedRows.map(item => item.version)
+      this.selectedRowKeys = selectedRows.map((item) => item.version)
       if (!selected) {
-        changeRows.map(item => {
+        changeRows.map((item) => {
           for (let i = 0; i < this.diffData.length; i++) {
             const element = this.diffData[i]
             if (element.version === item.version) {
@@ -245,8 +327,8 @@ export default {
           }
         })
       } else {
-        changeRows.map(item => {
-          if (!this.diffData.some(d => d.version === item.version)) {
+        changeRows.map((item) => {
+          if (!this.diffData.some((d) => d.version === item.version)) {
             this.diffData.push(item)
           }
         })
@@ -282,8 +364,8 @@ export default {
     renderSelectRows() {
       this.selectedRows = []
       this.selectedRowKeys = []
-      this.listData.map(item => {
-        if (this.diffData.some(key => key.version === item.version)) {
+      this.listData.map((item) => {
+        if (this.diffData.some((key) => key.version === item.version)) {
           this.selectedRows.push(item)
           this.selectedRowKeys.push(item.version)
         }
@@ -295,39 +377,42 @@ export default {
       const params = {
         current: this.pagination.current,
         pageSize: this.pagination.pageSize,
-        id: this.rowData.id
+        id: this.rowData.id,
       }
-      const result = await this.$server.label.getLabelVersionList(params)
+      const result = await this.$server.label
+        .getLabelVersionList(params)
         .finally(() => {
           this.listLoading = false
         })
       if (result.code === 200) {
-        this.listData = [].concat(result.rows.map(item => {
-          // 在这直接新建一个属性condition, 以免后面都要format
-          this.formatCondition(item)
-          switch (item.updateTime) {
-            case 0:
-              item.updateTime = '每天'
-              break
-            case 1:
-              item.updateTime = '每周'
-              break
-            case 2:
-              item.updateTime = '每月'
-              break
-            case 3:
-              item.updateTime = '不更新'
-              break
-            default:
-              break
-          }
-          return item
-        }))
+        this.listData = [].concat(
+          result.rows.map((item) => {
+            // 在这直接新建一个属性condition, 以免后面都要format
+            this.formatCondition(item)
+            switch (item.updateTime) {
+              case 0:
+                item.updateTime = '每天'
+                break
+              case 1:
+                item.updateTime = '每周'
+                break
+              case 2:
+                item.updateTime = '每月'
+                break
+              case 3:
+                item.updateTime = '不更新'
+                break
+              default:
+                break
+            }
+            return item
+          })
+        )
         this.renderSelectRows()
 
         Object.assign(this.pagination, {
           current: params.current,
-          total: result.total
+          total: result.total,
         })
       } else {
         this.$message.error(result.msg || '请求错误')
@@ -336,13 +421,14 @@ export default {
     async handleGetCompareData() {
       this.listLoading = true
 
-      const params = this.diffData.map(item => {
+      const params = this.diffData.map((item) => {
         return {
           id: item.id,
-          version: item.version
+          version: item.version,
         }
       })
-      const result = await this.$server.label.actionLabelCompare(params)
+      const result = await this.$server.label
+        .actionLabelCompare(params)
         .finally(() => {
           this.listLoading = false
         })
@@ -355,11 +441,11 @@ export default {
     handleResetForm() {
       this.form = this.$options.data().form
       this.$refs.form && this.$refs.form.resetFields()
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="less" scoped>
-@import url("../common");
+@import url('../common');
 </style>
