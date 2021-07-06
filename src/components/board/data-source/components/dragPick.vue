@@ -193,6 +193,7 @@
 import { mapGetters, mapActions } from 'vuex'
 import { deepClone } from '@/utils/deepClone'
 import { sum, summary } from '@/utils/summaryList'
+import TreeGroupBy from '@/components/board/options/treemap/tree-groupby'
 import navigateList from '@/config/navigate' // 导航条菜单
 import _ from 'lodash'
 import { Loading } from 'element-ui'
@@ -672,6 +673,19 @@ export default {
           apiData.source.columns = []
           apiData.source.rows = []
           this.$store.dispatch('SetSelfDataSource', apiData)
+          this.updateChartData()
+          return
+        }
+        // 矩形树图数据处理
+        if (this.currSelected.setting.chartType === 'v-treemap') {
+          let setting = deepClone(this.currSelected.setting)
+          let config = setting.config
+          const tree = new TreeGroupBy(res.rows, setting.api_data.dimensions.map(item => item.alias), setting.api_data.measures)
+          config.visualMap.pieces = TreeGroupBy.handlePieces(tree.tree, setting.config.series.recDimensionIndex)
+          config.series.data = tree.tree
+          config.series.visualMaxList = tree.max
+          config.visualMap.max = tree.max[0]
+          this.$store.dispatch('SetSelfProperty', config)
           this.updateChartData()
           return
         }

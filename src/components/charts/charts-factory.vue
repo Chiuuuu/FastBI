@@ -317,9 +317,37 @@ export default {
         })
         
       }
-      
-      
+
+      // 矩形树图
+      if (this.chartType === 'v-treemap') {
+        const series = options.series[0] ? options.series[0] : options.series
+        this.handleTreemapFormatter(series, 'tooltip')
+        this.handleTreemapFormatter(series, 'label')
+      }
       return options
+    },
+    // 处理矩形树图的formatter
+    handleTreemapFormatter(series, type) {
+        let flag = false
+        if (this.apiData.measures[0]) {
+          const measureAlias = this.apiData.measures[0].alias
+          flag = series[type + 'ShowList'].includes(measureAlias)
+        }
+        series[type].formatter = (params) => {
+          let result = []
+          let target = params.data
+          while (target.parent) {
+            if (series[type + 'ShowList'].includes(target.column)) {
+              result.push(target.name)
+            }
+            target = target.parent
+          }
+          result = result.reverse()
+          if (flag) {
+            result.push(params.value[1])
+          }
+          return result.toString()
+        }
     },
     // 添加图表点击事件，可以点击非数据区域
     setChartClick() {
@@ -328,7 +356,10 @@ export default {
         this.$refs.chart.echarts.getZr().on('click', function(params) {
           if (typeof params.target === 'undefined') {
             // 重置数据颜色样式
-            delete self.chartExtend.series.itemStyle.normal.color
+            const series = self.chartExtend.series
+            if (series.itemStyle && series.itemStyle.normal && series.itemStyle.normal.color) {
+              delete self.chartExtend.series.itemStyle.normal.color
+            }
             // 强行渲染，非数据变动不会自动重新渲染
             self.key++
             self.$emit('resetOriginData', self.id)
@@ -338,6 +369,7 @@ export default {
     },
     // 地图显示内容格式拼接
     setMapFormatter() {
+      // debugger
       for (let series of this.chartSeries) {
         // 指标内容
         let orient = series.label.normal.orient
