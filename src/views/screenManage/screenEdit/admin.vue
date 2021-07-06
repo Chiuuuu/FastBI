@@ -138,7 +138,7 @@
             ></high-charts>
             <!-- 矩形热力图 -->
             <chart-heart
-              v-else-if="transform.setting.name === 've-heatmap'"
+              v-else-if="transform.setting.name==='ve-heatmap'|transform.setting.name==='ve-sun'"
               :key="transform.id"
               :view="transform.setting.view"
               :config="transform.setting.config"
@@ -152,7 +152,7 @@
               :setting='transform.setting'
               :background="transform.setting.background"
             ></component> -->
-
+            <!-- <span>{{transform.setting.background}}</span> -->
             <charts-factory
               v-else
               :key="transform.id"

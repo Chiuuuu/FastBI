@@ -723,8 +723,7 @@ const list = [
                   fontSize: 12,
                   position: 'outside', // 可选inside
                   formatter: '{b}: {@2012} ({d}%)',
-                  //   formatterSelect: ['{b}', '{@2012}', '({d}%)']
-                  formatterSelect: ['name', 'value', 'percent']
+                  formatterSelect: ['{b}', '{@2012}', '({d}%)']
                 },
                 // 选中时样式
                 select: {
@@ -1083,25 +1082,15 @@ const list = [
                   fontWeight: 'normal'
                 }
               },
-              tooltip: {
-                trigger: 'item',
-                confine: true,
-                formatter: '{b} ：{c}'
-                // formatter(params) {
-                //   return params.name
-                // }
-              },
-              grid: {
-                left: 0,
-                top: 10,
-                right: 0,
-                bottom: 10
-              },
+              grid: { left: 0, top: 10, right: 0, bottom: 10 },
               legend: {
                 show: false,
                 textStyle: {
                   color: '#ffffff',
                   fontSize: 12
+                },
+                itemStyle: {
+                  color: DEFAULT_COLORS[0]
                 },
                 itemGap: 12,
                 icon: '',
@@ -1109,26 +1098,15 @@ const list = [
                 top: 'auto',
                 right: 'auto',
                 bottom: 'auto',
+                orient: 'horizontal',
                 data: ['人口']
               },
-              visualMap: {
+              xAxis: {
                 show: false,
-                type: 'piecewise',
-                min: 0,
-                max: 403631060,
-                seriesIndex: [0],
-                inRange: {
-                  color: ['#50a3ba', '#eac736', '#d94e5d'],
-                  symbolSize: [10, 16]
-                },
-                tooltip: {
-                  show: false,
-                  trigger: 'item',
-                  confine: true,
-                  formatter: '{b} ：{c}'
-                  // formatter(params) {
-                  //   return params.name
-                  // }
+                axisLabel: {
+                  color: '#ffffff',
+                  fontSize: 12,
+                  rotate: 0
                 },
                 axisLine: {
                   show: false,
@@ -1169,17 +1147,17 @@ const list = [
                 aspectScale: 0.75,
                 zoom: 1.1,
                 roam: false,
-                mapLocation: {
-                  x: 'left',
-                  y: 'top'
-                },
+                // mapLocation: {
+                //   x: 'left',
+                //   y: 'top'
+                // },
                 label: {
                   normal: {
-                    show: true,
+                    show: false,
                     color: '#fff'
                   },
                   emphasis: {
-                    show: true
+                    show: false
                   }
                 },
                 itemStyle: {
@@ -1196,15 +1174,10 @@ const list = [
                   }
                 }
               },
-              series: [],
-              color: DEFAULT_COLORS
+              series: []
+              //   color: DEFAULT_COLORS
             },
-            view: {
-              width: 300,
-              height: 500,
-              x: 710,
-              y: 290
-            }
+            view: { width: 300, height: 500, x: 710, y: 290 }
           },
           {
             title: '环形图',
@@ -1868,7 +1841,7 @@ const list = [
                 bottom: 50
               },
               legend: {
-                show: true,
+                show: false,
                 orient: 'horizontal',
                 textStyle: {
                   color: '#ffffff',
@@ -1876,6 +1849,25 @@ const list = [
                 },
                 itemGap: 12,
                 icon: '',
+                left: 'center',
+                top: 'auto',
+                right: 'auto',
+                bottom: 'auto'
+              },
+              visualMap: {
+                show: true,
+                type: 'continuous',
+                orient: 'horizontal',
+                dimension: 1,
+                max: 0,
+                textStyle: {
+                  color: '#ffffff',
+                  fontSize: 12
+                },
+                inRange: {
+                  color: ['#ffff0d', '#f69f2e']
+                },
+                itemGap: 12,
                 left: 'center',
                 top: 'auto',
                 right: 'auto',
@@ -1935,24 +1927,26 @@ const list = [
                 name: '矩形树图',
                 type: 'treemap',
                 recSize: 'value', // 矩形大小依据度量等比或所有矩形等大(none)
-                // visibleMin: 300,
+                recDimensionIndex: '', // 矩形颜色(即视觉映射的维度)
+                visualMaxList: [],
+                // 由于visualMap数组中的颜色定义, 即使隐藏了也会优先取piecewise的颜色集, 所以这里才去分开记录重新赋值到visualMap的方式解决
+                continuousColors: ['#ffff0d', '#f69f2e'],
+                piecewiseColors: ['#f69f2e', '#0fabf1', '#ed8693', '#ffff0d', '#0d8686'],
+                breadcrumb: { show: false },
                 tooltip: {
                   show: true,
                   formatter: '{b} {c}'
                 },
+                // 由于JSON.stringfy不支持转换function类型, 所以需要2个数组记录formatter的字段
+                tooltipShowList: [], // 记录tooltip需要展示的字段
+                labelShowList: [], // 记录label需要展示的字段
                 label: {
                   show: true,
                   align: 'center',
                   position: 'inside',
+                  fontSize: 12,
+                  color: '#fff',
                   ellipsis: true,
-                  formatter: '{b}'
-                },
-                upperLabel: {
-                  show: true,
-                  align: 'center',
-                  position: 'inside',
-                  ellipsis: true,
-                  height: 30,
                   formatter: '{b}'
                 },
                 emphasis: {
@@ -1963,74 +1957,49 @@ const list = [
                     height: 30
                   }
                 },
-                // itemStyle: {
-                //   borderColor: '#555'
-                // },
-                levels: [
-                  {
-                    upperLabel: {
-                      show: false
-                    },
-                    itemStyle: {
-                      borderColorSaturation: 0.25,
-                      borderWidth: 2,
-                      gapWidth: 1
-                    }
-                  },
-                  {
-                    itemStyle: {
-                      borderColorSaturation: 0.3,
-                      borderWidth: 2,
-                      gapWidth: 1
-                    }
-                  },
-                  {
-                    itemStyle: {
-                      borderColorSaturation: 0.35,
-                      borderWidth: 2,
-                      gapWidth: 1
-                    }
-                  }
-                ],
+                itemStyle: {
+                  color: 'transparent',
+                  borderWidth: 0.2
+                },
                 data: [
                   {
                     name: '广东省',
-                    value: [1000],
+                    value: [1000, 1000],
                     children: [
                       {
                         name: '广州市',
-                        value: [800]
+                        value: [800, 800]
                       },
                       {
                         name: '深圳市',
-                        value: [100]
+                        value: [100, 100]
                       },
                       {
                         name: '东莞市',
-                        value: [100]
+                        value: [100, 100]
                       }
                     ]
                   },
                   {
                     name: '江苏省',
-                    value: [1000],
+                    value: [1000, 1000],
                     children: [
                       {
                         name: '南京市',
-                        value: [700]
+                        value: [700, 700]
                       },
                       {
                         name: '苏州市',
-                        value: [200]
+                        value: [200, 200]
                       },
                       {
                         name: '无锡市',
-                        value: [100]
+                        value: [100, 100]
                       }
                     ]
                   }
                 ]
-              }
+              },
               // color: DEFAULT_COLORS
             },
             chartEvents: {
@@ -2046,7 +2015,7 @@ const list = [
           {
             title: '矩形热力图',
             name: 've-heatmap',
-            chartType: 'v-heatmap',
+            chartType: 'e-heat',
             icon: 'icon_pie_chart.png',
             // iconFont: 'icon-Pie-chart',
             type: '1',
@@ -2078,9 +2047,8 @@ const list = [
             config: {
               title: {
                 show: true,
-                content: '',
-                text: '矩形热力图',
-                left: 'center',
+                content: '矩形热力图',
+                textAlign: 'left',
                 textStyle: {
                   color: '#ffffff',
                   fontSize: 20,
@@ -2088,82 +2056,44 @@ const list = [
                   fontWeight: 'normal'
                 }
               },
-
               tooltip: {
                 position: 'top'
               },
               grid: {
-                left: 60,
-                top: 60,
-                right: 50,
-                bottom: 60
+                height: '50%',
+                top: '10%'
               },
               xAxis: {
                 type: 'category',
-                // data: ['1a', '2a', '3a', '4a', '5a', '6a', '7a', '8a', '9a', '10a', '11a', '12a'],
-                nameLocation: 'middle',
-                nameGap: 20,
-                nameTextStyle: {
-                  color: '#fff',
-                  fontSize: '12',
-                  align: 'right',
-                  padding: [30, 0, 0, 0]
-                },
-                axisLabel: {
-                  color: '#ffffff',
-                  fontSize: 12,
-                  rotate: 0
-                },
-                axisLine: {
-                  show: true,
-                  lineStyle: {
-                    color: '#fff'
-                  }
-                },
-                splitLine: {
-                  show: false,
-                  lineStyle: {
-                    type: 'solid',
-                    color: '#fff'
-                  }
-                },
-                axisTick: {
-                  show: true
-                },
+                data: [
+                  '1a',
+                  '2a',
+                  '3a',
+                  '4a',
+                  '5a',
+                  '6a',
+                  '7a',
+                  '8a',
+                  '9a',
+                  '10a',
+                  '11a',
+                  '12a'
+                ],
                 splitArea: {
                   show: true
                 }
               },
               yAxis: {
                 type: 'category',
-                // data: ['Saturday', 'Friday', 'Thursday', 'Wednesday', 'Tuesday', 'Monday', 'Sunday'],
-                position: 'left',
-                nameLocation: 'middle',
-                nameTextStyle: {
-                  color: '#fff',
-                  fontSize: 12,
-                  padding: [0, 0, 40, 0]
-                },
-                axisLabel: {
-                  color: '#ffffff',
-                  fontSize: 12
-                },
-                axisLine: {
-                  show: false,
-                  lineStyle: {
-                    color: '#fff'
-                  }
-                },
-                splitLine: {
-                  show: false,
-                  lineStyle: {
-                    type: 'solid',
-                    color: '#fff'
-                  }
-                },
-                axisTick: {
-                  show: false
-                },
+                data: [
+                  'Saturday',
+                  'Friday',
+                  'Thursday',
+                  'Wednesday',
+                  'Tuesday',
+                  'Monday',
+                  'Sunday'
+                ],
                 splitArea: {
                   show: true
                 }
@@ -2171,20 +2101,13 @@ const list = [
               visualMap: {
                 min: 0,
                 max: 10,
-                show: true,
                 calculable: true,
-                orient: 'horizontal', //vertical
-                left: 'center', //左 中 右
-                top: 'bottom', //上 中 下
-                bottom: '5%',
-                textStyle: {
-                  color: '#fff',
-                  fontSize: 15,
-                  fontFamily: 'not specified'
-                }
+                orient: 'horizontal',
+                left: 'center',
+                bottom: '15%'
               },
               series: {
-                name: '',
+                name: 'Punch Card',
                 type: 'heatmap',
                 data: [
                   ['1a', 'Sunday', 2],
@@ -2201,24 +2124,22 @@ const list = [
                   ['12a', 'Saturday', 12]
                 ],
                 label: {
-                  show: true,
-                  color: '#fff',
-                  position: 'inside'
-                },
-                emphasis: {
-                  itemStyle: {
-                    shadowBlur: 10,
-                    shadowColor: 'rgba(0, 0, 0, 0.5)'
-                  }
+                  show: true
                 }
-              }
-              // color: DEFAULT_COLORS
+                // emphasis: {
+                //   itemStyle: {
+                //     shadowBlur: 10,
+                //     shadowColor: 'rgba(0, 0, 0, 0.5)'
+                //   }
+                // }
+              },
+              color: DEFAULT_COLORS
             },
             chartEvents: {
               click: chartClick
             },
             view: {
-              width: 500,
+              width: 400,
               height: 400,
               x: 760,
               y: 340
@@ -2308,7 +2229,7 @@ const list = [
               //标题属性设置
               title: {
                 text: '立体饼图',
-                content: '',
+                content: '立体饼图',
                 align: 'center', //对齐方式left center right
                 style: {
                   //标题属性设置（字体、颜色、大小，粗细）
@@ -2455,7 +2376,7 @@ const list = [
               //标题属性设置
               title: {
                 text: '立体柱形图',
-                content: '',
+                content: '立体柱形图',
                 align: 'center', //对齐方式left center right
                 style: {
                   //标题属性设置（字体、颜色、大小，粗细）

@@ -193,6 +193,7 @@
 import { mapGetters, mapActions } from 'vuex'
 import { deepClone } from '@/utils/deepClone'
 import { sum, summary } from '@/utils/summaryList'
+import TreeGroupBy from '@/components/board/options/treemap/tree-groupby'
 import navigateList from '@/config/navigate' // 导航条菜单
 import _ from 'lodash'
 import { Loading } from 'element-ui'
@@ -683,6 +684,35 @@ export default {
           })
           datas = datas.map(item => _.omit(item, filterArr))
         }
+        // 矩形树图数据处理
+        if (this.currSelected.setting.chartType === 'v-treemap') {
+          let setting = deepClone(this.currSelected.setting)
+          let config = setting.config
+          const tree = new TreeGroupBy(res.rows, setting.api_data.dimensions.map(item => item.alias), setting.api_data.measures)
+          config.series.data = tree.tree
+          config.series.visualMaxList = tree.max
+          config.visualMap.max = tree.max[0]
+
+          // 若删除了维度, 且刚好指针指向了维度, 则切换映射类型
+          let index = config.series.recDimensionIndex
+          if (index === setting.api_data.dimensions.length) {
+            config.visualMap.max = config.series.visualMaxList[0]
+            config.visualMap.type = 'continuous'
+            config.visualMap.inRange.color = config.series.continuousColors
+          } else {
+            let dimensionIndex = setting.api_data.dimensions.length - index - 1
+            dimensionIndex = dimensionIndex < 0 ? 0 : dimensionIndex
+            config.visualMap.dimension = dimensionIndex + 1
+            config.visualMap.max = config.series.visualMaxList[dimensionIndex]
+            config.visualMap.type = 'piecewise'
+            config.visualMap.inRange.color = config.series.piecewiseColors
+            config.visualMap.pieces = TreeGroupBy.handlePieces(config.series.data, index)
+          }
+          this.$store.dispatch('SetSelfProperty', config)
+          this.updateChartData()
+          return
+        }
+        let rows = res.rows
         if (this.currSelected.setting.chartType === 'v-tables') {
           let columns = []
           apiData.tableList.forEach(item => {

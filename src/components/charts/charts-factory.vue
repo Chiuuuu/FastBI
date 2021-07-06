@@ -45,6 +45,7 @@
       :after-config="afterConfig"
       :title="chartType === 'v-ring' ? config.chartTitle : {}"
       :extend="chartExtend"
+      :legend="chartLegend"
       :options="chartOptions"
       :settings="chartSettings"
       :series="chartSeries"
@@ -182,7 +183,34 @@ export default {
             this.chartExtend = { ...omit(val, ['series']) }
             this.chartSeries = deepClone(val.series)
             // this.setMapFormatter()
+          } else if(this.typeName === 've-scatter'){ //散点图
+            this.chartExtend = { ...omit(val, ['series','legend']) }
+            this.chartLegend = val.legend; //图例
+            // series设置
+            let series = deepClone(val.series)
+            let data = series.data;
+            let list = [];
+            data.map(item=>{
+              list.push(deepClone(series))
+              list[list.length-1].data = item.data;
+              list[list.length-1].name = item.label;
+            })
+            this.chartSeries = list;
+            
+            // tooltip显示  -- 不生效
+            // this.chartExtend.tooltip.formatter = function(params){
+            //   let val= params.value;
+            //   if(val.length<6){ return ''};
+            //   console.log(params)
+            //   return `${params.marker}<br/>
+            //           ${val[5]}：${val[2]}<br/>
+            //           ${val[3]}：${val[0]}<br/>
+            //           ${val[4]}：${val[1]}<br/>
+            //           `;
+            // }
+
           } else {
+          
             this.chartExtend = deepClone(val)
             // 保留两位小数
             if (this.typeName !== 've-gauge' && this.typeName !== 've-ring') {
@@ -259,13 +287,26 @@ export default {
               if (!val.source) {
                 return
               }
-              // 如果有联动，显示联动的数据
-              this.chartData = val.selectData ? val.selectData : val.source
+              if(this.chartType === 'v-scatter'){ //散点图的数据自定义显示
+                this.chartData.columns = []
+                this.chartData.rows = []
+              }else{
+                // 如果有联动，显示联动的数据
+                this.chartData = val.selectData ? val.selectData : val.source
+              }
               return
             }
           }
-          this.chartData.columns = val.columns
-          this.chartData.rows = val.rows
+
+          if (this.chartType === 'v-scatter') { //散点图的数据自定义显示
+            this.chartData.columns = []
+            this.chartData.rows = []
+          }else{
+            this.chartData.columns = val.columns
+            this.chartData.rows = val.rows
+          }
+          
+          
         }
       },
       deep: true,
@@ -346,9 +387,37 @@ export default {
         })
         
       }
-      
-      
+
+      // 矩形树图
+      if (this.chartType === 'v-treemap') {
+        const series = options.series[0] ? options.series[0] : options.series
+        this.handleTreemapFormatter(series, 'tooltip')
+        this.handleTreemapFormatter(series, 'label')
+      }
       return options
+    },
+    // 处理矩形树图的formatter
+    handleTreemapFormatter(series, type) {
+        let flag = false
+        if (this.apiData.measures[0]) {
+          const measureAlias = this.apiData.measures[0].alias
+          flag = series[type + 'ShowList'].includes(measureAlias)
+        }
+        series[type].formatter = (params) => {
+          let result = []
+          let target = params.data
+          while (target.parent) {
+            if (series[type + 'ShowList'].includes(target.column)) {
+              result.push(target.name)
+            }
+            target = target.parent
+          }
+          result = result.reverse()
+          if (flag) {
+            result.push(params.value[1])
+          }
+          return result.toString()
+        }
     },
     // 添加图表点击事件，可以点击非数据区域
     setChartClick() {
@@ -357,7 +426,10 @@ export default {
         this.$refs.chart.echarts.getZr().on('click', function(params) {
           if (typeof params.target === 'undefined') {
             // 重置数据颜色样式
-            delete self.chartExtend.series.itemStyle.normal.color
+            const series = self.chartExtend.series
+            if (series.itemStyle && series.itemStyle.normal && series.itemStyle.normal.color) {
+              delete self.chartExtend.series.itemStyle.normal.color
+            }
             // 强行渲染，非数据变动不会自动重新渲染
             self.key++
             self.$emit('resetOriginData', self.chartId)
@@ -367,6 +439,7 @@ export default {
     },
     // 地图显示内容格式拼接
     setMapFormatter() {
+      // debugger
       for (let series of this.chartSeries) {
         // 指标内容
         let orient = series.label.normal.orient

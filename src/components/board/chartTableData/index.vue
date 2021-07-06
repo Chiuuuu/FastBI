@@ -1,40 +1,11 @@
 <template>
-  <div class="dialog" @click.self="close">
-    <div class="dialog-container">
-      <div class="dialog-title">图表数据</div>
-      <div class="content scrollbar">
-        <table class="chartdata-table">
-          <tr class="table-tr">
-            <th
-              class="table-td"
-              v-for="(value, index) in chartData.columns"
-              :key="index"
-            >
-              {{ value }}
-            </th>
-          </tr>
-          <tr
-            class="table-tr"
-            v-for="(row, index) in chartData.rows"
-            :key="index"
-          >
-            <td class="table-td" v-for="(value, key) in row" :key="key">
-              {{ value }}
-            </td>
-          </tr>
-        </table>
-      </div>
-      <div class="close-btn" @click="close">
-        <a-icon type="close" />
-      </div>
-    </div>
-  </div>
-  <!-- <a-modal
+  <a-modal
     :visible="true"
     title="图表数据"
     width="750px"
     :footer="null"
-    @cancel="close"
+    @cancel="$emit('cancel')"
+    :getContainer="getContainer"
   >
     <div style="width:100%">
       <table class="chartdata-table">
@@ -58,7 +29,7 @@
         </tr>
       </table>
     </div>
-  </a-modal> -->
+  </a-modal>
 </template>
 <script>
 export default {
@@ -73,6 +44,17 @@ export default {
     close() {
       this.$destroy()
       this.$el.remove()
+    }
+  },
+  inject: {
+    dvScreenDom: {
+      default: ''
+    }
+  },
+  methods: {
+    // 全屏下，内容挂在dvScreen元素下（screen.vue）可显示，默认挂在body下
+    getContainer(e) {
+      return this.dvScreenDom ? this.dvScreenDom() : document.body
     }
   }
 }

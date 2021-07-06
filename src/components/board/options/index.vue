@@ -17,7 +17,7 @@
           class="tab-item"
           v-if="
             currSelected.setting.name !== 've-image' &&
-              currSelected.setting.name !== 'figure'
+            currSelected.setting.name !== 'figure'
           "
           :class="{ active: tabsType === 1 }"
           @click="tabsTypeChange(1)"
@@ -29,8 +29,8 @@
           class="tab-item"
           v-if="
             currSelected.setting.type === '1' &&
-              currSelected.setting.name !== 've-map' &&
-              currSelected.setting.chartType !== 'v-multiPie'
+            currSelected.setting.name !== 've-map' &&
+            currSelected.setting.chartType !== 'v-multiPie'
           "
           :class="{ active: tabsType === 2 }"
           @click="tabsTypeChange(2)"
@@ -47,7 +47,7 @@
             <a-input-number
               v-model="globalSettings.width"
               size="small"
-              :formatter="value => `宽 ${value}`"
+              :formatter="(value) => `宽 ${value}`"
               class="f-clear-width"
               @change="setPageSetting"
             ></a-input-number>
@@ -56,7 +56,7 @@
             <a-input-number
               v-model="globalSettings.height"
               size="small"
-              :formatter="value => `高 ${value}`"
+              :formatter="(value) => `高 ${value}`"
               class="f-clear-width"
               @change="setPageSetting"
             ></a-input-number>
@@ -176,8 +176,8 @@
               <a-input-number
                 v-model="baseProperty.x"
                 size="small"
-                :formatter="value => `X ${value}`"
-                :parser="value => value.replace(/\X\s?|(,*)/g, '')"
+                :formatter="(value) => `X ${value}`"
+                :parser="(value) => value.replace(/\X\s?|(,*)/g, '')"
                 class="f-clear-width"
                 @change="setBaseProperty"
               ></a-input-number>
@@ -186,8 +186,8 @@
               <a-input-number
                 v-model="baseProperty.y"
                 size="small"
-                :formatter="value => `Y ${value}`"
-                :parser="value => value.replace(/\Y\s?|(,*)/g, '')"
+                :formatter="(value) => `Y ${value}`"
+                :parser="(value) => value.replace(/\Y\s?|(,*)/g, '')"
                 class="f-clear-width"
                 @change="setBaseProperty"
               ></a-input-number>
@@ -198,8 +198,8 @@
               <a-input-number
                 v-model="baseProperty.width"
                 size="small"
-                :formatter="value => `W ${value}`"
-                :parser="value => value.replace('W', '')"
+                :formatter="(value) => `W ${value}`"
+                :parser="(value) => value.replace('W', '')"
                 class="f-clear-width"
                 @change="setBaseProperty"
               ></a-input-number>
@@ -209,8 +209,8 @@
                 v-model="baseProperty.height"
                 size="small"
                 :max="selfConfig.title === '直线' ? 20 : Infinity"
-                :formatter="value => `H ${value}`"
-                :parser="value => value.replace(/\H\s?|(,*)/g, '')"
+                :formatter="(value) => `H ${value}`"
+                :parser="(value) => value.replace(/\H\s?|(,*)/g, '')"
                 class="f-clear-width"
                 @change="setBaseProperty"
               ></a-input-number>
@@ -221,6 +221,7 @@
             :HighConfig="currSelected"
             v-if="currSelected.setting.chartType === 'high-pie'"
           ></high-chart-pie>
+
           <high-chart-bar
             :HighConfig="currSelected"
             v-if="currSelected.setting.chartType === 'high-column'"
@@ -230,7 +231,7 @@
             v-model="collapseActive"
             v-if="
               (currSelected.setting.chartType !== 'high-pie') &
-                (currSelected.setting.chartType !== 'high-column')
+              (currSelected.setting.chartType !== 'high-column')
             "
           >
             <!--标题 noTitle图片没有标题-->
@@ -355,8 +356,8 @@
                     <a-input-number
                       v-model="selfConfig.grid.top"
                       size="small"
-                      :formatter="value => `上 ${value}`"
-                      :parser="value => value.replace(/\上\s?|(,*)/g, '')"
+                      :formatter="(value) => `上 ${value}`"
+                      :parser="(value) => value.replace(/\上\s?|(,*)/g, '')"
                       class="f-clear-width"
                       :min="0"
                       :max="60"
@@ -367,7 +368,7 @@
                     <a-input-number
                       v-model="selfConfig.grid.bottom"
                       size="small"
-                      :formatter="value => `下 ${value}`"
+                      :formatter="(value) => `下 ${value}`"
                       class="f-clear-width"
                       :min="0"
                       :max="60"
@@ -380,7 +381,7 @@
                     <a-input-number
                       v-model="selfConfig.grid.left"
                       size="small"
-                      :formatter="value => `左 ${value}`"
+                      :formatter="(value) => `左 ${value}`"
                       class="f-clear-width"
                       :min="0"
                       :max="60"
@@ -391,7 +392,7 @@
                     <a-input-number
                       v-model="selfConfig.grid.right"
                       size="small"
-                      :formatter="value => `右 ${value}`"
+                      :formatter="(value) => `右 ${value}`"
                       class="f-clear-width"
                       :min="0"
                       :max="200"
@@ -571,13 +572,13 @@
             <!-- 散点图独有 -->
             <template>
               <a-collapse-panel
-                key="indicator"
+                key="indicatorscatter"
                 header="指标设置"
                 v-if="isScatter"
               >
                 <a-switch
                   slot="extra"
-                  v-if="collapseActive.indexOf('indicator') > -1"
+                  v-if="collapseActive.indexOf('indicatorscatter') > -1"
                   v-model="selfConfig.series.label.show"
                   default-checked
                   @change="switchChange"
@@ -767,7 +768,7 @@
                     @change="setSelfProperty"
                   ></a-input>
                 </gui-field>
-                <gui-field label="玫瑰图" v-if="isPie">
+                <gui-field label="玫瑰图" v-if="this.chartType === 'v-pie'">
                   <!-- <a-switch
                     v-model="selfConfig.series.roseType"
                     size="small"
@@ -889,8 +890,37 @@
               </a-collapse-panel>
             </template>
 
+            <!-- 矩形树图独有 -->
+            <template v-if="isTreemap">
+              <a-collapse-panel key="treemap1" header="图形属性">
+                <Treemap1 :self-config="selfConfig" />
+              </a-collapse-panel>
+              <a-collapse-panel key="treemap2" header="鼠标移入提示">
+                <a-switch
+                  slot="extra"
+                  v-if="collapseActive.indexOf('treemap2') > -1"
+                  v-model="selfConfig.series.tooltip.show"
+                  default-checked
+                  @change="switchChange"
+                  size="small"
+                />
+                <Treemap2 :self-config="selfConfig" />
+              </a-collapse-panel>
+              <a-collapse-panel key="treemap3" header="图例设置">
+                <a-switch
+                  slot="extra"
+                  v-if="collapseActive.indexOf('treemap3') > -1"
+                  v-model="selfConfig.visualMap.show"
+                  default-checked
+                  @change="switchChange"
+                  size="small"
+                />
+                <Treemap3 :self-config="selfConfig" />
+              </a-collapse-panel>
+            </template>
+
             <!--图例-->
-            <template v-if="selfConfig.legend && !isRing && !isGauge && !isMap">
+            <template v-if="selfConfig.legend && !isRing && !isGauge && !isMap && !isTreemap">
               <a-collapse-panel key="legend" header="图例设置">
                 <a-switch
                   slot="extra"
@@ -1153,6 +1183,44 @@
               </a-collapse-panel>
             </template>
 
+            <!-- 单独的旭日图 -->
+            <!-- <template v-if="currSelected.setting.chartType=='v-sun'">
+              <a-collapse-panel key="sun-tuxin" header='图形属性'>
+                <gui-field label="外经大小">
+                  <gui-inline label='' style="width:100%">
+                    <a-input
+                      v-model="selfConfig.series.radius[1]"
+                      size="small"
+                      class="f-clear-width"
+                      @change="setSelfProperty">
+                    </a-input>
+                  </gui-inline>
+                </gui-field>
+                <gui-field label="内经大小">
+                   <gui-inline label='' style="width:100%">
+                    <a-input
+                      v-model="selfConfig.series.radius[0]"
+                      size="small"
+                      class="f-clear-width"
+                      @change="setSelfProperty">
+                    </a-input>
+                  </gui-inline>
+                </gui-field>
+                <gui-field label="环间距">
+                  <gui-inline label='' style="width:100%">
+                    <a-input-number
+                      v-model="selfConfig.series.itemStyle.borderWidth"
+                      size="small"
+                      :min="0"
+                      :max="8"
+                      class="f-clear-width"
+                      @change="setSelfProperty">
+                    </a-input-number>
+                  </gui-inline>
+                </gui-field>
+              </a-collapse-panel>
+            </template> -->
+
             <!--雷达图独有-->
             <template v-if="isRadar">
               <a-collapse-panel key="radar" header="图形属性">
@@ -1267,6 +1335,7 @@
                 </gui-field>
               </a-collapse-panel>
             </template>
+
             <!--仪表盘独有-->
             <template v-if="isGauge">
               <a-collapse-panel key="gauge" header="图形属性">
@@ -1353,7 +1422,7 @@
                     <a-input-number
                       v-model="selfConfig.series.splitLine.length"
                       size="small"
-                      :formatter="value => `长 ${value}`"
+                      :formatter="(value) => `长 ${value}`"
                       class="f-clear-width"
                       @change="setSelfProperty"
                     ></a-input-number>
@@ -1362,7 +1431,7 @@
                     <a-input-number
                       v-model="selfConfig.series.splitLine.lineStyle.width"
                       size="small"
-                      :formatter="value => `宽 ${value}`"
+                      :formatter="(value) => `宽 ${value}`"
                       class="f-clear-width"
                       @change="setSelfProperty"
                     ></a-input-number>
@@ -1373,7 +1442,7 @@
                     <a-input-number
                       v-model="selfConfig.series.startAngle"
                       size="small"
-                      :formatter="value => `起 ${value}`"
+                      :formatter="(value) => `起 ${value}`"
                       class="f-clear-width"
                       @change="setSelfProperty"
                     ></a-input-number>
@@ -1382,7 +1451,7 @@
                     <a-input-number
                       v-model="selfConfig.series.endAngle"
                       size="small"
-                      :formatter="value => `终 ${value}`"
+                      :formatter="(value) => `终 ${value}`"
                       class="f-clear-width"
                       @change="setSelfProperty"
                     ></a-input-number>
@@ -1390,6 +1459,7 @@
                 </gui-field>
               </a-collapse-panel>
             </template>
+
             <!--地图独有-->
             <template v-if="isMap">
               <a-collapse-panel key="geo" header="地理坐标系">
@@ -1457,7 +1527,7 @@
                   </gui-inline>
                 </gui-field>
                 <gui-field label="多边形">
-                  <gui-inline label="区域" style="width:auto;">
+                  <gui-inline label="区域" style="width: auto">
                     <el-color-picker
                       ref="areaColor"
                       show-alpha
@@ -1465,7 +1535,7 @@
                       @change="changeAreaColor"
                     ></el-color-picker>
                   </gui-inline>
-                  <gui-inline label="边框" style="width:auto;">
+                  <gui-inline label="边框" style="width: auto">
                     <el-color-picker
                       v-model="selfConfig.geo.itemStyle.normal.borderColor"
                       @change="setSelfProperty"
@@ -1473,7 +1543,7 @@
                   </gui-inline>
                 </gui-field>
                 <gui-field label="阴影">
-                  <gui-inline label="颜色" style="width:auto;">
+                  <gui-inline label="颜色" style="width: auto">
                     <el-color-picker
                       ref="areaColor"
                       show-alpha
@@ -1481,7 +1551,7 @@
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-inline>
-                  <gui-inline label="模糊大小" style="width:auto;">
+                  <gui-inline label="模糊大小" style="width: auto">
                     <a-input-number
                       v-model="selfConfig.geo.itemStyle.normal.shadowBlur"
                       size="small"
@@ -1517,13 +1587,13 @@
                   ></a-input-number>
                 </gui-field>
                 <gui-field label="多边形悬停">
-                  <gui-inline label="区域" style="width:auto;">
+                  <gui-inline label="区域" style="width: auto">
                     <el-color-picker
                       v-model="selfConfig.geo.itemStyle.emphasis.areaColor"
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-inline>
-                  <gui-inline label="边框" style="width:auto;">
+                  <gui-inline label="边框" style="width: auto">
                     <el-color-picker
                       v-model="selfConfig.geo.itemStyle.emphasis.borderColor"
                       @change="setSelfProperty"
@@ -1541,8 +1611,8 @@
                     <a-input-number
                       v-model="selfConfig.grid.top"
                       size="small"
-                      :formatter="value => `上 ${value}`"
-                      :parser="value => value.replace(/\上\s?|(,*)/g, '')"
+                      :formatter="(value) => `上 ${value}`"
+                      :parser="(value) => value.replace(/\上\s?|(,*)/g, '')"
                       class="f-clear-width"
                       :min="0"
                       :max="60"
@@ -1553,7 +1623,7 @@
                     <a-input-number
                       v-model="selfConfig.grid.bottom"
                       size="small"
-                      :formatter="value => `下 ${value}`"
+                      :formatter="(value) => `下 ${value}`"
                       class="f-clear-width"
                       :min="0"
                       :max="60"
@@ -1566,7 +1636,7 @@
                     <a-input-number
                       v-model="selfConfig.grid.left"
                       size="small"
-                      :formatter="value => `左 ${value}`"
+                      :formatter="(value) => `左 ${value}`"
                       class="f-clear-width"
                       :min="0"
                       :max="60"
@@ -1577,7 +1647,7 @@
                     <a-input-number
                       v-model="selfConfig.grid.right"
                       size="small"
-                      :formatter="value => `右 ${value}`"
+                      :formatter="(value) => `右 ${value}`"
                       class="f-clear-width"
                       :min="0"
                       :max="200"
@@ -1592,7 +1662,7 @@
                     header="填充层设置"
                     v-if="
                       selfConfig.series[0] &&
-                        selfConfig.series[0].type === 'map'
+                      selfConfig.series[0].type === 'map'
                     "
                   >
                     <!-- <gui-field label="显示标记点">
@@ -1637,8 +1707,8 @@
                             'select-color',
                             {
                               selected:
-                                color === selfConfig.series[0].themeColor
-                            }
+                                color === selfConfig.series[0].themeColor,
+                            },
                           ]"
                           @click="selectThemeColor(color)"
                         ></div>
@@ -1960,78 +2030,6 @@
                         @change="setSelfProperty"
                       ></a-input-number>
                     </gui-field>
-                    <!-- <gui-field label="类型">
-                      <a-select
-                        style="width: 120px"
-                        v-model="selfConfig.series[targetMeasure].type"
-                        size="small"
-                        @change="setSelfProperty"
-                      >
-                        <a-select-option value="scatter"
-                          >散点/气泡</a-select-option
-                        >
-                        <a-select-option value="effectScatter"
-                          >动画气泡</a-select-option
-                        >
-                      </a-select>
-                    </gui-field> -->
-                    <!-- <gui-field
-                      label="涟漪动画"
-                      v-if="
-                        selfConfig.series[targetMeasure].type ===
-                        'effectScatter'
-                      "
-                    >
-                      <gui-inline label="最大缩放比">
-                        <a-input-number
-                          v-model="
-                            selfConfig.series[targetMeasure].rippleEffect.scale
-                          "
-                          size="small"
-                          :step="0.5"
-                          @change="setSelfProperty"
-                        ></a-input-number>
-                      </gui-inline>
-                      <gui-inline label="波纹方式">
-                        <a-select
-                          style="width:70px"
-                          v-model="
-                            selfConfig.series[targetMeasure].rippleEffect
-                              .brushType
-                          "
-                          size="small"
-                          @change="setSelfProperty"
-                        >
-                          <a-select-option value="stroke"
-                            >stroke</a-select-option
-                          >
-                          <a-select-option value="fill">fill</a-select-option>
-                        </a-select>
-                      </gui-inline>
-                    </gui-field>
-                    <gui-field label="气泡悬停">
-                      <gui-inline label="边框宽度">
-                        <a-input-number
-                          v-model="
-                            selfConfig.series[targetMeasure].itemStyle.emphasis
-                              .borderWidth
-                          "
-                          size="small"
-                          :min="0"
-                          :max="2"
-                          @change="setSelfProperty"
-                        ></a-input-number>
-                      </gui-inline>
-                      <gui-inline label="边框颜色" style="width:auto;">
-                        <el-color-picker
-                          v-model="
-                            selfConfig.series[targetMeasure].itemStyle.emphasis
-                              .borderColor
-                          "
-                          @change="setSelfProperty"
-                        ></el-color-picker>
-                      </gui-inline>
-                    </gui-field> -->
                   </a-collapse-panel>
                 </a-collapse>
               </a-collapse-panel>
@@ -2102,8 +2100,8 @@
                     <a-input-number
                       v-model="selfConfig.xAxis.nameTextStyle.padding[0]"
                       size="small"
-                      :formatter="value => `上 ${value}`"
-                      :parser="value => value.replace(/\上\s?|(,*)/g, '')"
+                      :formatter="(value) => `上 ${value}`"
+                      :parser="(value) => value.replace(/\上\s?|(,*)/g, '')"
                       class="f-clear-width"
                       :min="0"
                       :max="60"
@@ -2114,7 +2112,7 @@
                     <a-input-number
                       v-model="selfConfig.xAxis.nameTextStyle.padding[2]"
                       size="small"
-                      :formatter="value => `下 ${value}`"
+                      :formatter="(value) => `下 ${value}`"
                       class="f-clear-width"
                       :min="0"
                       :max="60"
@@ -2127,7 +2125,7 @@
                     <a-input-number
                       v-model="selfConfig.xAxis.nameTextStyle.padding[3]"
                       size="small"
-                      :formatter="value => `左 ${value}`"
+                      :formatter="(value) => `左 ${value}`"
                       class="f-clear-width"
                       :min="0"
                       :max="60"
@@ -2138,7 +2136,7 @@
                     <a-input-number
                       v-model="selfConfig.xAxis.nameTextStyle.padding[1]"
                       size="small"
-                      :formatter="value => `右 ${value}`"
+                      :formatter="(value) => `右 ${value}`"
                       class="f-clear-width"
                       :min="0"
                       :max="200"
@@ -2221,6 +2219,7 @@
                 </gui-field>
               </a-collapse-panel>
             </template>
+
             <!--y轴-->
             <template v-if="showYAxis">
               <a-collapse-panel key="yAxis" header="y轴">
@@ -2232,12 +2231,6 @@
                   @change="switchChange"
                   size="small"
                 />
-                <!-- <gui-field label="y1标题" v-if="isHistogram">
-                            <a-input v-model="apis.yAxisName[0]" @change="setApis" style="width:100px;" size="small"></a-input>
-                          </gui-field>
-                          <gui-field label="y2标题" v-if="isHistogram">
-                            <a-input v-model="apis.yAxisName[1]" @change="setApis" style="width:100px;" size="small"></a-input>
-                        </gui-field>-->
                 <gui-field label="轴名称">
                   <a-input
                     v-model="selfConfig.yAxis.name"
@@ -2292,8 +2285,8 @@
                     <a-input-number
                       v-model="selfConfig.yAxis.nameTextStyle.padding[0]"
                       size="small"
-                      :formatter="value => `上 ${value}`"
-                      :parser="value => value.replace(/\上\s?|(,*)/g, '')"
+                      :formatter="(value) => `上 ${value}`"
+                      :parser="(value) => value.replace(/\上\s?|(,*)/g, '')"
                       class="f-clear-width"
                       :min="0"
                       :max="60"
@@ -2304,7 +2297,7 @@
                     <a-input-number
                       v-model="selfConfig.yAxis.nameTextStyle.padding[2]"
                       size="small"
-                      :formatter="value => `下 ${value}`"
+                      :formatter="(value) => `下 ${value}`"
                       class="f-clear-width"
                       :min="0"
                       :max="60"
@@ -2317,7 +2310,7 @@
                     <a-input-number
                       v-model="selfConfig.yAxis.nameTextStyle.padding[3]"
                       size="small"
-                      :formatter="value => `左 ${value}`"
+                      :formatter="(value) => `左 ${value}`"
                       class="f-clear-width"
                       :min="0"
                       :max="60"
@@ -2328,7 +2321,7 @@
                     <a-input-number
                       v-model="selfConfig.yAxis.nameTextStyle.padding[1]"
                       size="small"
-                      :formatter="value => `右 ${value}`"
+                      :formatter="(value) => `右 ${value}`"
                       class="f-clear-width"
                       :min="0"
                       :max="200"
@@ -2405,6 +2398,7 @@
                 </gui-field>
               </a-collapse-panel>
             </template>
+
             <!--颜色数组-->
             <template v-if="selfConfig.color">
               <a-collapse-panel key="colors" header="颜色设置">
@@ -2422,6 +2416,7 @@
                 </div>
               </a-collapse-panel>
             </template>
+
             <!-- 图片 -->
             <template v-if="isImage">
               <a-collapse-panel key="images" header="图片">
@@ -2441,6 +2436,7 @@
                 </gui-field>
               </a-collapse-panel>
             </template>
+
             <!-- 表格 -->
             <template v-if="isTables && selfConfig.header">
               <a-collapse-panel key="header" header="表头">
@@ -2600,23 +2596,8 @@
                   ></a-switch>
                 </gui-field>
               </a-collapse-panel>
-              <!-- <a-collapse-panel key="page" header="翻页器">
-                          <a-switch slot="extra"
-                                    v-if="collapseActive.indexOf('page')>-1"
-                                    v-model="selfConfig.header.show"
-                                    default-checked
-                                    @change="switchChange"
-                                    size="small" />
-                          <gui-field label="每页条数">
-                            <a-select style="width:100px" :default-value="10" v-model="selfConfig.table.pageSize" siza="small">
-                              <a-select-option :value="10">10</a-select-option>
-                              <a-select-option :value="20">20</a-select-option>
-                              <a-select-option :value="50">50</a-select-option>
-                              <a-select-option :value="100">100</a-select-option>
-                            </a-select>
-                          </gui-field>
-                      </a-collapse-panel>-->
             </template>
+
             <!--进度条-->
             <template v-if="isSteepBar">
               <a-collapse-panel key="steepBar" header="进度条">
@@ -2767,6 +2748,7 @@
                 </gui-field>
               </a-collapse-panel>
             </template>
+
             <!-- 背景设置-除素材库和图形外 -->
             <a-collapse-panel
               key="background"
@@ -2831,8 +2813,8 @@
                 <a-input-number
                   v-model="backgroundApi.borderWidth"
                   size="small"
-                  :formatter="value => `${value}px`"
-                  :parser="value => value.replace('px', '')"
+                  :formatter="(value) => `${value}px`"
+                  :parser="(value) => value.replace('px', '')"
                   @change="setBackGround"
                 ></a-input-number>
               </gui-field>
@@ -2853,8 +2835,8 @@
                 <a-input-number
                   v-model="backgroundApi.borderRadius"
                   size="small"
-                  :formatter="value => `${value}px`"
-                  :parser="value => value.replace('px', '')"
+                  :formatter="(value) => `${value}px`"
+                  :parser="(value) => value.replace('px', '')"
                   @change="setBackGround"
                 ></a-input-number>
               </gui-field>
@@ -2902,7 +2884,7 @@ import { mapGetters, mapActions } from 'vuex'
 import { setBaseProperty } from '../../../api/canvasMaps/canvas-maps-request'
 import {
   resetPageSettings,
-  setPageSettings
+  setPageSettings,
 } from '../../../api/app/app-request'
 import GuiGroup from './gui-group'
 import GuiWrap from './gui-wrap'
@@ -2915,30 +2897,36 @@ import Figure from './figure'
 import { DEFAULT_COLORS } from '../../../utils/defaultColors'
 import { deepClone } from '../../../utils/deepClone'
 import throttle from 'lodash/throttle'
+import Treemap1 from './treemap/treemap-1.vue'
+import Treemap2 from './treemap/treemap-2.vue'
+import Treemap3 from './treemap/treemap-3.vue'
 import HighChartPie from '@/components/board/options/highchart-pie'
 import HighChartBar from '@/components/board/options/highchart-bar'
 
 const themeColorNMap = {
   yellow: ['rgb(249,217,96)', 'rgb(249,159,61)', 'rgb(247,107,28)'],
   blue: ['rgb(79,174,255)', 'rgb(55,115,205)', 'rgb(32,56,156)'],
-  green: ['rgb(180,236,81)', 'rgb(120,189,55)', 'rgb(66,147,33)']
+  green: ['rgb(180,236,81)', 'rgb(120,189,55)', 'rgb(66,147,33)'],
 }
 export default {
   name: 'BoardOptions',
   props: {
     config: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   provide() {
     return {
       // 地图删除维度的时候调用，重置样式指标设置选择的度量
       initTargetMeasure: () => {
         this.targetMeasure = this.selfConfig.series.filter(
-          item => item.type === 'map'
+          (item) => item.type === 'map'
         ).length
-      }
+      },
+      switchChange: this.switchChange,
+      setSelfProperty: this.setSelfProperty,
+      onRadioChange: this.onRadioChange
     }
   },
   data() {
@@ -2946,7 +2934,7 @@ export default {
       formatList: [
         { label: '维度', value: '{b}', alias: 'name' },
         { label: '度量', value: '{@2012}', alias: 'value' },
-        { label: '占比', value: '({d}%)', alias: 'percent' }
+        { label: '占比', value: '({d}%)', alias: 'percent' },
       ],
       plainOptions: ['a', 'b', 'c'],
       formatShow: [],
@@ -2958,7 +2946,7 @@ export default {
         gridStep: 1,
         backgroundSrc: '',
         backgroundType: 1,
-        opacity: 1
+        opacity: 1,
       },
       baseProperty: { width: 0, height: 0, x: 0, y: 0, rotate: 0 }, // 配置-基础属性,
       collapseActive: [],
@@ -2973,14 +2961,14 @@ export default {
       activeKey: ['1'],
       radioStyle: {
         display: 'flex',
-        alignItems: 'center'
+        alignItems: 'center',
       }, // 单选radio样式
       showSlide: false, // 显示透明滑动条
       imageUrl: '', // 上传图片url
       loading: false, // 是否上传图片中
       refreshList: [
         { name: '分', value: 'min' },
-        { name: '小时', value: 'hour' }
+        { name: '小时', value: 'hour' },
       ],
       timer: null,
       chartTimers: {},
@@ -2995,33 +2983,32 @@ export default {
         { label: '庞门正道标题体', value: 'pangmenzhengdao' },
         { label: 'HuXiaoBoNanShenTi-2', value: 'HuXiaoBoNanShenTi-2' },
         { label: '优设标题黑', value: 'youshe' },
-        { label: 'digital-7-4', value: 'digital-7-4' }
+        { label: 'digital-7-4', value: 'digital-7-4' },
       ],
-      targetMeasure: 0, // 地图指标设置对应度量
       scatterColorList: [
         // 散点颜色
         { label: '单色', value: '0' },
-        { label: '按维度', value: '1' }
+        { label: '按维度', value: '1' },
       ],
       scatterSizeList: [
         // 散点大小
         { label: '无', value: '' },
         { label: '按度量1', value: '0' },
-        { label: '按度量2', value: '1' }
+        { label: '按度量2', value: '1' },
       ],
       scatterFormatList: [
         { label: '无', value: '' },
         { label: '维度1', value: '{@5}：{@2}' },
         { label: '度量1', value: '{@3}：{@0}' },
         { label: '度量2', value: '{@4}：{@1}' },
-        { label: '度量组', value: '({@0},{@1})' }
+        { label: '度量组', value: '({@0},{@1})' },
       ],
       scatterList: [], // 地图里散点图配置列表
       themeColors: ['yellow', 'blue', 'green'], // 地图填充色色系选择
       mapFillPointSelectList: [], // 地图填充指标选择列表
       mapFillTooltipSelectList: [], // 地图填充提示框选择列表
       mapLabelPointSelectList: [], // 地图标记层指标选择列表
-      mapLabelTooltipSelectList: [] // 地图标记层提示框内容选择列表
+      mapLabelTooltipSelectList: [], // 地图标记层提示框内容选择列表
     }
   },
   mounted() {
@@ -3036,7 +3023,7 @@ export default {
     clearInterval(this.timer)
     this.timer = null
     let keys = Object.keys(this.chartTimers)
-    keys.forEach(id => {
+    keys.forEach((id) => {
       clearInterval(this.chartTimers[id])
     })
     this.chartTimers = {}
@@ -3086,6 +3073,12 @@ export default {
     },
     // 设置自有属性
     setSelfProperty() {
+      // if(this.chartType=="v-sun"){
+      //   let _center = this.selfConfig.series.center;
+      //   let _one = _center[0].toString().endsWith("%")?_center[0]:`${_center[0]}%`;
+      //   let _two = _center[1].toString().endsWith("%")?_center[1]:`${_center[1]}%`;
+      //   this.selfConfig.series.center = [_one,_two];
+      // }
       this.$store.dispatch('SetSelfProperty', this.selfConfig)
       // 发送请求来保存数据
       setBaseProperty(this.currentSelected)
@@ -3204,7 +3197,7 @@ export default {
       form.append('avatarfile', e.target.files[0])
       this.$server.screenManage
         .actionUploadImage(form)
-        .then(res => {
+        .then((res) => {
           if (res.code === 200) {
             let imageUrl = process.env.VUE_APP_SERVICE_URL + res.imgUrl
             if (key === 'globalSettings') {
@@ -3224,7 +3217,7 @@ export default {
             this.$message.error(res.msg)
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err)
         })
     },
@@ -3289,7 +3282,7 @@ export default {
       // 堆叠柱状图
       if (val && type === 'stack') {
         this.apis.stack = {
-          用户: []
+          用户: [],
         }
         // 堆叠了把数值显示在右边防止挤在一起
         this.selfConfig.series.label.position = 'insideBottom'
@@ -3308,7 +3301,7 @@ export default {
         this.apis.showLine = [
           columns[columns.length - 2]
             ? columns[columns.length - 2]
-            : columns[columns.length - 1]
+            : columns[columns.length - 1],
         ]
         // this.apis.axisSite = { right: columns[columns.length - 2] || [columns[columns.length - 1]] }
       } else {
@@ -3349,7 +3342,7 @@ export default {
         clearInterval(this.chartTimers[id])
         this.chartTimers[id] = null
       }
-      let selected = this.canvasMap.find(item => item.id === id)
+      let selected = this.canvasMap.find((item) => item.id === id)
       let refresh = selected.setting.api_data.refresh
       // 所有条件都满足才开始倒计时刷新
       if (refresh.isRefresh && refresh.unit && refresh.frequency > 0) {
@@ -3404,13 +3397,11 @@ export default {
       // if(!val){ return; }
       if (val) {
         if (val === 'horizontal') {
-          this.selfConfig.series.label.formatter = this.apis.scatterLabel.join(
-            ' '
-          )
+          this.selfConfig.series.label.formatter =
+            this.apis.scatterLabel.join(' ')
         } else {
-          this.selfConfig.series.label.formatter = this.apis.scatterLabel.join(
-            '\n\r'
-          )
+          this.selfConfig.series.label.formatter =
+            this.apis.scatterLabel.join('\n\r')
         }
         this.apis.arrange = val
         this.setApis()
@@ -3434,23 +3425,22 @@ export default {
     },
     // 刷新大屏
     refreshData: throttle(
-      function() {
+      function () {
         this.refreshScreen({
           charSeted: false,
-          needLoading: true
+          needLoading: true,
         })
       },
       1000,
       {
         leading: true,
-        trailing: false
+        trailing: false,
       }
-    )
+    ),
   },
   watch: {
     currSelected: {
       handler(val) {
-        console.log(val, 'val')
         if (val) {
           if (val.setting.name === 've-image') {
             this.tabsType = 0
@@ -3461,10 +3451,10 @@ export default {
             if (val.setting.chartType === 'v-map') {
               // 地图里散点图配置列表
               this.scatterList = this.selfConfig.series.filter(
-                item => item.type === 'scatter'
+                (item) => item.type === 'scatter'
               )
               this.targetMeasure = this.selfConfig.series.filter(
-                item => item.type === 'map'
+                (item) => item.type === 'map'
               ).length
             }
           }
@@ -3475,7 +3465,8 @@ export default {
               this.mapFillPointSelectList = this.apiData.measures.concat()
               this.mapFillTooltipSelectList = this.apiData.measures.concat()
               this.mapLabelPointSelectList = this.apiData.labelMeasures.concat()
-              this.mapLabelTooltipSelectList = this.apiData.labelMeasures.concat()
+              this.mapLabelTooltipSelectList =
+                this.apiData.labelMeasures.concat()
               if (this.apiData.options.fillType === 'area') {
                 // 地区添加地区名/维度
                 let di = this.apiData.dimensions[0]
@@ -3494,7 +3485,7 @@ export default {
                   ? this.apiData.labelDimensions[0].alias
                   : ''
                 this.mapLabelPointSelectList.unshift({
-                  alias: `地区名/${labelDi}`
+                  alias: `地区名/${labelDi}`,
                 })
               } else {
                 this.mapLabelPointSelectList = this.apiData.dimensions.concat(
@@ -3515,7 +3506,7 @@ export default {
           }
         }
       },
-      deep: true
+      deep: true,
     },
     pageSettings: {
       handler(val) {
@@ -3524,7 +3515,7 @@ export default {
           if (!setting.refresh) {
             setting.refresh = {
               frequency: '',
-              isRefresh: false
+              isRefresh: false,
             }
           }
           this.globalSettings = deepClone(setting)
@@ -3544,8 +3535,8 @@ export default {
         }
       },
       deep: true,
-      immediate: true
-    }
+      immediate: true,
+    },
   },
   computed: {
     ...mapGetters([
@@ -3556,7 +3547,7 @@ export default {
       'currSelected',
       'screenId',
       'canvasMap',
-      'orginPageSettings'
+      'orginPageSettings',
     ]),
     chartType() {
       return this.currSelected ? this.currSelected.setting.chartType : ''
@@ -3571,7 +3562,7 @@ export default {
       return this.chartType === 'v-bar'
     },
     isPie() {
-      return this.chartType === 'v-pie'
+      return this.chartType === 'v-pie' || this.chartType === 'v-sun'
     },
     isMultiPie() {
       return this.chartType === 'v-multiPie'
@@ -3604,9 +3595,18 @@ export default {
       return this.chartType === 'steepBar'
     },
     isScatter() {
-      return (this.chartType === 'v-scatter') | (this.chartType === 'v-heatmap')
+      // return (this.chartType === 'v-scatter') | (this.chartType === 'v-heatmap')
+      return this.chartType === 'v-scatter' || this.chartType === 'v-heatmap'
+    },
+    // 是否为矩形树图
+    isTreemap() {
+      return this.chartType === 'v-treemap'
     },
     showGrid() {
+      // return (
+      //   this.selfConfig.grid &&
+      //   (this.isLine || this.isHistogram || this.isBar || this.isScatter)
+      // )
       if (this.chartType === 'v-heatmap') {
         return true
       } else {
@@ -3635,7 +3635,7 @@ export default {
           (this.isLine || this.isHistogram || this.isBar || this.isScatter)
         )
       }
-    }
+    },
   },
   components: {
     GuiField,
@@ -3644,8 +3644,11 @@ export default {
     DataSource,
     Interactive,
     Figure,
+    Treemap1,
+    Treemap2,
+    Treemap3,
     HighChartPie,
-    HighChartBar
-  }
+    HighChartBar,
+  },
 }
 </script>

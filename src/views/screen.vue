@@ -78,7 +78,7 @@
 
               <!-- 矩形热力图 -->
               <chart-heart
-                v-else-if="transform.setting.name === 've-heatmap'"
+                v-else-if="transform.setting.name === 've-heatmap'|transform.setting.name==='ve-sun'"
                 :key="transform.id"
                 :config="transform.setting.config"
                 :view="transform.setting.view"
@@ -112,6 +112,7 @@
       @mouseleave.native="handleTabShow"
     ></pation>
     <context-menu></context-menu>
+    <chartTableData :show.sync="show" :chart-data="chartData" @cancel="show = false"></chartTableData>
   </div>
 </template>
 
@@ -131,6 +132,7 @@ import SteepBar from '@/components/tools/SteepBar'
 import Pation from '@/components/board/pation/index' // 分页栏
 import ContextMenu from '@/components/board/context-menu/index' // 右键菜单
 // import AMap from '@/components/tools/aMap' // 进度条
+import chartTableData from '@/components/board/chartTableData/index' // 右键菜单
 import { Loading } from 'element-ui'
 
 import {
@@ -157,7 +159,8 @@ export default {
     Pation,
     HighCharts,
     ChartHeart,
-    ContextMenu
+    ContextMenu,
+    chartTableData
     // AMap
   },
   data() {
@@ -166,12 +169,15 @@ export default {
       range: '',
       chartTimer: null,
       timer: null,
-      showPageTab: false // 页签显示/隐藏
+      showPageTab: false, // 页签显示/隐藏
+      show: false, // 图表数据查看
+      chartData: {}, // 图表数据
     }
   },
   provide() {
     return {
-      showChartData: this.showChartData
+      showChartData: this.showChartData,
+      dvScreenDom:this.getDvScreen,
     }
   },
   computed: {
@@ -231,6 +237,9 @@ export default {
   },
   methods: {
     ...mapActions(['getScreenDetail', 'refreshScreen']),
+    getDvScreen(){
+      return this.$refs.dvScreen
+    },
     changeTab(pageId) {
       let loadingInstance = Loading.service({
         lock: true,
@@ -402,6 +411,10 @@ export default {
       }
       // 获取需要筛选的维度信息
       let dimensionData = apiData.dimensions[0]
+      // 矩形树图取最后一个维度
+      if (selected.setting.chartType === 'v-treemap') {
+        dimensionData = apiData.dimensions[apiData.dimensions.length - 1]
+      }
       dimensionData.value = [e.name]
       // 关联的每个图表进行数据筛选
       for (let chartId of bindCharts) {
