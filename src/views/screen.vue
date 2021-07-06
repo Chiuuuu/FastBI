@@ -368,6 +368,10 @@ export default {
       }
       // 获取需要筛选的维度信息
       let dimensionData = apiData.dimensions[0]
+      // 矩形树图取最后一个维度
+      if (selected.setting.chartType === 'v-treemap') {
+        dimensionData = apiData.dimensions[apiData.dimensions.length - 1]
+      }
       dimensionData.value = [e.name]
       // 关联的每个图表进行数据筛选
       for (let chartId of bindCharts) {
@@ -426,7 +430,6 @@ export default {
     },
     // 重置被联动的图标数据
     resetOriginData(id) {
-      debugger
       let selected = this.canvasMap.find(item => item.id === id)
       let bindCharts = selected.setting.api_data.interactive.bindedList
       for (let chartId of bindCharts) {

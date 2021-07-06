@@ -233,20 +233,6 @@ export default {
           if (this.fileList.length === 5) {
             this.fileList.splice(1, 1, dataFile)
           }
-          // const config = this.currSelected.setting.config
-          // const level = config.series.levels[config.series.levels.length - 1]
-          // let borderColorSaturation = level.itemStyle.borderColorSaturation + 0.05 || 0.3
-          // if (borderColorSaturation > 1) {
-          //   borderColorSaturation = 1
-          // }
-          // config.series.levels.push({
-          //   itemStyle: {
-          //     borderColorSaturation: borderColorSaturation,
-          //     borderWidth: 0.5,
-          //     gapWidth: 0
-          //   }
-          // })
-          // this.$store.dispatch('SetSelfProperty', config)
         } else {
           // 维度暂时只能拉入一个字段
           this.fileList[0] = dataFile
@@ -347,10 +333,36 @@ export default {
       }
       return countryside.properties.center
     },
+    handleTreemapConfig(rows) {
+      let setting = deepClone(this.currSelected.setting)
+      let config = setting.config
+      const tree = new TreeGroupBy(rows, setting.api_data.dimensions.map(item => item.alias), setting.api_data.measures)
+      config.series.data = tree.tree
+      config.series.visualMaxList = tree.max
+      config.visualMap.max = tree.max[0]
+
+      // 若删除了维度, 且刚好指针指向了维度, 则切换映射类型
+      let index = config.series.recDimensionIndex
+      if (index === setting.api_data.dimensions.length) {
+        config.visualMap.max = config.series.visualMaxList[0]
+        config.visualMap.type = 'continuous'
+        config.visualMap.inRange.color = config.series.continuousColors
+      } else {
+        let dimensionIndex = setting.api_data.dimensions.length - index - 1
+        dimensionIndex = dimensionIndex < 0 ? 0 : dimensionIndex
+        config.visualMap.dimension = dimensionIndex + 1
+        config.visualMap.max = config.series.visualMaxList[dimensionIndex]
+        config.visualMap.type = 'piecewise'
+        config.visualMap.inRange.color = config.series.piecewiseColors
+        config.visualMap.pieces = TreeGroupBy.handlePieces(config.series.data, index)
+      }
+      this.$store.dispatch('SetSelfProperty', config)
+      this.updateChartData()
+    },
     // 删除当前维度或者度量
-    deleteFile(item, index) {
+    async deleteFile(event, item, index) {
       this.fileList.splice(index, 1)
-      this.getData()
+      await this.getData()
       let current = deepClone(this.currSelected)
       // 维度度量删除完以后重置该图表数据
       if (this.chartType === '1' || this.chartType === '2') {
@@ -389,6 +401,26 @@ export default {
         // 环形重置显示值
         if (current.setting.chartType === 'v-ring') {
           current.setting.config.chartTitle.text = '70%'
+          this.$store.dispatch('SetSelfProperty', current.setting.config)
+        }
+        // 矩形树图清空数据
+        if (current.setting.chartType === 'v-treemap') {
+          if (this.fileList.length === 0) {
+            current.setting.config.series.data = []
+            current.setting.config.visualMap.pieces = []
+          }
+          const tooltipShowList = current.setting.config.series.tooltipShowList
+          for (let i = 0; i < tooltipShowList.length; i++) {
+            if (item.alias === tooltipShowList[i]) {
+              tooltipShowList.splice(i, 1)
+            }
+          }
+          const labelShowList = current.setting.config.series.labelShowList
+          for (let i = 0; i < labelShowList.length; i++) {
+            if (item.alias === labelShowList[i]) {
+              labelShowList.splice(i, 1)
+            }
+          }
           this.$store.dispatch('SetSelfProperty', current.setting.config)
         }
       }
@@ -565,16 +597,7 @@ export default {
         }
         // 矩形树图数据处理
         if (this.currSelected.setting.chartType === 'v-treemap') {
-          let setting = deepClone(this.currSelected.setting)
-          let config = setting.config
-          const tree = new TreeGroupBy(res.rows, setting.api_data.dimensions.map(item => item.alias), setting.api_data.measures)
-          config.visualMap.pieces = TreeGroupBy.handlePieces(tree.tree, setting.config.series.recDimensionIndex)
-          config.series.data = tree.tree
-          config.series.visualMaxList = tree.max
-          config.visualMap.max = tree.max[0]
-          this.$store.dispatch('SetSelfProperty', config)
-          this.updateChartData()
-          return
+          return this.handleTreemapConfig(res.rows)
         }
         if (this.type === 'tableList') {
           let columns = []

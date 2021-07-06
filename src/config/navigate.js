@@ -1949,15 +1949,6 @@ const list = [
                   ellipsis: true,
                   formatter: '{b}'
                 },
-                // 是否显示父节点
-                // upperLabel: {
-                //   show: true,
-                //   align: 'center',
-                //   position: 'inside',
-                //   ellipsis: true,
-                //   height: 30,
-                //   formatter: '{b}'
-                // },
                 emphasis: {
                   upperLabel: {
                     show: true,
@@ -1968,21 +1959,8 @@ const list = [
                 },
                 itemStyle: {
                   color: 'transparent',
-                  borderWidth: 0.5
+                  borderWidth: 0.2
                 },
-                // levels: [
-                //   {
-                //     upperLabel: {
-                //       show: false
-                //     },
-                //     itemStyle: {
-                //       borderColorSaturation: 0.25,
-                //       visualDimension: 1,
-                //       borderWidth: 0.5,
-                //       gapWidth: 0
-                //     }
-                //   }
-                // ],
                 data: [
                   {
                     name: '广东省',
