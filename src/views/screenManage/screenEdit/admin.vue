@@ -213,8 +213,8 @@ import { deepClone } from '@/utils/deepClone'
 const IconFont = Icon.createFromIconfontCN({
   scriptUrl: '//at.alicdn.com/t/font_2276651_71nv5th6v94.js'
 }) // 引入iconfont
-import HighCharts from '@/components/charts/highcharts'
-import ChartHeart from '@/components/charts/chart-heat'
+import HighCharts from '@/components/charts/highcharts.vue'
+import ChartHeart from '@/components/charts/chart-heat.vue'
 
 export default {
   name: 'Admin',
