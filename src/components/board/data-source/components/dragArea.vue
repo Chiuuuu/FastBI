@@ -501,8 +501,9 @@ export default {
         return
       }
       if (res.code === 200) {
-        let datas = res.data.fillList
+        let datas = res.rows
         if (this.currSelected.setting.chartType === 'v-map') {
+          datas = res.data.fillList
           let config = deepClone(this.currSelected.setting.config)
           let legend = []
           let rows = []
