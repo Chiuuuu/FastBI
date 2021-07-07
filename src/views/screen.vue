@@ -112,7 +112,8 @@
       @mouseleave.native="handleTabShow"
     ></pation>
     <context-menu></context-menu>
-    <chartTableData :show.sync="show" :chart-data="chartData" @cancel="show = false"></chartTableData>
+    <!-- 右键菜单 -- 查看数据 -->
+    <chartTableData :show="show" :chart-data="chartData" @cancel="show = false"></chartTableData>
   </div>
 </template>
 
@@ -222,7 +223,7 @@ export default {
       },
       deep: true,
       immediate: true
-    }
+    },
   },
   mounted() {
     this.$nextTick(this._calcStyle)

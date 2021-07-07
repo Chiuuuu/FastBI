@@ -360,7 +360,7 @@ export default {
   },
   methods: {
     afterConfig(options) {
-    //   options = deepClone(options);
+      options = deepClone(options);
       console.log('op', options)
       // 散点图
       if(this.typeName === 've-scatter'){

@@ -1,6 +1,6 @@
 <template>
   <a-modal
-    :visible="true"
+    :visible="show"
     title="图表数据"
     width="750px"
     :footer="null"
@@ -38,6 +38,10 @@ export default {
       type: Object,
       required: false,
       default: () => {}
+    },
+    show: {
+      type: Boolean,
+      required: true
     }
   },
   methods: {
@@ -53,13 +57,28 @@ export default {
   },
   methods: {
     // 全屏下，内容挂在dvScreen元素下（screen.vue）可显示，默认挂在body下
-    getContainer(e) {
+    getContainer() {
       return this.dvScreenDom ? this.dvScreenDom() : document.body
     }
   }
 }
 </script>
 <style lang="less" scoped>
+.chartdata-table {
+  height: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  border-spacing: 0px;
+  overflow: scroll;
+  border-left: 1px solid #787878;
+  border-top: 1px solid #787878;
+  .table-td {
+    padding: 10px;
+    text-align: center;
+    border-right: 1px solid #787878;
+    border-bottom: 1px solid #787878;
+  }
+}
 .dialog {
   position: fixed;
   top: 0;
@@ -94,22 +113,9 @@ export default {
       padding: 0 20px;
       box-sizing: border-box;
       overflow: scroll;
-      .chartdata-table {
-        height: 100%;
-        table-layout: fixed;
-        border-collapse: collapse;
-        border-spacing: 0px;
-        overflow: scroll;
-        border-left: 1px solid black;
-        border-top: 1px solid black;
-        .table-td {
-          padding: 10px;
-          text-align: center;
-          border-right: 1px solid black;
-          border-bottom: 1px solid black;
-        }
-      }
+      
     }
+
     .close-btn {
       position: absolute;
       top: 16px;
