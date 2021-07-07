@@ -430,10 +430,11 @@ export default {
     },
     fileSelectId: {
       get() {
-        return this.screenId
+        return this.$store.state.common.menuSelectId
       },
       set(value) {
         this.$store.dispatch('SetScreenId', value)
+        this.$store.commit('common/SET_MENUSELECTID', value)
       },
     },
     fileSelectName: {
@@ -655,6 +656,7 @@ export default {
             this.fileSelectName = ''
             this.$store.dispatch('SetParentId', '')
             this.$store.commit('common/SET_PRIVILEGES', [])
+            this.$store.commit('common/SET_MENUSELECTID', -1)
           }
         })
     },
@@ -1003,6 +1005,7 @@ export default {
   beforeRouteLeave(to, from, next) {
     if (to.name !== 'screenEdit') {
       this.fileSelectId = ''
+      this.$store.commit('common/SET_MENUSELECTID', -1)
       next()
     } else {
       next()

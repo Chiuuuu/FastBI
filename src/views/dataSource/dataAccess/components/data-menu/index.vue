@@ -269,10 +269,11 @@ export default {
     },
     fileSelectId: {
       get () {
-        return this.$store.state.dataAccess.modelId
+        return this.$store.state.common.menuSelectId
       },
       set (value) {
         this.$store.commit('dataAccess/SET_MODELID', value)
+        this.$store.commit('common/SET_MENUSELECTID', value)
       }
     },
     hasPermissionFolderAdd() {

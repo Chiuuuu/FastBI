@@ -1,17 +1,20 @@
 <template>
   <a-row class="navbar" type="flex" justify="end" align="middle">
     <a-select
-      :value='selectProject'
+      :value="selectProject"
       style="min-width: 120px;margin-right:20px;"
-      @change="handleChangeProject">
-      <a-select-option
-        v-for="item in projectList"
-        :key="item.id"
-      >{{ item.name }}</a-select-option>
+      @change="handleChangeProject"
+    >
+      <a-select-option v-for="item in projectList" :key="item.id">{{
+        item.name
+      }}</a-select-option>
     </a-select>
     <div class="user">
       <a-dropdown>
-        <span>{{userInfo.name}}<img src="@/assets/images/icon_head_portrait.png" alt=""/></span>
+        <span
+          >{{ userInfo.name
+          }}<img src="@/assets/images/icon_head_portrait.png" alt=""
+        /></span>
         <a-menu slot="overlay">
           <a-menu-item>
             <a href="javascript:;" @click="quitBtn">退出登录</a>
@@ -46,7 +49,9 @@ export default {
           if (result.code === 200) {
             await this.$store.dispatch('user/changeRole')
             // this.reload()
-            window.location.reload() // 重刷方法1,但是会闪白
+            // window.location.reload() // 重刷方法1,但是会闪白
+            this.$router.replace('/')
+            this.$store.commit('common/SET_MENUSELECTID', -1)
           } else {
             this.$message.error(result.msg || '请求错误')
           }

@@ -230,20 +230,17 @@ export default {
     },
     fileSelectId: {
       get () {
-        return this.$store.state.projectRoles.roleId
+        return this.$store.state.common.menuSelectId
       },
       set (value) {
         this.$store.commit('projectRoles/SET_ROLEID', value)
+        this.$store.commit('common/SET_MENUSELECTID', value)
       }
     }
   },
   mounted() {
     this.handleGetMenuList()
     this.$on('fileSelect', this.handleFileSelect)
-    if (this.roleId) {
-      this.fileSelectId = this.roleId
-      this.getRoleInfo()
-    }
   },
   methods: {
     /**
@@ -307,7 +304,6 @@ export default {
         if (newItem) result.push(newItem)
       })
       this.searchList = result
-      console.log('搜索结果', this.searchList)
     },
     /**
     * 选择左侧菜单
@@ -317,7 +313,6 @@ export default {
       this.fileSelectId = file.id
       this.getRoleInfo()
       this.$emit('handleChangeTab', 'permission')
-      this.$store.commit('projectRoles/SET_ROLEID', file.id)
       this.$store.commit('projectRoles/SET_PARENTID', file.parentId)
     },
     /**

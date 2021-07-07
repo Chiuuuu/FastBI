@@ -96,6 +96,7 @@ export default {
   mounted() {
     this.handleGetRoleInfo()
     this.$store.commit('projectRoles/SET_ROLEID', this.$route.params.id)
+    this.$store.commit('common/SET_MENUSELECTID', this.$route.params.id)
   },
   methods: {
     async handleGetRoleInfo() {

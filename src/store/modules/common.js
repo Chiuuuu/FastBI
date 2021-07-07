@@ -6,7 +6,8 @@ const state = {
     navMenuActive: '1-1', // 导航菜单高亮
     adminToken: tokenInfo ? tokenInfo.token : '', // token
     username: '',
-    privileges: [] // 当前模块权限列表
+    privileges: [], // 当前模块权限列表
+    menuSelectId: -1
 }
 
 const mutations = {
@@ -33,6 +34,11 @@ const mutations = {
     // 设置当前模块权限
     SET_PRIVILEGES(state, privileges) {
         state.privileges = privileges
+    },
+
+    // 设置当前模块权限
+    SET_MENUSELECTID(state, id) {
+        state.menuSelectId = id
     }
 }
 

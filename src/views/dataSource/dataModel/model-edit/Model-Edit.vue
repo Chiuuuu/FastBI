@@ -349,6 +349,7 @@ export default {
     } else if (this.model === 'edit') {
       this.handleGetData(this.$route.query.modelId)
       this.$store.dispatch('dataModel/setModelId', this.$route.query.modelId)
+      this.$store.commit('common/SET_MENUSELECTID', this.$route.query.modelId)
     }
     this.$EventBus.$on('tableUnion', this.handleTableUnion)
   },

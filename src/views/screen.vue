@@ -125,6 +125,7 @@ import Pation from '@/components/board/pation/index' // 分页栏
 import ContextMenu from '@/components/board/context-menu/index' // 右键菜单
 // import AMap from '@/components/tools/aMap' // 进度条
 import { Loading } from 'element-ui'
+import TreeGroupBy from '@/components/board/options/treemap/tree-groupby'
 
 import {
   addResizeListener,
@@ -134,6 +135,7 @@ import {
 import throttle from 'lodash/throttle'
 import HighCharts from '@/components/charts/highcharts'
 import ChartHeart from '@/components/charts/chart-heat'
+import { deepClone } from '../utils/deepClone'
 
 export default {
   name: 'screen',
@@ -412,13 +414,12 @@ export default {
     async getBindData(chart, dimensionData) {
       let apiData = chart.setting.api_data
       // 进行过数据筛选的不再执行联动
-      if (apiData.options) {
+      if (apiData.options.fileList) {
         return
       }
       let { pivotschemaId, dataType, value, name } = dimensionData
       let dimensionsLimit = [{ pivotschemaId, type: 1, dataType, value, name }]
       apiData.dataLink = { ...apiData.options, dimensionsLimit }
-
       let res = await this.$server.screenManage.getDataLink(chart)
       if (res.code === 200) {
         let columns = []
@@ -445,11 +446,24 @@ export default {
           }
           rows.push(obj)
         })
-        // 构造联动选择的数据
-        this.$set(apiData, 'selectData', {
+
+        let selectData = {
           columns,
           rows
-        })
+        }
+
+        // 矩形树图改变series.data
+        if (chart.setting.chartType === 'v-treemap') {
+          let config = deepClone(chart.setting.config)
+          const tree = new TreeGroupBy(res.rows, chart.setting.api_data.dimensions.map(item => item.alias), chart.setting.api_data.measures)
+          TreeGroupBy.handleLeafValue(tree.tree)
+          selectData = {
+            data: tree.tree,
+            pieces: TreeGroupBy.handlePieces(config.series.data, config.series.recDimensionIndex)
+          }
+        }
+        // 构造联动选择的数据
+        this.$set(apiData, 'selectData', selectData)
       } else {
         this.$message.error(res.msg)
       }
@@ -463,8 +477,14 @@ export default {
         if (!chart) {
           continue
         }
-        let apiData = chart.setting.api_data
+        // 矩形树图, 重置series.data值
+        if (chart.setting.chartType === 'v-treemap') {
+          let config = deepClone(chart.setting.config)
+          config.series.data = chart.setting.api_data.source
+          this.$store.dispatch('SetSelfProperty', config)
+        }
         // 删除联动数据
+        let apiData = chart.setting.api_data
         this.$delete(apiData, 'selectData')
       }
     },
