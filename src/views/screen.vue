@@ -365,7 +365,7 @@ export default {
     async getBindData(chart, dimensionData) {
       let apiData = chart.setting.api_data
       // 进行过数据筛选的不再执行联动
-      if (apiData.options) {
+      if (apiData.options.fileList) {
         return
       }
       let { pivotschemaId, dataType, value, name } = dimensionData
