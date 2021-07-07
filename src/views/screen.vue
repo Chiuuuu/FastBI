@@ -1,10 +1,17 @@
 <template>
-  <div class="dv-screen" ref="dvScreen">
+  <div
+    class="dv-screen"
+    :id="screenId"
+    ref="dvScreen"
+    @contextmenu.stop.prevent="poupExportMenu($event)"
+    @mousedown="cancelSelect"
+  >
     <b-scrollbar :style="wrapStyle">
       <div :style="scrollBoxStyle">
         <div class="canvas-panel" :style="canvasPanelStyle">
           <template v-for="transform in canvasMap">
             <preview-box
+              :id="transform.id"
               :key="transform.id"
               :item="transform"
               @contextmenu.native.stop.prevent="
@@ -35,7 +42,7 @@
               <!-- 文本 -->
               <chart-text
                 v-else-if="transform.setting.name === 've-text'"
-                :id="transform.id"
+                :chart-id="transform.id"
                 :config="transform.setting.config"
                 :background="transform.setting.background"
                 :api-data="transform.setting.api_data"
@@ -71,7 +78,7 @@
 
               <!-- 矩形热力图 -->
               <chart-heart
-                v-if="transform.setting.name === 've-heatmap'|transform.setting.name==='ve-sun'"
+                v-else-if="transform.setting.name === 've-heatmap'|transform.setting.name==='ve-sun'"
                 :key="transform.id"
                 :config="transform.setting.config"
                 :view="transform.setting.view"
@@ -81,7 +88,7 @@
 
               <charts-factory
                 v-else
-                :id="transform.id"
+                :chart-id="transform.id"
                 ref="chart"
                 :type-name="transform.setting.name"
                 :chart-type="transform.setting.chartType"
@@ -105,6 +112,7 @@
       @mouseleave.native="handleTabShow"
     ></pation>
     <context-menu></context-menu>
+    <chartTableData :show.sync="show" :chart-data="chartData" @cancel="show = false"></chartTableData>
   </div>
 </template>
 
@@ -124,6 +132,7 @@ import SteepBar from '@/components/tools/SteepBar'
 import Pation from '@/components/board/pation/index' // 分页栏
 import ContextMenu from '@/components/board/context-menu/index' // 右键菜单
 // import AMap from '@/components/tools/aMap' // 进度条
+import chartTableData from '@/components/board/chartTableData/index' // 右键菜单
 import { Loading } from 'element-ui'
 
 import {
@@ -150,7 +159,8 @@ export default {
     Pation,
     HighCharts,
     ChartHeart,
-    ContextMenu
+    ContextMenu,
+    chartTableData
     // AMap
   },
   data() {
@@ -159,12 +169,15 @@ export default {
       range: '',
       chartTimer: null,
       timer: null,
-      showPageTab: false // 页签显示/隐藏
+      showPageTab: false, // 页签显示/隐藏
+      show: false, // 图表数据查看
+      chartData: {}, // 图表数据
     }
   },
   provide() {
     return {
-      showChartData: this.showChartData
+      showChartData: this.showChartData,
+      dvScreenDom:this.getDvScreen,
     }
   },
   computed: {
@@ -174,7 +187,8 @@ export default {
       'screenId',
       'orginPageSettings',
       'isPublish',
-      'isScreen'
+      'isScreen',
+      'currentSelected'
     ]),
     // 画布面板的样式
     canvasPanelStyle() {
@@ -223,6 +237,9 @@ export default {
   },
   methods: {
     ...mapActions(['getScreenDetail', 'refreshScreen']),
+    getDvScreen(){
+      return this.$refs.dvScreen
+    },
     changeTab(pageId) {
       let loadingInstance = Loading.service({
         lock: true,
@@ -394,6 +411,10 @@ export default {
       }
       // 获取需要筛选的维度信息
       let dimensionData = apiData.dimensions[0]
+      // 矩形树图取最后一个维度
+      if (selected.setting.chartType === 'v-treemap') {
+        dimensionData = apiData.dimensions[apiData.dimensions.length - 1]
+      }
       dimensionData.value = [e.name]
       // 关联的每个图表进行数据筛选
       for (let chartId of bindCharts) {
@@ -408,7 +429,7 @@ export default {
     async getBindData(chart, dimensionData) {
       let apiData = chart.setting.api_data
       // 进行过数据筛选的不再执行联动
-      if (apiData.options) {
+      if (apiData.options.fileList) {
         return
       }
       let { pivotschemaId, dataType, value, name } = dimensionData
@@ -452,7 +473,6 @@ export default {
     },
     // 重置被联动的图标数据
     resetOriginData(id) {
-      debugger
       let selected = this.canvasMap.find(item => item.id === id)
       let bindCharts = selected.setting.api_data.interactive.bindedList
       for (let chartId of bindCharts) {
@@ -473,7 +493,11 @@ export default {
     handleRightClickOnCanvas(item, event) {
       // 全屏下图表查看数据&导出
       if (this.isScreen) {
-        let info = { x: event.pageX + 10, y: event.pageY + 10 }
+        let info = {
+          x: event.pageX + 10,
+          y: event.pageY + 10,
+          listType: 'exportChartList'
+        }
         this.$store.dispatch('ToggleContextMenu', info)
         this.$store.dispatch('SingleSelected', item.id)
       }
@@ -483,6 +507,19 @@ export default {
       this.chartData = chartData
       this.chartDataForMap = chartDataForMap
       this.show = true
+    },
+    cancelSelect() {
+      this.$store.dispatch('SingleSelected', null)
+    },
+    poupExportMenu(event) {
+      if (this.isScreen) {
+        let info = {
+          x: event.pageX + 10,
+          y: event.pageY + 10,
+          listType: 'screenMenuList'
+        }
+        this.$store.dispatch('ToggleContextMenu', info)
+      }
     }
   }
 }

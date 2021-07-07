@@ -87,6 +87,7 @@ class TreeGroupBy {
         this.dimensionIndex--
       }
 
+      let node = {}
       // 没找到相同节点, 从根节点开始push
       if (this.dimensionIndex < 0) {
         this.dimensionIndex = 0
@@ -107,7 +108,7 @@ class TreeGroupBy {
 
         // 插入叶子结点
         this.tree.push(newNode)
-        this.loop(newNode, record)
+        node = newNode
       } else { // 有相同节点, 从该节点开始
         // 获取key后, 查询当前层级有没有生成过该key值的子节点
         let targetNode = this.tree[this.chain[0].index]
@@ -115,14 +116,14 @@ class TreeGroupBy {
           targetNode = targetNode.children[this.chain[i].index]
         }
         this.chain = this.chain.slice(0, this.dimensionIndex + 1)
-
-        // 已经是最外层节点, 直接在节点里叠加value
-        if (this.chain.length === this.dimensionList.length) {
-          this.addValue(+record[this.measureKey])
-        } else {
-          // 找到相同的节点后, 递归遍历该节点的子节点, 然后插入数据
-          this.loop(targetNode, record)
-        }
+        node = targetNode
+      }
+      // 已经是最外层节点, 直接在节点里叠加value
+      if (this.chain.length === this.dimensionList.length) {
+        this.addValue(+record[this.measureKey])
+      } else {
+        // 找到相同的节点后, 递归遍历该节点的子节点, 然后插入数据
+        this.loop(node, record)
       }
     }
   }

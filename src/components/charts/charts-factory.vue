@@ -70,7 +70,7 @@ import { DEFAULT_COLORS } from '@/utils/defaultColors'
 export default {
   name: 'ChartsFactory',
   props: {
-    id: {
+    chartId: {
       type: String,
       default: '0'
     },
@@ -120,7 +120,7 @@ export default {
             delete self.chartExtend.series.itemStyle.normal.color
             // 强行渲染
             self.key++
-            self.$emit('resetOriginData', self.id)
+            self.$emit('resetOriginData', self.chartId)
             return
           }
           // 鼠标单击时选中,选中颜色不变，其余变暗
@@ -143,7 +143,7 @@ export default {
           self.currentIndex = e.dataIndex
           // 强行渲染
           self.key++
-          self.$emit('linkage', self.id, e)
+          self.$emit('linkage', self.chartId, e)
           chart.off('click')
           self.setChartClick()
         })
@@ -360,7 +360,7 @@ export default {
   },
   methods: {
     afterConfig(options) {
-      options = deepClone(options);
+    //   options = deepClone(options);
       console.log('op', options)
       // 散点图
       if(this.typeName === 've-scatter'){
@@ -435,7 +435,7 @@ export default {
             }
             // 强行渲染，非数据变动不会自动重新渲染
             self.key++
-            self.$emit('resetOriginData', self.id)
+            self.$emit('resetOriginData', self.chartId)
           }
         })
       })

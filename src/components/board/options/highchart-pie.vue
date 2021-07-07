@@ -408,11 +408,9 @@ export default {
   mixins: [HighMinxins],
   components: { GuiField, GuiInline },
   data() {
-    return {
-      
-    }
+    return {}
   },
-  computed: { },
+  computed: {},
   mounted() {},
   methods: {
     onChange(checkedValues) {
