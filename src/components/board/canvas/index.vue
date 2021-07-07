@@ -13,6 +13,7 @@
         <div class="screen-shot" :style="screenStyle" ref="screenInner">
           <div
             class="canvas-panel"
+            :id="screenId"
             :style="canvasPanelStyle"
             @click.stop.prevent="cancelSelected"
             :data-spm-anchor-id="$route.params.id"
@@ -131,7 +132,12 @@ export default {
     // }
   },
   computed: {
-    ...mapGetters(['pageSettings', 'canvasRange', 'contextMenuInfo']),
+    ...mapGetters([
+      'pageSettings',
+      'canvasRange',
+      'contextMenuInfo',
+      'screenId'
+    ]),
     // 画布面板的样式
     canvasPanelStyle() {
       return {

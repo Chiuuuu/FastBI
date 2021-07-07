@@ -2402,13 +2402,14 @@
             <!--颜色数组-->
             <template v-if="selfConfig.color">
               <a-collapse-panel key="colors" header="颜色设置">
-                <div style="padding: 5px 13px">
+                <div style="padding: 5px 13px;">
                   <gui-colors
                     v-for="(c, index) of selfConfig.color"
                     :key="index + c"
                   >
                     <el-color-picker
-                      v-model="selfConfig.yAxis.axisLabel.color"
+                      v-model="selfConfig.color[index]"
+                      :predefine="predefineColors"
                       @change="setSelfProperty"
                     ></el-color-picker>
                   </gui-colors>

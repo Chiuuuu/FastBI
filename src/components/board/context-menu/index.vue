@@ -25,13 +25,13 @@
             @click.stop="handleCommand(menu.order, item)"
           >
             <JsonExcel
-              v-show="i < 2"
+              v-if="i < 2"
               :fetch="setChartData"
-              :name="currSelected.name || ''"
+              :name="currSelected ? currSelected.name || 'test' : 'test'"
               :type="i === 0 ? 'xls' : 'csv'"
               >{{ menu.text }}</JsonExcel
             >
-            <span v-show="i === 2">{{ menu.text }}</span>
+            <span v-if="i === 2">{{ menu.text }}</span>
           </div>
         </div>
       </div>
@@ -40,9 +40,12 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import JsonExcel from 'vue-json-excel'
-import exportImg from '@/utils/exportImg'
+import { exportImg, exportForFull, exportScreen } from '@/utils/exportImg'
 import { mapGetters, mapActions } from 'vuex'
+import { Loading } from 'element-ui'
+import chartTableData from '../chartTableData/index' // 右键菜单
 const exportChartList = [
   { icon: 'ios-share', text: '查看数据', order: 'showChartData' },
   {
@@ -89,7 +92,8 @@ export default {
     return {
       menuList: chartMenuList, // 菜单列表
       chartData: { rows: [] }, // 图表数据(按最后展示格式)
-      chartDataForMap: null // 同上(地图标记层)
+      chartDataForMap: null, // 同上(地图标记层)
+      menuCompont: null
     }
   },
   inject: ['showChartData'],
@@ -101,9 +105,7 @@ export default {
     // },
     'contextMenuInfo.listType'(val) {
       if (val) {
-        this.$nextTick(() => {
-          this.menuList = eval(val)
-        })
+        this.menuList = eval(val)
       }
     }
   },
@@ -117,7 +119,8 @@ export default {
       'currentSelected',
       'pageSettings',
       'canvasRange',
-      'isScreen'
+      'isScreen',
+      'fileName'
     ]),
     contextMenuStyle() {
       let x =
@@ -173,22 +176,59 @@ export default {
         // 查看图表数据
         if (this.currSelected.setting.api_data.source && JSON.stringify(this.currSelected.setting.api_data.source)!='{}') {
           this.setChartData()
-          this.showChartData(this.chartData, this.chartDataForMap)
           this.$store.dispatch('ToggleContextMenu')
+          this.showChartData(this.chartData, this.chartDataForMap)
         } else {
           this.$message.error('该图表没有拖入图表数据')
         }
       } else if (order === 'exportImg') {
-        exportImg(
-          this.currentSelected,
-          this.currSelected,
-          this.pageSettings,
-          this.canvasRange
-        )
         this.$store.dispatch('ToggleContextMenu')
+        if (this.isScreen) {
+          exportForFull(
+            this.currentSelected,
+            this.currSelected,
+            this.pageSettings,
+            this.canvasRange
+          )
+        } else {
+          exportImg(
+            this.currentSelected,
+            this.currSelected,
+            this.pageSettings,
+            this.canvasRange
+          )
+        }
+      } else if (order === 'exportScreen') {
+        this.$store.dispatch('ToggleContextMenu')
+        this.exportScreen()
       } else {
         this.$store.dispatch('ContextMenuCommand', order)
       }
+    },
+    // 查看数据
+    viewChartData() {
+      const _Menu = Vue.extend(chartTableData)
+      this.menuCompont = new _Menu({
+        propsData: {
+          chartData: this.chartData
+        }
+      }).$mount()
+      const currentParentName = this.isScreen ? '.dv-screen' : '.board-layout'
+      document
+        .querySelector(currentParentName)
+        .appendChild(this.menuCompont.$el)
+    },
+    // 导出大屏数据
+    exportScreen() {
+      setTimeout(() => {
+        exportScreen(this.screenId, this.fileName)
+      }, 0)
+    },
+    startDownload() {
+      this.$message.info('正在导出')
+    },
+    finishDownload() {
+      this.$message.info('导出成功')
     },
     // 删除图表
     deleteOne() {
@@ -200,6 +240,12 @@ export default {
         this.$message.error('该图表没有拖入图表数据')
         return
       }
+      let loadingInstance = Loading.service({
+        lock: true,
+        text: '加载中...',
+        target: 'body',
+        background: 'rgb(255, 255, 255, 0.6)'
+      })
       let type = this.currSelected.setting.type
       if (this.currSelected.setting.chartType === 'v-map') {
         let fillrows = this.currSelected.setting.api_data.returnDataFill || []
@@ -222,6 +268,7 @@ export default {
         let rows = this.currSelected.setting.api_data.source.rows
         this.chartData = { columns: Object.keys(rows[0]), rows }
       }
+      loadingInstance.close()
       return this.chartData.rows
     }
   }

@@ -13,7 +13,7 @@ export default {
       required: true
     }
   },
-  created () {
+  created() {
     this.handleStyle(this.setting)
   },
   watch: {
@@ -38,11 +38,16 @@ export default {
         ...config,
         width: view.width + 'px',
         transform: `translate3d(0,0,0)`,
-        borderRadius: typeof config.borderRadius === 'string' ? config.borderRadius : config.borderRadius + 'px'
+        borderRadius:
+          typeof config.borderRadius === 'string'
+            ? config.borderRadius
+            : config.borderRadius + 'px'
       }
       if (this.setting.config.title === '直线') {
         if (config.showShadow) {
-          style.boxShadow = `0 ${config.borderWidth / 2}px ${config.borderWidth}px ${config.shadowColor}`
+          style.boxShadow = `0 ${config.borderWidth / 2}px ${
+            config.borderWidth
+          }px ${config.shadowColor}`
         }
         style.borderWidth = view.height + 'px 0 0' // 直线只显示上边框
       } else {

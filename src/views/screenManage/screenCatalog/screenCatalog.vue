@@ -164,7 +164,7 @@
             class="mod_input"
             v-decorator="[
               'name',
-              { rules: [{ required: true, message: '请输入大屏名称' }] },
+              { rules: [{ required: true, message: '请输入大屏名称' }] }
             ]"
             placeholder="请输入大屏名称"
             :maxLength="20"
@@ -278,8 +278,19 @@
       @close="choose = false"
     >
       <div class="dvs-head-btns">
-        <a-button type="primary" @click="getSubmit" :loading="btnloading"> 确定 </a-button>
-        <a-button style="marginright: 8px" @click="()=>{choose = false,chooseIndex=null}"> 取消 </a-button>
+        <a-button type="primary" @click="getSubmit" :loading="btnloading">
+          确定
+        </a-button>
+        <a-button
+          style="marginright: 8px"
+          @click="
+            () => {
+              ;(choose = false), (chooseIndex = null)
+            }
+          "
+        >
+          取消
+        </a-button>
       </div>
       <div class="templeList">
         <a-card
@@ -287,11 +298,14 @@
           style="width: 240px"
           v-for="(item, index) in templeList"
           :key="index"
-          :class="{active:index===chooseIndex}"
-          @click.stop="getCardClick(item,index)"
+          :class="{ active: index === chooseIndex }"
+          @click.stop="getCardClick(item, index)"
         >
           <img slot="cover" alt="example" :src="item.thumbnailsUrl" />
-          <a-card-meta :title="item.title" style="text-align:center"></a-card-meta>
+          <a-card-meta
+            :title="item.title"
+            style="text-align:center"
+          ></a-card-meta>
         </a-card>
       </div>
     </a-drawer>
@@ -307,7 +321,7 @@ import { mapGetters, mapActions } from 'vuex' // 导入vuex
 import Screen from '@/views/screen' // 预览
 import {
   addResizeListener,
-  removeResizeListener,
+  removeResizeListener
 } from 'bin-ui/src/utils/resize-event'
 import { checkActionPermission, hasPermission } from '@/utils/permission'
 import debounce from 'lodash/debounce'
@@ -321,7 +335,7 @@ export default {
     MenuFile,
     MenuFolder,
     Screen,
-    vueQr,
+    vueQr
   },
   data() {
     return {
@@ -345,64 +359,64 @@ export default {
           name: '新建大屏',
           permission: {
             OPERATOR: this.$PERMISSION_CODE.OPERATOR.add,
-            OBJECT: this.$PERMISSION_CODE.OBJECT.screen,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.screen
           },
-          onClick: this.handleScreen,
+          onClick: this.handleScreen
         },
         {
           name: '重命名',
           permission: {
             OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit,
-            OBJECT: this.$PERMISSION_CODE.OBJECT.screenFolder,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.screenFolder
           },
-          onClick: this.handleResetFolder,
+          onClick: this.handleResetFolder
         },
         {
           name: '删除',
           permission: {
             OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove,
-            OBJECT: this.$PERMISSION_CODE.OBJECT.screenFolder,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.screenFolder
           },
-          onClick: this.handleFolderDelete,
-        },
+          onClick: this.handleFolderDelete
+        }
       ],
       fileContenxtMenu: [
         {
           name: '移动至',
           permission: {
-            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit,
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit
           },
-          onClick: this.handleFilemoveFile,
+          onClick: this.handleFilemoveFile
         },
         {
           name: '重命名',
           permission: {
-            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit,
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit
           },
-          onClick: this.handleResetFile,
+          onClick: this.handleResetFile
         },
         {
           name: '复制',
           permission: {
-            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit,
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit
           },
-          onClick: this.copyScreen,
+          onClick: this.copyScreen
         },
         {
           name: '删除',
           permission: {
-            OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove,
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove
           },
-          onClick: this.handleFileDelete,
-        },
+          onClick: this.handleFileDelete
+        }
       ],
       searchName: '', // 搜索名称
       componentKey: 0, // 通过改变key实现子组件强制更新,数值在0,1之间变化
       choose: false,
-      chooseIndex:null,
-      chooseTemple:{},//选中的大屏模版
+      chooseIndex: null,
+      chooseTemple: {}, //选中的大屏模版
       templeList: [],
-      btnloading:false,
+      btnloading: false
     }
   },
   watch: {
@@ -411,7 +425,7 @@ export default {
       if (val) {
         this.showLimitWarn = ''
       }
-    },
+    }
   },
   computed: {
     ...mapGetters([
@@ -422,10 +436,10 @@ export default {
       'isScreen',
       'parentId',
       'pageList',
-      'isPublish',
+      'isPublish'
     ]),
     folderSelectList() {
-      return this.folderList.filter((item) => item.fileType === 0)
+      return this.folderList.filter(item => item.fileType === 0)
       //   .concat({ name: '清空' })
     },
     fileSelectId: {
@@ -443,7 +457,7 @@ export default {
       },
       set(value) {
         this.$store.dispatch('SetFileName', value)
-      },
+      }
     },
     menuList() {
       return this.searchValue ? this.searchList : this.tableList
@@ -481,7 +495,7 @@ export default {
         default:
           return '永久'
       }
-    },
+    }
   },
   mounted() {
     this.getList()
@@ -504,9 +518,9 @@ export default {
     // 获取文件夹列表
     getList() {
       let params = {
-        type: 3,
+        type: 3
       }
-      this.$server.screenManage.getFolderList({ params }).then((res) => {
+      this.$server.screenManage.getFolderList({ params }).then(res => {
         if (res.code === 200) {
           let rows = res.data
           // 大屏文件保存不需要文件夹
@@ -536,7 +550,7 @@ export default {
       this.getFirstScreen(list, index + 1)
     },
     // 搜索文件
-    menuSearch: debounce(function (event) {
+    menuSearch: debounce(function(event) {
       const value = event.target.value
       if (value !== '') {
         this.handleGetSearchList(value)
@@ -546,7 +560,7 @@ export default {
     }, 400),
     handleGetSearchList(value) {
       let result = []
-      this.folderList.map((item) => {
+      this.folderList.map(item => {
         const newItem = menuSearchLoop(item, value)
         if (newItem) result.push(newItem)
       })
@@ -570,7 +584,7 @@ export default {
         fileType: 1,
         id: this.id,
         name: this.name,
-        parentId,
+        parentId
       }
       const result = await this.$server.common.putMenuFolderName(
         '/screen/catalog/update',
@@ -608,11 +622,11 @@ export default {
       let loadingInstance = Loading.service({
         lock: true,
         text: '加载中...',
-        target: document.querySelector('.screen-manage'),
+        target: document.querySelector('.screen-manage')
       })
       this.$server.screenManage
         .copyScreen(file.id)
-        .then((res) => {
+        .then(res => {
           if (res.code === 200) {
             this.getList()
             this.$message.success(res.msg)
@@ -638,17 +652,17 @@ export default {
         content: '确定删除该数据大屏?',
         onOk: async () => {
           this.handleDelete(file.id)
-        },
+        }
       })
     },
     // 删除大屏
     handleDelete(id) {
       let params = {
-        id,
+        id
       }
       this.$server.common
         .deleMenuFolder(`/screen/catalog/delete/${id}`)
-        .then((res) => {
+        .then(res => {
           if (res.code === 200) {
             this.$message.success('删除成功')
             this.getList()
@@ -668,7 +682,7 @@ export default {
       this.folderTitle = '重命名文件夹'
       this.$nextTick(() => {
         this.$refs.newFolderForm.form.setFieldsValue({
-          name: folder.name,
+          name: folder.name
         })
       })
     },
@@ -682,7 +696,7 @@ export default {
       // dom渲染以后才能给form赋值
       this.$nextTick(() => {
         this.screenForm.setFieldsValue({
-          name: file.name,
+          name: file.name
         })
       })
     },
@@ -693,7 +707,7 @@ export default {
       // dom渲染以后才能给form赋值
       this.$nextTick(() => {
         this.screenForm.setFieldsValue({
-          parentId: folder.id,
+          parentId: folder.id
         })
       })
     },
@@ -733,7 +747,7 @@ export default {
             // 获取需要改名字的大屏的配置信息(因为可能会跟当前选中的大屏不是同一个)
             this.$server.screenManage
               .getScreenDetailById(this.id, this.pageList[0].id)
-              .then((res) => {
+              .then(res => {
                 if (res.code === 200) {
                   this.setting = res.data.setting
                   this.$store.dispatch('SetIsPublish', res.data.isPublish)
@@ -741,9 +755,9 @@ export default {
                   let params = {
                     id: this.id,
                     setting: this.setting,
-                    ...values,
+                    ...values
                   }
-                  this.saveScreenData({ ...params }).then((res) => {
+                  this.saveScreenData({ ...params }).then(res => {
                     if (res) {
                       this.$message.success('重命名成功')
                       this.fileSelectName = values.name
@@ -774,8 +788,8 @@ export default {
         name: 'screenEdit',
         query: {
           id: this.fileSelectId,
-          tabId: this.pageList[0].id,
-        },
+          tabId: this.pageList[0].id
+        }
       })
     },
     // 点击新建文件夹
@@ -873,7 +887,7 @@ export default {
     // 发布
     release() {
       if (this.isPublish === 0) {
-        this.$server.screenManage.getScreenLink(this.screenId).then((res) => {
+        this.$server.screenManage.getScreenLink(this.screenId).then(res => {
           this.releaseObj = { url: res.data, expired: 7, password: '' }
           this.releaseVisible = true
         })
@@ -938,11 +952,11 @@ export default {
         screenId: this.screenId,
         password: this.releaseObj.password,
         expired: this.releaseObj.expired,
-        valid: true,
+        valid: true
       }
       // 未发布
       if (this.isPublish === 0) {
-        this.$server.screenManage.releaseScreen(params).then((res) => {
+        this.$server.screenManage.releaseScreen(params).then(res => {
           if (res.code === 200) {
             this.$message.success('发布成功')
             // 状态改为已发布
@@ -953,7 +967,7 @@ export default {
       } else {
         // 重新发布
         params.id = this.releaseObj.id
-        this.$server.screenManage.reShareScreen(params).then((res) => {
+        this.$server.screenManage.reShareScreen(params).then(res => {
           if (res.code === 200) {
             this.$message.success('发布成功')
             this.releaseObj.valid = true
@@ -974,31 +988,33 @@ export default {
             // 状态改为未发布
             this.$store.dispatch('SetIsPublish', 0)
           }
-        },
+        }
       })
     },
     getSubmit() {
-      this.btnloading = true;
-      this.$server.chooseScreen.saveScreenData(this.chooseTemple.screenId).then(res=>{
-        this.btnloading = false;
-        this.$router.push({
-          name: 'screenEdit',
-          query: {
-            id: res.data.screenId,
-            tabId: res.data.tabId,
-          },
+      this.btnloading = true
+      this.$server.chooseScreen
+        .saveScreenData(this.chooseTemple.screenId)
+        .then(res => {
+          this.btnloading = false
+          this.$router.push({
+            name: 'screenEdit',
+            query: {
+              id: res.data.screenId,
+              tabId: res.data.tabId
+            }
+          })
         })
-      });
     },
     //获取大屏模版
     getScreenList() {
-      this.$server.chooseScreen.getScreenTemplates().then((res) => {
+      this.$server.chooseScreen.getScreenTemplates().then(res => {
         this.templeList = { ...res.data }
       })
     },
-    getCardClick(item,index){
-      this.chooseIndex = index;
-      this.chooseTemple = {...item};
+    getCardClick(item, index) {
+      this.chooseIndex = index
+      this.chooseTemple = { ...item }
     }
   },
   // 跳出大屏模块清除screenId
@@ -1010,7 +1026,7 @@ export default {
     } else {
       next()
     }
-  },
+  }
 }
 </script>
 

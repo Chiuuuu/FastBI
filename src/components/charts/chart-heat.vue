@@ -7,24 +7,24 @@ export default {
   props: {
     config: {
       type: Object,
-      required: true,
+      required: true
     },
     apiData: {
       type: Object,
-      required: true,
+      required: true
     },
     view: {
-      type: Object,
+      type: Object
     },
     background: {
-      type: Object,
-    },
+      type: Object
+    }
   },
   data() {
     return {
       mychart: null,
       option: {},
-      styleObj: {},
+      styleObj: {}
     }
   },
   mounted() {
@@ -35,14 +35,14 @@ export default {
       this.option = val ? val : this.config
       this.mychart = this.$echarts.init(this.$refs.dvsheat)
       this.mychart.setOption(val ? val : this.config)
-    },
+    }
   },
   watch: {
     config: {
       handler(val) {
         this.Init(val)
       },
-      deep: true,
+      deep: true
       //   immediate:true
     },
     view: {
@@ -52,7 +52,7 @@ export default {
         }
       },
       deep: true,
-      immediate: true,
+      immediate: true
     },
     apiData: {
       handler(val) {
@@ -109,9 +109,9 @@ export default {
         }
       },
       deep: true,
-      immediate: true,
-    },
-  },
+      immediate: true
+    }
+  }
 }
 </script>
 <style lang="less" scoped>

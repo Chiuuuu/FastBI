@@ -98,7 +98,7 @@
             <chart-text
               v-else-if="transform.setting.name === 've-text'"
               ref="veText"
-              :id="transform.id"
+              :chart-id="transform.id"
               canEdit
               :api-data="transform.setting.api_data"
               :config="transform.setting.config"
@@ -138,7 +138,7 @@
             ></high-charts>
             <!-- 矩形热力图 -->
             <chart-heart
-              v-else-if="transform.setting.name==='ve-heatmap'|transform.setting.name==='ve-sun'"
+              v-else-if="transform.setting.name==='ve-heatmap'||transform.setting.name==='ve-sun'"
               :key="transform.id"
               :view="transform.setting.view"
               :config="transform.setting.config"
@@ -213,8 +213,8 @@ import { deepClone } from '@/utils/deepClone'
 const IconFont = Icon.createFromIconfontCN({
   scriptUrl: '//at.alicdn.com/t/font_2276651_71nv5th6v94.js'
 }) // 引入iconfont
-import HighCharts from '@/components/charts/highcharts'
-import ChartHeart from '@/components/charts/chart-heat'
+import HighCharts from '@/components/charts/highcharts.vue'
+import ChartHeart from '@/components/charts/chart-heat.vue'
 
 export default {
   name: 'Admin',

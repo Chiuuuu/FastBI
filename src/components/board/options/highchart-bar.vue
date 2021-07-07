@@ -622,7 +622,7 @@ export default {
     getBtnRadio(key, val) {
       this.$set(this.HighConfig.setting.config[key].title, 'align', val)
       this.setSelfProperty()
-    },
+    }
   },
   watch: {}
 }
