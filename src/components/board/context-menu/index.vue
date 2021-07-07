@@ -177,7 +177,7 @@ export default {
         if (this.currSelected.setting.api_data.source && JSON.stringify(this.currSelected.setting.api_data.source)!='{}') {
           this.setChartData()
           this.$store.dispatch('ToggleContextMenu')
-          this.viewChartData()
+          this.showChartData(this.chartData, this.chartDataForMap)
         } else {
           this.$message.error('该图表没有拖入图表数据')
         }
