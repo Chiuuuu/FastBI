@@ -42,7 +42,7 @@
           :pagination="false"
           :scroll="{ x: 'calc(70vw - 50px)', y: 'calc(100vh - 430px)' }"
         >
-          <template #reason="text, record, index">
+          <template #reason="text,record,index">
             <span>{{ text || '/' }}</span>
           </template>
         </a-table>
@@ -87,63 +87,63 @@ const listColumn = [
     title: '版本号',
     width: 100,
     ellipsis: true,
-    dataIndex: 'userVersion',
+    dataIndex: 'userVersion'
   },
   {
     title: '标签名称',
     width: 200,
     ellipsis: true,
     dataIndex: 'name',
-    scopedSlots: { customRender: 'name' },
+    scopedSlots: { customRender: 'name' }
   },
   {
     title: '更新周期',
     width: 200,
     ellipsis: true,
     dataIndex: 'updateTime',
-    scopedSlots: { customRender: 'updateTime' },
+    scopedSlots: { customRender: 'updateTime' }
   },
   {
     title: '达标模型',
     width: 200,
     ellipsis: true,
     dataIndex: 'modelName',
-    scopedSlots: { customRender: 'modelName' },
+    scopedSlots: { customRender: 'modelName' }
   },
   {
     title: '达标规则',
     width: 200,
     ellipsis: true,
     dataIndex: 'condition',
-    scopedSlots: { customRender: 'condition' },
+    scopedSlots: { customRender: 'condition' }
   },
   {
     title: '标签描述',
     width: 300,
     ellipsis: true,
     dataIndex: 'description',
-    scopedSlots: { customRender: 'description' },
+    scopedSlots: { customRender: 'description' }
   },
   {
     title: '操作人',
     width: 100,
     ellipsis: true,
     dataIndex: 'modUserName',
-    scopedSlots: { customRender: 'modUserName' },
+    scopedSlots: { customRender: 'modUserName' }
   },
   {
     title: '修改原因',
     width: 300,
     ellipsis: true,
     dataIndex: 'reason',
-    scopedSlots: { customRender: 'reason' },
+    scopedSlots: { customRender: 'reason' }
   },
   {
     title: '操作时间',
     dataIndex: 'gmtModified',
     width: 180,
-    ellipsis: true,
-  },
+    ellipsis: true
+  }
 ]
 
 export default {
@@ -151,19 +151,19 @@ export default {
   mixins: [paginationMixin],
   components: {
     TextCompare,
-    downloadExcel,
+    downloadExcel
   },
   props: {
     visible: {
       type: Boolean,
-      default: false,
+      default: false
     },
     rowData: {
       type: Object,
       default() {
         return {}
-      },
-    },
+      }
+    }
   },
   computed: {
     rowSelection() {
@@ -171,9 +171,9 @@ export default {
         // fixed: true, // 高度不统一, 暂时先屏蔽
         selectedRowKeys: this.selectedRowKeys,
         onSelect: this.handleRowSelection,
-        onSelectAll: this.handleRowSelectionAll,
+        onSelectAll: this.handleRowSelectionAll
       }
-    },
+    }
   },
   data() {
     return {
@@ -182,7 +182,7 @@ export default {
         padding: '0',
         width: '70vw',
         height: 'calc(100vh - 240px)',
-        'overflow-y': 'auto',
+        'overflow-y': 'auto'
       },
       listLoading: false,
       listColumn,
@@ -199,8 +199,8 @@ export default {
           field: 'phone.landline',
           callback: (value) => {
             return `Landline Phone - ${value}`
-          },
-        },
+          }
+        }
       },
       json_data: [
         {
@@ -210,8 +210,8 @@ export default {
           birthdate: '4',
           phone: {
             mobile: '1-541-754-3010',
-            landline: '(541) 754-3010',
-          },
+            landline: '(541) 754-3010'
+          }
         },
         {
           name: '11',
@@ -220,10 +220,10 @@ export default {
           birthdate: '44',
           phone: {
             mobile: '55',
-            landline: '(66',
-          },
-        },
-      ],
+            landline: '(66'
+          }
+        }
+      ]
     }
   },
   mounted() {
@@ -247,7 +247,7 @@ export default {
       }
       return this.diffData
     },
-    //获取Xlsx文件名称
+    // 获取Xlsx文件名称
     getXlsxName() {
       return this.rowData.name
         ? this.rowData.name + '-版本对比.xls'
@@ -377,7 +377,7 @@ export default {
       const params = {
         current: this.pagination.current,
         pageSize: this.pagination.pageSize,
-        id: this.rowData.id,
+        id: this.rowData.id
       }
       const result = await this.$server.label
         .getLabelVersionList(params)
@@ -412,7 +412,7 @@ export default {
 
         Object.assign(this.pagination, {
           current: params.current,
-          total: result.total,
+          total: result.total
         })
       } else {
         this.$message.error(result.msg || '请求错误')
@@ -424,7 +424,7 @@ export default {
       const params = this.diffData.map((item) => {
         return {
           id: item.id,
-          version: item.version,
+          version: item.version
         }
       })
       const result = await this.$server.label
@@ -441,8 +441,8 @@ export default {
     handleResetForm() {
       this.form = this.$options.data().form
       this.$refs.form && this.$refs.form.resetFields()
-    },
-  },
+    }
+  }
 }
 </script>
 
