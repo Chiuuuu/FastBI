@@ -2,7 +2,7 @@
   <div
     class="canvas-main"
     ref="canvasMain"
-    @contextmenu.stop.prevent="hideContextMenu($event)"
+    @contextmenu.stop.prevent="showScreenContextMenu($event)"
   >
     <div
       class="canvas-panel-wrap"
@@ -90,13 +90,14 @@ export default {
       this.$store.dispatch('SingleSelected', null)
     },
     // 外层区域关闭右键菜单
-    hideContextMenu(event) {
+    showScreenContextMenu(event) {
       //   this.$store.dispatch('ToggleContextMenu')
       let info = {
         x: event.pageX + 10,
         y: event.pageY + 10,
         listType: 'screenMenuList'
       }
+      this.$store.dispatch('SingleSelected', null)
       this.$store.dispatch('ToggleContextMenu', info)
     }
   },

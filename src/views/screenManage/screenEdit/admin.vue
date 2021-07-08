@@ -155,6 +155,7 @@
             <!-- <span>{{transform.setting.background}}</span> -->
             <charts-factory
               v-else
+              :chart-id="transform.id"
               :key="transform.id"
               :chart-type="transform.setting.chartType"
               :type-name="transform.setting.name"
@@ -169,7 +170,7 @@
       </template>
     </board>
 
-    <screen v-if="isScreen"></screen>
+    <screen></screen>
     <b-modal
       v-model="deleteDialog"
       :styles="{ top: '300px', width: '350px' }"

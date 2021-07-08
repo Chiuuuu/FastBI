@@ -32,6 +32,7 @@
       :extend="chartExtend"
       :options="chartOptions"
       :settings="chartSettings"
+      :after-set-option="afterSetOption"
     ></component>
     <component
       v-else
@@ -49,6 +50,7 @@
       :options="chartOptions"
       :settings="chartSettings"
       :series="chartSeries"
+      :after-set-option="afterSetOption"
     ></component>
     <!-- <div v-else class="dv-charts-null">
       <a-icon  type="pie-chart" style="font-size:50px;" />
@@ -66,6 +68,7 @@ import { deepClone } from '@/utils/deepClone'
 import guangzhou from '@/utils/guangdong.json'
 import omit from 'lodash/omit'
 import { DEFAULT_COLORS } from '@/utils/defaultColors'
+import { setChartInstanceIdMap } from '@/utils/screenExport'
 
 export default {
   name: 'ChartsFactory',
@@ -174,7 +177,7 @@ export default {
       colors: [],
       geo: {},
       mapToolTip: {},
-      chartLegend:{},
+      chartLegend: {},
       key: 0,
       currentIndex: '' // 记录当前选择的度量数据(图表联动)
     }
@@ -188,21 +191,22 @@ export default {
           if (this.typeName === 've-map') {
             this.chartExtend = { ...omit(val, ['series']) }
             this.chartSeries = deepClone(val.series)
-            // this.setMapFormatter()
-          } else if(this.typeName === 've-scatter'){ //散点图
-            this.chartExtend = { ...omit(val, ['series','legend']) }
-            this.chartLegend = val.legend; //图例
+            this.setMapFormatter()
+          } else if (this.typeName === 've-scatter') {
+            //散点图
+            this.chartExtend = { ...omit(val, ['series', 'legend']) }
+            this.chartLegend = val.legend //图例
             // series设置
             let series = deepClone(val.series)
-            let data = series.data;
-            let list = [];
-            data.map(item=>{
+            let data = series.data
+            let list = []
+            data.map(item => {
               list.push(deepClone(series))
-              list[list.length-1].data = item.data;
-              list[list.length-1].name = item.label;
+              list[list.length - 1].data = item.data
+              list[list.length - 1].name = item.label
             })
-            this.chartSeries = list;
-            
+            this.chartSeries = list
+
             // tooltip显示  -- 不生效
             // this.chartExtend.tooltip.formatter = function(params){
             //   let val= params.value;
@@ -214,9 +218,7 @@ export default {
             //           ${val[4]}：${val[1]}<br/>
             //           `;
             // }
-
           } else {
-          
             this.chartExtend = deepClone(val)
             // 保留两位小数
             if (this.typeName !== 've-gauge' && this.typeName !== 've-ring') {
@@ -296,10 +298,11 @@ export default {
               if (!val.source) {
                 return
               }
-              if(this.chartType === 'v-scatter'){ //散点图的数据自定义显示
+              if (this.chartType === 'v-scatter') {
+                //散点图的数据自定义显示
                 this.chartData.columns = []
                 this.chartData.rows = []
-              }else{
+              } else {
                 // 如果有联动，显示联动的数据
                 this.chartData = val.selectData ? val.selectData : val.source
               }
@@ -307,7 +310,8 @@ export default {
             }
           }
 
-          if (this.chartType === 'v-scatter') { //散点图的数据自定义显示
+          if (this.chartType === 'v-scatter') {
+            //散点图的数据自定义显示
             this.chartData.columns = []
             this.chartData.rows = []
           } else {
@@ -325,7 +329,6 @@ export default {
           this.chartSettings = { ...val }
           this.$log.primary('========>chartSettings')
           this.$print(this.chartSettings)
-          
         }
       },
       deep: true,
@@ -367,32 +370,35 @@ export default {
       options = deepClone(options);
       console.log('op', options)
       // 散点图
-      if(this.typeName === 've-scatter'){
+      if (this.typeName === 've-scatter') {
         // tooltip显示
-        options.tooltip.formatter = function(params){
-          let val= params.value;
-          if(val.length<6){ return ''};
+        options.tooltip.formatter = function(params) {
+          let val = params.value
+          if (val.length < 6) {
+            return ''
+          }
           return `${params.marker}<br/>
                   ${val[5]}：${val[2]}<br/>
                   ${val[3]}：${val[0]}<br/>
                   ${val[4]}：${val[1]}<br/>
-                  `;
+                  `
         }
-        options.series.forEach(item=>{
+        options.series.forEach(item => {
           // 图形属性 -- 散点颜色 -- 单色
-          this.apis.scatterColor === '0' ? item.color = '#68ABDA' : delete item.color
+          this.apis.scatterColor === '0'
+            ? (item.color = '#68ABDA')
+            : delete item.color
 
           // 散点图大小设置
-          let scatterSize = this.apis.scatterSize;
-          if(scatterSize){
-            let max = scatterSize === '0' ? this.apis.xMax:this.apis.yMax;
-            item.symbolSize = function(val){
-              let num = val[scatterSize];
-              return max === 0 ? 8:(20/max)*num+8;
+          let scatterSize = this.apis.scatterSize
+          if (scatterSize) {
+            let max = scatterSize === '0' ? this.apis.xMax : this.apis.yMax
+            item.symbolSize = function(val) {
+              let num = val[scatterSize]
+              return max === 0 ? 8 : (20 / max) * num + 8
             }
           }
         })
-        
       }
 
       // 矩形树图
@@ -410,26 +416,26 @@ export default {
     },
     // 处理矩形树图的formatter
     handleTreemapFormatter(series, type) {
-        let flag = false
-        if (this.apiData.measures[0]) {
-          const measureAlias = this.apiData.measures[0].alias
-          flag = series[type + 'ShowList'].includes(measureAlias)
-        }
-        series[type].formatter = (params) => {
-          let result = []
-          let target = params.data
-          while (target.parent) {
-            if (series[type + 'ShowList'].includes(target.column)) {
-              result.push(target.name)
-            }
-            target = target.parent
+      let flag = false
+      if (this.apiData.measures[0]) {
+        const measureAlias = this.apiData.measures[0].alias
+        flag = series[type + 'ShowList'].includes(measureAlias)
+      }
+      series[type].formatter = params => {
+        let result = []
+        let target = params.data
+        while (target.parent) {
+          if (series[type + 'ShowList'].includes(target.column)) {
+            result.push(target.name)
           }
-          result = result.reverse()
-          if (flag) {
-            result.push(params.value[1])
-          }
-          return result.toString()
+          target = target.parent
         }
+        result = result.reverse()
+        if (flag) {
+          result.push(params.value[1])
+        }
+        return result.toString()
+      }
     },
     // 添加图表点击事件，可以点击非数据区域
     setChartClick() {
@@ -439,7 +445,11 @@ export default {
           if (typeof params.target === 'undefined') {
             // 重置数据颜色样式
             const series = self.chartExtend.series
-            if (series.itemStyle && series.itemStyle.normal && series.itemStyle.normal.color) {
+            if (
+              series.itemStyle &&
+              series.itemStyle.normal &&
+              series.itemStyle.normal.color
+            ) {
               delete self.chartExtend.series.itemStyle.normal.color
             }
             // 强行渲染，非数据变动不会自动重新渲染
@@ -506,6 +516,10 @@ export default {
             '0x' + hex.slice(3, 5)
           )},${parseInt('0x' + hex.slice(5, 7))},${opacity})`
         : ''
+    },
+    afterSetOption(chartObj) {
+      // 保存echart实例，截图用
+      setChartInstanceIdMap(chartObj, this.chartId)
     }
   },
   computed: {
