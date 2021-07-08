@@ -117,7 +117,11 @@ export default {
           // 重复选择数据，进行重置
           if (self.currentIndex === e.dataIndex) {
             // 重置数据颜色样式
-            delete self.chartExtend.series.itemStyle.normal.color
+            const series = self.chartExtend.series
+            if (series.itemStyle && series.itemStyle.normal && series.itemStyle.normal.color) {
+              delete self.chartExtend.series.itemStyle.normal.color
+            }
+            self.currentIndex = ''
             // 强行渲染
             self.key++
             self.$emit('resetOriginData', self.id)
@@ -144,7 +148,9 @@ export default {
           // 强行渲染
           self.key++
           self.$emit('linkage', self.id, e)
-          chart.off('click')
+          if (self.chartType !== 'v-treemap') {
+            chart.off('click')
+          }
           self.setChartClick()
         })
       }
@@ -301,12 +307,10 @@ export default {
           if (this.chartType === 'v-scatter') { //散点图的数据自定义显示
             this.chartData.columns = []
             this.chartData.rows = []
-          }else{
+          } else {
             this.chartData.columns = val.columns
             this.chartData.rows = val.rows
           }
-          
-          
         }
       },
       deep: true,
@@ -393,6 +397,11 @@ export default {
         const series = options.series[0] ? options.series[0] : options.series
         this.handleTreemapFormatter(series, 'tooltip')
         this.handleTreemapFormatter(series, 'label')
+        // 如果有图表联动, 则渲染联动的数据
+        if (this.apiData.selectData) {
+          series.data = this.apiData.selectData.data
+          options.visualMap.pieces = this.apiData.selectData.pieces
+        }
       }
       return options
     },
@@ -432,6 +441,7 @@ export default {
             }
             // 强行渲染，非数据变动不会自动重新渲染
             self.key++
+            self.currentIndex = ''
             self.$emit('resetOriginData', self.id)
           }
         })

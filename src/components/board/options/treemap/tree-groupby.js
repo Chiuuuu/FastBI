@@ -13,7 +13,7 @@ class TreeGroupBy {
     if (index === 0) {
       return tree.map(item => ({
         label: item.name,
-        value: item.valueBackup
+        value: 'valueBackup' in item ? item.valueBackup : item.value
       }))
     } else {
       loop(tree)
@@ -22,13 +22,9 @@ class TreeGroupBy {
     function loop(list) {
       list.map(item => {
         if (i === index) {
-          let value = item.value
-          if (Array.isArray(value)) {
-            value = value[1]
-          }
           result.push({
             label: item.name,
-            value: item.valueBackup
+            value: 'valueBackup' in item ? item.valueBackup : item.value
           })
         } else {
           i++
@@ -46,17 +42,37 @@ class TreeGroupBy {
         if (isEqual) {
           node.value = 1
         } else {
-          node.value = node.valueBackup
+          node.value = 'valueBackup' in node ? node.valueBackup : node.value
         }
         this.loopSetTreeValue(node.children, isEqual)
       } else {
         if (isEqual) {
           node.value[0] = 1
         } else {
-          node.value[0] = node.valueBackup
+          node.value[0] = 'valueBackup' in node ? node.valueBackup : node.value
         }
       }
     })
+  }
+
+  // 遍历整棵树, 赋值最终叶子节点的value值(视觉映射的dimension)
+  static handleLeafValue(datas) {
+    let chain = []
+    function loop(list) {
+      list.forEach(item => {
+        chain.push(item.value)
+        item.valueBackup = item.value
+        if (item.children && item.children.length > 0) {
+          loop(item.children)
+        } else {
+          item.value = chain.concat([item.valueBackup])
+          item.value.reverse()
+          chain = chain.slice(0, -1)
+        }
+      })
+      chain = chain.slice(0, -1)
+    }
+    loop(datas)
   }
 
   constructor(datas, dimensionList, measures) {
@@ -74,7 +90,6 @@ class TreeGroupBy {
     */
     this.chain = [] // 链表
     this.treeGroupBy()
-    this.handleLeafValue()
   }
 
   treeGroupBy() {
@@ -95,7 +110,7 @@ class TreeGroupBy {
         const newNode = {
           name: record[curKey],
           column: curKey,
-          valueBackup: 0,
+          value: 0,
           parent: {},
           children: []
         }
@@ -156,7 +171,7 @@ class TreeGroupBy {
     const node = {
       name: record[this.dimensionList[index]],
       column: this.dimensionList[index],
-      valueBackup: 0,
+      value: 0,
       parent: {
         name: parent.name,
         column: parent.column,
@@ -192,32 +207,13 @@ class TreeGroupBy {
       }
       // target.value[0] += value
       // target.value[1] += value
-      target.valueBackup += value
+      target.value += value
       // 记录当前维度的max值(用于视觉映射)
       const curMax = this.max[this.dimensionList.length - index - 1] || 0
       this.max[this.dimensionList.length - index - 1] = Math.ceil(Math.max(curMax, value))
     })
   }
 
-  // 遍历整棵树, 赋值最终叶子节点的value值(视觉映射的dimension)
-  handleLeafValue() {
-    let chain = []
-    function loop(list) {
-      list.forEach(item => {
-        chain.push(item.valueBackup)
-        if (item.children && item.children.length > 0) {
-          item.value = item.valueBackup
-          loop(item.children)
-        } else {
-          item.value = chain.concat([item.valueBackup])
-          item.value.reverse()
-          chain = chain.slice(0, -1)
-        }
-      })
-      chain = chain.slice(0, -1)
-    }
-    loop(this.tree)
-  }
 }
 
 export default TreeGroupBy

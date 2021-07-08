@@ -266,6 +266,9 @@ const app = {
       // 图表联动数据selectData不保存后台
       if (chart.setting.api_data.selectData) {
         delete chart.setting.api_data.selectData
+        if (chart.setting.chartType === 'v-treemap') {
+          chart.setting.config.series.data = chart.setting.api_data.source
+        }
       }
 
       let params = {
