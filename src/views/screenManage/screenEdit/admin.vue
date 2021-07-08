@@ -408,7 +408,6 @@ export default {
   beforeDestroy() {
     off(document, 'keyup', this.handleKeyup)
     this.$EventBus.$off('context/menu/delete', this.deleteDialogShow)
-    this.$store.commit('common/SET_MENUSELECTID', -1)
   },
   // 跳转编辑的时候如果token失效回到登录页，再次进来就重定向回目录页
   beforeRouteEnter(to, from, next) {
