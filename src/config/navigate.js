@@ -1467,6 +1467,7 @@ const list = [
               dimensions: [],
               measures: [],
               source: {},
+              origin_source:{},//原始数据
               columns: [
                 // 'x','y','日期'
               ],
@@ -1478,7 +1479,7 @@ const list = [
                 // { 日期: '1/5', x: 3792, y: 3492 },
                 // { 日期: '1/6', x: 4593, y: 4293 }
               ],
-              options: {}
+              options: {},
             },
             apis: {
               // level: [['1/1', '1/2', '1/3'], ['1/4', '1/5']],

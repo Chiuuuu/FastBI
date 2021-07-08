@@ -556,6 +556,12 @@ export default {
           })
           datas = datas.map(item => _.omit(item, filterArr))
         }
+        
+        // 保存原始数据 -- 查看数据有用
+        apiData.origin_source = deepClone( datas || res.data || [] )
+        this.$store.dispatch('SetSelfDataSource', apiData)
+        console.log(apiData,'apiData查看数据1')
+
         // 矩形树图数据处理
         if (this.currSelected.setting.chartType === 'v-treemap') {
           return this.handleTreemapConfig(res.rows)
@@ -636,7 +642,7 @@ export default {
 
           let columns = []
           let rows = []
-          let dimensionKeys = [] // 度量key
+          let dimensionKeys = [] // 维度key
           for (let m of apiData.dimensions) {
             dimensionKeys.push(m.alias)
             columns.push(m.alias) // 默认columns第二项起为指标
@@ -732,13 +738,11 @@ export default {
             this.$store.dispatch('SetApis', apis)
           }
 
-          // if(this.currSelected.setting.chartType !== 'v-scatter'){
-            apiData.source = {
-              columns,
-              rows
-            }
-            this.$store.dispatch('SetSelfDataSource', apiData)
-          // }
+          apiData.source = {
+            columns,
+            rows
+          }
+          this.$store.dispatch('SetSelfDataSource', apiData)
           
         }
         this.updateChartData()
