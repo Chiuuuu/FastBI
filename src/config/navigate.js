@@ -1927,7 +1927,7 @@ const list = [
                 name: '矩形树图',
                 type: 'treemap',
                 recSize: 'value', // 矩形大小依据度量等比或所有矩形等大(none)
-                recDimensionIndex: '', // 矩形颜色(即视觉映射的维度)
+                recDimensionIndex: 0, // 矩形颜色(即视觉映射的维度)
                 visualMaxList: [],
                 // 由于visualMap数组中的颜色定义, 即使隐藏了也会优先取piecewise的颜色集, 所以这里才去分开记录重新赋值到visualMap的方式解决
                 continuousColors: ['#ffff0d', '#f69f2e'],

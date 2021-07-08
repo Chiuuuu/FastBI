@@ -689,12 +689,13 @@ export default {
           let setting = deepClone(this.currSelected.setting)
           let config = setting.config
           const tree = new TreeGroupBy(res.rows, setting.api_data.dimensions.map(item => item.alias), setting.api_data.measures)
+          TreeGroupBy.handleLeafValue(tree.tree)
           config.series.data = tree.tree
           config.series.visualMaxList = tree.max
           config.visualMap.max = tree.max[0]
 
           // 若删除了维度, 且刚好指针指向了维度, 则切换映射类型
-          let index = config.series.recDimensionIndex
+          let index = config.series.recDimensionIndex || 0
           if (index === setting.api_data.dimensions.length) {
             config.visualMap.max = config.series.visualMaxList[0]
             config.visualMap.type = 'continuous'
@@ -709,6 +710,10 @@ export default {
             config.visualMap.pieces = TreeGroupBy.handlePieces(config.series.data, index)
           }
           this.$store.dispatch('SetSelfProperty', config)
+
+          let apiData = deepClone(this.currSelected.setting.api_data)
+          apiData.source = tree.tree
+          this.$store.dispatch('SetSelfDataSource', apiData)
           this.updateChartData()
           return
         }

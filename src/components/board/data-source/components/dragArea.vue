@@ -333,12 +333,16 @@ export default {
       let setting = deepClone(this.currSelected.setting)
       let config = setting.config
       const tree = new TreeGroupBy(rows, setting.api_data.dimensions.map(item => item.alias), setting.api_data.measures)
+      TreeGroupBy.handleLeafValue(tree.tree)
       config.series.data = tree.tree
       config.series.visualMaxList = tree.max
       config.visualMap.max = tree.max[0]
 
       // 若删除了维度, 且刚好指针指向了维度, 则切换映射类型
-      let index = config.series.recDimensionIndex
+      let index = config.series.recDimensionIndex || 0
+      if (index >= setting.api_data.dimensions.length) {
+        config.series.recDimensionIndex = index = setting.api_data.dimensions.length - 1
+      }
       if (index === setting.api_data.dimensions.length) {
         config.visualMap.max = config.series.visualMaxList[0]
         config.visualMap.type = 'continuous'
@@ -353,6 +357,10 @@ export default {
         config.visualMap.pieces = TreeGroupBy.handlePieces(config.series.data, index)
       }
       this.$store.dispatch('SetSelfProperty', config)
+
+      let apiData = deepClone(this.currSelected.setting.api_data)
+      apiData.source = tree.tree
+      this.$store.dispatch('SetSelfDataSource', apiData)
       this.updateChartData()
     },
     // 删除当前维度或者度量
@@ -392,6 +400,8 @@ export default {
           if (this.fileList.length === 0) {
             current.setting.config.series.data = []
             current.setting.config.visualMap.pieces = []
+            current.setting.config.visualMap.type = 'continuous'
+            current.setting.config.visualMap.inRange.color = current.setting.config.series.continuousColors
           }
           const tooltipShowList = current.setting.config.series.tooltipShowList
           for (let i = 0; i < tooltipShowList.length; i++) {
@@ -539,7 +549,7 @@ export default {
       if (res.code === 200) {
         let datas = res.rows
         // 去掉排序的数据
-        if (apiData.options.sort.length) {
+        if (apiData.options && apiData.options.sort && apiData.options.sort.length) {
           let filterArr = []
           apiData.options.sort.forEach(item => {
             filterArr.push(`sort_${item.alias}`)

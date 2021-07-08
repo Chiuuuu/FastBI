@@ -477,7 +477,7 @@ export default {
           TreeGroupBy.handleLeafValue(tree.tree)
           selectData = {
             data: tree.tree,
-            pieces: TreeGroupBy.handlePieces(config.series.data, config.series.recDimensionIndex)
+            pieces: TreeGroupBy.handlePieces(tree.tree, config.series.recDimensionIndex)
           }
         }
         // 构造联动选择的数据
