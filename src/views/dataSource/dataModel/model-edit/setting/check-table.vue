@@ -19,6 +19,7 @@
       <a-button
         key="submit"
         type="primary"
+        v-if="hasEditPermission"
         :loading="confirmLoading"
         @click="handleExport"
       >
@@ -69,6 +70,7 @@
 </template>
 
 <script>
+import { hasPermission } from '@/utils/permission'
 export default {
   name: 'checkTable',
   props: {
@@ -97,6 +99,11 @@ export default {
           this.handleGetData()
         }
       }
+    }
+  },
+  computed: {
+    hasEditPermission() {
+      return hasPermission(this.$store.state.common.privileges, this.$PERMISSION_CODE.OPERATOR.export)
     }
   },
   methods: {
