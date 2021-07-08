@@ -46,6 +46,7 @@ import { exportImg, exportForFull, exportScreen } from '@/utils/exportImg'
 import { mapGetters, mapActions } from 'vuex'
 import { Loading } from 'element-ui'
 import chartTableData from '../chartTableData/index' // 右键菜单
+import { deepClone } from '@/utils/deepClone'
 const exportChartList = [
   { icon: 'ios-share', text: '查看数据', order: 'showChartData' },
   {
@@ -174,10 +175,13 @@ export default {
         this.deleteOne()
       } else if (order === 'showChartData') {
         // 查看图表数据
-        if (this.currSelected.setting.api_data.source && JSON.stringify(this.currSelected.setting.api_data.source)!='{}') {
-          this.setChartData()
+        if (this.currSelected.setting.api_data.origin_source 
+            && JSON.stringify(this.currSelected.setting.api_data.origin_source)!='{}'
+            && JSON.stringify(this.currSelected.setting.api_data.origin_source)!='[]'
+        ) {
+          this.setChartData_scan()
           this.$store.dispatch('ToggleContextMenu')
-          this.showChartData(this.chartData, this.chartDataForMap)
+          this.showChartData(this.chartData)
         } else {
           this.$message.error('该图表没有拖入图表数据')
         }
@@ -270,6 +274,28 @@ export default {
       }
       loadingInstance.close()
       return this.chartData.rows
+    },
+    // 查看数据 -- 构造数据
+    setChartData_scan(){
+      let columns = [],rows = [],tableName = [];
+      let origin_source = deepClone(this.currSelected.setting.api_data.origin_source);
+      // 地图
+      if(this.currSelected.setting.chartType === 'v-map'){
+        Object.keys(origin_source).map((item)=>{
+          columns.push( Object.keys(origin_source[item][0]))
+          rows.push(origin_source[item])
+          tableName.push(item == 'fillList' ? '填充':'标记点')
+        })
+      }else{
+        rows = [origin_source]
+        columns = [Object.keys(origin_source[0])];
+      }
+      this.chartData = {
+        columns,
+        rows,
+        tableName,
+      }
+      return this.chartData.rows;
     }
   }
 }

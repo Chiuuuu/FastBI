@@ -547,6 +547,10 @@ export default {
         return
       }
       if (res.code === 200) {
+        // 保存原始数据 -- 查看数据有用
+        apiData.origin_source = deepClone( res.rows || res.data || {} )
+        this.$store.dispatch('SetSelfDataSource', apiData)
+        
         let datas = res.rows
         // 去掉排序的数据
         if (apiData.options && apiData.options.sort && apiData.options.sort.length) {
@@ -556,12 +560,6 @@ export default {
           })
           datas = datas.map(item => _.omit(item, filterArr))
         }
-        
-        // 保存原始数据 -- 查看数据有用
-        apiData.origin_source = deepClone( datas || res.data || [] )
-        this.$store.dispatch('SetSelfDataSource', apiData)
-        console.log(apiData,'apiData查看数据1')
-
         // 矩形树图数据处理
         if (this.currSelected.setting.chartType === 'v-treemap') {
           return this.handleTreemapConfig(res.rows)

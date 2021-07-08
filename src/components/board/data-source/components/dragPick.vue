@@ -675,6 +675,10 @@ export default {
           this.updateChartData()
           return
         }
+        // 保存原始数据 -- 查看数据有用
+        apiData.origin_source = deepClone( res.rows || res.data || {} )
+        this.$store.dispatch('SetSelfDataSource', apiData)
+        
         let datas = res.rows
         // 去掉排序的数据
         if (apiData.options.sort.length) {

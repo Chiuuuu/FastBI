@@ -524,9 +524,8 @@ export default {
       }
     },
     // 设置图表数据
-    showChartData(chartData, chartDataForMap) {
+    showChartData(chartData) {
       this.chartData = chartData
-      this.chartDataForMap = chartDataForMap
       this.show = true
     },
     cancelSelect() {

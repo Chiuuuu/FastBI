@@ -64,7 +64,6 @@ export default {
       errorData: '',
       show: false, // 图表数据查看
       chartData: {}, // 图表数据
-      chartDataForMap: {} // 地图第二层数据
     }
   },
   provide() {
@@ -113,9 +112,8 @@ export default {
       this.errorData = error
     },
     // 设置图表数据
-    showChartData(chartData, chartDataForMap) {
+    showChartData(chartData) {
       this.chartData = chartData
-      this.chartDataForMap = chartDataForMap
       this.show = true
     }
   },
