@@ -208,6 +208,12 @@ export default {
       this.spinning2 = true
       this.spinning3 = true
       for (let i = 1; i < 4; i++) {
+        if (!this.roleId && !this.$route.params.id) {
+          this.spinning1 = false
+          this.spinning2 = false
+          this.spinning3 = false
+          return
+        }
         const result = await this.$server.projectCenter
           .getRoleTree(this.roleId || this.$route.params.id, i)
           .finally(() => {
