@@ -138,7 +138,10 @@
             ></high-charts>
             <!-- 矩形热力图 -->
             <chart-heart
-              v-else-if="transform.setting.name==='ve-heatmap'|transform.setting.name==='ve-sun'"
+              v-else-if="
+                (transform.setting.name === 've-heatmap') |
+                  (transform.setting.name === 've-sun')
+              "
               :key="transform.id"
               :view="transform.setting.view"
               :config="transform.setting.config"
@@ -155,6 +158,7 @@
             <!-- <span>{{transform.setting.background}}</span> -->
             <charts-factory
               v-else
+              :chart-id="transform.id"
               :key="transform.id"
               :chart-type="transform.setting.chartType"
               :type-name="transform.setting.name"
@@ -169,7 +173,7 @@
       </template>
     </board>
 
-    <screen v-if="isScreen"></screen>
+    <screen></screen>
     <b-modal
       v-model="deleteDialog"
       :styles="{ top: '300px', width: '350px' }"

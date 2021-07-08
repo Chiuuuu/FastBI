@@ -1,7 +1,6 @@
 <template>
   <div
     class="dv-screen"
-    :id="screenId"
     ref="dvScreen"
     @contextmenu.stop.prevent="poupExportMenu($event)"
     @mousedown="cancelSelect"
@@ -78,7 +77,10 @@
 
               <!-- 矩形热力图 -->
               <chart-heart
-                v-else-if="transform.setting.name === 've-heatmap'|transform.setting.name==='ve-sun'"
+                v-else-if="
+                  (transform.setting.name === 've-heatmap') |
+                    (transform.setting.name === 've-sun')
+                "
                 :key="transform.id"
                 :config="transform.setting.config"
                 :view="transform.setting.view"
@@ -112,7 +114,11 @@
       @mouseleave.native="handleTabShow"
     ></pation>
     <context-menu></context-menu>
-    <chartTableData :show.sync="show" :chart-data="chartData" @cancel="show = false"></chartTableData>
+    <chartTableData
+      :show.sync="show"
+      :chart-data="chartData"
+      @cancel="show = false"
+    ></chartTableData>
   </div>
 </template>
 
@@ -171,13 +177,13 @@ export default {
       timer: null,
       showPageTab: false, // 页签显示/隐藏
       show: false, // 图表数据查看
-      chartData: {}, // 图表数据
+      chartData: {} // 图表数据
     }
   },
   provide() {
     return {
       showChartData: this.showChartData,
-      dvScreenDom:this.getDvScreen,
+      dvScreenDom: this.getDvScreen
     }
   },
   computed: {
@@ -217,7 +223,9 @@ export default {
     screenId: {
       handler(val) {
         if (val) {
-          if (this.$route.name === 'catalog') this.getScreenData()
+          if (this.$route.name === 'catalog') {
+            this.getScreenData()
+          }
         }
       },
       deep: true,
@@ -237,7 +245,7 @@ export default {
   },
   methods: {
     ...mapActions(['getScreenDetail', 'refreshScreen']),
-    getDvScreen(){
+    getDvScreen() {
       return this.$refs.dvScreen
     },
     changeTab(pageId) {

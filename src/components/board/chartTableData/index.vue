@@ -1,6 +1,6 @@
 <template>
   <a-modal
-    :visible="true"
+    :visible="show"
     title="图表数据"
     width="750px"
     :footer="null"
@@ -38,6 +38,10 @@ export default {
       type: Object,
       required: false,
       default: () => {}
+    },
+    show: {
+      type: Boolean,
+      required: true
     }
   },
   methods: {
