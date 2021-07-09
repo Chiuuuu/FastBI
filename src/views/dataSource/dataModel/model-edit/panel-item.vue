@@ -81,9 +81,19 @@ export default {
                 target.onClick.apply(this, arguments)
             }
        }
+      const produceType = this.itemData.produceType
+      const contextmenus = that.contextmenus.filter(item => {
+        if (produceType !== 0) {
+          return item
+        } else {
+          if (item.type !== 'custom') {
+            return item
+          }
+        }
+      })
       this.contenxtmenu = new ContextMenu({
         vm: that,
-        menus: that.contextmenus.map(item => {
+        menus: contextmenus.map(item => {
             if (item['children'] && item.children.length) {
                 item.children.forEach(subitem => {
                     addEvent(subitem)
@@ -96,7 +106,7 @@ export default {
         customStyle: () => {
           return {
             left: this.className === 'dimensions' ? `${e.clientX}px` : `${e.clientX - 180}px`,
-            top: `${e.clientY - (that.contextmenus.length + 1) * 28}px`
+            top: `${e.clientY - (contextmenus.length + 1) * 28}px`
           }
         },
         handleMarkCancel: function() {

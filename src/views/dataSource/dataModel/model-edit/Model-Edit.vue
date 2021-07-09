@@ -370,6 +370,16 @@ export default {
           }
         },
         {
+          name: '编辑',
+          type: 'custom',
+          onClick: this.handleEditField
+        },
+        {
+          name: '删除',
+          type: 'custom',
+          onClick: this.handleDeleField
+        },
+        {
           name: '复制字段',
           onClick: this.handleCopyField
         },
@@ -413,9 +423,45 @@ export default {
 
       return arry
     },
+    handleOpenComputeSetting(type) {
+      this.panelData = ''
+      this.openModal('compute-setting', type)
+    },
     switchFieldType(e, item, vm) {
       let dataType = item.dataType
       vm.itemData.dataType = dataType
+    },
+    handleEditField(event, handler, vm) {
+      const role = vm.itemData.role
+        this.panelData = vm.itemData
+      const isDimension = role === 1
+      const isMeasures = role === 2
+      if (isDimension) {
+         this.openModal('compute-setting', '维度')
+      } else if (isMeasures) {
+        this.openModal('compute-setting', '度量')
+      }
+    },
+    handleDeleField(event, handler, vm) {
+      const role = vm.itemData.role
+      const isDimension = role === 1
+      const isMeasures = role === 2
+      let index = -1
+      if (isDimension) {
+        index = this.cacheDimensions.findIndex(
+          item => item.id === vm.itemData.id
+        )
+        if (index > -1) {
+          this.cacheDimensions.splice(index, 1)
+          this.handleDimensions()
+        }
+      } else if (isMeasures) {
+        index = this.cacheMeasures.findIndex(item => item.id === vm.itemData.id)
+        if (index > -1) {
+          this.cacheMeasures.splice(index, 1)
+          this.handleMeasures()
+        }
+      }
     },
     async handleGetDatabaseList() {
       const result = await this.$server.dataModel.getDatabaseList(this.$route.query.datasourceId)
@@ -870,10 +916,19 @@ export default {
       }
     },
     doWithComputeSetting(data) {
+      let list
       if (this.computeType === '维度') {
-        this.cacheDimensions.push(data)
+        list = this.cacheDimensions
       } else {
-        this.cacheMeasures.push(data)
+        list = this.cacheMeasures
+      }
+      let index = list.findIndex(
+        item => item.id === data.id
+      )
+      if (index < 0) {
+        list.push(data)
+      } else {
+        list.splice(index, 1, data)
       }
       this.handleDimensions()
       this.handleMeasures()

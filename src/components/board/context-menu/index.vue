@@ -42,7 +42,11 @@
 <script>
 import Vue from 'vue'
 import JsonExcel from 'vue-json-excel'
-import { exportImg, exportForFull, exportScreen } from '@/utils/exportImg'
+import {
+  exportImg,
+  exportForFull,
+  exportScreen
+} from '@/utils/screenExport'
 import { mapGetters, mapActions } from 'vuex'
 import { Loading } from 'element-ui'
 import chartTableData from '../chartTableData/index' // 右键菜单
@@ -195,12 +199,7 @@ export default {
             this.canvasRange
           )
         } else {
-          exportImg(
-            this.currentSelected,
-            this.currSelected,
-            this.pageSettings,
-            this.canvasRange
-          )
+          exportImg(this.currentSelected, this.currSelected, this.pageSettings)
         }
       } else if (order === 'exportScreen') {
         this.$store.dispatch('ToggleContextMenu')
@@ -224,9 +223,7 @@ export default {
     },
     // 导出大屏数据
     exportScreen() {
-      setTimeout(() => {
-        exportScreen(this.screenId, this.fileName)
-      }, 0)
+      exportScreen(this.fileName)
     },
     startDownload() {
       this.$message.info('正在导出')

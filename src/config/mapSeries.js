@@ -105,7 +105,7 @@ export const dotSeries = {
     normal: {
       color: '#60b8f6',
       opacity: 0,
-      showSeries: false
+      showSeries: true
     },
     emphasis: {
       borderColor: '#fff',

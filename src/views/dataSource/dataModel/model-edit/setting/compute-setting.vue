@@ -189,7 +189,13 @@ export default {
   name: 'computeSetting',
   props: {
     isShow: Boolean,
-    computeType: String
+    computeType: String,
+    renameData: {
+      type: Object,
+      default() {
+        return {}
+      }
+    }
   },
   data() {
     return {
@@ -227,6 +233,9 @@ export default {
     this.debounceFn = debounce(this.check, 500)
   },
   computed: {
+    isEdit() {
+      return 'id' in this.renameData
+    },
     explain() {
       return this.expression[this.activeIndex].example.replace(/\n/gm, '<br/>')
     },
@@ -245,25 +254,33 @@ export default {
           this.errorMessage = ''
           this.dimensions = this.getDM(this.sourceDimensions)
           this.measures = this.getDM(this.sourceMeasures)
+          this.textareaValue = this.renameData.raw_expr
+          this.form = Object.assign(this.form, {
+            name: this.renameData.alias
+          })
         } else {
           this.dimensions = ''
           this.measures = ''
+          this.textareaValue = ''
+          this.form = this.$options.data().form
         }
       }
     },
     textareaValue(val) {
-      if (!val) {
+      if (!val && this.isShow) {
         this.errorMessage = '表达式不能为空'
       }
-      this.$refs['js-expshow'].innerHTML = ''
-      this.getExpshow(val)
+      this.$nextTick(() => {
+        this.$refs['js-expshow'].innerHTML = ''
+        this.getExpshow(val)
+      })
     }
   },
   methods: {
     validateName(rule, value, callback) {
       const arry = [...this.sourceDimensions, ...this.sourceMeasures]
       const item = arry.filter(item => item.alias === value).pop()
-      if (item) {
+      if (item && !this.isEdit) {
         callback(new Error('名称已存在'))
       } else {
         callback()
@@ -370,15 +387,22 @@ export default {
               raw_expr: this.textareaValue,
               expr: this.reverse(this.textareaValue)
             }
-            this.confirmLoading = true
-            const result = await this.$server.dataModel.addCustomizModelPivotschema(params).finally(() => {
-              this.confirmLoading = false
-            })
-
-            if (result.code === 200) {
-              this.$emit('success', result.data)
+            if (this.isEdit) {
+              const updateData = Object.assign({}, this.renameData, params, {
+                alias: params.name
+              })
+              this.$emit('success', updateData)
             } else {
-              this.$message.error(result.msg || '请求错误')
+              this.confirmLoading = true
+              const result = await this.$server.dataModel.addCustomizModelPivotschema(params).finally(() => {
+                this.confirmLoading = false
+              })
+
+              if (result.code === 200) {
+                this.$emit('success', result.data)
+              } else {
+                this.$message.error(result.msg || '请求错误')
+              }
             }
           }
         } else {

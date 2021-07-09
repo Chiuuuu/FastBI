@@ -526,7 +526,7 @@ export default {
           // 大屏文件保存不需要文件夹
           this.folderList = rows
           // 没有选择文件的时候默认选择第一个文件
-          if (!this.fileSelectId && this.folderList.length > 0) {
+          if (this.fileSelectId === -1 && this.folderList.length > 0) {
             this.getFirstScreen(this.folderList, 0)
           }
         }
