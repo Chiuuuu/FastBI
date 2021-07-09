@@ -17,10 +17,21 @@
         "
       >
         <drag-area
+          v-if="currSelected.setting.chartType !== 'v-ring'"
           type="measures"
-          :fileList="fileObj.measures"
           ref="child"
         ></drag-area>
+        <!-- 环形图 -->
+        <dragAreaForRing
+          v-if="currSelected.setting.chartType === 'v-ring'"
+          type="measures"
+          measureType="current"
+        ></dragAreaForRing>
+        <dragAreaForRing
+          v-if="currSelected.setting.chartType === 'v-ring'"
+          type="measures"
+          measureType="total"
+        ></dragAreaForRing>
       </a-collapse-panel>
       <a-collapse-panel key="tableList" header="列" v-if="chartType === '3'">
         <drag-area type="tableList" ref="table"></drag-area>
@@ -83,13 +94,15 @@
 import { mapGetters, mapActions } from 'vuex'
 import DragArea from './components/dragArea'
 import DragPick from './components/dragPick'
+import dragAreaForRing from './components/dragAreaForRing'
 import { deepClone } from '../../../utils/deepClone'
 import DragSort from './components/dragSort'
 export default {
   components: {
     DragArea,
     DragPick,
-    DragSort
+    DragSort,
+    dragAreaForRing
   },
   data() {
     return {

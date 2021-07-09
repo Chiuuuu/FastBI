@@ -361,20 +361,24 @@ export default {
                 value: total
               }
             ]
-            // 环形图第二度量(指针值)
-            if (
-              this.currSelected.setting.chartType === 'v-ring' &&
-              apiData.measures[1]
-            ) {
-              let currentTotal = sum(datas, apiData.measures[1].alias)
-              rows[0] = {
-                type: apiData.measures[1].alias,
-                value: currentTotal
-              }
+            // 环形图
+            if (this.currSelected.setting.chartType === 'v-ring') {
+              let keys = apiData.measures.map(measure => measure.alias)
+              // 当前值段
+              rows = [
+                {
+                  type: keys[0],
+                  value: datas[0][keys[0]]
+                }
+              ]
+              // 剩余段,目标值-当前值
               rows.push({
-                type: apiData.measures[0].alias,
-                value: total - currentTotal
+                type: keys[1],
+                value: datas[0][keys[1]] - rows[0].value
               })
+              let config = this.currSelected.setting.config
+              config.chartTitle.text = rows[0].value
+              this.$store.dispatch('SetSelfProperty', config)
             }
             apiData.source = {
               columns,
@@ -447,6 +451,27 @@ export default {
               rows.push(obj)
               // }
             })
+            // 雷达图
+            if (this.currSelected.setting.chartType === 'v-radar') {
+              // 格式例子cloumns:[度量，青瓜，土豆，菜心]
+              // rows:[{度量:度量1,青瓜，土豆，菜心},{度量2,青瓜，土豆，菜心}]
+              let metricsName = apiData.dimensions[0].alias
+              let newColumns = ['measure']
+              let newRows = []
+              apiData.measures.forEach(measure => {
+                let measureName = measure.alias
+                let obj = {}
+                rows.forEach(row => {
+                  newColumns.push(row[metricsName])
+                  obj.measure = measureName
+                  obj[row[metricsName]] = row[measureName]
+                })
+                newRows.push(obj)
+              })
+
+              columns = newColumns
+              rows = newRows
+            }
           }
 
           apiData.source = {
