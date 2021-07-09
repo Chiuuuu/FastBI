@@ -665,6 +665,27 @@ export default {
               rows.push(obj)
               // }
             })
+            // 雷达图
+            if (this.currSelected.setting.chartType === 'v-radar') {
+              // 格式例子cloumns:[度量，青瓜，土豆，菜心]
+              // rows:[{度量:度量1,青瓜，土豆，菜心},{度量2,青瓜，土豆，菜心}]
+              let metricsName = apiData.dimensions[0].alias
+              let newColumns = ['measure']
+              let newRows = []
+              apiData.measures.forEach(measure => {
+                let measureName = measure.alias
+                let obj = {}
+                rows.forEach(row => {
+                  newColumns.push(row[metricsName])
+                  obj.measure = measureName
+                  obj[row[metricsName]] = row[measureName]
+                })
+                newRows.push(obj)
+              })
+
+              columns = newColumns
+              rows = newRows
+            }
           }
 
           apiData.source = {
