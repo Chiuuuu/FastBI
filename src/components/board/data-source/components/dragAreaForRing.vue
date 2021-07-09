@@ -52,7 +52,7 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import { deepClone } from '@/utils/deepClone'
-import TreeGroupBy from '@/components/board/options/treemap/tree-groupby'
+// import TreeGroupBy from '@/components/board/options/treemap/tree-groupby'
 import { sum, summary } from '@/utils/summaryList'
 import geoJson from '@/utils/guangdong.json'
 import { Loading } from 'element-ui'
