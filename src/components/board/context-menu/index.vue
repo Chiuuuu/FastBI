@@ -26,7 +26,7 @@
           >
             <JsonExcel
               v-if="i < 2"
-              :fetch="setChartData"
+              :fetch="setChartData_scan"
               :name="currSelected ? currSelected.name || 'test' : 'test'"
               :type="i === 0 ? 'xls' : 'csv'"
               >{{ menu.text }}</JsonExcel
@@ -166,7 +166,7 @@ export default {
   methods: {
     ...mapActions(['saveScreenData', 'deleteChartData']),
     //  执行菜单命令
-    handleCommand(order, item) {
+    async handleCommand(order, item) {
       if (item) {
         item.showChildren = false
       }
@@ -183,9 +183,10 @@ export default {
             && JSON.stringify(this.currSelected.setting.api_data.origin_source)!='{}'
             && JSON.stringify(this.currSelected.setting.api_data.origin_source)!='[]'
         ) {
-          this.setChartData_scan()
+          await this.setChartData_scan()
           this.$store.dispatch('ToggleContextMenu')
           this.showChartData(this.chartData)
+          
         } else {
           this.$message.error('该图表没有拖入图表数据')
         }
@@ -273,26 +274,46 @@ export default {
       return this.chartData.rows
     },
     // 查看数据 -- 构造数据
-    setChartData_scan(){
-      let columns = [],rows = [],tableName = [];
-      let origin_source = deepClone(this.currSelected.setting.api_data.origin_source);
-      // 地图
+    async setChartData_scan(){
+      let params = {
+        id:this.currSelected.id,
+        type: this.currSelected.setting && this.currSelected.setting.chartType
+      }
+      let loadingInstance = Loading.service({
+        lock: true,
+        text: '加载中...',
+        target: 'body',
+        background: 'rgb(255, 255, 255, 0.6)'
+      })
+      let res = await this.$server.screenManage.getGraphInfo(params)
+      console.log(res,'res')
+      loadingInstance.close()
+      if (res.code !== 200) {
+        this.$message.error(res.msg || '请重新操作')
+        return;
+      }
+
+      let columns = [],rows = [],tableName = [],exportList = [];
+      let source = res.data || []
       if(this.currSelected.setting.chartType === 'v-map'){
-        Object.keys(origin_source).map((item)=>{
-          columns.push( Object.keys(origin_source[item][0]))
-          rows.push(origin_source[item])
+        Object.keys(source).map((item)=>{
+          columns.push( Object.keys(source[item][0]))
+          rows.push(source[item])
           tableName.push(item == 'fillList' ? '填充':'标记点')
+          exportList = exportList.concat(source[item])
         })
       }else{
-        rows = [origin_source]
-        columns = [Object.keys(origin_source[0])];
+        rows = [source]
+        columns = [Object.keys(source[0])];
+        exportList = source
       }
+      
       this.chartData = {
         columns,
         rows,
         tableName,
       }
-      return this.chartData.rows;
+      return exportList;
     }
   }
 }
