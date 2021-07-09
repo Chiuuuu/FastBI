@@ -207,6 +207,14 @@ const screenManage = {
     return $axios.post('/screen/graph/dataLink', params)
   },
   /**
+   * @description 请求展示用的图表数据(导出/查看数据)
+   * @param {*} params
+   * @returns
+   */
+  getGraphInfo(params) {
+    return $axios.post('  /screen/graph/graphInfo', params)
+  },
+  /**
    * @description 度量原始数据类型是否数值类型
    * @param {*} params
    * @returns

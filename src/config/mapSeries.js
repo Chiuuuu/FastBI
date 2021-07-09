@@ -33,7 +33,7 @@ export const mapSeries = {
     y: 'top'
   },
   tooltip: {
-    show: false,
+    show: true,
     trigger: 'item',
     confine: true
   },
@@ -82,7 +82,7 @@ export const dotSeries = {
     scale: 3
   },
   tooltip: {
-    show: false,
+    show: true,
     trigger: 'item',
     confine: true
   },

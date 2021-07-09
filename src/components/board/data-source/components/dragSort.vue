@@ -320,9 +320,9 @@ export default {
           return
         }
         // 保存原始数据 -- 查看数据有用
-        apiData.origin_source = deepClone( res.rows || res.data || {} )
+        apiData.origin_source = deepClone(res.rows || res.data || {})
         this.$store.dispatch('SetSelfDataSource', apiData)
-        
+
         let datas = res.rows
         // 去掉排序的数据
         if (apiData.options.sort.length) {
@@ -451,6 +451,27 @@ export default {
               rows.push(obj)
               // }
             })
+            // 雷达图
+            if (this.currSelected.setting.chartType === 'v-radar') {
+              // 格式例子cloumns:[度量，青瓜，土豆，菜心]
+              // rows:[{度量:度量1,青瓜，土豆，菜心},{度量2,青瓜，土豆，菜心}]
+              let metricsName = apiData.dimensions[0].alias
+              let newColumns = ['measure']
+              let newRows = []
+              apiData.measures.forEach(measure => {
+                let measureName = measure.alias
+                let obj = {}
+                rows.forEach(row => {
+                  newColumns.push(row[metricsName])
+                  obj.measure = measureName
+                  obj[row[metricsName]] = row[measureName]
+                })
+                newRows.push(obj)
+              })
+
+              columns = newColumns
+              rows = newRows
+            }
           }
 
           apiData.source = {

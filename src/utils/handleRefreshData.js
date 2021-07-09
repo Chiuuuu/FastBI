@@ -27,6 +27,24 @@ export function handleRefreshData({ chart, newData }) {
         row.value = newData[0][row.type] - newData[0][sourceRows[0].type]
       }
     })
+    // 环形图
+    if (chart.setting.chartType === 'v-ring') {
+      let datas = newData[0]
+      let keys = chart.setting.api_data.measures.map(measure => measure.alias)
+      // 当前值段
+      let rows = [
+        {
+          type: keys[0],
+          value: datas[keys[0]]
+        }
+      ]
+      // 剩余段,目标值-当前值
+      rows.push({
+        type: keys[1],
+        value: datas[keys[1]] - rows[0].value
+      })
+      chart.setting.api_data.source.rows = rows
+    }
     // 仪表盘
     if (
       chart.setting.chartType === 'v-gauge' &&
@@ -59,6 +77,27 @@ export function handleRefreshData({ chart, newData }) {
   } else {
     if (chart.setting.api_data.source) {
       chart.setting.api_data.source.rows = newData
+    }
+    // 雷达图
+    if (chart.setting.chartType === 'v-radar') {
+      // 格式例子cloumns:[度量，青瓜，土豆，菜心]
+      // rows:[{度量:度量1,青瓜，土豆，菜心},{度量2,青瓜，土豆，菜心}]
+      let metricsName = chart.setting.api_data.dimensions[0].alias
+      let newColumns = ['measure']
+      let newRows = []
+      chart.setting.api_data.measures.forEach(measure => {
+        let measureName = measure.alias
+        let obj = {}
+        newData.forEach(row => {
+          newColumns.push(row[metricsName])
+          obj.measure = measureName
+          obj[row[metricsName]] = row[measureName]
+        })
+        newRows.push(obj)
+      })
+
+      chart.setting.api_data.source.columns = newColumns
+      chart.setting.api_data.source.rows = newRows
     }
   }
 }
