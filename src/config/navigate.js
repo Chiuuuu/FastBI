@@ -723,7 +723,7 @@ const list = [
                   fontSize: 12,
                   position: 'outside', // 可选inside
                   formatter: '{b}: {@2012} ({d}%)',
-                  formatterSelect: ['{b}', '{@2012}', '({d}%)']
+                  formatterSelect: ['name', 'value', 'percent']
                 },
                 // 选中时样式
                 select: {
