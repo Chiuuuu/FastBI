@@ -1,7 +1,7 @@
 <!-- 8-14 数据模型侧栏 -->
 <template>
   <div class="board-model" :style="config.style">
-    <div style="height:100%">
+    <div style="height: 100%">
       <div class="model-header" v-show="config.title.enable">
         <a-icon
           class="model-back"
@@ -19,24 +19,24 @@
         />
       </div>
       <!-- 操作界面 -->
-      <div v-if="modelExpand" style="height:calc(100% - 150px);">
+      <div v-if="modelExpand" style="height: calc(100% - 150px)">
         <div class="model-operation" v-if="model">
           <div class="operation">
             <a-radio-group
               v-model="resourceType"
               button-style="solid"
-              style="width:100%"
+              style="width: 100%"
             >
               <a-radio-button
                 :value="8"
-                style="width:50%"
+                style="width: 50%"
                 @click.native="changeAddType(8)"
               >
                 数据模型
               </a-radio-button>
               <a-radio-button
                 :value="3"
-                style="width:50%"
+                style="width: 50%"
                 @click.native="changeAddType(3)"
               >
                 数据接入
@@ -44,16 +44,25 @@
             </a-radio-group>
           </div>
           <div class="operation">
-            <a-select v-model="resourceId" style="width:62%">
+            <a-select v-model="resourceId" style="width: 62%">
               <a-select-option
+                class="cls-mode-sel"
                 v-for="item in disableItem"
                 :value="item.tableId"
                 :key="item.id"
-                >{{ item.resourceName }}</a-select-option
+                @mouseover="getHover(item.tableId)"
               >
+                {{ item.resourceName }}
+                <a-icon
+                  class="cls-close"
+                  v-show="item.tableId === hoveDataModelId"
+                  @click="getDelDataModel(item.screenId, item.tableId)"
+                  type="close-circle"
+                />
+              </a-select-option>
             </a-select>
             <a-button
-              style="margin-left:8px"
+              style="margin-left: 8px"
               @click="resourceType === 8 ? modelAdd() : sourceAdd()"
               >添加</a-button
             >
@@ -64,7 +73,7 @@
               show-search
               :value="searchValue"
               placeholder="请输入关键字搜索"
-              style="width:100%"
+              style="width: 100%"
               :default-active-first-option="false"
               :show-arrow="false"
               :filter-option="false"
@@ -92,7 +101,7 @@
               <div class="mea_main">
                 <a-collapse
                   class="scrollbar"
-                  style="height:100%;overflow: scroll;margin-top: 10px;"
+                  style="height: 100%; overflow: scroll; margin-top: 10px"
                   v-model="dimensionsKey"
                   :bordered="false"
                 >
@@ -108,7 +117,7 @@
                         class="filelist"
                         :class="[
                           { active: item2.id === searchSelected },
-                          { error: item2.status === 1 }
+                          { error: item2.status === 1 },
                         ]"
                         :key="index2 + '_'"
                         :draggable="item2.status === 0"
@@ -160,7 +169,7 @@
               <div class="mea_main">
                 <a-collapse
                   class="scrollbar"
-                  style="height:100%;overflow: scroll;margin-top: 10px;"
+                  style="height: 100%; overflow: scroll; margin-top: 10px"
                   v-model="measuresKey"
                 >
                   <a-collapse-panel
@@ -175,7 +184,7 @@
                         class="filelist"
                         :class="[
                           { active: item2.id === searchSelected },
-                          { error: item2.status === 1 }
+                          { error: item2.status === 1 },
                         ]"
                         :key="index2 + '_'"
                         :draggable="item2.status === 0"
@@ -235,11 +244,11 @@
           ></geo-setting>
         </div>
         <!-- 初始界面 -->
-        <div class="model-contain" v-else style="height:100%;">
+        <div class="model-contain" v-else style="height: 100%">
           <div class="model-search">
             <a-input-search
               placeholder="输入关键字搜索"
-              style="width:90%;margin-left:15px"
+              style="width: 90%; margin-left: 15px"
               @change="modelSearch"
             />
           </div>
@@ -273,8 +282,8 @@ export default {
   props: {
     config: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   components: { ComputeSetting, GeoSetting, AddDataList },
   data() {
@@ -306,14 +315,15 @@ export default {
         { name: '平均', value: 'AVG' },
         { name: '最大值', value: 'MAX' },
         { name: '最小值', value: 'MIN' },
-        { name: '统计', value: 'CNT' }
+        { name: '统计', value: 'CNT' },
       ],
       createdMapData: {},
       resourceType: 8, // 当前数据类型标识（接入:3|模型:8）
       dataList: [], // 显示的菜单列表
       modelList: [], // 模型菜单
       sourceList: [], // 接入菜单
-      key: 0 // 刷新菜单
+      key: 0, // 刷新菜单
+      hoveDataModelId: '', //悬浮选中的数据模型id
     }
   },
   computed: {
@@ -324,26 +334,26 @@ export default {
       'selectedModelList',
       'currentSelected',
       'currSelected',
-      'canvasMap'
+      'canvasMap',
     ]),
     // 过滤模型列表
     savedModels() {
-      return this.selectedModelList.filter(item => item.resourceType === 8)
+      return this.selectedModelList.filter((item) => item.resourceType === 8)
     },
     // 过滤接入列表
     savedSources() {
-      return this.selectedModelList.filter(item => item.resourceType === 3)
+      return this.selectedModelList.filter((item) => item.resourceType === 3)
     },
     // 根据类型显示对应列表
     disableItem() {
       return this.resourceType === 8 ? this.savedModels : this.savedSources
-    }
+    },
   },
   watch: {
     selectedModelList: {
       handler(val) {
         if (val.length > 0) {
-          if (!val.find(item => item.id === this.resourceId)) {
+          if (!val.find((item) => item.id === this.resourceId)) {
             if (this.resourceType === 8) {
               this.resourceId =
                 this.savedModels.length > 0 ? this.savedModels[0].tableId : ''
@@ -358,9 +368,9 @@ export default {
           this.resourceId = ''
           this.$store.dispatch('SetModelMeasures', [])
         }
-        this.disableId = val.map(item => item.tableId)
+        this.disableId = val.map((item) => item.tableId)
       },
-      deep: true
+      deep: true,
     },
     currSelected: {
       handler(val) {
@@ -373,7 +383,7 @@ export default {
               val.setting.api_data.dimensions &&
               val.setting.api_data.dimensions.length > 0
             ) {
-              val.setting.api_data.dimensions.map(item => {
+              val.setting.api_data.dimensions.map((item) => {
                 this.dimensionsChecked.push(item.id)
               })
             }
@@ -382,14 +392,14 @@ export default {
               val.setting.api_data.measures &&
               val.setting.api_data.measures.length > 0
             ) {
-              val.setting.api_data.measures.map(item => {
+              val.setting.api_data.measures.map((item) => {
                 this.measuresChecked.push(item.id)
               })
             }
           }
         }
       },
-      deep: true
+      deep: true,
     },
     resourceId(val) {
       // 没有选中数据，清空维度度量信息
@@ -402,11 +412,12 @@ export default {
         return
       }
       this.getPivoSchemaList(val)
-    }
+    },
   },
   methods: {
+    ...mapActions(['getScreenDetail']),
     // 数据模型搜索
-    modelSearch: debounce(function(event) {
+    modelSearch: debounce(function (event) {
       const value = event.target.value
       if (value) {
         this.handleGetSearchList(value)
@@ -452,7 +463,7 @@ export default {
     // 搜索关键字
     search(list, value) {
       let result = []
-      list.map(item => {
+      list.map((item) => {
         const newItem = menuSearchLoop(item, value)
         if (newItem) {
           result.push(newItem)
@@ -471,7 +482,7 @@ export default {
         this.model = !this.model
         return
       }
-      this.getModelList().then(res => {
+      this.getModelList().then((res) => {
         if (res) {
           this.model = !this.model
         }
@@ -484,7 +495,7 @@ export default {
         this.model = !this.model
         return
       }
-      this.getSourceList().then(res => {
+      this.getSourceList().then((res) => {
         if (res) {
           this.model = !this.model
         }
@@ -496,7 +507,7 @@ export default {
         '/datasource/catalog/list/1'
       )
       if (catalog.code === 200) {
-        catalog.rows.map(item => {
+        catalog.rows.map((item) => {
           item.selected = false
           item.showMore = false
         })
@@ -530,7 +541,7 @@ export default {
         resourceName: item.name,
         datasourceId: '',
         databaseId: '',
-        tableId: item.id
+        tableId: item.id,
       }
       // 数据接入
       if (item.resourceType === 3) {
@@ -539,7 +550,7 @@ export default {
           datasourceId: item.datasourceId,
           databaseId: item.databaseId,
           tableId: item.id,
-          origin: 3 // 数据源:3,模型:8
+          origin: 3, // 数据源:3,模型:8
         }
       } else {
         // 模型
@@ -571,9 +582,9 @@ export default {
     },
     // 数据模型列表
     async getModelList() {
-      return this.$server.screenManage.getCatalogList().then(res => {
+      return this.$server.screenManage.getCatalogList().then((res) => {
         if (res.code === 200) {
-          res.data.map(item => {
+          res.data.map((item) => {
             item.selected = false
             item.showMore = false
           })
@@ -587,7 +598,7 @@ export default {
     handleSearch(value) {
       if (value) {
         let result = []
-        this.searchList.map(item => {
+        this.searchList.map((item) => {
           if (item.name.includes(value)) {
             result.push(item)
           }
@@ -628,9 +639,9 @@ export default {
         datamodelId: item.datamodelId,
         pivotschemaId: item.pivotschemaId,
         role: num, // 转成维度传1，转成度量传2
-        screenId: this.screenId
+        screenId: this.screenId,
       }
-      this.$server.screenManage.screenModuleTransform(params).then(res => {
+      this.$server.screenManage.screenModuleTransform(params).then((res) => {
         if (res.code === 200) {
           this.getPivoSchemaList(this.resourceId, 2)
         }
@@ -650,32 +661,32 @@ export default {
         lock: true,
         text: '加载中...',
         target: 'body',
-        background: 'rgb(255, 255, 255, 0.6)'
+        background: 'rgb(255, 255, 255, 0.6)',
       })
       this.$server.screenManage
         .getPivoSchemaList(id, this.screenId, type)
-        .then(res => {
+        .then((res) => {
           if (res.code === 200) {
-            res.data.dimensions.map(item => {
+            res.data.dimensions.map((item) => {
               item.showMore = false
             })
-            res.data.measures.map(item => {
+            res.data.measures.map((item) => {
               item.showMore = false
             })
             let datas = res.data
             let dimensions = datas.dimensions
             let measures = datas.measures
             this.dimensions = this.transData(dimensions)
-            dimensions = dimensions.map(item => {
+            dimensions = dimensions.map((item) => {
               return { ...item, visible: true, produceType: 0 }
             })
             this.measures = this.transData(measures)
-            measures = measures.map(item => {
+            measures = measures.map((item) => {
               return {
                 ...item,
                 visible: true,
                 produceType: 0,
-                resourceType: this.resourceType
+                resourceType: this.resourceType,
               }
             })
             this.$store.dispatch('SetModelMeasures', measures)
@@ -683,13 +694,13 @@ export default {
 
             this.detailInfo.pivotSchema = {
               dimensions,
-              measures
+              measures,
             } // 聚合运算数据
 
             // 获取被删除的数据(status===1)
             this.$emit('getErrorData', {
-              dimensions: dimensions.filter(item => item.status === 1),
-              measures: measures.filter(item => item.status === 1)
+              dimensions: dimensions.filter((item) => item.status === 1),
+              measures: measures.filter((item) => item.status === 1),
             })
           }
         })
@@ -715,11 +726,31 @@ export default {
     },
     handleSave(datas) {
       let selected = this.canvasMap.find(
-        item => item.id === this.currentSelected
+        (item) => item.id === this.currentSelected
       )
       selected.setting.api_data.mapDatas = datas
-    }
-  }
+    },
+    getHover(val) {
+      let datamoel = this.canvasMap.map((x) => x.datamodelId)
+      if (!datamoel.includes(val)) {
+        this.hoveDataModelId = val
+      } else {
+        this.hoveDataModelId = ''
+      }
+    },
+    async getDelDataModel(screenId, tableId) {
+      let res = await this.$server.dataModel.delDataModel(screenId, tableId)
+      if (res.code == 200) {
+        this.$message.success('删除成功')
+        this.getScreenDetail({
+          id: this.$route.query.id,
+          tabId: this.$route.query.tabId,
+        })
+      } else {
+        this.$message.error(res.msg || res || '删除失败')
+      }
+    },
+  },
 }
 </script>
 
@@ -733,151 +764,179 @@ export default {
 }
 
 .mod {
-    width: 100%;
-    height: 350px;
-    display: flex;
-    justify-content: space-between;
-    .modal_l {
-        .modal_dropdown {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 40px;
-            width: 257px;
-            .dropdown {
-                position relative;
-                width 120px;
-                height 32px;
-                line-height 1.5;
-                border 1px solid #d9d9d9;
-                padding 4px 11px;
-                cursor pointer;
-                &::after {
-                    content: "";
-                    display: block;
-                    width: 0;
-                    height: 0;
-                    border-style: solid dashed dashed;
-                    border-width: 6px 5px;
-                    border-color: #aaa transparent transparent transparent;
-                    position: absolute;
-                    right: 12px;
-                    top: 12px;
-                }
-            }
+  width: 100%;
+  height: 350px;
+  display: flex;
+  justify-content: space-between;
+
+  .modal_l {
+    .modal_dropdown {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 40px;
+      width: 257px;
+
+      .dropdown {
+        position: relative;
+        width: 120px;
+        height: 32px;
+        line-height: 1.5;
+        border: 1px solid #d9d9d9;
+        padding: 4px 11px;
+        cursor: pointer;
+
+        &::after {
+          content: '';
+          display: block;
+          width: 0;
+          height: 0;
+          border-style: solid dashed dashed;
+          border-width: 6px 5px;
+          border-color: #aaa transparent transparent transparent;
+          position: absolute;
+          right: 12px;
+          top: 12px;
         }
+      }
     }
-        .modal_r {
-        width: 365px;
-        padding: 20px 10px 32px;
-        background: rgba(246, 246, 246, 1);
-        display: flex;
-        justify-content: space-around;
-        .bar {
-            width: 140px;
-        }
-        .descript {
-            margin-top: 13px;
-            margin-left: 11px;
-        }
-        .list {
-            height: calc(100% - 32px)
-            border: 1px solid #d9d9d9;
-            background-color: #fff;
-            overflow-y: auto;
-        }
-        .list-item {
-            padding: 5px 12px;
-            line-height: 22px;
-            cursor: pointer;
-            &.active {
-                background-color: #40c0a8;
-                color: #fff;
-            }
-        }
-        .text {
-            padding: 10px 10px 10px 20px;
-            font-size: 12px;
-            max-height: 260px;
-            overflow: auto;
-            .tit {
-                padding-bottom: 10px;
-                font-weight: bolder;
-            }
-            .des {
-                word-break: break-all;
-                line-height: 18px;
-            }
-            .example {
-                margin-top: 10px;
-                line-height: 15px;
-                span.title {
-                    font-weight: bolder;
-                }
-            }
-        }
-    }
-}
-.cacsader{
+  }
+
+  .modal_r {
+    width: 365px;
+    padding: 20px 10px 32px;
+    background: rgba(246, 246, 246, 1);
     display: flex;
     justify-content: space-around;
 
-    }
-.geo-contain{
-    display: flex;
-    justify-content space-between;
-  // width: 750px;
-.geo-map{
-    width: 188px;
-    height 279px;
-    padding:10px;
-    background:rgba(248,248,248,1);
-    margin-top: 19px;
-    }
-.geo-set{
-    width: 580px;
-    .set-head{
-    background:rgba(248,248,248,1);
-    margin-left: 18px;
-    margin-top: 19px;
-    height: 36px;
-    display: flex;
-    justify-content space-between;
-    .g-s-s{
-    font-size:14px;
-    font-family:Microsoft YaHei;
-    font-weight:400;
-    color:rgba(1,4,15,1);
-    line-height:35px;
-    margin-left: 12px;
-    }
-.g-s-r{
-    font-size:14px;
-    font-family:Microsoft YaHei;
-    font-weight:400;
-    color:rgba(252,92,92,1);
-    line-height:35px;
-    margin-right: 12px;
-    }
-}
-.set-select{
-    display: flex;
-    justify-content: space-between;
-    margin-left: 18px;
-    margin-top: 14px;
-    .s-s-s{
-        font-size:14px;
-        font-family:Microsoft YaHei;
-        font-weight:400;
-        color:rgba(1,4,15,1);
-        }
-    }
-    .set-table{
-        margin-top: 10px;
-        margin-left: 30px;
-        width: 90%;
-        }
+    .bar {
+      width: 140px;
     }
 
+    .descript {
+      margin-top: 13px;
+      margin-left: 11px;
+    }
+
+    .list {
+      height: calc(100% - 32px);
+      border: 1px solid #d9d9d9;
+      background-color: #fff;
+      overflow-y: auto;
+    }
+
+    .list-item {
+      padding: 5px 12px;
+      line-height: 22px;
+      cursor: pointer;
+
+      &.active {
+        background-color: #40c0a8;
+        color: #fff;
+      }
+    }
+
+    .text {
+      padding: 10px 10px 10px 20px;
+      font-size: 12px;
+      max-height: 260px;
+      overflow: auto;
+
+      .tit {
+        padding-bottom: 10px;
+        font-weight: bolder;
+      }
+
+      .des {
+        word-break: break-all;
+        line-height: 18px;
+      }
+
+      .example {
+        margin-top: 10px;
+        line-height: 15px;
+
+        span.title {
+          font-weight: bolder;
+        }
+      }
+    }
+  }
+}
+
+.cacsader {
+  display: flex;
+  justify-content: space-around;
+}
+
+.geo-contain {
+  display: flex;
+  justify-content: space-between;
+
+  .geo-map {
+    width: 188px;
+    height: 279px;
+    padding: 10px;
+    background: rgba(248, 248, 248, 1);
+    margin-top: 19px;
+  }
+
+  .geo-set {
+    width: 580px;
+
+    .set-head {
+      background: rgba(248, 248, 248, 1);
+      margin-left: 18px;
+      margin-top: 19px;
+      height: 36px;
+      display: flex;
+      justify-content: space-between;
+
+      .g-s-s {
+        font-size: 14px;
+        font-family: Microsoft YaHei;
+        font-weight: 400;
+        color: rgba(1, 4, 15, 1);
+        line-height: 35px;
+        margin-left: 12px;
+      }
+
+      .g-s-r {
+        font-size: 14px;
+        font-family: Microsoft YaHei;
+        font-weight: 400;
+        color: rgba(252, 92, 92, 1);
+        line-height: 35px;
+        margin-right: 12px;
+      }
+    }
+
+    .set-select {
+      display: flex;
+      justify-content: space-between;
+      margin-left: 18px;
+      margin-top: 14px;
+
+      .s-s-s {
+        font-size: 14px;
+        font-family: Microsoft YaHei;
+        font-weight: 400;
+        color: rgba(1, 4, 15, 1);
+      }
+    }
+
+    .set-table {
+      margin-top: 10px;
+      margin-left: 30px;
+      width: 90%;
+    }
+  }
+}
+
+.cls-close {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  z-index: 999;
 }
 </style>
