@@ -2074,6 +2074,7 @@ const list = [
                   '#ffff0d',
                   '#0d8686'
                 ],
+                nodeClick: false,
                 breadcrumb: {
                   show: false
                 },

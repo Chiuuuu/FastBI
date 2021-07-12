@@ -190,7 +190,9 @@
         header="排序"
         v-if="
           (chartType === '1'  || chartType === '3') &&
-            currSelected.setting.chartType !== 'v-map'
+            currSelected.setting.chartType !== 'v-map' &&
+            currSelected.setting.chartType !== 'v-treemap' &&
+            currSelected.setting.chartType !== 'v-heatmap'
         "
       >
         <DragSort type="sort"></DragSort>
