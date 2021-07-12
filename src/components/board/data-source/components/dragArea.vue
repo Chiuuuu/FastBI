@@ -239,6 +239,7 @@ export default {
           } else if (this.fileList.length === 5) {
             this.fileList.splice(4, 1, dataFile)
           }
+          this.handleTreemapShowList(dataFile, 4)
         } else if (this.currSelected.setting.chartType === 'v-sun') {
           this.fileList.push(dataFile)
         } else {
@@ -273,6 +274,7 @@ export default {
         } else if (this.currSelected.setting.chartType === 'v-treemap') {
           // 矩形树图暂时只能拉入一个度量
           this.fileList[0] = dataFile
+          this.handleTreemapShowList(dataFile, 0)
         } else {
           this.fileList.push(dataFile)
         }
@@ -380,6 +382,31 @@ export default {
       apiData.source = tree.tree
       this.$store.dispatch('SetSelfDataSource', apiData)
       this.updateChartData()
+    },
+    handleTreemapShowList(dataFile, maxIndex) {
+      const config = deepClone(this.currSelected.setting.config)
+      if (this.fileList.length < (maxIndex + 1)) {
+        if (config.series.tooltipShowList.indexOf(dataFile.alias) < 0) {
+          config.series.tooltipShowList.push(dataFile.alias)
+        }
+        if (config.series.labelShowList.indexOf(dataFile.alias) < 0) {
+          config.series.labelShowList.push(dataFile.alias)
+        }
+      } else if (this.fileList.length === (maxIndex + 1)) {
+        let tooltipIndex = config.series.tooltipShowList.indexOf(this.fileList[maxIndex].alias)
+        if (tooltipIndex < 0) {
+          config.series.tooltipShowList.push(dataFile.alias)
+        } else {
+          config.series.tooltipShowList.splice(tooltipIndex, 1, dataFile.alias)
+        }
+        let labelIndex = config.series.labelShowList.indexOf(this.fileList[maxIndex].alias)
+        if (labelIndex < 0) {
+          config.series.labelShowList.push(dataFile.alias)
+        } else {
+          config.series.labelShowList.splice(labelIndex, 1, dataFile.alias)
+        }
+      }
+      this.$store.dispatch('SetSelfProperty', config)
     },
     // 删除当前维度或者度量
     async deleteFile(event, item, index) {
