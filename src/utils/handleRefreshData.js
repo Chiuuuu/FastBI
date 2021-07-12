@@ -76,6 +76,8 @@ export function handleRefreshData({ chart, newData }) {
         value: datas[keys[1]] - rows[0].value
       })
       chart.setting.api_data.source.rows = rows
+      chart.setting.config.chartTitle.text =
+        (rows[0].value / rows[1].value) * 100 + '%'
     }
     // 仪表盘
     if (
@@ -112,25 +114,25 @@ export function handleRefreshData({ chart, newData }) {
     }
     // 雷达图
     if (chart.setting.chartType === 'v-radar') {
-        // 格式例子cloumns:[度量，青瓜，土豆，菜心]
-        // rows:[{度量:度量1,青瓜，土豆，菜心},{度量2,青瓜，土豆，菜心}]
-        let metricsName = chart.setting.api_data.dimensions[0].alias
-        let newColumns = ['measure']
-        let newRows = []
-        chart.setting.api_data.measures.forEach(measure => {
-          let measureName = measure.alias
-          let obj = {}
-          newData.forEach(row => {
-            newColumns.push(row[metricsName])
-            obj.measure = measureName
-            obj[row[metricsName]] = row[measureName]
-          })
-          newRows.push(obj)
+      // 格式例子cloumns:[度量，青瓜，土豆，菜心]
+      // rows:[{度量:度量1,青瓜，土豆，菜心},{度量2,青瓜，土豆，菜心}]
+      let metricsName = chart.setting.api_data.dimensions[0].alias
+      let newColumns = ['measure']
+      let newRows = []
+      chart.setting.api_data.measures.forEach(measure => {
+        let measureName = measure.alias
+        let obj = {}
+        newData.forEach(row => {
+          newColumns.push(row[metricsName])
+          obj.measure = measureName
+          obj[row[metricsName]] = row[measureName]
         })
-  
-        chart.setting.api_data.source.columns = newColumns
-        chart.setting.api_data.source.rows = newRows
-      }
+        newRows.push(obj)
+      })
+
+      chart.setting.api_data.source.columns = newColumns
+      chart.setting.api_data.source.rows = newRows
+    }
   }
 }
 async function setMapData(chart, newData) {
