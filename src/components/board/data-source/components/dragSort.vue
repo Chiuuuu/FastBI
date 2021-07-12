@@ -320,9 +320,9 @@ export default {
           return
         }
         // 保存原始数据 -- 查看数据有用
-        apiData.origin_source = deepClone( res.rows || res.data || {} )
+        apiData.origin_source = deepClone(res.rows || res.data || {})
         this.$store.dispatch('SetSelfDataSource', apiData)
-        
+
         let datas = res.rows
         // 去掉排序的数据
         if (apiData.options.sort.length) {
@@ -351,59 +351,6 @@ export default {
           }
           this.$store.dispatch('SetSelfDataSource', apiData)
         } else {
-          // 仪表盘/环形图 只显示度量
-          if (this.chartType === '2') {
-            let columns = ['type', 'value'] // 维度固定
-            for (let m of apiData.measures) {
-              columns.push(m.alias) // 默认columns第二项起为指标
-            }
-            // 对返回的数据列进行求和
-            let total = sum(datas, apiData.measures[0].alias)
-            let rows = [
-              {
-                type: apiData.measures[0].alias,
-                value: total
-              }
-            ]
-            // 环形图第二度量(指针值)
-            if (
-              this.currSelected.setting.chartType === 'v-ring' &&
-              apiData.measures[1]
-            ) {
-              let currentTotal = sum(datas, apiData.measures[1].alias)
-              rows[0] = {
-                type: apiData.measures[1].alias,
-                value: currentTotal
-              }
-              rows.push({
-                type: apiData.measures[0].alias,
-                value: total - currentTotal
-              })
-            }
-            apiData.source = {
-              columns,
-              rows
-            }
-            // 保存apidata数据
-            this.$store.dispatch('SetSelfDataSource', apiData)
-            let config = deepClone(this.currSelected.setting.config)
-            if (this.currSelected.setting.chartType === 'v-multiPie') {
-              config.chartTitle.text = rows[0].value
-              this.$store.dispatch('SetSelfProperty', config)
-            }
-            // 如果是仪表盘，第二个度量是目标值（进度条最大值）
-            if (
-              this.currSelected.setting.chartType === 'v-gauge' &&
-              apiData.measures[1]
-            ) {
-              let goalTotal = sum(datas, apiData.measures[1].alias)
-              config.series.max = goalTotal
-              this.$store.dispatch('SetSelfProperty', config)
-            }
-            //   this.updateChartData()
-            return
-          }
-
           let columns = []
           let rows = []
           let dimensionKeys = [] // 度量key
@@ -451,6 +398,27 @@ export default {
               rows.push(obj)
               // }
             })
+            // 雷达图
+            if (this.currSelected.setting.chartType === 'v-radar') {
+              // 格式例子cloumns:[度量，青瓜，土豆，菜心]
+              // rows:[{度量:度量1,青瓜，土豆，菜心},{度量2,青瓜，土豆，菜心}]
+              let metricsName = apiData.dimensions[0].alias
+              let newColumns = ['measure']
+              let newRows = []
+              apiData.measures.forEach(measure => {
+                let measureName = measure.alias
+                let obj = {}
+                rows.forEach(row => {
+                  newColumns.push(row[metricsName])
+                  obj.measure = measureName
+                  obj[row[metricsName]] = row[measureName]
+                })
+                newRows.push(obj)
+              })
+
+              columns = newColumns
+              rows = newRows
+            }
           }
 
           apiData.source = {

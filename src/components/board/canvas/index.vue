@@ -2,12 +2,13 @@
   <div
     class="canvas-main"
     ref="canvasMain"
-    @contextmenu.stop.prevent="showScreenContextMenu($event)"
+    @contextmenu.stop.prevent="hideContextMenu($event)"
   >
     <div
       class="canvas-panel-wrap"
       :style="wrapStyle"
       @click.stop.prevent="cancelSelected"
+      @contextmenu.stop.prevent="showScreenContextMenu($event)"
     >
       <b-scrollbar style="height:100%;">
         <div class="screen-shot" :style="screenStyle" ref="screenInner">
@@ -90,6 +91,9 @@ export default {
       this.$store.dispatch('SingleSelected', null)
     },
     // 外层区域关闭右键菜单
+    hideContextMenu(event) {
+      this.$store.dispatch('ToggleContextMenu')
+    },
     showScreenContextMenu(event) {
       //   this.$store.dispatch('ToggleContextMenu')
       let info = {
