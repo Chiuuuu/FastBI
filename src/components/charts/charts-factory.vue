@@ -121,7 +121,11 @@ export default {
           if (self.currentIndex === e.dataIndex) {
             // 重置数据颜色样式
             const series = self.chartExtend.series
-            if (series.itemStyle && series.itemStyle.normal && series.itemStyle.normal.color) {
+            if (
+              series.itemStyle &&
+              series.itemStyle.normal &&
+              series.itemStyle.normal.color
+            ) {
               delete self.chartExtend.series.itemStyle.normal.color
             }
             self.currentIndex = ''
@@ -216,8 +220,8 @@ export default {
             // 保留两位小数
             if (this.typeName !== 've-gauge' && this.typeName !== 've-ring') {
               let type = this.typeName
-              let chartType = this.chartType;
-              if(chartType=='high-pie'||chartType=='high-column'){
+              let chartType = this.chartType
+              if (chartType == 'high-pie' || chartType == 'high-column') {
                 return
               }
               this.chartExtend.series.label.formatter = function(params) {
@@ -326,7 +330,7 @@ export default {
     apis: {
       handler(val) {
         if (val) {
-          this.chartSettings = { ...val }
+          this.chartSettings = deepClone(val)
           this.$log.primary('========>chartSettings')
           this.$print(this.chartSettings)
         }
@@ -367,7 +371,7 @@ export default {
   },
   methods: {
     afterConfig(options) {
-      options = deepClone(options);
+      options = deepClone(options)
       console.log('op', options)
       // 散点图
       if (this.typeName === 've-scatter') {
@@ -462,7 +466,6 @@ export default {
     },
     // 地图显示内容格式拼接
     setMapFormatter() {
-      // debugger
       for (let series of this.chartSeries) {
         // 指标内容
         let orient = series.label.normal.orient

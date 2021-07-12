@@ -119,10 +119,16 @@ export default {
         let noList = []
         this.pages.forEach(item => {
           if (/页面\d/.test(item.name)) {
-            noList.push(parseInt(item.name.replace(/[^0-9]/gi, '')))
+            noList.push(
+              parseInt(
+                item.name.replace(/页面(\d)(\(.*?\))?/gi, (match, targetValue) => {
+                  return targetValue
+                })
+              )
+            )
           }
         })
-        // 去页面x最大的数字作为新页面的名称
+        // 取页面x最大的数字作为新页面的名称
         let no = noList.length === 0 ? 1 : Math.max(...noList) + 1
         let name = `页面${no}`
 

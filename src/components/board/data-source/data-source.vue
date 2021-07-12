@@ -17,11 +17,27 @@
             currSelected.setting.chartType !== 'v-map'
         "
       >
-        <drag-area type="measures" ref="child"></drag-area>
+        <drag-area
+          v-if="currSelected.setting.chartType !== 'v-ring'"
+          type="measures"
+          ref="child"
+        ></drag-area>
+        <!-- 环形图 -->
+        <dragAreaForRing
+          v-if="currSelected.setting.chartType === 'v-ring'"
+          type="measures"
+          measureType="current"
+        ></dragAreaForRing>
+        <dragAreaForRing
+          v-if="currSelected.setting.chartType === 'v-ring'"
+          type="measures"
+          measureType="total"
+        ></dragAreaForRing>
       </a-collapse-panel>
       <a-collapse-panel key="tableList" header="列" v-if="chartType === '3'">
         <drag-area type="tableList" ref="table"></drag-area>
       </a-collapse-panel>
+
       <!-- 地图填充 -->
       <a-collapse-panel
         key="mapFill"
@@ -173,8 +189,10 @@
         key="sort"
         header="排序"
         v-if="
-          (chartType === '1' || chartType === '2' || chartType === '3') &&
-            currSelected.setting.chartType !== 'v-map'
+          (chartType === '1'  || chartType === '3') &&
+            currSelected.setting.chartType !== 'v-map' &&
+            currSelected.setting.chartType !== 'v-treemap' &&
+            currSelected.setting.chartType !== 'v-heatmap'
         "
       >
         <DragSort type="sort"></DragSort>
@@ -220,6 +238,7 @@ import { mapGetters, mapActions } from 'vuex'
 import DragArea from './components/dragArea'
 import dragAreaForMapFill from './components/dragAreaForMapFill'
 import dragAreaForMapLabel from './components/dragAreaForMapLabel'
+import dragAreaForRing from './components/dragAreaForRing'
 import DragPick from './components/dragPick'
 import DragSort from './components/dragSort'
 import { deepClone } from '../../../utils/deepClone'
@@ -230,6 +249,7 @@ export default {
     DragPick,
     dragAreaForMapFill,
     dragAreaForMapLabel,
+    dragAreaForRing,
     DragSort
     // GuiField
   },
