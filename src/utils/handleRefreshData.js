@@ -44,6 +44,8 @@ export function handleRefreshData({ chart, newData }) {
         value: datas[keys[1]] - rows[0].value
       })
       chart.setting.api_data.source.rows = rows
+      chart.setting.config.chartTitle.text =
+        (rows[0].value / rows[1].value) * 100 + '%'
     }
     // 仪表盘
     if (

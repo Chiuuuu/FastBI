@@ -649,7 +649,8 @@ export default {
             this.$store.dispatch('SetSelfDataSource', apiData)
             let config = deepClone(this.currSelected.setting.config)
             if (this.currSelected.setting.chartType === 'v-ring') {
-              config.chartTitle.text = rows[1] ? rows[1].value : rows[0].value
+              config.chartTitle.text =
+                (rows[0].value / rows[1].value) * 100 + '%'
               this.$store.dispatch('SetSelfProperty', config)
             }
             // 如果是仪表盘，第二个度量是目标值（进度条最大值）

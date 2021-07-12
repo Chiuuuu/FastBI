@@ -306,7 +306,8 @@ export default {
         // 保存apidata数据
         this.$store.dispatch('SetSelfDataSource', apiData)
         let config = this.currSelected.setting.config
-        config.chartTitle.text = rows[0].value
+        config.chartTitle.text =
+          +((rows[0].value / datas[keys[1]]) * 100).toFixed(2) + '%'
         this.$store.dispatch('SetSelfProperty', config)
 
         this.updateChartData()

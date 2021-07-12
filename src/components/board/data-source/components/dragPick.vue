@@ -634,6 +634,12 @@ export default {
         if (apiData.measures.length === 0) {
           return
         }
+        if (
+          this.currSelected.setting.chartType === 'v-ring' &&
+          apiData.measures.length < 2
+        ) {
+          return
+        }
         if (apiData.measures.some(item => item.status === 1)) {
           return
         }
@@ -778,7 +784,8 @@ export default {
                 value: datas[0][keys[1]] - rows[0].value
               })
               let config = this.currSelected.setting.config
-              config.chartTitle.text = rows[0].value
+              config.chartTitle.text =
+                +((rows[0].value / datas[0][keys[1]]) * 100).toFixed(2) + '%'
               this.$store.dispatch('SetSelfProperty', config)
             }
             apiData.source = {

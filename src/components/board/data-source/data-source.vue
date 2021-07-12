@@ -189,7 +189,7 @@
         key="sort"
         header="排序"
         v-if="
-          (chartType === '1' || chartType === '2' || chartType === '3') &&
+          (chartType === '1'  || chartType === '3') &&
             currSelected.setting.chartType !== 'v-map'
         "
       >

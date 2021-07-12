@@ -466,7 +466,6 @@ export default {
     },
     // 地图显示内容格式拼接
     setMapFormatter() {
-      // debugger
       for (let series of this.chartSeries) {
         // 指标内容
         let orient = series.label.normal.orient
