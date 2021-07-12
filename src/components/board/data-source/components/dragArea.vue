@@ -701,7 +701,7 @@ export default {
               if (xMax < item[columns[1]]) {
                 xMax = item[columns[1]]
               }
-              if (xMax < item[columns[2]]) {
+              if (yMax < item[columns[2]]) {
                 yMax = item[columns[2]]
               }
               if (!scatterData[item[columns[0]]]) {
