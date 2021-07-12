@@ -739,7 +739,7 @@ export default {
               })
               let config = this.currSelected.setting.config
               config.chartTitle.text =
-                +((rows[0].value / datas[keys[1]]) * 100).toFixed(2) + '%'
+                +((rows[0].value / datas[0][keys[1]]) * 100).toFixed(2) + '%'
               this.$store.dispatch('SetSelfProperty', config)
             }
             apiData.source = {
@@ -749,10 +749,6 @@ export default {
             // 保存apidata数据
             this.$store.dispatch('SetSelfDataSource', apiData)
             let config = deepClone(this.currSelected.setting.config)
-            if (this.currSelected.setting.chartType === 'v-multiPie') {
-              config.chartTitle.text = rows[0].value
-              this.$store.dispatch('SetSelfProperty', config)
-            }
             // 如果是仪表盘，第二个度量是目标值（进度条最大值）
             if (
               this.currSelected.setting.chartType === 'v-gauge' &&
@@ -762,7 +758,7 @@ export default {
               config.series.max = goalTotal
               this.$store.dispatch('SetSelfProperty', config)
             }
-            //   this.updateChartData()
+            this.updateChartData()
             return
           }
 
