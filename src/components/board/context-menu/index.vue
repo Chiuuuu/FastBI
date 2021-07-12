@@ -180,8 +180,8 @@ export default {
       } else if (order === 'showChartData') {
         // 查看图表数据
         if (this.currSelected.setting.api_data.origin_source 
-            && JSON.stringify(this.currSelected.setting.api_data.origin_source)!='{}'
-            && JSON.stringify(this.currSelected.setting.api_data.origin_source)!='[]'
+          && JSON.stringify(this.currSelected.setting.api_data.origin_source)!='{}'
+          && JSON.stringify(this.currSelected.setting.api_data.origin_source)!='[]'
         ) {
           await this.setChartData_scan()
           this.$store.dispatch('ToggleContextMenu')
@@ -275,6 +275,13 @@ export default {
     },
     // 查看数据 -- 构造数据
     async setChartData_scan(){
+      if (!this.currSelected.setting.api_data.origin_source 
+          || JSON.stringify(this.currSelected.setting.api_data.origin_source)=='{}'
+          || JSON.stringify(this.currSelected.setting.api_data.origin_source)=='[]'
+        ) {
+          this.$message.error('该图表没有拖入图表数据')
+          return;
+        }
       let params = {
         id:this.currSelected.id,
         type: this.currSelected.setting && this.currSelected.setting.chartType
@@ -286,7 +293,6 @@ export default {
         background: 'rgb(255, 255, 255, 0.6)'
       })
       let res = await this.$server.screenManage.getGraphInfo(params)
-      console.log(res,'res')
       loadingInstance.close()
       if (res.code !== 200) {
         this.$message.error(res.msg || '请重新操作')
@@ -297,10 +303,12 @@ export default {
       let source = res.data || []
       if(this.currSelected.setting.chartType === 'v-map'){
         Object.keys(source).map((item)=>{
-          columns.push( Object.keys(source[item][0]))
-          rows.push(source[item])
-          tableName.push(item == 'fillList' ? '填充':'标记点')
-          exportList = exportList.concat(source[item])
+          if(source[item]){
+            columns.push( Object.keys(source[item][0]))
+            rows.push(source[item])
+            tableName.push(item == 'fillList' ? '填充':'标记点')
+            exportList = exportList.concat(source[item])
+          }
         })
       }else{
         rows = [source]
