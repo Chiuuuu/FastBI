@@ -1495,6 +1495,45 @@ const list = [
               },
               radius: 100,
               // 自定义参数
+              legendData:['广州1', '广州2', '广州3'],
+              seriesData: [
+                {
+                  label: '广州1',
+                  data: [{
+                      name: '',
+                      value: [1000, 1000, '广州1', 'x', 'y', '地区']
+                    },
+                    {
+                      name: '',
+                      value: [130, 1050, '广州1', 'x', 'y', '地区']
+                    }
+                  ]
+                },
+                {
+                  label: '广州2',
+                  data: [{
+                      name: '',
+                      value: [550, 700, '广州2', 'x', 'y', '地区']
+                    },
+                    {
+                      name: '',
+                      value: [660, 120, '广州2', 'x', 'y', '地区']
+                    }
+                  ]
+                },
+                {
+                  label: '广州3',
+                  data: [{
+                      name: '',
+                      value: [660, 700, '广州3', 'x', 'y', '地区']
+                    },
+                    {
+                      name: '',
+                      value: [880, 120, '广州3', 'x', 'y', '地区']
+                    }
+                  ]
+                }
+              ],
               scatterColor: '1', //散点颜色 0单色 1按维度
               scatterSize: '', //散点大小  0：按度量1  1：按度量2  默认空，为无
               scatterLabel: [], //指标-显示内容
@@ -1548,7 +1587,7 @@ const list = [
                 top: 'auto',
                 right: 'auto',
                 bottom: 'auto',
-                data: ['广州1', '广州2', '广州3']
+                data: []
               },
               xAxis: {
                 type: 'value',
@@ -1626,47 +1665,7 @@ const list = [
                   align: 'left',
                   offset: [-10, 0]
                 },
-                data: [
-                  {
-                    label: '广州1',
-                    data: [
-                      {
-                        name: '',
-                        value: [1000, 1000, '广州1', 'x', 'y', '地区']
-                      },
-                      {
-                        name: '',
-                        value: [130, 1050, '广州1', 'x', 'y', '地区']
-                      }
-                    ]
-                  },
-                  {
-                    label: '广州2',
-                    data: [
-                      {
-                        name: '',
-                        value: [550, 700, '广州2', 'x', 'y', '地区']
-                      },
-                      {
-                        name: '',
-                        value: [660, 120, '广州2', 'x', 'y', '地区']
-                      }
-                    ]
-                  },
-                  {
-                    label: '广州3',
-                    data: [
-                      {
-                        name: '',
-                        value: [660, 700, '广州3', 'x', 'y', '地区']
-                      },
-                      {
-                        name: '',
-                        value: [880, 120, '广州3', 'x', 'y', '地区']
-                      }
-                    ]
-                  }
-                ]
+                
               },
               color: DEFAULT_COLORS
             },
@@ -2074,6 +2073,7 @@ const list = [
                   '#ffff0d',
                   '#0d8686'
                 ],
+                nodeClick: false,
                 breadcrumb: {
                   show: false
                 },

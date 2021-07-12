@@ -229,17 +229,15 @@ export default {
         ) {
           if (this.fileList.length < 2) {
             this.fileList.push(dataFile)
-          }
-          if (this.fileList.length == 2) {
+          } else if (this.fileList.length == 2) {
             this.fileList.splice(1, 1, dataFile)
           }
         } else if (this.currSelected.setting.chartType === 'v-treemap') {
           // 矩形树图可以拖入5个维度
           if (this.fileList.length < 5) {
             this.fileList.push(dataFile)
-          }
-          if (this.fileList.length === 5) {
-            this.fileList.splice(1, 1, dataFile)
+          } else if (this.fileList.length === 5) {
+            this.fileList.splice(4, 1, dataFile)
           }
         } else if (this.currSelected.setting.chartType === 'v-sun') {
           this.fileList.push(dataFile)
@@ -749,7 +747,7 @@ export default {
               if (xMax < item[columns[1]]) {
                 xMax = item[columns[1]]
               }
-              if (xMax < item[columns[2]]) {
+              if (yMax < item[columns[2]]) {
                 yMax = item[columns[2]]
               }
               if (!scatterData[item[columns[0]]]) {
