@@ -282,7 +282,14 @@ const screenManage = {
    */
   getMaterials(params) {
     return $axios.post('/screen/material/picList', params)
-  }
+  },
+
+  /**
+   * 获取图表数据
+   */
+   getGraphInfo(params) {
+    return $axios.post('/screen/graph/graphInfo', params)
+  },
 }
 
 export default screenManage
