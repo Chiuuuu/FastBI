@@ -31,7 +31,10 @@
                 >{{ aggregator.name }}</a-menu-item
               >
             </a-sub-menu>
-            <a-menu-item key="3"><div @click.stop="deleteFile($event, item, index)">移除</div></a-menu-item
+            <a-menu-item key="3"
+              ><div @click.stop="deleteFile($event, item, index)">
+                移除
+              </div></a-menu-item
             >
           </a-menu>
         </a-dropdown>
@@ -233,26 +236,26 @@ export default {
       if (this.type === 'dimensions' && this.dragFile === this.type) {
         // 嵌套饼图可以有多个维度（最多只能2个）
         //矩形热力图必须2个维度一个度量(v-heatmap)
-        if (this.currSelected.setting.chartType === 'v-multiPie'||this.currSelected.setting.chartType==='v-heatmap') {
-          if(this.fileList.length<2){
+        if (
+          this.currSelected.setting.chartType === 'v-multiPie' ||
+          this.currSelected.setting.chartType === 'v-heatmap'
+        ) {
+          if (this.fileList.length < 2) {
             this.fileList.push(dataFile)
-          }
-          if (this.fileList.length == 2) {
+          } else if (this.fileList.length == 2) {
             this.fileList.splice(1, 1, dataFile)
           }
         } else if (this.currSelected.setting.chartType === 'v-treemap'||this.currSelected.setting.chartType==='v-sun') {
           // 矩形树图可以拖入5个维度
           if (this.fileList.length < 5) {
             this.fileList.push(dataFile)
+          } else if (this.fileList.length === 5) {
+            this.fileList.splice(4, 1, dataFile)
           }
-          if (this.fileList.length === 5) {
-            this.fileList.splice(1, 1, dataFile)
+          if(this.currSelected.setting.chartType!=='v-sun'){
+            this.handleTreemapShowList(dataFile, 4)
           }
-        }
-        // else if(this.currSelected.setting.chartType==='v-sun'){
-        //   this.fileList.push(dataFile);
-        // }
-         else {
+        } else {
           // 维度暂时只能拉入一个字段
           this.fileList[0] = dataFile
         }
@@ -266,7 +269,11 @@ export default {
         this.chartType === '1'
       ) {
         // 饼图类型只能拉入一个度量（包含3d和矩形热力图）
-        if (this.currSelected.setting.name === 've-pie'|this.currSelected.setting.chartType==='high-pie'|this.currSelected.setting.chartType==='v-heatmap') {
+        if (
+          (this.currSelected.setting.name === 've-pie') |
+          (this.currSelected.setting.chartType === 'high-pie') |
+          (this.currSelected.setting.chartType === 'v-heatmap')
+        ) {
           this.fileList[0] = dataFile
         } else if (
           this.currSelected.setting.name === 've-scatter' &&
@@ -280,6 +287,10 @@ export default {
         } else if (this.currSelected.setting.chartType === 'v-treemap'||this.currSelected.setting.chartType==='v-sun') {
           // 矩形树图暂时只能拉入一个度量
           this.fileList[0] = dataFile
+          if(this.currSelected.setting.chartType!=='v-sun'){
+            this.handleTreemapShowList(dataFile, 0)
+          }
+          
         } else {
           this.fileList.push(dataFile)
         }
@@ -359,7 +370,11 @@ export default {
     handleTreemapConfig(rows) {
       let setting = deepClone(this.currSelected.setting)
       let config = setting.config
-      const tree = new TreeGroupBy(rows, setting.api_data.dimensions.map(item => item.alias), setting.api_data.measures)
+      const tree = new TreeGroupBy(
+        rows,
+        setting.api_data.dimensions.map(item => item.alias),
+        setting.api_data.measures
+      )
       TreeGroupBy.handleLeafValue(tree.tree)
       config.series.data = tree.tree
       config.series.visualMaxList = tree.max
@@ -368,7 +383,8 @@ export default {
       // 若删除了维度, 且刚好指针指向了维度, 则切换映射类型
       let index = config.series.recDimensionIndex || 0
       if (index >= setting.api_data.dimensions.length) {
-        config.series.recDimensionIndex = index = setting.api_data.dimensions.length - 1
+        config.series.recDimensionIndex = index =
+          setting.api_data.dimensions.length - 1
       }
       if (index === setting.api_data.dimensions.length) {
         config.visualMap.max = config.series.visualMaxList[0]
@@ -381,7 +397,10 @@ export default {
         config.visualMap.max = config.series.visualMaxList[dimensionIndex]
         config.visualMap.type = 'piecewise'
         config.visualMap.inRange.color = config.series.piecewiseColors
-        config.visualMap.pieces = TreeGroupBy.handlePieces(config.series.data, index)
+        config.visualMap.pieces = TreeGroupBy.handlePieces(
+          config.series.data,
+          index
+        )
       }
       this.$store.dispatch('SetSelfProperty', config)
 
@@ -389,6 +408,31 @@ export default {
       apiData.source = tree.tree
       this.$store.dispatch('SetSelfDataSource', apiData)
       this.updateChartData()
+    },
+    handleTreemapShowList(dataFile, maxIndex) {
+      const config = deepClone(this.currSelected.setting.config)
+      if (this.fileList.length < (maxIndex + 1)) {
+        if (config.series.tooltipShowList.indexOf(dataFile.alias) < 0) {
+          config.series.tooltipShowList.push(dataFile.alias)
+        }
+        if (config.series.labelShowList.indexOf(dataFile.alias) < 0) {
+          config.series.labelShowList.push(dataFile.alias)
+        }
+      } else if (this.fileList.length === (maxIndex + 1)) {
+        let tooltipIndex = config.series.tooltipShowList.indexOf(this.fileList[maxIndex].alias)
+        if (tooltipIndex < 0) {
+          config.series.tooltipShowList.push(dataFile.alias)
+        } else {
+          config.series.tooltipShowList.splice(tooltipIndex, 1, dataFile.alias)
+        }
+        let labelIndex = config.series.labelShowList.indexOf(this.fileList[maxIndex].alias)
+        if (labelIndex < 0) {
+          config.series.labelShowList.push(dataFile.alias)
+        } else {
+          config.series.labelShowList.splice(labelIndex, 1, dataFile.alias)
+        }
+      }
+      this.$store.dispatch('SetSelfProperty', config)
     },
     // 删除当前维度或者度量
     async deleteFile(event, item, index) {
@@ -428,7 +472,8 @@ export default {
             current.setting.config.series.data = []
             current.setting.config.visualMap.pieces = []
             current.setting.config.visualMap.type = 'continuous'
-            current.setting.config.visualMap.inRange.color = current.setting.config.series.continuousColors
+            current.setting.config.visualMap.inRange.color =
+              current.setting.config.series.continuousColors
           }
           const tooltipShowList = current.setting.config.series.tooltipShowList
           for (let i = 0; i < tooltipShowList.length; i++) {
@@ -457,7 +502,7 @@ export default {
       let selected = this.canvasMap.find(
         item => item.id === this.currentSelected
       )
-      
+
       // 维度
       if (this.type === 'dimensions') {
         selected.setting.api_data.dimensions = this.fileList
@@ -554,8 +599,11 @@ export default {
       }
 
       //矩形热力图只有在2个维度和一个度量的时候，才能请求数据
-      if(this.currSelected.setting.chartType == 'v-heatmap'&&(apiData.dimensions.length<=1||apiData.measures.length==0) ){
-        return;
+      if (
+        this.currSelected.setting.chartType == 'v-heatmap' &&
+        (apiData.dimensions.length <= 1 || apiData.measures.length == 0)
+      ) {
+        return
       }
 
       let loadingInstance = Loading.service({
@@ -575,12 +623,16 @@ export default {
       }
       if (res.code === 200) {
         // 保存原始数据 -- 查看数据有用
-        apiData.origin_source = deepClone( res.rows || res.data || {} )
+        apiData.origin_source = deepClone(res.rows || res.data || {})
         this.$store.dispatch('SetSelfDataSource', apiData)
-        
+
         let datas = res.rows
         // 去掉排序的数据
-        if (apiData.options && apiData.options.sort && apiData.options.sort.length) {
+        if (
+          apiData.options &&
+          apiData.options.sort &&
+          apiData.options.sort.length
+        ) {
           let filterArr = []
           apiData.options.sort.forEach(item => {
             filterArr.push(`sort_${item.alias}`)
@@ -648,7 +700,8 @@ export default {
             this.$store.dispatch('SetSelfDataSource', apiData)
             let config = deepClone(this.currSelected.setting.config)
             if (this.currSelected.setting.chartType === 'v-ring') {
-              config.chartTitle.text = rows[1] ? rows[1].value : rows[0].value
+              config.chartTitle.text =
+                (rows[0].value / rows[1].value) * 100 + '%'
               this.$store.dispatch('SetSelfProperty', config)
             }
             // 如果是仪表盘，第二个度量是目标值（进度条最大值）
@@ -713,6 +766,27 @@ export default {
               rows.push(obj)
               // }
             })
+            // 雷达图
+            if (this.currSelected.setting.chartType === 'v-radar') {
+              // 格式例子cloumns:[度量，青瓜，土豆，菜心]
+              // rows:[{度量:度量1,青瓜，土豆，菜心},{度量2,青瓜，土豆，菜心}]
+              let metricsName = apiData.dimensions[0].alias
+              let newColumns = ['measure']
+              let newRows = []
+              apiData.measures.forEach(measure => {
+                let measureName = measure.alias
+                let obj = {}
+                rows.forEach(row => {
+                  newColumns.push(row[metricsName])
+                  obj.measure = measureName
+                  obj[row[metricsName]] = row[measureName]
+                })
+                newRows.push(obj)
+              })
+
+              columns = newColumns
+              rows = newRows
+            }
           }
 
           // 散点图，两个度量分别是x，y轴的值
@@ -726,7 +800,7 @@ export default {
               if (xMax < item[columns[1]]) {
                 xMax = item[columns[1]]
               }
-              if (xMax < item[columns[2]]) {
+              if (yMax < item[columns[2]]) {
                 yMax = item[columns[2]]
               }
               if (!scatterData[item[columns[0]]]) {
@@ -768,7 +842,6 @@ export default {
             rows
           }
           this.$store.dispatch('SetSelfDataSource', apiData)
-          
         }
         this.updateChartData()
       } else {

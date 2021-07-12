@@ -170,7 +170,7 @@
       </template>
     </board>
 
-    <screen></screen>
+    <screen :key="isScreen"></screen>
     <b-modal
       v-model="deleteDialog"
       :styles="{ top: '300px', width: '350px' }"

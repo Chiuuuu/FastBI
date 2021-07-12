@@ -2351,14 +2351,14 @@
                     <a-radio-button
                       value="middle"
                       @click.native.stop="
-                        onRadioChange($event, selfConfig.xAxis, 'nameLocation')
+                        onRadioChange($event, selfConfig.xAxis, 'nameLocation','xAxis')
                       "
                       >中部</a-radio-button
                     >
                     <a-radio-button
                       value="end"
                       @click.native.stop="
-                        onRadioChange($event, selfConfig.xAxis, 'nameLocation')
+                        onRadioChange($event, selfConfig.xAxis, 'nameLocation','xAxis')
                       "
                       >末尾</a-radio-button
                     >
@@ -2536,14 +2536,14 @@
                     <a-radio-button
                       value="middle"
                       @click.native.stop="
-                        onRadioChange($event, selfConfig.yAxis, 'nameLocation')
+                        onRadioChange($event, selfConfig.yAxis, 'nameLocation','yAxis')
                       "
                       >中部</a-radio-button
                     >
                     <a-radio-button
                       value="end"
                       @click.native.stop="
-                        onRadioChange($event, selfConfig.yAxis, 'nameLocation')
+                        onRadioChange($event, selfConfig.yAxis, 'nameLocation','yAxis')
                       "
                       >末尾</a-radio-button
                     >
@@ -3542,10 +3542,21 @@ export default {
       this.setSelfProperty()
     },
 
-    onRadioChange(e, data, key) {
+    onRadioChange(e, data, key,x_yName) {
       let val = e.target.value
       if (val === 'false') {
         val = false
+      }
+      // x,y轴的标题位置发生变化时，设置默认标题镖局
+      if(x_yName){
+        if(x_yName == 'xAxis'){
+          val == 'middle' && (this.$set(this.selfConfig.xAxis.nameTextStyle, 'padding', [30,0,0,0]))
+          val == 'end' && (this.$set(this.selfConfig.xAxis.nameTextStyle, 'padding', [60,0,0,0]))
+        }else if(x_yName == 'yAxis'){
+          val == 'middle' && (this.$set(this.selfConfig.yAxis.nameTextStyle, 'padding', [0,0,40,0]))
+          val == 'end' && (this.$set(this.selfConfig.yAxis.nameTextStyle, 'padding', [0,0,0,0]))
+        }
+        
       }
       this.$set(data, key, val)
       this.setSelfProperty()

@@ -1,8 +1,8 @@
 <template>
   <div class="transform-handler" :class="{'hide':!comHover&&!isSelected}" :style="dvWrapperStyles">
     <slot>我是块的标题</slot>
-    <div class="line-left-point" @mousedown.stop.prevent="handleTransformStart($event, 'left')"></div>
-    <div class="line-right-point" @mousedown.stop.prevent="handleTransformStart($event, 'right')"></div>
+    <div v-show="isSelected" class="line-left-point" @mousedown.stop.prevent="handleTransformStart($event, 'left')"></div>
+    <div v-show="isSelected" class="line-right-point" @mousedown.stop.prevent="handleTransformStart($event, 'right')"></div>
   </div>
 </template>
 

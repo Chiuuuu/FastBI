@@ -7,7 +7,7 @@
     @mousedown="handleMoveStart"
     @touchstart="handleMoveStart"
   >
-    <div class="navigator-line" v-show="isSelected">
+    <div class="navigator-line" v-show="isSelected" :style="lineRotateStyle">
       <div class="navigator-line-left" :style="lineLeft"></div>
       <div class="navigator-line-top" :style="lineTop"></div>
       <div class="navigator-line-account" :style="lineAccountStyle">
@@ -20,7 +20,16 @@
       :class="{ hovered: comHover }"
       style="transform: rotate(0deg);"
     >
+      <DragLine
+        v-if="isLine"
+        :item="item"
+        :selected="selected"
+        :com-hover="comHover"
+      >
+        <slot></slot>
+      </DragLine>
       <div
+        v-else
         class="transform-handler"
         :class="{ hide: !comHover && !isSelected }"
       >
@@ -57,11 +66,11 @@
           ></span>
         </i>
         <i class="top-left-handler">
-          <span
+          <!-- <span
             v-show="isFigure"
             class="control-rotate control-rotate-top-left"
             @mousedown.stop.prevent="handleRotateMoveStart"
-          ></span>
+          ></span> -->
           <span
             class="control-point"
             :style="controlPointStyleTopLeft"
@@ -69,11 +78,11 @@
           ></span>
         </i>
         <i class="top-right-handler">
-          <span
+          <!-- <span
             v-show="isFigure"
             class="control-rotate control-rotate-top-right"
             @mousedown.stop.prevent="handleRotateMoveStart"
-          ></span>
+          ></span> -->
           <span
             class="control-point"
             :style="controlPointStyleTopRight"
@@ -81,11 +90,11 @@
           ></span>
         </i>
         <i class="bottom-left-handler">
-          <span
+          <!-- <span
             v-show="isFigure"
             class="control-rotate control-rotate-bottom-left"
             @mousedown.stop.prevent="handleRotateMoveStart"
-          ></span>
+          ></span> -->
           <span
             class="control-point"
             :style="controlPointStyleTopRight"
@@ -93,11 +102,11 @@
           ></span>
         </i>
         <i class="bottom-right-handler">
-          <span
+          <!-- <span
             v-show="isFigure"
             class="control-rotate control-rotate-bottom-right"
             @mousedown.stop.prevent="handleRotateMoveStart"
-          ></span>
+          ></span> -->
           <span
             class="control-point"
             :style="controlPointStyleTopLeft"
@@ -115,6 +124,7 @@
 import { on, off } from 'bin-ui/src/utils/dom'
 import { mapGetters, mapActions } from 'vuex'
 import { setBaseProperty } from '../../api/canvasMaps/canvas-maps-request'
+import DragLine from './components/drag-line.vue'
 
 export default {
   name: 'DragItem',
@@ -129,6 +139,9 @@ export default {
     comHover: {
       type: Boolean
     }
+  },
+  components: {
+    DragLine
   },
   data() {
     return {
@@ -185,6 +198,9 @@ export default {
     isFigure() {
       return this.item.setting.name === 'figure'
     },
+    isLine() {
+      return this.item.setting.chartType === 'line'
+    },
     lineLeft() {
       return {
         width: this.transformData.x + 60 / this.canvasRange + 'px'
@@ -203,39 +219,46 @@ export default {
         top: -10 + 'px'
       }
     },
-    contentStyles() {
-      if (this.dragScale) {
+    lineRotateStyle() {
+      if (this.isLine) {
         return {
-          width: this.transformData.width / this.dragScale.x + 'px',
-          height: this.transformData.height / this.dragScale.y + 'px',
+          transform: `rotate(${360 - (this.transformData.rotate || 0)}deg)`
+        }
+      }
+      return {}
+    },
+    contentStyles() {
+      if (this.isLine) {
+        return {
+          width: this.transformData.width + 'px',
+          height: this.transformData.height + 'px',
+          transformOrigin: 'left center',
+          transform: `translate3d(${this.transformData.x}px,${
+            this.transformData.y
+          }px,0) rotate(${this.transformData.rotate || 0}deg)`
+        }
+      } else {
+        return {
+          width: this.transformData.width + 'px',
+          height: this.transformData.height + 'px',
           transform: `translate3d(${this.transformData.x}px,${
             this.transformData.y
           }px,0)`
         }
       }
-      return {
-        width: this.transformData.width + 'px',
-        height: this.transformData.height + 'px',
-        transform: `translate3d(${this.transformData.x}px,${
-          this.transformData.y
-        }px,0)`
-      }
     },
-    dvWrapperStyles() {
+    dvWrapperStyles () {
       if (this.dragScale) {
         return {
           width: this.transformData.width / this.dragScale.x + 'px',
-          height: this.transformData.height / this.dragScale.y + 'px',
-          transform: `translateZ(0) rotate(${this.transformData.rotate ||
-            0}deg)`
-          // padding: '10px 0'
+          height: this.transformData.height / this.dragScale.y + 'px'
         }
-      }
-      return {
-        transform: `translateZ(0) rotate(${this.transformData.rotate || 0}deg)`,
-        width: this.transformData.width + 'px',
-        height: this.transformData.height + 'px'
-        // padding: '10px 0'
+      } else {
+        return {
+          width: this.transformData.width + 'px',
+          height: this.transformData.height + 'px',
+          transform: `translateZ(0) rotate(${this.transformData.rotate || 0}deg)`
+        }
       }
     },
     controlPointStyleBottom() {
@@ -259,6 +282,22 @@ export default {
         return `transform:scale(${this.dragScale.x},${this.dragScale.y})`
       }
       return ''
+    },
+    // 画布到页面边界距离X
+    canvasOffsetX() {
+      const coverageWidth = document.querySelector('.board-coverage').clientWidth || 120
+      const screenShotWidth = document.querySelector('.screen-shot').clientWidth || 1368
+      const canvasPanelWidth = document.querySelector('.canvas-panel').clientWidth || 1920
+      const width = (screenShotWidth - canvasPanelWidth * this.canvasRange) / 2
+      return coverageWidth + width
+    },
+    // 画布到页面边界距离Y
+    canvasOffsetY() {
+      const borderHeaderHeight = document.querySelector('.board-header').clientHeight || 62
+      const screenShotHeight = document.querySelector('.screen-shot').clientHeight || 822
+      const canvasPanelHeight = document.querySelector('.canvas-panel').clientHeight || 1080
+      const height = (screenShotHeight - canvasPanelHeight * this.canvasRange) / 2
+      return borderHeaderHeight + height
     }
   },
   methods: {
@@ -535,8 +574,8 @@ export default {
     },
     handleComputeAngle(distance) {
       // 减去画布到页面的距离
-      const distanceX = distance.x - (this.coverageExpand ? 240 : 120)
-      const distanceY = distance.y - 130
+      const distanceX = distance.x - this.canvasOffsetX
+      const distanceY = distance.y - this.canvasOffsetY
       // 计算鼠标到圆心的距离, 并根据反正切值获取角度
       const dx = distanceX - this.dragData.originX
       const dy = distanceY - this.dragData.originY

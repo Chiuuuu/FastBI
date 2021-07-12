@@ -121,7 +121,11 @@ export default {
           if (self.currentIndex === e.dataIndex) {
             // 重置数据颜色样式
             const series = self.chartExtend.series
-            if (series.itemStyle && series.itemStyle.normal && series.itemStyle.normal.color) {
+            if (
+              series.itemStyle &&
+              series.itemStyle.normal &&
+              series.itemStyle.normal.color
+            ) {
               delete self.chartExtend.series.itemStyle.normal.color
             }
             self.currentIndex = ''
@@ -193,6 +197,11 @@ export default {
             this.chartSeries = deepClone(val.series)
             this.setMapFormatter()
           } else if (this.typeName === 've-scatter') {
+            val = deepClone(val)
+            if(this.apiData.dimensions.length == 0){
+              val.legend.data = this.apis.legendData
+              val.series.data = this.apis.seriesData
+            }
             //散点图
             this.chartExtend = { ...omit(val, ['series', 'legend']) }
             this.chartLegend = val.legend //图例
@@ -206,25 +215,13 @@ export default {
               list[list.length - 1].name = item.label
             })
             this.chartSeries = list
-
-            // tooltip显示  -- 不生效
-            // this.chartExtend.tooltip.formatter = function(params){
-            //   let val= params.value;
-            //   if(val.length<6){ return ''};
-            //   console.log(params)
-            //   return `${params.marker}<br/>
-            //           ${val[5]}：${val[2]}<br/>
-            //           ${val[3]}：${val[0]}<br/>
-            //           ${val[4]}：${val[1]}<br/>
-            //           `;
-            // }
           } else {
             this.chartExtend = deepClone(val)
             // 保留两位小数
             if (this.typeName !== 've-gauge' && this.typeName !== 've-ring') {
               let type = this.typeName
-              let chartType = this.chartType;
-              if(chartType=='high-pie'||chartType=='high-column'){
+              let chartType = this.chartType
+              if (chartType == 'high-pie' || chartType == 'high-column') {
                 return
               }
               this.chartExtend.series.label.formatter = function(params) {
@@ -310,6 +307,13 @@ export default {
             }
           }
 
+          if((val.dimensions || []).length == 0 && (val.measures || []).length == 0 && this.chartType === 'v-scatter'){
+            // let config = deepClone(this.config)
+            this.config.legend.data = this.apis.legendData;
+            this.config.series.data = this.apis.seriesData;
+            this.apis.xMax = 1000; //度量1 最大值
+            this.apis.yMax = 1000; //度量2 最大值
+          }
           if (this.chartType === 'v-scatter') {
             //散点图的数据自定义显示
             this.chartData.columns = []
@@ -326,7 +330,7 @@ export default {
     apis: {
       handler(val) {
         if (val) {
-          this.chartSettings = { ...val }
+          this.chartSettings = deepClone(val)
           this.$log.primary('========>chartSettings')
           this.$print(this.chartSettings)
         }
@@ -367,7 +371,7 @@ export default {
   },
   methods: {
     afterConfig(options) {
-      options = deepClone(options);
+      options = deepClone(options)
       console.log('op', options)
       // 散点图
       if (this.typeName === 've-scatter') {
@@ -462,7 +466,6 @@ export default {
     },
     // 地图显示内容格式拼接
     setMapFormatter() {
-      // debugger
       for (let series of this.chartSeries) {
         // 指标内容
         let orient = series.label.normal.orient
