@@ -2423,6 +2423,7 @@ const list = [{
                 size: '80%', //饼图外圈直径大小
                 innerSize: 0, //饼图的内圈直径大小
                 showInLegend: true, //是否显示图利
+                borderWidth:0,
                 //数据引导线
                 dataLabels: {
                   enabled: true, //是否显示饼图的线形tip

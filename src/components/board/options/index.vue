@@ -825,7 +825,26 @@
                 />
                 <!-- <gui-field label="显示内容"> -->
                 显示内容
+                <!-- 旭日图独有 -->
                 <a-select
+                  v-if="chartType=='v-sun'"
+                  mode="tags"
+                  placeholder="选择显示内容"
+                  :default-value="['{b}', '{@2012}', '({c}%)']"
+                  style="width: 100%"
+                  @change="onChange"
+                >
+                  <a-select-option
+                    v-for="i in formatSunList"
+                    :key="i.label"
+                    :value="i.value"
+                  >
+                    {{ i.label }}
+                  </a-select-option>
+                </a-select>
+
+                <a-select
+                  v-else
                   mode="tags"
                   placeholder="选择显示内容"
                   :default-value="['name', 'value', 'percent']"
@@ -3181,6 +3200,11 @@ export default {
   },
   data() {
     return {
+      formatSunList:[
+        { label: '维度', value: '{b}'},
+        { label: '度量', value: '{@2012}' },
+        { label: '占比', value: '({c}%)'}
+      ],
       formatList: [
         { label: '维度', value: '{b}', alias: 'name' },
         { label: '度量', value: '{@2012}', alias: 'value' },
@@ -3307,6 +3331,8 @@ export default {
           this.selfConfig.series.label.formatter = checkedValues.join('\n\r')
         }
         this.setApis()
+      }else if(this.chartType=='v-sun'){
+        this.selfConfig.series.label.formatter = checkedValues.join('\n\r');
       } else {
         this.selfConfig.series.label.formatterSelect = checkedValues
       }

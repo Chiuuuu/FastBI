@@ -244,10 +244,17 @@ export default {
   },
   /**
    *@description 大屏删除数据模型
-   * @param {String} screenId 请求体
-   * @param {String} tableId 配置
+   * @param {String} screenId 
+   * @param {String} tableId 
    */
   delDataModel(screenId,tableId) {
     return $axios.get(`/screen/pivotschema/del/${screenId}/${tableId}`);
-  }
+  },
+  /** 
+   *@description 判断度量是否为数字
+   * @param {String} id  pivotschemaId
+  */
+ getMeasures(id){
+    return $axios.get(`/screen/graph/measureCheck/${id}`);
+ }
 }

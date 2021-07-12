@@ -40,6 +40,7 @@ export default {
   watch: {
     config: {
       handler(val) {
+        console.log(val.series.label);
         this.Init(val)
       },
       deep: true

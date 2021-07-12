@@ -739,7 +739,8 @@ export default {
       }
     },
     async getDelDataModel(screenId, tableId) {
-      let res = await this.$server.dataModel.delDataModel(screenId, tableId)
+      console.log('****',this.screenId);
+      let res = await this.$server.dataModel.delDataModel(this.screenId, tableId)
       if (res.code == 200) {
         this.$message.success('删除成功')
         this.getScreenDetail({
@@ -934,9 +935,11 @@ export default {
 }
 
 .cls-close {
+  
   position: absolute;
   right: 10px;
   top: 10px;
   z-index: 999;
+  font-size: 15px;
 }
 </style>

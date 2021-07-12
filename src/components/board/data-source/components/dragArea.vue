@@ -25,7 +25,7 @@
               v-show="item.file === 'measures'"
             >
               <a-menu-item
-                v-for="(aggregator, index) in polymerizationData"
+                v-for="(aggregator, index) in polymerizationData[strornum]"
                 :key="index"
                 @click.native="changePolymerization(aggregator, item)"
                 >{{ aggregator.name }}</a-menu-item
@@ -72,13 +72,22 @@ export default {
         filter: '拖入字段',
         tableList: '拖入字段'
       },
-      polymerizationData: [
-        { name: '求和', value: 'SUM' },
-        { name: '平均', value: 'AVG' },
-        { name: '最大值', value: 'MAX' },
-        { name: '最小值', value: 'MIN' },
-        { name: '统计', value: 'CNT' }
-      ],
+      strornum:"",
+      polymerizationData: {
+        //数字
+        num:[
+          { name: '求和', value: 'SUM' },
+          { name: '平均', value: 'AVG' },
+          { name: '最大值', value: 'MAX' },
+          { name: '最小值', value: 'MIN' },
+          { name: '计数', value: 'CNT' },
+          { name:'去重计数',value: 'CNT­_D' }
+        ],
+        str:[
+           { name: '计数', value: 'CNT' },
+           { name:'去重计数',value: 'CNT­_D' }
+        ]
+      },
       isdrag: false, // 是否拖拽中
       fileList: [], // 维度字段数组
       isVaild: false, //
@@ -86,7 +95,9 @@ export default {
         { name: '求和', value: 'SUM' },
         { name: '平均', value: 'AVG' },
         { name: '最大值', value: 'MAX' },
-        { name: '最小值', value: 'MIN' }
+        { name: '最小值', value: 'MIN' },
+        { name: '计数', value: 'CNT' },
+        { name: '计数', value:'COUNT' }
       ] // 聚合方式
     }
   },
@@ -206,7 +217,9 @@ export default {
     // 将拖动的维度到所选择的放置目标节点中
     handleDropOnFilesWD(event) {
       // h5 api
-      let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
+      let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'));
+      let _alias = this.polymerizeType.find(x=>x.value===dataFile.defaultAggregator);
+      dataFile.alias += `(${_alias.name})`;
       if (
         this.currSelected.datamodelId &&
         this.currSelected.datamodelId !== '0' &&
@@ -227,7 +240,7 @@ export default {
           if (this.fileList.length == 2) {
             this.fileList.splice(1, 1, dataFile)
           }
-        } else if (this.currSelected.setting.chartType === 'v-treemap') {
+        } else if (this.currSelected.setting.chartType === 'v-treemap'||this.currSelected.setting.chartType==='v-sun') {
           // 矩形树图可以拖入5个维度
           if (this.fileList.length < 5) {
             this.fileList.push(dataFile)
@@ -235,9 +248,11 @@ export default {
           if (this.fileList.length === 5) {
             this.fileList.splice(1, 1, dataFile)
           }
-        }else if(this.currSelected.setting.chartType==='v-sun'){
-          this.fileList.push(dataFile);
-        } else {
+        }
+        // else if(this.currSelected.setting.chartType==='v-sun'){
+        //   this.fileList.push(dataFile);
+        // }
+         else {
           // 维度暂时只能拉入一个字段
           this.fileList[0] = dataFile
         }
@@ -262,7 +277,7 @@ export default {
         } else if (this.currSelected.setting.name === 've-map') {
           // 地图类型暂时只能拉入一个度量
           this.fileList[0] = dataFile
-        } else if (this.currSelected.setting.chartType === 'v-treemap') {
+        } else if (this.currSelected.setting.chartType === 'v-treemap'||this.currSelected.setting.chartType==='v-sun') {
           // 矩形树图暂时只能拉入一个度量
           this.fileList[0] = dataFile
         } else {
@@ -312,7 +327,17 @@ export default {
       this.isdrag = false
     },
     // 点击右键显示更多
-    showMore(item) {
+    async showMore(item) {
+      console.log('*******************');
+      //调用接口判断是否为数字
+      let res = await this.$server.dataModel.getMeasures(item.pivotschemaId);
+      //返回 data true表示 是数值类型
+      //返回 data false表示 是字符类型
+      if(res.code==200){
+        this.strornum = res.data?'num':'str';
+      }else {
+        this.$message.error(res.msg || res || '删除失败')
+      }
       item.showMore = true
     },
     // 修改数据聚合方式
