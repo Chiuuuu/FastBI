@@ -1,5 +1,5 @@
 <template>
-  <!-- 3D饼图和柱形图 -->
+  <!-- 3D饼图和柱状图 -->
   <div class="dvs-high">
     <div class="container" ref="container"></div>
   </div>

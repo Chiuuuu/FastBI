@@ -1465,7 +1465,7 @@ const list = [
             title: '散点图',
             name: 've-scatter',
             chartType: 'v-scatter',
-            icon: 'icon_pie_chart.png',
+            icon: '散点图.png',
             type: '1',
             modelId: '',
             isEmpty: false,
@@ -1683,7 +1683,7 @@ const list = [
             title: '旭日图',
             name: 've-sun',
             chartType: 'v-sun',
-            icon: 'icon_pie_chart.png',
+            icon: '旭日图.png',
             // iconFont: 'icon-Pie-chart',
             type: '1',
             modelId: '',
@@ -1929,7 +1929,7 @@ const list = [
             title: '矩形树图',
             name: 've-tree',
             chartType: 'v-treemap',
-            icon: 'icon_pie_chart.png',
+            icon: '矩形树图.png',
             // iconFont: 'icon-Pie-chart',
             type: '1',
             modelId: '',
@@ -2160,7 +2160,7 @@ const list = [
             title: '矩形热力图',
             name: 've-heatmap',
             chartType: 'v-heatmap',
-            icon: 'icon_pie_chart.png',
+            icon: '热力图.png',
             // iconFont: 'icon-Pie-chart',
             type: '1',
             modelId: '',
@@ -2345,7 +2345,7 @@ const list = [
             title: '立体饼图',
             name: 'high-pie',
             chartType: 'high-pie',
-            icon: 'icon_pie_chart.png',
+            icon: '立体饼图.png',
             // iconFont: 'icon-Pie-chart',
             type: '1',
             modelId: '',
@@ -2518,10 +2518,10 @@ const list = [
             }
           },
           {
-            title: '立体柱形图',
+            title: '立体柱状图',
             name: 'high-pie',
             chartType: 'high-column',
-            icon: 'icon_pie_chart.png',
+            icon: '立体柱状图.png',
             // iconFont: 'icon-Pie-chart',
             type: '1',
             modelId: '',
@@ -2572,8 +2572,8 @@ const list = [
               },
               //标题属性设置
               title: {
-                text: '立体柱形图',
-                content: '立体柱形图',
+                text: '立体柱状图',
+                content: '立体柱状图',
                 align: 'center', //对齐方式left center right
                 style: {
                   //标题属性设置（字体、颜色、大小，粗细）

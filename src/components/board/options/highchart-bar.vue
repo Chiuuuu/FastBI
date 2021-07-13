@@ -195,7 +195,7 @@
           @change="a=>setHistogram(a,'chart')"
         ></a-switch>
       </gui-field> -->
-      <gui-field label="堆叠柱形图">
+      <gui-field label="堆叠柱状图">
         <a-switch
           size="small"
           @change="a => setHistogram(a, 'plotOptions')"
