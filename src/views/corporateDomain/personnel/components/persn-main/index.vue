@@ -6,9 +6,9 @@
           <a-tab-pane key="person" tab="人员管理">
             <person-manage ref="person" />
           </a-tab-pane>
-          <a-tab-pane key="user" tab="用户属性">
+          <!-- <a-tab-pane key="user" tab="用户属性">
             <user-prop ref="user" />
-          </a-tab-pane>
+          </a-tab-pane> -->
         </a-tabs>
       </div>
     </a-spin>
