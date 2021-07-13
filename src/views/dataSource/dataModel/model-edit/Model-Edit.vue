@@ -130,7 +130,7 @@
             <div class="dim_title">
               <span class="dim_span">维度</span>
               <div class="dim_operation">
-                <a v-on:click="openModal('compute-setting', '维度')" style="color:#627CFF;line-height:38px">新建计算维度</a>
+                <a v-on:click="handleOpenComputeSetting('维度')" style="color:#627CFF;line-height:38px">新建计算维度</a>
                 <a-divider type="vertical" />
                 <!-- <a v-on:click="openModal('geo-setting')" style="color:#627CFF;">设置地理位置</a> -->
               </div>
@@ -160,7 +160,7 @@
             <div class="mea_title">
               <span class="mea_span">度量</span>
               <div class="mea_operation">
-                <a v-on:click="openModal('compute-setting', '度量')" style="color:#627CFF;margin-right:20px;line-height:38px">新建计算度量</a>
+                <a v-on:click="handleOpenComputeSetting('度量')" style="color:#627CFF;margin-right:20px;line-height:38px">新建计算度量</a>
               </div>
             </div>
             <div class="mea_menu scrollbar">
@@ -424,7 +424,7 @@ export default {
       return arry
     },
     handleOpenComputeSetting(type) {
-      this.panelData = ''
+      this.panelData = {}
       this.openModal('compute-setting', type)
     },
     switchFieldType(e, item, vm) {

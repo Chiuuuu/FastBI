@@ -267,7 +267,7 @@ export default {
       }
     },
     textareaValue(val) {
-      if (!val && this.isShow) {
+      if (val === '' && this.isShow) {
         this.errorMessage = '表达式不能为空'
       }
       this.$nextTick(() => {
