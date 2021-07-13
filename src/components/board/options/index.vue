@@ -847,7 +847,7 @@
                   v-else
                   mode="tags"
                   placeholder="选择显示内容"
-                  :default-value="['name', 'value', 'percent']"
+                  v-model="selfConfig.series.label.formatterSelect"
                   style="width: 100%"
                   @change="onChange"
                 >
@@ -1731,145 +1731,6 @@
 
             <!--地图独有-->
             <template v-if="isMap">
-              <a-collapse-panel key="geo" header="地理坐标系">
-                <gui-field label="视角缩放">
-                  <a-input-number
-                    v-model="selfConfig.geo.zoom"
-                    size="small"
-                    :min="0"
-                    :step="0.1"
-                    @change="setSelfProperty"
-                  ></a-input-number>
-                </gui-field>
-                <gui-field label="文本">
-                  <a-switch
-                    v-model="selfConfig.geo.label.normal.show"
-                    size="small"
-                    @change="switchChange"
-                  ></a-switch>
-                </gui-field>
-                <gui-field
-                  label="文本样式"
-                  v-if="selfConfig.geo.label.normal.show"
-                >
-                  <gui-inline label="字号">
-                    <a-input-number
-                      v-model="selfConfig.geo.label.normal.fontSize"
-                      size="small"
-                      :min="12"
-                      :max="40"
-                      @change="setSelfProperty"
-                    ></a-input-number>
-                  </gui-inline>
-                  <gui-inline label="颜色">
-                    <el-color-picker
-                      v-model="selfConfig.geo.label.normal.color"
-                      @change="setSelfProperty"
-                    ></el-color-picker>
-                  </gui-inline>
-                </gui-field>
-                <gui-field label="文本悬停">
-                  <a-switch
-                    v-model="selfConfig.geo.label.emphasis.show"
-                    size="small"
-                    @change="switchChange"
-                  ></a-switch>
-                </gui-field>
-                <gui-field
-                  label="文本悬停样式"
-                  v-if="selfConfig.geo.label.emphasis.show"
-                >
-                  <gui-inline label="字号">
-                    <a-input-number
-                      v-model="selfConfig.geo.label.emphasis.fontSize"
-                      size="small"
-                      :min="12"
-                      :max="40"
-                      @change="setSelfProperty"
-                    ></a-input-number>
-                  </gui-inline>
-                  <gui-inline label="颜色">
-                    <el-color-picker
-                      v-model="selfConfig.geo.label.emphasis.color"
-                      @change="setSelfProperty"
-                    ></el-color-picker>
-                  </gui-inline>
-                </gui-field>
-                <gui-field label="多边形">
-                  <gui-inline label="区域" style="width: auto">
-                    <el-color-picker
-                      ref="areaColor"
-                      show-alpha
-                      v-model="selfConfig.geo.itemStyle.normal.areaColor"
-                      @change="changeAreaColor"
-                    ></el-color-picker>
-                  </gui-inline>
-                  <gui-inline label="边框" style="width: auto">
-                    <el-color-picker
-                      v-model="selfConfig.geo.itemStyle.normal.borderColor"
-                      @change="setSelfProperty"
-                    ></el-color-picker>
-                  </gui-inline>
-                </gui-field>
-                <!-- <gui-field label="阴影">
-                  <gui-inline label="颜色" style="width: auto">
-                    <el-color-picker
-                      ref="areaColor"
-                      show-alpha
-                      v-model="selfConfig.geo.itemStyle.normal.shadowColor"
-                      @change="setSelfProperty"
-                    ></el-color-picker>
-                  </gui-inline>
-                  <gui-inline label="模糊大小" style="width: auto">
-                    <a-input-number
-                      v-model="selfConfig.geo.itemStyle.normal.shadowBlur"
-                      size="small"
-                      :min="0"
-                      :max="200"
-                      @change="setSelfProperty"
-                    ></a-input-number>
-                  </gui-inline>
-                </gui-field> -->
-                <!-- <gui-field label="区域透明">
-                  <a-switch
-                    v-model="mapOpacity"
-                    size="small"
-                    @change="switchChange"
-                  ></a-switch> -->
-                <!-- <a-input-number
-                    v-model="selfConfig.geo.itemStyle.normal.opacity"
-                    size="small"
-                    :max="1"
-                    :min="0"
-                    :step="0.1"
-                    @change="setSelfProperty"
-                  ></a-input-number> -->
-                <!-- </gui-field> -->
-                <gui-field label="边框宽度">
-                  <a-input-number
-                    v-model="selfConfig.geo.itemStyle.normal.borderWidth"
-                    size="small"
-                    :max="10"
-                    :min="0"
-                    :step="1"
-                    @change="setSelfProperty"
-                  ></a-input-number>
-                </gui-field>
-                <gui-field label="多边形悬停">
-                  <gui-inline label="区域" style="width: auto">
-                    <el-color-picker
-                      v-model="selfConfig.geo.itemStyle.emphasis.areaColor"
-                      @change="setSelfProperty"
-                    ></el-color-picker>
-                  </gui-inline>
-                  <gui-inline label="边框" style="width: auto">
-                    <el-color-picker
-                      v-model="selfConfig.geo.itemStyle.emphasis.borderColor"
-                      @change="setSelfProperty"
-                    ></el-color-picker>
-                  </gui-inline>
-                </gui-field>
-              </a-collapse-panel>
               <a-collapse-panel
                 key="mapIndicator"
                 header="图形属性"
@@ -1924,177 +1785,188 @@
                     ></a-input-number>
                   </gui-inline>
                 </gui-field>
-                <a-collapse v-model="mapActive">
-                  <!-- 填充配置 -->
-                  <a-collapse-panel
-                    key="fill"
-                    header="填充层设置"
-                    v-if="
-                      selfConfig.series[0] &&
-                        selfConfig.series[0].type === 'map'
-                    "
+                <gui-field label="底色">
+                  <el-color-picker
+                    ref="areaColor"
+                    v-model="selfConfig.geo.itemStyle.normal.areaColor"
+                    @change="setSelfProperty"
+                  ></el-color-picker>
+                </gui-field>
+                <gui-field label="底色透明度">
+                  <a-input-number
+                    v-model="selfConfig.geo.itemStyle.normal.opacity"
+                    size="small"
+                    :max="1"
+                    :min="0"
+                    :step="0.1"
+                    @change="setSelfProperty"
+                  ></a-input-number>
+                </gui-field>
+                <gui-field label="悬停区域色">
+                  <el-color-picker
+                    v-model="selfConfig.geo.itemStyle.emphasis.areaColor"
+                    @change="changeAreaColor"
+                  ></el-color-picker>
+                </gui-field>
+                <gui-field label="区域边框色">
+                  <el-color-picker
+                    v-model="selfConfig.geo.itemStyle.normal.borderColor"
+                    @change="setSelfProperty"
+                  ></el-color-picker>
+                </gui-field>
+              </a-collapse-panel>
+              <!-- 填充配置 -->
+              <a-collapse-panel
+                key="fill"
+                header="填充层设置"
+                v-if="
+                  selfConfig.series[0] && selfConfig.series[0].type === 'map'
+                "
+              >
+                <gui-field label="填充色">
+                  <div
+                    class="el-color-picker el-color-picker--small"
+                    @click.stop="showColorSelect = true"
                   >
-                    <!-- <gui-field label="显示标记点">
-                      <a-switch
-                        v-model="selfConfig.series[0].showLegendSymbol"
-                        size="small"
-                        @change="switchChange"
-                      ></a-switch>
-                    </gui-field> -->
-                    <!-- <gui-field label="视角缩放">
-                      <a-input-number
-                        v-model="selfConfig.series[0].zoom"
-                        size="small"
-                        :min="0"
-                        :step="0.1"
-                        @change="setSelfProperty"
-                      ></a-input-number>
-                    </gui-field> -->
-                    <gui-field label="底色">
-                      <el-color-picker
-                        ref="areaColor"
-                        show-alpha
-                        v-model="
-                          selfConfig.series[0].itemStyle.normal.areaColor
-                        "
-                        @change="changeAreaColor"
-                      ></el-color-picker>
-                    </gui-field>
-                    <gui-field label="底色透明度">
-                      <a-input-number
-                        v-model="selfConfig.series[0].itemStyle.normal.opacity"
-                        size="small"
-                        @change="setSelfProperty"
-                      ></a-input-number>
-                    </gui-field>
-                    <gui-field label="填充色">
-                      <div class="color-select-bar">
+                    <div class="el-color-picker__trigger">
+                      <span class="el-color-picker__color"
+                        ><span
+                          class="el-color-picker__color-inner"
+                          :style="{
+                            backgroundColor: selfConfig.series[0].themeColor
+                          }"
+                        ></span></span
+                      ><span
+                        class="el-color-picker__icon el-icon-arrow-down"
+                      ></span>
+                    </div>
+                    <!-- 颜色选择下拉 -->
+                    <!-- 透明遮罩 -->
+                    <div
+                      v-show="showColorSelect"
+                      style="position:fixed;top:0;left:0;width:100vw;height:100vh;"
+                      @click.stop="showColorSelect = false"
+                    ></div>
+                    <div
+                      class="el-color-dropdown el-color-picker__panel"
+                      style="position:absolute;right:0;width:80px"
+                      v-show="showColorSelect"
+                    >
+                      <div class="el-color-predefine__colors">
                         <div
-                          v-for="(color, key) in themeColors"
-                          :key="key"
                           :class="[
-                            'select-color',
+                            'el-color-predefine__color-selector',
                             {
                               selected:
                                 color === selfConfig.series[0].themeColor
                             }
                           ]"
-                          @click="selectThemeColor(color)"
-                        ></div>
-                      </div>
-                    </gui-field>
-                    <gui-field label="悬停区域色">
-                      <el-color-picker
-                        v-model="
-                          selfConfig.series[0].itemStyle.emphasis.areaColor
-                        "
-                        @change="setSelfProperty"
-                      ></el-color-picker>
-                    </gui-field>
-                    <gui-field label="区域边框色">
-                      <el-color-picker
-                        v-model="
-                          selfConfig.series[0].itemStyle.normal.borderColor
-                        "
-                        @change="setSelfProperty"
-                      ></el-color-picker>
-                    </gui-field>
-                    <gui-field label="区域展示指标">
-                      <a-switch
-                        v-model="selfConfig.series[0].label.normal.show"
-                        size="small"
-                        @change="switchChange"
-                      ></a-switch>
-                    </gui-field>
-                    指标内容
-                    <a-select
-                      mode="tags"
-                      placeholder="选择显示内容"
-                      v-model="selfConfig.series[0].pointShowList"
-                      style="width: 100%"
-                      @change="setSelfProperty"
-                    >
-                      <a-select-option
-                        v-for="i in mapFillPointSelectList"
-                        :key="i.alias"
-                        :value="i.alias"
-                      >
-                        {{ i.alias }}
-                      </a-select-option>
-                    </a-select>
-                    <gui-field label="文本">
-                      <gui-inline label="字号">
-                        <a-input-number
-                          class="longwidth"
-                          v-model="selfConfig.series[0].label.normal.fontSize"
-                          size="small"
-                          :min="12"
-                          :max="40"
-                          @change="setSelfProperty"
-                        ></a-input-number>
-                      </gui-inline>
-                      <gui-inline label="颜色">
-                        <el-color-picker
-                          v-model="selfConfig.series[0].label.normal.color"
-                          @change="setSelfProperty"
-                        ></el-color-picker>
-                      </gui-inline>
-                    </gui-field>
-                    <gui-field label="排列">
-                      <gui-inline>
-                        <a-radio-group
-                          :value="selfConfig.series[0].label.normal.orient"
-                          size="small"
+                          v-for="(color, index) in themeColors"
+                          :key="index"
+                          @click.stop="selectThemeColor(color)"
                         >
-                          <a-radio-button
-                            value="horizontal"
-                            @click.native.stop="
-                              onRadioChange(
-                                $event,
-                                selfConfig.series[0].label.normal,
-                                'orient'
-                              )
-                            "
-                            >水平</a-radio-button
-                          >
-                          <a-radio-button
-                            value="vertical"
-                            @click.native.stop="
-                              onRadioChange(
-                                $event,
-                                selfConfig.series[0].label.normal,
-                                'orient'
-                              )
-                            "
-                            >垂直</a-radio-button
-                          >
-                        </a-radio-group>
-                      </gui-inline>
-                    </gui-field>
-                    <gui-field label="鼠标移入区域提示">
-                      <a-switch
-                        v-model="selfConfig.series[0].tooltip.show"
-                        size="small"
-                        @change="switchChange"
-                      ></a-switch>
-                    </gui-field>
-                    显示内容
-                    <a-select
-                      mode="tags"
-                      placeholder="选择显示内容"
-                      v-model="selfConfig.series[0].tooltipShowList"
-                      style="width: 100%"
+                          <div :style="{ backgroundColor: color }"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </gui-field>
+                <gui-field label="区域展示指标">
+                  <a-switch
+                    v-model="selfConfig.series[0].label.normal.show"
+                    size="small"
+                    @change="switchChange"
+                  ></a-switch>
+                </gui-field>
+                指标内容
+                <a-select
+                  mode="tags"
+                  placeholder="选择显示内容"
+                  v-model="selfConfig.series[0].pointShowList"
+                  style="width: 100%"
+                  @change="setSelfProperty"
+                >
+                  <a-select-option
+                    v-for="i in mapFillPointSelectList"
+                    :key="i.alias"
+                    :value="i.alias"
+                  >
+                    {{ i.alias }}
+                  </a-select-option>
+                </a-select>
+                <gui-field label="文本">
+                  <gui-inline label="字号">
+                    <a-input-number
+                      class="longwidth"
+                      v-model="selfConfig.series[0].label.normal.fontSize"
+                      size="small"
+                      :min="12"
+                      :max="40"
                       @change="setSelfProperty"
+                    ></a-input-number>
+                  </gui-inline>
+                  <gui-inline label="颜色">
+                    <el-color-picker
+                      v-model="selfConfig.series[0].label.normal.color"
+                      @change="setSelfProperty"
+                    ></el-color-picker>
+                  </gui-inline>
+                </gui-field>
+                <gui-field label="排列">
+                  <gui-inline>
+                    <a-radio-group
+                      :value="selfConfig.series[0].label.normal.orient"
+                      size="small"
                     >
-                      <a-select-option
-                        v-for="i in mapFillTooltipSelectList"
-                        :key="i.alias"
-                        :value="i.alias"
+                      <a-radio-button
+                        value="horizontal"
+                        @click.native.stop="
+                          onRadioChange(
+                            $event,
+                            selfConfig.series[0].label.normal,
+                            'orient'
+                          )
+                        "
+                        >水平</a-radio-button
                       >
-                        {{ i.alias }}
-                      </a-select-option>
-                    </a-select>
-                    <!-- <gui-field label="阴影">
+                      <a-radio-button
+                        value="vertical"
+                        @click.native.stop="
+                          onRadioChange(
+                            $event,
+                            selfConfig.series[0].label.normal,
+                            'orient'
+                          )
+                        "
+                        >垂直</a-radio-button
+                      >
+                    </a-radio-group>
+                  </gui-inline>
+                </gui-field>
+                <gui-field label="鼠标移入区域提示">
+                  <a-switch
+                    v-model="selfConfig.series[0].tooltip.show"
+                    size="small"
+                    @change="switchChange"
+                  ></a-switch>
+                </gui-field>
+                显示内容
+                <a-select
+                  mode="tags"
+                  placeholder="选择显示内容"
+                  v-model="selfConfig.series[0].tooltipShowList"
+                  style="width: 100%"
+                  @change="setSelfProperty"
+                >
+                  <a-select-option
+                    v-for="i in mapFillTooltipSelectList"
+                    :key="i.alias"
+                    :value="i.alias"
+                  >
+                    {{ i.alias }}
+                  </a-select-option>
+                </a-select>
+                <!-- <gui-field label="阴影">
                       <gui-inline label="颜色" style="width: auto">
                         <el-color-picker
                           ref="areaColor"
@@ -2117,190 +1989,184 @@
                         ></a-input-number>
                       </gui-inline>
                     </gui-field> -->
-                    <gui-field label="边框宽度">
-                      <a-input-number
-                        v-model="
-                          selfConfig.series[0].itemStyle.normal.borderWidth
-                        "
-                        size="small"
-                        :max="10"
-                        :min="0"
-                        :step="1"
-                        @change="setSelfProperty"
-                      ></a-input-number>
-                    </gui-field>
-                  </a-collapse-panel>
-                  <!-- 标记点配置 -->
-                  <a-collapse-panel
-                    key="label"
-                    header="标记层设置"
-                    v-if="scatterList.length > 0"
+                <!-- <gui-field label="边框宽度">
+                  <a-input-number
+                    v-model="selfConfig.series[0].itemStyle.normal.borderWidth"
+                    size="small"
+                    :max="10"
+                    :min="0"
+                    :step="1"
+                    @change="setSelfProperty"
+                  ></a-input-number>
+                </gui-field> -->
+              </a-collapse-panel>
+              <!-- 标记点配置 -->
+              <a-collapse-panel
+                key="label"
+                header="标记层设置"
+                v-if="scatterList.length > 0"
+              >
+                <gui-field label="标记点">
+                  <a-switch
+                    v-model="scatterList[0].itemStyle.normal.showSeries"
+                    size="small"
+                    @change="mapShowScatter"
+                  ></a-switch>
+                </gui-field>
+                <gui-field label="标记点颜色">
+                  <el-color-picker
+                    v-model="scatterList[0].itemStyle.normal.color"
+                    @change="setSelfProperty"
+                  ></el-color-picker>
+                </gui-field>
+                <gui-field label="区域展示指标">
+                  <a-switch
+                    v-model="scatterList[0].label.normal.show"
+                    size="small"
+                    @change="switchChange"
+                  ></a-switch>
+                </gui-field>
+                指标内容
+                <a-select
+                  mode="tags"
+                  placeholder="选择显示内容"
+                  v-model="scatterList[0].pointShowList"
+                  style="width: 100%"
+                  @change="setSelfProperty"
+                >
+                  <a-select-option
+                    v-for="i in mapLabelPointSelectList"
+                    :key="i.alias"
+                    :value="i.alias"
                   >
-                    <gui-field label="标记点">
-                      <a-switch
-                        v-model="scatterList[0].itemStyle.normal.showSeries"
-                        size="small"
-                        @change="mapShowScatter"
-                      ></a-switch>
-                    </gui-field>
-                    <gui-field label="标记点颜色">
-                      <el-color-picker
-                        v-model="scatterList[0].itemStyle.normal.color"
-                        @change="setSelfProperty"
-                      ></el-color-picker>
-                    </gui-field>
-                    <gui-field label="区域展示指标">
-                      <a-switch
-                        v-model="scatterList[0].label.normal.show"
-                        size="small"
-                        @change="switchChange"
-                      ></a-switch>
-                    </gui-field>
-                    指标内容
-                    <a-select
-                      mode="tags"
-                      placeholder="选择显示内容"
-                      v-model="scatterList[0].pointShowList"
-                      style="width: 100%"
+                    {{ i.alias }}
+                  </a-select-option>
+                </a-select>
+                <gui-field label="文本样式">
+                  <gui-inline label="字号">
+                    <a-input-number
+                      v-model="scatterList[0].label.normal.fontSize"
+                      size="small"
+                      :min="12"
+                      :max="40"
                       @change="setSelfProperty"
-                    >
-                      <a-select-option
-                        v-for="i in mapLabelPointSelectList"
-                        :key="i.alias"
-                        :value="i.alias"
-                      >
-                        {{ i.alias }}
-                      </a-select-option>
-                    </a-select>
-                    <gui-field label="文本样式">
-                      <gui-inline label="字号">
-                        <a-input-number
-                          v-model="scatterList[0].label.normal.fontSize"
-                          size="small"
-                          :min="12"
-                          :max="40"
-                          @change="setSelfProperty"
-                        ></a-input-number>
-                      </gui-inline>
-                      <gui-inline label="颜色">
-                        <el-color-picker
-                          v-model="scatterList[0].label.normal.color"
-                          @change="setSelfProperty"
-                        ></el-color-picker>
-                      </gui-inline>
-                    </gui-field>
-                    <gui-field label="显示位置">
-                      <gui-inline>
-                        <a-radio-group
-                          :value="scatterList[0].label.normal.position"
-                          size="small"
-                        >
-                          <a-radio-button
-                            value="top"
-                            @click.native.stop="
-                              onRadioChange(
-                                $event,
-                                scatterList[0].label.normal,
-                                'position'
-                              )
-                            "
-                            >顶部</a-radio-button
-                          >
-                          <a-radio-button
-                            value="bottom"
-                            @click.native.stop="
-                              onRadioChange(
-                                $event,
-                                scatterList[0].label.normal,
-                                'position'
-                              )
-                            "
-                            >底部</a-radio-button
-                          >
-                        </a-radio-group>
-                      </gui-inline>
-                    </gui-field>
-                    <gui-field label="排列">
-                      <gui-inline>
-                        <a-radio-group
-                          :value="scatterList[0].label.normal.orient"
-                          size="small"
-                        >
-                          <a-radio-button
-                            value="horizontal"
-                            @click.native.stop="
-                              onRadioChange(
-                                $event,
-                                scatterList[0].label.normal,
-                                'orient'
-                              )
-                            "
-                            >水平</a-radio-button
-                          >
-                          <a-radio-button
-                            value="vertical"
-                            @click.native.stop="
-                              onRadioChange(
-                                $event,
-                                scatterList[0].label.normal,
-                                'orient'
-                              )
-                            "
-                            >垂直</a-radio-button
-                          >
-                        </a-radio-group>
-                      </gui-inline>
-                    </gui-field>
-                    <gui-field label="鼠标移入区域提示">
-                      <a-switch
-                        v-model="scatterList[0].tooltip.show"
-                        size="small"
-                        @change="switchChange"
-                      ></a-switch>
-                    </gui-field>
-                    显示内容
-                    <a-select
-                      mode="tags"
-                      placeholder="选择显示内容"
-                      v-model="scatterList[0].tooltipShowList"
-                      style="width: 100%"
+                    ></a-input-number>
+                  </gui-inline>
+                  <gui-inline label="颜色">
+                    <el-color-picker
+                      v-model="scatterList[0].label.normal.color"
                       @change="setSelfProperty"
+                    ></el-color-picker>
+                  </gui-inline>
+                </gui-field>
+                <gui-field label="显示位置">
+                  <gui-inline>
+                    <a-radio-group
+                      :value="scatterList[0].label.normal.position"
+                      size="small"
                     >
-                      <a-select-option
-                        v-for="i in mapLabelTooltipSelectList"
-                        :key="i.alias"
-                        :value="i.alias"
+                      <a-radio-button
+                        value="top"
+                        @click.native.stop="
+                          onRadioChange(
+                            $event,
+                            scatterList[0].label.normal,
+                            'position'
+                          )
+                        "
+                        >顶部</a-radio-button
                       >
-                        {{ i.alias }}
-                      </a-select-option>
-                    </a-select>
-                    <gui-field label="形状">
-                      <a-select
-                        style="width: 120px"
-                        v-model="scatterList[0].symbol"
-                        size="small"
-                        @change="setSelfProperty"
+                      <a-radio-button
+                        value="bottom"
+                        @click.native.stop="
+                          onRadioChange(
+                            $event,
+                            scatterList[0].label.normal,
+                            'position'
+                          )
+                        "
+                        >底部</a-radio-button
                       >
-                        <a-select-option value="circle">圆形</a-select-option>
-                        <a-select-option value="rent">方形</a-select-option>
-                        <a-select-option value="pin">水滴</a-select-option>
-                        <a-select-option value="triangle"
-                          >三角形</a-select-option
-                        >
-                        <a-select-option value="arrow">箭头</a-select-option>
-                      </a-select>
-                    </gui-field>
-                    <gui-field label="大小">
-                      <a-input-number
-                        v-model="scatterList[0].symbolSize"
-                        size="small"
-                        :min="0"
-                        :max="40"
-                        @change="setSelfProperty"
-                      ></a-input-number>
-                    </gui-field>
-                  </a-collapse-panel>
-                </a-collapse>
+                    </a-radio-group>
+                  </gui-inline>
+                </gui-field>
+                <gui-field label="排列">
+                  <gui-inline>
+                    <a-radio-group
+                      :value="scatterList[0].label.normal.orient"
+                      size="small"
+                    >
+                      <a-radio-button
+                        value="horizontal"
+                        @click.native.stop="
+                          onRadioChange(
+                            $event,
+                            scatterList[0].label.normal,
+                            'orient'
+                          )
+                        "
+                        >水平</a-radio-button
+                      >
+                      <a-radio-button
+                        value="vertical"
+                        @click.native.stop="
+                          onRadioChange(
+                            $event,
+                            scatterList[0].label.normal,
+                            'orient'
+                          )
+                        "
+                        >垂直</a-radio-button
+                      >
+                    </a-radio-group>
+                  </gui-inline>
+                </gui-field>
+                <gui-field label="鼠标移入区域提示">
+                  <a-switch
+                    v-model="scatterList[0].tooltip.show"
+                    size="small"
+                    @change="switchChange"
+                  ></a-switch>
+                </gui-field>
+                显示内容
+                <a-select
+                  mode="tags"
+                  placeholder="选择显示内容"
+                  v-model="scatterList[0].tooltipShowList"
+                  style="width: 100%"
+                  @change="setSelfProperty"
+                >
+                  <a-select-option
+                    v-for="i in mapLabelTooltipSelectList"
+                    :key="i.alias"
+                    :value="i.alias"
+                  >
+                    {{ i.alias }}
+                  </a-select-option>
+                </a-select>
+                <gui-field label="形状">
+                  <a-select
+                    style="width: 120px"
+                    v-model="scatterList[0].symbol"
+                    size="small"
+                    @change="setSelfProperty"
+                  >
+                    <a-select-option value="circle">圆形</a-select-option>
+                    <a-select-option value="rent">方形</a-select-option>
+                    <a-select-option value="pin">水滴</a-select-option>
+                    <a-select-option value="triangle">三角形</a-select-option>
+                    <a-select-option value="arrow">箭头</a-select-option>
+                  </a-select>
+                </gui-field>
+                <gui-field label="大小">
+                  <a-input-number
+                    v-model="scatterList[0].symbolSize"
+                    size="small"
+                    :min="0"
+                    :max="40"
+                    @change="setSelfProperty"
+                  ></a-input-number>
+                </gui-field>
               </a-collapse-panel>
             </template>
 
@@ -2351,14 +2217,24 @@
                     <a-radio-button
                       value="middle"
                       @click.native.stop="
-                        onRadioChange($event, selfConfig.xAxis, 'nameLocation','xAxis')
+                        onRadioChange(
+                          $event,
+                          selfConfig.xAxis,
+                          'nameLocation',
+                          'xAxis'
+                        )
                       "
                       >中部</a-radio-button
                     >
                     <a-radio-button
                       value="end"
                       @click.native.stop="
-                        onRadioChange($event, selfConfig.xAxis, 'nameLocation','xAxis')
+                        onRadioChange(
+                          $event,
+                          selfConfig.xAxis,
+                          'nameLocation',
+                          'xAxis'
+                        )
                       "
                       >末尾</a-radio-button
                     >
@@ -2536,14 +2412,24 @@
                     <a-radio-button
                       value="middle"
                       @click.native.stop="
-                        onRadioChange($event, selfConfig.yAxis, 'nameLocation','yAxis')
+                        onRadioChange(
+                          $event,
+                          selfConfig.yAxis,
+                          'nameLocation',
+                          'yAxis'
+                        )
                       "
                       >中部</a-radio-button
                     >
                     <a-radio-button
                       value="end"
                       @click.native.stop="
-                        onRadioChange($event, selfConfig.yAxis, 'nameLocation','yAxis')
+                        onRadioChange(
+                          $event,
+                          selfConfig.yAxis,
+                          'nameLocation',
+                          'yAxis'
+                        )
                       "
                       >末尾</a-radio-button
                     >
@@ -3231,7 +3117,6 @@ export default {
       backgroundApi: {},
       predefineColors: DEFAULT_COLORS,
       dataSource: '',
-
       activeKey: ['1'],
       radioStyle: {
         display: 'flex',
@@ -3282,7 +3167,8 @@ export default {
       mapFillPointSelectList: [], // 地图填充指标选择列表
       mapFillTooltipSelectList: [], // 地图填充提示框选择列表
       mapLabelPointSelectList: [], // 地图标记层指标选择列表
-      mapLabelTooltipSelectList: [] // 地图标记层提示框内容选择列表
+      mapLabelTooltipSelectList: [], // 地图标记层提示框内容选择列表
+      showColorSelect: false // 地图下拉选择颜色
     }
   },
   mounted() {
@@ -3301,6 +3187,7 @@ export default {
       clearInterval(this.chartTimers[id])
     })
     this.chartTimers = {}
+    this.showColorSelect = false
   },
   methods: {
     ...mapActions(['saveScreenData', 'updateChartData', 'refreshScreen']),
@@ -3335,15 +3222,6 @@ export default {
         this.selfConfig.series.label.formatter = checkedValues.join('\n\r');
       } else {
         this.selfConfig.series.label.formatterSelect = checkedValues
-      }
-      this.setSelfProperty()
-    },
-    changeAreaColor(color) {
-      //   if (this.selfConfig.geo.itemStyle.normal.areaColor !== 'transparent') {
-      //     this.selfConfig.geo.itemStyle.normal.areaColor = this.selfConfig.geo.itemStyle.normal.areaColor
-      //   }
-      if (!color) {
-        this.selfConfig.geo.itemStyle.normal.areaColor = 'rgba(0,0,0,0)'
       }
       this.setSelfProperty()
     },
@@ -3542,23 +3420,55 @@ export default {
       this.setSelfProperty()
     },
 
-    onRadioChange(e, data, key,x_yName) {
+    onRadioChange(e, data, key, x_yName) {
       let val = e.target.value
       if (val === 'false') {
         val = false
       }
       // x,y轴的标题位置发生变化时，设置默认标题镖局
-      if(x_yName){
-        if(x_yName == 'xAxis'){
-          val == 'middle' && (this.$set(this.selfConfig.xAxis.nameTextStyle, 'padding', [30,0,0,0]))
-          val == 'end' && (this.$set(this.selfConfig.xAxis.nameTextStyle, 'padding', [60,0,0,0]))
-        }else if(x_yName == 'yAxis'){
-          val == 'middle' && (this.$set(this.selfConfig.yAxis.nameTextStyle, 'padding', [0,0,40,0]))
-          val == 'end' && (this.$set(this.selfConfig.yAxis.nameTextStyle, 'padding', [0,0,0,0]))
+      if (x_yName) {
+        if (x_yName == 'xAxis') {
+          val == 'middle' &&
+            this.$set(this.selfConfig.xAxis.nameTextStyle, 'padding', [
+              30,
+              0,
+              0,
+              0
+            ])
+          val == 'end' &&
+            this.$set(this.selfConfig.xAxis.nameTextStyle, 'padding', [
+              60,
+              0,
+              0,
+              0
+            ])
+        } else if (x_yName == 'yAxis') {
+          val == 'middle' &&
+            this.$set(this.selfConfig.yAxis.nameTextStyle, 'padding', [
+              0,
+              0,
+              40,
+              0
+            ])
+          val == 'end' &&
+            this.$set(this.selfConfig.yAxis.nameTextStyle, 'padding', [
+              0,
+              0,
+              0,
+              0
+            ])
         }
-        
       }
       this.$set(data, key, val)
+      this.setSelfProperty()
+    },
+    changeAreaColor(color) {
+      if (
+        this.selfConfig.series[0] &&
+        this.selfConfig.series[0].type === 'map'
+      ) {
+        this.selfConfig.series[0].itemStyle.emphasis.areaColor = this.selfConfig.geo.itemStyle.emphasis.areaColor
+      }
       this.setSelfProperty()
     },
 
@@ -3702,6 +3612,7 @@ export default {
     selectThemeColor(color) {
       this.selfConfig.series[0].themeColor = color
       this.selfConfig.visualMap.inRange.color = themeColorNMap[color]
+      this.showColorSelect = false
       this.setSelfProperty()
     },
     mapShowScatter() {
@@ -3793,6 +3704,7 @@ export default {
             this.backgroundApi = deepClone(val.setting.background)
           }
         }
+        this.showColorSelect = false
       },
       deep: true
     },

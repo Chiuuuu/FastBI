@@ -189,7 +189,7 @@
         key="sort"
         header="排序"
         v-if="
-          (chartType === '1'  || chartType === '3') &&
+          (chartType === '1' || chartType === '3') &&
             currSelected.setting.chartType !== 'v-map' &&
             currSelected.setting.chartType !== 'v-treemap' &&
             currSelected.setting.chartType !== 'v-heatmap'
@@ -348,7 +348,7 @@ export default {
       // 类型对应关系
       const clearMap = {
         fillType: {
-          seriesType: 'map',
+          seriesType: 'scatter',
           clearData: {
             normal: [],
             latitude: [],
@@ -360,7 +360,7 @@ export default {
           }
         },
         labelType: {
-          seriesType: 'scatter',
+          seriesType: 'map',
           clearData: {
             labelNormal: [],
             labelLatitude: [],

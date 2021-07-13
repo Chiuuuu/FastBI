@@ -255,28 +255,6 @@ export default {
         )
         this.$delete(current.setting.config, 'visualMap')
       }
-      // 清空标签悬浮内容
-      if (
-        current.setting.config.series[0] &&
-        current.setting.config.series[0].type === 'map'
-      ) {
-        if (
-          current.setting.api_data.point &&
-          current.setting.api_data.point.length === 0
-        ) {
-          current.setting.config.series[0].data.forEach(item => {
-            delete item[current.setting.api_data.point[0].alias]
-          })
-        }
-        if (
-          current.setting.api_data.over &&
-          current.setting.api_data.over.length === 0
-        ) {
-          current.setting.config.series[0].data.forEach(item => {
-            delete item[current.setting.api_data.over[0].alias]
-          })
-        }
-      }
       this.$store.dispatch('SetSelfProperty', current.setting.config)
       this.updateChartData()
     },
@@ -374,23 +352,6 @@ export default {
       })
       let params = deepClone(selected)
       delete params.setting.apis.mapOrigin
-      // 传参添加标签悬浮的维度/度量
-      //   if (
-      //     params.setting.api_data.point &&
-      //     params.setting.api_data.point.length > 0
-      //   ) {
-      //     params.setting.api_data[selected.setting.api_data.point[0].file].push(
-      //       selected.setting.api_data.point[0]
-      //     )
-      //   }
-      //   if (
-      //     params.setting.api_data.over &&
-      //     params.setting.api_data.over.length > 0
-      //   ) {
-      //     params.setting.api_data[selected.setting.api_data.over[0].file].push(
-      //       selected.setting.api_data.over[0]
-      //     )
-      //   }
       let res = await this.$server.screenManage.getData(params)
 
       selected.setting.isEmpty = false
@@ -403,9 +364,9 @@ export default {
       }
       if (res.code === 200) {
         // 保存原始数据 -- 查看数据有用
-        apiData.origin_source = deepClone( res.rows || res.data || {} )
+        apiData.origin_source = deepClone(res.rows || res.data || {})
         this.$store.dispatch('SetSelfDataSource', apiData)
-        
+
         apiData.returnDataFill = res.data.fillList
         let config = this.currSelected.setting.config
         // 重置series
@@ -471,14 +432,14 @@ export default {
                 地区名: positionMsg.district, // 地区名
                 [alias]: data[alias] // 度量
               }
-              // 存在标签数据加上标签数据
-              // if (apiData.point && apiData.point[0]) {
-              //   datacontent[apiData.point[0].alias] = data[apiData.point[0].alias]
-              // }
-              // if (apiData.over && apiData.over[0]) {
-              //   datacontent[apiData.over[0].alias] = data[apiData.over[0].alias]
-              // }
-              datas.push(datacontent)
+              // 已有地图数据直接累加
+              let areaData = datas.find(item => item.name === datacontent.name)
+              if (areaData) {
+                areaData[alias] += datacontent[alias]
+                areaData.value += datacontent.value
+              } else {
+                datas.push(datacontent)
+              }
             } catch (err) {
               continue
             }

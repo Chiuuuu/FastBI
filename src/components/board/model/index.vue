@@ -52,7 +52,9 @@
                 :key="item.id"
                 @mouseover="getHover(item.tableId)"
               >
-                {{ item.resourceName }}
+                <a-tooltip :title="item.resourceName">
+                  {{ item.resourceName }}
+                </a-tooltip>
                 <a-icon
                   class="cls-close"
                   v-show="item.tableId === hoveDataModelId"
@@ -117,7 +119,7 @@
                         class="filelist"
                         :class="[
                           { active: item2.id === searchSelected },
-                          { error: item2.status === 1 },
+                          { error: item2.status === 1 }
                         ]"
                         :key="index2 + '_'"
                         :draggable="item2.status === 0"
@@ -184,7 +186,7 @@
                         class="filelist"
                         :class="[
                           { active: item2.id === searchSelected },
-                          { error: item2.status === 1 },
+                          { error: item2.status === 1 }
                         ]"
                         :key="index2 + '_'"
                         :draggable="item2.status === 0"
@@ -282,8 +284,8 @@ export default {
   props: {
     config: {
       type: Object,
-      required: true,
-    },
+      required: true
+    }
   },
   components: { ComputeSetting, GeoSetting, AddDataList },
   data() {
@@ -315,7 +317,7 @@ export default {
         { name: '平均', value: 'AVG' },
         { name: '最大值', value: 'MAX' },
         { name: '最小值', value: 'MIN' },
-        { name: '统计', value: 'CNT' },
+        { name: '统计', value: 'CNT' }
       ],
       createdMapData: {},
       resourceType: 8, // 当前数据类型标识（接入:3|模型:8）
@@ -323,7 +325,7 @@ export default {
       modelList: [], // 模型菜单
       sourceList: [], // 接入菜单
       key: 0, // 刷新菜单
-      hoveDataModelId: '', //悬浮选中的数据模型id
+      hoveDataModelId: '' //悬浮选中的数据模型id
     }
   },
   computed: {
@@ -334,26 +336,26 @@ export default {
       'selectedModelList',
       'currentSelected',
       'currSelected',
-      'canvasMap',
+      'canvasMap'
     ]),
     // 过滤模型列表
     savedModels() {
-      return this.selectedModelList.filter((item) => item.resourceType === 8)
+      return this.selectedModelList.filter(item => item.resourceType === 8)
     },
     // 过滤接入列表
     savedSources() {
-      return this.selectedModelList.filter((item) => item.resourceType === 3)
+      return this.selectedModelList.filter(item => item.resourceType === 3)
     },
     // 根据类型显示对应列表
     disableItem() {
       return this.resourceType === 8 ? this.savedModels : this.savedSources
-    },
+    }
   },
   watch: {
     selectedModelList: {
       handler(val) {
         if (val.length > 0) {
-          if (!val.find((item) => item.id === this.resourceId)) {
+          if (!val.find(item => item.id === this.resourceId)) {
             if (this.resourceType === 8) {
               this.resourceId =
                 this.savedModels.length > 0 ? this.savedModels[0].tableId : ''
@@ -368,9 +370,9 @@ export default {
           this.resourceId = ''
           this.$store.dispatch('SetModelMeasures', [])
         }
-        this.disableId = val.map((item) => item.tableId)
+        this.disableId = val.map(item => item.tableId)
       },
-      deep: true,
+      deep: true
     },
     currSelected: {
       handler(val) {
@@ -383,7 +385,7 @@ export default {
               val.setting.api_data.dimensions &&
               val.setting.api_data.dimensions.length > 0
             ) {
-              val.setting.api_data.dimensions.map((item) => {
+              val.setting.api_data.dimensions.map(item => {
                 this.dimensionsChecked.push(item.id)
               })
             }
@@ -392,14 +394,14 @@ export default {
               val.setting.api_data.measures &&
               val.setting.api_data.measures.length > 0
             ) {
-              val.setting.api_data.measures.map((item) => {
+              val.setting.api_data.measures.map(item => {
                 this.measuresChecked.push(item.id)
               })
             }
           }
         }
       },
-      deep: true,
+      deep: true
     },
     resourceId(val) {
       // 没有选中数据，清空维度度量信息
@@ -412,12 +414,12 @@ export default {
         return
       }
       this.getPivoSchemaList(val)
-    },
+    }
   },
   methods: {
     ...mapActions(['getScreenDetail']),
     // 数据模型搜索
-    modelSearch: debounce(function (event) {
+    modelSearch: debounce(function(event) {
       const value = event.target.value
       if (value) {
         this.handleGetSearchList(value)
@@ -463,7 +465,7 @@ export default {
     // 搜索关键字
     search(list, value) {
       let result = []
-      list.map((item) => {
+      list.map(item => {
         const newItem = menuSearchLoop(item, value)
         if (newItem) {
           result.push(newItem)
@@ -482,7 +484,7 @@ export default {
         this.model = !this.model
         return
       }
-      this.getModelList().then((res) => {
+      this.getModelList().then(res => {
         if (res) {
           this.model = !this.model
         }
@@ -495,7 +497,7 @@ export default {
         this.model = !this.model
         return
       }
-      this.getSourceList().then((res) => {
+      this.getSourceList().then(res => {
         if (res) {
           this.model = !this.model
         }
@@ -507,7 +509,7 @@ export default {
         '/datasource/catalog/list/1'
       )
       if (catalog.code === 200) {
-        catalog.rows.map((item) => {
+        catalog.rows.map(item => {
           item.selected = false
           item.showMore = false
         })
@@ -541,7 +543,7 @@ export default {
         resourceName: item.name,
         datasourceId: '',
         databaseId: '',
-        tableId: item.id,
+        tableId: item.id
       }
       // 数据接入
       if (item.resourceType === 3) {
@@ -550,7 +552,7 @@ export default {
           datasourceId: item.datasourceId,
           databaseId: item.databaseId,
           tableId: item.id,
-          origin: 3, // 数据源:3,模型:8
+          origin: 3 // 数据源:3,模型:8
         }
       } else {
         // 模型
@@ -582,9 +584,9 @@ export default {
     },
     // 数据模型列表
     async getModelList() {
-      return this.$server.screenManage.getCatalogList().then((res) => {
+      return this.$server.screenManage.getCatalogList().then(res => {
         if (res.code === 200) {
-          res.data.map((item) => {
+          res.data.map(item => {
             item.selected = false
             item.showMore = false
           })
@@ -598,7 +600,7 @@ export default {
     handleSearch(value) {
       if (value) {
         let result = []
-        this.searchList.map((item) => {
+        this.searchList.map(item => {
           if (item.name.includes(value)) {
             result.push(item)
           }
@@ -639,9 +641,9 @@ export default {
         datamodelId: item.datamodelId,
         pivotschemaId: item.pivotschemaId,
         role: num, // 转成维度传1，转成度量传2
-        screenId: this.screenId,
+        screenId: this.screenId
       }
-      this.$server.screenManage.screenModuleTransform(params).then((res) => {
+      this.$server.screenManage.screenModuleTransform(params).then(res => {
         if (res.code === 200) {
           this.getPivoSchemaList(this.resourceId, 2)
         }
@@ -661,32 +663,32 @@ export default {
         lock: true,
         text: '加载中...',
         target: 'body',
-        background: 'rgb(255, 255, 255, 0.6)',
+        background: 'rgb(255, 255, 255, 0.6)'
       })
       this.$server.screenManage
         .getPivoSchemaList(id, this.screenId, type)
-        .then((res) => {
+        .then(res => {
           if (res.code === 200) {
-            res.data.dimensions.map((item) => {
+            res.data.dimensions.map(item => {
               item.showMore = false
             })
-            res.data.measures.map((item) => {
+            res.data.measures.map(item => {
               item.showMore = false
             })
             let datas = res.data
             let dimensions = datas.dimensions
             let measures = datas.measures
             this.dimensions = this.transData(dimensions)
-            dimensions = dimensions.map((item) => {
+            dimensions = dimensions.map(item => {
               return { ...item, visible: true, produceType: 0 }
             })
             this.measures = this.transData(measures)
-            measures = measures.map((item) => {
+            measures = measures.map(item => {
               return {
                 ...item,
                 visible: true,
                 produceType: 0,
-                resourceType: this.resourceType,
+                resourceType: this.resourceType
               }
             })
             this.$store.dispatch('SetModelMeasures', measures)
@@ -694,13 +696,13 @@ export default {
 
             this.detailInfo.pivotSchema = {
               dimensions,
-              measures,
+              measures
             } // 聚合运算数据
 
             // 获取被删除的数据(status===1)
             this.$emit('getErrorData', {
-              dimensions: dimensions.filter((item) => item.status === 1),
-              measures: measures.filter((item) => item.status === 1),
+              dimensions: dimensions.filter(item => item.status === 1),
+              measures: measures.filter(item => item.status === 1)
             })
           }
         })
@@ -726,12 +728,12 @@ export default {
     },
     handleSave(datas) {
       let selected = this.canvasMap.find(
-        (item) => item.id === this.currentSelected
+        item => item.id === this.currentSelected
       )
       selected.setting.api_data.mapDatas = datas
     },
     getHover(val) {
-      let datamoel = this.canvasMap.map((x) => x.datamodelId)
+      let datamoel = this.canvasMap.map(x => x.datamodelId)
       if (!datamoel.includes(val)) {
         this.hoveDataModelId = val
       } else {
@@ -739,19 +741,22 @@ export default {
       }
     },
     async getDelDataModel(screenId, tableId) {
-      console.log('****',this.screenId);
-      let res = await this.$server.dataModel.delDataModel(this.screenId, tableId)
+      console.log('****', this.screenId)
+      let res = await this.$server.dataModel.delDataModel(
+        this.screenId,
+        tableId
+      )
       if (res.code == 200) {
         this.$message.success('删除成功')
         this.getScreenDetail({
           id: this.$route.query.id,
-          tabId: this.$route.query.tabId,
+          tabId: this.$route.query.tabId
         })
       } else {
         this.$message.error(res.msg || res || '删除失败')
       }
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -935,7 +940,7 @@ export default {
 }
 
 .cls-close {
-  
+
   position: absolute;
   right: 10px;
   top: 10px;
