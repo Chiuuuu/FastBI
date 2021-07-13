@@ -2,7 +2,7 @@
   <transition name="fade-in">
     <div
       class="dv-context-menu"
-      v-if="contextMenuInfo.isShow"
+      v-if="contextMenuInfo.isShow && currSelected"
       @mousedown.stop.prevent
       :style="contextMenuStyle"
       @click.stop.prevent
@@ -11,6 +11,7 @@
         class="context-menu-item"
         v-for="item in menuList"
         :key="item.order"
+        v-show="!item.ignore || !item.ignore.includes(currSelected.setting.name)"
         @mouseenter="item.showChildren = true"
         @mouseleave="item.showChildren = false"
         @click="handleCommand(item.order)"
@@ -52,11 +53,12 @@ import { Loading } from 'element-ui'
 import chartTableData from '../chartTableData/index' // 右键菜单
 import { deepClone } from '@/utils/deepClone'
 const exportChartList = [
-  { icon: 'ios-share', text: '查看数据', order: 'showChartData' },
+  { icon: 'ios-share', text: '查看数据', order: 'showChartData', ignore: ['figure'] },
   {
     icon: 'ios-download',
     text: '导出',
     order: 'export',
+    ignore: ['figure'],
     showChildren: false,
     children: [
       { text: 'excel', order: 'toexcel' },
@@ -66,11 +68,12 @@ const exportChartList = [
   }
 ]
 const chartMenuList = [
-  { icon: 'ios-share', text: '查看数据', order: 'showChartData' },
+  { icon: 'ios-share', text: '查看数据', order: 'showChartData', ignore: ['figure'] },
   {
     icon: 'ios-download',
     text: '导出',
     order: 'export',
+    ignore: ['figure'],
     showChildren: false,
     children: [
       { text: 'excel', order: 'toexcel' },
