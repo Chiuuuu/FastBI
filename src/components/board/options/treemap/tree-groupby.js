@@ -212,6 +212,7 @@ class TreeGroupBy {
       const curMax = this.max[this.dimensionList.length - index - 1] || 0
       this.max[this.dimensionList.length - index - 1] = Math.ceil(Math.max(curMax, value))
     })
+    this.chain = this.chain.slice(0, -1)
   }
 
 }

@@ -3043,7 +3043,7 @@ const list = [
                 opacity: 1,
                 borderColor: '#fff',
                 borderRadius: 0,
-                borderWidth: 20,
+                borderWidth: 1,
                 borderStyle: 'solid',
                 shadowColor: '#fff',
                 showShadow: false
@@ -3053,7 +3053,7 @@ const list = [
             apis: {},
             view: {
               width: 400,
-              height: 20,
+              height: 1,
               x: 760,
               y: 340,
               rotate: 0
