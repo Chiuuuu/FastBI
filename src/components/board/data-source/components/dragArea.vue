@@ -245,15 +245,15 @@ export default {
           } else if (this.fileList.length == 2) {
             this.fileList.splice(1, 1, dataFile)
           }
-        } else if (this.currSelected.setting.chartType === 'v-treemap'||this.currSelected.setting.chartType==='v-sun') {
+        } else if (this.currSelected.setting.chartType === 'v-treemap' || this.currSelected.setting.chartType === 'v-sun') {
+          if (this.currSelected.setting.chartType !== 'v-sun') {
+            this.handleTreemapShowList(dataFile, 4)
+          }
           // 矩形树图可以拖入5个维度
           if (this.fileList.length < 5) {
             this.fileList.push(dataFile)
           } else if (this.fileList.length === 5) {
             this.fileList.splice(4, 1, dataFile)
-          }
-          if(this.currSelected.setting.chartType!=='v-sun'){
-            this.handleTreemapShowList(dataFile, 4)
           }
         } else {
           // 维度暂时只能拉入一个字段
@@ -285,11 +285,11 @@ export default {
           // 地图类型暂时只能拉入一个度量
           this.fileList[0] = dataFile
         } else if (this.currSelected.setting.chartType === 'v-treemap'||this.currSelected.setting.chartType==='v-sun') {
-          // 矩形树图暂时只能拉入一个度量
-          this.fileList[0] = dataFile
-          if(this.currSelected.setting.chartType!=='v-sun'){
+          if (this.currSelected.setting.chartType !== 'v-sun') {
             this.handleTreemapShowList(dataFile, 0)
           }
+          // 矩形树图暂时只能拉入一个度量
+          this.fileList[0] = dataFile
           
         } else {
           this.fileList.push(dataFile)

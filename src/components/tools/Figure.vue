@@ -45,8 +45,8 @@ export default {
       }
       if (this.setting.config.title === '直线') {
         if (config.showShadow) {
-          style.boxShadow = `0 ${config.borderWidth / 2}px ${
-            config.borderWidth
+          style.boxShadow = `0 ${view.height / 2}px ${
+            view.height
           }px ${config.shadowColor}`
         }
         style.borderWidth = view.height + 'px 0 0' // 直线只显示上边框
@@ -65,5 +65,9 @@ export default {
   position: relative;
   width: 100%;
   height: 100%;
+
+  .dv-figure {
+    background-clip: content-box;
+  }
 }
 </style>
