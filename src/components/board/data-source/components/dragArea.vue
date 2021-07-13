@@ -16,7 +16,7 @@
         :key="index"
         @contextmenu.prevent="showMore(item)"
       >
-        <a-dropdown :trigger="['click', 'contextmenu']" v-model="item.showMore">
+        <a-dropdown :trigger="['click', 'contextmenu']" v-model="item.showMore" @visibleChange="v => v && showMore(item)">
           <a-icon class="icon-more" type="caret-down" />
           <a-menu slot="overlay">
             <a-sub-menu
