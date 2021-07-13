@@ -49,7 +49,9 @@
                 v-for="item in disableItem"
                 :value="item.tableId"
                 :key="item.id"
-                >{{ item.resourceName }}</a-select-option
+                ><a-tooltip :title="item.resourceName">
+                  {{ item.resourceName }}
+                </a-tooltip></a-select-option
               >
             </a-select>
             <a-button

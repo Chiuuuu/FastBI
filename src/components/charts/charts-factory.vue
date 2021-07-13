@@ -198,7 +198,7 @@ export default {
             this.setMapFormatter()
           } else if (this.typeName === 've-scatter') {
             val = deepClone(val)
-            if(this.apiData.dimensions.length == 0){
+            if (this.apiData.dimensions.length == 0) {
               val.legend.data = this.apis.legendData
               val.series.data = this.apis.seriesData
             }
@@ -217,40 +217,8 @@ export default {
             this.chartSeries = list
           } else {
             this.chartExtend = deepClone(val)
-            // 保留两位小数
-            if (this.typeName !== 've-gauge' && this.typeName !== 've-ring') {
-              let type = this.typeName
-              let chartType = this.chartType
-              if (chartType == 'high-pie' || chartType == 'high-column') {
-                return
-              }
-              this.chartExtend.series.label.formatter = function(params) {
-                if (type === 've-line') {
-                  return params.data[1].toFixed(2)
-                } else if (type === 've-pie') {
-                  // 嵌套饼图不需要拼接显示内容
-                  if (chartType === 'v-multiPie') {
-                    return params.data.value.toFixed(2)
-                  }
-                  let list = val.series.label.formatterSelect
-                  let str = []
-                  list.forEach(item => {
-                    let val = params[item]
-                    if (typeof val === 'number') {
-                      val = +parseFloat(val).toFixed(2)
-                    }
-                    if (item === 'percent') {
-                      val += '%'
-                    }
-                    str.push(val)
-                  })
-                  return str.join(' ')
-                } else if (type === 've-radar') {
-                  return params.value.toFixed(2)
-                } else {
-                  return params.data.toFixed(2)
-                }
-              }
+            if (this.typeName === 've-pie') {
+              this.setPieFormatter()
             }
           }
           // this.colors = [...val.colors]
@@ -307,12 +275,16 @@ export default {
             }
           }
 
-          if((val.dimensions || []).length == 0 && (val.measures || []).length == 0 && this.chartType === 'v-scatter'){
+          if (
+            (val.dimensions || []).length == 0 &&
+            (val.measures || []).length == 0 &&
+            this.chartType === 'v-scatter'
+          ) {
             // let config = deepClone(this.config)
-            this.config.legend.data = this.apis.legendData;
-            this.config.series.data = this.apis.seriesData;
-            this.apis.xMax = 1000; //度量1 最大值
-            this.apis.yMax = 1000; //度量2 最大值
+            this.config.legend.data = this.apis.legendData
+            this.config.series.data = this.apis.seriesData
+            this.apis.xMax = 1000 //度量1 最大值
+            this.apis.yMax = 1000 //度量2 最大值
           }
           if (this.chartType === 'v-scatter') {
             //散点图的数据自定义显示
@@ -464,14 +436,35 @@ export default {
         })
       })
     },
+    // 饼图显示内容格式拼接
+    setPieFormatter() {
+      let list = this.chartExtend.series.label.formatterSelect || []
+      this.chartExtend.series.label.formatter = function(params) {
+        let str = []
+        list.forEach(item => {
+          let val = params[item]
+          if (typeof val === 'number') {
+            val = +parseFloat(val).toFixed(2)
+          }
+          if (item === 'percent') {
+            val += '%'
+          }
+          str.push(val)
+        })
+        return str.join(' ')
+      }
+    },
     // 地图显示内容格式拼接
     setMapFormatter() {
       for (let series of this.chartSeries) {
         // 指标内容
+        let isShowAreaName = series.pointShowList.some(
+          str => str.search('地区名') > -1
+        )
         let orient = series.label.normal.orient
         series.label.normal.formatter = function(params) {
           if (!params.data) {
-            return params.name
+            return isShowAreaName ? params.name : ''
           }
           let str = []
           series.pointShowList.forEach(item => {
@@ -494,9 +487,9 @@ export default {
             if (typeof val === 'number') {
               val = +parseFloat(val).toFixed(2)
             }
-            str.push(val)
+            str.push(`${item}：${val}`)
           })
-          return str.join(':')
+          return str.join('<br />')
         }
       }
     },

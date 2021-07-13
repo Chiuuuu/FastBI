@@ -17,7 +17,7 @@
       >
         <b-icon :name="item.icon"></b-icon>
         <span>{{ item.text }}</span>
-        <div class="context-menu-item-children" v-show="item.showChildren">
+        <div class="context-menu-item-children" v-if="item.showChildren">
           <div
             class="context-menu-item"
             v-for="(menu, i) in item.children"
@@ -26,9 +26,14 @@
           >
             <JsonExcel
               v-if="i < 2"
+              :key="currentSelected ? currentSelected + 'index' + i : 0"
               :fetch="setChartData_scan"
-              :fields="json_fields"
-              :name="currSelected ? currSelected.name || 'test' : 'test'"
+              :fields="
+                currSelected.setting.chartType === 'v-map'
+                  ? { ' ': 'name0', '  ': 'name1', '    ': 'name2' }
+                  : null
+              "
+              :name="i === 0 ? currSelected.name : currSelected.name + '.csv'"
               :type="i === 0 ? 'xls' : 'csv'"
               >{{ menu.text }}</JsonExcel
             >
@@ -309,11 +314,25 @@ export default {
       if (this.currSelected.setting.chartType === 'v-map') {
         Object.keys(source).map(item => {
           if (source[item]) {
-            columns.push(Object.keys(source[item][0]))
+            let aliasKeys = Object.keys(source[item][0])
+            columns.push(aliasKeys)
             rows.push(source[item])
-            tableName.push(item == 'fillList' ? '填充' : '标记点')
-            debugger
-            exportList = exportList.concat(source[item])
+            let type = item == 'fillList' ? '填充' : '标记点'
+            tableName.push(type)
+            let aliasObj = {}
+            aliasKeys.forEach((alias, index) => {
+              aliasObj['name' + index] = alias
+            })
+            let cunstomRow = source[item].map(row => {
+              let obj = {}
+              aliasKeys.forEach((alias, index) => {
+                obj['name' + index] = row[alias]
+              })
+              return obj
+            })
+            let titleRow = { name0: type, name1: '', name2: '' }
+            cunstomRow = [titleRow, aliasObj].concat(cunstomRow)
+            exportList = cunstomRow.concat(exportList)
           }
         })
       } else {

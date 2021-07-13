@@ -1166,8 +1166,9 @@ const list = [
                     areaColor: 'rgba(1, 33, 92, 0.45)',
                     borderColor: 'rgba(147, 235, 248, 1)',
                     borderWidth: 2,
-                    shadowColor: 'rgba(0,54,255, 1)',
-                    shadowBlur: 100
+                    // shadowColor: 'rgba(0,54,255, 1)',
+                    // shadowBlur: 100,
+                    opacity: 1
                   },
                   emphasis: {
                     borderColor: '#073684',
@@ -1445,7 +1446,8 @@ const list = [
                   color: '',
                   fontSize: 12,
                   position: 'outside', // 可选inside
-                  formatter: '{b}: {@2012} ({d}%)'
+                  formatter: '{b}: {@2012} ({d}%)',
+                  formatterSelect: ['name', 'value', 'percent']
                 },
                 center: ['50%', '50%'] // 饼图可选
               },
@@ -1495,11 +1497,12 @@ const list = [
               },
               radius: 100,
               // 自定义参数
-              legendData:['广州1', '广州2', '广州3'],
+              legendData: ['广州1', '广州2', '广州3'],
               seriesData: [
                 {
                   label: '广州1',
-                  data: [{
+                  data: [
+                    {
                       name: '',
                       value: [1000, 1000, '广州1', 'x', 'y', '地区']
                     },
@@ -1511,7 +1514,8 @@ const list = [
                 },
                 {
                   label: '广州2',
-                  data: [{
+                  data: [
+                    {
                       name: '',
                       value: [550, 700, '广州2', 'x', 'y', '地区']
                     },
@@ -1523,7 +1527,8 @@ const list = [
                 },
                 {
                   label: '广州3',
-                  data: [{
+                  data: [
+                    {
                       name: '',
                       value: [660, 700, '广州3', 'x', 'y', '地区']
                     },
@@ -1664,8 +1669,7 @@ const list = [
                   position: 'outside', // 可选inside
                   align: 'left',
                   offset: [-10, 0]
-                },
-                
+                }
               },
               color: DEFAULT_COLORS
             },

@@ -138,7 +138,10 @@
             ></high-charts>
             <!-- 矩形热力图 -->
             <chart-heart
-              v-else-if="transform.setting.name==='ve-heatmap'||transform.setting.name==='ve-sun'"
+              v-else-if="
+                transform.setting.name === 've-heatmap' ||
+                  transform.setting.name === 've-sun'
+              "
               :key="transform.id"
               :view="transform.setting.view"
               :config="transform.setting.config"
@@ -343,13 +346,13 @@ export default {
     },
     // transform点击事件右键点击
     handleRightClickOnCanvas(item, event) {
+      this.$store.dispatch('SingleSelected', item.id)
       let info = {
         x: event.pageX + 10,
         y: event.pageY + 10,
         listType: 'chartMenuList'
       }
       this.$store.dispatch('ToggleContextMenu', info)
-      this.$store.dispatch('SingleSelected', item.id)
     },
     // 外层区域关闭右键菜单
     hideContextMenu() {

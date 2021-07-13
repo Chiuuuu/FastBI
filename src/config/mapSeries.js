@@ -54,13 +54,13 @@ export const mapSeries = {
   tooltipShowList: [], // 提示框显示
   itemStyle: {
     normal: {
-      areaColor: 'rgba(1, 33, 92, 0.45)',
-      borderColor: '#215495',
+      areaColor: 'transparent', // 'rgba(1, 33, 92, 0.45)',
+      borderColor: 'transparent', // '#215495',
       borderWidth: 1,
       opacity: 1
     },
     emphasis: {
-      borderColor: '#073684',
+      borderColor: 'transparent', //'#073684',
       areaColor: '#061E3D'
     }
   },
@@ -104,7 +104,7 @@ export const dotSeries = {
   itemStyle: {
     normal: {
       color: '#60b8f6',
-      opacity: 0,
+      opacity: 1,
       showSeries: true
     },
     emphasis: {
