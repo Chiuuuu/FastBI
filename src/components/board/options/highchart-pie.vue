@@ -137,13 +137,13 @@
       </gui-field>
       <gui-field label="主题类型">
         <a-select
-          v-model="chooseTheme"
+          v-model="HighConfig.setting.config.themeName"
           style="width: 164px"
           size="small"
           @change="getThemeColor"
         >
           <a-select-option
-            :value="theme.colors"
+            :value="theme.title"
             v-for="(theme, index) in themes"
             :key="index"
             >{{ theme.title }}</a-select-option
@@ -332,7 +332,7 @@
         >
           <gui-field label="背景颜色">
             <el-color-picker
-              v-model="HighConfig.setting.config.chart.backgroundColor"
+              v-model="HighConfig.setting.background.backgroundColor"
               show-alpha
               @change="setBackGround"
             ></el-color-picker>
@@ -357,21 +357,21 @@
               name
               accept="image/png, image/jpeg, image/gif"
               style="display: none"
-              @change="selectPhoto($event, 'plotBackgroundImage')"
+              @change="selectPhoto($event, 'backgroundImage')"
             />
           </gui-field>
         </a-radio>
       </a-radio-group>
       <gui-field label="边框颜色">
         <el-color-picker
-          v-model="HighConfig.setting.config.chart.borderColor"
+          v-model="HighConfig.setting.background.borderColor"
           show-alpha
           @change="setBackGround"
         ></el-color-picker>
       </gui-field>
       <gui-field label="边框大小">
         <a-input-number
-          v-model="HighConfig.setting.config.chart.borderWidth"
+          v-model="HighConfig.setting.background.borderWidth"
           size="small"
           :formatter="value => `${value}px`"
           :parser="value => value.replace('px', '')"
@@ -380,12 +380,25 @@
       </gui-field>
       <gui-field label="圆角大小">
         <a-input-number
-          v-model="HighConfig.setting.config.chart.borderRadius"
+          v-model="HighConfig.setting.background.borderRadius"
           size="small"
           :formatter="value => `${value}px`"
           :parser="value => value.replace('px', '')"
           @change="setBackGround"
         ></a-input-number>
+      </gui-field>
+      <gui-field label="边框线型">
+        <a-select
+          style="width: 90px"
+          v-model="HighConfig.setting.background.borderStyle"
+          @change="setBackGround"
+          placeholder="无"
+          size="small"
+        >
+          <a-select-option value="solid">实线</a-select-option>
+          <a-select-option value="dotted">点状</a-select-option>
+          <a-select-option value="dashed">虚线</a-select-option>
+        </a-select>
       </gui-field>
     </a-collapse-panel>
   </a-collapse>

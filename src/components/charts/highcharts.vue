@@ -1,7 +1,7 @@
 <template>
   <!-- 3D饼图和柱状图 -->
   <div class="dvs-high">
-    <div class="container" ref="container"></div>
+    <div class="container" ref="container" :style="styleObj"></div>
   </div>
 </template>
 <script>
@@ -22,7 +22,8 @@ export default {
   },
   data() {
     return {
-      chart: null
+      chart: null,
+      styleObj: {}
     }
   },
   mounted() {
@@ -34,14 +35,29 @@ export default {
         this.$refs.container,
         this.setting.config
       )
+    },
+    getBackgroundColor(objcolor){
+      for (const key in objcolor) {
+          let _key = key
+            .replace(/::/g, '/')
+            .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
+            .replace(/([a-z\d])([A-Z])/g, '$1_$2')
+            .replace(/_/g, '-')
+            .toLowerCase();
+          this.$set(this.styleObj,_key,
+            key == 'backgroundImage' ? `url(${objcolor[key]})` : (typeof objcolor[key])==='number'?`${objcolor[key]}px`:objcolor[key]
+          )
+        }
     }
   },
   watch: {
     setting: {
       handler(val) {
-        val.config.chart.width = val.view.width
-        val.config.chart.height = val.view.height
+        val.config.chart.width = val.view.width;
+        val.config.chart.height = val.view.height;
+        console.log('background',val.background);
         // this.$highCharts.chart(this.$refs.container, val.config);
+        this.getBackgroundColor(val.background);
         this.chart.update(val.config)
       },
       deep: true
@@ -58,27 +74,32 @@ export default {
         measures//度量(value)
       */
         //单维度
-        if (!val.source) {
+        if (!val.source||(val.dimensions.length==0||val.measures.length==0)) {
           return
         }
-        let _dimensions = val.dimensions[0].alias
-        //判断是否单度量和多度量
-        let _measure = val.measures.map(item => item.alias),
-          series = []
+        if(val.source.rows.length==0){
+          this.setting.config.series = [];
+        }else{
+          let _dimensions = val.dimensions[0].alias
+          //判断是否单度量和多度量
+          let _measure = val.measures.map(item => item.alias),
+            series = []
 
-        _measure.forEach(key => {
-          series.push({
-            name: key,
-            data: val.source.rows.map(x => ({
-              name: x[_dimensions],
-              y: x[key]
-            }))
+          _measure.forEach(key => {
+            series.push({
+              name: key,
+              data: val.source.rows.map(x => ({
+                name: x[_dimensions],
+                y: x[key]
+              }))
+            })
           })
-        })
-        if (series.length == 0) {
-          return
+          if (series.length == 0) {
+            return
+          }
+          this.setting.config.series = [...series]
         }
-        this.setting.config.series = [...series]
+        
         this.chart = this.$highCharts.chart(
           this.$refs.container,
           this.setting.config

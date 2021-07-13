@@ -69,33 +69,34 @@ export default {
       ],
       themes: [{
           title: '默认',
-          colors: "#058DC7,#50B432,#ED561B,#DDDF00,#24CBE5,#64E572,#FF9655,#FFF263,#6AF9C4"
+          colors: ["#058DC7", "#50B432", "#ED561B", "#DDDF00", "#24CBE5", "#64E572", "#FF9655", "#FFF263", "#6AF9C4"]
         }, {
           title: 'westerns',
-          colors: "#516b91,#59c4e6,#edafda,#93b7e3,#a5e7f0,#cbb0e3, #c05050,#7eb00a,#588dd5"
+          colors: ["#516b91", "#59c4e6", "#edafda", "#93b7e3", "#a5e7f0", "#cbb0e3", " #c05050", "#7eb00a", "#588dd5"]
         },
         {
           title: 'wonderland',
-          colors: "#4ea397,#22c3aa,#7bd9a5,#d0648a,#f58db2,#f2b3c9,#5ab1ef,#9a7fd1,#c14089"
+          colors: ["#4ea397", "#22c3aa", "#7bd9a5", "#d0648a", "#f58db2", "#f2b3c9", "#5ab1ef", "#9a7fd1", "#c14089"]
         },
         {
           title: 'walden',
-          colors: "#3fb1e3,#6be6c1,#626c91,#a0a7e6,#c4ebad,#96dee8,#dc69aa,#07a2a4,#a5e7f0"
+          colors: ["#3fb1e3", "#6be6c1", "#626c91", "#a0a7e6", "#c4ebad", "#96dee8", "#dc69aa", "#07a2a4", "#a5e7f0"]
         },
         {
           title: 'chalk',
-          colors: "#fc97af,#87f7cf,#f7f494,#72ccff,#f7c5a0,#d4a4eb,#d2f5a6,#76f2f2,#c9ab00"
+          colors: ["#fc97af", "#87f7cf", "#f7f494", "#72ccff", "#f7c5a0", "#d4a4eb", "#d2f5a6", "#76f2f2", "#c9ab00"]
         },
         {
           title: 'macarons',
-          colors: "#2ec7c9,#b6a2de,#ffb980,#d87a80,#8d98b3,#e5cf0d,#97b552,#95706d,#f5994e"
+          colors: ["#2ec7c9", "#b6a2de", "#ffb980", "#d87a80", "#8d98b3", "#e5cf0d", "#97b552", "#95706d", "#f5994e"]
         },
         {
           title: 'purple-passion',
-          colors: "#9b8bba,#e098c7,#8fd3e8,#71669e,#cc70af,#7cb4cc,#59678c,#6f5553,#c14089"
+          colors: ["#9b8bba", "#e098c7", "#8fd3e8", "#71669e", "#cc70af", "#7cb4cc", "#59678c", "#6f5553", "#c14089"]
         }
       ],
-      chooseTheme:"#058DC7,#50B432,#ED561B,#DDDF00,#24CBE5,#64E572,#FF9655,#FFF263,#6AF9C4"
+      // chooseTheme:"#058DC7,#50B432,#ED561B,#DDDF00,#24CBE5,#64E572,#FF9655,#FFF263,#6AF9C4"
+      // chooseTheme:'默认'
     }
   },
   computed: {
@@ -135,10 +136,11 @@ export default {
       document.getElementById('bgPhoto').click()
     },
     setBackGround(val) {
-      if (val) {
+      // if (val) {
+        this.$store.dispatch('SetBackGround', this.HighConfig.setting.background)
         setBaseProperty(this.currentSelected)
         this.updateChartData()
-      }
+      // }
       // this.$store.dispatch('SetBackGround', this.backgroundApi)
       // 发送请求来保存数据
     },
@@ -158,10 +160,10 @@ export default {
         .actionUploadImage(form)
         .then((res) => {
           if (res.code === 200) {
-            let imageUrl = process.env.VUE_APP_SERVICE_URL + res.imgUrl
-            if (key === 'plotBackgroundImage') {
-              this.HighConfig.setting.config.chart[key] = imageUrl
-              this.setPageSetting()
+            let imageUrl = process.env.VUE_APP_SERVICE_URL + res.imgUrl;
+            if (key === 'backgroundImage') {
+              this.HighConfig.setting.background['backgroundImage'] = imageUrl
+              this.setBackGround()
             }
             // if (key === 'selfConfig') {
             //   data['imageUrl'] = imageUrl
@@ -179,9 +181,11 @@ export default {
           console.log(err)
         })
     },
-    getThemeColor(value){
-        this.$set(this.HighConfig.setting.config, 'colors', value.split(','));
-        this.setSelfProperty();
+    getThemeColor(title) {
+      let theme = this.themes.find(item => item.title === title);
+      this.$set(this.HighConfig.setting.config, 'themeName', theme.title);
+      this.$set(this.HighConfig.setting.config, 'colors', theme.colors);
+      this.setSelfProperty();
     }
   }
 }

@@ -428,7 +428,7 @@
                     @change="setSelfProperty"
                   ></a-input-number>
                 </gui-field>
-                <gui-field label="展示数值" v-if="!isScatter">
+                <gui-field label="展示数值" v-if="!isScatter||isHeatmap">
                   <a-switch
                     v-model="selfConfig.series.label.show"
                     size="small"
@@ -466,7 +466,7 @@
                     </a-radio-group>
                   </gui-inline>
                 </gui-field>
-                <gui-field label="文本" v-if="!isScatter">
+                <gui-field label="文本" v-if="!isScatter||isHeatmap">
                   <gui-inline label="字号">
                     <a-input-number
                       class="longwidth"
@@ -574,7 +574,7 @@
               <a-collapse-panel
                 key="indicatorscatter"
                 header="指标设置"
-                v-if="isScatter"
+                v-if="isScatter||isHeatmap"
               >
                 <a-switch
                   slot="extra"
@@ -3884,7 +3884,10 @@ export default {
     },
     isScatter() {
       // return (this.chartType === 'v-scatter') | (this.chartType === 'v-heatmap')
-      return this.chartType === 'v-scatter' || this.chartType === 'v-heatmap'
+      return this.chartType === 'v-scatter'
+    },
+    isHeatmap(){
+      return this.chartType === 'v-heatmap'
     },
     // 是否为矩形树图
     isTreemap() {

@@ -2352,32 +2352,7 @@ const list = [
             isEmpty: false,
             api_data: {
               columns: ['日期', '访问用户'],
-              rows: [
-                {
-                  日期: '1/1',
-                  访问用户: 1393
-                },
-                {
-                  日期: '1/2',
-                  访问用户: 3530
-                },
-                {
-                  日期: '1/3',
-                  访问用户: 2923
-                },
-                {
-                  日期: '1/4',
-                  访问用户: 1723
-                },
-                {
-                  日期: '1/5',
-                  访问用户: 3792
-                },
-                {
-                  日期: '1/6',
-                  访问用户: 4593
-                }
-              ],
+              rows: [],
               options: {}
             },
             apis: {},
@@ -2405,13 +2380,12 @@ const list = [
               credits: {
                 enabled: false
               },
-              colors: '#058DC7,#50B432,#ED561B,#DDDF00,#24CBE5,#64E572,#FF9655,#FFF263,#6AF9C4'.split(
-                ','
-              ),
+              themeName:"默认",
+              colors: ["#058DC7", "#50B432", "#ED561B", "#DDDF00", "#24CBE5", "#64E572", "#FF9655", "#FFF263", "#6AF9C4"],
               chart: {
                 backgroundColor: 'rgba(0,0,0,0)', //背景透明
                 plotBackgroundImage: '', //背景图片
-                borderColor: '#335cad', //边框颜色
+                borderColor: '#fff', //边框颜色
                 borderWidth: 0, //边框宽度
                 borderRadius: 0, //边框圆角
                 type: 'pie',
@@ -2426,13 +2400,13 @@ const list = [
               title: {
                 text: '立体饼图',
                 content: '立体饼图',
-                align: 'center', //对齐方式left center right
+                align: 'left', //对齐方式left center right
                 style: {
                   //标题属性设置（字体、颜色、大小，粗细）
-                  fontFamily: '微软雅黑',
-                  fontWeight: 'bold',
+                  fontFamily: '默认',
+                  fontWeight: '正常',
                   color: '#fff',
-                  fontSize: '20'
+                  fontSize: 12
                 }
               },
               //图例属性设置
@@ -2459,6 +2433,11 @@ const list = [
                   innerSize: 0, //饼图的内圈直径大小
                   showInLegend: true, //是否显示图利
                   borderWidth:0,
+                  states: {
+                    inactive: {
+                      opacity: 1
+                    }
+                  },
                   //数据引导线
                   dataLabels: {
                     enabled: true, //是否显示饼图的线形tip
@@ -2484,7 +2463,7 @@ const list = [
                       y: 61.41
                     },
                     {
-                      name: 'Internet Explorer',
+                      name: 'IE',
                       y: 11.84
                     },
                     {
@@ -2545,9 +2524,8 @@ const list = [
               credits: {
                 enabled: false
               },
-              colors: '#058DC7,#50B432,#ED561B,#DDDF00,#24CBE5,#64E572,#FF9655,#FFF263,#6AF9C4'.split(
-                ','
-              ),
+              themeName:'默认',
+              colors: ["#058DC7", "#50B432", "#ED561B", "#DDDF00", "#24CBE5", "#64E572", "#FF9655", "#FFF263", "#6AF9C4"],
               chart: {
                 backgroundColor: 'rgba(0,0,0,0)', //背景透明
                 plotBackgroundImage: '', //背景图片
@@ -2572,15 +2550,15 @@ const list = [
               },
               //标题属性设置
               title: {
-                text: '立体柱状图',
-                content: '立体柱状图',
-                align: 'center', //对齐方式left center right
+                text: '立体柱形图',
+                content: '立体柱形图',
+                align: 'left', //对齐方式left center right
                 style: {
                   //标题属性设置（字体、颜色、大小，粗细）
-                  fontFamily: '微软雅黑',
-                  fontWeight: 'bold',
+                  fontFamily: '默认',
+                  fontWeight: '正常',
                   color: '#fff',
-                  fontSize: '20'
+                  fontSize: 12
                 }
               },
               //图例属性设置

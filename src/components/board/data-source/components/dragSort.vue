@@ -350,6 +350,9 @@ export default {
             rows
           }
           this.$store.dispatch('SetSelfDataSource', apiData)
+        }else if(this.currSelected.setting.chartType==='v-sun'){
+          apiData.source.rows = res.rows;
+          this.$store.dispatch('SetSelfDataSource', apiData)
         } else {
           let columns = []
           let rows = []

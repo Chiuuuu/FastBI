@@ -665,7 +665,7 @@ export default {
       })
       let res = await this.$server.screenManage.getData(selected)
       loadingInstance.close()
-      selected.setting.isEmpty = false
+      selected.setting.isEmpty = false;
       // 数据源被删掉
       if (res.code === 500 && res.msg === 'IsChanged') {
         selected.setting.isEmpty = true
@@ -754,7 +754,11 @@ export default {
             rows
           }
           this.$store.dispatch('SetSelfDataSource', apiData)
-        } else {
+        }else if(this.currSelected.setting.chartType ==='v-sun'){
+          apiData.source.rows = res.rows;
+          this.$store.dispatch('SetSelfDataSource', apiData)
+          this.updateChartData()
+        }else {
           // 仪表盘/环形图 只显示度量
           if (this.chartType === '2') {
             let columns = ['type', 'value'] // 维度固定

@@ -264,8 +264,8 @@ export default {
     // 先清空数据
     this.$store.dispatch('InitCanvasMaps', [])
     if (this.$route.query.id) {
-      this.$store.dispatch('SetScreenId', this.$route.query.id)
-      this.$store.commit('common/SET_MENUSELECTID', this.$route.query.id)
+      this.$store.dispatch('SetScreenId', this.$route.query.id);
+      this.$store.commit('common/SET_MENUSELECTID', this.$route.query.id);
       this.getScreenTabs().then(res => {
         this.getScreenData()
       })

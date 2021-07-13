@@ -57,7 +57,7 @@ import { sum, summary } from '@/utils/summaryList'
 import geoJson from '@/utils/guangdong.json'
 import { Loading } from 'element-ui'
 import _ from 'lodash'
-
+import navigateList from '@/config/navigate';
 export default {
   props: {
     type: {
@@ -221,8 +221,7 @@ export default {
     handleDropOnFilesWD(event) {
       // h5 api
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'));
-      let _alias = this.polymerizeType.find(x=>x.value===dataFile.defaultAggregator);
-      dataFile.alias += `(${_alias.name})`;
+      
       if (
         this.currSelected.datamodelId &&
         this.currSelected.datamodelId !== '0' &&
@@ -268,6 +267,8 @@ export default {
         this.dragFile === this.type &&
         this.chartType === '1'
       ) {
+        let _alias = this.polymerizeType.find(x=>x.value===dataFile.defaultAggregator);
+        dataFile.alias += `(${_alias.name})`;
         // 饼图类型只能拉入一个度量（包含3d和矩形热力图）
         if (
           (this.currSelected.setting.name === 've-pie') |
@@ -455,6 +456,12 @@ export default {
             }
             this.$store.dispatch('SetApis', apis)
           }
+          //立体图和矩形热力图 旭日图重置
+          if (current.setting.chartType === 'high-pie'|current.setting.chartType==='high-column'){
+            let _item = navigateList[0].tabs[0].children.find(x=>x.chartType==current.setting.chartType);
+            current.setting.config.series = [... _item.config.series];
+            this.$store.dispatch('SetSelfProperty', current.setting.config);
+          } 
         }
         // 如果是仪表盘，第二个度量是目标值（进度条最大值）,重置进度条范围
         if (current.setting.chartType === 'v-gauge') {
