@@ -896,7 +896,7 @@ export default {
       }
     },
     // 获取分享信息
-    getShareData(sharedata) {
+    getShareData(sharedata = {}) {
       this.releaseObj = sharedata
     },
     // 查看分享

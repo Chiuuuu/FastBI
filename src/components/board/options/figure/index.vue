@@ -116,6 +116,8 @@
       <GuiField label="圆角大小">
         <a-input-number
           :value="config.style.borderRadius"
+          :min="0"
+          :max="70"
           @change="setStyle($event, 'borderRadius')"
         />
       </GuiField>
