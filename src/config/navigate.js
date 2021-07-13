@@ -3032,7 +3032,7 @@ const list = [
             name: 'figure',
             title: '直线',
             chartType: 'line',
-            icon: 'icon_addteb.png',
+            icon: '线.png',
             modelId: '',
             config: {
               title: '直线',
@@ -3064,7 +3064,7 @@ const list = [
             name: 'figure',
             title: '圆形',
             chartType: 'circle',
-            icon: 'icon_addteb.png',
+            icon: '圆.png',
             modelId: '',
             config: {
               title: '圆形',
@@ -3094,7 +3094,7 @@ const list = [
             name: 'figure',
             title: '矩形',
             chartType: 'rectangle',
-            icon: 'icon_addteb.png',
+            icon: '矩形.png',
             modelId: '',
             config: {
               title: '矩形',
