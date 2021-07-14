@@ -15,6 +15,15 @@ function isInteger(item) {
 function isFloat(item) {
   return item.dataType === 'DOUBLE'
 }
+
+/**
+ * @description 是否小数
+ * @param {Object} item
+ * @returns
+ */
+function isDecimal(item) {
+  return item.dataType === 'DECIMAL'
+}
 export class Methods {
   constructor(dmType) {
     this.dmType = dmType || 'measures'
@@ -42,6 +51,11 @@ export class Methods {
       } else if (isFloat(value)) {
         return {
           type: 'float',
+          value: true
+        }
+      } else if (isDecimal(value)) {
+        return {
+          type: 'decimal',
           value: true
         }
       } else {

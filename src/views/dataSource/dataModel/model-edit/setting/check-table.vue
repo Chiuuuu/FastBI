@@ -120,6 +120,8 @@ export default {
           return '日期'
         case 'BIGINT':
           return '整数'
+        case 'DECIMAL':
+          return '数值'
         case 'DOUBLE':
           return '小数'
         default:

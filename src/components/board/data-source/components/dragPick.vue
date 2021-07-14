@@ -347,6 +347,7 @@ export default {
         if (
           resourceType === 3 &&
           dataType !== 'BIGINT' &&
+          dataType !== 'DECIMAL' &&
           dataType !== 'DOUBLE'
         ) {
           this.$message.error('当前字段为文本类型，无法进行数值区间筛选')

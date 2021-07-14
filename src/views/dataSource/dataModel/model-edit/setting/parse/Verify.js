@@ -13,6 +13,7 @@ export class Verify {
       case 'string':
       case 'float':
       case 'integer':
+      case 'decimal':
       case 'boolean':
       case 'fname':
       case 'aggregator':
@@ -119,6 +120,15 @@ export class Verify {
       return item.dataType === 'BIGINT'
     }
 
+    /**
+     * @description 是否数值
+     * @param {Object} item
+     * @returns
+     */
+    function isDecimal(item) {
+      return item.dataType === 'DECIMAL'
+    }
+
         /**
      * @description 是否字符串
      * @param {Object} item
@@ -139,6 +149,8 @@ export class Verify {
           return 'string'
         case 'BIGINT':
           return 'integer'
+        case 'DECIMAL':
+          return 'decimal'
         case 'DOUBLE':
           return 'float'
         default:
@@ -162,6 +174,9 @@ export class Verify {
         case 'DOUBLE':
         case 'float':
           return '小数'
+        case 'DECIMAL':
+        case 'decimal':
+          return '数值'
         case 'TIMESTAMP':
         case 'DATE':
           return '时间'
@@ -193,7 +208,7 @@ export class Verify {
      * @returns
      */
     function isWhiteList(item, operator = '+') {
-      const list = ['VARCHAR', 'DOUBLE', 'BIGINT']
+      const list = ['VARCHAR', 'DOUBLE', 'BIGINT', 'DECIMAL']
       if (operator === '+') {
         return list.includes(item.dataType)
       } else {
@@ -208,7 +223,7 @@ export class Verify {
      * @returns
      */
     function isOriginalWhiteList(type, operator = '+') {
-      const list = ['string', 'integer', 'float', 'neg']
+      const list = ['string', 'integer', 'float', 'decimal', 'neg']
       if (operator === '+') {
         return list.includes(type)
       } else {
@@ -274,6 +289,11 @@ export class Verify {
                 type: 'integer',
                 value: true
               }
+            } else if (isDecimal(left.value) && rightType === 'decimal') {
+              return {
+                type: 'decimal',
+                value: true
+              }
             } else {
               return {
                 type: 'float',
@@ -294,6 +314,11 @@ export class Verify {
             } else if (leftType === 'integer' && isInteger(right.value)) {
               return {
                 type: 'integer',
+                value: true
+              }
+            } else if (leftType === 'decimal' && isDecimal(right.value)) {
+              return {
+                type: 'decimal',
                 value: true
               }
             } else {
@@ -384,6 +409,11 @@ export class Verify {
                 type: 'integer',
                 value: true
               }
+            } else if (isDecimal(left.value) && rightType === 'decimal') {
+              return {
+                type: 'decimal',
+                value: true
+              }
             } else {
               return {
                 type: 'float',
@@ -402,6 +432,11 @@ export class Verify {
             if (leftType === 'integer' && isInteger(right.value)) {
               return {
                 type: 'integer',
+                value: true
+              }
+            } else if (leftType === 'decimal' && isDecimal(right.value)) {
+              return {
+                type: 'decimal',
                 value: true
               }
             } else {
@@ -451,7 +486,7 @@ export class Verify {
         }
 
         // eslint-disable-next-line eqeqeq
-        if (['integer', 'float', 'neg'].includes(rightType) && num(right.value) == 0) {
+        if (['integer', 'float', 'decimal', 'neg'].includes(rightType) && num(right.value) == 0) {
           throw new Error(`除数不能为0`)
         }
 
@@ -492,6 +527,11 @@ export class Verify {
                 type: 'integer',
                 value: true
               }
+            } else if (isDecimal(left.value) && rightType === 'decimal') {
+              return {
+                type: 'decimal',
+                value: true
+              }
             } else {
               return {
                 type: 'float',
@@ -510,6 +550,11 @@ export class Verify {
             if (leftType === 'integer' && isInteger(right.value)) {
               return {
                 type: 'integer',
+                value: true
+              }
+            } else if (leftType === 'decimal' && isDecimal(right.value)) {
+              return {
+                type: 'decimal',
                 value: true
               }
             } else {

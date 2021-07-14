@@ -165,6 +165,7 @@ export default {
       if (
         dataFile.resourceType === 3 &&
         dataFile.dataType !== 'BIGINT' &&
+        dataFile.dataType !== 'DECIMAL' &&
         dataFile.dataType !== 'DOUBLE'
       ) {
         type = 'string'

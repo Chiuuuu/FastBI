@@ -397,6 +397,11 @@ export default {
               onClick: this.switchFieldType
             },
             {
+              name: '转换为数值',
+              dataType: 'DECIMAL',
+              onClick: this.switchFieldType
+            },
+            {
               name: '转换为字符串',
               dataType: 'VARCHAR',
               onClick: this.switchFieldType
