@@ -16,7 +16,11 @@
         :key="index"
         @contextmenu.prevent="showMore(item)"
       >
-        <a-dropdown :trigger="['click', 'contextmenu']" v-model="item.showMore" @visibleChange="v => v && showMore(item)">
+        <a-dropdown
+          :trigger="['click', 'contextmenu']"
+          v-model="item.showMore"
+          @visibleChange="v => v && showMore(item)"
+        >
           <a-icon class="icon-more" type="caret-down" />
           <a-menu slot="overlay">
             <a-sub-menu
@@ -57,7 +61,7 @@ import { sum, summary } from '@/utils/summaryList'
 import geoJson from '@/utils/guangdong.json'
 import { Loading } from 'element-ui'
 import _ from 'lodash'
-import navigateList from '@/config/navigate';
+import navigateList from '@/config/navigate'
 export default {
   props: {
     type: {
@@ -75,20 +79,20 @@ export default {
         filter: '拖入字段',
         tableList: '拖入字段'
       },
-      strornum:"",
+      strornum: '',
       polymerizationData: {
         //数字
-        num:[
+        num: [
           { name: '求和', value: 'SUM' },
           { name: '平均', value: 'AVG' },
           { name: '最大值', value: 'MAX' },
           { name: '最小值', value: 'MIN' },
           { name: '计数', value: 'CNT' },
-          { name:'去重计数',value: 'CNT­_D' }
+          { name: '去重计数', value: 'CNT­_D' }
         ],
-        str:[
-           { name: '计数', value: 'CNT' },
-           { name:'去重计数',value: 'CNT­_D' }
+        str: [
+          { name: '计数', value: 'CNT' },
+          { name: '去重计数', value: 'CNT­_D' }
         ]
       },
       isdrag: false, // 是否拖拽中
@@ -100,7 +104,7 @@ export default {
         { name: '最大值', value: 'MAX' },
         { name: '最小值', value: 'MIN' },
         { name: '计数', value: 'CNT' },
-        { name: '计数', value:'COUNT' }
+        { name: '计数', value: 'COUNT' }
       ] // 聚合方式
     }
   },
@@ -216,12 +220,12 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['saveScreenData', 'updateChartData']),
+    ...mapActions(['updateChartData']),
     // 将拖动的维度到所选择的放置目标节点中
     handleDropOnFilesWD(event) {
       // h5 api
-      let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'));
-      
+      let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
+
       if (
         this.currSelected.datamodelId &&
         this.currSelected.datamodelId !== '0' &&
@@ -244,7 +248,10 @@ export default {
           } else if (this.fileList.length == 2) {
             this.fileList.splice(1, 1, dataFile)
           }
-        } else if (this.currSelected.setting.chartType === 'v-treemap' || this.currSelected.setting.chartType === 'v-sun') {
+        } else if (
+          this.currSelected.setting.chartType === 'v-treemap' ||
+          this.currSelected.setting.chartType === 'v-sun'
+        ) {
           if (this.currSelected.setting.chartType !== 'v-sun') {
             this.handleTreemapShowList(dataFile, 4)
           }
@@ -267,8 +274,10 @@ export default {
         this.dragFile === this.type &&
         this.chartType === '1'
       ) {
-        let _alias = this.polymerizeType.find(x=>x.value===dataFile.defaultAggregator);
-        dataFile.alias += `(${_alias.name})`;
+        let _alias = this.polymerizeType.find(
+          x => x.value === dataFile.defaultAggregator
+        )
+        dataFile.alias += `(${_alias.name})`
         // 饼图类型只能拉入一个度量（包含3d和矩形热力图）
         if (
           (this.currSelected.setting.name === 've-pie') |
@@ -285,13 +294,15 @@ export default {
         } else if (this.currSelected.setting.name === 've-map') {
           // 地图类型暂时只能拉入一个度量
           this.fileList[0] = dataFile
-        } else if (this.currSelected.setting.chartType === 'v-treemap'||this.currSelected.setting.chartType==='v-sun') {
+        } else if (
+          this.currSelected.setting.chartType === 'v-treemap' ||
+          this.currSelected.setting.chartType === 'v-sun'
+        ) {
           if (this.currSelected.setting.chartType !== 'v-sun') {
             this.handleTreemapShowList(dataFile, 0)
           }
           // 矩形树图暂时只能拉入一个度量
           this.fileList[0] = dataFile
-          
         } else {
           this.fileList.push(dataFile)
         }
@@ -340,14 +351,14 @@ export default {
     },
     // 点击右键显示更多
     async showMore(item) {
-      console.log('*******************');
+      console.log('*******************')
       //调用接口判断是否为数字
-      let res = await this.$server.dataModel.getMeasures(item.pivotschemaId);
+      let res = await this.$server.dataModel.getMeasures(item.pivotschemaId)
       //返回 data true表示 是数值类型
       //返回 data false表示 是字符类型
-      if(res.code==200){
-        this.strornum = res.data?'num':'str';
-      }else {
+      if (res.code == 200) {
+        this.strornum = res.data ? 'num' : 'str'
+      } else {
         this.$message.error(res.msg || res || '删除失败')
       }
       item.showMore = true
@@ -412,21 +423,25 @@ export default {
     },
     handleTreemapShowList(dataFile, maxIndex) {
       const config = deepClone(this.currSelected.setting.config)
-      if (this.fileList.length < (maxIndex + 1)) {
+      if (this.fileList.length < maxIndex + 1) {
         if (config.series.tooltipShowList.indexOf(dataFile.alias) < 0) {
           config.series.tooltipShowList.push(dataFile.alias)
         }
         if (config.series.labelShowList.indexOf(dataFile.alias) < 0) {
           config.series.labelShowList.push(dataFile.alias)
         }
-      } else if (this.fileList.length === (maxIndex + 1)) {
-        let tooltipIndex = config.series.tooltipShowList.indexOf(this.fileList[maxIndex].alias)
+      } else if (this.fileList.length === maxIndex + 1) {
+        let tooltipIndex = config.series.tooltipShowList.indexOf(
+          this.fileList[maxIndex].alias
+        )
         if (tooltipIndex < 0) {
           config.series.tooltipShowList.push(dataFile.alias)
         } else {
           config.series.tooltipShowList.splice(tooltipIndex, 1, dataFile.alias)
         }
-        let labelIndex = config.series.labelShowList.indexOf(this.fileList[maxIndex].alias)
+        let labelIndex = config.series.labelShowList.indexOf(
+          this.fileList[maxIndex].alias
+        )
         if (labelIndex < 0) {
           config.series.labelShowList.push(dataFile.alias)
         } else {
@@ -457,11 +472,16 @@ export default {
             this.$store.dispatch('SetApis', apis)
           }
           //立体图和矩形热力图 旭日图重置
-          if (current.setting.chartType === 'high-pie'|current.setting.chartType==='high-column'){
-            let _item = navigateList[0].tabs[0].children.find(x=>x.chartType==current.setting.chartType);
-            current.setting.config.series = [... _item.config.series];
-            this.$store.dispatch('SetSelfProperty', current.setting.config);
-          } 
+          if (
+            (current.setting.chartType === 'high-pie') |
+            (current.setting.chartType === 'high-column')
+          ) {
+            let _item = navigateList[0].tabs[0].children.find(
+              x => x.chartType == current.setting.chartType
+            )
+            current.setting.config.series = [..._item.config.series]
+            this.$store.dispatch('SetSelfProperty', current.setting.config)
+          }
         }
         // 如果是仪表盘，第二个度量是目标值（进度条最大值）,重置进度条范围
         if (current.setting.chartType === 'v-gauge') {

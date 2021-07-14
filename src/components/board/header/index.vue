@@ -37,10 +37,6 @@
         <a-icon type="block" style="font-size:18px" />
         <span>预览</span>
       </div>
-      <!-- <div class="item" flex="dir:top" @click.stop="saveScreenData({mes: '保存成功', callback:goBack})">
-          <a-icon type="save" style="font-size:18px" />
-          <span> 保存并关闭</span>
-      </div>-->
       <div class="item" flex="dir:top" @click="goBack">
         <a-icon type="close" style="font-size:18px" />
         <span>保存并关闭</span>
@@ -84,7 +80,12 @@ export default {
   },
   mounted() {},
   methods: {
-    ...mapActions(['saveScreenData', 'updateChartData', 'refreshScreen']),
+    ...mapActions([
+      'saveScreenData',
+      'renameScreenData',
+      'updateChartData',
+      'refreshScreen'
+    ]),
     goBack() {
       // 选了背景图片又没有上传图片的，默认选回背景颜色
       if (
@@ -115,6 +116,9 @@ export default {
         return
       }
       this.isFocus = false
+      setTimeout(this.renameScreen, 0)
+    },
+    renameScreen() {
       let params = {
         fileType: 1,
         id: this.screenId,
@@ -123,7 +127,7 @@ export default {
         setting: this.pageSettings
       }
 
-      this.saveScreenData({ ...params }).then(res => {
+      this.renameScreenData({ ...params }).then(res => {
         if (res) {
           this.$message.success('重命名成功')
           this.$store.dispatch('SetFileName', this.screenName)

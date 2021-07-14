@@ -339,7 +339,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['saveScreenData', 'handleRefreshData', 'updateChartData']),
+    ...mapActions(['handleRefreshData', 'updateChartData']),
     // 修改地图类型
     onRadioChange(value, key) {
       if (this[key] === value) {

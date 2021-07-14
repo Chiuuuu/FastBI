@@ -240,7 +240,7 @@ export default {
     })
   },
   methods: {
-    ...mapActions(['saveScreenData', 'updateChartData']),
+    ...mapActions(['updateChartData']),
     removeSelection() {
       if (this.editable) {
         return

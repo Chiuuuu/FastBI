@@ -166,7 +166,7 @@ export default {
     ])
   },
   methods: {
-    ...mapActions(['saveScreenData', 'updateChartData']),
+    ...mapActions(['updateChartData']),
     // 将拖动的维度到所选择的放置目标节点中
     handleDropOnFilesWD(event) {
       // h5 api
@@ -362,9 +362,8 @@ export default {
         return
       }
       if (res.code === 200) {
-        
         // 保存原始数据 -- 查看数据有用
-        apiData.origin_source = deepClone( res.rows || res.data || {} )
+        apiData.origin_source = deepClone(res.rows || res.data || {})
         this.$store.dispatch('SetSelfDataSource', apiData)
 
         apiData.returnDataLabel = res.data.labelList

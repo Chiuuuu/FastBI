@@ -160,7 +160,7 @@ export default {
   },
   mounted() {},
   methods: {
-    ...mapActions(['addChartData', 'saveScreenData']),
+    ...mapActions(['addChartData']),
     // 拖拽图表添加到大屏
     handleDragStart(component, event) {
       component.api_data.dimensions = []

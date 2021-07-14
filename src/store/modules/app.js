@@ -144,22 +144,44 @@ const app = {
         })
     },
     // 保存大屏页面设置
-    async saveScreenData({ rootGetters, state }, obj) {
-      let params = {}
-      // 重命名
-      if (obj) {
-        let { id, name, setting } = obj
-        params.id = id
-        params.newName = name
-        params.setting = setting
-      } else {
-        // 普通保存
-        // 保存图层排序列表，图层操作，新增，删除顺序会变，所以这三个操作要调这个接口
-        state.pageSettings.idList = rootGetters.canvasMapIdList
+    async renameScreenData({ rootGetters, state }, obj) {
+        let params = {}
+        // 重命名
+        if (obj) {
+          let { id, name, setting } = obj
+          params.id = id
+          params.newName = name
+          params.setting = setting
+        } else {
+          // 普通保存
+          // 保存图层排序列表，图层操作，新增，删除顺序会变，所以这三个操作要调这个接口
+          state.pageSettings.idList = rootGetters.canvasMapIdList
 
-        params.id = state.screenId
-        params.setting = state.pageSettings
-      }
+          params.id = state.screenId
+          params.setting = state.pageSettings
+        }
+        return screenManage
+          .renameScreen(params)
+          .then(res => {
+            if (res.code === 200) {
+              // res.msg && message.success(res.msg)
+              return true
+            }
+            res.msg && message.error(res.msg)
+          })
+          .catch(err => {
+            // 需要捕获错误 否则无法传递给commit
+            err && message.error(err)
+          })
+      },
+    // 保存页面配置
+    async saveScreenData({ rootGetters, state }) {
+      let params = {}
+      // 普通保存
+      // 保存图层排序列表，图层操作，新增，删除顺序会变，所以这三个操作要调这个接口
+      state.pageSettings.idList = rootGetters.canvasMapIdList
+      params.id = state.currentPageId
+      params.setting = state.pageSettings
       return screenManage
         .saveScreen(params)
         .then(res => {
@@ -182,7 +204,8 @@ const app = {
       }
       let name = ''
       // 数据格式不一样的特殊处理
-      if (obj.setting.name === 'material' || obj.setting.name === 'figure') { // 素材库and图形
+      if (obj.setting.name === 'material' || obj.setting.name === 'figure') {
+        // 素材库and图形
         name = obj.setting.name
       } else {
         name = obj.setting.config.title.content

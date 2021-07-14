@@ -298,7 +298,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['saveScreenData', 'updateChartData']),
+    ...mapActions(['updateChartData']),
     // 将拖动的维度到所选择的放置目标节点中
     async handleDropOnFilesWD(event) {
       this.isExist = false
@@ -665,7 +665,7 @@ export default {
       })
       let res = await this.$server.screenManage.getData(selected)
       loadingInstance.close()
-      selected.setting.isEmpty = false;
+      selected.setting.isEmpty = false
       // 数据源被删掉
       if (res.code === 500 && res.msg === 'IsChanged') {
         selected.setting.isEmpty = true
@@ -754,11 +754,11 @@ export default {
             rows
           }
           this.$store.dispatch('SetSelfDataSource', apiData)
-        }else if(this.currSelected.setting.chartType ==='v-sun'){
-          apiData.source.rows = res.rows;
+        } else if (this.currSelected.setting.chartType === 'v-sun') {
+          apiData.source.rows = res.rows
           this.$store.dispatch('SetSelfDataSource', apiData)
           this.updateChartData()
-        }else {
+        } else {
           // 仪表盘/环形图 只显示度量
           if (this.chartType === '2') {
             let columns = ['type', 'value'] // 维度固定
@@ -885,9 +885,10 @@ export default {
           }
 
           // 散点图，两个度量分别是x，y轴的值
-          if (this.currSelected.setting.chartType === 'v-scatter' 
-            && apiData.dimensions.length == 1 
-            && apiData.measures.length  == 2
+          if (
+            this.currSelected.setting.chartType === 'v-scatter' &&
+            apiData.dimensions.length == 1 &&
+            apiData.measures.length == 2
           ) {
             let scatterData = {}
             let legendData = []
