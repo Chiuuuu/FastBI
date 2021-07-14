@@ -7,7 +7,7 @@
   >
     <b-scrollbar :style="wrapStyle">
       <div :style="scrollBoxStyle">
-        <div class="canvas-panel" :style="canvasPanelStyle">
+        <div class="canvas-panel" :style="canvasPanelStyle" @click.stop.prevent="toggleContextMenu">
           <template v-for="transform in canvasMap">
             <preview-box
               :id="transform.id"
@@ -244,6 +244,11 @@ export default {
   },
   methods: {
     ...mapActions(['getScreenDetail', 'refreshScreen']),
+    toggleContextMenu() {
+      if (this.$store.getters.contextMenuInfo.isShow) {
+        this.$store.dispatch('ToggleContextMenu')
+      }
+    },
     getDvScreen() {
       return this.$refs.dvScreen
     },

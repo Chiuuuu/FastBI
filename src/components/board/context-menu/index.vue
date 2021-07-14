@@ -2,7 +2,7 @@
   <transition name="fade-in">
     <div
       class="dv-context-menu"
-      v-if="contextMenuInfo.isShow && currSelected"
+      v-if="contextMenuInfo.isShow"
       @mousedown.stop.prevent
       :style="contextMenuStyle"
       @click.stop.prevent
@@ -11,14 +11,14 @@
         class="context-menu-item"
         v-for="item in menuList"
         :key="item.order"
-        v-show="!item.ignore || !item.ignore.includes(currSelected.setting.name)"
+        v-show="showMenu(item)"
         @mouseenter="item.showChildren = true"
         @mouseleave="item.showChildren = false"
         @click="handleCommand(item.order)"
       >
         <b-icon :name="item.icon"></b-icon>
         <span>{{ item.text }}</span>
-        <div class="context-menu-item-children" v-show="item.showChildren">
+        <div class="context-menu-item-children" v-if="item.showChildren">
           <div
             class="context-menu-item"
             v-for="(menu, i) in item.children"
@@ -27,8 +27,14 @@
           >
             <JsonExcel
               v-if="i < 2"
+              :key="currentSelected ? currentSelected + 'index' + i : 0"
               :fetch="setChartData_scan"
-              :name="currSelected ? currSelected.name || 'test' : 'test'"
+              :fields="
+                currSelected.setting.chartType === 'v-map'
+                  ? { ' ': 'name0', '  ': 'name1', '    ': 'name2' }
+                  : null
+              "
+              :name="i === 0 ? currSelected.name : currSelected.name + '.csv'"
               :type="i === 0 ? 'xls' : 'csv'"
               >{{ menu.text }}</JsonExcel
             >
@@ -43,11 +49,7 @@
 <script>
 import Vue from 'vue'
 import JsonExcel from 'vue-json-excel'
-import {
-  exportImg,
-  exportForFull,
-  exportScreen
-} from '@/utils/screenExport'
+import { exportImg, exportForFull, exportScreen } from '@/utils/screenExport'
 import { mapGetters, mapActions } from 'vuex'
 import { Loading } from 'element-ui'
 import chartTableData from '../chartTableData/index' // 右键菜单
@@ -101,7 +103,8 @@ export default {
       menuList: chartMenuList, // 菜单列表
       chartData: { rows: [] }, // 图表数据(按最后展示格式)
       chartDataForMap: null, // 同上(地图标记层)
-      menuCompont: null
+      menuCompont: null,
+      json_fields: null // 导出格式
     }
   },
   inject: ['showChartData'],
@@ -168,6 +171,12 @@ export default {
   },
   methods: {
     ...mapActions(['saveScreenData', 'deleteChartData']),
+    showMenu(item) {
+      if (!this.contextMenuInfo.isShow) {
+        return false
+      }
+      return !item.ignore || !(this.currSelected && item.ignore.includes(this.currSelected.setting.name))
+    },
     //  执行菜单命令
     async handleCommand(order, item) {
       if (item) {
@@ -182,14 +191,16 @@ export default {
         this.deleteOne()
       } else if (order === 'showChartData') {
         // 查看图表数据
-        if (this.currSelected.setting.api_data.origin_source 
-          && JSON.stringify(this.currSelected.setting.api_data.origin_source)!='{}'
-          && JSON.stringify(this.currSelected.setting.api_data.origin_source)!='[]'
+        if (
+          this.currSelected.setting.api_data.origin_source &&
+          JSON.stringify(this.currSelected.setting.api_data.origin_source) !=
+            '{}' &&
+          JSON.stringify(this.currSelected.setting.api_data.origin_source) !=
+            '[]'
         ) {
           await this.setChartData_scan()
           this.$store.dispatch('ToggleContextMenu')
           this.showChartData(this.chartData)
-          
         } else {
           this.$message.error('该图表没有拖入图表数据')
         }
@@ -277,16 +288,18 @@ export default {
       return this.chartData.rows
     },
     // 查看数据 -- 构造数据
-    async setChartData_scan(){
-      if (!this.currSelected.setting.api_data.origin_source 
-          || JSON.stringify(this.currSelected.setting.api_data.origin_source)=='{}'
-          || JSON.stringify(this.currSelected.setting.api_data.origin_source)=='[]'
-        ) {
-          this.$message.error('该图表没有拖入图表数据')
-          return;
-        }
+    async setChartData_scan() {
+      if (
+        !this.currSelected.setting.api_data.origin_source ||
+        JSON.stringify(this.currSelected.setting.api_data.origin_source) ==
+          '{}' ||
+        JSON.stringify(this.currSelected.setting.api_data.origin_source) == '[]'
+      ) {
+        this.$message.error('该图表没有拖入图表数据')
+        return
+      }
       let params = {
-        id:this.currSelected.id,
+        id: this.currSelected.id,
         type: this.currSelected.setting && this.currSelected.setting.chartType
       }
       let loadingInstance = Loading.service({
@@ -299,32 +312,50 @@ export default {
       loadingInstance.close()
       if (res.code !== 200) {
         this.$message.error(res.msg || '请重新操作')
-        return;
+        return
       }
 
-      let columns = [],rows = [],tableName = [],exportList = [];
+      let columns = [],
+        rows = [],
+        tableName = [],
+        exportList = []
       let source = res.data || []
-      if(this.currSelected.setting.chartType === 'v-map'){
-        Object.keys(source).map((item)=>{
-          if(source[item]){
-            columns.push( Object.keys(source[item][0]))
+      if (this.currSelected.setting.chartType === 'v-map') {
+        Object.keys(source).map(item => {
+          if (source[item]) {
+            let aliasKeys = Object.keys(source[item][0])
+            columns.push(aliasKeys)
             rows.push(source[item])
-            tableName.push(item == 'fillList' ? '填充':'标记点')
-            exportList = exportList.concat(source[item])
+            let type = item == 'fillList' ? '填充' : '标记点'
+            tableName.push(type)
+            let aliasObj = {}
+            aliasKeys.forEach((alias, index) => {
+              aliasObj['name' + index] = alias
+            })
+            let cunstomRow = source[item].map(row => {
+              let obj = {}
+              aliasKeys.forEach((alias, index) => {
+                obj['name' + index] = row[alias]
+              })
+              return obj
+            })
+            let titleRow = { name0: type, name1: '', name2: '' }
+            cunstomRow = [titleRow, aliasObj].concat(cunstomRow)
+            exportList = cunstomRow.concat(exportList)
           }
         })
-      }else{
+      } else {
         rows = [source]
-        columns = [Object.keys(source[0])];
+        columns = [Object.keys(source[0])]
         exportList = source
       }
-      
+
       this.chartData = {
         columns,
         rows,
-        tableName,
+        tableName
       }
-      return exportList;
+      return exportList
     }
   }
 }
