@@ -267,8 +267,8 @@ export default {
     // 先清空数据
     this.$store.dispatch('InitCanvasMaps', [])
     if (this.$route.query.id) {
-      this.$store.dispatch('SetScreenId', this.$route.query.id);
-      this.$store.commit('common/SET_MENUSELECTID', this.$route.query.id);
+      this.$store.dispatch('SetScreenId', this.$route.query.id)
+      this.$store.commit('common/SET_MENUSELECTID', this.$route.query.id)
       this.getScreenTabs().then(res => {
         this.getScreenData()
       })
@@ -290,7 +290,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['saveScreenData', 'deleteChartData', 'getScreenDetail']),
+    ...mapActions(['deleteChartData', 'getScreenDetail']),
     // 获取素材库
     async getMaterial() {
       let res = await this.$server.screenManage.getMaterialGroupList()
@@ -328,10 +328,12 @@ export default {
     },
     // 获取大屏数据
     getScreenData() {
-      this.getScreenDetail({
-        id: this.$route.query.id,
-        tabId: this.$route.query.tabId
-      })
+      if (this.$route.query.tabId) {
+        this.getScreenDetail({
+          id: this.$route.query.id,
+          tabId: this.$route.query.tabId
+        })
+      }
     },
     // 悬停事件
     handleHover(item) {

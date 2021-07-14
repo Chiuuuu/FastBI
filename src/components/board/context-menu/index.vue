@@ -167,7 +167,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['saveScreenData', 'deleteChartData']),
+    ...mapActions(['deleteChartData']),
     //  执行菜单命令
     async handleCommand(order, item) {
       if (item) {

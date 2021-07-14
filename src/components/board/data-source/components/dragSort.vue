@@ -155,7 +155,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['saveScreenData', 'updateChartData']),
+    ...mapActions(['updateChartData']),
     // 将拖动的维度到所选择的放置目标节点中
     async handleDropOnFilesWD(event) {
       this.isExist = false
@@ -350,8 +350,8 @@ export default {
             rows
           }
           this.$store.dispatch('SetSelfDataSource', apiData)
-        }else if(this.currSelected.setting.chartType==='v-sun'){
-          apiData.source.rows = res.rows;
+        } else if (this.currSelected.setting.chartType === 'v-sun') {
+          apiData.source.rows = res.rows
           this.$store.dispatch('SetSelfDataSource', apiData)
         } else {
           let columns = []
@@ -403,9 +403,10 @@ export default {
             })
 
             // 散点图，两个度量分别是x，y轴的值
-            if (this.currSelected.setting.chartType === 'v-scatter'
-              && apiData.dimensions.length == 1 
-              && apiData.measures.length  == 2
+            if (
+              this.currSelected.setting.chartType === 'v-scatter' &&
+              apiData.dimensions.length == 1 &&
+              apiData.measures.length == 2
             ) {
               let scatterData = {}
               let legendData = []

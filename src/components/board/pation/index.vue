@@ -61,7 +61,16 @@ import {
   removeResizeListener
 } from 'bin-ui/src/utils/resize-event'
 import { mapActions, mapGetters } from 'vuex'
-
+let orginPageSettings = {
+  width: 1920,
+  height: 1080,
+  backgroundColor: '#0d2a42',
+  gridStep: 1,
+  backgroundSrc: '',
+  backgroundType: '1',
+  opacity: 1,
+  refresh: { frequency: '', isRefresh: false }
+}
 export default {
   props: {
     canEdit: {
@@ -121,9 +130,12 @@ export default {
           if (/页面\d/.test(item.name)) {
             noList.push(
               parseInt(
-                item.name.replace(/页面(\d)(\(.*?\))?/gi, (match, targetValue) => {
-                  return targetValue
-                })
+                item.name.replace(
+                  /页面(\d)(\(.*?\))?/gi,
+                  (match, targetValue) => {
+                    return targetValue
+                  }
+                )
               )
             )
           }
@@ -135,7 +147,8 @@ export default {
         let params = {
           name: name,
           orderNo: this.pages.length + 1,
-          screenId: this.screenId
+          screenId: this.screenId,
+          setting: orginPageSettings
         }
         this.$server.screenManage.addScreenTab(params).then(res => {
           if (res.code === 200) {
@@ -278,7 +291,13 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['screenId', 'pageList', 'currentPageId', 'isScreen']),
+    ...mapGetters([
+      'screenId',
+      'pageList',
+      'currentPageId',
+      'isScreen',
+      'pageSettings'
+    ]),
     pages: {
       get() {
         return this.pageList

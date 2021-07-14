@@ -289,7 +289,7 @@ export default {
           )
           this.$store.dispatch('SetPageList', pages)
           this.$store.dispatch('SetPageId', pages[0].id)
-          if (!this.screenId) {
+          if (!this.screenId || !pages[0].id) {
             loadingInstance.close()
             return
           }

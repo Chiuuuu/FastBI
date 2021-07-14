@@ -115,12 +115,20 @@ const screenManage = {
     return $axios.get(`/screen/bigscreen/copyScreen/${screenId}`)
   },
   /**
-   * @description 保存大屏
+   * @description 重命名大屏
+   * @param {*} params
+   * @returns
+   */
+  renameScreen(params) {
+    return $axios.post('/screen/bigscreen/saveScreen', params)
+  },
+  /**
+   * @description 保存页签设置
    * @param {*} params
    * @returns
    */
   saveScreen(params) {
-    return $axios.post('/screen/bigscreen/saveScreen', params)
+    return $axios.post('/screen/bigscreen/updateTab', params)
   },
   /**
    * @description 保存图表
@@ -287,9 +295,9 @@ const screenManage = {
   /**
    * 获取图表数据
    */
-   getGraphInfo(params) {
+  getGraphInfo(params) {
     return $axios.post('/screen/graph/graphInfo', params)
-  },
+  }
 }
 
 export default screenManage

@@ -449,7 +449,7 @@ export default {
       set(value) {
         this.$store.dispatch('SetScreenId', value)
         this.$store.commit('common/SET_MENUSELECTID', value)
-      },
+      }
     },
     fileSelectName: {
       get() {
@@ -514,7 +514,12 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['addScreenData', 'saveScreenData', 'SetCanvasRange']),
+    ...mapActions([
+      'addScreenData',
+      'saveScreenData',
+      'renameScreenData',
+      'SetCanvasRange'
+    ]),
     // 获取文件夹列表
     getList() {
       let params = {
@@ -757,7 +762,7 @@ export default {
                     setting: this.setting,
                     ...values
                   }
-                  this.saveScreenData({ ...params }).then(res => {
+                  this.renameScreenData({ ...params }).then(res => {
                     if (res) {
                       this.$message.success('重命名成功')
                       this.fileSelectName = values.name

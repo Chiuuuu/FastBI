@@ -247,7 +247,7 @@ export default {
         }
       }
     },
-    dvWrapperStyles () {
+    dvWrapperStyles() {
       if (this.dragScale) {
         return {
           width: this.transformData.width / this.dragScale.x + 'px',
@@ -257,7 +257,8 @@ export default {
         return {
           width: this.transformData.width + 'px',
           height: this.transformData.height + 'px',
-          transform: `translateZ(0) rotate(${this.transformData.rotate || 0}deg)`
+          transform: `translateZ(0) rotate(${this.transformData.rotate ||
+            0}deg)`
         }
       }
     },
@@ -285,23 +286,30 @@ export default {
     },
     // 画布到页面边界距离X
     canvasOffsetX() {
-      const coverageWidth = document.querySelector('.board-coverage').clientWidth || 120
-      const screenShotWidth = document.querySelector('.screen-shot').clientWidth || 1368
-      const canvasPanelWidth = document.querySelector('.canvas-panel').clientWidth || 1920
+      const coverageWidth =
+        document.querySelector('.board-coverage').clientWidth || 120
+      const screenShotWidth =
+        document.querySelector('.screen-shot').clientWidth || 1368
+      const canvasPanelWidth =
+        document.querySelector('.canvas-panel').clientWidth || 1920
       const width = (screenShotWidth - canvasPanelWidth * this.canvasRange) / 2
       return coverageWidth + width
     },
     // 画布到页面边界距离Y
     canvasOffsetY() {
-      const borderHeaderHeight = document.querySelector('.board-header').clientHeight || 62
-      const screenShotHeight = document.querySelector('.screen-shot').clientHeight || 822
-      const canvasPanelHeight = document.querySelector('.canvas-panel').clientHeight || 1080
-      const height = (screenShotHeight - canvasPanelHeight * this.canvasRange) / 2
+      const borderHeaderHeight =
+        document.querySelector('.board-header').clientHeight || 62
+      const screenShotHeight =
+        document.querySelector('.screen-shot').clientHeight || 822
+      const canvasPanelHeight =
+        document.querySelector('.canvas-panel').clientHeight || 1080
+      const height =
+        (screenShotHeight - canvasPanelHeight * this.canvasRange) / 2
       return borderHeaderHeight + height
     }
   },
   methods: {
-    ...mapActions(['saveScreenData', 'updateChartData']),
+    ...mapActions(['updateChartData']),
     // 悬停事件
     handleHover() {
       this.comHover = true
@@ -597,7 +605,6 @@ export default {
       return angle
     },
     setBaseProperty() {
-      // this.saveScreenData()
       this.updateChartData()
       // setBaseProperty(this.currentSelected)
     }
