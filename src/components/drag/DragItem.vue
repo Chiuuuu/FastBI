@@ -1,13 +1,17 @@
 <template>
   <div
     class="dv-transform"
-    :class="{ selected: isSelected }"
+    :class="{ selected: isSelected && !isScreen }"
     :style="contentStyles"
     ref="dvTransform"
     @mousedown="handleMoveStart"
     @touchstart="handleMoveStart"
   >
-    <div class="navigator-line" v-show="isSelected" :style="lineRotateStyle">
+    <div
+      class="navigator-line"
+      v-show="isSelected && !isScreen"
+      :style="lineRotateStyle"
+    >
       <div class="navigator-line-left" :style="lineLeft"></div>
       <div class="navigator-line-top" :style="lineTop"></div>
       <div class="navigator-line-account" :style="lineAccountStyle">
@@ -17,7 +21,7 @@
     <!-- <div class="dv-scale" :style="isFigure ? '' : dragScaleStyle"> -->
     <div
       class="dv-com"
-      :class="{ hovered: comHover }"
+      :class="{ hovered: comHover && !isScreen }"
       style="transform: rotate(0deg);"
     >
       <DragLine
@@ -30,10 +34,17 @@
       </DragLine>
       <div
         v-else
-        class="transform-handler"
-        :class="{ hide: !comHover && !isSelected }"
+        :class="[
+          'transform-handler',
+          { hide: (!comHover && !isSelected) || isScreen },
+          { 'default-cursor': isScreen }
+        ]"
       >
-        <div class="dv-wrapper" :id="item.id" :style="dvWrapperStyles">
+        <div
+          :class="['dv-wrapper', { 'full-screen': isScreen }]"
+          :id="item.id"
+          :style="dvWrapperStyles"
+        >
           <slot>我是块的标题</slot>
         </div>
         <!--缩放辅助条-->
@@ -189,7 +200,8 @@ export default {
       'pageSettings',
       'contextMenuInfo',
       'currentSelected',
-      'coverageExpand'
+      'coverageExpand',
+      'isScreen'
     ]),
     // 鼠标移动根据栅格间距的值
     mouseMoveStep() {
@@ -248,19 +260,24 @@ export default {
       }
     },
     dvWrapperStyles() {
+      let style = {}
       if (this.dragScale) {
-        return {
+        style = {
           width: this.transformData.width / this.dragScale.x + 'px',
           height: this.transformData.height / this.dragScale.y + 'px'
         }
       } else {
-        return {
+        style = {
           width: this.transformData.width + 'px',
           height: this.transformData.height + 'px',
           transform: `translateZ(0) rotate(${this.transformData.rotate ||
             0}deg)`
         }
       }
+      if (this.isScreen) {
+        style.cursor = 'default'
+      }
+      return style
     },
     controlPointStyleBottom() {
       return `cursor: ${this.handleCursor('bottom')}; transform: scale(${1 /
@@ -360,7 +377,8 @@ export default {
         this.$store.dispatch('SingleSelected', this.item.id)
         this.$store.dispatch('ToggleContextMenu')
       }
-      if (!this.isSelected || this.contextMenuInfo.isShow) return
+      if (!this.isSelected || this.contextMenuInfo.isShow || this.isScreen)
+        return
       // 计算鼠标的相对位置
       // 兼容移动端touch事件
       let e = event.targetTouches ? event.targetTouches[0] : event
@@ -629,5 +647,10 @@ export default {
 .control-rotate-top-right,
 .control-rotate-bottom-right {
   cursor: url('../../assets/images/chart/routate_right.png'), auto;
+}
+</style>
+<style lang="less" scoped>
+.full-screen {
+  pointer-events: auto !important;
 }
 </style>

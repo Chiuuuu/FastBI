@@ -232,7 +232,7 @@ export default {
       if (!countryside) {
         return null
       }
-      return countryside.properties.center
+      return countryside.properties.centroid
     },
     // 删除当前维度或者度量
     deleteFile(item, index) {

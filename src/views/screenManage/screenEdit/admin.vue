@@ -1,6 +1,6 @@
 <template>
   <div class="dv-admin" @click.stop.prevent="hideContextMenu()">
-    <board v-if="!isScreen" :screenData="screenData">
+    <board :screenData="screenData">
       <!--头部嵌套可拖拽物品-->
       <template v-slot:headerBox>
         <drag-list :drag-list="navigate"></drag-list>

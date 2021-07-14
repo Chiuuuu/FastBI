@@ -124,12 +124,13 @@ const list = [
                 itemGap: 12,
                 icon: '',
                 left: 'center',
-                top: 'auto',
+                top: 'top',
                 right: 'auto',
                 bottom: 'auto'
               },
               xAxis: {
                 name: '',
+                show: true,
                 nameLocation: 'middle',
                 nameGap: 5,
                 nameTextStyle: {
@@ -139,6 +140,7 @@ const list = [
                   padding: [30, 0, 0, 0]
                 },
                 axisLabel: {
+                  show: true,
                   color: '#ffffff',
                   fontSize: 12,
                   rotate: 0
@@ -150,7 +152,7 @@ const list = [
                   }
                 },
                 splitLine: {
-                  show: false,
+                  show: true,
                   lineStyle: {
                     width: 2,
                     type: 'solid',
@@ -163,6 +165,7 @@ const list = [
               },
               yAxis: {
                 name: '单位:个',
+                show: true,
                 position: 'left',
                 nameLocation: 'middle',
                 nameTextStyle: {
@@ -171,6 +174,7 @@ const list = [
                   padding: [0, 0, 40, 0]
                 },
                 axisLabel: {
+                  show: true,
                   color: '#ffffff',
                   fontSize: 12
                 },
@@ -321,12 +325,13 @@ const list = [
                 itemGap: 12,
                 icon: '',
                 left: 'center',
-                top: 'auto',
+                top: 'top',
                 right: 'auto',
                 bottom: 'auto'
               },
               xAxis: {
                 name: '',
+                show: true,
                 nameLocation: 'middle',
                 nameGap: 20,
                 nameTextStyle: {
@@ -336,6 +341,7 @@ const list = [
                   padding: [30, 0, 0, 0]
                 },
                 axisLabel: {
+                  show: true,
                   color: '#ffffff',
                   fontSize: 12,
                   rotate: 0
@@ -359,6 +365,7 @@ const list = [
               },
               yAxis: {
                 name: '单位:个',
+                show: true,
                 position: 'left',
                 nameLocation: 'middle',
                 nameTextStyle: {
@@ -367,11 +374,12 @@ const list = [
                   padding: [0, 0, 40, 0]
                 },
                 axisLabel: {
+                  show: true,
                   color: '#ffffff',
                   fontSize: 12
                 },
                 axisLine: {
-                  show: false,
+                  show: true,
                   lineStyle: {
                     color: '#fff'
                   }
@@ -506,12 +514,13 @@ const list = [
                 itemGap: 12,
                 icon: '',
                 left: 'center',
-                top: 'auto',
+                top: 'top',
                 right: 'auto',
                 bottom: 'auto'
               },
               xAxis: {
                 name: '',
+                show: true,
                 position: 'bottom',
                 nameLocation: 'middle',
                 nameTextStyle: {
@@ -521,6 +530,7 @@ const list = [
                   padding: [30, 0, 0, 0]
                 },
                 axisLabel: {
+                  show: true,
                   color: '#ffffff',
                   fontSize: 12,
                   rotate: 0
@@ -532,7 +542,7 @@ const list = [
                   }
                 },
                 splitLine: {
-                  show: false,
+                  show: true,
                   lineStyle: {
                     type: 'solid',
                     color: '#fff'
@@ -544,6 +554,7 @@ const list = [
               },
               yAxis: {
                 name: '单位:个',
+                show: true,
                 position: 'left',
                 // nameLocation: 'middle',
                 nameTextStyle: {
@@ -552,11 +563,12 @@ const list = [
                   padding: [0, 0, 30, 0]
                 },
                 axisLabel: {
+                  show: true,
                   color: '#ffffff',
                   fontSize: 12
                 },
                 axisLine: {
-                  show: false,
+                  show: true,
                   lineStyle: {
                     color: '#fff'
                   }
@@ -672,19 +684,20 @@ const list = [
                 itemGap: 12,
                 icon: '',
                 left: 'center',
-                top: 'auto',
+                top: 'top',
                 right: 'auto',
                 bottom: 'auto'
               },
               xAxis: {
                 show: false,
                 axisLabel: {
+                  show: true,
                   color: '#ffffff',
                   fontSize: 12,
                   rotate: 0
                 },
                 axisLine: {
-                  show: false,
+                  show: true,
                   lineStyle: {
                     color: '#cccccc'
                   }
@@ -699,11 +712,12 @@ const list = [
               yAxis: {
                 show: false,
                 axisLabel: {
+                  show: true,
                   color: '#ffffff',
                   fontSize: 12
                 },
                 axisLine: {
-                  show: false,
+                  show: true,
                   lineStyle: {
                     color: '#cccccc'
                   }
@@ -827,7 +841,7 @@ const list = [
                 itemGap: 12,
                 icon: '',
                 left: 'center',
-                top: 'auto',
+                top: 'top',
                 right: 'auto',
                 bottom: 'auto'
               },
@@ -968,7 +982,7 @@ const list = [
                 itemGap: 12,
                 icon: '',
                 left: 'center',
-                top: 'auto',
+                top: 'top',
                 right: 'auto',
                 bottom: 'auto'
               },
@@ -1096,7 +1110,7 @@ const list = [
                 itemGap: 12,
                 icon: '',
                 left: 'center',
-                top: 'auto',
+                top: 'top',
                 right: 'auto',
                 bottom: 'auto',
                 orient: 'horizontal',
@@ -1105,12 +1119,13 @@ const list = [
               xAxis: {
                 show: false,
                 axisLabel: {
+                  show: true,
                   color: '#ffffff',
                   fontSize: 12,
                   rotate: 0
                 },
                 axisLine: {
-                  show: false,
+                  show: true,
                   lineStyle: {
                     color: '#cccccc'
                   }
@@ -1125,11 +1140,12 @@ const list = [
               yAxis: {
                 show: false,
                 axisLabel: {
+                  show: true,
                   color: '#ffffff',
                   fontSize: 12
                 },
                 axisLine: {
-                  show: false,
+                  show: true,
                   lineStyle: {
                     color: '#cccccc'
                   }
@@ -1268,7 +1284,7 @@ const list = [
                 itemGap: 12,
                 icon: '',
                 left: 'center',
-                top: 'auto',
+                top: 'top',
                 right: 'auto',
                 bottom: 'auto'
               },
@@ -1397,19 +1413,20 @@ const list = [
                 itemGap: 12,
                 icon: '',
                 left: 'center',
-                top: 'auto',
+                top: 'top',
                 right: 'auto',
                 bottom: 'auto'
               },
               xAxis: {
                 show: false,
                 axisLabel: {
+                  show: true,
                   color: '#ffffff',
                   fontSize: 12,
                   rotate: 0
                 },
                 axisLine: {
-                  show: false,
+                  show: true,
                   lineStyle: {
                     color: '#cccccc'
                   }
@@ -1424,11 +1441,12 @@ const list = [
               yAxis: {
                 show: false,
                 axisLabel: {
+                  show: true,
                   color: '#ffffff',
                   fontSize: 12
                 },
                 axisLine: {
-                  show: false,
+                  show: true,
                   lineStyle: {
                     color: '#cccccc'
                   }
@@ -1589,13 +1607,14 @@ const list = [
                 itemGap: 12,
                 icon: '',
                 left: 'center',
-                top: 'auto',
+                top: 'top',
                 right: 'auto',
                 bottom: 'auto',
                 data: []
               },
               xAxis: {
                 type: 'value',
+                show: true,
                 name: '',
                 nameLocation: 'middle',
                 nameGap: 20,
@@ -1606,6 +1625,7 @@ const list = [
                   padding: [30, 0, 0, 0]
                 },
                 axisLabel: {
+                  show: true,
                   color: '#ffffff',
                   fontSize: 12,
                   rotate: 0
@@ -1617,7 +1637,7 @@ const list = [
                   }
                 },
                 splitLine: {
-                  show: false,
+                  show: true,
                   lineStyle: {
                     type: 'solid',
                     color: '#fff'
@@ -1629,6 +1649,7 @@ const list = [
               },
               yAxis: {
                 type: 'value',
+                show: true,
                 name: '',
                 position: 'left',
                 nameLocation: 'middle',
@@ -1638,11 +1659,12 @@ const list = [
                   padding: [0, 0, 40, 0]
                 },
                 axisLabel: {
+                  show: true,
                   color: '#ffffff',
                   fontSize: 12
                 },
                 axisLine: {
-                  show: false,
+                  show: true,
                   lineStyle: {
                     color: '#fff'
                   }
@@ -1855,7 +1877,7 @@ const list = [
                 itemGap: 12,
                 icon: '',
                 left: 'center',
-                top: 'auto',
+                top: 'top',
                 right: 'auto',
                 bottom: 'auto'
               },
@@ -1881,6 +1903,7 @@ const list = [
               xAxis: {
                 type: 'value',
                 name: '',
+                show: true,
                 nameLocation: 'middle',
                 nameGap: 20,
                 nameTextStyle: {
@@ -1890,6 +1913,7 @@ const list = [
                   padding: [30, 0, 0, 0]
                 },
                 axisLabel: {
+                  show: false,
                   color: '#ffffff',
                   fontSize: 12,
                   rotate: 0
@@ -1906,6 +1930,7 @@ const list = [
               },
               yAxis: {
                 type: 'value',
+                show: true,
                 name: '',
                 position: 'left',
                 nameLocation: 'middle',
@@ -1915,6 +1940,7 @@ const list = [
                   padding: [0, 0, 40, 0]
                 },
                 axisLabel: {
+                  show: false,
                   color: '#ffffff',
                   fontSize: 12
                 },
@@ -2083,6 +2109,7 @@ const list = [
               },
               xAxis: {
                 type: 'category',
+                show: true,
                 // data: ['1a', '2a', '3a', '4a', '5a', '6a', '7a', '8a', '9a', '10a', '11a', '12a'],
                 nameLocation: 'middle',
                 nameGap: 20,
@@ -2093,6 +2120,7 @@ const list = [
                   padding: [30, 0, 0, 0]
                 },
                 axisLabel: {
+                  show: true,
                   color: '#ffffff',
                   fontSize: 12,
                   rotate: 0
@@ -2119,6 +2147,7 @@ const list = [
               },
               yAxis: {
                 type: 'category',
+                show: true,
                 // data: ['Saturday', 'Friday', 'Thursday', 'Wednesday', 'Tuesday', 'Monday', 'Sunday'],
                 position: 'left',
                 nameLocation: 'middle',
@@ -2128,11 +2157,12 @@ const list = [
                   padding: [0, 0, 40, 0]
                 },
                 axisLabel: {
+                  show: false,
                   color: '#ffffff',
                   fontSize: 12
                 },
                 axisLine: {
-                  show: false,
+                  show: true,
                   lineStyle: {
                     color: '#fff'
                   }
@@ -2250,8 +2280,18 @@ const list = [
               credits: {
                 enabled: false
               },
-              themeName:"默认",
-              colors: ["#058DC7", "#50B432", "#ED561B", "#DDDF00", "#24CBE5", "#64E572", "#FF9655", "#FFF263", "#6AF9C4"],
+              themeName: '默认',
+              colors: [
+                '#058DC7',
+                '#50B432',
+                '#ED561B',
+                '#DDDF00',
+                '#24CBE5',
+                '#64E572',
+                '#FF9655',
+                '#FFF263',
+                '#6AF9C4'
+              ],
               chart: {
                 backgroundColor: 'rgba(0,0,0,0)', //背景透明
                 plotBackgroundImage: '', //背景图片
@@ -2302,7 +2342,7 @@ const list = [
                   size: '80%', //饼图外圈直径大小
                   innerSize: 0, //饼图的内圈直径大小
                   showInLegend: true, //是否显示图利
-                  borderWidth:0,
+                  borderWidth: 0,
                   states: {
                     inactive: {
                       opacity: 1
@@ -2394,8 +2434,18 @@ const list = [
               credits: {
                 enabled: false
               },
-              themeName:'默认',
-              colors: ["#058DC7", "#50B432", "#ED561B", "#DDDF00", "#24CBE5", "#64E572", "#FF9655", "#FFF263", "#6AF9C4"],
+              themeName: '默认',
+              colors: [
+                '#058DC7',
+                '#50B432',
+                '#ED561B',
+                '#DDDF00',
+                '#24CBE5',
+                '#64E572',
+                '#FF9655',
+                '#FFF263',
+                '#6AF9C4'
+              ],
               chart: {
                 backgroundColor: 'rgba(0,0,0,0)', //背景透明
                 plotBackgroundImage: '', //背景图片

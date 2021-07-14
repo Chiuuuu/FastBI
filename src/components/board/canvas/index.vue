@@ -8,7 +8,6 @@
       class="canvas-panel-wrap"
       :style="wrapStyle"
       @click.stop.prevent="cancelSelected"
-      @contextmenu.stop.prevent="showScreenContextMenu($event)"
     >
       <b-scrollbar style="height:100%;">
         <div class="screen-shot" :style="screenStyle" ref="screenInner">
@@ -17,11 +16,14 @@
             :id="screenId"
             :style="canvasPanelStyle"
             @click.stop.prevent="cancelSelected"
+            @contextmenu.stop.prevent="showScreenContextMenu($event)"
             :data-spm-anchor-id="$route.params.id"
           >
             <drop-panel>
               <slot></slot>
             </drop-panel>
+            <!--右键菜单-->
+            <context-menu v-if="isScreen"></context-menu>
           </div>
         </div>
       </b-scrollbar>
@@ -40,6 +42,7 @@ import EditSlider from './components/edit-slider'
 import Pation from '../pation/index' // 分页栏
 import DropPanel from '../../drop/drop-panel'
 import { mapActions, mapGetters } from 'vuex'
+import ContextMenu from '../context-menu/index' // 右键菜单
 
 export default {
   name: 'CanvasMain',
@@ -141,7 +144,8 @@ export default {
       'pageSettings',
       'canvasRange',
       'contextMenuInfo',
-      'screenId'
+      'screenId',
+      'isScreen'
     ]),
     // 画布面板的样式
     canvasPanelStyle() {
@@ -160,6 +164,6 @@ export default {
       }
     }
   },
-  components: { DropPanel, EditSlider, Pation }
+  components: { DropPanel, EditSlider, Pation, ContextMenu }
 }
 </script>

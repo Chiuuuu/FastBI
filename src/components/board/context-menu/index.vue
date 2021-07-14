@@ -55,7 +55,12 @@ import { Loading } from 'element-ui'
 import chartTableData from '../chartTableData/index' // 右键菜单
 import { deepClone } from '@/utils/deepClone'
 const exportChartList = [
-  { icon: 'ios-share', text: '查看数据', order: 'showChartData', ignore: ['figure'] },
+  {
+    icon: 'ios-share',
+    text: '查看数据',
+    order: 'showChartData',
+    ignore: ['figure']
+  },
   {
     icon: 'ios-download',
     text: '导出',
@@ -70,7 +75,12 @@ const exportChartList = [
   }
 ]
 const chartMenuList = [
-  { icon: 'ios-share', text: '查看数据', order: 'showChartData', ignore: ['figure'] },
+  {
+    icon: 'ios-share',
+    text: '查看数据',
+    order: 'showChartData',
+    ignore: ['figure']
+  },
   {
     icon: 'ios-download',
     text: '导出',
@@ -195,6 +205,7 @@ export default {
         // this.$EventBus.$emit('context/menu/delete')
         this.deleteOne()
       } else if (order === 'showChartData') {
+        this.$store.dispatch('ToggleContextMenu')
         // 查看图表数据
         if (
           this.currSelected.setting.api_data.origin_source &&
@@ -204,14 +215,13 @@ export default {
             '[]'
         ) {
           await this.setChartData_scan()
-          this.$store.dispatch('ToggleContextMenu')
           this.showChartData(this.chartData)
         } else {
           this.$message.error('该图表没有拖入图表数据')
         }
       } else if (order === 'exportImg') {
         this.$store.dispatch('ToggleContextMenu')
-        if (this.isScreen) {
+        if (this.isScreen && this.$route.name !== 'screenEdit') {
           exportForFull(
             this.currentSelected,
             this.currSelected,
