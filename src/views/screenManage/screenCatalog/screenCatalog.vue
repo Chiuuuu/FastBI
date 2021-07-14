@@ -301,7 +301,7 @@
           :class="{ active: index === chooseIndex }"
           @click.stop="getCardClick(item, index)"
         >
-          <img slot="cover" alt="example" :src="item.thumbnailsUrl" />
+          <img slot="cover" alt="example" height="240" :src="item.thumbnailsUrl" />
           <a-card-meta
             :title="item.title"
             style="text-align:center"
