@@ -2,7 +2,7 @@
   <transition name="fade-in">
     <div
       class="dv-context-menu"
-      v-if="contextMenuInfo.isShow && currSelected"
+      v-if="contextMenuInfo.isShow"
       @mousedown.stop.prevent
       :style="contextMenuStyle"
       @click.stop.prevent
@@ -11,7 +11,7 @@
         class="context-menu-item"
         v-for="item in menuList"
         :key="item.order"
-        v-show="!item.ignore || !item.ignore.includes(currSelected.setting.name)"
+        v-show="showMenu(item)"
         @mouseenter="item.showChildren = true"
         @mouseleave="item.showChildren = false"
         @click="handleCommand(item.order)"
@@ -171,6 +171,12 @@ export default {
   },
   methods: {
     ...mapActions(['deleteChartData']),
+    showMenu(item) {
+      if (!this.contextMenuInfo.isShow) {
+        return false
+      }
+      return !item.ignore || !(this.currSelected && item.ignore.includes(this.currSelected.setting.name))
+    },
     //  执行菜单命令
     async handleCommand(order, item) {
       if (item) {
