@@ -40,9 +40,10 @@ export default {
   watch: {
     config: {
       handler(val) {
-        console.log(val.series.data);
-        let max = val.series.data.map(item=>item.value);
-        val.visualMap.max = Math.max(...max)
+        if(val.title.text!=="矩形热力图"){
+          let max = val.series.data.map(item=>item.value);
+          val.visualMap.max = Math.max(...max)
+        }
         this.Init(val)
       },
       deep: true
@@ -64,7 +65,6 @@ export default {
             return
           }
           let list = val.source.rows;
-          console.log('****',list);
           //判断是否为旭日图
           if (this.config.title.text === '旭日图') {
             let max = list.map(item=>item.value);
@@ -89,6 +89,7 @@ export default {
               this.option.series.data = [..._series]
               this.mychart.setOption(this.option);
             }
+            console.clear();
           }
         }
       },

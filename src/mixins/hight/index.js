@@ -209,11 +209,14 @@ export default {
       document.getElementById('bgPhoto').click()
     },
     setBackGround(val) {
-      // if (val) {
+      if (val) {
+        if(this.HighConfig.setting.background.hasOwnProperty('backgroundImage')){
+          delete this.HighConfig.setting.background.backgroundImage;
+        }
+      }
       this.$store.dispatch('SetBackGround', this.HighConfig.setting.background)
       setBaseProperty(this.currentSelected)
-      this.updateChartData()
-      // }
+      this.updateChartData();
       // this.$store.dispatch('SetBackGround', this.backgroundApi)
       // 发送请求来保存数据
     },
@@ -235,6 +238,7 @@ export default {
           if (res.code === 200) {
             let imageUrl = process.env.VUE_APP_SERVICE_URL + res.imgUrl
             if (key === 'backgroundImage') {
+              this.HighConfig.setting.background.backgroundColor='';
               this.HighConfig.setting.background['backgroundImage'] = imageUrl
               this.setBackGround()
             }

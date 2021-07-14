@@ -31,12 +31,14 @@ export default {
   },
   methods: {
     init() {
+      this.getBackgroundColor(this.setting.background);
       this.chart = this.$highCharts.chart(
         this.$refs.container,
         this.setting.config
       )
     },
     getBackgroundColor(objcolor){
+      this.styleObj = {};
       for (const key in objcolor) {
           let _key = key
             .replace(/::/g, '/')
