@@ -472,16 +472,16 @@ export default {
             this.$store.dispatch('SetApis', apis)
           }
           //立体图和矩形热力图 旭日图重置
-          if (
-            (current.setting.chartType === 'high-pie') |
-            (current.setting.chartType === 'high-column')
-          ) {
-            let _item = navigateList[0].tabs[0].children.find(
-              x => x.chartType == current.setting.chartType
-            )
-            current.setting.config.series = [..._item.config.series]
-            this.$store.dispatch('SetSelfProperty', current.setting.config)
-          }
+          if (current.setting.chartType === 'high-pie'|current.setting.chartType==='high-column'|current.setting.chartType==='v-sun'){
+            console.log("原始数据",navigateList[0].tabs[0].children);
+            let _item = navigateList[0].tabs[0].children.find(x=>x.chartType==current.setting.chartType);
+            // current.setting.config.series = [];
+            current.setting.config.series =  _item.config.series;
+            this.$store.dispatch('SetSelfProperty', current.setting.config);
+            if(current.setting.chartType!=='v-sun'){
+              this.updateChartData()
+            }
+          } 
         }
         // 如果是仪表盘，第二个度量是目标值（进度条最大值）,重置进度条范围
         if (current.setting.chartType === 'v-gauge') {
@@ -529,7 +529,6 @@ export default {
       let selected = this.canvasMap.find(
         item => item.id === this.currentSelected
       )
-
       // 维度
       if (this.type === 'dimensions') {
         selected.setting.api_data.dimensions = this.fileList

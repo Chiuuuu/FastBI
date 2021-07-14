@@ -74,7 +74,14 @@ export default {
         measures//度量(value)
       */
         //单维度
-        if (!val.source||(val.dimensions.length==0||val.measures.length==0)) {
+        if((val.dimensions.length==0&&val.measures.length==0)){
+          this.chart = this.$highCharts.chart(
+            this.$refs.container,
+            this.setting.config
+          );
+          return;
+        }
+        if (!val.source|val.dimensions.length==0|val.measures.length==0) {
           return
         }
         if(val.source.rows.length==0){

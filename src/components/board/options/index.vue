@@ -830,7 +830,7 @@
                   v-if="chartType=='v-sun'"
                   mode="tags"
                   placeholder="选择显示内容"
-                  :default-value="['{b}', '{@2012}', '({c}%)']"
+                  :default-value="sunVal"
                   style="width: 100%"
                   @change="onChange"
                 >
@@ -3219,7 +3219,7 @@ export default {
         }
         this.setApis()
       }else if(this.chartType=='v-sun'){
-        this.selfConfig.series.label.formatter = checkedValues.join('\n\r');
+        this.selfConfig.series.label.formatter = checkedValues.join(' ');
       } else {
         this.selfConfig.series.label.formatterSelect = checkedValues
       }
@@ -3837,6 +3837,14 @@ export default {
           this.selfConfig.yAxis &&
           (this.isLine || this.isHistogram || this.isBar || this.isScatter)
         )
+      }
+    },
+    sunVal(){
+      let val = this.selfConfig.series.label.formatter;
+      if(val==''){
+        return [];
+      }else{
+        return val.split(' ');
       }
     }
   },

@@ -1767,145 +1767,11 @@ const list = [
                   borderWidth: 1
                 },
                 data: [
-                  {
-                    children: [
-                      {
-                        children: [
-                          {
-                            children: [],
-                            name: 'NULL',
-                            value: 1
-                          }
-                        ],
-                        name: '公众客户',
-                        value: 2
-                      },
-                      {
-                        children: [
-                          {
-                            children: [],
-                            name: 'NULL',
-                            value: 22
-                          }
-                        ],
-                        name: '政企客户',
-                        value: 33
-                      }
-                    ],
-                    name: '白云有线',
-                    value: 34
-                  },
-                  {
-                    children: [
-                      {
-                        children: [
-                          {
-                            children: [],
-                            name: 'NULL',
-                            value: 45
-                          }
-                        ],
-                        name: '公众客户',
-                        value: 55
-                      },
-                      {
-                        children: [
-                          {
-                            children: [],
-                            name: 'NULL',
-                            value: 55
-                          }
-                        ],
-                        name: '政企客户',
-                        value: 62
-                      }
-                    ],
-                    name: '从化',
-                    value: 73
-                  },
-
-                  {
-                    children: [
-                      {
-                        children: [
-                          {
-                            children: [],
-                            name: '白云金沙001网格',
-                            value: 0
-                          },
-                          {
-                            children: [],
-                            name: '东湖东片5网格(代)',
-                            value: 0
-                          },
-                          {
-                            children: [],
-                            name: '周门2片2网格(代)',
-                            value: 90
-                          },
-                          {
-                            children: [],
-                            name: 'NULL',
-                            value: 100
-                          }
-                        ],
-                        name: '公众客户',
-                        value: 40
-                      }
-                    ],
-                    name: '客服中心',
-                    value: 40
-                  },
-                  {
-                    children: [
-                      {
-                        children: [
-                          {
-                            children: [],
-                            name: '大岗聚豪格网格',
-                            value: 25
-                          },
-                          {
-                            children: [],
-                            name: 'NULL',
-                            value: 32
-                          }
-                        ],
-                        name: '公众客户',
-                        value: 72
-                      },
-                      {
-                        children: [
-                          {
-                            children: [],
-                            name: 'NULL',
-                            value: 91
-                          }
-                        ],
-                        name: '政企客户',
-                        value: 82
-                      }
-                    ],
-                    name: '南沙三镇',
-                    value: 81
-                  },
-                  {
-                    children: [
-                      {
-                        children: [
-                          {
-                            children: [],
-                            name: 'NULL',
-                            value: 0
-                          }
-                        ],
-                        name: '公众客户',
-                        value: 0
-                      }
-                    ],
-                    name: '未知分公司',
-                    value: 0
-                  }
+                  {name: "张明1", value: 78, children: [{name: "男", value: 78, children: []}]},
+                  {name: "张明2", value: 42, children: [{name: "男", value: 42, children: []}]},
+                  {name: "张明3", value: 88, children: [{name: "男", value: 88, children: []}]},
+                  {name: "张明4", value: 32, children: [{name: "男", value: 32, children: []}]},
+                  {name: "张明5", value: 20, children: [{name: "男", value: 20, children: []}]}
                 ]
               }
               // series: {
@@ -2410,7 +2276,7 @@ const list = [
                   fontFamily: '默认',
                   fontWeight: '正常',
                   color: '#fff',
-                  fontSize: 12
+                  fontSize: 20
                 }
               },
               //图例属性设置
@@ -2422,7 +2288,7 @@ const list = [
                 verticalAlign: 'top', //垂直对齐，有top（上），middle（中），下（bottom）
                 itemStyle: {
                   cursor: 'pointer',
-                  fontSize: '20',
+                  fontSize: 12,
                   color: '#fff'
                 }
               },
@@ -2554,15 +2420,15 @@ const list = [
               },
               //标题属性设置
               title: {
-                text: '立体柱形图',
-                content: '立体柱形图',
+                text: '立体柱状图',
+                content: '立体柱状图',
                 align: 'left', //对齐方式left center right
                 style: {
                   //标题属性设置（字体、颜色、大小，粗细）
                   fontFamily: '默认',
                   fontWeight: '正常',
                   color: '#fff',
-                  fontSize: 12
+                  fontSize: 20
                 }
               },
               //图例属性设置
@@ -2574,7 +2440,7 @@ const list = [
                 verticalAlign: 'top', //垂直对齐，有top（上），middle（中），下（bottom）
                 itemStyle: {
                   cursor: 'pointer',
-                  fontSize: '20',
+                  fontSize: 12,
                   color: '#fff'
                 }
               },

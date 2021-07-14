@@ -199,7 +199,7 @@
         <a-switch
           size="small"
           @change="a => setHistogram(a, 'plotOptions')"
-          v-model="bartype.isdd"
+          v-model="isdd"
           clearable
         ></a-switch>
       </gui-field>
@@ -368,7 +368,7 @@
           >
           <a-radio-button
             value="high"
-            @click.native.stop="getBtnRadio('yAxis', 'high')"
+            @click.native.stop="getBtnRadio('xAxis', 'high')"
             >末尾</a-radio-button
           >
         </a-radio-group>
@@ -458,7 +458,7 @@
         >
           <a-radio-button
             value="middle"
-            @click.native.stop="getBtnRadio('xAxis', 'middle')"
+            @click.native.stop="getBtnRadio('yAxis', 'middle')"
             >中部</a-radio-button
           >
           <a-radio-button
@@ -593,13 +593,22 @@ export default {
   components: { GuiField, GuiInline },
   data() {
     return {
-      bartype: {
-        isyz: false, //是否圆柱图
-        isdd: false //是否堆叠图
+      // bartype: {
+      //   isyz: false, //是否圆柱图
+      //   isdd: false //是否堆叠图
+      // }
+    }
+  },
+  computed: {
+    isdd(){
+      let flag = this.HighConfig.setting.config.plotOptions.column.stacking;
+      if(flag==null){
+        return false;
+      }else{
+        return true;
       }
     }
   },
-  computed: {},
   mounted() {},
   methods: {
     setHistogram(val, key) {
