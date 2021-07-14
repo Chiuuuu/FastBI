@@ -7,29 +7,35 @@
     @cancel="$emit('cancel')"
     :getContainer="getContainer"
   >
-    <div style="width:100%">
-      <div style="margin: 0 0 10px;" v-for="(item,index) in chartData.columns" :key="index">  
-        <h3 style="margin: 0 0 2px;" v-if="chartData.tableName[index]">{{chartData.tableName[index]}}</h3>
+    <div class="scrollbar" style="width:100%;height:400px;overflow-y:scroll;">
+      <div
+        style="margin: 0 0 10px;"
+        v-for="(item, index) in chartData.columns"
+        :key="index"
+      >
+        <h3 style="margin: 0 0 2px;" v-if="chartData.tableName[index]">
+          {{ chartData.tableName[index] }}
+        </h3>
         <table class="chartdata-table">
-        <tr class="table-tr">
-          <th
-            class="table-td"
-            v-for="(subItem, subIndex) in item"
-            :key="subIndex"
+          <tr class="table-tr">
+            <th
+              class="table-td"
+              v-for="(subItem, subIndex) in item"
+              :key="subIndex"
+            >
+              {{ subItem }}
+            </th>
+          </tr>
+          <tr
+            class="table-tr"
+            v-for="(subItem2, subIndex2) in chartData.rows[index]"
+            :key="subIndex2"
           >
-            {{ subItem }}
-          </th>
-        </tr>
-        <tr
-          class="table-tr"
-          v-for="(subItem2, subIndex2) in chartData.rows[index]"
-          :key="subIndex2"
-        >
-          <td class="table-td" v-for="(value, key) in subItem2" :key="key">
-            {{ value }}
-          </td>
-        </tr>
-      </table>
+            <td class="table-td" v-for="(value, key) in subItem2" :key="key">
+              {{ value }}
+            </td>
+          </tr>
+        </table>
       </div>
       <!-- <table class="chartdata-table">
         <tr class="table-tr">
@@ -81,7 +87,9 @@ export default {
   methods: {
     // 全屏下，内容挂在dvScreen元素下（screen.vue）可显示，默认挂在body下
     getContainer() {
-      return this.dvScreenDom ? this.dvScreenDom() : document.body
+      return this.dvScreenDom
+        ? this.dvScreenDom()
+        : document.querySelector('.canvas-panel')
     }
   }
 }
@@ -136,7 +144,6 @@ export default {
       padding: 0 20px;
       box-sizing: border-box;
       overflow: scroll;
-      
     }
 
     .close-btn {

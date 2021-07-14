@@ -1022,7 +1022,17 @@ export default {
       this.chooseTemple = { ...item }
     }
   },
-  // 跳出大屏模块清除screenId
+  // 进入大屏重置菜单选择id
+  beforeRouteEnter(to, from, next) {
+    if (from.name !== 'screenEdit') {
+      next(vm => {
+        vm.$store.commit('common/SET_MENUSELECTID', -1)
+      })
+    } else {
+      next()
+    }
+  },
+  // 跳出大屏模块清除菜单选择id
   beforeRouteLeave(to, from, next) {
     if (to.name !== 'screenEdit') {
       this.fileSelectId = ''

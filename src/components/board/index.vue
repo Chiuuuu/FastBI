@@ -35,10 +35,12 @@
         <slot name="model"></slot>
       </board-model>
     </div>
-    <!--右键菜单-->
-    <context-menu></context-menu>
     <!-- 右键菜单 -- 查看数据 -->
-    <chartTableData :show="show" :chart-data="chartData" @cancel="show = false"></chartTableData>
+    <chartTableData
+      :show="show"
+      :chart-data="chartData"
+      @cancel="show = false"
+    ></chartTableData>
   </div>
 </template>
 
@@ -49,7 +51,6 @@ import BoardHeader from './header/index' // 头部
 import BoardCoverage from './coverage/index' // 左侧栏(图层)
 import BoardOptions from './options/index' // 右侧栏(页面配置)
 import CanvasMain from './canvas' // 中间画板
-import ContextMenu from './context-menu/index' // 右键菜单
 import chartTableData from './chartTableData/index' // 右键菜单
 import BoardModel from './model/index' // 8-14 新增数据模型
 import { mapGetters, mapActions } from 'vuex'
@@ -63,7 +64,7 @@ export default {
       config: config,
       errorData: '',
       show: false, // 图表数据查看
-      chartData: {}, // 图表数据
+      chartData: {} // 图表数据
     }
   },
   provide() {
@@ -119,7 +120,6 @@ export default {
   },
   // 8-14 添加配置侧栏
   components: {
-    ContextMenu,
     CanvasMain,
     BoardCoverage,
     BoardHeader,

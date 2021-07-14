@@ -115,7 +115,11 @@
     ></pation>
     <context-menu></context-menu>
     <!-- 右键菜单 -- 查看数据 -->
-    <chartTableData :show="show" :chart-data="chartData" @cancel="show = false"></chartTableData>
+    <chartTableData
+      :show="show"
+      :chart-data="chartData"
+      @cancel="show = false"
+    ></chartTableData>
   </div>
 </template>
 
@@ -229,7 +233,7 @@ export default {
       },
       deep: true,
       immediate: true
-    },
+    }
   },
   mounted() {
     this.$nextTick(this._calcStyle)
@@ -477,11 +481,18 @@ export default {
         // 矩形树图改变series.data
         if (chart.setting.chartType === 'v-treemap') {
           let config = deepClone(chart.setting.config)
-          const tree = new TreeGroupBy(res.rows, chart.setting.api_data.dimensions.map(item => item.alias), chart.setting.api_data.measures)
+          const tree = new TreeGroupBy(
+            res.rows,
+            chart.setting.api_data.dimensions.map(item => item.alias),
+            chart.setting.api_data.measures
+          )
           TreeGroupBy.handleLeafValue(tree.tree)
           selectData = {
             data: tree.tree,
-            pieces: TreeGroupBy.handlePieces(tree.tree, config.series.recDimensionIndex)
+            pieces: TreeGroupBy.handlePieces(
+              tree.tree,
+              config.series.recDimensionIndex
+            )
           }
         }
         // 构造联动选择的数据
@@ -534,6 +545,7 @@ export default {
     },
     cancelSelect() {
       this.$store.dispatch('SingleSelected', null)
+      this.$store.dispatch('ToggleContextMenu')
     },
     poupExportMenu(event) {
       if (this.isScreen) {

@@ -141,7 +141,7 @@ export default {
       this.$store.dispatch('SingleSelected', null)
       // 位置在screen.vue,对应画板元素
       this.$nextTick(() => {
-        var docElm = document.querySelector('.dv-screen')
+        var docElm = document.querySelector('.canvas-panel')
         if (docElm) {
           if (docElm.requestFullscreen) {
             // W3C
