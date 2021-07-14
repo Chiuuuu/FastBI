@@ -171,11 +171,16 @@ export default {
   },
   methods: {
     ...mapActions(['deleteChartData']),
+    // 控制是否显示菜单栏
     showMenu(item) {
       if (!this.contextMenuInfo.isShow) {
         return false
       }
-      return !item.ignore || !(this.currSelected && item.ignore.includes(this.currSelected.setting.name))
+      if (this.currSelected) {
+        return !item.ignore || !item.ignore.includes(this.currSelected.setting.name)
+      } else {
+        return true
+      }
     },
     //  执行菜单命令
     async handleCommand(order, item) {

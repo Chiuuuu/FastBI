@@ -3,7 +3,6 @@
     class="dv-screen"
     ref="dvScreen"
     @contextmenu.stop.prevent="poupExportMenu($event)"
-    @mousedown="cancelSelect"
   >
     <b-scrollbar :style="wrapStyle">
       <div :style="scrollBoxStyle">
@@ -13,9 +12,7 @@
               :id="transform.id"
               :key="transform.id"
               :item="transform"
-              @contextmenu.native.stop.prevent="
-                handleRightClickOnCanvas(transform, $event)
-              "
+              @contextmenu.native.stop.prevent="handleRightClickOnCanvas(transform, $event)"
             >
               <!--数据模型不存在-->
               <chart-nodata
@@ -247,6 +244,7 @@ export default {
     toggleContextMenu() {
       if (this.$store.getters.contextMenuInfo.isShow) {
         this.$store.dispatch('ToggleContextMenu')
+        this.$store.dispatch('SingleSelected', null)
       }
     },
     getDvScreen() {
@@ -536,9 +534,6 @@ export default {
     showChartData(chartData) {
       this.chartData = chartData
       this.show = true
-    },
-    cancelSelect() {
-      this.$store.dispatch('SingleSelected', null)
     },
     poupExportMenu(event) {
       if (this.isScreen) {
