@@ -145,35 +145,35 @@ const app = {
     },
     // 保存大屏页面设置
     async renameScreenData({ rootGetters, state }, obj) {
-        let params = {}
-        // 重命名
-        if (obj) {
-          let { id, name, setting } = obj
-          params.id = id
-          params.newName = name
-          params.setting = setting
-        } else {
-          // 普通保存
-          // 保存图层排序列表，图层操作，新增，删除顺序会变，所以这三个操作要调这个接口
-          state.pageSettings.idList = rootGetters.canvasMapIdList
+      let params = {}
+      // 重命名
+      if (obj) {
+        let { id, name, setting } = obj
+        params.id = id
+        params.newName = name
+        params.setting = setting
+      } else {
+        // 普通保存
+        // 保存图层排序列表，图层操作，新增，删除顺序会变，所以这三个操作要调这个接口
+        state.pageSettings.idList = rootGetters.canvasMapIdList
 
-          params.id = state.screenId
-          params.setting = state.pageSettings
-        }
-        return screenManage
-          .renameScreen(params)
-          .then(res => {
-            if (res.code === 200) {
-              // res.msg && message.success(res.msg)
-              return true
-            }
-            res.msg && message.error(res.msg)
-          })
-          .catch(err => {
-            // 需要捕获错误 否则无法传递给commit
-            err && message.error(err)
-          })
-      },
+        params.id = state.screenId
+        params.setting = state.pageSettings
+      }
+      return screenManage
+        .renameScreen(params)
+        .then(res => {
+          if (res.code === 200) {
+            // res.msg && message.success(res.msg)
+            return true
+          }
+          res.msg && message.error(res.msg)
+        })
+        .catch(err => {
+          // 需要捕获错误 否则无法传递给commit
+          err && message.error(err)
+        })
+    },
     // 保存页面配置
     async saveScreenData({ rootGetters, state }) {
       let params = {}
@@ -315,7 +315,11 @@ const app = {
           let graphs = res.data ? res.data.screenGraphs : []
           dispatch('InitCanvasMaps', {
             maps: graphs,
-            idList: res.data ? res.data.setting.idList : []
+            idList: res.data
+              ? res.data.setting
+                ? res.data.setting.idList
+                : []
+              : []
           })
           dispatch('dataModel/setSelectedModelList', res.list)
           commit('common/SET_PRIVILEGES', res.data.privileges || [])
