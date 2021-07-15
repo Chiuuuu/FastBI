@@ -30,43 +30,34 @@ export default {
   },
   computed: {
     ...mapGetters(['currentSelected']),
+    isLine() {
+      return this.item.setting.chartType === 'line'
+    },
     contentStyles() {
-      let result
-      if (this.dragScale) {
-        result = {
-          width: this.transformData.width / this.dragScale.x + 'px',
-          height: this.transformData.height / this.dragScale.y + 'px'
+      if (this.isLine) {
+        return {
+          width: this.transformData.width + 'px',
+          height: this.transformData.height + 'px',
+          transformOrigin: 'left center',
+          transform: `translate3d(${this.transformData.x}px,${
+            this.transformData.y
+          }px,0) rotate(${this.transformData.rotate || 0}deg)`
+        }
+      } else {
+        return {
+          width: this.transformData.width + 'px',
+          height: this.transformData.height + 'px',
+          transform: `translate3d(${this.transformData.x}px,${
+            this.transformData.y
+          }px,0)`
         }
       }
-      result = {
-        width: this.transformData.width + 'px',
-        height: this.transformData.height + 'px'
-      }
-      if (this.item.setting.config.title === '直线') {
-      }
-      result.transform = `translate3d(${this.transformData.x}px,${
-        this.transformData.y
-      }px,0)`
-      return result
     },
     dvWrapperStyles() {
-      let result
-      if (this.dragScale) {
-        result = {
-          width: this.transformData.width / this.dragScale.x + 'px',
-          height: this.transformData.height / this.dragScale.y + 'px'
-        }
-      }
-      result = {
+      return {
         width: this.transformData.width + 'px',
         height: this.transformData.height + 'px'
       }
-      result.transform = `translateZ(0) rotate(${this.transformData.rotate ||
-        0}deg)`
-      if (this.item.setting.config.title === '直线') {
-        result.transformOrigin = this.transformData.origin
-      }
-      return result
     }
   }
 }

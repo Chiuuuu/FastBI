@@ -269,9 +269,10 @@ export default {
       } else {
         style = {
           width: this.transformData.width + 'px',
-          height: this.transformData.height + 'px',
-          transform: `translateZ(0) rotate(${this.transformData.rotate ||
-            0}deg)`
+          height: this.transformData.height + 'px'
+        }
+        if (!this.isLine) {
+          style.transform = `translateZ(0) rotate(${this.transformData.rotate || 0}deg)`
         }
       }
       if (this.isScreen) {
