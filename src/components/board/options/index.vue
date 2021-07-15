@@ -3057,6 +3057,7 @@ import Treemap2 from './treemap/treemap-2.vue'
 import Treemap3 from './treemap/treemap-3.vue'
 import HighChartPie from '@/components/board/options/highchart-pie'
 import HighChartBar from '@/components/board/options/highchart-bar'
+import { Divider } from 'ant-design-vue'
 
 const themeColorNMap = {
   yellow: ['rgb(249,217,96)', 'rgb(249,159,61)', 'rgb(247,107,28)'],
@@ -3218,8 +3219,8 @@ export default {
           this.selfConfig.series.label.formatter = checkedValues.join('\n\r')
         }
         this.setApis()
-      }else if(this.chartType=='v-sun'){
-        this.selfConfig.series.label.formatter = checkedValues.join(' ');
+      } else if (this.chartType == 'v-sun') {
+        this.selfConfig.series.label.formatter = checkedValues.join(' ')
       } else {
         this.selfConfig.series.label.formatterSelect = checkedValues
       }
@@ -3662,36 +3663,7 @@ export default {
             this.apiData = deepClone(val.setting.api_data)
             // 地区构造指标提示框内容选择列表
             if (val.setting.chartType === 'v-map') {
-              this.mapFillPointSelectList = this.apiData.measures.concat()
-              this.mapFillTooltipSelectList = this.apiData.measures.concat()
-              this.mapLabelPointSelectList = this.apiData.labelMeasures.concat()
-              this.mapLabelTooltipSelectList = this.apiData.labelMeasures.concat()
-              if (this.apiData.options.fillType === 'area') {
-                // 地区添加地区名/维度
-                let di = this.apiData.dimensions[0]
-                  ? this.apiData.dimensions[0].alias
-                  : ''
-                this.mapFillPointSelectList.unshift({ alias: `地区名/${di}` })
-              } else {
-                this.mapFillPointSelectList = this.apiData.dimensions.concat(
-                  this.mapFillPointSelectList
-                )
-                this.mapFillPointSelectList.unshift({ alias: '地区名' })
-              }
-              if (this.apiData.options.labelType === 'area') {
-                // 地区添加地区名/维度
-                let labelDi = this.apiData.labelDimensions[0]
-                  ? this.apiData.labelDimensions[0].alias
-                  : ''
-                this.mapLabelPointSelectList.unshift({
-                  alias: `地区名/${labelDi}`
-                })
-              } else {
-                this.mapLabelPointSelectList = this.apiData.dimensions.concat(
-                  this.mapLabelPointSelectList
-                )
-                this.mapLabelPointSelectList.unshift({ alias: '地区名' })
-              }
+              this.handleMapFormatterSelect()
             }
           }
           if (val.setting.apis) {
@@ -3839,12 +3811,48 @@ export default {
         )
       }
     },
-    sunVal(){
-      let val = this.selfConfig.series.label.formatter;
-      if(val==''){
-        return [];
-      }else{
-        return val.split(' ');
+    sunVal() {
+      let val = this.selfConfig.series.label.formatter
+      if (val == '') {
+        return []
+      } else {
+        return val.split(' ')
+      }
+    },
+    handleMapFormatterSelect() {
+      this.mapFillPointSelectList = this.apiData.measures.concat()
+      this.mapFillTooltipSelectList = this.apiData.measures.concat()
+      if (this.apiData.options.fillType === 'area') {
+        // 地区添加地区名/维度
+        let di = this.apiData.dimensions[0]
+          ? this.apiData.dimensions[0].alias
+          : ''
+        this.mapFillPointSelectList.unshift({ alias: `地区名/${di}` })
+        this.mapFillTooltipSelectList.unshift({ alias: di })
+      } else {
+        this.mapFillPointSelectList = this.apiData.dimensions.concat(
+          this.mapFillPointSelectList
+        )
+        this.mapFillPointSelectList.unshift({ alias: '地区名' })
+      }
+      this.mapLabelPointSelectList = this.apiData.labelMeasures.concat()
+      this.mapLabelTooltipSelectList = this.apiData.labelMeasures.concat()
+      if (this.apiData.options.labelType === 'area') {
+        // 标记点添加维度
+        let labelDi = this.apiData.labelDimensions[0]
+          ? this.apiData.labelDimensions[0].alias
+          : ''
+        this.mapLabelPointSelectList.unshift({
+          alias: `地区名/${labelDi}`
+        })
+        this.mapLabelTooltipSelectList.unshift({
+          alias: labelDi
+        })
+      } else {
+        this.mapLabelPointSelectList = this.apiData.dimensions.concat(
+          this.mapLabelPointSelectList
+        )
+        this.mapLabelPointSelectList.unshift({ alias: '地区名' })
       }
     }
   },
