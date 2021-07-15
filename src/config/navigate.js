@@ -2673,7 +2673,6 @@ const list = [
               title: {
                 total: '',
                 content: '文本',
-                text: '',
                 textAlign: 'left',
                 textStyle: {
                   color: '#ffffff',

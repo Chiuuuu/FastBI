@@ -248,7 +248,7 @@
                 <gui-field label="标题名">
                   <a-input
                     v-model="selfConfig.title.content"
-                    v-if="selfConfig.title.content != ''"
+                    v-if="!('text' in selfConfig.title)"
                     size="small"
                     :maxLength="20"
                     @change="setSelfProperty"

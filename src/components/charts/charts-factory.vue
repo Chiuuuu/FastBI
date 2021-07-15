@@ -65,6 +65,7 @@ import {
 } from 'bin-ui/src/utils/resize-event'
 import { formatData, convertData } from '../../utils/formatData'
 import { deepClone } from '@/utils/deepClone'
+import guangzhou from '@/utils/guangdong.json'
 import omit from 'lodash/omit'
 import { DEFAULT_COLORS } from '@/utils/defaultColors'
 import { setChartInstanceIdMap } from '@/utils/screenExport'
