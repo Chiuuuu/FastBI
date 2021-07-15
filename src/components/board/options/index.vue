@@ -506,7 +506,7 @@
                       @change="setHistogram($event, 'radius')"
                     ></a-switch>
                   </gui-field>
-                  <gui-field label="柱条间隔(不同系列)">
+                  <gui-field label="柱条间隔">
                     <a-input
                       size="small"
                       @change="setSelfProperty"
@@ -1259,6 +1259,7 @@
                           v-model="selfConfig.visualMap.min"
                           size="small"
                           :min="0"
+                          style="width: 60px"
                           @change="setSelfProperty"
                         ></a-input-number>
                       </gui-inline>
@@ -1267,6 +1268,7 @@
                           v-model="selfConfig.visualMap.max"
                           size="small"
                           :min="0"
+                          style="width: 60px"
                           @change="setSelfProperty"
                         ></a-input-number>
                       </gui-inline>
@@ -1315,9 +1317,9 @@
                       @change="switchChange"
                       size="small"
                     />
-                    <gui-field v-if="scatterList[0]" label="图例颜色">
+                    <gui-field label="图例颜色">
                       <el-color-picker
-                        v-model="scatterList[0].itemStyle.color"
+                        v-model="selfConfig.legend.itemStyle.color"
                         @change="setSelfProperty"
                       ></el-color-picker>
                     </gui-field>
@@ -1949,7 +1951,7 @@
                     </a-radio-group>
                   </gui-inline>
                 </gui-field>
-                <gui-field label="鼠标移入区域提示">
+                <gui-field label="鼠标移入提示">
                   <a-switch
                     v-model="selfConfig.series[0].tooltip.show"
                     size="small"
@@ -2127,7 +2129,7 @@
                     </a-radio-group>
                   </gui-inline>
                 </gui-field>
-                <gui-field label="鼠标移入区域提示">
+                <gui-field label="鼠标移入提示">
                   <a-switch
                     v-model="scatterList[0].tooltip.show"
                     size="small"

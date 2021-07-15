@@ -41,7 +41,7 @@
         </a-tooltip>
       </div>
     </div>
-    <div v-else class="empty" :class="{ field: isdrag }">
+    <div v-else class="empty under-level" :class="{ field: isdrag }">
       {{ emptyText[type][dimensionType] || emptyText[type] }}
     </div>
   </div>
