@@ -218,7 +218,7 @@ export default {
       }
       return options
     },
-    _calcStyle() {
+    async _calcStyle() {
       const wrap = this.$refs.wrap
       const title = this.$refs.titles
       if (!wrap) return
@@ -231,7 +231,7 @@ export default {
       this.height = height + 'px'
 
       // 计算表格每列宽度
-      this.getColWidths()
+      await this.getColWidths()
 
       // 计算表宽(单元格宽度求和)
       this.tableWidth = this.colWidths.reduce((total, value) => {
@@ -253,7 +253,7 @@ export default {
         this.showTableSize.tableY - this.$refs.tableheader.clientHeight
     },
     // 计算单元格宽度
-    getColWidths() {
+    async getColWidths() {
       this.colWidths = []
       for (let row of this.tableData) {
         let index = 0
@@ -278,6 +278,7 @@ export default {
           index++
         }
       }
+      return true
     },
     // 汉字转换成两个字符长度
     getActaulLen(value) {
