@@ -446,8 +446,11 @@ export default {
         let str = []
         list.forEach(item => {
           let val = params[item]
+          if (!val) {
+            return
+          }
           if (typeof val === 'number') {
-            val = +parseFloat(val).toFixed(2)
+            val = +parseFloat(val)
           }
           if (item === 'percent') {
             val += '%'
@@ -472,6 +475,9 @@ export default {
           let str = []
           series.pointShowList.forEach(item => {
             let val = params.data[item]
+            if (!val) {
+              return
+            }
             if (typeof val === 'number') {
               val = +parseFloat(val).toFixed(2)
             }
@@ -487,6 +493,9 @@ export default {
           let str = []
           series.tooltipShowList.forEach(item => {
             let val = params.data[item]
+            if (!val) {
+              return
+            }
             if (typeof val === 'number') {
               val = +parseFloat(val).toFixed(2)
             }
