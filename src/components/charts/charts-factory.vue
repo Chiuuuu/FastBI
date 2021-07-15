@@ -302,6 +302,9 @@ export default {
       handler(val) {
         if (val) {
           this.chartSettings = deepClone(val)
+          if (this.typeName === 've-map') {
+            this.chartSettings.mapOrigin = guangzhou
+          }
           this.$log.primary('========>chartSettings')
           this.$print(this.chartSettings)
         }
