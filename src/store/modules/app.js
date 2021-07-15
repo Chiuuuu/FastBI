@@ -121,27 +121,17 @@ const app = {
         isSaved: 1,
         setting: state.orginPageSettings // 新建传默认配置
       }
-      screenManage
-        .addScreen(params)
-        .then(res => {
-          if (res.code === 200) {
-            commit('SET_PAGE_SETTING', state.orginPageSettings)
-            commit('SET_PAGE_LIST', [])
-            commit('SET_SCREEN_ID', res.id)
-            res.msg && message.success(res.msg)
-            router.push({
-              name: 'screenEdit',
-              query: { id: res.id }
-            })
-          } else {
-            res.msg && message.error(res.msg)
-            return false
-          }
-        })
-        .catch(err => {
-          // 捕获错误
-          err && message.error(err)
-        })
+      const res = await screenManage.addScreen(params)
+      if (res.code === 200) {
+        commit('SET_PAGE_SETTING', state.orginPageSettings)
+        commit('SET_PAGE_LIST', [])
+        commit('SET_SCREEN_ID', res.id)
+        res.msg && message.success(res.msg)
+        return true
+      } else {
+        res.msg && message.error(res.msg)
+        return false
+      }
     },
     // 保存大屏页面设置
     async renameScreenData({ rootGetters, state }, obj) {
