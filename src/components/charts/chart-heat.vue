@@ -34,7 +34,6 @@ export default {
     Init(val) {
       this.option = val ? val : this.config
       this.mychart = this.$echarts.init(this.$refs.dvsheat)
-      console.log("999",this.option);
       this.mychart.setOption(val ? val : this.config,true)
     }
   },

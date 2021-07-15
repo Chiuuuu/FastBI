@@ -730,7 +730,7 @@ export default {
     },
     // 新建/编辑大屏名称
     handleOk(e) {
-      this.screenForm.validateFields((err, values) => {
+      this.screenForm.validateFields(async (err, values) => {
         if (err) {
           return
         }
@@ -738,11 +738,19 @@ export default {
         if (this.isAdd === 1) {
           // 新增
           // 新建大屏清空模型列表
-          this.$store.dispatch('dataModel/setSelectedModelList', [])
-          this.addScreenData({ ...values })
-          this.fileSelectName = values.name
-          // 新建默认赋予所有权限
-          this.$store.commit('common/SET_PRIVILEGES', [0])
+          const res = await this.addScreenData({ ...values })
+          if (res) {
+            this.$store.dispatch('dataModel/setSelectedModelList', [])
+            this.$router.push({
+              name: 'screenEdit',
+              query: { id: res }
+            })
+            this.fileSelectName = values.name
+            // 新建默认赋予所有权限
+            this.$store.commit('common/SET_PRIVILEGES', [0])
+          } else {
+            return
+          }
         } else if (this.isAdd === 3) {
           // 移动大屏
           // 没有选文件夹保存在外面

@@ -11,7 +11,7 @@
   >
     <div v-if="fileList.length > 0">
       <div
-        :class="['field', { error: item.status === 1 }]"
+        :class="['field','under-level', { error: item.status === 1 }]"
         v-for="(item, index) in fileList"
         :key="index"
         @contextmenu.prevent="showMore(item)"
@@ -41,7 +41,7 @@
         </a-tooltip>
       </div>
     </div>
-    <div v-else class="empty" :class="{ field: isdrag }">
+    <div v-else class="empty under-level" :class="{ field: isdrag }">
       {{ emptyText[type][dimensionType] || emptyText[type] }}
     </div>
   </div>

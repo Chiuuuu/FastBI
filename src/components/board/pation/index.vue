@@ -179,7 +179,8 @@ export default {
           name: copyName,
           orderNo: page.orderNo,
           screenId: this.screenId,
-          id: page.id
+          id: page.id,
+          setting: this.pageSettings
         }
         this.$server.screenManage.copyScreenTab(params).then(res => {
           if (res.code === 200) {

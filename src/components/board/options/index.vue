@@ -248,7 +248,7 @@
                 <gui-field label="标题名">
                   <a-input
                     v-model="selfConfig.title.content"
-                    v-if="selfConfig.title.content != ''"
+                    v-if="!('text' in selfConfig.title)"
                     size="small"
                     :maxLength="20"
                     @change="setSelfProperty"
@@ -506,7 +506,7 @@
                       @change="setHistogram($event, 'radius')"
                     ></a-switch>
                   </gui-field>
-                  <gui-field label="柱条间隔(不同系列)">
+                  <gui-field label="柱条间隔">
                     <a-input
                       size="small"
                       @change="setSelfProperty"
@@ -645,7 +645,7 @@
                 </gui-field>
                 显示内容
                 <a-select
-                  mode="tags"
+                  mode="multiple"
                   v-model="apis.scatterLabel"
                   placeholder="选择显示内容"
                   style="width: 100%"
@@ -834,9 +834,9 @@
                 <!-- 旭日图独有 -->
                 <a-select
                   v-if="chartType == 'v-sun'"
-                  mode="tags"
+                  mode="multiple"
                   placeholder="选择显示内容"
-                  :default-value="sunVal"
+                  v-model="selfConfig.series.label.formatter"
                   style="width: 100%"
                   @change="onChange"
                 >
@@ -851,7 +851,7 @@
 
                 <a-select
                   v-else
-                  mode="tags"
+                  mode="multiple"
                   placeholder="选择显示内容"
                   v-model="selfConfig.series.label.formatterSelect"
                   style="width: 100%"
@@ -1259,6 +1259,7 @@
                           v-model="selfConfig.visualMap.min"
                           size="small"
                           :min="0"
+                          style="width: 60px"
                           @change="setSelfProperty"
                         ></a-input-number>
                       </gui-inline>
@@ -1267,6 +1268,7 @@
                           v-model="selfConfig.visualMap.max"
                           size="small"
                           :min="0"
+                          style="width: 60px"
                           @change="setSelfProperty"
                         ></a-input-number>
                       </gui-inline>
@@ -1315,9 +1317,9 @@
                       @change="switchChange"
                       size="small"
                     />
-                    <gui-field v-if="scatterList[0]" label="图例颜色">
+                    <gui-field label="图例颜色">
                       <el-color-picker
-                        v-model="scatterList[0].itemStyle.color"
+                        v-model="selfConfig.legend.itemStyle.color"
                         @change="setSelfProperty"
                       ></el-color-picker>
                     </gui-field>
@@ -1886,7 +1888,7 @@
                 </gui-field>
                 指标内容
                 <a-select
-                  mode="tags"
+                  mode="multiple"
                   placeholder="选择显示内容"
                   v-model="selfConfig.series[0].pointShowList"
                   style="width: 100%"
@@ -1949,7 +1951,7 @@
                     </a-radio-group>
                   </gui-inline>
                 </gui-field>
-                <gui-field label="鼠标移入区域提示">
+                <gui-field label="鼠标移入提示">
                   <a-switch
                     v-model="selfConfig.series[0].tooltip.show"
                     size="small"
@@ -1958,7 +1960,7 @@
                 </gui-field>
                 显示内容
                 <a-select
-                  mode="tags"
+                  mode="multiple"
                   placeholder="选择显示内容"
                   v-model="selfConfig.series[0].tooltipShowList"
                   style="width: 100%"
@@ -2034,7 +2036,7 @@
                 </gui-field>
                 指标内容
                 <a-select
-                  mode="tags"
+                  mode="multiple"
                   placeholder="选择显示内容"
                   v-model="scatterList[0].pointShowList"
                   style="width: 100%"
@@ -2127,7 +2129,7 @@
                     </a-radio-group>
                   </gui-inline>
                 </gui-field>
-                <gui-field label="鼠标移入区域提示">
+                <gui-field label="鼠标移入提示">
                   <a-switch
                     v-model="scatterList[0].tooltip.show"
                     size="small"
@@ -2136,7 +2138,7 @@
                 </gui-field>
                 显示内容
                 <a-select
-                  mode="tags"
+                  mode="multiple"
                   placeholder="选择显示内容"
                   v-model="scatterList[0].tooltipShowList"
                   style="width: 100%"
@@ -3075,6 +3077,7 @@ import Treemap2 from './treemap/treemap-2.vue'
 import Treemap3 from './treemap/treemap-3.vue'
 import HighChartPie from '@/components/board/options/highchart-pie'
 import HighChartBar from '@/components/board/options/highchart-bar'
+import { Divider } from 'ant-design-vue'
 
 const themeColorNMap = {
   yellow: ['rgb(249,217,96)', 'rgb(249,159,61)', 'rgb(247,107,28)'],
@@ -3236,8 +3239,8 @@ export default {
           this.selfConfig.series.label.formatter = checkedValues.join('\n\r')
         }
         this.setApis()
-      }else if(this.chartType=='v-sun'){
-        this.selfConfig.series.label.formatter = checkedValues.join(' ');
+      } else if (this.chartType == 'v-sun') {
+        this.selfConfig.series.label.formatter = checkedValues.join(' ')
       } else {
         this.selfConfig.series.label.formatterSelect = checkedValues
       }
@@ -3654,7 +3657,44 @@ export default {
         leading: true,
         trailing: false
       }
-    )
+    ),
+    // 初始化地图指标显示内容列表
+    handleMapFormatterSelect() {
+      this.mapFillPointSelectList = this.apiData.measures.concat()
+      this.mapFillTooltipSelectList = this.apiData.measures.concat()
+      if (this.apiData.options.fillType === 'area') {
+        // 地区添加地区名/维度
+        let di = this.apiData.dimensions[0]
+          ? this.apiData.dimensions[0].alias
+          : ''
+        this.mapFillPointSelectList.unshift({ alias: `地区名/${di}` })
+        this.mapFillTooltipSelectList.unshift({ alias: di })
+      } else {
+        this.mapFillPointSelectList = this.apiData.dimensions.concat(
+          this.mapFillPointSelectList
+        )
+        this.mapFillPointSelectList.unshift({ alias: '地区名' })
+      }
+      this.mapLabelPointSelectList = this.apiData.labelMeasures.concat()
+      this.mapLabelTooltipSelectList = this.apiData.labelMeasures.concat()
+      if (this.apiData.options.labelType === 'area') {
+        // 标记点添加维度
+        let labelDi = this.apiData.labelDimensions[0]
+          ? this.apiData.labelDimensions[0].alias
+          : ''
+        this.mapLabelPointSelectList.unshift({
+          alias: `地区名/${labelDi}`
+        })
+        this.mapLabelTooltipSelectList.unshift({
+          alias: labelDi
+        })
+      } else {
+        this.mapLabelPointSelectList = this.apiData.dimensions.concat(
+          this.mapLabelPointSelectList
+        )
+        this.mapLabelPointSelectList.unshift({ alias: '地区名' })
+      }
+    }
   },
   watch: {
     currSelected: {
@@ -3680,36 +3720,7 @@ export default {
             this.apiData = deepClone(val.setting.api_data)
             // 地区构造指标提示框内容选择列表
             if (val.setting.chartType === 'v-map') {
-              this.mapFillPointSelectList = this.apiData.measures.concat()
-              this.mapFillTooltipSelectList = this.apiData.measures.concat()
-              this.mapLabelPointSelectList = this.apiData.labelMeasures.concat()
-              this.mapLabelTooltipSelectList = this.apiData.labelMeasures.concat()
-              if (this.apiData.options.fillType === 'area') {
-                // 地区添加地区名/维度
-                let di = this.apiData.dimensions[0]
-                  ? this.apiData.dimensions[0].alias
-                  : ''
-                this.mapFillPointSelectList.unshift({ alias: `地区名/${di}` })
-              } else {
-                this.mapFillPointSelectList = this.apiData.dimensions.concat(
-                  this.mapFillPointSelectList
-                )
-                this.mapFillPointSelectList.unshift({ alias: '地区名' })
-              }
-              if (this.apiData.options.labelType === 'area') {
-                // 地区添加地区名/维度
-                let labelDi = this.apiData.labelDimensions[0]
-                  ? this.apiData.labelDimensions[0].alias
-                  : ''
-                this.mapLabelPointSelectList.unshift({
-                  alias: `地区名/${labelDi}`
-                })
-              } else {
-                this.mapLabelPointSelectList = this.apiData.dimensions.concat(
-                  this.mapLabelPointSelectList
-                )
-                this.mapLabelPointSelectList.unshift({ alias: '地区名' })
-              }
+              this.handleMapFormatterSelect()
             }
           }
           if (val.setting.apis) {
@@ -3857,12 +3868,12 @@ export default {
         )
       }
     },
-    sunVal(){
-      let val = this.selfConfig.series.label.formatter;
-      if(val==''){
-        return [];
-      }else{
-        return val.split(' ');
+    sunVal() {
+      let val = this.selfConfig.series.label.formatter
+      if (val == '') {
+        return []
+      } else {
+        return val.split(' ')
       }
     }
   },
