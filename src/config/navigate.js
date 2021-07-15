@@ -2157,7 +2157,7 @@ const list = [
                   padding: [0, 0, 40, 0]
                 },
                 axisLabel: {
-                  show: false,
+                  show: true,
                   color: '#ffffff',
                   fontSize: 12
                 },
@@ -2354,7 +2354,7 @@ const list = [
                     color: '#fff',
                     distance: '30%', //显示位置，正数外部，负数在图形中
                     format:
-                      '{point.name}：{point.y}（{point.percentage:.1f}%）',
+                      '{point.name} {y} ({point.percentage:.1f}%)',
                     style: {
                       fontSize: 12,
                       textOutline: 'none' //去掉文字白边

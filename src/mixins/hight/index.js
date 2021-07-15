@@ -53,7 +53,7 @@ export default {
       formatList: [
         {
           label: '维度',
-          value: '{point.name}：'
+          value: '{point.name}'
         },
         {
           label: '度量',
@@ -201,7 +201,7 @@ export default {
     },
     // 图表 点击选择背景
     onBgChange(key, val) {
-      this.$set(this.HighConfig.setting, key, val)
+      this.$set(this.HighConfig.setting.background, key, val)
       this.setBackGround()
     },
     // 点击上传图形背景图
@@ -209,11 +209,11 @@ export default {
       document.getElementById('bgPhoto').click()
     },
     setBackGround(val) {
-      if (val) {
-        if(this.HighConfig.setting.background.hasOwnProperty('backgroundImage')){
-          delete this.HighConfig.setting.background.backgroundImage;
-        }
-      }
+      // if (val) {
+      //   if(this.HighConfig.setting.background.hasOwnProperty('backgroundImage')){
+      //     delete this.HighConfig.setting.background.backgroundImage;
+      //   }
+      // }
       this.$store.dispatch('SetBackGround', this.HighConfig.setting.background)
       setBaseProperty(this.currentSelected)
       this.updateChartData();
@@ -238,7 +238,7 @@ export default {
           if (res.code === 200) {
             let imageUrl = process.env.VUE_APP_SERVICE_URL + res.imgUrl
             if (key === 'backgroundImage') {
-              this.HighConfig.setting.background.backgroundColor='';
+              // this.HighConfig.setting.background.backgroundColor='';
               this.HighConfig.setting.background['backgroundImage'] = imageUrl
               this.setBackGround()
             }

@@ -34,16 +34,18 @@ export default {
     Init(val) {
       this.option = val ? val : this.config
       this.mychart = this.$echarts.init(this.$refs.dvsheat)
-      this.mychart.setOption(val ? val : this.config)
+      console.log("999",this.option);
+      this.mychart.setOption(val ? val : this.config,true)
     }
   },
   watch: {
     config: {
       handler(val) {
-        if(val.title.text!=="矩形热力图"){
-          let max = val.series.data.map(item=>item.value);
-          val.visualMap.max = Math.max(...max)
-        }
+        // if(val.title.text!=="矩形热力图"){
+        //   debugger
+        //   let max = val.series.data.map(item=>item.value);
+        //   val.visualMap.max = Math.max(...max)
+        // }
         this.Init(val)
       },
       deep: true
@@ -73,9 +75,12 @@ export default {
             this.mychart.setOption(this.option);
           } else {
             //维度
-            let dim = val.dimensions.map((x) => x.alias)
+            let dim = val.dimensions.map((x) => x.alias);
             //度量
-            let mea = val.measures.map((y) => y.alias)
+            let mea = val.measures.map((y) => y.alias);
+            if(dim.length==0|mea.length==0){
+              return;
+            }
             //获取度量数组
             let meaarr = list.map((h) => h[mea[0]])
             let _series = list.map((item) => [
@@ -89,7 +94,7 @@ export default {
               this.option.series.data = [..._series]
               this.mychart.setOption(this.option);
             }
-            console.clear();
+            // console.clear();
           }
         }
       },
@@ -97,21 +102,30 @@ export default {
       // immediate: true,
     },
     background: {
-      handler(val) {
-        for (const key in val) {
-          let _key = key
-            .replace(/::/g, '/')
-            .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
-            .replace(/([a-z\d])([A-Z])/g, '$1_$2')
-            .replace(/_/g, '-')
-            .toLowerCase();
-          this.$set(
-            this.styleObj,
-            _key,
-            key == 'backgroundImage' ? `url(${val[key]})` : (typeof val[key])==='number'?`${val[key]}px`:val[key]
-          )
-          // this.styleObj[_key] = val[key];
+      handler(objcolor) {
+        let type = objcolor.backgroundType;
+        this.styleObj = {
+          background:type === '1'? objcolor.backgroundColor: `url(${objcolor.backgroundImage})`,
+              //  backgroundColor: val.backgroundColor,
+          'border-color': objcolor.borderColor,
+          'border-width': objcolor.borderWidth + 'px',
+          'border-style': objcolor.borderStyle,
+          'border-radius': objcolor.borderRadius + 'px'
         }
+        // for (const key in val) {
+        //   let _key = key
+        //     .replace(/::/g, '/')
+        //     .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
+        //     .replace(/([a-z\d])([A-Z])/g, '$1_$2')
+        //     .replace(/_/g, '-')
+        //     .toLowerCase();
+        //   this.$set(
+        //     this.styleObj,
+        //     _key,
+        //     key == 'backgroundImage' ? `url(${val[key]})` : (typeof val[key])==='number'?`${val[key]}px`:val[key]
+        //   )
+        //   // this.styleObj[_key] = val[key];
+        // }
       },
       deep: true,
       immediate: true

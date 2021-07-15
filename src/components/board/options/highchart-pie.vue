@@ -267,7 +267,7 @@
       <a-select
         mode="tags"
         placeholder="选择显示内容"
-        :default-value="['{point.name}：', '{y}', '({point.percentage:.1f}%)']"
+        :default-value="selval"
         style="width: 100%"
         @change="onChange"
       >
@@ -423,7 +423,18 @@ export default {
   data() {
     return {}
   },
-  computed: {},
+  computed: {
+    selval(){
+      let val = this.HighConfig.setting.config.plotOptions.pie.dataLabels.format;
+      if(val==''){
+        this.HighConfig.setting.config.plotOptions.pie.dataLabels.enabled = false;
+        return [];
+      }else{
+        this.HighConfig.setting.config.plotOptions.pie.dataLabels.enabled = true;
+        return val.split(' ');
+      }
+    }
+  },
   mounted() {},
   methods: {
     onChange(checkedValues) {

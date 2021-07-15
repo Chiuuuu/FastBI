@@ -43,7 +43,7 @@
               </a-radio-button>
             </a-radio-group>
           </div>
-          <div class="operation">
+          <div class="operation cls-frstsel">
             <a-select v-model="resourceId" style="width: 62%">
               <a-select-option
                 class="cls-mode-sel"
@@ -938,7 +938,11 @@ export default {
     }
   }
 }
-
+.cls-frstsel{
+  .cls-close{
+    display: none;
+  }
+}
 .cls-close {
 
   position: absolute;

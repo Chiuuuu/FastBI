@@ -38,18 +38,27 @@ export default {
       )
     },
     getBackgroundColor(objcolor){
-      this.styleObj = {};
-      for (const key in objcolor) {
-          let _key = key
-            .replace(/::/g, '/')
-            .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
-            .replace(/([a-z\d])([A-Z])/g, '$1_$2')
-            .replace(/_/g, '-')
-            .toLowerCase();
-          this.$set(this.styleObj,_key,
-            key == 'backgroundImage' ? `url(${objcolor[key]})` : (typeof objcolor[key])==='number'?`${objcolor[key]}px`:objcolor[key]
-          )
-        }
+      // this.styleObj = {};
+      let type = objcolor.backgroundType;
+      this.styleObj = {
+        background:type === '1'? objcolor.backgroundColor: `url(${objcolor.backgroundImage})`,
+            //  backgroundColor: val.backgroundColor,
+        'border-color': objcolor.borderColor,
+        'border-width': objcolor.borderWidth + 'px',
+        'border-style': objcolor.borderStyle,
+        'border-radius': objcolor.borderRadius + 'px'
+      }
+      // for (const key in objcolor) {
+      //     let _key = key
+      //       .replace(/::/g, '/')
+      //       .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
+      //       .replace(/([a-z\d])([A-Z])/g, '$1_$2')
+      //       .replace(/_/g, '-')
+      //       .toLowerCase();
+      //     this.$set(this.styleObj,_key,
+      //       key == 'backgroundImage' ? `url(${objcolor[key]})` : (typeof objcolor[key])==='number'?`${objcolor[key]}px`:objcolor[key]
+      //     )
+      //   }
     }
   },
   watch: {
@@ -57,7 +66,7 @@ export default {
       handler(val) {
         val.config.chart.width = val.view.width;
         val.config.chart.height = val.view.height;
-        console.log('background',val.background);
+        // console.log('background',val.background);
         // this.$highCharts.chart(this.$refs.container, val.config);
         this.getBackgroundColor(val.background);
         this.chart.update(val.config)

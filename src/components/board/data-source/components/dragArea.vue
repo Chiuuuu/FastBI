@@ -2,7 +2,7 @@
   <div
     class="dragArea"
     :class="{
-      'dragable-vaild': isdrag
+      'dragable-vaild': isdrag,
     }"
     @drop.stop.prevent="handleDropOnFilesWD($event)"
     @dragover.stop.prevent
@@ -19,7 +19,7 @@
         <a-dropdown
           :trigger="['click', 'contextmenu']"
           v-model="item.showMore"
-          @visibleChange="v => v && showMore(item)"
+          @visibleChange="(v) => v && showMore(item)"
         >
           <a-icon class="icon-more" type="caret-down" />
           <a-menu slot="overlay">
@@ -61,13 +61,15 @@ import { sum, summary } from '@/utils/summaryList'
 import geoJson from '@/utils/guangdong.json'
 import { Loading } from 'element-ui'
 import _ from 'lodash'
-import navigateList from '@/config/navigate'
+// import navigateList from '@/config/navigate'
+import source from './defaultData';
+
 export default {
   props: {
     type: {
       type: String,
-      default: ''
-    } // 区域类型 维度/度量
+      default: '',
+    }, // 区域类型 维度/度量
   },
   data() {
     return {
@@ -77,7 +79,7 @@ export default {
         dimensions: '拖入维度',
         measures: '拖入度量',
         filter: '拖入字段',
-        tableList: '拖入字段'
+        tableList: '拖入字段',
       },
       strornum: '',
       polymerizationData: {
@@ -88,12 +90,12 @@ export default {
           { name: '最大值', value: 'MAX' },
           { name: '最小值', value: 'MIN' },
           { name: '计数', value: 'CNT' },
-          { name: '去重计数', value: 'CNT­_D' }
+          { name: '去重计数', value: 'CNT­_D' },
         ],
         str: [
           { name: '计数', value: 'CNT' },
-          { name: '去重计数', value: 'CNT­_D' }
-        ]
+          { name: '去重计数', value: 'CNT­_D' },
+        ],
       },
       isdrag: false, // 是否拖拽中
       fileList: [], // 维度字段数组
@@ -104,8 +106,8 @@ export default {
         { name: '最大值', value: 'MAX' },
         { name: '最小值', value: 'MIN' },
         { name: '计数', value: 'CNT' },
-        { name: '计数', value: 'COUNT' }
-      ] // 聚合方式
+        { name: '计数', value: 'COUNT' },
+      ], // 聚合方式
     }
   },
   inject: ['errorFile', 'initTargetMeasure'],
@@ -143,7 +145,7 @@ export default {
         }
       },
       deep: true,
-      immediate: true
+      immediate: true,
     },
     errorFile: {
       handler(val) {
@@ -152,9 +154,9 @@ export default {
           if (this.chartType === '1') {
             if (this.type === 'dimensions' && this.fileList) {
               // 维度
-              this.fileList.forEach(file => {
+              this.fileList.forEach((file) => {
                 let dimension = val.dimensions.find(
-                  item => item.alias === file.alias
+                  (item) => item.alias === file.alias
                 )
                 if (dimension && dimension.status === 1) {
                   file.status = dimension.status
@@ -163,9 +165,9 @@ export default {
             }
             if (this.type === 'measures' && this.fileList) {
               // 度量
-              this.fileList.forEach(file => {
+              this.fileList.forEach((file) => {
                 let measure = val.measures.find(
-                  item => item.alias === file.alias
+                  (item) => item.alias === file.alias
                 )
                 if (measure && measure.status === 1) {
                   file.status = measure.status
@@ -177,9 +179,9 @@ export default {
           // 只需要度量
           if (this.chartType === '2') {
             if (this.type === 'measures' && this.fileList) {
-              this.fileList.forEach(file => {
+              this.fileList.forEach((file) => {
                 let measure = val.measures.find(
-                  item => item.alias === file.alias
+                  (item) => item.alias === file.alias
                 )
                 if (measure && measure.status === 1) {
                   file.status = measure.status
@@ -192,8 +194,8 @@ export default {
           if (this.chartType === '3') {
             if (this.type === 'tableList' && this.fileList) {
               let list = val.dimensions.concat(val.measures)
-              this.fileList.forEach(file => {
-                let li = list.find(item => item.alias === file.alias)
+              this.fileList.forEach((file) => {
+                let li = list.find((item) => item.alias === file.alias)
                 if (li && li.status === 1) {
                   file.status = li.status
                 }
@@ -203,8 +205,8 @@ export default {
         }
       },
       deep: true,
-      immediate: true
-    }
+      immediate: true,
+    },
   },
   computed: {
     ...mapGetters([
@@ -213,11 +215,11 @@ export default {
       'currSelected',
       'optionsTabsType',
       'dataModel',
-      'canvasMap'
+      'canvasMap',
     ]),
     chartType() {
       return this.currSelected ? this.currSelected.setting.type : ''
-    }
+    },
   },
   methods: {
     ...mapActions(['updateChartData']),
@@ -275,7 +277,7 @@ export default {
         this.chartType === '1'
       ) {
         let _alias = this.polymerizeType.find(
-          x => x.value === dataFile.defaultAggregator
+          (x) => x.value === dataFile.defaultAggregator
         )
         dataFile.alias += `(${_alias.name})`
         // 饼图类型只能拉入一个度量（包含3d和矩形热力图）
@@ -337,7 +339,7 @@ export default {
     // 对象数组去重,type表示对象里面的一个属性
     uniqueFun(arr, type) {
       const res = new Map()
-      return arr.filter(a => !res.has(a[type]) && res.set(a[type], 1))
+      return arr.filter((a) => !res.has(a[type]) && res.set(a[type], 1))
     },
     // 当可拖动的元素进入可放置的目标时
     dragenter(event) {
@@ -351,7 +353,6 @@ export default {
     },
     // 点击右键显示更多
     async showMore(item) {
-      console.log('*******************')
       //调用接口判断是否为数字
       let res = await this.$server.dataModel.getMeasures(item.pivotschemaId)
       //返回 data true表示 是数值类型
@@ -373,7 +374,7 @@ export default {
     // 抓取区中心点
     getCenterCoordinate(name) {
       let dataList = geoJson.features
-      let countryside = dataList.find(item => item.properties.name === name)
+      let countryside = dataList.find((item) => item.properties.name === name)
       if (!countryside) {
         return null
       }
@@ -384,7 +385,7 @@ export default {
       let config = setting.config
       const tree = new TreeGroupBy(
         rows,
-        setting.api_data.dimensions.map(item => item.alias),
+        setting.api_data.dimensions.map((item) => item.alias),
         setting.api_data.measures
       )
       TreeGroupBy.handleLeafValue(tree.tree)
@@ -454,7 +455,8 @@ export default {
     async deleteFile(event, item, index) {
       this.fileList.splice(index, 1)
       await this.getData()
-      let current = deepClone(this.currSelected)
+      let current = deepClone(this.currSelected);
+      console.log('777',current);
       // 维度度量删除完以后重置该图表数据
       if (this.chartType === '1' || this.chartType === '2') {
         if (
@@ -467,21 +469,29 @@ export default {
           // 嵌套饼图apis恢复原始状态
           if (current.setting.chartType === 'v-multiPie') {
             let apis = {
-              level: [['1/1', '1/2', '1/3'], ['1/4', '1/5']]
+              level: [
+                ['1/1', '1/2', '1/3'],
+                ['1/4', '1/5'],
+              ],
             }
             this.$store.dispatch('SetApis', apis)
           }
           //立体图和矩形热力图 旭日图重置
-          if (current.setting.chartType === 'high-pie'|current.setting.chartType==='high-column'|current.setting.chartType==='v-sun'){
-            console.log("原始数据",navigateList[0].tabs[0].children);
-            let _item = navigateList[0].tabs[0].children.find(x=>x.chartType==current.setting.chartType);
-            // current.setting.config.series = [];
-            current.setting.config.series =  _item.config.series;
+          if (
+            (current.setting.chartType === 'high-pie') |
+            (current.setting.chartType === 'high-column') |
+            (current.setting.chartType === 'v-sun') |
+            (current.setting.chartType === 'v-heatmap')
+          ) {
+            let res = source[current.setting.chartType];
+            console.log('深拷贝',JSON.parse(JSON.stringify(res)));;
+            console.log('原始数据', source[current.setting.chartType]);
+            current.setting.config.series = JSON.parse(JSON.stringify(res));
             this.$store.dispatch('SetSelfProperty', current.setting.config);
-            if(current.setting.chartType!=='v-sun'){
+            if (current.setting.chartType !== 'v-sun'&&current.setting.chartType !== 'v-heatmap') {
               this.updateChartData()
             }
-          } 
+          }
         }
         // 如果是仪表盘，第二个度量是目标值（进度条最大值）,重置进度条范围
         if (current.setting.chartType === 'v-gauge') {
@@ -527,7 +537,7 @@ export default {
     // 根据维度度量获取数据
     async getData() {
       let selected = this.canvasMap.find(
-        item => item.id === this.currentSelected
+        (item) => item.id === this.currentSelected
       )
       // 维度
       if (this.type === 'dimensions') {
@@ -542,7 +552,7 @@ export default {
         // 不区分默认都放在维度
         let di = []
         let me = []
-        this.fileList.forEach(item => {
+        this.fileList.forEach((item) => {
           if (item.file === 'dimensions') {
             di.push(item)
           }
@@ -566,28 +576,30 @@ export default {
         )
         selected.setting.resourceType = this.fileList[0].resourceType
       }
-      this.updateChartData()
-
-      let data = this.currSelected.setting.api_data
-      if (this.chartType === '1') {
-        if (data.dimensions.length === 0 && data.measures.length === 0) {
-          selected.datamodelId = 0
-          selected.setting.api_data.modelId = 0
-          selected.setting.isEmpty = false
-          selected.setting.resourceType = ''
-          this.updateChartData()
-          return
+      // if(this.currSelected.setting.chartType!=='v-heatmap'){
+        this.updateChartData()
+        let data = this.currSelected.setting.api_data;
+        if (this.chartType === '1') {
+          if (data.dimensions.length === 0 && data.measures.length === 0) {
+            selected.datamodelId = 0
+            selected.setting.api_data.modelId = 0
+            selected.setting.isEmpty = false
+            selected.setting.resourceType = ''
+            this.updateChartData()
+            return
+          }
+          if (data.dimensions.length === 0 || data.measures.length === 0) {
+            return
+          }
+          if (
+            data.dimensions.some((item) => item.status === 1) ||
+            data.measures.some((item) => item.status === 1)
+          ) {
+            return
+          }
         }
-        if (data.dimensions.length === 0 || data.measures.length === 0) {
-          return
-        }
-        if (
-          data.dimensions.some(item => item.status === 1) ||
-          data.measures.some(item => item.status === 1)
-        ) {
-          return
-        }
-      }
+      // }
+     
       if (this.chartType === '2') {
         if (data.measures.length === 0) {
           selected.datamodelId = 0
@@ -597,7 +609,7 @@ export default {
           this.updateChartData()
           return
         }
-        if (data.measures.some(item => item.status === 1)) {
+        if (data.measures.some((item) => item.status === 1)) {
           return
         }
       }
@@ -610,7 +622,7 @@ export default {
           this.updateChartData()
           return
         }
-        if (data.tableList.some(item => item.status === 1)) {
+        if (data.tableList.some((item) => item.status === 1)) {
           return
         }
       }
@@ -623,7 +635,6 @@ export default {
       ) {
         return
       }
-
       //矩形热力图只有在2个维度和一个度量的时候，才能请求数据
       if (
         this.currSelected.setting.chartType == 'v-heatmap' &&
@@ -636,7 +647,7 @@ export default {
         lock: true,
         text: '加载中...',
         target: 'body',
-        background: 'rgb(255, 255, 255, 0.6)'
+        background: 'rgb(255, 255, 255, 0.6)',
       })
       let res = await this.$server.screenManage.getData(params)
       loadingInstance.close()
@@ -660,10 +671,10 @@ export default {
           apiData.options.sort.length
         ) {
           let filterArr = []
-          apiData.options.sort.forEach(item => {
+          apiData.options.sort.forEach((item) => {
             filterArr.push(`sort_${item.alias}`)
           })
-          datas = datas.map(item => _.omit(item, filterArr))
+          datas = datas.map((item) => _.omit(item, filterArr))
         }
         // 矩形树图数据处理
         if (this.currSelected.setting.chartType === 'v-treemap') {
@@ -675,7 +686,7 @@ export default {
             columns.push({
               title: item.alias,
               dataIndex: item.alias,
-              key: item.alias
+              key: item.alias,
             })
           }
           let rows = datas
@@ -684,7 +695,7 @@ export default {
           }
           apiData.source = {
             columns,
-            rows
+            rows,
           }
           this.$store.dispatch('SetSelfDataSource', apiData)
         } else {
@@ -700,8 +711,8 @@ export default {
             let rows = [
               {
                 type: apiData.measures[0].alias,
-                value: total
-              }
+                value: total,
+              },
             ]
             // 环形图第二度量(指针值)
             if (
@@ -711,16 +722,16 @@ export default {
               let currentTotal = sum(datas, apiData.measures[1].alias)
               rows[0] = {
                 type: apiData.measures[1].alias,
-                value: currentTotal
+                value: currentTotal,
               }
               rows.push({
                 type: apiData.measures[0].alias,
-                value: total - currentTotal
+                value: total - currentTotal,
               })
             }
             apiData.source = {
               columns,
-              rows
+              rows,
             }
             // 保存apidata数据
             this.$store.dispatch('SetSelfDataSource', apiData)
@@ -764,16 +775,16 @@ export default {
             columns = ['name', 'value']
             let level = []
             // 一个维度是一层饼
-            dimensionKeys.forEach(item => {
+            dimensionKeys.forEach((item) => {
               // 根据当前维度分类得到的列表
               let list = summary(datas, item, measureKeys[0]) // 嵌套饼图度量只有一个，直接取第一个数
               rows = rows.concat(list) // 把所有维度分类出来的数组进行拼接（v-charts配置格式要求）
 
-              level.push(list.map(obj => obj.name)) // 按维度分层
+              level.push(list.map((obj) => obj.name)) // 按维度分层
             })
 
             let apis = {
-              level
+              level,
             }
             this.$store.dispatch('SetApis', apis)
           } else if (this.currSelected.setting.chartType === 'v-sun') {
@@ -799,10 +810,10 @@ export default {
               let metricsName = apiData.dimensions[0].alias
               let newColumns = ['measure']
               let newRows = []
-              apiData.measures.forEach(measure => {
+              apiData.measures.forEach((measure) => {
                 let measureName = measure.alias
                 let obj = {}
-                rows.forEach(row => {
+                rows.forEach((row) => {
                   newColumns.push(row[metricsName])
                   obj.measure = measureName
                   obj[row[metricsName]] = row[measureName]
@@ -822,7 +833,7 @@ export default {
             let list = []
             let xMax = 0
             let yMax = 0
-            rows.forEach(item => {
+            rows.forEach((item) => {
               if (xMax < item[columns[1]]) {
                 xMax = item[columns[1]]
               }
@@ -841,14 +852,14 @@ export default {
                   item[columns[0]], // 维度
                   columns[1],
                   columns[2],
-                  columns[0]
-                ]
+                  columns[0],
+                ],
               })
             })
             for (let i in scatterData) {
               list.push({
                 label: i,
-                data: scatterData[i]
+                data: scatterData[i],
               })
             }
             let config = deepClone(this.currSelected.setting.config)
@@ -865,7 +876,7 @@ export default {
 
           apiData.source = {
             columns,
-            rows
+            rows,
           }
           this.$store.dispatch('SetSelfDataSource', apiData)
         }
@@ -873,8 +884,8 @@ export default {
       } else {
         this.$message.error(res.msg)
       }
-    }
-  }
+    },
+  },
 }
 </script>
 
