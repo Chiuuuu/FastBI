@@ -198,9 +198,8 @@ const app = {
     },
     // 新增图表
     async addChartData({ dispatch, state }, obj) {
-      // 地图去掉mapOrgin，减少数据
       if (obj.setting.name === 've-map') {
-        obj.setting.apis.mapOrigin = ''
+        delete obj.setting.apis.mapOrigin
       }
       let name = ''
       // 数据格式不一样的特殊处理
@@ -224,12 +223,6 @@ const app = {
         .then(res => {
           if (res.code === 200) {
             // res.msg && message.success(res.msg)
-            // 地图类型还原json
-            if (res.data.setting.name === 've-map') {
-              res.data.setting.apis.mapOrigin = guangzhou
-            } else {
-            }
-
             dispatch('AddCanvasMap', res.data)
             // 保存图层顺序
             dispatch('saveScreenData')
@@ -271,7 +264,8 @@ const app = {
           if (updateList.length > 0) {
             screenManage.saveAllChart(updateList)
           }
-          dispatch('dataModel/setSelectedModelList', res.data)
+          // 需求改动，删除图表跟模型删除分开
+          //   dispatch('dataModel/setSelectedModelList', res.data)
           dispatch('SingleSelected', null)
           dispatch('HideContextMenu')
           // 保存图层顺序
@@ -292,6 +286,11 @@ const app = {
         if (chart.setting.chartType === 'v-treemap') {
           chart.setting.config.series.data = chart.setting.api_data.source
         }
+      }
+
+      // 去掉地图描点数据
+      if (chart.setting.chartType === 'v-map') {
+        delete chart.setting.apis.mapOrigin
       }
 
       let params = {
