@@ -639,7 +639,7 @@
                 </gui-field>
                 显示内容
                 <a-select
-                  mode="tags"
+                  mode="multiple"
                   v-model="apis.scatterLabel"
                   placeholder="选择显示内容"
                   style="width: 100%"
@@ -828,9 +828,9 @@
                 <!-- 旭日图独有 -->
                 <a-select
                   v-if="chartType == 'v-sun'"
-                  mode="tags"
+                  mode="multiple"
                   placeholder="选择显示内容"
-                  :default-value="sunVal"
+                  v-model="selfConfig.series.label.formatter"
                   style="width: 100%"
                   @change="onChange"
                 >
@@ -845,7 +845,7 @@
 
                 <a-select
                   v-else
-                  mode="tags"
+                  mode="multiple"
                   placeholder="选择显示内容"
                   v-model="selfConfig.series.label.formatterSelect"
                   style="width: 100%"
@@ -1880,7 +1880,7 @@
                 </gui-field>
                 指标内容
                 <a-select
-                  mode="tags"
+                  mode="multiple"
                   placeholder="选择显示内容"
                   v-model="selfConfig.series[0].pointShowList"
                   style="width: 100%"
@@ -1952,7 +1952,7 @@
                 </gui-field>
                 显示内容
                 <a-select
-                  mode="tags"
+                  mode="multiple"
                   placeholder="选择显示内容"
                   v-model="selfConfig.series[0].tooltipShowList"
                   style="width: 100%"
@@ -2028,7 +2028,7 @@
                 </gui-field>
                 指标内容
                 <a-select
-                  mode="tags"
+                  mode="multiple"
                   placeholder="选择显示内容"
                   v-model="scatterList[0].pointShowList"
                   style="width: 100%"
@@ -2130,7 +2130,7 @@
                 </gui-field>
                 显示内容
                 <a-select
-                  mode="tags"
+                  mode="multiple"
                   placeholder="选择显示内容"
                   v-model="scatterList[0].tooltipShowList"
                   style="width: 100%"
@@ -3637,7 +3637,44 @@ export default {
         leading: true,
         trailing: false
       }
-    )
+    ),
+    // 初始化地图指标显示内容列表
+    handleMapFormatterSelect() {
+      this.mapFillPointSelectList = this.apiData.measures.concat()
+      this.mapFillTooltipSelectList = this.apiData.measures.concat()
+      if (this.apiData.options.fillType === 'area') {
+        // 地区添加地区名/维度
+        let di = this.apiData.dimensions[0]
+          ? this.apiData.dimensions[0].alias
+          : ''
+        this.mapFillPointSelectList.unshift({ alias: `地区名/${di}` })
+        this.mapFillTooltipSelectList.unshift({ alias: di })
+      } else {
+        this.mapFillPointSelectList = this.apiData.dimensions.concat(
+          this.mapFillPointSelectList
+        )
+        this.mapFillPointSelectList.unshift({ alias: '地区名' })
+      }
+      this.mapLabelPointSelectList = this.apiData.labelMeasures.concat()
+      this.mapLabelTooltipSelectList = this.apiData.labelMeasures.concat()
+      if (this.apiData.options.labelType === 'area') {
+        // 标记点添加维度
+        let labelDi = this.apiData.labelDimensions[0]
+          ? this.apiData.labelDimensions[0].alias
+          : ''
+        this.mapLabelPointSelectList.unshift({
+          alias: `地区名/${labelDi}`
+        })
+        this.mapLabelTooltipSelectList.unshift({
+          alias: labelDi
+        })
+      } else {
+        this.mapLabelPointSelectList = this.apiData.dimensions.concat(
+          this.mapLabelPointSelectList
+        )
+        this.mapLabelPointSelectList.unshift({ alias: '地区名' })
+      }
+    }
   },
   watch: {
     currSelected: {
@@ -3817,42 +3854,6 @@ export default {
         return []
       } else {
         return val.split(' ')
-      }
-    },
-    handleMapFormatterSelect() {
-      this.mapFillPointSelectList = this.apiData.measures.concat()
-      this.mapFillTooltipSelectList = this.apiData.measures.concat()
-      if (this.apiData.options.fillType === 'area') {
-        // 地区添加地区名/维度
-        let di = this.apiData.dimensions[0]
-          ? this.apiData.dimensions[0].alias
-          : ''
-        this.mapFillPointSelectList.unshift({ alias: `地区名/${di}` })
-        this.mapFillTooltipSelectList.unshift({ alias: di })
-      } else {
-        this.mapFillPointSelectList = this.apiData.dimensions.concat(
-          this.mapFillPointSelectList
-        )
-        this.mapFillPointSelectList.unshift({ alias: '地区名' })
-      }
-      this.mapLabelPointSelectList = this.apiData.labelMeasures.concat()
-      this.mapLabelTooltipSelectList = this.apiData.labelMeasures.concat()
-      if (this.apiData.options.labelType === 'area') {
-        // 标记点添加维度
-        let labelDi = this.apiData.labelDimensions[0]
-          ? this.apiData.labelDimensions[0].alias
-          : ''
-        this.mapLabelPointSelectList.unshift({
-          alias: `地区名/${labelDi}`
-        })
-        this.mapLabelTooltipSelectList.unshift({
-          alias: labelDi
-        })
-      } else {
-        this.mapLabelPointSelectList = this.apiData.dimensions.concat(
-          this.mapLabelPointSelectList
-        )
-        this.mapLabelPointSelectList.unshift({ alias: '地区名' })
       }
     }
   },

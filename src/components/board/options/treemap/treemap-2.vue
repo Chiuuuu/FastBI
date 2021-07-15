@@ -3,7 +3,7 @@
   <div>
     <gui-field label="指标内容"></gui-field>
     <a-select
-      mode="tags"
+      mode="multiple"
       placeholder="选择显示内容"
       v-model="selfConfig.series.tooltipShowList"
       style="width: 100%"
