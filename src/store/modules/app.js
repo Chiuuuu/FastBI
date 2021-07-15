@@ -127,7 +127,7 @@ const app = {
         commit('SET_PAGE_LIST', [])
         commit('SET_SCREEN_ID', res.id)
         res.msg && message.success(res.msg)
-        return true
+        return res.id
       } else {
         res.msg && message.error(res.msg)
         return false

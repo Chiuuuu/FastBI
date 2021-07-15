@@ -743,7 +743,7 @@ export default {
             this.$store.dispatch('dataModel/setSelectedModelList', [])
             this.$router.push({
               name: 'screenEdit',
-              query: { id: res.id }
+              query: { id: res }
             })
             this.fileSelectName = values.name
             // 新建默认赋予所有权限
