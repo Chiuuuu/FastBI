@@ -31,8 +31,8 @@
             v-for="(subItem2, subIndex2) in chartData.rows[index]"
             :key="subIndex2"
           >
-            <td class="table-td" v-for="(value, key) in subItem2" :key="key">
-              {{ value }}
+            <td class="table-td" v-for="(value, key) in item" :key="key">
+              {{ subItem2[value] || '' }}
             </td>
           </tr>
         </table>
@@ -71,6 +71,13 @@ export default {
     show: {
       type: Boolean,
       required: true
+    }
+  },
+  watch: {
+    show(val) {
+      if (val) {
+    console.log(111111, this.chartData)
+      }
     }
   },
   methods: {

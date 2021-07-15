@@ -283,11 +283,11 @@ export default {
         let fillrows = this.currSelected.setting.api_data.returnDataFill || []
         let labelrows = this.currSelected.setting.api_data.returnDataLabel || []
         if (fillrows.length) {
-          this.chartData = { columns: Object.keys(fillrows[0]), fillrows }
+          this.chartData = { columns: this.handleTableColumns(Object.keys(fillrows[0])), fillrows }
         }
         if (labelrows.length) {
           this.chartDataForMap = {
-            columns: Object.keys(labelrows[0]),
+            columns: this.handleTableColumns(Object.keys(labelrows[0])),
             labelrows
           }
         }
@@ -295,10 +295,10 @@ export default {
         this.chartData = this.currSelected.setting.api_data.source
       } else if (type === '2') {
         let rows = this.currSelected.setting.api_data.returnData
-        this.chartData = { columns: Object.keys(rows[0]), rows }
+        this.chartData = { columns: this.handleTableColumns(Object.keys(rows[0])), rows }
       } else {
         let rows = this.currSelected.setting.api_data.source.rows
-        this.chartData = { columns: Object.keys(rows[0]), rows }
+        this.chartData = { columns: this.handleTableColumns(Object.keys(rows[0])), rows }
       }
       loadingInstance.close()
       return this.chartData.rows
@@ -339,7 +339,7 @@ export default {
       if (this.currSelected.setting.chartType === 'v-map') {
         Object.keys(source).map(item => {
           if (source[item]) {
-            let aliasKeys = Object.keys(source[item][0])
+            let aliasKeys = this.handleTableColumns(Object.keys(source[item][0]))
             columns.push(aliasKeys)
             rows.push(source[item])
             let type = item == 'fillList' ? '填充' : '标记点'
@@ -362,7 +362,7 @@ export default {
         })
       } else {
         rows = [source]
-        columns = [Object.keys(source[0])]
+        columns = [this.handleTableColumns(Object.keys(source[0]))]
         exportList = source
       }
 
@@ -372,6 +372,18 @@ export default {
         tableName
       }
       return exportList
+    },
+    // 处理表头, 按拖入的维度度量顺序排列
+    handleTableColumns(keys) {
+      const apiData = this.currSelected.setting.api_data
+      const fieldList = [].concat(apiData.dimensions).concat(apiData.measures)
+      const column = []
+      fieldList.map(item => {
+        if (keys.includes(item.alias)) {
+          column.push(item.alias)
+        }
+      })
+      return column
     }
   }
 }
