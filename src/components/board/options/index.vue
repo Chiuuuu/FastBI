@@ -319,30 +319,36 @@
                     :value="selfConfig.title.textAlign || selfConfig.title.left"
                     size="small"
                   >
-                    <a-radio-button
-                      value="left"
-                      @click.native.stop="
-                        onAlignChange(selfConfig.title, 'left')
-                      "
-                    >
-                      <a-icon type="align-left" value="left" />
-                    </a-radio-button>
-                    <a-radio-button
-                      value="center"
-                      @click.native.stop="
-                        onAlignChange(selfConfig.title, 'center')
-                      "
-                    >
-                      <a-icon type="align-center" value="center" />
-                    </a-radio-button>
-                    <a-radio-button
-                      value="right"
-                      @click.native.stop="
-                        onAlignChange(selfConfig.title, 'right')
-                      "
-                    >
-                      <a-icon type="align-right" value="right" />
-                    </a-radio-button>
+                    <a-tooltip placement="top" title="左对齐">
+                      <a-radio-button
+                        value="left"
+                        @click.native.stop="
+                          onAlignChange(selfConfig.title, 'left')
+                        "
+                      >
+                        <a-icon type="align-left" value="left" />
+                      </a-radio-button>
+                    </a-tooltip>
+                    <a-tooltip placement="top" title="居中">
+                      <a-radio-button
+                        value="center"
+                        @click.native.stop="
+                          onAlignChange(selfConfig.title, 'center')
+                        "
+                      >
+                        <a-icon type="align-center" value="center" />
+                      </a-radio-button>
+                    </a-tooltip>
+                    <a-tooltip placement="top" title="右对齐">
+                      <a-radio-button
+                        value="right"
+                        @click.native.stop="
+                          onAlignChange(selfConfig.title, 'right')
+                        "
+                      >
+                        <a-icon type="align-right" value="right" />
+                      </a-radio-button>
+                    </a-tooltip>
                   </a-radio-group>
                 </gui-field>
               </a-collapse-panel>
@@ -2631,42 +2637,48 @@
                     :value="selfConfig.header.textStyle.textAlign"
                     size="small"
                   >
-                    <a-radio-button
-                      value="left"
-                      @click.native.stop="
-                        onRadioChange(
-                          $event,
-                          selfConfig.header.textStyle,
-                          'textAlign'
-                        )
-                      "
-                    >
-                      <a-icon type="align-left" value="left" />
-                    </a-radio-button>
-                    <a-radio-button
-                      value="center"
-                      @click.native.stop="
-                        onRadioChange(
-                          $event,
-                          selfConfig.header.textStyle,
-                          'textAlign'
-                        )
-                      "
-                    >
-                      <a-icon type="align-center" value="center" />
-                    </a-radio-button>
-                    <a-radio-button
-                      value="right"
-                      @click.native.stop="
-                        onRadioChange(
-                          $event,
-                          selfConfig.header.textStyle,
-                          'textAlign'
-                        )
-                      "
-                    >
-                      <a-icon type="align-right" value="right" />
-                    </a-radio-button>
+                    <a-tooltip placement="top" title="左对齐">
+                      <a-radio-button
+                        value="left"
+                        @click.native.stop="
+                          onRadioChange(
+                            $event,
+                            selfConfig.header.textStyle,
+                            'textAlign'
+                          )
+                        "
+                      >
+                        <a-icon type="align-left" value="left" />
+                      </a-radio-button>
+                    </a-tooltip>
+                    <a-tooltip placement="top" title="居中">
+                      <a-radio-button
+                        value="center"
+                        @click.native.stop="
+                          onRadioChange(
+                            $event,
+                            selfConfig.header.textStyle,
+                            'textAlign'
+                          )
+                        "
+                      >
+                        <a-icon type="align-center" value="center" />
+                      </a-radio-button>
+                    </a-tooltip>
+                    <a-tooltip placement="top" title="右对齐">
+                      <a-radio-button
+                        value="right"
+                        @click.native.stop="
+                          onRadioChange(
+                            $event,
+                            selfConfig.header.textStyle,
+                            'textAlign'
+                          )
+                        "
+                      >
+                        <a-icon type="align-right" value="right" />
+                      </a-radio-button>
+                    </a-tooltip>
                   </a-radio-group>
                 </gui-field>
               </a-collapse-panel>
@@ -2693,42 +2705,48 @@
                     :value="selfConfig.table.textStyle.textAlign"
                     size="small"
                   >
-                    <a-radio-button
-                      value="left"
-                      @click.native.stop="
-                        onRadioChange(
-                          $event,
-                          selfConfig.table.textStyle,
-                          'textAlign'
-                        )
-                      "
-                    >
-                      <a-icon type="align-left" value="left" />
-                    </a-radio-button>
-                    <a-radio-button
-                      value="center"
-                      @click.native.stop="
-                        onRadioChange(
-                          $event,
-                          selfConfig.table.textStyle,
-                          'textAlign'
-                        )
-                      "
-                    >
-                      <a-icon type="align-center" value="center" />
-                    </a-radio-button>
-                    <a-radio-button
-                      value="right"
-                      @click.native.stop="
-                        onRadioChange(
-                          $event,
-                          selfConfig.table.textStyle,
-                          'textAlign'
-                        )
-                      "
-                    >
-                      <a-icon type="align-right" value="right" />
-                    </a-radio-button>
+                    <a-tooltip placement="top" title="左对齐">
+                      <a-radio-button
+                        value="left"
+                        @click.native.stop="
+                          onRadioChange(
+                            $event,
+                            selfConfig.table.textStyle,
+                            'textAlign'
+                          )
+                        "
+                      >
+                        <a-icon type="align-left" value="left" />
+                      </a-radio-button>
+                    </a-tooltip>
+                    <a-tooltip placement="top" title="居中">
+                      <a-radio-button
+                        value="center"
+                        @click.native.stop="
+                          onRadioChange(
+                            $event,
+                            selfConfig.table.textStyle,
+                            'textAlign'
+                          )
+                        "
+                      >
+                        <a-icon type="align-center" value="center" />
+                      </a-radio-button>
+                    </a-tooltip>
+                    <a-tooltip placement="top" title="右对齐">
+                      <a-radio-button
+                        value="right"
+                        @click.native.stop="
+                          onRadioChange(
+                            $event,
+                            selfConfig.table.textStyle,
+                            'textAlign'
+                          )
+                        "
+                      >
+                        <a-icon type="align-right" value="right" />
+                      </a-radio-button>
+                    </a-tooltip>
                   </a-radio-group>
                 </gui-field>
                 <gui-field label="奇行">

@@ -84,7 +84,7 @@
       </a-empty>
     </div>
     <div class="right scrollbar" style="overflow: hidden">
-      <div class="right-header" v-if="fileSelectId !== ''">
+      <div class="right-header" v-if="fileSelectId !== -1">
         <span class="nav_title">{{ fileSelectName }} </span>
         <img
           v-show="isPublish === 0"

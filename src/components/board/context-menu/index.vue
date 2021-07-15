@@ -23,6 +23,7 @@
             class="context-menu-item"
             v-for="(menu, i) in item.children"
             :key="menu.order"
+            v-show="showMenu(menu)"
             @click.stop="handleCommand(menu.order, item)"
           >
             <JsonExcel
@@ -59,7 +60,7 @@ const exportChartList = [
     icon: 'ios-share',
     text: '查看数据',
     order: 'showChartData',
-    ignore: ['figure']
+    ignore: ['figure', 've-image']
   },
   {
     icon: 'ios-download',
@@ -68,8 +69,8 @@ const exportChartList = [
     ignore: ['figure'],
     showChildren: false,
     children: [
-      { text: 'excel', order: 'toexcel' },
-      { text: 'csv', order: 'tocsv' },
+      { text: 'excel', order: 'toexcel', ignore: ['ve-image'] },
+      { text: 'csv', order: 'tocsv', ignore: ['ve-image'] },
       { text: '图片', order: 'exportImg' }
     ]
   }
@@ -79,7 +80,7 @@ const chartMenuList = [
     icon: 'ios-share',
     text: '查看数据',
     order: 'showChartData',
-    ignore: ['figure']
+    ignore: ['figure', 've-image']
   },
   {
     icon: 'ios-download',
@@ -88,8 +89,8 @@ const chartMenuList = [
     ignore: ['figure'],
     showChildren: false,
     children: [
-      { text: 'excel', order: 'toexcel' },
-      { text: 'csv', order: 'tocsv' },
+      { text: 'excel', order: 'toexcel', ignore: ['ve-image'] },
+      { text: 'csv', order: 'tocsv', ignore: ['ve-image'] },
       { text: '图片', order: 'exportImg' }
     ]
   },

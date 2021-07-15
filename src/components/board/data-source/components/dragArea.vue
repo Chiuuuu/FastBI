@@ -468,12 +468,8 @@ export default {
           this.$store.dispatch('SetSelfDataSource', current.setting.api_data)
           // 嵌套饼图apis恢复原始状态
           if (current.setting.chartType === 'v-multiPie') {
-            let apis = {
-              level: [
-                ['1/1', '1/2', '1/3'],
-                ['1/4', '1/5'],
-              ],
-            }
+            const apis = current.setting.apis
+            apis.level = [['1/1', '1/2', '1/3'], ['1/4', '1/5']]
             this.$store.dispatch('SetApis', apis)
           }
           //立体图和矩形热力图 旭日图重置
@@ -773,6 +769,8 @@ export default {
           if (this.currSelected.setting.chartType === 'v-multiPie') {
             // name是各维度数据拼接，value是分类汇总过的数值
             columns = ['name', 'value']
+            const apis = deepClone(this.currSelected.setting.apis)
+            apis.level = [['1/1', '1/2', '1/3'], ['1/4', '1/5']]
             let level = []
             // 一个维度是一层饼
             dimensionKeys.forEach((item) => {
@@ -783,9 +781,7 @@ export default {
               level.push(list.map((obj) => obj.name)) // 按维度分层
             })
 
-            let apis = {
-              level,
-            }
+            apis.level = level
             this.$store.dispatch('SetApis', apis)
           } else if (this.currSelected.setting.chartType === 'v-sun') {
             rows = [...datas]

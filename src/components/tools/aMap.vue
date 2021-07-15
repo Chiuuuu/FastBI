@@ -4,7 +4,6 @@
   </div>
 </template>
 <script>
-import guangzhou from '@/utils/guangdong.json'
 export default {
   name: 'amap',
   components: {},
