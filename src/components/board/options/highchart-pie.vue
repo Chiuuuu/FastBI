@@ -264,7 +264,7 @@
       <a-switch
         slot="extra"
         v-model="HighConfig.setting.config.plotOptions.pie.dataLabels.enabled"
-        default-checked
+       
         @change="switchChange"
         size="small"
       />
@@ -427,26 +427,29 @@ export default {
   mixins: [HighMinxins],
   components: { GuiField, GuiInline },
   data() {
-    return {}
+    return {
+      // selval:[]
+    }
   },
   computed: {
     selval(){
-      let val = this.HighConfig.setting.config.plotOptions.pie.dataLabels.format;
-      if(val==''){
-        this.HighConfig.setting.config.plotOptions.pie.dataLabels.enabled = false;
+      let _val = this.HighConfig.setting.config.plotOptions.pie.dataLabels.format;
+      if(_val==''){
+        // this.HighConfig.setting.config.plotOptions.pie.dataLabels.enabled = false;
         return [];
       }else{
-        this.HighConfig.setting.config.plotOptions.pie.dataLabels.enabled = true;
-        return val.split(' ');
+        // this.HighConfig.setting.config.plotOptions.pie.dataLabels.enabled = true;
+        return _val.split(' ');
       }
     }
   },
   mounted() {},
   methods: {
     onChange(checkedValues) {
+      // this.selval = checkedValues;
       // this.HighConfig.setting.config.plotOptions.pie.dataLabels.format = checkedValues.join('');
       let source = this.HighConfig.setting.config.plotOptions.pie.dataLabels
-      this.$set(source, 'format', checkedValues.join(''))
+      this.$set(source, 'format', checkedValues.join(' '))
       this.setSelfProperty()
     }
   },

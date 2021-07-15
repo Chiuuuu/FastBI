@@ -175,6 +175,7 @@ export default {
     ...mapActions(['updateChartData', 'refreshScreen']),
     // 设置自有属性
     setSelfProperty() {
+      console.log('config',this.HighConfig.setting.config);
       this.$store.dispatch('SetSelfProperty', this.HighConfig.setting.config)
       // 发送请求来保存数据
       setBaseProperty(this.currentSelected)

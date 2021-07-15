@@ -66,7 +66,7 @@ export default {
       handler(val) {
         val.config.chart.width = val.view.width;
         val.config.chart.height = val.view.height;
-        // console.log('background',val.background);
+        console.log('background',val.config);
         // this.$highCharts.chart(this.$refs.container, val.config);
         this.getBackgroundColor(val.background);
         this.chart.update(val.config)

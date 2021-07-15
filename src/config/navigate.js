@@ -2355,8 +2355,7 @@ const list = [
                     enabled: true, //是否显示饼图的线形tip
                     color: '#fff',
                     distance: '30%', //显示位置，正数外部，负数在图形中
-                    format:
-                      '{point.name} {y} ({point.percentage:.1f}%)',
+                    format:'{point.name}',
                     style: {
                       fontSize: 12,
                       textOutline: 'none' //去掉文字白边
