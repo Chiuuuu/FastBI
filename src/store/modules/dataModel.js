@@ -38,7 +38,7 @@ const mutations = {
     state.datasourceId = id
   },
   SET_SELECTEDMODELlIST(state, list) {
-    state.selectedModelList = list
+    state.selectedModelList = list || []
   }
 }
 

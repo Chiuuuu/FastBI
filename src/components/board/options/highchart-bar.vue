@@ -60,24 +60,30 @@
           :value="HighConfig.setting.config.title.align"
           size="small"
         >
-          <a-radio-button
-            value="left"
-            @click.native.stop="onRadioChange('title', 'align', 'left')"
-          >
-            <a-icon type="align-left" value="left" />
-          </a-radio-button>
-          <a-radio-button
-            value="center"
-            @click.native.stop="onRadioChange('title', 'align', 'center')"
-          >
-            <a-icon type="align-center" value="center" />
-          </a-radio-button>
-          <a-radio-button
-            value="right"
-            @click.native.stop="onRadioChange('title', 'align', 'right')"
-          >
-            <a-icon type="align-right" value="right" />
-          </a-radio-button>
+          <a-tooltip placement="top" title="左对齐">
+            <a-radio-button
+              value="left"
+              @click.native.stop="onRadioChange('title', 'align', 'left')"
+            >
+              <a-icon type="align-left" value="left" />
+            </a-radio-button>
+          </a-tooltip>
+          <a-tooltip placement="top" title="居中">
+            <a-radio-button
+              value="center"
+              @click.native.stop="onRadioChange('title', 'align', 'center')"
+            >
+              <a-icon type="align-center" value="center" />
+            </a-radio-button>
+          </a-tooltip>
+          <a-tooltip placement="top" title="右对齐">
+            <a-radio-button
+              value="right"
+              @click.native.stop="onRadioChange('title', 'align', 'right')"
+            >
+              <a-icon type="align-right" value="right" />
+            </a-radio-button>
+          </a-tooltip>
         </a-radio-group>
       </gui-field>
     </a-collapse-panel>

@@ -1459,6 +1459,7 @@ const list = [
                 }
               },
               series: {
+                type: 'pie',
                 label: {
                   show: true,
                   color: '',
@@ -1858,7 +1859,8 @@ const list = [
                   color: '#ffffff',
                   fontSize: 20,
                   fontFamily: 'not specified',
-                  fontWeight: 'normal'
+                  fontWeight: 'normal',
+                  overflow: 'break'
                 }
               },
               grid: {

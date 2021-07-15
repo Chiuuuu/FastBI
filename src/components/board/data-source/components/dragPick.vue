@@ -807,6 +807,7 @@ export default {
               apiData.measures[1]
             ) {
               let goalTotal = sum(datas, apiData.measures[1].alias)
+              let config = deepClone(this.currSelected.setting.config)
               config.series.max = goalTotal
               this.$store.dispatch('SetSelfProperty', config)
             }
@@ -832,21 +833,17 @@ export default {
           if (this.currSelected.setting.chartType === 'v-multiPie') {
             // name是各维度数据拼接，value是分类汇总过的数值
             columns = ['name', 'value']
-            let rows = datas
+            const apis = deepClone(this.currSelected.setting.apis)
             let level = []
             // 一个维度是一层饼
             dimensionKeys.forEach(item => {
               // 根据当前维度分类得到的列表
-              let list = summary(rows, item, measureKeys[0]) // 嵌套饼图度量只有一个，直接取第一个数
+              let list = summary(res.rows, item, measureKeys[0]) // 嵌套饼图度量只有一个，直接取第一个数
               rows = rows.concat(list) // 把所有维度分类出来的数组进行拼接（v-charts配置格式要求）
 
               level.push(list.map(obj => obj.name)) // 按维度分层
             })
-
-            let apis = {
-              level
-            }
-            console.log(apis)
+            apis.level = level
             this.$store.dispatch('SetApis', apis)
           } else {
             datas.map((item, index) => {
