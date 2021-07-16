@@ -122,17 +122,7 @@ export default {
           // 重复选择数据，进行重置
           if (self.currentIndex === e.dataIndex) {
             // 重置数据颜色样式
-            const series = self.chartExtend.series
-            if (
-              series.itemStyle &&
-              series.itemStyle.normal &&
-              series.itemStyle.normal.color
-            ) {
-              delete self.chartExtend.series.itemStyle.normal.color
-            }
-            self.currentIndex = ''
-            // 强行渲染
-            self.key++
+            self.resetChartStyle()
             resetOriginData(self.chartId, self.canvasMap)
             // self.$emit('resetOriginData', self.chartId)
             return
@@ -420,6 +410,21 @@ export default {
         return result.toString()
       }
     },
+    // 重置图表样式(图表联动)
+    resetChartStyle() {
+        debugger
+      const series = this.chartExtend.series
+      if (
+        series.itemStyle &&
+        series.itemStyle.normal &&
+        series.itemStyle.normal.color
+      ) {
+        delete this.chartExtend.series.itemStyle.normal.color
+      }
+      this.currentIndex = ''
+      // 强行渲染
+      this.key++
+    },
     // 添加图表点击事件，可以点击非数据区域
     setChartClick() {
       this.$nextTick(() => {
@@ -427,16 +432,7 @@ export default {
         this.$refs.chart.echarts.getZr().on('click', function(params) {
           if (typeof params.target === 'undefined') {
             // 重置数据颜色样式
-            const series = self.chartExtend.series
-            if (
-              series.itemStyle &&
-              series.itemStyle.normal &&
-              series.itemStyle.normal.color
-            ) {
-              delete self.chartExtend.series.itemStyle.normal.color
-            }
-            // 强行渲染，非数据变动不会自动重新渲染
-            self.key++
+            self.resetChartStyle()
             resetOriginData(self.chartId, self.canvasMap)
             // self.$emit('resetOriginData', self.chartId)
             self.currentIndex = ''
