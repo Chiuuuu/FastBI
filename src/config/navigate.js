@@ -677,6 +677,12 @@ const list = [
               legend: {
                 show: true,
                 orient: 'horizontal',
+                // 加翻页
+                type: 'scroll',
+                pageIconColor:'#fff',
+                pageTextStyle:{
+                  color:'#fff' 
+                },
                 textStyle: {
                   color: '#ffffff',
                   fontSize: 12
@@ -1406,6 +1412,12 @@ const list = [
               legend: {
                 show: true,
                 orient: 'horizontal',
+                // 加翻页
+                type: 'scroll',
+                pageIconColor:'#fff',
+                pageTextStyle:{
+                  color:'#fff' 
+                },
                 textStyle: {
                   color: '#ffffff',
                   fontSize: 12
@@ -1560,7 +1572,7 @@ const list = [
               ],
               scatterColor: '1', //散点颜色 0单色 1按维度
               scatterSize: '', //散点大小  0：按度量1  1：按度量2  默认空，为无
-              scatterLabel: [], //指标-显示内容
+              scatterLabel: ['{@5}：{@2}','({@0},{@1})'], //指标-显示内容
               arrange: 'horizontal', //指标-排列 horizontal水平  vertical垂直
               scatterTargetColor: '0', //0使用图例 1：自定义
               xMax: 1000, //度量1 最大值
@@ -1599,8 +1611,14 @@ const list = [
                 bottom: 50
               },
               legend: {
-                show: true,
+                show: false,
                 orient: 'horizontal',
+                // 加翻页
+                type: 'scroll',
+                pageIconColor:'#fff',
+                pageTextStyle:{
+                  color:'#fff' 
+                },
                 textStyle: {
                   color: '#ffffff',
                   fontSize: 12
@@ -1686,12 +1704,13 @@ const list = [
                 type: 'scatter',
                 symbolSize: 15,
                 label: {
-                  show: false,
+                  show: true,
                   color: '',
                   fontSize: 12,
                   position: 'outside', // 可选inside
                   align: 'left',
-                  offset: [-10, 0]
+                  offset: [-10, 0],
+                  formatter: "{@5}：{@2} ({@0},{@1})",
                 }
               },
               color: DEFAULT_COLORS
@@ -1873,6 +1892,12 @@ const list = [
               legend: {
                 show: false,
                 orient: 'horizontal',
+                // 加翻页
+                type: 'scroll',
+                pageIconColor:'#fff',
+                pageTextStyle:{
+                  color:'#fff' 
+                },
                 textStyle: {
                   color: '#ffffff',
                   fontSize: 12
@@ -2334,6 +2359,18 @@ const list = [
                   cursor: 'pointer',
                   fontSize: 12,
                   color: '#fff'
+                },
+                // 翻页设置样式
+                navigation: {
+                  activeColor: '#fff',
+                  animation: true,
+                  arrowSize: 12,
+                  inactiveColor: '#ccc',
+                  style: {
+                    fontWeight: 'bold',
+                    color: '#fff',
+                    fontSize: '12px'
+                  }
                 }
               },
               //图形种类配置
@@ -2500,7 +2537,7 @@ const list = [
                   cursor: 'pointer',
                   fontSize: 12,
                   color: '#fff'
-                }
+                },
               },
               xAxis: {
                 type: 'category',

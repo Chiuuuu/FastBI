@@ -38,10 +38,13 @@ export function handleRefreshData({ chart, newData }) {
           value: datas[keys[0]]
         }
       ]
+      // 剩余数
+      let value = datas[keys[1]] - rows[0].value
+      value = value > 0 ? value : 0
       // 剩余段,目标值-当前值
       rows.push({
         type: keys[1],
-        value: datas[keys[1]] - rows[0].value
+        value
       })
       chart.setting.api_data.source.rows = rows
       chart.setting.config.chartTitle.text =

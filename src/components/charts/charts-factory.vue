@@ -122,17 +122,7 @@ export default {
           // 重复选择数据，进行重置
           if (self.currentIndex === e.dataIndex) {
             // 重置数据颜色样式
-            const series = self.chartExtend.series
-            if (
-              series.itemStyle &&
-              series.itemStyle.normal &&
-              series.itemStyle.normal.color
-            ) {
-              delete self.chartExtend.series.itemStyle.normal.color
-            }
-            self.currentIndex = ''
-            // 强行渲染
-            self.key++
+            self.resetChartStyle()
             resetOriginData(self.chartId, self.canvasMap)
             // self.$emit('resetOriginData', self.chartId)
             return
@@ -278,13 +268,12 @@ export default {
               return
             }
           }
-
+          // 散点图 -- 维度和度量都移除后，设置回初始默认值
           if (
             (val.dimensions || []).length == 0 &&
             (val.measures || []).length == 0 &&
             this.chartType === 'v-scatter'
           ) {
-            // let config = deepClone(this.config)
             this.config.legend.data = this.apis.legendData
             this.config.series.data = this.apis.seriesData
             this.apis.xMax = 1000 //度量1 最大值
@@ -371,7 +360,6 @@ export default {
           this.apis.scatterColor === '0'
             ? (item.color = '#68ABDA')
             : delete item.color
-
           // 散点图大小设置
           let scatterSize = this.apis.scatterSize
           if (scatterSize) {
@@ -382,6 +370,26 @@ export default {
             }
           }
         })
+        // 如果有图表联动, 则渲染联动的数据
+        if (this.apiData.selectData) {
+          let seriesData = options.series[0];
+          let columns = this.apiData.selectData.columns;
+          let rows1 = this.apiData.selectData.rows[0];
+          seriesData.data = [{
+            name:'',
+            value:[
+              rows1[columns[1]],
+              rows1[columns[2]],
+              rows1[columns[0]],
+              columns[1],
+              columns[2],
+              columns[0],
+            ]
+          }]
+          options.series = seriesData
+          options.legend.data = [rows1[columns[0]]]
+        }
+     
       }
 
       // 矩形树图
@@ -420,6 +428,20 @@ export default {
         return result.toString()
       }
     },
+    // 重置图表样式(图表联动)
+    resetChartStyle() {
+      const series = this.chartExtend.series
+      if (
+        series.itemStyle &&
+        series.itemStyle.normal &&
+        series.itemStyle.normal.color
+      ) {
+        delete this.chartExtend.series.itemStyle.normal.color
+      }
+      this.currentIndex = ''
+      // 强行渲染
+      this.key++
+    },
     // 添加图表点击事件，可以点击非数据区域
     setChartClick() {
       this.$nextTick(() => {
@@ -427,16 +449,7 @@ export default {
         this.$refs.chart.echarts.getZr().on('click', function(params) {
           if (typeof params.target === 'undefined') {
             // 重置数据颜色样式
-            const series = self.chartExtend.series
-            if (
-              series.itemStyle &&
-              series.itemStyle.normal &&
-              series.itemStyle.normal.color
-            ) {
-              delete self.chartExtend.series.itemStyle.normal.color
-            }
-            // 强行渲染，非数据变动不会自动重新渲染
-            self.key++
+            self.resetChartStyle()
             resetOriginData(self.chartId, self.canvasMap)
             // self.$emit('resetOriginData', self.chartId)
             self.currentIndex = ''

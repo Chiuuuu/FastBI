@@ -563,7 +563,7 @@
                     >
                       <a-select-option
                         :value="font.value"
-                        v-for="(font, index) in scatterSizeList"
+                        v-for="(font, index) in scatterSizeList_"
                         :key="index"
                         >{{ font.label }}</a-select-option
                       >
@@ -643,6 +643,31 @@
                     </a-select>
                   </gui-inline>
                 </gui-field>
+                <!--  -->
+                <gui-field label="指标偏移">
+                  <gui-inline>
+                    <a-input-number
+                      v-model="selfConfig.series.label.offset[0]"
+                      size="small"
+                      :formatter="value => `水平 ${value}`"
+                      :parser="value => value.replace(/\上\s?|(,*)/g, '')"
+                      class="f-clear-width"
+                      @change="setSelfProperty"
+                    ></a-input-number>
+                  </gui-inline>
+                </gui-field>
+                <gui-field label>
+                  <gui-inline>
+                    <a-input-number
+                      v-model="selfConfig.series.label.offset[1]"
+                      size="small"
+                      :formatter="value => `垂直 ${value}`"
+                      class="f-clear-width"
+                      @change="setSelfProperty"
+                    ></a-input-number>
+                  </gui-inline>
+                </gui-field>
+                
                 显示内容
                 <a-select
                   mode="multiple"
@@ -652,7 +677,7 @@
                   @change="onChange"
                 >
                   <a-select-option
-                    v-for="i in scatterFormatList"
+                    v-for="i in scatterFormatList_"
                     :key="i.label"
                     :value="i.value"
                   >
@@ -3875,7 +3900,29 @@ export default {
       } else {
         return val.split(' ')
       }
-    }
+    },
+    scatterFormatList_(){
+      let scatterFormatList = deepClone(this.scatterFormatList);
+      if(this.currSelected.setting.api_data.dimensions.length === 1 
+        && this.currSelected.setting.api_data.measures.length === 2
+      ){
+        scatterFormatList[1].label = this.currSelected.setting.api_data.dimensions[0].alias //维度1
+        scatterFormatList[2].label = this.currSelected.setting.api_data.measures[0].alias //度量1
+        scatterFormatList[3].label = this.currSelected.setting.api_data.measures[1].alias //度量2
+      }
+      return scatterFormatList;
+    },
+    scatterSizeList_(){
+      let scatterSizeList = deepClone(this.scatterSizeList);
+      if(this.currSelected.setting.api_data.dimensions.length === 1 
+        && this.currSelected.setting.api_data.measures.length === 2
+      ){
+        scatterSizeList[1].label = '按' + this.currSelected.setting.api_data.measures[0].alias //度量1
+        scatterSizeList[2].label = '按' + this.currSelected.setting.api_data.measures[1].alias //度量2
+      }
+      return scatterSizeList;
+    },
+    
   },
   components: {
     GuiField,

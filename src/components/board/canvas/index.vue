@@ -67,7 +67,7 @@ export default {
       if (!wrap) return
       // 计算wrap样式
       this.wrapStyle = {
-        width: wrap.clientWidth - 10 + 'px',
+        width: wrap.clientWidth + 'px',
         height: wrap.clientHeight - 61 + 'px'
       }
       this.screenStyle = {

@@ -5,6 +5,7 @@ import { Loading } from 'element-ui'
 import { handleRefreshData } from '@/utils/handleRefreshData'
 import { messages } from 'bin-ui'
 import guangzhou from '@/utils/guangdong.json'
+import { deepClone } from '@/utils/deepClone'
 
 let orginPageSettings = {
   width: 1920,
@@ -270,13 +271,6 @@ const app = {
       if (!chart) {
         chart = rootGetters.canvasMap.find(item => item.id === id)
       }
-      // 图表联动数据selectData不保存后台
-      if (chart.setting.api_data.selectData) {
-        delete chart.setting.api_data.selectData
-        if (chart.setting.chartType === 'v-treemap') {
-          chart.setting.config.series.data = chart.setting.api_data.source
-        }
-      }
 
       // 去掉地图描点数据
       if (chart.setting.chartType === 'v-map') {
@@ -289,7 +283,14 @@ const app = {
         screenId: state.screenId,
         datamodelId: chart.datamodelId || 0,
         isPublish: 1,
-        setting: chart.setting
+        setting: deepClone(chart.setting)
+      }
+      // 图表联动数据selectData不保存后台
+      if (params.setting.api_data.selectData) {
+        delete params.setting.api_data.selectData
+        // if (params.setting.chartType === 'v-treemap') {
+        //   params.setting.config.series.data = chart.setting.api_data.source
+        // }
       }
       return screenManage.updateChart(params)
     },
@@ -324,7 +325,10 @@ const app = {
       })
     },
     // 刷新大屏
-    async refreshScreen({ state, rootGetters }, { charSeted, needLoading }) {
+    async refreshScreen(
+      { state, rootGetters, dispatch },
+      { charSeted, needLoading }
+    ) {
       // 有loading的是手动刷新，refreshCache设为true
       let params = {
         tabId: state.currentPageId,
@@ -355,6 +359,18 @@ const app = {
               let chart = rootGetters.canvasMap.find(
                 chart => chart.id + '' === id
               )
+              // 图表联动数据selectData不保存后台
+              if (chart.setting.api_data.selectData) {
+                delete chart.setting.api_data.selectData
+                if (chart.setting.chartType === 'v-treemap') {
+                  chart.setting.config.series.data =
+                    chart.setting.api_data.source
+                }
+              }
+              // 素材库不需要数据
+              if (chart.name === 'material') {
+                continue
+              }
               let newData = dataItem[id].graphData
 
               // 找到chart的表示当前页
