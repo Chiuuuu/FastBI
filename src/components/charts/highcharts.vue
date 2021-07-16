@@ -40,6 +40,7 @@ export default {
     getBackgroundColor(objcolor){
       // this.styleObj = {};
       let type = objcolor.backgroundType;
+      debugger
       this.styleObj = {
         background:type === '1'? objcolor.backgroundColor: `url(${objcolor.backgroundImage})`,
             //  backgroundColor: val.backgroundColor,
@@ -66,7 +67,7 @@ export default {
       handler(val) {
         val.config.chart.width = val.view.width;
         val.config.chart.height = val.view.height;
-        console.log('background',val.config);
+        console.log('background',val.background);
         // this.$highCharts.chart(this.$refs.container, val.config);
         this.getBackgroundColor(val.background);
         this.chart.update(val.config)

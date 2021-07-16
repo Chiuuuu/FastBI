@@ -580,6 +580,19 @@
           @change="setBackGround"
         ></a-input-number>
       </gui-field>
+      <gui-field label="边框线型">
+        <a-select
+          style="width: 90px"
+          v-model="HighConfig.setting.background.borderStyle"
+          @change="setBackGround"
+          placeholder="无"
+          size="small"
+        >
+          <a-select-option value="solid">实线</a-select-option>
+          <a-select-option value="dotted">点状</a-select-option>
+          <a-select-option value="dashed">虚线</a-select-option>
+        </a-select>
+      </gui-field>
     </a-collapse-panel>
   </a-collapse>
 </template>
@@ -632,7 +645,8 @@ export default {
           val ? 'normal' : null
         )
       }
-      this.setSelfProperty()
+      this.setSelfProperty();
+      console.clear();
     },
     getBtnRadio(key, val) {
       this.$set(this.HighConfig.setting.config[key].title, 'align', val)

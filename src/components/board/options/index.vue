@@ -836,7 +836,7 @@
                   v-if="chartType == 'v-sun'"
                   mode="multiple"
                   placeholder="选择显示内容"
-                  v-model="selfConfig.series.label.formatter"
+                  v-model="sunVal"
                   style="width: 100%"
                   @change="onChange"
                 >
@@ -3244,7 +3244,8 @@ export default {
       } else {
         this.selfConfig.series.label.formatterSelect = checkedValues
       }
-      this.setSelfProperty()
+      this.setSelfProperty();
+      console.clear();
     },
     // 设置自有属性
     setSelfProperty() {
