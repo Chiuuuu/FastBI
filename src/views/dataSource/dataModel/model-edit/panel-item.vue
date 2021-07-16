@@ -73,7 +73,10 @@ export default {
     },
     handleCreateMenu(e) {
       e.stopPropagation()
-      const that = this
+      const that = this;
+      //每次点击获取他的原始数据类型
+      let _dataType = this.itemData.dataType;
+      console.log('原始数据类型',_dataType);
       addClass(this.$refs.file, 'file-active')
        function addEvent(target) {
             target.$$fun = function () {
@@ -96,7 +99,10 @@ export default {
         menus: contextmenus.map(item => {
             if (item['children'] && item.children.length) {
                 item.children.forEach(subitem => {
-                    addEvent(subitem)
+                  if(subitem.dataType===_dataType){
+                    subitem.name = `还原为${subitem.name.split('为')[1]}`;
+                  }
+                  addEvent(subitem)
                 })
             } else {
                 addEvent(item)

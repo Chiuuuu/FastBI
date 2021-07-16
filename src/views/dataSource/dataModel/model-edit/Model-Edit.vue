@@ -434,7 +434,7 @@ export default {
     },
     switchFieldType(e, item, vm) {
       let dataType = item.dataType
-      vm.itemData.dataType = dataType
+      vm.itemData.convertType = dataType
     },
     handleEditField(event, handler, vm) {
       const role = vm.itemData.role
