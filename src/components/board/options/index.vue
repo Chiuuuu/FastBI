@@ -3725,8 +3725,7 @@ export default {
     currSelected: {
       handler(val) {
         if (val) {
-          console.log(val,'val---------------------')
-          if (val.setting.name === 've-image') {
+          if (val.setting.name === 've-image' || val.setting.name === 'figure') {
             this.tabsType = 0
           }
           this.baseProperty = { ...val.setting.view }

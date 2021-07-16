@@ -51,7 +51,7 @@
                     chart.id === currentSelected
                 "
               >
-                {{ chart.setting.config.title.content }}
+                {{ chart.setting.config.title.content || chart.setting.config.title.text }}
                 <span v-show="chart.id === currentSelected">(当前报表)</span>
                 <span v-show="checkBeBinded(chart)">已存在于联动路径中</span>
                 <span v-show="checkHaveBind(chart)">已被创建联动</span>

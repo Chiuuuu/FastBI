@@ -375,6 +375,10 @@ const app = {
 
               // 找到chart的表示当前页
               if (chart) {
+                // 素材库不需要数据
+                if (chart.name === 'material') {
+                  continue
+                }
                 // 图表模型被删掉
                 if (dataItem[id] === 'IsChanged') {
                   chart.setting.isEmpty = true
