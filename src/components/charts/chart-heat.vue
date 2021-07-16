@@ -81,7 +81,10 @@ export default {
               return;
             }
             //获取度量数组
-            let meaarr = list.map((h) => h[mea[0]])
+            let meaarr = list.map((h) => h[mea[0]]);
+            if(meaarr.includes(undefined)){
+              return
+            }
             let _series = list.map((item) => [
               item[dim[0]],
               item[dim[1]],

@@ -62,7 +62,7 @@ import geoJson from '@/utils/guangdong.json'
 import { Loading } from 'element-ui'
 import _ from 'lodash'
 // import navigateList from '@/config/navigate'
-import source from './defaultData';
+import sourceMap from './defaultData';
 
 export default {
   props: {
@@ -479,9 +479,10 @@ export default {
             (current.setting.chartType === 'v-sun') |
             (current.setting.chartType === 'v-heatmap')
           ) {
-            let res = source[current.setting.chartType];
+            let res = sourceMap[current.setting.chartType];
+            // let res = navigateList[0].tabs[0].children;
             console.log('深拷贝',JSON.parse(JSON.stringify(res)));;
-            console.log('原始数据', source[current.setting.chartType]);
+            console.log('原始数据', sourceMap[current.setting.chartType]);
             current.setting.config.series = JSON.parse(JSON.stringify(res));
             this.$store.dispatch('SetSelfProperty', current.setting.config);
             if (current.setting.chartType !== 'v-sun'&&current.setting.chartType !== 'v-heatmap') {
