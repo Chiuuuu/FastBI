@@ -34,7 +34,7 @@ export default {
       text: '页面配置'
     },
     style: {
-      width: '270px'
+      width: '290px'
     }
   },
   // 8-14 数据模型侧栏
