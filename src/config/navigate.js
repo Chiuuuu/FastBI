@@ -2434,7 +2434,7 @@ const list = [
           },
           {
             title: '立体柱状图',
-            name: 'high-pie',
+            name: 'high-column',
             chartType: 'high-column',
             icon: '立体柱状图.png',
             // iconFont: 'icon-Pie-chart',
