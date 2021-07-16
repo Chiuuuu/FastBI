@@ -412,7 +412,6 @@ export default {
     },
     // 重置图表样式(图表联动)
     resetChartStyle() {
-        debugger
       const series = this.chartExtend.series
       if (
         series.itemStyle &&
