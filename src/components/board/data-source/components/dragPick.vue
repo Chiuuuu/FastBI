@@ -784,10 +784,13 @@ export default {
                   value: datas[0][keys[0]]
                 }
               ]
+              // 剩余数
+              let value = datas[0][keys[1]] - rows[0].value
+              value = value > 0 ? value : 0
               // 剩余段,目标值-当前值
               rows.push({
                 type: keys[1],
-                value: datas[0][keys[1]] - rows[0].value
+                value
               })
               let config = this.currSelected.setting.config
               config.chartTitle.text =

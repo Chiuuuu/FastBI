@@ -158,6 +158,7 @@
             <!-- <span>{{transform.setting.background}}</span> -->
             <charts-factory
               v-else
+              ref="vChart"
               :chart-id="transform.id"
               :key="transform.id"
               :chart-type="transform.setting.chartType"
@@ -233,6 +234,10 @@ export default {
       screenData: null
     }
   },
+  provide() {
+    // 刷新的时候重置图表联动的选中样式
+    return { resetChartStyle: this.resetChartStyle }
+  },
   computed: {
     ...mapGetters([
       'canvasMap',
@@ -296,6 +301,14 @@ export default {
       let res = await this.$server.screenManage.getMaterialGroupList()
       const base = this.navigate.find(item => item.type === 'Base')
       base.tabs = res.data
+    },
+    // 重置图表样式(图表联动)
+    resetChartStyle() {
+      if (this.$refs.vChart) {
+        this.$refs.vChart.forEach(vchart => {
+          vchart.resetChartStyle()
+        })
+      }
     },
     // 获取大屏页签
     async getScreenTabs() {
