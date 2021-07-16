@@ -69,6 +69,8 @@ import guangzhou from '@/utils/guangdong.json'
 import omit from 'lodash/omit'
 import { DEFAULT_COLORS } from '@/utils/defaultColors'
 import { setChartInstanceIdMap } from '@/utils/screenExport'
+import { setLinkageData, resetOriginData } from '@/utils/setDataLink'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'ChartsFactory',
@@ -131,7 +133,8 @@ export default {
             self.currentIndex = ''
             // 强行渲染
             self.key++
-            self.$emit('resetOriginData', self.chartId)
+            resetOriginData(self.chartId, self.canvasMap)
+            // self.$emit('resetOriginData', self.chartId)
             return
           }
           // 鼠标单击时选中,选中颜色不变，其余变暗
@@ -154,7 +157,8 @@ export default {
           self.currentIndex = e.dataIndex
           // 强行渲染
           self.key++
-          self.$emit('linkage', self.chartId, e)
+          setLinkageData(self.chartId, e, self.canvasMap)
+          //   self.$emit('linkage', self.chartId, e)
           if (self.chartType !== 'v-treemap') {
             chart.off('click')
           }
@@ -433,7 +437,8 @@ export default {
             }
             // 强行渲染，非数据变动不会自动重新渲染
             self.key++
-            self.$emit('resetOriginData', self.chartId)
+            resetOriginData(self.chartId, self.canvasMap)
+            // self.$emit('resetOriginData', self.chartId)
             self.currentIndex = ''
           }
         })
@@ -531,6 +536,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['canvasMap']),
     titleStyle() {
       return {
         padding: '20px 10px',
