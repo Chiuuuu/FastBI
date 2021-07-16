@@ -78,51 +78,12 @@ export default {
       borderColor: '#fff',
       borderWidth: 1
     },
-    data: [{
-        name: "张明1",
-        value: 78,
-        children: [{
-          name: "男",
-          value: 78,
-          children: []
-        }]
-      },
-      {
-        name: "张明2",
-        value: 42,
-        children: [{
-          name: "男",
-          value: 42,
-          children: []
-        }]
-      },
-      {
-        name: "张明3",
-        value: 88,
-        children: [{
-          name: "男",
-          value: 88,
-          children: []
-        }]
-      },
-      {
-        name: "张明4",
-        value: 32,
-        children: [{
-          name: "男",
-          value: 32,
-          children: []
-        }]
-      },
-      {
-        name: "张明5",
-        value: 20,
-        children: [{
-          name: "男",
-          value: 20,
-          children: []
-        }]
-      }
+    data: [
+      {name: "张明1", value: 78, children: [{name: "男", value: 78, children: []}]},
+      {name: "张明2", value: 42, children: [{name: "男", value: 42, children: []}]},
+      {name: "张明3", value: 88, children: [{name: "男", value: 88, children: []}]},
+      {name: "张明4", value: 32, children: [{name: "男", value: 32, children: []}]},
+      {name: "张明5", value: 20, children: [{name: "男", value: 20, children: []}]}
     ]
   },
   'v-heatmap': {
