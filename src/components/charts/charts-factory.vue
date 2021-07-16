@@ -278,13 +278,12 @@ export default {
               return
             }
           }
-
+          // 散点图 -- 维度和度量都移除后，设置回初始默认值
           if (
             (val.dimensions || []).length == 0 &&
             (val.measures || []).length == 0 &&
             this.chartType === 'v-scatter'
           ) {
-            // let config = deepClone(this.config)
             this.config.legend.data = this.apis.legendData
             this.config.series.data = this.apis.seriesData
             this.apis.xMax = 1000 //度量1 最大值

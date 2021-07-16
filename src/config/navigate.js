@@ -2358,6 +2358,18 @@ const list = [
                   fontSize: 12,
                   color: '#fff'
                 },
+                // 翻页设置样式
+                navigation: {
+                  activeColor: '#fff',
+                  animation: true,
+                  arrowSize: 12,
+                  inactiveColor: '#ccc',
+                  style: {
+                    fontWeight: 'bold',
+                    color: '#fff',
+                    fontSize: '12px'
+                  }
+                }
               },
               //图形种类配置
               plotOptions: {
