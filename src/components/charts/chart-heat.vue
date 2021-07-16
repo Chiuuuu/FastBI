@@ -3,8 +3,15 @@
   <div class="dvs-heat" ref="dvsheat" :style="styleObj"></div>
 </template>
 <script>
+import { DEFAULT_COLORS } from '@/utils/defaultColors'
+import { mapGetters } from 'vuex'
+import { setLinkageData, resetOriginData } from '@/utils/setDataLink'
 export default {
   props: {
+    chartId: {
+      type: String,
+      required: true
+    },
     config: {
       type: Object,
       required: true
@@ -20,21 +27,72 @@ export default {
       type: Object
     }
   },
+  computed: {
+    ...mapGetters(['canvasMap']),
+    // 是否开启图表联动
+    isClickLink() {
+      return this.apiData.interactive && this.apiData.interactive.clickLink
+    }
+  },
   data() {
     return {
       mychart: null,
       option: {},
-      styleObj: {}
+      styleObj: {},
+      currentIndex: '' // 记录当前选择的度量数据(图表联动)
     }
   },
   mounted() {
     this.Init()
+    this.mychart.on('click', this.clickEvent)
   },
   methods: {
     Init(val) {
-      this.option = val ? val : this.config
+      this.option = val || this.config
       this.mychart = this.$echarts.init(this.$refs.dvsheat)
-      this.mychart.setOption(val ? val : this.config,true)
+      this.mychart.setOption(val || this.config, true)
+    },
+    clickEvent(e) {
+      let self = this
+      // 判断是否启用了联动
+      if (!self.isClickLink) {
+        return
+      }
+      self.$nextTick(() => {
+        // 重复选择数据，进行重置
+        if (self.currentIndex === e.dataIndex) {
+          self.currentIndex = ''
+          // 强行渲染
+          self.key++
+          resetOriginData(self.chartId, self.canvasMap)
+          return
+        }
+        // 记录当前选择数据的index
+        self.currentIndex = e.dataIndex
+        self.setChartClick()
+        setLinkageData(self.chartId, e, self.canvasMap)
+      })
+    },
+    // 添加图表点击事件，可以点击非数据区域
+    setChartClick() {
+      this.$nextTick(() => {
+        let self = this
+        this.mychart.getZr().on('click', function(params) {
+          if (typeof params.target === 'undefined') {
+            // 重置数据颜色样式
+            const series = self.config.series
+            if (
+              series.itemStyle &&
+              series.itemStyle.normal &&
+              series.itemStyle.normal.color
+            ) {
+              delete self.config.series.itemStyle.normal.color
+            }
+            resetOriginData(self.chartId, self.canvasMap)
+            self.currentIndex = ''
+          }
+        })
+      })
     }
   },
   watch: {
@@ -65,50 +123,57 @@ export default {
           if (!val.source.rows) {
             return
           }
-          let list = val.source.rows;
-          //判断是否为旭日图
-          if (this.config.title.text === '旭日图') {
-            let max = list.map(item=>item.value);
+          let list = val.source.rows
+          // 是否有联动数据
+          if (val.selectData) {
+            list = val.selectData.rows
+          }
+          // 判断是否为旭日图
+          if (this.config.title.content === '旭日图') {
+            let max = list.map(item => item.value)
             this.option.visualMap.max = Math.max(...max)
-            this.option.series.data = [...list];
-            this.mychart.setOption(this.option);
+            this.option.series.data = [...list]
+            this.mychart.setOption(this.option)
           } else {
-            //维度
-            let dim = val.dimensions.map((x) => x.alias);
-            //度量
-            let mea = val.measures.map((y) => y.alias);
-            if(dim.length==0|mea.length==0){
-              return;
-            }
-            //获取度量数组
-            let meaarr = list.map((h) => h[mea[0]]);
-            if(meaarr.includes(undefined)){
+            // 维度
+            let dim = val.dimensions.map(x => x.alias)
+            // 度量
+            let mea = val.measures.map(y => y.alias)
+            if ((dim.length === 0) | (mea.length === 0)) {
               return
             }
-            let _series = list.map((item) => [
+            // 获取度量数组
+            let meaarr = list.map(h => h[mea[0]])
+            if (meaarr.includes(undefined)) {
+              return
+            }
+            let _series = list.map(item => [
               item[dim[0]],
               item[dim[1]],
-              item[mea[0]],
+              item[mea[0]]
             ])
             if (this.mychart != null) {
               //   this.option.xAxis.data = val.source.rows.map(x=>(x[dim[0]]));
               this.option.visualMap.max = Math.max(...meaarr)
               this.option.series.data = [..._series]
-              this.mychart.setOption(this.option);
+              this.mychart.setOption(this.option)
             }
             // console.clear();
           }
         }
       },
-      deep: true,
+      deep: true
       // immediate: true,
     },
     background: {
       handler(objcolor) {
-        let type = objcolor.backgroundType;
+        let type = objcolor.backgroundType
         this.styleObj = {
-          background:type === '1'? objcolor.backgroundColor: `url(${objcolor.backgroundImage})`,
-              //  backgroundColor: val.backgroundColor,
+          background:
+            type === '1'
+              ? objcolor.backgroundColor
+              : `url(${objcolor.backgroundImage})`,
+          //  backgroundColor: val.backgroundColor,
           'border-color': objcolor.borderColor,
           'border-width': objcolor.borderWidth + 'px',
           'border-style': objcolor.borderStyle,

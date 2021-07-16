@@ -1732,7 +1732,7 @@ const list = [
             config: {
               title: {
                 show: true,
-                content: '',
+                content: '旭日图',
                 text: '旭日图',
                 left: 'left',
                 textStyle: {
@@ -1772,6 +1772,7 @@ const list = [
               },
               series: {
                 type: 'sunburst',
+                nodeClick: false,
                 emphasis: {
                   focus: 'ancestor'
                 },
@@ -1972,6 +1973,7 @@ const list = [
                   '#0d8686'
                 ],
                 nodeClick: false,
+                roam: false,
                 breadcrumb: {
                   show: false
                 },
@@ -2089,7 +2091,7 @@ const list = [
             config: {
               title: {
                 show: true,
-                content: '',
+                content: '矩形热力图',
                 text: '矩形热力图',
                 left: 'center',
                 textStyle: {
@@ -2336,6 +2338,11 @@ const list = [
               },
               //图形种类配置
               plotOptions: {
+                series: {
+                  events: {
+                    click: chartClick
+                  }
+                },
                 pie: {
                   allowPointSelect: true, //每个扇块能否选中
                   cursor: 'pointer', //鼠标指针
@@ -2546,6 +2553,11 @@ const list = [
                 //   depth: 25,
                 //   colorByPoint: true
                 // }
+                series: {
+                  events: {
+                    click: chartClick
+                  }
+                },
                 column: {
                   depth: 25,
                   //是否显示数值

@@ -136,6 +136,8 @@ import ChartTables from '@/components/tools/Tables'
 import ChartNodata from '@/components/tools/Nodata'
 import ChartMaterial from '@/components/tools/Material'
 import ChartFigure from '@/components/tools/Figure'
+import ChartHeart from '@/components/charts/chart-heat'
+import HighCharts from '@/components/charts/highcharts'
 import SteepBar from '@/components/tools/SteepBar'
 import Pation from '@/components/board/pation/index' // 分页栏
 import ContextMenu from '@/components/board/context-menu/index' // 右键菜单
@@ -150,8 +152,6 @@ import {
 } from 'bin-ui/src/utils/resize-event'
 
 import throttle from 'lodash/throttle'
-import HighCharts from '@/components/charts/highcharts'
-import ChartHeart from '@/components/charts/chart-heat'
 import { deepClone } from '../utils/deepClone'
 
 export default {

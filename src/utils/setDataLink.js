@@ -69,7 +69,6 @@ async function getBindData(chart, dimensionData) {
       columns,
       rows
     }
-
     // 矩形树图改变series.data
     if (chart.setting.chartType === 'v-treemap') {
       let config = deepClone(chart.setting.config)
@@ -85,6 +84,14 @@ async function getBindData(chart, dimensionData) {
           tree.tree,
           config.series.recDimensionIndex
         )
+      }
+    } else if (chart.setting.chartType === 'v-sun') {
+      selectData = {
+        rows: new TreeGroupBy(
+          res.rows,
+          chart.setting.api_data.dimensions.map(item => item.alias),
+          chart.setting.api_data.measures
+        ).tree
       }
     }
     // 构造联动选择的数据
