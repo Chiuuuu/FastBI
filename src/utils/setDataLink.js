@@ -3,6 +3,7 @@ import { message } from 'ant-design-vue'
 import Vue from 'vue'
 import { deepClone } from '../utils/deepClone'
 import TreeGroupBy from '@/components/board/options/treemap/tree-groupby'
+import store from '@/store'
 // 设置联动的图标的数据
 export async function setLinkageData(id, e, canvasMap) {
   let selected = canvasMap.find(item => item.id === id)
@@ -102,14 +103,12 @@ export function resetOriginData(id, canvasMap) {
     if (!chart) {
       continue
     }
-    // 矩形树图, 重置series.data值
-    if (chart.setting.chartType === 'v-treemap') {
-      //   let config = deepClone(chart.setting.config)
-      let config = chart.setting.config
-      config.series.data = chart.setting.api_data.source
-      Vue.set(config.series, 'data', chart.setting.api_data.source)
-      //   this.$store.dispatch('SetSelfProperty', config)
-    }
+    // // 矩形树图, 重置series.data值
+    // if (chart.setting.chartType === 'v-treemap') {
+    //   let config = deepClone(chart.setting.config)
+    //   config.series.data = chart.setting.api_data.source
+    //   store.dispatch('SetSelfProperty', config)
+    // }
     // 删除联动数据
     let apiData = chart.setting.api_data
     Vue.delete(apiData, 'selectData')
