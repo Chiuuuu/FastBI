@@ -192,7 +192,8 @@
           (chartType === '1' || chartType === '3') &&
             currSelected.setting.chartType !== 'v-map' &&
             currSelected.setting.chartType !== 'v-treemap' &&
-            currSelected.setting.chartType !== 'v-heatmap'
+            currSelected.setting.chartType !== 'v-heatmap' &&
+            currSelected.setting.chartType !== 'v-scatter'
         "
       >
         <DragSort type="sort"></DragSort>

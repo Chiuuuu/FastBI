@@ -37,8 +37,12 @@ function createCanvas(chartId, width, height) {
 
 // 处理截图的dom,复制控件(不受transform影响) // targetDom(全屏:preview-wrap/编辑:dv-wrapper)
 function handleShootedDom(chart, targetDom) {
-  // 非图表控件
-  if (!classifyControl(chart)) {
+  // 非图表控件 && hightcharts可以直接深拷贝
+  if (
+    !classifyControl(chart) ||
+    chart.setting.name === 'high-pie' ||
+    chart.setting.name === 'high-column'
+  ) {
     const domObjClone = targetDom.cloneNode(true)
     domObjClone.setAttribute('id', 'cloneShotTarget')
     return domObjClone

@@ -40,7 +40,6 @@ export default {
     getBackgroundColor(objcolor){
       // this.styleObj = {};
       let type = objcolor.backgroundType;
-      debugger
       this.styleObj = {
         background:type === '1'? objcolor.backgroundColor: `url(${objcolor.backgroundImage})`,
             //  backgroundColor: val.backgroundColor,

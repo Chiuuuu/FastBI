@@ -132,9 +132,10 @@
             <high-charts
               v-else-if="transform.setting.name === 'high-pie'"
               :key="transform.id"
+              :chart-id="transform.id"
               :setting="transform.setting"
+              :config="transform.setting.config"
               :api-data="transform.setting.api_data"
-              :background="transform.setting.background"
             ></high-charts>
             <!-- 矩形热力图 -->
             <chart-heart
@@ -142,6 +143,7 @@
                 transform.setting.name === 've-heatmap' ||
                   transform.setting.name === 've-sun'
               "
+              :chart-id="transform.id"
               :key="transform.id"
               :view="transform.setting.view"
               :config="transform.setting.config"
@@ -158,6 +160,7 @@
             <!-- <span>{{transform.setting.background}}</span> -->
             <charts-factory
               v-else
+              ref="vChart"
               :chart-id="transform.id"
               :key="transform.id"
               :chart-type="transform.setting.chartType"
@@ -206,6 +209,8 @@ import ChartTables from '@/components/tools/Tables' // 表格模块
 import ChartNodata from '@/components/tools/Nodata' // 数据丢失
 import ChartMaterial from '@/components/tools/Material' // 素材库
 import ChartFigure from '@/components/tools/Figure' // 素材库
+import ChartHeart from '@/components/charts/chart-heat.vue' // 旭日图/矩形热力图
+import HighCharts from '@/components/charts/highcharts.vue' // 3d图表
 import SteepBar from '@/components/tools/SteepBar' // 进度条
 import ContextMenu from '@/components/board/context-menu/index' // 右键菜单
 // import AMap from '@/components/tools/aMap' // 进度条
@@ -217,8 +222,6 @@ import { deepClone } from '@/utils/deepClone'
 const IconFont = Icon.createFromIconfontCN({
   scriptUrl: '//at.alicdn.com/t/font_2276651_71nv5th6v94.js'
 }) // 引入iconfont
-import HighCharts from '@/components/charts/highcharts.vue'
-import ChartHeart from '@/components/charts/chart-heat.vue'
 
 export default {
   name: 'Admin',
@@ -232,6 +235,10 @@ export default {
       canEdit: true,
       screenData: null
     }
+  },
+  provide() {
+    // 刷新的时候重置图表联动的选中样式
+    return { resetChartStyle: this.resetChartStyle }
   },
   computed: {
     ...mapGetters([
@@ -296,6 +303,14 @@ export default {
       let res = await this.$server.screenManage.getMaterialGroupList()
       const base = this.navigate.find(item => item.type === 'Base')
       base.tabs = res.data
+    },
+    // 重置图表样式(图表联动)
+    resetChartStyle() {
+      if (this.$refs.vChart) {
+        this.$refs.vChart.forEach(vchart => {
+          vchart.resetChartStyle()
+        })
+      }
     },
     // 获取大屏页签
     async getScreenTabs() {

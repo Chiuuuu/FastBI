@@ -63,6 +63,7 @@ export default {
       screenData: null
     }
   },
+  inject: ['resetChartStyle'],
   computed: {
     ...mapGetters([
       'isScreen',
@@ -165,6 +166,7 @@ export default {
         this.$message.error('暂无数据可刷新，请先添加数据')
         return
       }
+      this.resetChartStyle()
       this.refreshScreen({
         charSeted: false,
         needLoading: true
