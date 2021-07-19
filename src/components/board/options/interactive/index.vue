@@ -51,7 +51,10 @@
                     chart.id === currentSelected
                 "
               >
-                {{ chart.setting.config.title.content || chart.setting.config.title.text }}
+                {{
+                  chart.setting.config.title.content ||
+                    chart.setting.config.title.text
+                }}
                 <span v-show="chart.id === currentSelected">(当前报表)</span>
                 <span v-show="checkBeBinded(chart)">已存在于联动路径中</span>
                 <span v-show="checkHaveBind(chart)">已被创建联动</span>
@@ -222,9 +225,13 @@ export default {
         // 获取图表信息
         let chartApiData = chart.setting.api_data
         if (chartApiData.interactive) {
-          chartApiData.interactive.beBinded = isInBindList
-            ? this.currentSelected
-            : ''
+          let interactive = chartApiData.interactive
+          if (isInBindList) {
+            interactive.beBinded = this.currentSelected
+          } else if (interactive.beBinded === this.currentSelected) {
+            // 取消绑定
+            interactive.beBinded = ''
+          }
         } else if (isInBindList) {
           chartApiData.interactive = { beBinded: this.currentSelected }
         }

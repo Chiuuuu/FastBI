@@ -4,8 +4,22 @@ import geoJson from '@/utils/guangdong.json'
 import { visualMapConfig, mapSeries, dotSeries } from '@/config/mapSeries'
 import { message } from 'ant-design-vue'
 // 处理大屏刷新数据
-export function handleRefreshData({ chart, newData }) {
+export function handleRefreshData({ chart, newData, refreshType }) {
   let apiData = chart.setting.api_data
+  // 假刷新获取不到null的值，遍历加上
+  if (!refreshType) {
+    // 获取所有数据的key
+    let keys = apiData.dimensions
+      .concat(apiData.measures)
+      .map(item => item.alias)
+    for (let rowDatas of newData) {
+      for (let key of keys) {
+        if (typeof rowDatas[key] === 'undefined') {
+          rowDatas[key] = null
+        }
+      }
+    }
+  }
   if (chart.setting.chartType === 'v-map') {
     setMapData(chart, newData)
   }
