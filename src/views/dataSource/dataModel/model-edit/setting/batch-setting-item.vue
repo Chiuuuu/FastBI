@@ -14,9 +14,9 @@
         @change="handleCheckName"
         style="width: 156px height: 32px" />
     </template>
-    <template #dataType="text, record">
+    <template #convertType="text, record">
       <field-select
-        :text="(text || record.dataType) | formatField"
+        :text="(text || record.convertType) | formatField"
         :select-data="record"
         :contextmenus="fieldContenxtMenu"
         :isDimension="record.role === 1"
@@ -65,9 +65,9 @@ const column = [
   },
   {
     title: '字段类型',
-    dataIndex: 'dataType',
+    dataIndex: 'convertType',
     scopedSlots: {
-      customRender: 'dataType'
+      customRender: 'convertType'
     }
   },
   {
@@ -206,7 +206,7 @@ export default {
     },
     switchFieldType(e, item, vm) {
       let dataType = item.dataType
-      vm.selectData.dataType = dataType
+      vm.selectData.convertType = dataType
     },
     switchRoleType(e, item, vm) {
       let roleType = item.roleType
