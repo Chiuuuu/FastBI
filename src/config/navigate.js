@@ -1935,7 +1935,7 @@ const list = [{
           config: {
             title: {
               show: true,
-              content: '',
+              content: '旭日图',
               text: '旭日图',
               left: 'left',
               textStyle: {
