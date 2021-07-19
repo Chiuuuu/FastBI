@@ -90,11 +90,11 @@ export default {
           { name: '最大值', value: 'MAX' },
           { name: '最小值', value: 'MIN' },
           { name: '计数', value: 'CNT' },
-          { name: '去重计数', value: 'CNT­_D' },
+          { name: '去重计数', value: 'CNT­D' },
         ],
         str: [
           { name: '计数', value: 'CNT' },
-          { name: '去重计数', value: 'CNT­_D' },
+          { name: '去重计数', value: 'CNT­D' },
         ],
       },
       isdrag: false, // 是否拖拽中
