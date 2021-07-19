@@ -50,9 +50,13 @@ export class TokenStream {
       name: 'COUNTD',
       got: 1
     },
+    // {
+    //   name: 'ATTR',
+    //   got: 1
+    // },
     {
-      name: 'ATTR',
-      got: 1
+      name: 'AVG',
+      min: 1
     }
   ];
   FNAME = [
@@ -63,7 +67,43 @@ export class TokenStream {
     {
       name: 'MINIMUM',
       min: 2
-    }
+    },
+    {
+      name: 'ABS', // 绝对值
+      got: 1
+    },
+    {
+      name: 'ROUND', // 四舍五入
+      max: 2
+    },
+    // {
+    //   name: 'INT', // 向下取整
+    //   got: 1
+    // },
+    // {
+    //   name: 'CURRENT_DATE', // 今天日期
+    //   got: 0
+    // },
+    // {
+    //   name: 'CURRENT_TIMESTAMP', // 现在时间
+    //   got: 0
+    // },
+    // {
+    //   name: 'LENGTH', // 字符串长度
+    //   got: 1 // string
+    // },
+    // {
+    //   name: 'AND', // 逻辑与
+    //   min: 1
+    // },
+    // {
+    //   name: 'OR', // 逻辑或
+    //   min: 1
+    // },
+    // {
+    //   name: 'PMT', // 年金函数PMT(财务)
+    //   got: 5 // (Rate: float, Nper: integer, Pv: float | integer, Fv: float | integer, Type: 0 | 1)
+    // }
   ]
 
   constructor(source, skipSpace) {
@@ -476,9 +516,9 @@ export class TokenStream {
     }
     return isRight
       ? {
-          type: 'comment',
-          value: `${prefix}${str}`
-        }
+        type: 'comment',
+        value: `${prefix}${str}`
+      }
       : this.lexFail(`${prefix}${str}`)
   }
 

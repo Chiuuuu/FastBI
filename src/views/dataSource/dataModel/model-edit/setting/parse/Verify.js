@@ -58,8 +58,11 @@ export class Verify {
           }
           const result = this.methods[func.value].apply(
             this,
-            expr.args.map(arg => {
-              return this.validate(arg)
+            expr.args.map((arg, index) => {
+              if (this.argHasFun(arg)) {
+                throw new Error('不支持嵌套函数')
+              }
+              return this.validateFun(arg, index, func)
             })
           )
           return expr.isNeg ? -result : result
@@ -67,6 +70,20 @@ export class Verify {
         return func
       }
       case 'binary': {
+        // 如果是逻辑判断, 允许两端传入等式
+        if (expr.operator === 'AND' || expr.operator === 'OR') {
+          if (expr.left.type !== 'assign' && expr.left.type !== 'binary') {
+            throw new Error('仅支持逻辑表达式判断')
+          } else if (expr.right.type !== 'assign' && expr.right.type !== 'binary') {
+            throw new Error('仅支持逻辑表达式判断')
+          }
+          return this.evaluate(
+            expr.operator,
+            expr.left.type === 'assign' ? this.validateCaseAssign(expr.left) : this.validate(expr.left),
+            expr.right.type === 'assign' ? this.validateCaseAssign(expr.right) : this.validate(expr.right)
+          )
+        }
+
         if (expr.left.type === 'fun' && expr.left.func.type === 'aggregator') {
           if (expr.right.type !== 'fun' && expr.right.type !== 'aggregator') {
             throw Error(`聚合粒度错误: 方法 ${expr.operator} 不能应用于 已聚合,未聚合`)
@@ -76,12 +93,11 @@ export class Verify {
             throw Error(`聚合粒度错误: 方法 ${expr.operator} 不能应用于 未聚合,已聚合`)
           }
         }
-        const re = this.evaluate(
+        return this.evaluate(
           expr.operator,
           this.validate(expr.left),
           this.validate(expr.right)
         )
-        return re
       }
       case 'if': {
         const cond = this.validate(expr.cond)
@@ -95,9 +111,96 @@ export class Verify {
       case 'tail':
         throw new Error(`语法错误`)
       default:
-        throw new Error("I don't know how to validate " + expr)
+        throw new Error('无法解析 ' + expr)
     }
   }
+
+  // 判断参数中是否含有函数
+  argHasFun(arg) {
+    if (arg.left) {
+      return this.argHasFun(arg.left) && this.argHasFun(arg.right)
+    } else {
+      return arg.type === 'fun'
+    }
+  }
+
+  // 针对不同的函数作出调整
+  validateFun(arg, index, func) {
+    switch (func.value) {
+      // 财务运算-年金函数
+      case 'PMT': {
+        const result = this.validate(arg)
+        if (index === 0) {
+          if (result.type !== 'float' && result.type !== 'integer') {
+            throw new Error('Rate仅支持数字类型')
+          }
+        } else if (index === 1) {
+          if (result.type !== 'integer') {
+            throw new Error('Nper仅支持整数类型')
+          }
+        } else if (index === 2) {
+          if (result.type !== 'float' && result.type !== 'integer') {
+            throw new Error('Pv仅支持数字类型')
+          }
+        } else if (index === 3) {
+          if (result.type !== 'float' && result.type !== 'integer') {
+            throw new Error('Fv仅支持数字类型')
+          }
+        } else if (index === 4) {
+          if (result.value !== 0 && result.value !== 1) {
+            throw new Error('Type仅支持0或1')
+          }
+        }
+        return {
+          type: result.type,
+          value: true
+        }
+      }
+      // ROUND四舍五入
+      case 'ROUND': {
+        if (index === 1 && arg.type !== 'integer') {
+          throw new Error('位数仅支持整数类型')
+        }
+        return this.validate(arg)
+      }
+
+      default:
+        return this.validate(arg)
+    }
+  }
+
+  // 暂时仅用于逻辑判断
+  validateCaseAssign(expr) {
+    if (expr.left.type === 'alias' && expr.left.value.role !== 2) {
+      throw Error(`逻辑判断暂不支持维度字段`)
+    } else if (expr.right.type === 'alias' && expr.right.value.role !== 2) {
+      throw Error(`逻辑判断暂不支持维度字段`)
+    }
+    const left = this.validate(expr.left)
+    const right = this.validate(expr.right)
+    // 等式左边
+    if (!['integer', 'float', 'decimal', 'neg', 'alias'].includes(left.type) || left.value === false) {
+      throw Error(`等式左边表达式结果必须为数字类型`)
+    }
+    if (left.type === 'alias') {
+      const type = left.value.dataType
+      if (type !== 'BIGINT' && type !== 'DOUBLE' && type !== 'DECIMAL') {
+        throw Error(`等式左边表达式结果必须为数字类型`)
+      }
+    }
+    // 等式右边
+    if (!['integer', 'float', 'decimal', 'neg', 'alias'].includes(right.type) || right.value === false) {
+      throw Error(`等式右边表达式结果必须为数字类型`)
+    }
+    if (right.type === 'alias') {
+      const type = right.value.dataType
+      if (type !== 'BIGINT' && type !== 'DOUBLE' && type !== 'DECIMAL') {
+        throw Error(`等式右边表达式结果必须为数字类型`)
+      }
+    }
+    return right
+  }
+
   evaluate(operator, left, right) {
     function num(x) {
       if (typeof x === 'number') {
@@ -586,6 +689,44 @@ export class Verify {
         } else {
           // 解析树无法解析
           throw new Error(`无法解析类型`)
+        }
+      }
+      case 'AND':
+      case 'OR': {
+        return left.value !== false ? left : right
+      }
+      // 逻辑判断(仅支持度量)
+      case '>':
+      case '>=':
+      case '<':
+      case '<=':
+      case '!=': {
+        // 等式判断两边仅支持数字类型
+        const whiteList = ['integer', 'float', 'decimal', 'neg', 'alias']
+        const numberList = ['BIGINT', 'DOUBLE', 'DECIMAL']
+        if (!whiteList.includes(rightType) || !whiteList.includes(leftType)) {
+          throw new Error(`等式判断两边仅支持数字类型`)
+        } else {
+          if (rightType === 'alias') {
+            if (!numberList.includes(right.value.dataType)) {
+              throw new Error(`等式判断两边仅支持数字类型`)
+            } else if (right.value.role !== 2) {
+              throw new Error(`逻辑判断暂不支持维度字段`)
+            }
+            return left
+          } else if (leftType === 'alias') {
+            if (!numberList.includes(left.value.dataType)) {
+              throw new Error(`等式判断两边仅支持数字类型`)
+            } else if (left.value.role !== 2) {
+              throw new Error(`逻辑判断暂不支持维度字段`)
+            }
+            return right
+          } else {
+            return {
+              type: 'integer',
+              value: true
+            }
+          }
         }
       }
     }

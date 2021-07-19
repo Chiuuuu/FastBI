@@ -144,6 +144,26 @@ const expression = [
     groups: ['aggregator', 'date', 'logic']
   },
   {
+    id: 'COUNT',
+    name: '计数聚合',
+    expression: 'COUNT(表达式)',
+    description:
+      '返回表达式在所有记录中的计数值。COUNT只能用于数字、日期、日期时间字段。',
+    example: 'COUNT([访问量])',
+    syntax: 'COUNT(表达式)',
+    groups: ['aggregator', 'date', 'logic']
+  },
+  {
+    id: 'COUNTD',
+    name: '去重计数聚合',
+    expression: 'COUNTD(表达式)',
+    description:
+      '返回表达式在所有记录中的去重计数值。COUNTD只能用于数字、日期、日期时间字段。',
+    example: 'COUNTD([访问量])',
+    syntax: 'COUNTD(表达式)',
+    groups: ['aggregator', 'date', 'logic']
+  },
+  {
     id: '+',
     name: '加法',
     expression: '表达式1 + 表达式2\\\\数值',
@@ -181,6 +201,24 @@ const expression = [
     description: '/ 作为除法运算符，只能用于数字字段。',
     example: '[总人口] / [城市数量]',
     syntax: '表达式1 / 表达式2',
+    groups: ['calculation']
+  },
+  {
+    id: 'ABS',
+    name: '绝对值',
+    expression: 'ABS(表达式)',
+    description: '返回表达式在所有记录中的计数值。ABS只能用于数字字段。',
+    example: 'ABS([总人口])',
+    syntax: 'ABS(表达式)',
+    groups: ['calculation']
+  },
+  {
+    id: 'ROUND',
+    name: '四舍五入',
+    expression: 'ROUND(表达式, [位数])',
+    description: '返回表达式在所有记录中的四舍五入后的值。ROUND只能用于数字字段。',
+    example: 'ROUND([总人口], [位数])',
+    syntax: 'ROUND(表达式, 1)',
     groups: ['calculation']
   }
 ]
