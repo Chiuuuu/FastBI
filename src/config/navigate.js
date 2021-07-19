@@ -2768,7 +2768,9 @@ const list = [{
                   color: '#fff',
                   fontSize: 12,
                   fontFamily: '微软雅黑'
-                }
+                },
+                step: 1,
+			          staggerLines: 1
               },
               title: {
                 text: '',
