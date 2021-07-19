@@ -42,8 +42,8 @@
             >
           </a-menu>
         </a-dropdown>
-        <a-tooltip :title="item.alias">
-          <span ref="itemName" class="field-text">{{ item.alias }}</span>
+        <a-tooltip :title="formatAggregator(item)">
+          <span ref="itemName" class="field-text">{{ formatAggregator(item) }}</span>
         </a-tooltip>
       </div>
     </div>
@@ -223,6 +223,14 @@ export default {
   },
   methods: {
     ...mapActions(['updateChartData']),
+    formatAggregator(item) {
+      const fun = this.polymerizeType.find((x) => x.value === item.defaultAggregator)
+      if (item.role === 2) {
+        return `${item.alias} (${fun.name})`
+      } else {
+        return item.alias
+      }
+    },
     // 将拖动的维度到所选择的放置目标节点中
     handleDropOnFilesWD(event) {
       // h5 api
@@ -277,7 +285,7 @@ export default {
         this.dragFile === this.type &&
         this.chartType === '1'
       ) {
-        dataFile.alias += `(${_alias.name})`
+        // dataFile.alias += `(${_alias.name})`
         // 饼图类型只能拉入一个度量（包含3d和矩形热力图）
         if (
           (this.currSelected.setting.name === 've-pie') |
@@ -322,7 +330,7 @@ export default {
         this.dragFile === this.type
       ) {
         // 进度条只有一个度量
-        dataFile.alias += `(${_alias.name})`
+        // dataFile.alias += `(${_alias.name})`
         if (this.currSelected.setting.name === 'steepBar') {
           this.fileList[0] = dataFile
         } else {
@@ -370,7 +378,7 @@ export default {
     // 修改数据聚合方式
     changePolymerization(i, item) {
       item.showMore = false
-      item.alias = item.alias.replace(/\(.*?\)/, '(' + i.name + ')')
+      // item.alias = item.alias.replace(/\(.*?\)/, '(' + i.name + ')')
       item.defaultAggregator = i.value
       this.getData()
     },

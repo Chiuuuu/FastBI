@@ -241,7 +241,7 @@ export default {
       if (item.defaultAggregator === i.value) {
         return
       }
-      item.alias = item.alias.replace(/\(.*?\)/, '(' + i.name + ')')
+      // item.alias = item.alias.replace(/\(.*?\)/, '(' + i.name + ')')
       item.defaultAggregator = i.value
       this.handleSort()
     },
