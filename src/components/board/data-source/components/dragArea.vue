@@ -42,8 +42,8 @@
             >
           </a-menu>
         </a-dropdown>
-        <a-tooltip :title="item.alias">
-          <span ref="itemName" class="field-text">{{ item.alias }}</span>
+        <a-tooltip :title="formatAggregator(item)">
+          <span ref="itemName" class="field-text">{{ formatAggregator(item) }}</span>
         </a-tooltip>
       </div>
     </div>
@@ -224,6 +224,14 @@ export default {
   },
   methods: {
     ...mapActions(['updateChartData']),
+    formatAggregator(item) {
+      const fun = this.polymerizeType.find((x) => x.value === item.defaultAggregator)
+      if (item.role === 2) {
+        return `${item.alias} (${fun.name})`
+      } else {
+        return item.alias
+      }
+    },
     // 将拖动的维度到所选择的放置目标节点中
     handleDropOnFilesWD(event) {
       // h5 api
@@ -278,7 +286,7 @@ export default {
         this.dragFile === this.type &&
         this.chartType === '1'
       ) {
-        dataFile.alias += `(${_alias.name})`
+        // dataFile.alias += `(${_alias.name})`
         // 饼图类型只能拉入一个度量（包含3d和矩形热力图）
         if (
           (this.currSelected.setting.name === 've-pie') |
@@ -323,7 +331,7 @@ export default {
         this.dragFile === this.type
       ) {
         // 进度条只有一个度量
-        dataFile.alias += `(${_alias.name})`
+        // dataFile.alias += `(${_alias.name})`
         if (this.currSelected.setting.name === 'steepBar') {
           this.fileList[0] = dataFile
         } else {
@@ -354,20 +362,24 @@ export default {
     // 点击右键显示更多
     async showMore(item) {
       // 调用接口判断是否为数字
-      let res = await this.$server.dataModel.getMeasures(item.pivotschemaId)
-      // 返回 data true表示 是数值类型
-      // 返回 data false表示 是字符类型
-      if (res.code === 200) {
-        this.strornum = res.data ? 'num' : 'str'
+      if (item.resourceType === 8) {
+        let res = await this.$server.dataModel.getMeasures(item.pivotschemaId)
+        // 返回 data true表示 是数值类型
+        // 返回 data false表示 是字符类型
+        if (res.code === 200) {
+          this.strornum = res.data ? 'num' : 'str'
+        } else {
+          this.$message.error(res.msg || res || '删除失败')
+        }
       } else {
-        this.$message.error(res.msg || res || '删除失败')
+        this.strornum = ['DECIMAL', 'BIGINT', 'DOUBLE'].includes(item.dataType) ? 'num' : 'str'
       }
       item.showMore = true
     },
     // 修改数据聚合方式
     changePolymerization(i, item) {
       item.showMore = false
-      item.alias = item.alias.replace(/\(.*?\)/, '(' + i.name + ')')
+      // item.alias = item.alias.replace(/\(.*?\)/, '(' + i.name + ')')
       item.defaultAggregator = i.value
       this.getData()
     },

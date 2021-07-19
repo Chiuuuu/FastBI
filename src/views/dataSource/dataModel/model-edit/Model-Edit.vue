@@ -325,7 +325,8 @@ export default {
     },
     tableFields() {
       if (this.detailInfo.pivotSchema) {
-        const arry = [...this.detailInfo.pivotSchema.dimensions, ...this.detailInfo.pivotSchema.measures, ...this.cacheDimensions, ...this.cacheMeasures]
+        let arry = [...this.detailInfo.pivotSchema.dimensions, ...this.detailInfo.pivotSchema.measures, ...this.cacheDimensions, ...this.cacheMeasures];
+        arry = arry.map(x=>({...x,convertType:x.convertType===null?x.dataType:x.convertType}));
         return groupBy(arry, 'tableNo')
       } else {
         return []
