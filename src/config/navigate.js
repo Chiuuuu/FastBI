@@ -2469,7 +2469,8 @@ const list = [{
               label: {
                 show: true,
                 color: '#fff',
-                position: 'inside'
+                position: 'inside',
+                offset:[0,0]
               },
               emphasis: {
                 itemStyle: {
