@@ -807,6 +807,12 @@ const list = [{
             legend: {
               show: true,
               orient: 'horizontal',
+              // 加翻页
+              type: 'scroll',
+              pageIconColor: '#fff',
+              pageTextStyle: {
+                color: '#fff'
+              },
               textStyle: {
                 color: '#ffffff',
                 fontSize: 12
@@ -1594,6 +1600,12 @@ const list = [{
             legend: {
               show: true,
               orient: 'horizontal',
+              // 加翻页
+              type: 'scroll',
+              pageIconColor: '#fff',
+              pageTextStyle: {
+                color: '#fff'
+              },
               textStyle: {
                 color: '#ffffff',
                 fontSize: 12
@@ -1744,7 +1756,7 @@ const list = [{
             ],
             scatterColor: '1', //散点颜色 0单色 1按维度
             scatterSize: '', //散点大小  0：按度量1  1：按度量2  默认空，为无
-            scatterLabel: [], //指标-显示内容
+            scatterLabel: ['{@5}：{@2}', '({@0},{@1})'], //指标-显示内容
             arrange: 'horizontal', //指标-排列 horizontal水平  vertical垂直
             scatterTargetColor: '0', //0使用图例 1：自定义
             xMax: 1000, //度量1 最大值
@@ -1783,8 +1795,14 @@ const list = [{
               bottom: 50
             },
             legend: {
-              show: true,
+              show: false,
               orient: 'horizontal',
+              // 加翻页
+              type: 'scroll',
+              pageIconColor: '#fff',
+              pageTextStyle: {
+                color: '#fff'
+              },
               textStyle: {
                 color: '#ffffff',
                 fontSize: 12
@@ -1870,12 +1888,13 @@ const list = [{
               type: 'scatter',
               symbolSize: 15,
               label: {
-                show: false,
+                show: true,
                 color: '',
                 fontSize: 12,
                 position: 'outside', // 可选inside
                 align: 'left',
-                offset: [-10, 0]
+                offset: [-10, 0],
+                formatter: "{@5}：{@2} ({@0},{@1})",
               }
             },
             color: DEFAULT_COLORS
@@ -1956,6 +1975,7 @@ const list = [{
             },
             series: {
               type: 'sunburst',
+              nodeClick: false,
               emphasis: {
                 focus: 'ancestor'
               },
@@ -2095,6 +2115,12 @@ const list = [{
             legend: {
               show: false,
               orient: 'horizontal',
+              // 加翻页
+              type: 'scroll',
+              pageIconColor: '#fff',
+              pageTextStyle: {
+                color: '#fff'
+              },
               textStyle: {
                 color: '#ffffff',
                 fontSize: 12
@@ -2195,6 +2221,7 @@ const list = [{
                 '#0d8686'
               ],
               nodeClick: false,
+              roam: false,
               breadcrumb: {
                 show: false
               },
@@ -2412,7 +2439,6 @@ const list = [{
               left: 'right', //左 中 右
               top: 'bottom', //上 中 下
               bottom: '5%',
-              // padding: [5, 20],
               inRange: {
                 color: ['#FF85A9', '#FF3976', '#CC2D5D']
               },
@@ -2553,10 +2579,27 @@ const list = [{
                 cursor: 'pointer',
                 fontSize: 12,
                 color: '#fff'
+              },
+              // 翻页设置样式
+              navigation: {
+                activeColor: '#fff',
+                animation: true,
+                arrowSize: 12,
+                inactiveColor: '#ccc',
+                style: {
+                  fontWeight: 'bold',
+                  color: '#fff',
+                  fontSize: '12px'
+                }
               }
             },
             //图形种类配置
             plotOptions: {
+              series: {
+                events: {
+                  click: chartClick
+                }
+              },
               pie: {
                 allowPointSelect: true, //每个扇块能否选中
                 cursor: 'pointer', //鼠标指针
@@ -2711,7 +2754,7 @@ const list = [{
                 cursor: 'pointer',
                 fontSize: 12,
                 color: '#fff'
-              }
+              },
             },
             xAxis: {
               type: 'category',
@@ -2764,6 +2807,11 @@ const list = [{
               //   depth: 25,
               //   colorByPoint: true
               // }
+              series: {
+                events: {
+                  click: chartClick
+                }
+              },
               column: {
                 depth: 25,
                 //是否显示数值
