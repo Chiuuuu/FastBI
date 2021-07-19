@@ -8,10 +8,6 @@ import { mapGetters } from 'vuex'
 import { setLinkageData, resetOriginData } from '@/utils/setDataLink'
 export default {
   props: {
-    chartId: {
-      type: String,
-      required: true
-    },
     config: {
       type: Object,
       required: true

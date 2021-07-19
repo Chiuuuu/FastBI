@@ -75,7 +75,7 @@
                 v-for="(value, key) in row"
                 :key="key"
               >
-                {{ typeof value === 'number' ? +value.toFixed(2) : value }}
+                {{ value }}
               </td>
             </tr>
           </table>

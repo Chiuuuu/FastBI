@@ -209,17 +209,6 @@
                             <a-menu-item key="3" @click="changeItem(item2, 1)"
                               >转为维度</a-menu-item
                             >
-                            <!-- <a-sub-menu key="1" title="聚合方式">
-                              <a-menu-item
-                                v-for="(aggregator,
-                                index) in polymerizationData"
-                                :key="index"
-                                @click.native="
-                                  changePolymerization(aggregator.value, item2)
-                                "
-                                >{{ aggregator.name }}</a-menu-item
-                              >
-                            </a-sub-menu> -->
                           </a-menu>
                         </a-dropdown>
                       </li>
@@ -312,13 +301,6 @@ export default {
       detailInfo: {}, // 聚合运算数据
       cacheDimensions: [],
       cacheMeasures: [], // 缓存自定义度量
-      polymerizationData: [
-        { name: '求和', value: 'SUM' },
-        { name: '平均', value: 'AVG' },
-        { name: '最大值', value: 'MAX' },
-        { name: '最小值', value: 'MIN' },
-        { name: '统计', value: 'CNT' }
-      ],
       createdMapData: {},
       resourceType: 8, // 当前数据类型标识（接入:3|模型:8）
       dataList: [], // 显示的菜单列表
@@ -648,14 +630,6 @@ export default {
           this.getPivoSchemaList(this.resourceId, 2)
         }
       })
-    },
-    // 修改数据聚合方式
-    changePolymerization(type, item) {
-      item.showMore = false
-      if (item.defaultAggregator !== type) {
-        item.defaultAggregator = type
-      }
-      //   this.getData()
     },
     // 维度、度量列表
     getPivoSchemaList(id, type = 1) {

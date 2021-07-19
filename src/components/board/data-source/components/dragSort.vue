@@ -25,7 +25,7 @@
               v-show="item.polymerizationShow"
             >
               <a-menu-item
-                v-for="(aggregator, index) in item.polymerizationShow"
+                v-for="(aggregator, index) in polymerizationData[strornum]"
                 :key="index"
                 @click.native="changePolymerization(aggregator, item)"
                 >{{ aggregator.name }}</a-menu-item
@@ -93,13 +93,15 @@ export default {
           { name: '平均', value: 'AVG' },
           { name: '最大值', value: 'MAX' },
           { name: '最小值', value: 'MIN' },
-          { name: '统计', value: 'CNT' }
+          { name: '计数', value: 'CNT' },
+          { name: '去重计数', value: 'DCNT' }
         ],
         stringType: [
           { name: '计数', value: 'CNT' },
-          { name: '去重计数', value: 'MIN' }
+          { name: '去重计数', value: 'DCNT' }
         ]
-      }
+      },
+      strornum: '',
     }
   },
   inject: ['errorFile'],
@@ -225,7 +227,16 @@ export default {
       this.isdrag = false
     },
     // 点击右键显示更多
-    showMore(item) {
+    async showMore(item) {
+         // 调用接口判断是否为数字
+      let res = await this.$server.dataModel.getMeasures(item.pivotschemaId)
+      // 返回 data true表示 是数值类型
+      // 返回 data false表示 是字符类型
+      if (res.code === 200) {
+        this.strornum = res.data ? 'num' : 'str'
+      } else {
+        this.$message.error(res.msg || res || '删除失败')
+      }
       item.showMore = true
     },
     async handleSort() {
