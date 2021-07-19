@@ -1,7 +1,7 @@
 <template>
   <!-- 3D饼图和柱状图 -->
   <div class="dvs-high">
-    <div class="container" ref="container" :style="styleObj"></div>
+    <div class="container" ref="container" :style="styleObj" @click.capture="resetBindData"></div>
   </div>
 </template>
 <script>
@@ -46,8 +46,7 @@ export default {
     }
   },
   mounted() {
-    // this.init()
-    console.log('id', this.chartId)
+    this.init()
   },
   methods: {
     init() {
@@ -58,6 +57,11 @@ export default {
         this.setting.config
       )
     },
+    resetBindData() {
+      if (this.currentIndex !== '') {
+        resetOriginData(this.chartId, this.canvasMap)
+      }
+    },
     clickEvent(e) {
       let self = this
       // 判断是否启用了联动
@@ -65,7 +69,6 @@ export default {
         return
       }
       self.$nextTick(() => {
-        console.log(self.chartId)
         // 重复选择数据，进行重置
         if (self.currentIndex === e.point.index) {
           self.currentIndex = ''
