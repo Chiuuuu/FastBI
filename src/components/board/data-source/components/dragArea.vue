@@ -237,6 +237,7 @@ export default {
         this.isdrag = false
         return false
       }
+      let _alias = this.polymerizeType.find((x) => x.value === dataFile.defaultAggregator);
       dataFile.showMore = false // 是否点击显示更多
       if (this.type === 'dimensions' && this.dragFile === this.type) {
         // 嵌套饼图可以有多个维度（最多只能2个）
@@ -276,9 +277,6 @@ export default {
         this.dragFile === this.type &&
         this.chartType === '1'
       ) {
-        let _alias = this.polymerizeType.find(
-          (x) => x.value === dataFile.defaultAggregator
-        )
         dataFile.alias += `(${_alias.name})`
         // 饼图类型只能拉入一个度量（包含3d和矩形热力图）
         if (
@@ -324,6 +322,7 @@ export default {
         this.dragFile === this.type
       ) {
         // 进度条只有一个度量
+        dataFile.alias += `(${_alias.name})`
         if (this.currSelected.setting.name === 'steepBar') {
           this.fileList[0] = dataFile
         } else {

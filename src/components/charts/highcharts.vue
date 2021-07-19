@@ -146,8 +146,9 @@ export default {
   watch: {
     setting: {
       handler(val) {
-        val.config.chart.width = val.view.width
-        val.config.chart.height = val.view.height
+        val.config.chart.width = val.view.width;
+        val.config.chart.height = val.view.height;
+        // console.log('background',val.background);
         // this.$highCharts.chart(this.$refs.container, val.config);
         this.getBackgroundColor(val.background)
         this.mychart.update(val.config)
