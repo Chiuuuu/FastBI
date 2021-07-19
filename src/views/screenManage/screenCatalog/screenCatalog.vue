@@ -237,7 +237,7 @@
             maxlength="6"
             @input="handlePassword"
           />
-          <span v-else>{{ releaseObj.password }}</span>
+          <span v-else>{{ releaseObj.password || '无密码' }}</span>
         </div>
         <div class="releace-line" v-show="showLimitWarn">
           <span class="errortext">请输入6位数字+字母</span>
@@ -301,7 +301,12 @@
           :class="{ active: index === chooseIndex }"
           @click.stop="getCardClick(item, index)"
         >
-          <img slot="cover" alt="example" height="240" :src="item.thumbnailsUrl" />
+          <img
+            slot="cover"
+            alt="example"
+            height="240"
+            :src="item.thumbnailsUrl"
+          />
           <a-card-meta
             :title="item.title"
             style="text-align:center"

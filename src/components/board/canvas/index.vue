@@ -50,7 +50,8 @@ export default {
     return {
       wrapStyle: {},
       screenStyle: {},
-      range: 0.65
+      range: 0.65,
+      fullScreenRange: 1 // 全屏缩放值
     }
   },
   mounted() {
@@ -77,13 +78,16 @@ export default {
           wrap.clientHeight - 61
         )}px`
       }
-      // 计算缩放比例
-      // let range = ((this.pageSettings.width) / 1920)
-      // range = Math.round(range * 100) / 100
-      // if (range < 0.3) {
-      //   range = 0.3
-      // }
-      // this.range = range
+
+      if (this.isScreen) {
+        let range =
+          this.$refs.screenInner.clientWidth / this.orginPageSettings.width
+        range = Math.round(range * 100) / 100
+        if (range < 0.4) {
+          range = 0.4
+        }
+        this.fullScreenRange = range
+      }
     },
     // transform点击事件
     cancelSelected() {
@@ -145,14 +149,16 @@ export default {
       'canvasRange',
       'contextMenuInfo',
       'screenId',
-      'isScreen'
+      'isScreen',
+      'orginPageSettings'
     ]),
     // 画布面板的样式
     canvasPanelStyle() {
+      let range = this.isScreen ? this.fullScreenRange : this.canvasRange
       return {
         width: `${this.pageSettings.width}px`,
         height: `${this.pageSettings.height}px`,
-        transform: `scale(${this.canvasRange}) translate3d(-50%, -50%, 0)`,
+        transform: `scale(${range}) translate3d(-50%, -50%, 0)`,
         background:
           this.pageSettings.backgroundType === '1'
             ? this.pageSettings.backgroundColor

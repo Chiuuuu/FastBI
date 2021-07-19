@@ -30,7 +30,8 @@ const aggregatorMap = {
   平均: 'AVG',
   最大值: 'MAX',
   最小值: 'MIN',
-  统计: 'CNT'
+  计数: 'CNT',
+  去重计数: 'DCNT'
 }
 const reg = /<span class="edit-alias" contenteditable="false">(.*?)<\/span>/g // /<span class="edit-alias" contenteditable="false">(.*?)\(.*?\)(&nbsp;){3}<\/span>/g // 字符串替换模板
 export default {
@@ -401,7 +402,7 @@ export default {
           return res.msg
         }
         str = this.htmlText.replace(reg, (match, alias) => {
-          return res.rows[0][alias].toFixed(2)
+          return res.rows[0][alias]
         })
       }
       return str

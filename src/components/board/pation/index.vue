@@ -61,16 +61,6 @@ import {
   removeResizeListener
 } from 'bin-ui/src/utils/resize-event'
 import { mapActions, mapGetters } from 'vuex'
-let orginPageSettings = {
-  width: 1920,
-  height: 1080,
-  backgroundColor: '#0d2a42',
-  gridStep: 1,
-  backgroundSrc: '',
-  backgroundType: '1',
-  opacity: 1,
-  refresh: { frequency: '', isRefresh: false }
-}
 export default {
   props: {
     canEdit: {
@@ -148,7 +138,7 @@ export default {
           name: name,
           orderNo: this.pages.length + 1,
           screenId: this.screenId,
-          setting: orginPageSettings
+          setting: this.orginPageSettings
         }
         this.$server.screenManage.addScreenTab(params).then(res => {
           if (res.code === 200) {
@@ -297,7 +287,8 @@ export default {
       'pageList',
       'currentPageId',
       'isScreen',
-      'pageSettings'
+      'pageSettings',
+      'orginPageSettings'
     ]),
     pages: {
       get() {

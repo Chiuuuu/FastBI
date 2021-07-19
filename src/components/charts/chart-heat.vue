@@ -9,10 +9,6 @@ import { setLinkageData, resetOriginData } from '@/utils/setDataLink'
 export default {
   name: 'chartHeat',
   props: {
-    chartId: {
-      type: String,
-      default: '0'
-    },
     config: {
       type: Object,
       required: true

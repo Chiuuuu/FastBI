@@ -479,6 +479,15 @@ export default {
     },
     async handleOk() {
       if (this.isNoSelectData) {
+        this.screenVisible = false
+        return
+      }
+      // 度量没有添加条件不能确定
+      if (
+        this.currentFile.file === 'measures' &&
+        !this.currentFile.conditionList.length
+      ) {
+        this.screenVisible = false
         return
       }
       let apiData = deepClone(this.currSelected.setting.api_data)
