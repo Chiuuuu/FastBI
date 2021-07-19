@@ -326,6 +326,10 @@ export default {
     },
     // 设置定时器
     setTimer() {
+      // 编辑页面的screen不刷新（用来提前渲染导出大屏图片）
+      if (this.$route.name === 'screenEdit') {
+        return
+      }
       if (this.timer) {
         clearInterval(this.timer)
         this.timer = null
