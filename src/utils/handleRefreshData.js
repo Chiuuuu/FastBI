@@ -6,6 +6,46 @@ import { message } from 'ant-design-vue'
 // 处理大屏刷新数据
 export function handleRefreshData({ chart, newData, refreshType }) {
   let apiData = chart.setting.api_data
+  if (chart.setting.chartType === 'v-map') {
+    // 假刷新获取不到null的值，遍历加上
+    if (!refreshType) {
+      // 获取所有数据的key
+      if (newData.fillList) {
+        let keys = apiData.dimensions
+          .concat(apiData.measures)
+          .map(item => item.alias)
+        for (let rowDatas of newData.fillList) {
+          for (let key of keys) {
+            if (typeof rowDatas[key] === 'undefined') {
+              rowDatas[key] = null
+            }
+          }
+        }
+      }
+      if (newData.labelList) {
+        let labelKeys = apiData.labelDimensions
+          .concat(apiData.labelMeasures)
+          .map(item => item.alias)
+        for (let rowDatas of newData.labelList) {
+          for (let key of labelKeys) {
+            if (typeof rowDatas[key] === 'undefined') {
+              rowDatas[key] = null
+            }
+          }
+        }
+      }
+    }
+    setMapData(chart, newData)
+    return
+  }
+  let source = chart.setting.api_data.source
+  if (!source) {
+    return
+  }
+  let sourceRows = source.rows
+  if (!sourceRows) {
+    return
+  }
   // 假刷新获取不到null的值，遍历加上
   if (!refreshType) {
     // 获取所有数据的key
@@ -22,17 +62,6 @@ export function handleRefreshData({ chart, newData, refreshType }) {
         }
       }
     }
-  }
-  if (chart.setting.chartType === 'v-map') {
-    setMapData(chart, newData)
-  }
-  let source = chart.setting.api_data.source
-  if (!source) {
-    return
-  }
-  let sourceRows = source.rows
-  if (!sourceRows) {
-    return
   }
   if (chart.setting.type === '2') {
     chart.setting.api_data.returnData = newData // 记录返回的键值对，方便展示图表数据直接用

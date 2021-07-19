@@ -371,24 +371,25 @@ export default {
         })
         // 如果有图表联动, 则渲染联动的数据
         if (this.apiData.selectData) {
-          let seriesData = options.series[0];
-          let columns = this.apiData.selectData.columns;
-          let rows1 = this.apiData.selectData.rows[0];
-          seriesData.data = [{
-            name:'',
-            value:[
-              rows1[columns[1]],
-              rows1[columns[2]],
-              rows1[columns[0]],
-              columns[1],
-              columns[2],
-              columns[0],
-            ]
-          }]
+          let seriesData = options.series[0]
+          let columns = this.apiData.selectData.columns
+          let rows1 = this.apiData.selectData.rows[0]
+          seriesData.data = [
+            {
+              name: '',
+              value: [
+                rows1[columns[1]],
+                rows1[columns[2]],
+                rows1[columns[0]],
+                columns[1],
+                columns[2],
+                columns[0]
+              ]
+            }
+          ]
           options.series = seriesData
           options.legend.data = [rows1[columns[0]]]
         }
-     
       }
 
       // 矩形树图
@@ -495,9 +496,6 @@ export default {
             if (!val) {
               return
             }
-            if (typeof val === 'number') {
-              val = +parseFloat(val).toFixed(2)
-            }
             str.push(val)
           })
           str = orient === 'vertical' ? str.join('\n') : str.join(':')
@@ -512,9 +510,6 @@ export default {
             let val = params.data[item]
             if (!val) {
               return
-            }
-            if (typeof val === 'number') {
-              val = +parseFloat(val).toFixed(2)
             }
             str.push(`${item}：${val}`)
           })

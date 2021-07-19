@@ -11,21 +11,25 @@
   >
     <div v-if="fileList.length > 0">
       <div
-        :class="['field','under-level', { error: item.status === 1 }]"
+        :class="['field', 'under-level', { error: item.status === 1 }]"
         v-for="(item, index) in fileList"
         :key="index"
         @contextmenu.prevent="showMore(item)"
       >
-        <a-dropdown :trigger="['click', 'contextmenu']" v-model="item.showMore">
+        <a-dropdown
+          :trigger="['click', 'contextmenu']"
+          v-model="item.showMore"
+          @visibleChange="v => v && showMore(item)"
+        >
           <a-icon class="icon-more" type="caret-down" />
           <a-menu slot="overlay">
             <a-sub-menu
               key="1"
               title="聚合方式"
-              v-show="item.file === 'labelMeasures'"
+              v-show="item.file === 'measures'"
             >
               <a-menu-item
-                v-for="(aggregator, index) in polymerizationData"
+                v-for="(aggregator, index) in polymerizationData[strornum]"
                 :key="index"
                 @click.native="changePolymerization(aggregator, item)"
                 >{{ aggregator.name }}</a-menu-item
@@ -83,22 +87,33 @@ export default {
         },
         measures: '拖入度量'
       },
-      polymerizationData: [
-        { name: '求和', value: 'SUM' },
-        { name: '平均', value: 'AVG' },
-        { name: '最大值', value: 'MAX' },
-        { name: '最小值', value: 'MIN' },
-        { name: '统计', value: 'CNT' }
-      ],
-      isdrag: false, // 是否拖拽中
-      fileList: [], // 维度字段数组
-      isVaild: false, //
+      polymerizationData: {
+        // 数字
+        num: [
+          { name: '求和', value: 'SUM' },
+          { name: '平均', value: 'AVG' },
+          { name: '最大值', value: 'MAX' },
+          { name: '最小值', value: 'MIN' },
+          { name: '计数', value: 'CNT' },
+          { name: '去重计数', value: 'DCNT' }
+        ],
+        str: [
+          { name: '计数', value: 'CNT' },
+          { name: '去重计数', value: 'DCNT' }
+        ]
+      },
+      strornum: '',
       polymerizeType: [
         { name: '求和', value: 'SUM' },
         { name: '平均', value: 'AVG' },
         { name: '最大值', value: 'MAX' },
-        { name: '最小值', value: 'MIN' }
-      ] // 聚合方式
+        { name: '最小值', value: 'MIN' },
+        { name: '计数', value: 'CNT' },
+        { name: '计数', value: 'COUNT' },
+        { name: '去重计数', value: 'DCNT' }
+      ], // 聚合方式
+      isdrag: false, // 是否拖拽中
+      fileList: [] // 维度字段数组
     }
   },
   inject: ['errorFile', 'initTargetMeasure'],
@@ -196,13 +211,12 @@ export default {
       }
       // 度量
       if (this.type === 'measures' && this.dragFile === this.type) {
+        let _alias = this.polymerizeType.find(
+          x => x.value === dataFile.defaultAggregator
+        )
+        dataFile.alias += `(${_alias.name})`
         // 区域一个维度一个度量，经纬度度量经度维度值
-        if (this.labelType === 'area') {
-          this.fileList.push(dataFile)
-          this.fileList = this.uniqueFun(this.fileList, 'alias')
-        } else {
-          this.fileList[0] = dataFile
-        }
+        this.fileList[0] = dataFile
         this.getData()
       }
       this.isdrag = false
@@ -223,7 +237,16 @@ export default {
       this.isdrag = false
     },
     // 点击右键显示更多
-    showMore(item) {
+    async showMore(item) {
+      // 调用接口判断是否为数字
+      let res = await this.$server.dataModel.getMeasures(item.pivotschemaId)
+      // 返回 data true表示 是数值类型
+      // 返回 data false表示 是字符类型
+      if (res.code === 200) {
+        this.strornum = res.data ? 'num' : 'str'
+      } else {
+        this.$message.error(res.msg || res || '删除失败')
+      }
       item.showMore = true
     },
     // 修改数据聚合方式
