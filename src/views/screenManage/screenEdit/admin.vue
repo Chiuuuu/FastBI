@@ -346,7 +346,8 @@ export default {
       if (this.$route.query.tabId) {
         this.getScreenDetail({
           id: this.$route.query.id,
-          tabId: this.$route.query.tabId
+          tabId: this.$route.query.tabId,
+          needRefresh: true
         })
       }
     },

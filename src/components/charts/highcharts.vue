@@ -1,7 +1,7 @@
 <template>
   <!-- 3D饼图和柱状图 -->
   <div class="dvs-high">
-    <div class="container" ref="container" :style="styleObj"></div>
+    <div class="container" ref="container" :style="styleObj" @click.capture="resetBindData"></div>
   </div>
 </template>
 <script>
@@ -46,8 +46,7 @@ export default {
     }
   },
   mounted() {
-    // this.init()
-    console.log('id', this.chartId)
+    this.init()
   },
   methods: {
     init() {
@@ -58,6 +57,18 @@ export default {
         this.setting.config
       )
     },
+    resetBindData(e) {
+      const nodeName = e.target.nodeName
+      if (nodeName !== 'path') {
+        // 清除选中效果
+        const target = this.mychart.series[0].data[this.currentIndex]
+        if (target && typeof target.slice === 'function') {
+          target.slice(false)
+        }
+        resetOriginData(this.chartId, this.canvasMap)
+        this.currentIndex = ''
+      }
+    },
     clickEvent(e) {
       let self = this
       // 判断是否启用了联动
@@ -65,55 +76,22 @@ export default {
         return
       }
       self.$nextTick(() => {
-        console.log(self.chartId)
         // 重复选择数据，进行重置
         if (self.currentIndex === e.point.index) {
-          self.currentIndex = ''
-          // 强行渲染
-          self.key++
+          // 清除选中效果
+          const target = self.mychart.series[0].data[self.currentIndex]
+          if (target && typeof target.slice === 'function') {
+            target.slice(false)
+          }
           resetOriginData(self.chartId, self.canvasMap)
+          self.currentIndex = ''
           return
         }
-        // if (typeof params.target === 'undefined') {
-        //     // 重置数据颜色样式
-        //     const series = self.config.series
-        //     if (
-        //       series.itemStyle &&
-        //       series.itemStyle.normal &&
-        //       series.itemStyle.normal.color
-        //     ) {
-        //       delete self.config.series.itemStyle.normal.color
-        //     }
-        //     resetOriginData(self.chartId, self.canvasMap)
-        //     self.currentIndex = ''
-        //   }
         // 记录当前选择数据的index
         self.currentIndex = e.point.index
-        // self.setChartClick()
         // 兼容echarts处理, echarts的e.name就是维度值
         e.name = e.point.name
         setLinkageData(self.chartId, e, self.canvasMap)
-      })
-    },
-    // 添加图表点击事件，可以点击非数据区域
-    setChartClick() {
-      this.$nextTick(() => {
-        let self = this
-        this.mychart.getZr().on('click', function(params) {
-          if (typeof params.target === 'undefined') {
-            // 重置数据颜色样式
-            const series = self.config.series
-            if (
-              series.itemStyle &&
-              series.itemStyle.normal &&
-              series.itemStyle.normal.color
-            ) {
-              delete self.config.series.itemStyle.normal.color
-            }
-            resetOriginData(self.chartId, self.canvasMap)
-            self.currentIndex = ''
-          }
-        })
       })
     },
     getBackgroundColor(objcolor) {

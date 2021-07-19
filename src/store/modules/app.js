@@ -6,6 +6,7 @@ import { handleRefreshData } from '@/utils/handleRefreshData'
 import { messages } from 'bin-ui'
 import guangzhou from '@/utils/guangdong.json'
 import { deepClone } from '@/utils/deepClone'
+import _ from 'lodash'
 
 let orginPageSettings = {
   width: 1920,
@@ -244,12 +245,17 @@ const app = {
           let updateList = []
           rootGetters.canvasMap.forEach(chart => {
             let apiData = chart.setting.api_data
-            if (
-              apiData.interactive &&
-              apiData.interactive.beBinded === rootGetters.currentSelected
-            ) {
-              apiData.interactive.beBinded = ''
-              updateList.push(chart)
+            if (apiData.interactive) {
+              if (
+                apiData.interactive.beBinded === rootGetters.currentSelected
+              ) {
+                apiData.interactive.beBinded = ''
+                updateList.push(chart)
+              }
+              apiData.interactive.bindedList = _.pull(
+                apiData.interactive.bindedList,
+                rootGetters.currentSelected
+              )
             }
           })
           if (updateList.length > 0) {
@@ -359,22 +365,22 @@ const app = {
               let chart = rootGetters.canvasMap.find(
                 chart => chart.id + '' === id
               )
-              // 图表联动数据selectData不保存后台
-              if (chart.setting.api_data.selectData) {
-                delete chart.setting.api_data.selectData
-                if (chart.setting.chartType === 'v-treemap') {
-                  chart.setting.config.series.data =
-                    chart.setting.api_data.source
-                }
-              }
-              // 素材库不需要数据
-              if (chart.name === 'material') {
-                continue
-              }
               let newData = dataItem[id].graphData
 
               // 找到chart的表示当前页
               if (chart) {
+                // 素材库不需要数据
+                if (chart.name === 'material') {
+                  continue
+                }
+                // 图表联动数据selectData不保存后台
+                if (chart.setting.api_data.selectData) {
+                  delete chart.setting.api_data.selectData
+                  if (chart.setting.chartType === 'v-treemap') {
+                    chart.setting.config.series.data =
+                      chart.setting.api_data.source
+                  }
+                }
                 // 素材库不需要数据
                 if (chart.name === 'material') {
                   continue
@@ -386,7 +392,7 @@ const app = {
                 }
                 chart.setting.isEmpty = false
                 // 更新界面
-                handleRefreshData({ chart, newData })
+                handleRefreshData({ chart, newData, needLoading })
               }
             }
             screenManage.saveAllChart(rootGetters.canvasMap)

@@ -46,7 +46,7 @@ export default {
   mounted() {
     this.Init()
     this.mychart.on('click', this.clickEvent)
-    console.log('heat', this.chartId)
+    console.log('heat', this.chartId, this.config)
   },
   methods: {
     Init(val) {
