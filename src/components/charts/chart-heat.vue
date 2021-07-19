@@ -7,10 +7,11 @@ import { DEFAULT_COLORS } from '@/utils/defaultColors'
 import { mapGetters } from 'vuex'
 import { setLinkageData, resetOriginData } from '@/utils/setDataLink'
 export default {
+  name: 'chartHeat',
   props: {
     chartId: {
       type: String,
-      required: true
+      default: '0'
     },
     config: {
       type: Object,
@@ -45,6 +46,7 @@ export default {
   mounted() {
     this.Init()
     this.mychart.on('click', this.clickEvent)
+    console.log('heat', this.chartId)
   },
   methods: {
     Init(val) {

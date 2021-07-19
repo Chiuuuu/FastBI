@@ -56,7 +56,7 @@
           </div>
         </div>
       </template>
-      <template v-slot:canvas>
+      <template v-slot:canvas v-if="canvasMap.length > 0">
         <!--动态组件-->
         <template v-for="transform in canvasMap">
           <drag-item

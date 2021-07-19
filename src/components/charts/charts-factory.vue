@@ -340,7 +340,6 @@ export default {
   methods: {
     afterConfig(options) {
       options = deepClone(options)
-      console.log('afterConfig', options)
       // 散点图
       if (this.typeName === 've-scatter') {
         // tooltip显示
