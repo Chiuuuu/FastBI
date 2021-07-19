@@ -73,9 +73,10 @@
               <high-charts
                 v-else-if="transform.setting.name === 'high-pie'"
                 :key="transform.id"
+                :chart-id="transform.id"
                 :setting="transform.setting"
+                :config="transform.setting.config"
                 :api-data="transform.setting.api_data"
-                :background="transform.setting.background"
               ></high-charts>
 
               <!-- 矩形热力图 -->
@@ -84,9 +85,10 @@
                   (transform.setting.name === 've-heatmap') |
                     (transform.setting.name === 've-sun')
                 "
+                :chart-id="transform.id"
                 :key="transform.id"
-                :config="transform.setting.config"
                 :view="transform.setting.view"
+                :config="transform.setting.config"
                 :api-data="transform.setting.api_data"
                 :background="transform.setting.background"
               ></chart-heart>
