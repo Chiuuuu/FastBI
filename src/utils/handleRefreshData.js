@@ -12,10 +12,13 @@ export function handleRefreshData({ chart, newData, refreshType }) {
     let keys = apiData.dimensions
       .concat(apiData.measures)
       .map(item => item.alias)
-    for (let rowDatas of newData) {
-      for (let key of keys) {
-        if (typeof rowDatas[key] === 'undefined') {
-          rowDatas[key] = null
+
+    if (Array.isArray(newData)) {
+      for (let rowDatas of newData) {
+        for (let key of keys) {
+          if (typeof rowDatas[key] === 'undefined') {
+            rowDatas[key] = null
+          }
         }
       }
     }
