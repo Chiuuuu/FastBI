@@ -40,8 +40,7 @@ function handleShootedDom(chart, targetDom) {
   // 非图表控件 && hightcharts可以直接深拷贝
   if (
     !classifyControl(chart) ||
-    chart.setting.name === 'high-pie' ||
-    chart.setting.name === 'high-column'
+    chart.setting.name === 'high-pie'
   ) {
     const domObjClone = targetDom.cloneNode(true)
     domObjClone.setAttribute('id', 'cloneShotTarget')
