@@ -189,11 +189,22 @@ export default {
     },
     // 检查可选图表是否已经绑定当前图表
     checkBeBinded(chart) {
-      let apiData = this.currSelected.setting.api_data
-      if (apiData.interactive && apiData.interactive.beBinded === chart.id) {
+      let result = this.checkUpperBind(this.currentSelected, chart.id)
+      return result
+    },
+    // 往上寻找有没有在绑定路径中
+    checkUpperBind(upperChartId, targetChartId) {
+      let upperChart = this.canvasMap.find(item => item.id === upperChartId)
+      let apiData = upperChart.setting.api_data
+      // 没有被任何图表绑定
+      if (!apiData.interactive || !apiData.interactive.beBinded) {
+        return false
+      }
+      // 绑定了当前图表
+      if (apiData.interactive.beBinded === targetChartId) {
         return true
       }
-      return false
+      this.checkUpperBind(apiData.interactive.beBinded, targetChartId)
     },
     // 检查可选图表是否已经被其他图表绑定
     checkHaveBind(chart) {
