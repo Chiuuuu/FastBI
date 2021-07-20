@@ -84,7 +84,7 @@
       </a-empty>
     </div>
     <div class="right scrollbar" style="overflow: hidden">
-      <div class="right-header" v-if="fileSelectId !== -1">
+      <div class="right-header" v-if="fileSelectId">
         <span class="nav_title">{{ fileSelectName }} </span>
         <img
           v-show="isPublish === 0"
@@ -676,8 +676,6 @@ export default {
           if (res.code === 200) {
             this.$message.success('删除成功')
             this.getList()
-            this.fileSelectId = ''
-            this.fileSelectName = ''
             this.$store.dispatch('SetParentId', '')
             this.$store.commit('common/SET_PRIVILEGES', [])
             this.$store.commit('common/SET_MENUSELECTID', -1)
@@ -739,7 +737,6 @@ export default {
         if (err) {
           return
         }
-        // this.fileSelectId = ''
         if (this.isAdd === 1) {
           // 新增
           // 新建大屏清空模型列表
