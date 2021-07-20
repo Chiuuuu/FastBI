@@ -529,13 +529,13 @@
                       @change="setHistogram($event, 'stack')"
                     ></a-switch>
                   </gui-field>
-                  <gui-field label="混合状图">
+                  <!-- <gui-field label="混合状图">
                     <a-switch
                       v-model="selfConfig.mixed"
                       size="small"
                       @change="setHistogram($event, 'mixed')"
                     ></a-switch>
-                  </gui-field>
+                  </gui-field> -->
                 </div>
                 <!-- 散点图 -->
                 <div v-if="isScatter">
