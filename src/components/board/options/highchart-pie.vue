@@ -1,6 +1,6 @@
 <template>
   <!-- highechart 样式设置 -->
-  <a-collapse>
+  <a-collapse v-model="collapseActive">
     <a-collapse-panel key="title" header="标题">
       <!-- <a-switch
         slot="extra"
@@ -94,6 +94,7 @@
         </a-radio-group>
       </gui-field>
     </a-collapse-panel>
+
     <a-collapse-panel key="properties" header="图形属性">
       <gui-field label="是否3d图">
         <a-switch
@@ -157,14 +158,24 @@
         </a-select>
       </gui-field>
     </a-collapse-panel>
+
     <a-collapse-panel key="legend" header="图例设置">
       <a-switch
         slot="extra"
         v-model="HighConfig.setting.config.legend.enabled"
+        v-if="collapseActive.indexOf('legend') > -1"
         default-checked
         @change="switchChange"
         size="small"
       />
+      <gui-field label="图例颜色">
+        <el-color-picker
+          v-for="(color, index) in HighConfig.setting.config.colors"
+          :key="index"
+          v-model="HighConfig.setting.config.colors[index]"
+          @change="setSelfProperty"
+        ></el-color-picker>
+      </gui-field>
       <gui-field label="文本">
         <gui-inline label="字号">
           <a-input-number
@@ -264,26 +275,28 @@
       <a-switch
         slot="extra"
         v-model="HighConfig.setting.config.plotOptions.pie.dataLabels.enabled"
-       
+        v-if="collapseActive.indexOf('indicator') > -1"
         @change="switchChange"
         size="small"
       />
-      <!-- <gui-field label="显示内容"> -->
-      显示内容
+      <gui-field label="显示内容"></gui-field>
       <a-select
-        mode="tags"
+        mode="multiple"
         placeholder="选择显示内容"
-        :default-value="selval"
+        v-model="HighConfig.setting.config.plotOptions.pie.dataLabels.labelShowList"
         style="width: 100%"
-        @change="onChange"
+        @change="handleFormatter($event, 'label')"
       >
         <a-select-option
-          v-for="i in formatList"
-          :key="i.label"
-          :value="i.value"
+          :key="0"
+          value="dimensions"
+          >维度</a-select-option
         >
-          {{ i.label }}
-        </a-select-option>
+        <a-select-option
+          :key="0"
+          value="measures"
+          >度量</a-select-option
+        >
       </a-select>
       <gui-field label="文本">
         <gui-inline label="字号">
@@ -306,27 +319,56 @@
           ></el-color-picker>
         </gui-inline>
       </gui-field>
-      <!-- <gui-field label="显示位置">
+      <gui-field label="显示位置">
         <a-radio-group :value="HighConfig.setting.config.plotOptions.pie.dataLabels.distance" size="small">
           <a-radio-button
-            value="-30%"
+            :value="-30"
             @click.native.stop="
-              onRadioChange('indicator','distance', '-30%')
+              onRadioChange('indicator','distance', -30)
             "
             >内部</a-radio-button
           >
           <a-radio-button
-            value="30%"
+            :value="10"
             @click.native.stop="
-              onRadioChange('indicator','distance', '30%')
+              onRadioChange('indicator','distance', 10)
             "
             >外部</a-radio-button
           >
         </a-radio-group>
-      </gui-field> -->
+      </gui-field>
     </a-collapse-panel>
 
-    <a-collapse-panel key="background" header="背景设置">
+    <a-collapse-panel key="tooltip" header="鼠标移入提示">
+      <a-switch
+        slot="extra"
+        v-model="HighConfig.setting.config.tooltip.enabled"
+        v-if="collapseActive.indexOf('tooltip') > -1"
+        @change="switchChange"
+        size="small"
+      />
+      <gui-field label="显示内容"></gui-field>
+      <a-select
+        mode="multiple"
+        placeholder="选择显示内容"
+        v-model="HighConfig.setting.config.tooltip.tooltipShowList"
+        style="width: 100%"
+        @change="handleFormatter($event, 'tooltip')"
+      >
+        <a-select-option
+          :key="0"
+          value="dimensions"
+          >维度</a-select-option
+        >
+        <a-select-option
+          :key="0"
+          value="measures"
+          >度量</a-select-option
+        >
+      </a-select>
+    </a-collapse-panel>
+
+    <a-collapse-panel key="background" header="背景和边框">
       <a-radio-group
         v-model="HighConfig.setting.background.backgroundType"
         name="radioGroup"
@@ -429,17 +471,21 @@ export default {
   data() {
     return {
       // selval:[]
+      collapseActive: [],
+      tooltipShowList: [],
+      labelShowList: []
     }
   },
   computed: {
-    selval(){
-      let _val = this.HighConfig.setting.config.plotOptions.pie.dataLabels.format;
-      if(_val==''){
+    selval() {
+      let _val = this.HighConfig.setting.config.plotOptions.pie.dataLabels
+        .format
+      if (_val === '') {
         // this.HighConfig.setting.config.plotOptions.pie.dataLabels.enabled = false;
-        return [];
-      }else{
+        return []
+      } else {
         // this.HighConfig.setting.config.plotOptions.pie.dataLabels.enabled = true;
-        return _val.split(' ');
+        return _val.split(' ')
       }
     }
   },
@@ -450,6 +496,27 @@ export default {
       // this.HighConfig.setting.config.plotOptions.pie.dataLabels.format = checkedValues.join('');
       let source = this.HighConfig.setting.config.plotOptions.pie.dataLabels
       this.$set(source, 'format', checkedValues.join(' '))
+      this.setSelfProperty()
+    },
+    handleFormatter(value, type) {
+      let result = ''
+      if (value.includes('dimensions')) {
+        result += '{point.options.name}'
+      }
+      if (value.includes('measures')) {
+        if (!result) {
+          result = '{point.options.y}'
+        } else {
+          result += ': {point.options.y}'
+        }
+      }
+      if (type === 'tooltip') {
+        this.HighConfig.setting.config.tooltip.pointFormat = result
+        this.HighConfig.setting.config.tooltip.tooltipShowList = value
+      } else {
+        this.HighConfig.setting.config.plotOptions.pie.dataLabels.pointFormat = result
+        this.HighConfig.setting.config.plotOptions.pie.dataLabels.labelShowList = value
+      }
       this.setSelfProperty()
     }
   },

@@ -1,6 +1,6 @@
 <template>
   <!-- highechart 样式设置 -->
-  <a-collapse>
+  <a-collapse v-model="collapseActive">
     <a-collapse-panel key="title" header="标题">
       <gui-field label="标题名">
         <a-input
@@ -138,15 +138,6 @@
           ></a-input-number>
         </gui-inline>
       </gui-field>
-      <gui-field label="展示数值">
-        <a-switch
-          v-model="
-            HighConfig.setting.config.plotOptions.column.dataLabels.enabled
-          "
-          size="small"
-          @change="setSelfProperty"
-        ></a-switch>
-      </gui-field>
       <gui-field label="文本">
         <gui-inline label="字号">
           <a-input-number
@@ -209,7 +200,39 @@
           clearable
         ></a-switch>
       </gui-field>
-      <gui-field label="主题类型">
+      <!-- <gui-field label="柱条宽度">
+        <a-input-number
+          class="longwidth"
+          v-model="HighConfig.setting.config.plotOptions.column.borderWidth"
+          size="small"
+          @change="setSelfProperty"
+        ></a-input-number>
+      </gui-field> -->
+      <gui-field label="展示数值">
+        <a-switch
+          v-model="HighConfig.setting.config.plotOptions.column.dataLabels.enabled"
+          size="small"
+          @change="setSelfProperty"
+        ></a-switch>
+      </gui-field>
+      <gui-field label="柱体内展示">
+        <a-switch
+          v-model="HighConfig.setting.config.plotOptions.column.dataLabels.inside"
+          size="small"
+          @change="setSelfProperty"
+        ></a-switch>
+      </gui-field>
+      <gui-field label="数值倾斜角度">
+        <a-input-number
+          class="longwidth"
+          v-model="HighConfig.setting.config.plotOptions.column.dataLabels.rotation"
+          size="small"
+          :min="0"
+          :max="360"
+          @change="setSelfProperty"
+        ></a-input-number>
+      </gui-field>
+      <!-- <gui-field label="主题类型">
         <a-select
           v-model="HighConfig.setting.config.themeName"
           style="width: 164px"
@@ -223,17 +246,26 @@
             >{{ theme.title }}</a-select-option
           >
         </a-select>
-      </gui-field>
+      </gui-field> -->
     </a-collapse-panel>
 
     <a-collapse-panel key="legend" header="图例设置">
       <a-switch
         slot="extra"
+        v-if="collapseActive.indexOf('legend') > -1"
         v-model="HighConfig.setting.config.legend.enabled"
         default-checked
         @change="switchChange"
         size="small"
       />
+      <gui-field label="图例颜色">
+        <el-color-picker
+          v-for="(color, index) in HighConfig.setting.config.colors"
+          :key="index"
+          v-model="HighConfig.setting.config.colors[index]"
+          @change="setSelfProperty"
+        ></el-color-picker>
+      </gui-field>
       <gui-field label="文本">
         <gui-inline label="字号">
           <a-input-number
@@ -333,6 +365,7 @@
       <a-switch
         slot="extra"
         v-model="HighConfig.setting.config.xAxis.visible"
+        v-if="collapseActive.indexOf('x') > -1"
         default-checked
         @change="switchChange"
         size="small"
@@ -428,6 +461,7 @@
       <a-switch
         slot="extra"
         v-model="HighConfig.setting.config.yAxis.visible"
+        v-if="collapseActive.indexOf('y') > -1"
         default-checked
         @change="switchChange"
         size="small"
@@ -511,9 +545,39 @@
       </gui-field>
     </a-collapse-panel>
 
+    <a-collapse-panel key="tooltip" header="鼠标移入提示">
+      <a-switch
+        slot="extra"
+        v-if="collapseActive.indexOf('tooltip') > -1"
+        v-model="HighConfig.setting.config.tooltip.enabled"
+        default-checked
+        @change="switchChange"
+        size="small"
+      />
+      <gui-field label="指标内容"></gui-field>
+      <a-select
+        mode="multiple"
+        placeholder="选择显示内容"
+        v-model="HighConfig.setting.config.tooltip.tooltipShowList"
+        style="width: 100%"
+        @change="handleFormatter($event, 'tooltip')"
+      >
+        <a-select-option
+          :key="0"
+          value="dimensions"
+          >维度</a-select-option
+        >
+        <a-select-option
+          :key="0"
+          value="measures"
+          >度量</a-select-option
+        >
+      </a-select>
+    </a-collapse-panel>
+
     <!-- <a-collapse-panel key="indicator" header="指标设置"> </a-collapse-panel> -->
 
-    <a-collapse-panel key="background" header="背景设置">
+    <a-collapse-panel key="background" header="背景和边框">
       <a-radio-group
         v-model="HighConfig.setting.background.backgroundType"
         name="radioGroup"
@@ -612,6 +676,8 @@ export default {
   components: { GuiField, GuiInline },
   data() {
     return {
+      collapseActive: [],
+      tooltipShowList: []
       // bartype: {
       //   isyz: false, //是否圆柱图
       //   isdd: false //是否堆叠图
@@ -619,19 +685,19 @@ export default {
     }
   },
   computed: {
-    isdd(){
-      let flag = this.HighConfig.setting.config.plotOptions.column.stacking;
-      if(flag==null){
-        return false;
-      }else{
-        return true;
+    isdd() {
+      let flag = this.HighConfig.setting.config.plotOptions.column.stacking
+      if (flag == null) {
+        return false
+      } else {
+        return true
       }
     }
   },
   mounted() {},
   methods: {
     setHistogram(val, key) {
-      //圆柱
+      // 圆柱
       if (key === 'chart') {
         this.$set(
           this.HighConfig.setting.config[key],
@@ -645,11 +711,30 @@ export default {
           val ? 'normal' : null
         )
       }
-      this.setSelfProperty();
-      console.clear();
+      this.setSelfProperty()
+      console.clear()
     },
     getBtnRadio(key, val) {
       this.$set(this.HighConfig.setting.config[key].title, 'align', val)
+      this.setSelfProperty()
+    },
+    handleFormatter(value, type) {
+      let result = ''
+      if (value.includes('dimensions')) {
+        result += '{series.name}'
+      }
+      if (value.includes('measures')) {
+        if (!result) {
+          result = '{point.y}'
+        } else {
+          result += ': {point.y}'
+        }
+      }
+      if (type === 'tooltip') {
+        this.HighConfig.setting.config.tooltip.pointFormat = result
+      } else {
+        this.HighConfig.setting.config.plotOptions.column.dataLabels.pointFormat = result
+      }
       this.setSelfProperty()
     }
   },

@@ -1,7 +1,12 @@
 <template>
   <!-- 3D饼图和柱状图 -->
   <div class="dvs-high">
-    <div class="container" ref="container" :style="styleObj" @click.capture="resetBindData"></div>
+    <div
+      class="container"
+      ref="container"
+      :style="styleObj"
+      @click.capture="resetBindData"
+    ></div>
   </div>
 </template>
 <script>
@@ -119,13 +124,29 @@ export default {
       //       key == 'backgroundImage' ? `url(${objcolor[key]})` : (typeof objcolor[key])==='number'?`${objcolor[key]}px`:objcolor[key]
       //     )
       //   }
+    },
+    // 处理formatter
+    handleFormatter(series, type) {
+      let result = []
+      this.apiData.measures.dimensions.map(item => {
+        if (series[type + 'ShowList'].includes(item.alias)) {
+          result.push(item.name)
+        }
+      })
+      if (this.apiData.measures[0]) {
+        const measureAlias = this.apiData.measures[0].alias
+        if (series[type + 'ShowList'].includes(measureAlias)) {
+          result.push()
+        }
+      }
+      return result.toString()
     }
   },
   watch: {
     setting: {
       handler(val) {
-        val.config.chart.width = val.view.width;
-        val.config.chart.height = val.view.height;
+        val.config.chart.width = val.view.width
+        val.config.chart.height = val.view.height
         // console.log('background',val.background);
         // this.$highCharts.chart(this.$refs.container, val.config);
         this.getBackgroundColor(val.background)

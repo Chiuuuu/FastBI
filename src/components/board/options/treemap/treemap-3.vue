@@ -1,7 +1,6 @@
 <template>
   <div>
-    <gui-field label="图例颜色"></gui-field>
-    <gui-field v-if="isContinuous">
+    <gui-field v-if="isContinuous" label="图例颜色">
       <el-color-picker
         v-for="(color, index) in selfConfig.series.continuousColors"
         :key="index"

@@ -169,19 +169,26 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['currentSelected'])
+    ...mapGetters(['currentSelected', 'currSelected']),
+    // 维度度量合并列表
+    concatDimAndMea() {
+      const {
+        dimensions = [],
+        measures = []
+      } = this.currSelected.setting.api_data
+      return dimensions.concat(measures)
+    }
   },
   methods: {
     ...mapActions(['updateChartData', 'refreshScreen']),
     // 设置自有属性
     setSelfProperty() {
-      console.log('config',this.HighConfig.setting.config);
       this.$store.dispatch('SetSelfProperty', this.HighConfig.setting.config)
       // 发送请求来保存数据
       setBaseProperty(this.currentSelected)
       this.updateChartData()
     },
-    //图例点击
+    // 图例点击
     onRadioChange(source, key, value) {
       if (source === 'indicator') {
         this.$set(
@@ -217,7 +224,7 @@ export default {
       // }
       this.$store.dispatch('SetBackGround', this.HighConfig.setting.background)
       setBaseProperty(this.currentSelected)
-      this.updateChartData();
+      this.updateChartData()
       // this.$store.dispatch('SetBackGround', this.backgroundApi)
       // 发送请求来保存数据
     },
