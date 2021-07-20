@@ -41,7 +41,9 @@
           </a-menu>
         </a-dropdown>
         <a-tooltip :title="formatAggregator(item)">
-          <span ref="itemName" class="field-text">{{ formatAggregator(item) }}</span>
+          <span ref="itemName" class="field-text">{{
+            formatAggregator(item)
+          }}</span>
         </a-tooltip>
       </div>
     </div>
@@ -185,7 +187,9 @@ export default {
   methods: {
     ...mapActions(['updateChartData']),
     formatAggregator(item) {
-      const fun = this.polymerizeType.find((x) => x.value === item.defaultAggregator)
+      const fun = this.polymerizeType.find(
+        x => x.value === item.defaultAggregator
+      )
       if (item.role === 2) {
         return `${item.alias} (${fun.name})`
       } else {
@@ -213,10 +217,11 @@ export default {
       }
       // 度量
       if (this.type === 'measures' && this.dragFile === this.type) {
-        let _alias = this.polymerizeType.find(
-          x => x.value === dataFile.defaultAggregator
-        )
-        dataFile.alias += `(${_alias.name})`
+        // let _alias = this.polymerizeType.find(
+        //   x => x.value === dataFile.defaultAggregator
+        // )
+        // dataFile.alias += `(${_alias.name})`
+        dataFile.defaultAggregator = this.judgeDataType(dataFile.dataType)
         this.fileList[0] = dataFile
         this.getData()
       }
@@ -237,17 +242,17 @@ export default {
       event.preventDefault()
       this.isdrag = false
     },
+    // 判断数值类型
+    judgeDataType(dataType) {
+      // 判断数值类型
+      let isNum =
+        dataType === 'BIGINT' || dataType === 'DECIMAL' || dataType === 'DOUBLE'
+      this.strornum = isNum ? 'num' : 'str'
+      return isNum ? 'SUM' : 'CNT'
+    },
     // 点击右键显示更多
-    async showMore(item) {
-      // 调用接口判断是否为数字
-      let res = await this.$server.dataModel.getMeasures(item.pivotschemaId)
-      // 返回 data true表示 是数值类型
-      // 返回 data false表示 是字符类型
-      if (res.code === 200) {
-        this.strornum = res.data ? 'num' : 'str'
-      } else {
-        this.$message.error(res.msg || res || '删除失败')
-      }
+    showMore(item) {
+        this.judgeDataType(item.dataType)
       item.showMore = true
     },
     // 修改数据聚合方式

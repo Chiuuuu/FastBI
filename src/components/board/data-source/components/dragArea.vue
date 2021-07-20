@@ -43,7 +43,9 @@
           </a-menu>
         </a-dropdown>
         <a-tooltip :title="formatAggregator(item)">
-          <span ref="itemName" class="field-text">{{ formatAggregator(item) }}</span>
+          <span ref="itemName" class="field-text">{{
+            formatAggregator(item)
+          }}</span>
         </a-tooltip>
       </div>
     </div>
@@ -217,7 +219,9 @@ export default {
   methods: {
     ...mapActions(['updateChartData']),
     formatAggregator(item) {
-      const fun = this.polymerizeType.find((x) => x.value === item.defaultAggregator)
+      const fun = this.polymerizeType.find(
+        x => x.value === item.defaultAggregator
+      )
       if (item.role === 2) {
         return `${item.alias} (${fun.name})`
       } else {
@@ -238,7 +242,9 @@ export default {
         this.isdrag = false
         return false
       }
-      let _alias = this.polymerizeType.find((x) => x.value === dataFile.defaultAggregator);
+      let _alias = this.polymerizeType.find(
+        x => x.value === dataFile.defaultAggregator
+      )
       dataFile.showMore = false // 是否点击显示更多
       if (this.type === 'dimensions' && this.dragFile === this.type) {
         // 嵌套饼图可以有多个维度（最多只能2个）
@@ -278,7 +284,12 @@ export default {
         this.dragFile === this.type &&
         this.chartType === '1'
       ) {
+        // let _alias = this.polymerizeType.find(
+        //   x => x.value === dataFile.defaultAggregator
+        // )
         // dataFile.alias += `(${_alias.name})`
+        // 获取初始聚合方式
+        dataFile.defaultAggregator = this.judgeDataType(dataFile.dataType)
         // 饼图类型只能拉入一个度量（包含3d和矩形热力图）
         if (
           (this.currSelected.setting.name === 've-pie') |
@@ -312,6 +323,9 @@ export default {
       }
       // 表格
       if (this.type === 'tableList') {
+        if (dataFile.file === 'measures') {
+          dataFile.defaultAggregator = this.judgeDataType(dataFile.dataType)
+        }
         this.fileList.push(dataFile)
         this.fileList = this.uniqueFun(this.fileList, 'alias')
         this.getData()
@@ -351,21 +365,18 @@ export default {
       event.preventDefault()
       this.isdrag = false
     },
+    // 判断数值类型
+    judgeDataType(dataType) {
+      // 判断数值类型
+      let isNum =
+        dataType === 'BIGINT' || dataType === 'DECIMAL' || dataType === 'DOUBLE'
+      this.strornum = isNum ? 'num' : 'str'
+      return isNum ? 'SUM' : 'CNT'
+    },
     // 点击右键显示更多
-    async showMore(item) {
-      // 调用接口判断是否为数字
-      if (item.resourceType === 8) {
-        let res = await this.$server.dataModel.getMeasures(item.pivotschemaId)
-        // 返回 data true表示 是数值类型
-        // 返回 data false表示 是字符类型
-        if (res.code === 200) {
-          this.strornum = res.data ? 'num' : 'str'
-        } else {
-          this.$message.error(res.msg || res || '删除失败')
-        }
-      } else {
-        this.strornum = ['DECIMAL', 'BIGINT', 'DOUBLE'].includes(item.dataType) ? 'num' : 'str'
-      }
+    showMore(item) {
+      // 重新根据数值类型获取聚合列表
+      this.judgeDataType(item.dataType)
       item.showMore = true
     },
     // 修改数据聚合方式
