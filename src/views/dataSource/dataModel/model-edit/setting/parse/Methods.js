@@ -37,6 +37,15 @@ export class Methods {
   constructor(dmType) {
     this.dmType = dmType || 'measures'
   }
+
+  common(arg, methodName) {
+    const { type, value } = arg
+    return {
+      type,
+      value: true
+    }
+  }
+
   // 数值类型通用校验
   numberCommon(arg, methodName) {
     if (this.methods.dmType === 'dimessions') {
@@ -145,11 +154,11 @@ export class Methods {
   }
   // 计数
   COUNT(arg) {
-    return this.methods.numberCommon.call(this, arg, 'COUNT')
+    return this.methods.common.call(this, arg, 'COUNT')
   }
   // 计数
   COUNTD(arg) {
-    return this.methods.numberCommon.call(this, arg, 'COUNTD')
+    return this.methods.common.call(this, arg, 'COUNTD')
   }
   // 取绝对值
   ABS(arg) {

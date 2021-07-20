@@ -12,9 +12,12 @@
         margin: 0 15px;
         white-space: nowrap;
         text-overflow: ellipsis;
-        overflow: hidden;">{{ datasourceName }}</div>
+        overflow: hidden;"
+      >
+        {{ datasourceName }}
+      </div>
       <!-- <div class="selector"> -->
-        <!-- <a-select default-value="银行账户" style="width: 94%;">
+      <!-- <a-select default-value="银行账户" style="width: 94%;">
           <a-select-option value="SQL Server">
             SQL Server
           </a-select-option>
@@ -29,13 +32,23 @@
         class="menu_select"
         @change="handleChangeDatabase"
       >
-        <a-select-option v-for="database in databaseList" :key="database.id" :value="database.name">{{ database.name }}</a-select-option>
+        <a-select-option
+          v-for="database in databaseList"
+          :key="database.id"
+          :value="database.name"
+          >{{ database.name }}</a-select-option
+        >
       </a-select>
       <a-divider />
-      <div class="table_list" :class="{'no-sql': !isDatabase}">
+      <div class="table_list" :class="{ 'no-sql': !isDatabase }">
         <div class="menu_search">
           <span class="search_span">表</span>
-          <a-input placeholder="请输入关键词搜索" :value="tableSearch" @change="handleSearchTable" class="search_input">
+          <a-input
+            placeholder="请输入关键词搜索"
+            :value="tableSearch"
+            @change="handleSearchTable"
+            class="search_input"
+          >
             <a-icon slot="prefix" type="search" />
           </a-input>
         </div>
@@ -50,17 +63,21 @@
       <div v-if="isDatabase" class="SQL_View table_list">
         <div class="menu_search">
           <span class="search_span">自定义SQL视图</span>
-          <a-icon class="view_icon" type="plus-square" @click="handleAddSQL('new')" />
+          <a-icon
+            class="view_icon"
+            type="plus-square"
+            @click="handleAddSQL('new')"
+          />
         </div>
         <!-- <div class="text-center"> -->
-          <edit-left
-            ref="editSqlRef"
-            type="sql"
-            :list="rightMenuList"
-            @on-left-drag-leave="handleLeftDragLeave"
-            @edit="item => handleAddSQL('edit', item)"
-            @delete="item => handleSQLDelete(item)"
-          ></edit-left>
+        <edit-left
+          ref="editSqlRef"
+          type="sql"
+          :list="rightMenuList"
+          @on-left-drag-leave="handleLeftDragLeave"
+          @edit="item => handleAddSQL('edit', item)"
+          @delete="item => handleSQLDelete(item)"
+        ></edit-left>
         <!-- </div> -->
         <!-- <div class="sheet_list">
           <a-dropdown class="sheet_list_item" :trigger="['contextmenu']">
@@ -82,47 +99,85 @@
         </div> -->
       </div>
     </div>
-    <div class="right" ref="rightBody" :class="{ 'add_new': model === 'add' }">
-      <div class="header" v-if="model==='edit'">
-        <span class="data_con">{{detailInfo.name}}</span>
+    <div class="right" ref="rightBody" :class="{ add_new: model === 'add' }">
+      <div class="header" v-if="model === 'edit'">
+        <span class="data_con">{{ detailInfo.name }}</span>
       </div>
       <div class="data_con_add" v-else-if="model === 'add'">
-        <a-form :form="modelForm" :label-col="{ span: 3 }" :wrapper-col="{ span: 12 }">
+        <a-form
+          :form="modelForm"
+          :label-col="{ span: 3 }"
+          :wrapper-col="{ span: 12 }"
+        >
           <a-form-item label="数据模型名称">
             <a-input
-              v-decorator="['name', {
-                rules: [
-                  {
-                    required: true,
-                    message: '请填写名称'
-                  },
-                  {
-                    type: 'string',
-                    min: 1,
-                    max: 20,
-                    message: '请输入1-20个字的名称'
-                  }
-                ]
-              }]"
+              v-decorator="[
+                'name',
+                {
+                  rules: [
+                    {
+                      required: true,
+                      message: '请填写名称'
+                    },
+                    {
+                      type: 'string',
+                      min: 1,
+                      max: 20,
+                      message: '请输入1-20个字的名称'
+                    }
+                  ]
+                }
+              ]"
             />
           </a-form-item>
         </a-form>
       </div>
       <div class="description">
-        <span class="d-s" :title="detailInfo.description">描述： {{detailInfo.description}}</span>
-        <a-icon type="edit" v-on:click="openModal('describe-setting')" class="d-s-icon"/>
+        <span class="d-s" :title="detailInfo.description"
+          >描述： {{ detailInfo.description }}</span
+        >
+        <a-icon
+          type="edit"
+          v-on:click="openModal('describe-setting')"
+          class="d-s-icon"
+        />
       </div>
-      <p class="tips"><a-icon theme="filled" type="exclamation-circle" style="margin-right: 2px;" />下方表显示红色表示表在数据源已被删除，请您删除此表。表显示黄色表示表中列字段发生了变动，请您重新构建表关联关系。</p>
+      <p class="tips">
+        <a-icon
+          theme="filled"
+          type="exclamation-circle"
+          style="margin-right: 2px;"
+        />下方表显示红色表示表在数据源已被删除，请您删除此表。表显示黄色表示表中列字段发生了变动，请您重新构建表关联关系。
+      </p>
       <div class="draw_board scrollbar">
-        <edit-right-top ref='rightTopRef' :detailInfo="detailInfo"></edit-right-top>
+        <edit-right-top
+          ref="rightTopRef"
+          :detailInfo="detailInfo"
+        ></edit-right-top>
       </div>
       <div class="detail scrollbar">
         <div class="detail_header">
-          <span>数据模型详情<span class="sub">{{ createViewName ? `(已导入BI库-表名: ${createViewName})` : '' }}</span></span>
+          <span
+            >数据模型详情<span class="sub">{{
+              createViewName ? `(已导入BI库-表名: ${createViewName})` : ''
+            }}</span></span
+          >
           <div class="detail_btn">
-            <a-button v-on:click="openModal('create-view')" :disabled="disableByDetailInfo">导入BI库</a-button>
-            <a-button v-on:click="openModal('check-table')" :disabled="disableByDetailInfo">查看宽表</a-button>
-            <a-button v-on:click="openModal('batch-setting')" :disabled="disableByDetailInfo">批量编辑字段</a-button>
+            <a-button
+              v-on:click="openModal('create-view')"
+              :disabled="disableByDetailInfo"
+              >导入BI库</a-button
+            >
+            <a-button
+              v-on:click="openModal('check-table')"
+              :disabled="disableByDetailInfo"
+              >查看宽表</a-button
+            >
+            <a-button
+              v-on:click="openModal('batch-setting')"
+              :disabled="disableByDetailInfo"
+              >批量编辑字段</a-button
+            >
           </div>
         </div>
         <div class="detail_main">
@@ -130,7 +185,11 @@
             <div class="dim_title">
               <span class="dim_span">维度</span>
               <div class="dim_operation">
-                <a v-on:click="handleOpenComputeSetting('维度')" style="color:#627CFF;line-height:38px">新建计算维度</a>
+                <a
+                  v-on:click="handleOpenComputeSetting('维度')"
+                  style="color:#627CFF;line-height:38px"
+                  >新建计算维度</a
+                >
                 <a-divider type="vertical" />
                 <!-- <a v-on:click="openModal('geo-setting')" style="color:#627CFF;">设置地理位置</a> -->
               </div>
@@ -160,7 +219,11 @@
             <div class="mea_title">
               <span class="mea_span">度量</span>
               <div class="mea_operation">
-                <a v-on:click="handleOpenComputeSetting('度量')" style="color:#627CFF;margin-right:20px;line-height:38px">新建计算度量</a>
+                <a
+                  v-on:click="handleOpenComputeSetting('度量')"
+                  style="color:#627CFF;margin-right:20px;line-height:38px"
+                  >新建计算度量</a
+                >
               </div>
             </div>
             <div class="mea_menu scrollbar">
@@ -189,7 +252,7 @@
 
       <!-- 动态弹窗组件 -->
       <component
-        ref='componentRef'
+        ref="componentRef"
         v-bind:is="modalName"
         :is-show="visible"
         :detailInfo="detailInfo"
@@ -206,7 +269,13 @@
       />
       <div class="submit_btn">
         <!-- <a-button :disabled="!detailInfo">保存并新建报告</a-button> -->
-        <a-button v-if="hasBtnPermissionSave" type="primary" @click="handleSave" :disabled="!detailInfo">保 存</a-button>
+        <a-button
+          v-if="hasBtnPermissionSave"
+          type="primary"
+          @click="handleSave"
+          :disabled="!detailInfo"
+          >保 存</a-button
+        >
         <a-button v-on:click="exit">退 出</a-button>
       </div>
     </div>
@@ -325,8 +394,16 @@ export default {
     },
     tableFields() {
       if (this.detailInfo.pivotSchema) {
-        let arry = [...this.detailInfo.pivotSchema.dimensions, ...this.detailInfo.pivotSchema.measures, ...this.cacheDimensions, ...this.cacheMeasures];
-        arry = arry.map(x=>({...x,convertType:x.convertType===null?x.dataType:x.convertType}));
+        let arry = [
+          ...this.detailInfo.pivotSchema.dimensions,
+          ...this.detailInfo.pivotSchema.measures,
+          ...this.cacheDimensions,
+          ...this.cacheMeasures
+        ]
+        arry = arry.map(x => ({
+          ...x,
+          convertType: x.convertType === null ? x.dataType : x.convertType
+        }))
         return groupBy(arry, 'tableNo')
       } else {
         return []
@@ -337,7 +414,10 @@ export default {
         return true
       }
 
-      return this.detailInfo.config.tables && this.detailInfo.config.tables.length === 0
+      return (
+        this.detailInfo.config.tables &&
+        this.detailInfo.config.tables.length === 0
+      )
     },
     hasBtnPermissionSave() {
       return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.edit)
@@ -397,11 +477,11 @@ export default {
               dataType: 'DOUBLE',
               onClick: this.switchFieldType
             },
-            {
-              name: '转换为数值',
-              dataType: 'DECIMAL',
-              onClick: this.switchFieldType
-            },
+            // {
+            //   name: '转换为数值',
+            //   dataType: 'DECIMAL',
+            //   onClick: this.switchFieldType
+            // },
             {
               name: '转换为字符串',
               dataType: 'VARCHAR',
@@ -439,11 +519,11 @@ export default {
     },
     handleEditField(event, handler, vm) {
       const role = vm.itemData.role
-        this.panelData = vm.itemData
+      this.panelData = vm.itemData
       const isDimension = role === 1
       const isMeasures = role === 2
       if (isDimension) {
-         this.openModal('compute-setting', '维度')
+        this.openModal('compute-setting', '维度')
       } else if (isMeasures) {
         this.openModal('compute-setting', '度量')
       }
@@ -470,7 +550,9 @@ export default {
       }
     },
     async handleGetDatabaseList() {
-      const result = await this.$server.dataModel.getDatabaseList(this.$route.query.datasourceId)
+      const result = await this.$server.dataModel.getDatabaseList(
+        this.$route.query.datasourceId
+      )
       if (result.code === 200) {
         const baseBalck = [11, 12] // 黑名单
         const type = result.data.type
@@ -500,16 +582,24 @@ export default {
      * 根据数据源获取数据库(暂时只支持显示第一个库)
      */
     async handleGetDatabase() {
-      const len = this.detailInfo.config.tables ? this.detailInfo.config.tables.length : 0
+      const len = this.detailInfo.config.tables
+        ? this.detailInfo.config.tables.length
+        : 0
       let tableId = ''
       if (len > 0) {
         tableId = this.detailInfo.config.tables[len - 1].tableId
       }
-      const result = await this.$server.dataModel.getDataBaseDataInfoList(this.$route.query.datasourceId, tableId)
+      const result = await this.$server.dataModel.getDataBaseDataInfoList(
+        this.$route.query.datasourceId,
+        tableId
+      )
 
       if (result.code === 200) {
         this.databaseList = result.data
-        this.databaseName = (this.databaseList.length && this.databaseList.length > 0) ? this.databaseList[0].name : ''
+        this.databaseName =
+          this.databaseList.length && this.databaseList.length > 0
+            ? this.databaseList[0].name
+            : ''
         if (this.databaseList.length && this.databaseList.length > 0) {
           this.handleGetDatabaseTable(result.data[0].id)
         }
@@ -523,11 +613,15 @@ export default {
     async handleGetDatabaseTable(id) {
       const listResult = await this.$server.dataModel.getTableListById(id)
       if (listResult.code === 200) {
-        this.leftMenuList = [].concat(listResult.data.filter(item => {
-          item.type = +item.type
-          return item.type === 0
-        }))
-        this.rightMenuList = [].concat(listResult.data.filter(item => item.type === 1))
+        this.leftMenuList = [].concat(
+          listResult.data.filter(item => {
+            item.type = +item.type
+            return item.type === 0
+          })
+        )
+        this.rightMenuList = [].concat(
+          listResult.data.filter(item => item.type === 1)
+        )
         this.$store.dispatch('dataModel/setDatabaseId', id)
       } else {
         this.$message.error(listResult.msg)
@@ -536,7 +630,9 @@ export default {
     handleSearchTable: debounce(function(event) {
       const value = event.target.value
       this.tableSearch = value ? value.trim() : value
-      this.searchList = this.leftMenuList.filter(item => item.name.toLowerCase().indexOf(value.toLowerCase()) > -1)
+      this.searchList = this.leftMenuList.filter(
+        item => item.name.toLowerCase().indexOf(value.toLowerCase()) > -1
+      )
     }, 400),
     /**
      * 切换数据库
@@ -568,7 +664,12 @@ export default {
       let index
       if (type === 'dimensions') {
         // 维度 转去 度量
-        index = this.getTargetIndex(vm.itemData.tableNo === 0 ? this.cacheDimensions : this.detailInfo.pivotSchema.dimensions, vm.itemData.alias)
+        index = this.getTargetIndex(
+          vm.itemData.tableNo === 0
+            ? this.cacheDimensions
+            : this.detailInfo.pivotSchema.dimensions,
+          vm.itemData.alias
+        )
         if (vm.itemData.tableNo === 0) {
           // 如果是自定义
           this.cacheMeasures.push(data)
@@ -579,7 +680,12 @@ export default {
         }
       } else {
         // 度量 转去 维度
-        index = this.getTargetIndex(vm.itemData.tableNo === 0 ? this.cacheMeasures : this.detailInfo.pivotSchema.measures, vm.itemData.alias)
+        index = this.getTargetIndex(
+          vm.itemData.tableNo === 0
+            ? this.cacheMeasures
+            : this.detailInfo.pivotSchema.measures,
+          vm.itemData.alias
+        )
         if (vm.itemData.tableNo === 0) {
           // 如果是自定义
           this.cacheDimensions.push(data)
@@ -603,17 +709,34 @@ export default {
       let newField = {
         ...vm.itemData,
         datamodelId: this.model === 'add' ? this.addModelId : this.modelId,
-        expr: vm.itemData.produceType === 0 ? `$$${vm.itemData.id}` : vm.itemData.expr,
-        raw_expr: vm.itemData.produceType === 0 ? `[${vm.itemData.alias}]` : vm.itemData.raw_expr
+        expr:
+          vm.itemData.produceType === 0
+            ? `$$${vm.itemData.id}`
+            : vm.itemData.expr,
+        raw_expr:
+          vm.itemData.produceType === 0
+            ? `[${vm.itemData.alias}]`
+            : vm.itemData.raw_expr
       }
-      const result = await this.$server.dataModel.addCustomizModelPivotschema(newField)
+      const result = await this.$server.dataModel.addCustomizModelPivotschema(
+        newField
+      )
       if (result.code === 200) {
         newField = {
           ...newField,
           ...result.data
         }
-        const arry = [...this.detailInfo.pivotSchema.dimensions, ...this.detailInfo.pivotSchema.measures, ...this.cacheDimensions, ...this.cacheMeasures]
-        newField.alias = this.handleAddCustomField(arry, newField, newField.alias)
+        const arry = [
+          ...this.detailInfo.pivotSchema.dimensions,
+          ...this.detailInfo.pivotSchema.measures,
+          ...this.cacheDimensions,
+          ...this.cacheMeasures
+        ]
+        newField.alias = this.handleAddCustomField(
+          arry,
+          newField,
+          newField.alias
+        )
         if (isDimension) {
           this.cacheDimensions.push(newField)
           this.handleDimensions()
@@ -651,7 +774,7 @@ export default {
     },
     /**
      * 同字段名处理
-    */
+     */
     handleSameName(list) {
       if (Array.isArray(list) && list.length > 1) {
         const map = new Map()
@@ -700,13 +823,16 @@ export default {
     },
     /**
      * 合并维度数据
-    */
+     */
     handleConcatDimensions() {
-      return [...this.cacheDimensions, ...this.detailInfo.pivotSchema.dimensions]
+      return [
+        ...this.cacheDimensions,
+        ...this.detailInfo.pivotSchema.dimensions
+      ]
     },
     /**
      * 维度数据处理
-    */
+     */
     handleDimensions() {
       const arry = this.handleConcatDimensions()
       this.handleSameName(arry)
@@ -715,13 +841,13 @@ export default {
     },
     /**
      * 合并度量数据
-    */
+     */
     handleConcatMeasures() {
       return [...this.cacheMeasures, ...this.detailInfo.pivotSchema.measures]
     },
     /**
      * 度量数据处理
-    */
+     */
     handleMeasures() {
       const arry = this.handleConcatMeasures()
       this.handleSameName(arry)
@@ -730,7 +856,7 @@ export default {
     },
     /**
      * 合并维度度量数据
-    */
+     */
     handleConcat() {
       return {
         dimensions: this.handleConcatDimensions(),
@@ -739,10 +865,11 @@ export default {
     },
     /**
      * 编辑时获取模型数据
-    */
+     */
     async handleGetData(id) {
       this.spinning = true
-      const result = await this.$server.dataModel.getDataModelDetailInfo(id)
+      const result = await this.$server.dataModel
+        .getDataModelDetailInfo(id)
         .finally(() => {
           this.spinning = false
         })
@@ -752,14 +879,23 @@ export default {
         this.createViewName = result.data.alias
         this.detailInfo = result.data
         // 将自定义维度度量剥离处理
-        this.detailInfo.pivotSchema.dimensions = this.handlePeelCustom(this.detailInfo.pivotSchema.dimensions, this.cacheDimensions)
-        this.detailInfo.pivotSchema.measures = this.handlePeelCustom(this.detailInfo.pivotSchema.measures, this.cacheMeasures)
+        this.detailInfo.pivotSchema.dimensions = this.handlePeelCustom(
+          this.detailInfo.pivotSchema.dimensions,
+          this.cacheDimensions
+        )
+        this.detailInfo.pivotSchema.measures = this.handlePeelCustom(
+          this.detailInfo.pivotSchema.measures,
+          this.cacheMeasures
+        )
 
         // 校验缺失字段
         this.doWithMissing(this.cacheDimensions, result.data.pivotSchema)
         this.doWithMissing(this.cacheMeasures, result.data.pivotSchema)
 
-        this.$store.commit('common/SET_PRIVILEGES', result.data.privileges || [])
+        this.$store.commit(
+          'common/SET_PRIVILEGES',
+          result.data.privileges || []
+        )
 
         this.handleDimensions()
         this.handleMeasures()
@@ -778,7 +914,10 @@ export default {
           matchs.forEach(value => {
             const matchStr = value.match(/(\[)(.+)(\])/)
             const key = matchStr[2] ? matchStr[2] : ''
-            const pairList = [...pivotSchema.dimensions, ...pivotSchema.measures]
+            const pairList = [
+              ...pivotSchema.dimensions,
+              ...pivotSchema.measures
+            ]
             const missing = pairList.filter(item => item.alias === key).pop()
             if (!missing) {
               filed.status = 1
@@ -819,23 +958,32 @@ export default {
       }
     },
     handleSQLDelete(item) {
-      this.$server.dataModel.deleCustomSql({
-        name: item.name,
-        tableId: item.id
-      }).then(res => {
-        if (res.code === 200) {
-          const tables = (this.detailInfo && this.detailInfo['config'] && this.detailInfo.config['tables']) || []
+      this.$server.dataModel
+        .deleCustomSql({
+          name: item.name,
+          tableId: item.id
+        })
+        .then(res => {
+          if (res.code === 200) {
+            const tables =
+              (this.detailInfo &&
+                this.detailInfo['config'] &&
+                this.detailInfo.config['tables']) ||
+              []
 
-          if (Array.isArray(tables) && tables.some(table => table.id === item.id)) {
-            return this.$message.error('资源有被其他资源依赖，不能被删除。')
+            if (
+              Array.isArray(tables) &&
+              tables.some(table => table.id === item.id)
+            ) {
+              return this.$message.error('资源有被其他资源依赖，不能被删除。')
+            }
+
+            const index = this.rightMenuList.indexOf(item)
+            this.rightMenuList.splice(index, 1)
+          } else {
+            this.$message.error(res.msg)
           }
-
-          const index = this.rightMenuList.indexOf(item)
-          this.rightMenuList.splice(index, 1)
-        } else {
-          this.$message.error(res.msg)
-        }
-      })
+        })
     },
     close(data) {
       this.visible = false
@@ -887,12 +1035,26 @@ export default {
       })
 
       // 由于层次过深，需要set
-      this.$set(this.detailInfo.config.tables[index]['union'], 'connectType', data.union.connectType)
-      this.$set(this.detailInfo.config.tables[index]['union'], 'tableList', [...data.union.tableList])
+      this.$set(
+        this.detailInfo.config.tables[index]['union'],
+        'connectType',
+        data.union.connectType
+      )
+      this.$set(this.detailInfo.config.tables[index]['union'], 'tableList', [
+        ...data.union.tableList
+      ])
 
       // 处理更改名字
-      this.detailInfo.pivotSchema.dimensions = this.handleChangeTableName(this.detailInfo.pivotSchema.dimensions, node.props.tableNo, data.form.name)
-      this.detailInfo.pivotSchema.measures = this.handleChangeTableName(this.detailInfo.pivotSchema.measures, node.props.tableNo, data.form.name)
+      this.detailInfo.pivotSchema.dimensions = this.handleChangeTableName(
+        this.detailInfo.pivotSchema.dimensions,
+        node.props.tableNo,
+        data.form.name
+      )
+      this.detailInfo.pivotSchema.measures = this.handleChangeTableName(
+        this.detailInfo.pivotSchema.measures,
+        node.props.tableNo,
+        data.form.name
+      )
 
       this.handleDimensions()
       this.handleMeasures()
@@ -915,8 +1077,14 @@ export default {
         this.cacheDimensions = []
         this.cacheMeasures = []
         // 将自定义维度度量剥离处理
-        this.detailInfo.pivotSchema.dimensions = this.handlePeelCustom(cacheDimensions, this.cacheDimensions)
-        this.detailInfo.pivotSchema.measures = this.handlePeelCustom(cacheMeasures, this.cacheMeasures)
+        this.detailInfo.pivotSchema.dimensions = this.handlePeelCustom(
+          cacheDimensions,
+          this.cacheDimensions
+        )
+        this.detailInfo.pivotSchema.measures = this.handlePeelCustom(
+          cacheMeasures,
+          this.cacheMeasures
+        )
         this.handleDimensions()
         this.handleMeasures()
       }
@@ -928,9 +1096,7 @@ export default {
       } else {
         list = this.cacheMeasures
       }
-      let index = list.findIndex(
-        item => item.id === data.id
-      )
+      let index = list.findIndex(item => item.id === data.id)
       if (index < 0) {
         list.push(data)
       } else {
@@ -998,7 +1164,9 @@ export default {
 
       if (this.$refs.rightTopRef.errorTables.length > 0) {
         const hasError = this.detailInfo.config.tables.some(table => {
-          return this.$refs.rightTopRef.errorTables.some(errorNo => errorNo === table.tableNo)
+          return this.$refs.rightTopRef.errorTables.some(
+            errorNo => errorNo === table.tableNo
+          )
         })
         if (hasError) {
           this.$message.error('模型中部分关联表无法关联，请修改字段数据类型')
@@ -1048,13 +1216,15 @@ export default {
         if (this.model === 'add') {
           await this.handleSaveModelSourceId()
         }
-        this.$message.success({
-          content: this.model === 'add' ? '保存成功' : '编辑成功',
-          duration: 0.5
-        }).then(() => {
-          this.$store.commit('dataModel/SET_MODELID', result.data.id)
-          this.exit()
-        })
+        this.$message
+          .success({
+            content: this.model === 'add' ? '保存成功' : '编辑成功',
+            duration: 0.5
+          })
+          .then(() => {
+            this.$store.commit('dataModel/SET_MODELID', result.data.id)
+            this.exit()
+          })
       } else {
         this.$message.error(result.msg)
       }
@@ -1074,7 +1244,8 @@ export default {
         this.$refs.componentRef.pushFetchParam({
           sourceId: this.$route.query.datasourceId,
           databaseName: this.databaseName,
-          databaseId: this.databaseList.length > 0 ? this.databaseList[0].id : '',
+          databaseId:
+            this.databaseList.length > 0 ? this.databaseList[0].id : '',
           dataModelId: this.model === 'add' ? this.addModelId : this.modelId
         })
       }

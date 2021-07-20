@@ -35,7 +35,7 @@
             </template>
             <template slot="convertType" slot-scope="text, record">
               <field-select
-                :text="(text || record.dataType) | formatField"
+                :text="(text || record.convertType) | formatField"
                 :select-data="record"
                 :contextmenus="fieldContenxtMenu"
                 :isDimension="record.role === 1"
@@ -233,32 +233,32 @@ export default {
       fieldContenxtMenu: [
         {
           name: '转换为整数',
-          convertType: 'BIGINT',
+          dataType: 'BIGINT',
           onClick: this.switchFieldType
         },
         {
           name: '转换为小数',
-          convertType: 'DOUBLE',
+          dataType: 'DOUBLE',
           onClick: this.switchFieldType
         },
-        {
-          name: '转换为数值',
-          convertType: 'DECIMAL',
-          onClick: this.switchFieldType
-        },
+        // {
+        //   name: '转换为数值',
+        //   dataType: 'DECIMAL',
+        //   onClick: this.switchFieldType
+        // },
         {
           name: '转换为字符串',
-          convertType: 'VARCHAR',
+          dataType: 'VARCHAR',
           onClick: this.switchFieldType
         },
         {
           name: '转换为日期',
-          convertType: 'DATE',
+          dataType: 'DATE',
           onClick: this.switchFieldType
         },
         {
           name: '转换为日期时间',
-          convertType: 'TIMESTAMP',
+          dataType: 'TIMESTAMP',
           onClick: this.switchFieldType
         }
       ]
@@ -357,7 +357,8 @@ export default {
       record[key] = value
     },
     switchFieldType(e, item, vm) {
-      let convertType = item.convertType
+      debugger
+      let convertType = item.dataType
       vm.selectData.convertType = convertType
     },
     switchRoleType(e, item, vm) {

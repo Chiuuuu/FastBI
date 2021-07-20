@@ -148,7 +148,7 @@ const expression = [
     name: '计数聚合',
     expression: 'COUNT(表达式)',
     description:
-      '返回表达式在所有记录中的计数值。COUNT只能用于数字、日期、日期时间字段。',
+      '返回表达式在所有记录中的计数值。',
     example: 'COUNT([访问量])',
     syntax: 'COUNT(表达式)',
     groups: ['aggregator', 'date', 'logic']
@@ -158,7 +158,7 @@ const expression = [
     name: '去重计数聚合',
     expression: 'COUNTD(表达式)',
     description:
-      '返回表达式在所有记录中的去重计数值。COUNTD只能用于数字、日期、日期时间字段。',
+      '返回表达式在所有记录中的去重计数值。',
     example: 'COUNTD([访问量])',
     syntax: 'COUNTD(表达式)',
     groups: ['aggregator', 'date', 'logic']
