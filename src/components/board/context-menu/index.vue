@@ -380,7 +380,11 @@ export default {
       const column = []
       fieldList.map(item => {
         if (keys.includes(item.alias)) {
-          column.push(item.alias)
+          column.push({
+            alias: item.alias,
+            defaultAggregator: item.defaultAggregator,
+            role: item.role
+          })
         }
       })
       return column

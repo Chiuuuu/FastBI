@@ -34,7 +34,16 @@ const app = {
     screenDataModels: [],
     pageList: [],
     currentPageId: '',
-    isPublish: '' // 大屏是否已发布
+    isPublish: '', // 大屏是否已发布
+    polymerizeType: [ // 聚合方式及中文映射
+      { name: '求和', value: 'SUM' },
+      { name: '平均', value: 'AVG' },
+      { name: '最大值', value: 'MAX' },
+      { name: '最小值', value: 'MIN' },
+      { name: '计数', value: 'CNT' },
+      { name: '计数', value: 'COUNT' },
+      { name: '去重计数', value: 'DCNT' }
+    ]
   },
   mutations: {
     SET_CANVAS_RANGE: (state, val) => {

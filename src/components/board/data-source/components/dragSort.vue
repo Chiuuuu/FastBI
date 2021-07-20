@@ -99,16 +99,7 @@ export default {
           { name: '计数', value: 'CNT' },
           { name: '去重计数', value: 'MIN' }
         ]
-      },
-      polymerizeType: [
-        { name: '求和', value: 'SUM' },
-        { name: '平均', value: 'AVG' },
-        { name: '最大值', value: 'MAX' },
-        { name: '最小值', value: 'MIN' },
-        { name: '计数', value: 'CNT' },
-        { name: '计数', value: 'COUNT' },
-        { name: '去重计数', value: 'DCNT' }
-      ] // 聚合方式
+      }
     }
   },
   inject: ['errorFile'],
@@ -157,7 +148,8 @@ export default {
       'currSelected',
       'optionsTabsType',
       'dataModel',
-      'canvasMap'
+      'canvasMap',
+      'polymerizeType'
     ]),
     chartType() {
       return this.currSelected ? this.currSelected.setting.type : ''
@@ -199,10 +191,8 @@ export default {
       // 根据数值类型设置初值
       if (type === 'number') {
         dataFile.polymerizationShow = this.polymerizationData.numberType
-        dataFile.alias += '(求和)'
         dataFile.defaultAggregator = 'SUM'
       } else {
-        dataFile.alias += '(计数)'
         dataFile.polymerizationShow = this.polymerizationData.stringType
       }
       // 设置默认排序

@@ -110,15 +110,6 @@ export default {
         ]
       },
       strornum: '',
-      polymerizeType: [
-        { name: '求和', value: 'SUM' },
-        { name: '平均', value: 'AVG' },
-        { name: '最大值', value: 'MAX' },
-        { name: '最小值', value: 'MIN' },
-        { name: '计数', value: 'CNT' },
-        { name: '计数', value: 'COUNT' },
-        { name: '去重计数', value: 'DCNT' }
-      ], // 聚合方式
       isdrag: false, // 是否拖拽中
       fileList: [], // 维度字段数组
       isVaild: false //
@@ -187,7 +178,8 @@ export default {
       'currSelected',
       'optionsTabsType',
       'dataModel',
-      'canvasMap'
+      'canvasMap',
+      'polymerizeType'
     ])
   },
   methods: {
