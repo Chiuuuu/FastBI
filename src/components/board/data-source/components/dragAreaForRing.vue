@@ -43,7 +43,9 @@
           </a-menu>
         </a-dropdown>
         <a-tooltip :title="formatAggregator(item)">
-          <span ref="itemName" class="field-text">{{ formatAggregator(item) }}</span>
+          <span ref="itemName" class="field-text">{{
+            formatAggregator(item)
+          }}</span>
         </a-tooltip>
       </div>
     </div>
@@ -163,7 +165,9 @@ export default {
   methods: {
     ...mapActions(['updateChartData']),
     formatAggregator(item) {
-      const fun = this.polymerizeType.find((x) => x.value === item.defaultAggregator)
+      const fun = this.polymerizeType.find(
+        x => x.value === item.defaultAggregator
+      )
       if (item.role === 2) {
         return `${item.alias} (${fun.name})`
       } else {
@@ -192,9 +196,8 @@ export default {
         // if (_alias) {
         //   dataFile.alias += `(${_alias.name})`
         // }
-        let result = this.judgeDataType(dataFile.dataType)
-        dataFile.alias += result._alias
-        dataFile.defaultAggregator = result.defaultAggregator
+        let defaultAggregator = this.judgeDataType(dataFile.dataType)
+        dataFile.defaultAggregator = defaultAggregator
         this.fileList[0] = dataFile
       }
       this.getData()
@@ -216,10 +219,7 @@ export default {
       let isNum =
         dataType === 'BIGINT' || dataType === 'DECIMAL' || dataType === 'DOUBLE'
       this.strornum = isNum ? 'num' : 'str'
-      return {
-        _alias: isNum ? '(求和)' : '(计数)',
-        defaultAggregator: isNum ? 'SUM' : 'CNT'
-      }
+      return isNum ? 'SUM' : 'CNT'
     },
     // 点击右键显示更多
     showMore(item) {

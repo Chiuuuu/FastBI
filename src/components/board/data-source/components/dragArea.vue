@@ -43,7 +43,9 @@
           </a-menu>
         </a-dropdown>
         <a-tooltip :title="formatAggregator(item)">
-          <span ref="itemName" class="field-text">{{ formatAggregator(item) }}</span>
+          <span ref="itemName" class="field-text">{{
+            formatAggregator(item)
+          }}</span>
         </a-tooltip>
       </div>
     </div>
@@ -225,7 +227,9 @@ export default {
   methods: {
     ...mapActions(['updateChartData']),
     formatAggregator(item) {
-      const fun = this.polymerizeType.find((x) => x.value === item.defaultAggregator)
+      const fun = this.polymerizeType.find(
+        x => x.value === item.defaultAggregator
+      )
       if (item.role === 2) {
         return `${item.alias} (${fun.name})`
       } else {
@@ -246,7 +250,9 @@ export default {
         this.isdrag = false
         return false
       }
-      let _alias = this.polymerizeType.find((x) => x.value === dataFile.defaultAggregator);
+      let _alias = this.polymerizeType.find(
+        x => x.value === dataFile.defaultAggregator
+      )
       dataFile.showMore = false // 是否点击显示更多
       if (this.type === 'dimensions' && this.dragFile === this.type) {
         // 嵌套饼图可以有多个维度（最多只能2个）
@@ -291,9 +297,8 @@ export default {
         // )
         // dataFile.alias += `(${_alias.name})`
         // 获取初始聚合方式
-        let result = this.judgeDataType(dataFile.dataType)
-        dataFile.alias += result._alias
-        dataFile.defaultAggregator = result.defaultAggregator
+        let defaultAggregator = this.judgeDataType(dataFile.dataType)
+        dataFile.defaultAggregator = defaultAggregator
         // 饼图类型只能拉入一个度量（包含3d和矩形热力图）
         if (
           (this.currSelected.setting.name === 've-pie') |
@@ -327,6 +332,10 @@ export default {
       }
       // 表格
       if (this.type === 'tableList') {
+        if (dataFile.file === 'measures') {
+          let defaultAggregator = this.judgeDataType(dataFile.dataType)
+          dataFile.defaultAggregator = defaultAggregator
+        }
         this.fileList.push(dataFile)
         this.fileList = this.uniqueFun(this.fileList, 'alias')
         this.getData()
@@ -372,10 +381,7 @@ export default {
       let isNum =
         dataType === 'BIGINT' || dataType === 'DECIMAL' || dataType === 'DOUBLE'
       this.strornum = isNum ? 'num' : 'str'
-      return {
-        _alias: isNum ? '(求和)' : '(计数)',
-        defaultAggregator: isNum ? 'SUM' : 'CNT'
-      }
+      return isNum ? 'SUM' : 'CNT'
     },
     // 点击右键显示更多
     showMore(item) {
