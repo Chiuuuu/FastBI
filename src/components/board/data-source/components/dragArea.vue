@@ -353,16 +353,12 @@ export default {
       this.isdrag = false
     },
     // 点击右键显示更多
-    async showMore(item) {
-      // 调用接口判断是否为数字
-      let res = await this.$server.dataModel.getMeasures(item.pivotschemaId)
-      // 返回 data true表示 是数值类型
-      // 返回 data false表示 是字符类型
-      if (res.code === 200) {
-        this.strornum = res.data ? 'num' : 'str'
-      } else {
-        this.$message.error(res.msg || res || '删除失败')
-      }
+    showMore(item) {
+      // 判断数值类型
+      let dataType = item.dataType
+      let isNum =
+        dataType === 'BIGINT' || dataType === 'DECIMAL' || dataType === 'DOUBLE'
+      this.strornum = isNum ? 'num' : 'str'
       item.showMore = true
     },
     // 修改数据聚合方式
