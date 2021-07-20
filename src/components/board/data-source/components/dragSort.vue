@@ -161,24 +161,10 @@ export default {
       this.isExist = false
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
       // 验证字段数值类型,非数值不能修改聚合方式
-      let type = 'number'
-      if (
-        dataFile.resourceType === 3 &&
-        dataFile.dataType !== 'BIGINT' &&
-        dataFile.dataType !== 'DECIMAL' &&
-        dataFile.dataType !== 'DOUBLE'
-      ) {
-        type = 'string'
-      }
-      // 模型调接口判断
-      if (dataFile.resourceType === 8) {
-        let res = await this.$server.screenManage.getMeasureCheck(
-          dataFile.pivotschemaId
-        )
-        if (res.code !== 200 || !res.data) {
-          type = 'string'
-        }
-      }
+      let dataType = dataFile.dataType
+      let isNum =
+        dataType === 'BIGINT' || dataType === 'DECIMAL' || dataType === 'DOUBLE'
+      let type = isNum ? 'number' : 'string'
       // 根据数值类型设置初值
       if (type === 'number') {
         dataFile.polymerizationShow = this.polymerizationData.numberType
@@ -187,6 +173,7 @@ export default {
       } else {
         dataFile.alias += '(计数)'
         dataFile.polymerizationShow = this.polymerizationData.stringType
+        dataFile.defaultAggregator = 'CNT'
       }
       // 设置默认排序
       // 1：升序；2：降序
