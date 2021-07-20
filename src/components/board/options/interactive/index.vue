@@ -55,9 +55,9 @@
                   chart.setting.config.title.content ||
                     chart.setting.config.title.text
                 }}
-                <span v-show="chart.id === currentSelected">(当前报表)</span>
-                <span v-show="checkBeBinded(chart)">已存在于联动路径中</span>
-                <span v-show="checkHaveBind(chart)">已被创建联动</span>
+                <span v-if="chart.id === currentSelected">(当前报表)</span>
+                <span v-else-if="checkBeBinded(chart)">已存在于联动路径中</span>
+                <span v-else-if="checkHaveBind(chart)">已被创建联动</span>
               </a-checkbox>
             </div>
           </a-checkbox-group>
@@ -121,6 +121,12 @@ export default {
       )
       return list
     },
+    // 显示的绑定列表中有效数据(过滤禁用项，用来判断全选)
+    vaildList() {
+      return this.toBindList.filter(
+        chart => !this.checkBeBinded(chart) && !this.checkHaveBind(chart)
+      )
+    },
     // 当前图表对应的模型
     currentData() {
       // 没有使用数据文件
@@ -166,15 +172,15 @@ export default {
     // 点击全选
     onCheckAllChange(e) {
       this.checkAll = e.target.checked
-      // 过滤禁用项
-      let list = this.toBindList.filter(
-        chart => !this.checkBeBinded(chart) && !this.checkHaveBind(chart)
-      )
-      this.bindList = e.target.checked ? list.map(item => item.id) : []
+      this.bindList = e.target.checked
+        ? this.vaildList.map(item => item.id)
+        : []
     },
     // 多选框变化的时候重新判断全选
     checkSelectAll() {
-      this.checkAll = this.bindList.length === this.toBindList.length // 判断是否全选
+      this.checkAll =
+        this.bindList.length > 0 &&
+        this.bindList.length === this.vaildList.length // 判断是否全选
     },
     // 是否开启图表联动
     openLink() {
@@ -204,7 +210,7 @@ export default {
       if (apiData.interactive.beBinded === targetChartId) {
         return true
       }
-      this.checkUpperBind(apiData.interactive.beBinded, targetChartId)
+      return this.checkUpperBind(apiData.interactive.beBinded, targetChartId)
     },
     // 检查可选图表是否已经被其他图表绑定
     checkHaveBind(chart) {
@@ -237,12 +243,14 @@ export default {
         let chartApiData = chart.setting.api_data
         if (chartApiData.interactive) {
           let interactive = chartApiData.interactive
+          // 选中的图标被当前图表绑定
           if (isInBindList) {
             interactive.beBinded = this.currentSelected
           } else if (interactive.beBinded === this.currentSelected) {
             // 取消绑定
             interactive.beBinded = ''
           }
+          // 被其他图表绑定的保持不变
         } else if (isInBindList) {
           chartApiData.interactive = { beBinded: this.currentSelected }
         }
