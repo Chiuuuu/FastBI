@@ -286,7 +286,14 @@ export default {
         this.dragFile === this.type &&
         this.chartType === '1'
       ) {
+        // let _alias = this.polymerizeType.find(
+        //   x => x.value === dataFile.defaultAggregator
+        // )
         // dataFile.alias += `(${_alias.name})`
+        // 获取初始聚合方式
+        let result = this.judgeDataType(dataFile.dataType)
+        dataFile.alias += result._alias
+        dataFile.defaultAggregator = result.defaultAggregator
         // 饼图类型只能拉入一个度量（包含3d和矩形热力图）
         if (
           (this.currSelected.setting.name === 've-pie') |
@@ -359,21 +366,19 @@ export default {
       event.preventDefault()
       this.isdrag = false
     },
-    // 点击右键显示更多
-    async showMore(item) {
-      // 调用接口判断是否为数字
-      if (item.resourceType === 8) {
-        let res = await this.$server.dataModel.getMeasures(item.pivotschemaId)
-        // 返回 data true表示 是数值类型
-        // 返回 data false表示 是字符类型
-        if (res.code === 200) {
-          this.strornum = res.data ? 'num' : 'str'
-        } else {
-          this.$message.error(res.msg || res || '删除失败')
-        }
-      } else {
-        this.strornum = ['DECIMAL', 'BIGINT', 'DOUBLE'].includes(item.dataType) ? 'num' : 'str'
+    // 判断数值类型
+    judgeDataType(dataType) {
+      // 判断数值类型
+      let isNum =
+        dataType === 'BIGINT' || dataType === 'DECIMAL' || dataType === 'DOUBLE'
+      this.strornum = isNum ? 'num' : 'str'
+      return {
+        _alias: isNum ? '(求和)' : '(计数)',
+        defaultAggregator: isNum ? 'SUM' : 'CNT'
       }
+    },
+    // 点击右键显示更多
+    showMore(item) {
       item.showMore = true
     },
     // 修改数据聚合方式

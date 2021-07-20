@@ -345,7 +345,6 @@ export default {
         let { pivotschemaId, resourceType, dataType } = dataFile
         // 数据接入类型直接判断，dataType是不是BIGINT/DOUBLE类型
         if (
-          resourceType === 3 &&
           dataType !== 'BIGINT' &&
           dataType !== 'DECIMAL' &&
           dataType !== 'DOUBLE'
@@ -353,17 +352,6 @@ export default {
           this.$message.error('当前字段为文本类型，无法进行数值区间筛选')
           this.isdrag = false
           return
-        }
-        // 模型调接口判断
-        if (resourceType === 8) {
-          let res = await this.$server.screenManage.getMeasureCheck(
-            pivotschemaId
-          )
-          if (res.code !== 200 || !res.data) {
-            this.$message.error('当前字段为文本类型，无法进行数值区间筛选')
-            this.isdrag = false
-            return
-          }
         }
         // 通过验证初始化条件列表
         dataFile.conditionList = []
