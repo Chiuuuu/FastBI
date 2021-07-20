@@ -29,7 +29,7 @@
             <JsonExcel
               v-if="i < 2"
               :key="currentSelected ? currentSelected + 'index' + i : 0"
-              :fetch="setChartData_scan"
+              :fetch="handleChartData"
               :fields="
                 currSelected.setting.chartType === 'v-map'
                   ? { ' ': 'name0', '  ': 'name1', '    ': 'name2' }
@@ -55,6 +55,7 @@ import { mapGetters, mapActions } from 'vuex'
 import { Loading } from 'element-ui'
 import chartTableData from '../chartTableData/index' // 右键菜单
 import { deepClone } from '@/utils/deepClone'
+import { message } from 'ant-design-vue'
 const exportChartList = [
   {
     icon: 'ios-share',
@@ -120,11 +121,6 @@ export default {
   },
   inject: ['showChartData'],
   watch: {
-    // currentSelected(val) {
-    //   if (val) {
-    //     this.setChartData()
-    //   }
-    // },
     'contextMenuInfo.listType'(val) {
       if (val) {
         this.menuList = eval(val)
@@ -180,6 +176,9 @@ export default {
       return tmpObj
     }
   },
+  destroyed() {
+    message.destroy()
+  },
   methods: {
     ...mapActions(['deleteChartData']),
     // 控制是否显示菜单栏
@@ -188,7 +187,9 @@ export default {
         return false
       }
       if (this.currSelected) {
-        return !item.ignore || !item.ignore.includes(this.currSelected.setting.name)
+        return (
+          !item.ignore || !item.ignore.includes(this.currSelected.setting.name)
+        )
       } else {
         return true
       }
@@ -207,19 +208,8 @@ export default {
         this.deleteOne()
       } else if (order === 'showChartData') {
         this.$store.dispatch('ToggleContextMenu')
-        // 查看图表数据
-        if (
-          this.currSelected.setting.api_data.origin_source &&
-          JSON.stringify(this.currSelected.setting.api_data.origin_source) !=
-            '{}' &&
-          JSON.stringify(this.currSelected.setting.api_data.origin_source) !=
-            '[]'
-        ) {
-          await this.setChartData_scan()
-          this.showChartData(this.chartData)
-        } else {
-          this.$message.error('该图表没有拖入图表数据')
-        }
+        // 查看/导出数据
+        this.handleChartData('view')
       } else if (order === 'exportImg') {
         this.$store.dispatch('ToggleContextMenu')
         if (this.isScreen && this.$route.name !== 'screenEdit') {
@@ -240,18 +230,18 @@ export default {
       }
     },
     // 查看数据
-    viewChartData() {
-      const _Menu = Vue.extend(chartTableData)
-      this.menuCompont = new _Menu({
-        propsData: {
-          chartData: this.chartData
-        }
-      }).$mount()
-      const currentParentName = this.isScreen ? '.dv-screen' : '.board-layout'
-      document
-        .querySelector(currentParentName)
-        .appendChild(this.menuCompont.$el)
-    },
+    // viewChartData() {
+    //   const _Menu = Vue.extend(chartTableData)
+    //   this.menuCompont = new _Menu({
+    //     propsData: {
+    //       chartData: this.chartData
+    //     }
+    //   }).$mount()
+    //   const currentParentName = this.isScreen ? '.dv-screen' : '.board-layout'
+    //   document
+    //     .querySelector(currentParentName)
+    //     .appendChild(this.menuCompont.$el)
+    // },
     // 导出大屏数据
     exportScreen() {
       exportScreen(this.fileName)
@@ -266,54 +256,36 @@ export default {
     deleteOne() {
       this.deleteChartData()
     },
-    // 构造查看数据/导出表格
-    setChartData() {
-      if (!this.currSelected.setting.api_data.source) {
-        this.$message.error('该图表没有拖入图表数据')
-        return
-      }
-      let loadingInstance = Loading.service({
-        lock: true,
-        text: '加载中...',
-        target: 'body',
-        background: 'rgb(255, 255, 255, 0.6)'
-      })
-      let type = this.currSelected.setting.type
-      if (this.currSelected.setting.chartType === 'v-map') {
-        let fillrows = this.currSelected.setting.api_data.returnDataFill || []
-        let labelrows = this.currSelected.setting.api_data.returnDataLabel || []
-        if (fillrows.length) {
-          this.chartData = { columns: this.handleTableColumns(Object.keys(fillrows[0])), fillrows }
-        }
-        if (labelrows.length) {
-          this.chartDataForMap = {
-            columns: this.handleTableColumns(Object.keys(labelrows[0])),
-            labelrows
-          }
-        }
-      } else if (type === '1') {
-        this.chartData = this.currSelected.setting.api_data.source
-      } else if (type === '2') {
-        let rows = this.currSelected.setting.api_data.returnData
-        this.chartData = { columns: this.handleTableColumns(Object.keys(rows[0])), rows }
-      } else {
-        let rows = this.currSelected.setting.api_data.source.rows
-        this.chartData = { columns: this.handleTableColumns(Object.keys(rows[0])), rows }
-      }
-      loadingInstance.close()
-      return this.chartData.rows
-    },
-    // 查看数据 -- 构造数据
-    async setChartData_scan() {
+    // 处理查看/导出数据
+    async handleChartData(type) {
+      // 查看图表数据
       if (
-        !this.currSelected.setting.api_data.origin_source ||
-        JSON.stringify(this.currSelected.setting.api_data.origin_source) ==
-          '{}' ||
-        JSON.stringify(this.currSelected.setting.api_data.origin_source) == '[]'
+        this.currSelected.setting.api_data.origin_source &&
+        JSON.stringify(this.currSelected.setting.api_data.origin_source) !=
+          '{}' &&
+        JSON.stringify(this.currSelected.setting.api_data.origin_source) != '[]'
       ) {
-        this.$message.error('该图表没有拖入图表数据')
-        return
+        let dataList = await this.setChartData_scan()
+        // 查看数据弹出展示窗
+        if (type === 'view') {
+          this.showChartData(this.chartData)
+          return
+        }
+        return dataList
+      } else {
+        const elmNameMap = {
+          catalog: '.dv-screen',
+          screenEdit: '.screen-shot'
+        }
+        let dom = document.querySelector(elmNameMap[this.$route.name])
+        message.config({
+          getContainer: () => dom
+        })
+        message.error('该图表没有拖入图表数据')
       }
+    },
+    // 查看/导出数据 -- 构造数据
+    async setChartData_scan() {
       let params = {
         id: this.currSelected.id,
         type: this.currSelected.setting && this.currSelected.setting.chartType
@@ -339,7 +311,9 @@ export default {
       if (this.currSelected.setting.chartType === 'v-map') {
         Object.keys(source).map(item => {
           if (source[item]) {
-            let aliasKeys = this.handleTableColumns(Object.keys(source[item][0]))
+            let aliasKeys = this.handleTableColumns(
+              Object.keys(source[item][0])
+            )
             columns.push(aliasKeys)
             rows.push(source[item])
             let type = item == 'fillList' ? '填充' : '标记点'
