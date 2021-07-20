@@ -229,8 +229,7 @@ export default {
         //   x => x.value === dataFile.defaultAggregator
         // )
         // dataFile.alias += `(${_alias.name})`
-        let defaultAggregator = this.judgeDataType(dataFile.dataType)
-        dataFile.defaultAggregator = defaultAggregator
+        dataFile.defaultAggregator = this.judgeDataType(dataFile.dataType)
         this.fileList[0] = dataFile
         this.getData()
       }
@@ -261,6 +260,7 @@ export default {
     },
     // 点击右键显示更多
     showMore(item) {
+        this.judgeDataType(item.dataType)
       item.showMore = true
     },
     // 修改数据聚合方式

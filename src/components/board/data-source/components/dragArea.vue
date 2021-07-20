@@ -297,8 +297,7 @@ export default {
         // )
         // dataFile.alias += `(${_alias.name})`
         // 获取初始聚合方式
-        let defaultAggregator = this.judgeDataType(dataFile.dataType)
-        dataFile.defaultAggregator = defaultAggregator
+        dataFile.defaultAggregator = this.judgeDataType(dataFile.dataType)
         // 饼图类型只能拉入一个度量（包含3d和矩形热力图）
         if (
           (this.currSelected.setting.name === 've-pie') |
@@ -333,8 +332,7 @@ export default {
       // 表格
       if (this.type === 'tableList') {
         if (dataFile.file === 'measures') {
-          let defaultAggregator = this.judgeDataType(dataFile.dataType)
-          dataFile.defaultAggregator = defaultAggregator
+          dataFile.defaultAggregator = this.judgeDataType(dataFile.dataType)
         }
         this.fileList.push(dataFile)
         this.fileList = this.uniqueFun(this.fileList, 'alias')
@@ -385,6 +383,8 @@ export default {
     },
     // 点击右键显示更多
     showMore(item) {
+      // 重新根据数值类型获取聚合列表
+      this.judgeDataType(item.dataType)
       item.showMore = true
     },
     // 修改数据聚合方式

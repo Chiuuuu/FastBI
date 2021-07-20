@@ -97,7 +97,7 @@ export default {
         ],
         stringType: [
           { name: '计数', value: 'CNT' },
-          { name: '去重计数', value: 'MIN' }
+          { name: '去重计数', value: 'DCNT' }
         ]
       },
       polymerizeType: [
@@ -185,10 +185,8 @@ export default {
       // 根据数值类型设置初值
       if (type === 'number') {
         dataFile.polymerizationShow = this.polymerizationData.numberType
-        dataFile.alias += '(求和)'
         dataFile.defaultAggregator = 'SUM'
       } else {
-        dataFile.alias += '(计数)'
         dataFile.polymerizationShow = this.polymerizationData.stringType
         dataFile.defaultAggregator = 'CNT'
       }
