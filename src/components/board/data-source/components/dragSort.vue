@@ -42,12 +42,12 @@
             >
           </a-menu>
         </a-dropdown>
-        <a-tooltip :title="item.alias">
+        <a-tooltip :title="formatAggregator(item)">
           <span ref="itemName" class="field-text"
             ><icon-font
               style="font-weight:bolder"
               :type="item.asc === 1 ? 'icon-paixu-5' : 'icon-paixu-3'"
-            />&nbsp;&nbsp;{{ item.alias }}</span
+            />&nbsp;&nbsp;{{ formatAggregator(item) }}</span
           >
         </a-tooltip>
       </div>
@@ -99,7 +99,16 @@ export default {
           { name: '计数', value: 'CNT' },
           { name: '去重计数', value: 'MIN' }
         ]
-      }
+      },
+      polymerizeType: [
+        { name: '求和', value: 'SUM' },
+        { name: '平均', value: 'AVG' },
+        { name: '最大值', value: 'MAX' },
+        { name: '最小值', value: 'MIN' },
+        { name: '计数', value: 'CNT' },
+        { name: '计数', value: 'COUNT' },
+        { name: '去重计数', value: 'DCNT' }
+      ] // 聚合方式
     }
   },
   inject: ['errorFile'],
@@ -156,6 +165,14 @@ export default {
   },
   methods: {
     ...mapActions(['updateChartData']),
+    formatAggregator(item) {
+      const fun = this.polymerizeType.find((x) => x.value === item.defaultAggregator)
+      if (item.role === 2) {
+        return `${item.alias} (${fun.name})`
+      } else {
+        return item.alias
+      }
+    },
     // 将拖动的维度到所选择的放置目标节点中
     async handleDropOnFilesWD(event) {
       this.isExist = false
