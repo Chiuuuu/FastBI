@@ -22,7 +22,11 @@ export default function handleNullData(returnData, setting, isLabel = false) {
       for (let key of keys) {
         if (typeof rowDatas[key] === 'undefined') {
           // setting.isEmpty = 'dataError'
-          rowDatas[key] = null
+          rowDatas[key] = '空'
+          // 表格赋值null
+          if (setting.chartType === 'v-tables') {
+            rowDatas[key] = ''
+          }
         }
       }
     }
