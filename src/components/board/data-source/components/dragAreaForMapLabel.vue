@@ -400,7 +400,7 @@ export default {
         this.$store.dispatch('SetSelfDataSource', apiData)
 
         apiData.returnDataLabel = res.data.labelList
-        let config = deepClone(this.currSelected.setting.config)
+        let config = selected.setting.config
         // 重置series
         config.series = config.series.filter(item => item.type === 'map')
         // 类型为区域
@@ -428,7 +428,7 @@ export default {
               })
             }
             config.series.push(
-              Object.assign(dotSeries, {
+              Object.assign({}, dotSeries, {
                 data: datas,
                 name: measure.alias,
                 pointShowList: [showName],
@@ -473,7 +473,7 @@ export default {
             return
           }
           config.series.push(
-            Object.assign(dotSeries, {
+            Object.assign({}, dotSeries, {
               data: datas,
               name: alias,
               pointShowList: ['地区名'],

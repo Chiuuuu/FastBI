@@ -398,13 +398,16 @@ export default {
         return
       }
       if (res.code === 200) {
-        res.data.fillList = await handleNullData(res.data.fillList, this.currSelected.setting)
+        res.data.fillList = await handleNullData(
+          res.data.fillList,
+          this.currSelected.setting
+        )
         // 保存原始数据 -- 查看数据有用
         apiData.origin_source = deepClone(res.rows || res.data || {})
         this.$store.dispatch('SetSelfDataSource', apiData)
 
         apiData.returnDataFill = res.data.fillList
-        let config = this.currSelected.setting.config
+        let config = selected.setting.config
         // 重置series
         config.series = config.series.filter(item => item.type === 'scatter')
         let valueList = [] // 数据列表，计算视觉映射最大最小值
@@ -437,7 +440,7 @@ export default {
               datas.push(datacontent)
             }
             config.series.unshift(
-              Object.assign(mapSeries, {
+              Object.assign({}, mapSeries, {
                 data: datas,
                 name: measure.alias,
                 pointShowList: [showName],
@@ -486,7 +489,7 @@ export default {
             return
           }
           config.series.unshift(
-            Object.assign(mapSeries, {
+            Object.assign({}, mapSeries, {
               data: datas,
               name: alias,
               pointShowList: ['地区名'],
@@ -500,7 +503,7 @@ export default {
           valueList = datas.map(item => item.value)
         }
         // 区域填充加上视觉映射控制
-        config.visualMap = visualMapConfig
+        config.visualMap = Object.assign({}, visualMapConfig)
         config.visualMap.max = Math.max(...valueList)
         config.visualMap.min = Math.min(...valueList)
         loadingInstance.close()
