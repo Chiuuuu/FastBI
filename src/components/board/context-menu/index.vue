@@ -307,12 +307,13 @@ export default {
         rows = [],
         tableName = [],
         exportList = []
+        
       let source = res.data || []
       if (this.currSelected.setting.chartType === 'v-map') {
         Object.keys(source).map(item => {
           if (source[item]) {
             let aliasKeys = this.handleTableColumns(
-              Object.keys(source[item][0])
+              Object.keys(source[item][0]),item
             )
             columns.push(aliasKeys)
             rows.push(source[item])
@@ -320,12 +321,12 @@ export default {
             tableName.push(type)
             let aliasObj = {}
             aliasKeys.forEach((alias, index) => {
-              aliasObj['name' + index] = alias
+              aliasObj['name' + index] = alias['alias']
             })
             let cunstomRow = source[item].map(row => {
               let obj = {}
               aliasKeys.forEach((alias, index) => {
-                obj['name' + index] = row[alias]
+                obj['name' + index] = row[alias['alias']]
               })
               return obj
             })
@@ -339,18 +340,24 @@ export default {
         columns = [this.handleTableColumns(Object.keys(source[0]))]
         exportList = source
       }
-
       this.chartData = {
         columns,
         rows,
         tableName
       }
+      console.log(exportList,'this.chartData')
       return exportList
     },
     // 处理表头, 按拖入的维度度量顺序排列
-    handleTableColumns(keys) {
-      const apiData = this.currSelected.setting.api_data
-      const fieldList = [].concat(apiData.dimensions).concat(apiData.measures)
+    handleTableColumns(keys,label) {
+      const apiData = this.currSelected.setting.api_data  
+      let fieldList = [] 
+      if(label && label == 'labelList'){
+        // 地图 -- 标记点数据
+        fieldList = [].concat(apiData.labelDimensions).concat(apiData.labelMeasures)
+      }else{
+        fieldList = [].concat(apiData.dimensions).concat(apiData.measures)
+      }
       const column = []
       fieldList.map(item => {
         if (keys.includes(item.alias)) {
