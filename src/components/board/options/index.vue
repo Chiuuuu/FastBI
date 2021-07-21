@@ -650,7 +650,6 @@
                       v-model="selfConfig.series.label.offset[0]"
                       size="small"
                       :formatter="value => `水平 ${value}`"
-                      :parser="value => value.replace(/\上\s?|(,*)/g, '')"
                       class="f-clear-width"
                       @change="setSelfProperty"
                     ></a-input-number>
