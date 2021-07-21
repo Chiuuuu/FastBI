@@ -23,6 +23,7 @@
               <!--数据模型不存在-->
               <chart-nodata
                 v-if="transform.setting.isEmpty"
+                :isEmpty="transform.setting.isEmpty"
                 :config="transform.setting.config"
               ></chart-nodata>
               <ChartFigure

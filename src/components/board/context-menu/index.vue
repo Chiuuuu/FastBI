@@ -51,6 +51,7 @@
 import Vue from 'vue'
 import JsonExcel from 'vue-json-excel'
 import { exportImg, exportForFull, exportScreen } from '@/utils/screenExport'
+import handleNullData from '@/utils/handleNullData'
 import { mapGetters, mapActions } from 'vuex'
 import { Loading } from 'element-ui'
 import chartTableData from '../chartTableData/index' // 右键菜单
@@ -305,24 +306,29 @@ export default {
 
       let source = res.data || []
 
-      // 处理空数据
-      this.handleNullData(source)
-
       let columns = [],
         rows = [],
         tableName = [],
         exportList = []
+
       if (this.currSelected.setting.chartType === 'v-map') {
         if (source.fillList) {
-          this.handleNullData(source)
+          source.fillList = await handleNullData(
+            source.fillList,
+            this.currSelected.setting
+          )
         }
         if (source.labelList) {
-          this.handleNullData(source, true)
+          source.labelList = await handleNullData(
+            source.labelList,
+            this.currSelected.setting,
+            true
+          )
         }
         Object.keys(source).map(item => {
           if (source[item]) {
             let aliasKeys = this.handleTableColumns(
-              Object.keys(source[item][0])
+              Object.keys(source[item][0]),item
             )
             columns.push(aliasKeys)
             rows.push(source[item])
@@ -330,12 +336,12 @@ export default {
             tableName.push(type)
             let aliasObj = {}
             aliasKeys.forEach((alias, index) => {
-              aliasObj['name' + index] = alias
+              aliasObj['name' + index] = alias['alias']
             })
             let cunstomRow = source[item].map(row => {
               let obj = {}
               aliasKeys.forEach((alias, index) => {
-                obj['name' + index] = row[alias]
+                obj['name' + index] = row[alias['alias']]
               })
               return obj
             })
@@ -345,11 +351,12 @@ export default {
           }
         })
       } else {
+        // 处理空数据
+        source = await handleNullData(source, this.currSelected.setting)
         rows = [source]
         columns = [this.handleTableColumns(Object.keys(source[0]))]
         exportList = source
       }
-
       this.chartData = {
         columns,
         rows,
@@ -357,30 +364,16 @@ export default {
       }
       return exportList
     },
-    // 返回的空字段补null
-    handleNullData(returnData, isLabel = false) {
-      let apiData = this.currSelected.setting.api_data
-      let dimensions = isLabel ? 'labelDimensions' : 'dimensions'
-      let measures = isLabel ? 'labelMeasures' : 'measures'
-      // 获取所有数据的key
-      let keys = apiData[`${dimensions}`]
-        .concat(apiData[`${measures}`])
-        .map(item => item.alias)
-
-      if (Array.isArray(returnData)) {
-        for (let rowDatas of returnData) {
-          for (let key of keys) {
-            if (typeof rowDatas[key] === 'undefined') {
-              rowDatas[key] = null
-            }
-          }
-        }
-      }
-    },
     // 处理表头, 按拖入的维度度量顺序排列
-    handleTableColumns(keys) {
-      const apiData = this.currSelected.setting.api_data
-      const fieldList = [].concat(apiData.dimensions).concat(apiData.measures)
+    handleTableColumns(keys,label) {
+      const apiData = this.currSelected.setting.api_data  
+      let fieldList = [] 
+      if(label && label == 'labelList'){
+        // 地图 -- 标记点数据
+        fieldList = [].concat(apiData.labelDimensions).concat(apiData.labelMeasures)
+      }else{
+        fieldList = [].concat(apiData.dimensions).concat(apiData.measures)
+      }
       const column = []
       fieldList.map(item => {
         if (keys.includes(item.alias)) {

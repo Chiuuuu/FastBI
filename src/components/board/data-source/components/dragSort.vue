@@ -64,6 +64,7 @@ import navigateList from '@/config/navigate' // 导航条菜单
 import _ from 'lodash'
 import { Loading } from 'element-ui'
 import { Icon } from 'ant-design-vue'
+import handleNullData from '@/utils/handleNullData'
 const IconFont = Icon.createFromIconfontCN({
   scriptUrl: '//at.alicdn.com/t/font_2276651_mlklp2yb77i.js'
 }) // 引入iconfont
@@ -158,7 +159,9 @@ export default {
   methods: {
     ...mapActions(['updateChartData']),
     formatAggregator(item) {
-      const fun = this.polymerizeType.find((x) => x.value === item.defaultAggregator)
+      const fun = this.polymerizeType.find(
+        x => x.value === item.defaultAggregator
+      )
       if (item.role === 2) {
         return `${item.alias} (${fun.name})`
       } else {
@@ -300,7 +303,7 @@ export default {
       selected.setting.isEmpty = false
       // 数据源被删掉
       if (res.code === 500 && res.msg === 'IsChanged') {
-        selected.setting.isEmpty = true
+        selected.setting.isEmpty = 'noData'
         this.updateChartData()
         return
       }
@@ -319,6 +322,10 @@ export default {
         this.$store.dispatch('SetSelfDataSource', apiData)
 
         let datas = res.rows
+
+        // 处理空数据
+        datas = await handleNullData(datas, this.currSelected.setting)
+
         // 去掉排序的数据
         if (apiData.options.sort.length) {
           let filterArr = []

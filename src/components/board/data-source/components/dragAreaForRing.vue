@@ -62,6 +62,7 @@ import TreeGroupBy from '@/components/board/options/treemap/tree-groupby'
 import { sum, summary } from '@/utils/summaryList'
 import { Loading } from 'element-ui'
 import _ from 'lodash'
+import handleNullData from '@/utils/handleNullData'
 
 export default {
   props: {
@@ -296,7 +297,7 @@ export default {
       selected.setting.isEmpty = false
       // 数据源被删掉
       if (res.code === 500 && res.msg === 'IsChanged') {
-        selected.setting.isEmpty = true
+        selected.setting.isEmpty = 'noData'
         this.updateChartData()
         return
       }
@@ -304,9 +305,13 @@ export default {
         // 保存原始数据 -- 查看数据有用
         apiData.origin_source = deepClone(res.rows || res.data || {})
         this.$store.dispatch('SetSelfDataSource', apiData)
-
+        
         // 环形图只有一条数据
         let datas = res.rows[0]
+
+        // 处理空数据
+        datas = await handleNullData(datas, this.currSelected.setting)
+
         // 去掉排序的数据
         if (
           apiData.options &&
