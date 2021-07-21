@@ -50,7 +50,12 @@ export default {
             await this.$store.dispatch('user/changeRole')
             // this.reload()
             // window.location.reload() // 重刷方法1,但是会闪白
-            this.$router.replace('/')
+
+            if (this.$route.name === 'dataAccess') { // 如果刚好是数据接入界面, 刷新菜单列表
+              this.$store.dispatch('dataAccess/getMenuList', this)
+            } else {
+              this.$router.replace('/')
+            }
             this.$store.commit('common/SET_MENUSELECTID', -1)
           } else {
             this.$message.error(result.msg || '请求错误')
