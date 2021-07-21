@@ -264,6 +264,11 @@ export default {
               } else {
                 // 如果有联动，显示联动的数据
                 this.chartData = val.selectData ? val.selectData : val.source
+                // 被联动的图表恢复样式,取消原来选中状态
+                if(val.selectData){
+                    this.resetChartStyle()
+                    this.currentIndex = ''
+                }
               }
               return
             }
