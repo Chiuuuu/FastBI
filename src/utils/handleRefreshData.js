@@ -9,30 +9,11 @@ export function handleRefreshData({ chart, newData, refreshType }) {
   if (chart.setting.chartType === 'v-map') {
     // 假刷新获取不到null的值，遍历加上
     if (!refreshType) {
-      // 获取所有数据的key
       if (newData.fillList) {
-        let keys = apiData.dimensions
-          .concat(apiData.measures)
-          .map(item => item.alias)
-        for (let rowDatas of newData.fillList) {
-          for (let key of keys) {
-            if (typeof rowDatas[key] === 'undefined') {
-              rowDatas[key] = null
-            }
-          }
-        }
+        handleNullData(newData, apiData)
       }
       if (newData.labelList) {
-        let labelKeys = apiData.labelDimensions
-          .concat(apiData.labelMeasures)
-          .map(item => item.alias)
-        for (let rowDatas of newData.labelList) {
-          for (let key of labelKeys) {
-            if (typeof rowDatas[key] === 'undefined') {
-              rowDatas[key] = null
-            }
-          }
-        }
+        handleNullData(newData, apiData, true)
       }
     }
     setMapData(chart, newData)
@@ -48,20 +29,7 @@ export function handleRefreshData({ chart, newData, refreshType }) {
   }
   // 假刷新获取不到null的值，遍历加上
   if (!refreshType) {
-    // 获取所有数据的key
-    let keys = apiData.dimensions
-      .concat(apiData.measures)
-      .map(item => item.alias)
-
-    if (Array.isArray(newData)) {
-      for (let rowDatas of newData) {
-        for (let key of keys) {
-          if (typeof rowDatas[key] === 'undefined') {
-            rowDatas[key] = null
-          }
-        }
-      }
-    }
+    handleNullData(newData, apiData)
   }
   if (chart.setting.type === '2') {
     chart.setting.api_data.returnData = newData // 记录返回的键值对，方便展示图表数据直接用
@@ -326,4 +294,24 @@ function getCenterCoordinate(name) {
     return null
   }
   return countryside.properties.center
+}
+
+// 返回的空字段补null
+function handleNullData(returnData, apiData, isLabel = false) {
+  let dimensions = isLabel ? 'labelDimensions' : 'dimensions'
+  let measures = isLabel ? 'labelMeasures' : 'measures'
+  // 获取所有数据的key
+  let keys = apiData[`${dimensions}`]
+    .concat(apiData[`${measures}`])
+    .map(item => item.alias)
+
+  if (Array.isArray(returnData)) {
+    for (let rowDatas of returnData) {
+      for (let key of keys) {
+        if (typeof rowDatas[key] === 'undefined') {
+          rowDatas[key] = null
+        }
+      }
+    }
+  }
 }
