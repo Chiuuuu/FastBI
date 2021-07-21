@@ -2346,10 +2346,6 @@ const list = [{
             fontWeight: 'normal'
           }
         },
-
-        tooltip: {
-          position: 'top'
-        },
         grid: {
           left: 60,
           top: 60,
@@ -2440,13 +2436,16 @@ const list = [{
           top: 'bottom', // 上 中 下
           bottom: '5%',
           inRange: {
-            color: ['#FF85A9', '#FF3976', '#CC2D5D']
+            color: ['#ffff35', '#f69f2e']
           },
           textStyle: {
             color: '#fff',
             fontSize: 15,
             fontFamily: 'not specified'
           }
+        },
+        tooltip: {
+          trigger: 'item'
         },
         series: {
           name: '',
@@ -2466,10 +2465,19 @@ const list = [{
             ['11a', 'Monday', 20],
             ['12a', 'Saturday', 12]
           ],
+          labelShowList: [], // 记录指标显示的字段
+          tooltipShowList: [], // 记录气泡显示的字段
+          tooltip: {
+            show: true,
+            formatter: '{b}',
+            position: 'top'
+          },
           label: {
             show: true,
             color: '#fff',
+            fontSize: 14,
             position: 'inside',
+            formatter: '{b}',
             offset: [0, 0]
           },
           emphasis: {
@@ -2772,14 +2780,14 @@ const list = [{
           gridLineColor: '#fff', // 网格线颜色
           gridLineWidth: 0, // 纵向网格线宽度
           labels: {
-            rotation: 0,
+            rotation: 20,
             style: {
               color: '#fff',
               fontSize: 12,
               fontFamily: '微软雅黑'
             },
-            step: 1,
-            staggerLines: 1
+            // step: 1,
+            // staggerLines: 1
           },
           title: {
             text: '',

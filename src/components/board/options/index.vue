@@ -434,7 +434,7 @@
                     @change="setSelfProperty"
                   ></a-input-number>
                 </gui-field>
-                <gui-field label="展示数值" v-if="!isScatter || isHeatmap">
+                <gui-field label="展示数值" v-if="!isScatter">
                   <a-switch
                     v-model="selfConfig.series.label.show"
                     size="small"
@@ -472,7 +472,7 @@
                     </a-radio-group>
                   </gui-inline>
                 </gui-field>
-                <gui-field label="文本" v-if="!isScatter || isHeatmap">
+                <gui-field label="文本" v-if="!isScatter">
                   <gui-inline label="字号">
                     <a-input-number
                       class="longwidth"
@@ -580,7 +580,7 @@
               <a-collapse-panel
                 key="indicatorscatter"
                 header="指标设置"
-                v-if="isScatter || isHeatmap"
+                v-if="isScatter"
               >
                 <a-switch
                   slot="extra"
@@ -969,10 +969,39 @@
               </a-collapse-panel>
             </template>
 
+            <!-- 矩形热力图独有 -->
+            <template v-if="isHeatmap">
+              <a-collapse-panel key="heatmap1" header="图形属性">
+                <Heatmap1 :self-config="selfConfig" />
+              </a-collapse-panel>
+              <a-collapse-panel key="heatmap2" header="鼠标移入提示">
+                <a-switch
+                  slot="extra"
+                  v-if="collapseActive.indexOf('heatmap2') > -1"
+                  v-model="selfConfig.series.tooltip.show"
+                  default-checked
+                  @change="switchChange"
+                  size="small"
+                />
+                <Heatmap2 :self-config="selfConfig" />
+              </a-collapse-panel>
+              <a-collapse-panel key="heatmap3" header="图例设置">
+                <a-switch
+                  slot="extra"
+                  v-if="collapseActive.indexOf('heatmap3') > -1"
+                  v-model="selfConfig.visualMap.show"
+                  default-checked
+                  @change="switchChange"
+                  size="small"
+                />
+                <Heatmap3 :self-config="selfConfig" />
+              </a-collapse-panel>
+            </template>
+
             <!--图例-->
             <template
               v-if="
-                selfConfig.legend && !isRing && !isGauge && !isMap && !isTreemap
+                selfConfig.legend && !isRing && !isGauge && !isMap && !isTreemap && !isHeatmap
               "
             >
               <a-collapse-panel key="legend" header="图例设置">
@@ -3100,6 +3129,9 @@ import throttle from 'lodash/throttle'
 import Treemap1 from './treemap/treemap-1.vue'
 import Treemap2 from './treemap/treemap-2.vue'
 import Treemap3 from './treemap/treemap-3.vue'
+import Heatmap1 from './heatmap/heatmap-1.vue'
+import Heatmap2 from './heatmap/heatmap-2.vue'
+import Heatmap3 from './heatmap/heatmap-3.vue'
 import HighChartPie from '@/components/board/options/highchart-pie'
 import HighChartBar from '@/components/board/options/highchart-bar'
 import { Divider } from 'ant-design-vue'
@@ -3865,14 +3897,10 @@ export default {
       //   this.selfConfig.grid &&
       //   (this.isLine || this.isHistogram || this.isBar || this.isScatter)
       // )
-      if (this.chartType === 'v-heatmap') {
-        return true
-      } else {
-        return (
-          this.selfConfig.grid &&
-          (this.isLine || this.isHistogram || this.isBar || this.isScatter)
-        )
-      }
+      return (
+        this.selfConfig.grid &&
+        (this.isLine || this.isHistogram || this.isBar || this.isScatter)
+      )
     },
     showXAxis() {
       if (this.chartType === 'v-heatmap') {
@@ -3935,6 +3963,9 @@ export default {
     Treemap1,
     Treemap2,
     Treemap3,
+    Heatmap1,
+    Heatmap2,
+    Heatmap3,
     HighChartPie,
     HighChartBar
   }

@@ -1,19 +1,11 @@
 <template>
   <div>
-    <gui-field v-if="isContinuous" label="图例颜色">
+    <gui-field label="图例颜色">
       <el-color-picker
-        v-for="(color, index) in selfConfig.series.continuousColors"
+        v-for="(color, index) in selfConfig.visualMap.inRange.color"
         :key="index"
-        v-model="selfConfig.series.continuousColors[index]"
-        @change="changeColor"
-      ></el-color-picker>
-    </gui-field>
-    <gui-field v-else label="图例颜色">
-      <el-color-picker
-        v-for="(color, index) in selfConfig.series.piecewiseColors"
-        :key="index"
-        v-model="selfConfig.series.piecewiseColors[index]"
-        @change="changeColor"
+        v-model="selfConfig.visualMap.inRange.color[index]"
+        @change="setSelfProperty"
       ></el-color-picker>
     </gui-field>
     <gui-field label="文本">
@@ -32,18 +24,6 @@
           v-model="selfConfig.visualMap.textStyle.color"
           @change="setSelfProperty"
         ></el-color-picker>
-      </gui-inline>
-    </gui-field>
-    <gui-field label="样式">
-      <gui-inline label="图例间隔">
-        <a-input-number
-          v-model="selfConfig.visualMap.itemGap"
-          size="small"
-          class="f-clear-width"
-          :min="0"
-          :max="50"
-          @change="setSelfProperty"
-        ></a-input-number>
       </gui-inline>
     </gui-field>
     <gui-field label="位置">
@@ -132,10 +112,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['currSelected']),
-    isContinuous() {
-      return this.currSelected.setting.config.visualMap.type === 'continuous'
-    }
+    ...mapGetters(['currSelected'])
   },
   components: {
     GuiField,
@@ -145,14 +122,6 @@ export default {
     return {}
   },
   methods: {
-    changeColor() {
-      if (this.isContinuous) {
-        this.selfConfig.visualMap.inRange.color = this.selfConfig.series.continuousColors
-      } else {
-        this.selfConfig.visualMap.inRange.color = this.selfConfig.series.piecewiseColors
-      }
-      this.setSelfProperty()
-    }
   }
 }
 </script>

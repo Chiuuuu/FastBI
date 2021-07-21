@@ -253,6 +253,9 @@ export default {
           this.currSelected.setting.chartType === 'v-multiPie' ||
           this.currSelected.setting.chartType === 'v-heatmap'
         ) {
+          if (this.currSelected.setting.chartType === 'v-heatmap') {
+            this.handleShowList(dataFile, 1)
+          }
           if (this.fileList.length < 2) {
             this.fileList.push(dataFile)
           } else if (this.fileList.length === 2) {
@@ -263,7 +266,7 @@ export default {
           this.currSelected.setting.chartType === 'v-sun'
         ) {
           if (this.currSelected.setting.chartType !== 'v-sun') {
-            this.handleTreemapShowList(dataFile, 4)
+            this.handleShowList(dataFile, 4)
           }
           // 矩形树图可以拖入5个维度
           if (this.fileList.length < 5) {
@@ -296,6 +299,9 @@ export default {
           (this.currSelected.setting.chartType === 'high-pie') |
           (this.currSelected.setting.chartType === 'v-heatmap')
         ) {
+          if (this.currSelected.setting.chartType === 'v-heatmap') {
+            this.handleShowList(dataFile, 0)
+          }
           this.fileList[0] = dataFile
         } else if (
           this.currSelected.setting.name === 've-scatter' &&
@@ -311,7 +317,7 @@ export default {
           this.currSelected.setting.chartType === 'v-sun'
         ) {
           if (this.currSelected.setting.chartType !== 'v-sun') {
-            this.handleTreemapShowList(dataFile, 0)
+            this.handleShowList(dataFile, 0)
           }
           // 矩形树图暂时只能拉入一个度量
           this.fileList[0] = dataFile
@@ -437,7 +443,7 @@ export default {
       this.$store.dispatch('SetSelfDataSource', apiData)
       this.updateChartData()
     },
-    handleTreemapShowList(dataFile, maxIndex) {
+    handleShowList(dataFile, maxIndex) {
       const config = deepClone(this.currSelected.setting.config)
       if (this.fileList.length < maxIndex + 1) {
         if (config.series.tooltipShowList.indexOf(dataFile.alias) < 0) {
@@ -694,6 +700,8 @@ export default {
         // 矩形树图数据处理
         if (this.currSelected.setting.chartType === 'v-treemap') {
           return this.handleTreemapConfig(res.rows)
+        } else if (this.currSelected.setting.chartType === 'v-heatmap') {
+          
         }
         if (this.type === 'tableList') {
           let columns = []

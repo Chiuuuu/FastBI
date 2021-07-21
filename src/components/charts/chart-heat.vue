@@ -6,6 +6,7 @@
 import { DEFAULT_COLORS } from '@/utils/defaultColors'
 import { mapGetters } from 'vuex'
 import { setLinkageData, resetOriginData } from '@/utils/setDataLink'
+import { deepClone } from '@/utils/deepClone'
 export default {
   name: 'chartHeat',
   props: {
@@ -42,7 +43,6 @@ export default {
   mounted() {
     this.Init()
     this.mychart.on('click', this.clickEvent)
-    console.log('heat', this.chartId, this.config)
   },
   methods: {
     Init(val) {
@@ -91,6 +91,29 @@ export default {
           }
         })
       })
+    },
+    // 处理矩形树图的formatter
+    handleFormatter(series, type) {
+      let flag = false
+      if (this.apiData.measures[0]) {
+        const measureAlias = this.apiData.measures[0].alias
+        flag = series[type + 'ShowList'].includes(measureAlias)
+      }
+      series[type].formatter = params => {
+        let result = []
+        this.apiData.dimensions.map((item, index) => {
+          if (series[type + 'ShowList'].includes(item.alias)) {
+            result.push(params.data[index])
+          }
+        })
+        if (this.apiData.measures[0]) {
+          const measureAlias = this.apiData.measures[0].alias
+          if (series[type + 'ShowList'].includes(measureAlias)) {
+            result.push(params.data[params.data.length - 1])
+          }
+        }
+        return result.toString()
+      }
     }
   },
   watch: {
@@ -101,10 +124,17 @@ export default {
         //   let max = val.series.data.map(item=>item.value);
         //   val.visualMap.max = Math.max(...max)
         // }
-        this.Init(val)
+        const config = deepClone(val)
+        this.handleFormatter(config.series, 'tooltip')
+        this.handleFormatter(config.series, 'label')
+        // 如果有图表联动, 则渲染联动的数据
+        if (this.apiData.selectData) {
+          config.series.data = this.apiData.selectData.data
+        }
+        this.Init(config)
       },
       deep: true
-      //   immediate:true
+      // immediate: true
     },
     view: {
       handler(val) {
@@ -154,6 +184,7 @@ export default {
               //   this.option.xAxis.data = val.source.rows.map(x=>(x[dim[0]]));
               this.option.visualMap.max = Math.max(...meaarr)
               this.option.series.data = [..._series]
+              this.$store.dispatch('SetSelfProperty', this.option)
               this.mychart.setOption(this.option)
             }
             // console.clear();

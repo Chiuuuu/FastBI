@@ -124,22 +124,6 @@ export default {
       //       key == 'backgroundImage' ? `url(${objcolor[key]})` : (typeof objcolor[key])==='number'?`${objcolor[key]}px`:objcolor[key]
       //     )
       //   }
-    },
-    // 处理formatter
-    handleFormatter(series, type) {
-      let result = []
-      this.apiData.measures.dimensions.map(item => {
-        if (series[type + 'ShowList'].includes(item.alias)) {
-          result.push(item.name)
-        }
-      })
-      if (this.apiData.measures[0]) {
-        const measureAlias = this.apiData.measures[0].alias
-        if (series[type + 'ShowList'].includes(measureAlias)) {
-          result.push()
-        }
-      }
-      return result.toString()
     }
   },
   watch: {
@@ -193,19 +177,34 @@ export default {
             rows = val.selectData.rows
           }
 
-          _measure.forEach(key => {
-            series.push({
-              name: key,
-              data: rows.map(x => ({
-                name: x[_dimensions],
-                y: x[key]
-              }))
+          if (this.setting.chartType === 'high-column') {
+            let categories = []
+            _measure.forEach(key => {
+              series.push({
+                name: key,
+                data: rows.map(x => x[key])
+              })
             })
-          })
-          if (series.length === 0) {
-            return
+            if (series.length === 0) {
+              return
+            }
+            this.setting.config.series = [...series]
+            this.setting.config.xAxis.categories = rows.map(x => x[_dimensions])
+          } else {
+            _measure.forEach(key => {
+              series.push({
+                name: key,
+                data: rows.map(x => ({
+                  name: x[_dimensions],
+                  y: x[key]
+                }))
+              })
+            })
+            if (series.length === 0) {
+              return
+            }
+            this.setting.config.series = [...series]
           }
-          this.setting.config.series = [...series]
         }
         this.mychart = this.$highCharts.chart(
           this.$refs.container,
