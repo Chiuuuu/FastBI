@@ -484,7 +484,6 @@ export default {
       } else if (this.resetName.type === 'reset') {
         this.handleResetName(values)
       }
-      this.resetNameVisible = false
     },
     /**
      * 新增角色
@@ -527,11 +526,10 @@ export default {
       if (result.code === 200) {
         this.handleGetMenuList()
         this.$message.success('新建成功')
+        this.resetNameVisible = false
       } else {
         this.$message.error(result.msg)
       }
-
-      this.resetNameVisible = false
     },
     /**
      * 重命名文件夹
@@ -546,11 +544,10 @@ export default {
       if (result.code === 200) {
         this.handleGetMenuList()
         this.$message.success('修改成功')
+        this.resetNameVisible = false
       } else {
         this.$message.error(result.msg)
       }
-
-      this.resetNameVisible = false
     },
     /**
      * 判断是否有相同名称

@@ -303,13 +303,23 @@ export default {
         return
       }
 
+      let source = res.data || []
+
+      // 处理空数据
+      this.handleNullData(source)
+
       let columns = [],
         rows = [],
         tableName = [],
         exportList = []
-        
-      let source = res.data || []
+
       if (this.currSelected.setting.chartType === 'v-map') {
+        if (source.fillList) {
+          this.handleNullData(source)
+        }
+        if (source.labelList) {
+          this.handleNullData(source, true)
+        }
         Object.keys(source).map(item => {
           if (source[item]) {
             let aliasKeys = this.handleTableColumns(
@@ -345,8 +355,27 @@ export default {
         rows,
         tableName
       }
-      console.log(exportList,'this.chartData')
       return exportList
+    },
+    // 返回的空字段补null
+    handleNullData(returnData, isLabel = false) {
+      let apiData = this.currSelected.setting.api_data
+      let dimensions = isLabel ? 'labelDimensions' : 'dimensions'
+      let measures = isLabel ? 'labelMeasures' : 'measures'
+      // 获取所有数据的key
+      let keys = apiData[`${dimensions}`]
+        .concat(apiData[`${measures}`])
+        .map(item => item.alias)
+
+      if (Array.isArray(returnData)) {
+        for (let rowDatas of returnData) {
+          for (let key of keys) {
+            if (typeof rowDatas[key] === 'undefined') {
+              rowDatas[key] = null
+            }
+          }
+        }
+      }
     },
     // 处理表头, 按拖入的维度度量顺序排列
     handleTableColumns(keys,label) {

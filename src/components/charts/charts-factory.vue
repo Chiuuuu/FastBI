@@ -127,20 +127,30 @@ export default {
             // self.$emit('resetOriginData', self.chartId)
             return
           }
-          // 鼠标单击时选中,选中颜色不变，其余变暗
-          if (self.typeName === 've-bar' || self.typeName === 've-histogram') {
-            // 柱状图折线图数据颜色体现在度量，用seriesIndex
-            self.chartExtend.series.itemStyle.normal.color = function(params) {
-              return params.dataIndex === e.dataIndex
-                ? DEFAULT_COLORS[params.seriesIndex]
-                : self.hexToRgba(DEFAULT_COLORS[params.seriesIndex], 0.4)
-            }
-          } else if (self.typeName === 've-pie') {
-            // 饼图数据颜色体现在维度，用dataIndex
-            self.chartExtend.series.itemStyle.normal.color = function(params) {
-              return params.dataIndex === e.dataIndex
-                ? DEFAULT_COLORS[params.dataIndex]
-                : self.hexToRgba(DEFAULT_COLORS[params.dataIndex], 0.4)
+          // 如果被联动筛选过样式不改变
+          if (!self.apiData.selectData) {
+            // 鼠标单击时选中,选中颜色不变，其余变暗
+            if (
+              self.typeName === 've-bar' ||
+              self.typeName === 've-histogram'
+            ) {
+              // 柱状图折线图数据颜色体现在度量，用seriesIndex
+              self.chartExtend.series.itemStyle.normal.color = function(
+                params
+              ) {
+                return params.dataIndex === e.dataIndex
+                  ? DEFAULT_COLORS[params.seriesIndex]
+                  : self.hexToRgba(DEFAULT_COLORS[params.seriesIndex], 0.4)
+              }
+            } else if (self.typeName === 've-pie') {
+              // 饼图数据颜色体现在维度，用dataIndex
+              self.chartExtend.series.itemStyle.normal.color = function(
+                params
+              ) {
+                return params.dataIndex === e.dataIndex
+                  ? DEFAULT_COLORS[params.dataIndex]
+                  : self.hexToRgba(DEFAULT_COLORS[params.dataIndex], 0.4)
+              }
             }
           }
           // 记录当前选择数据的index
@@ -149,10 +159,9 @@ export default {
           self.key++
           setLinkageData(self.chartId, e, self.canvasMap)
           //   self.$emit('linkage', self.chartId, e)
-          if (self.chartType !== 'v-treemap') {
-            chart.off('click')
+          if (!self.apiData.selectData) {
+            self.setChartClick()
           }
-          self.setChartClick()
         })
       }
     }
@@ -264,6 +273,13 @@ export default {
               } else {
                 // 如果有联动，显示联动的数据
                 this.chartData = val.selectData ? val.selectData : val.source
+                // 被联动的图表恢复样式,取消原来选中状态
+                if (val.selectData) {
+                  this.resetChartStyle()
+                  this.currentIndex = ''
+                } else {
+                  this.setChartClick()
+                }
               }
               return
             }
