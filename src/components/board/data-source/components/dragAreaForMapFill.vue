@@ -61,6 +61,7 @@ import geoJson from '@/utils/guangdong.json'
 import reverseAddressResolution from '@/utils/reverseAddressResolution'
 import { visualMapConfig, mapSeries } from '@/config/mapSeries'
 import { Loading } from 'element-ui'
+import handleNullData from '@/utils/handleNullData'
 export default {
   props: {
     type: {
