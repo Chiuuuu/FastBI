@@ -490,12 +490,10 @@ export default {
             apis.level = [['1/1', '1/2', '1/3'], ['1/4', '1/5']]
             this.$store.dispatch('SetApis', apis)
           }
-          // 立体图和矩形热力图 旭日图重置
+          // 立体图重置
           if (
             (current.setting.chartType === 'high-pie') |
-            (current.setting.chartType === 'high-column') |
-            (current.setting.chartType === 'v-sun') |
-            (current.setting.chartType === 'v-heatmap')
+            (current.setting.chartType === 'high-column')
           ) {
             let res = sourceMap[current.setting.chartType]
             // let res = navigateList[0].tabs[0].children;
@@ -503,12 +501,7 @@ export default {
             console.log('原始数据', sourceMap[current.setting.chartType])
             current.setting.config.series = JSON.parse(JSON.stringify(res))
             this.$store.dispatch('SetSelfProperty', current.setting.config)
-            if (
-              current.setting.chartType !== 'v-sun' &&
-              current.setting.chartType !== 'v-heatmap'
-            ) {
-              this.updateChartData()
-            }
+            this.updateChartData()
           }
         }
         // 如果是仪表盘，第二个度量是目标值（进度条最大值）,重置进度条范围
@@ -530,6 +523,20 @@ export default {
             current.setting.config.visualMap.inRange.color =
               current.setting.config.series.continuousColors
           }
+          const tooltipShowList = current.setting.config.series.tooltipShowList
+          for (let i = 0; i < tooltipShowList.length; i++) {
+            if (item.alias === tooltipShowList[i]) {
+              tooltipShowList.splice(i, 1)
+            }
+          }
+          const labelShowList = current.setting.config.series.labelShowList
+          for (let i = 0; i < labelShowList.length; i++) {
+            if (item.alias === labelShowList[i]) {
+              labelShowList.splice(i, 1)
+            }
+          }
+          this.$store.dispatch('SetSelfProperty', current.setting.config)
+        } else if (current.setting.chartType === 'v-sun' || current.setting.chartType === 'v-heatmap') {
           const tooltipShowList = current.setting.config.series.tooltipShowList
           for (let i = 0; i < tooltipShowList.length; i++) {
             if (item.alias === tooltipShowList[i]) {

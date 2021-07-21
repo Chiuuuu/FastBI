@@ -171,6 +171,7 @@ export default {
             let max = list.map(item => item.value)
             this.option.visualMap.max = Math.max(...max)
             this.option.series.data = [...list]
+            this.$store.dispatch('SetSelfProperty', this.option)
             this.mychart.setOption(this.option)
           } else {
             // 维度
