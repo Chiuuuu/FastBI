@@ -398,7 +398,7 @@ export default {
         return
       }
       if (res.code === 200) {
-        res.fillList = await handleNullData(res.fillList, this.currSelected.setting)
+        res.data.fillList = await handleNullData(res.data.fillList, this.currSelected.setting)
         // 保存原始数据 -- 查看数据有用
         apiData.origin_source = deepClone(res.rows || res.data || {})
         this.$store.dispatch('SetSelfDataSource', apiData)

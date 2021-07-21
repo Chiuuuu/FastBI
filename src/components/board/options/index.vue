@@ -666,7 +666,7 @@
                     ></a-input-number>
                   </gui-inline>
                 </gui-field>
-                
+
                 显示内容
                 <a-select
                   mode="multiple"
@@ -3321,8 +3321,8 @@ export default {
       } else {
         this.selfConfig.series.label.formatterSelect = checkedValues
       }
-      this.setSelfProperty();
-      console.clear();
+      this.setSelfProperty()
+      console.clear()
     },
     // 设置自有属性
     setSelfProperty() {
@@ -3738,39 +3738,43 @@ export default {
     ),
     // 初始化地图指标显示内容列表
     handleMapFormatterSelect() {
-      this.mapFillPointSelectList = this.apiData.measures.concat()
-      this.mapFillTooltipSelectList = this.apiData.measures.concat()
+      // 填充
+      let measures = this.apiData.measures
       if (this.apiData.options.fillType === 'area') {
         // 地区添加地区名/维度
         let di = this.apiData.dimensions[0]
           ? this.apiData.dimensions[0].alias
           : ''
-        this.mapFillPointSelectList.unshift({ alias: `地区名/${di}` })
-        this.mapFillTooltipSelectList.unshift({ alias: di })
-      } else {
-        this.mapFillPointSelectList = this.apiData.dimensions.concat(
-          this.mapFillPointSelectList
+        this.mapFillPointSelectList = [{ alias: `地区名/${di}` }].concat(
+          measures
         )
-        this.mapFillPointSelectList.unshift({ alias: '地区名' })
+        this.mapFillTooltipSelectList = [{ alias: di }].concat(measures)
+      } else {
+        this.mapFillTooltipSelectList = this.apiData.dimensions.concat(measures)
+        this.mapFillPointSelectList = [{ alias: '地区名' }].concat(
+          this.mapFillTooltipSelectList
+        )
       }
-      this.mapLabelPointSelectList = this.apiData.labelMeasures.concat()
-      this.mapLabelTooltipSelectList = this.apiData.labelMeasures.concat()
+      // 散点
+      let labelMeasures = this.apiData.labelMeasures
       if (this.apiData.options.labelType === 'area') {
         // 标记点添加维度
         let labelDi = this.apiData.labelDimensions[0]
           ? this.apiData.labelDimensions[0].alias
           : ''
-        this.mapLabelPointSelectList.unshift({
-          alias: `地区名/${labelDi}`
-        })
-        this.mapLabelTooltipSelectList.unshift({
-          alias: labelDi
-        })
-      } else {
-        this.mapLabelPointSelectList = this.apiData.dimensions.concat(
-          this.mapLabelPointSelectList
+        this.mapLabelPointSelectList = [{ alias: `地区名/${labelDi}` }].concat(
+          labelMeasures
         )
-        this.mapLabelPointSelectList.unshift({ alias: '地区名' })
+        this.mapLabelTooltipSelectList = [{ alias: labelDi }].concat(
+          labelMeasures
+        )
+      } else {
+        this.mapLabelTooltipSelectList = this.apiData.labelDimensions.concat(
+          labelMeasures
+        )
+        this.mapLabelPointSelectList = [{ alias: '地区名' }].concat(
+          mapLabelTooltipSelectList
+        )
       }
     }
   },
@@ -3778,7 +3782,10 @@ export default {
     currSelected: {
       handler(val) {
         if (val) {
-          if (val.setting.name === 've-image' || val.setting.name === 'figure') {
+          if (
+            val.setting.name === 've-image' ||
+            val.setting.name === 'figure'
+          ) {
             this.tabsType = 0
           }
           this.baseProperty = { ...val.setting.view }
@@ -3953,28 +3960,31 @@ export default {
         return val.split(' ')
       }
     },
-    scatterFormatList_(){
-      let scatterFormatList = deepClone(this.scatterFormatList);
-      if(this.currSelected.setting.api_data.dimensions.length === 1 
-        && this.currSelected.setting.api_data.measures.length === 2
-      ){
+    scatterFormatList_() {
+      let scatterFormatList = deepClone(this.scatterFormatList)
+      if (
+        this.currSelected.setting.api_data.dimensions.length === 1 &&
+        this.currSelected.setting.api_data.measures.length === 2
+      ) {
         scatterFormatList[1].label = this.currSelected.setting.api_data.dimensions[0].alias //维度1
         scatterFormatList[2].label = this.currSelected.setting.api_data.measures[0].alias //度量1
         scatterFormatList[3].label = this.currSelected.setting.api_data.measures[1].alias //度量2
       }
-      return scatterFormatList;
+      return scatterFormatList
     },
-    scatterSizeList_(){
-      let scatterSizeList = deepClone(this.scatterSizeList);
-      if(this.currSelected.setting.api_data.dimensions.length === 1 
-        && this.currSelected.setting.api_data.measures.length === 2
-      ){
-        scatterSizeList[1].label = '按' + this.currSelected.setting.api_data.measures[0].alias //度量1
-        scatterSizeList[2].label = '按' + this.currSelected.setting.api_data.measures[1].alias //度量2
+    scatterSizeList_() {
+      let scatterSizeList = deepClone(this.scatterSizeList)
+      if (
+        this.currSelected.setting.api_data.dimensions.length === 1 &&
+        this.currSelected.setting.api_data.measures.length === 2
+      ) {
+        scatterSizeList[1].label =
+          '按' + this.currSelected.setting.api_data.measures[0].alias //度量1
+        scatterSizeList[2].label =
+          '按' + this.currSelected.setting.api_data.measures[1].alias //度量2
       }
-      return scatterSizeList;
-    },
-    
+      return scatterSizeList
+    }
   },
   components: {
     GuiField,

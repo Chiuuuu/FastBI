@@ -391,8 +391,8 @@ export default {
         return
       }
       if (res.code === 200) {
-        res.labelList = await handleNullData(
-          res.labelList,
+        res.data.labelList = await handleNullData(
+          res.data.labelList,
           this.currSelected.setting
         )
         // 保存原始数据 -- 查看数据有用
