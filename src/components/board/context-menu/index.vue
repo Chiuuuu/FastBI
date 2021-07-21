@@ -51,6 +51,7 @@
 import Vue from 'vue'
 import JsonExcel from 'vue-json-excel'
 import { exportImg, exportForFull, exportScreen } from '@/utils/screenExport'
+import handleNullData from '@/utils/handleNullData'
 import { mapGetters, mapActions } from 'vuex'
 import { Loading } from 'element-ui'
 import chartTableData from '../chartTableData/index' // 右键菜单
@@ -305,9 +306,6 @@ export default {
 
       let source = res.data || []
 
-      // 处理空数据
-      this.handleNullData(source)
-
       let columns = [],
         rows = [],
         tableName = [],
@@ -315,10 +313,17 @@ export default {
 
       if (this.currSelected.setting.chartType === 'v-map') {
         if (source.fillList) {
-          this.handleNullData(source)
+          source.fillList = await handleNullData(
+            source.fillList,
+            this.currSelected.setting
+          )
         }
         if (source.labelList) {
-          this.handleNullData(source, true)
+          source.labelList = await handleNullData(
+            source.labelList,
+            this.currSelected.setting,
+            true
+          )
         }
         Object.keys(source).map(item => {
           if (source[item]) {
@@ -346,6 +351,8 @@ export default {
           }
         })
       } else {
+        // 处理空数据
+        source = await handleNullData(source, this.currSelected.setting)
         rows = [source]
         columns = [this.handleTableColumns(Object.keys(source[0]))]
         exportList = source
@@ -356,26 +363,6 @@ export default {
         tableName
       }
       return exportList
-    },
-    // 返回的空字段补null
-    handleNullData(returnData, isLabel = false) {
-      let apiData = this.currSelected.setting.api_data
-      let dimensions = isLabel ? 'labelDimensions' : 'dimensions'
-      let measures = isLabel ? 'labelMeasures' : 'measures'
-      // 获取所有数据的key
-      let keys = apiData[`${dimensions}`]
-        .concat(apiData[`${measures}`])
-        .map(item => item.alias)
-
-      if (Array.isArray(returnData)) {
-        for (let rowDatas of returnData) {
-          for (let key of keys) {
-            if (typeof rowDatas[key] === 'undefined') {
-              rowDatas[key] = null
-            }
-          }
-        }
-      }
     },
     // 处理表头, 按拖入的维度度量顺序排列
     handleTableColumns(keys,label) {

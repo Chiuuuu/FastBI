@@ -75,6 +75,7 @@
             <!--数据模型不存在-->
             <chart-nodata
               v-if="transform.setting.isEmpty"
+              :isEmpty="transform.setting.isEmpty"
               :config="transform.setting.config"
             ></chart-nodata>
             <!-- 图形 -->
@@ -346,8 +347,7 @@ export default {
       if (this.$route.query.tabId) {
         this.getScreenDetail({
           id: this.$route.query.id,
-          tabId: this.$route.query.tabId,
-          needRefresh: true
+          tabId: this.$route.query.tabId
         })
       }
     },
