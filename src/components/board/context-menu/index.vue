@@ -62,7 +62,7 @@ const exportChartList = [
     icon: 'ios-share',
     text: '查看数据',
     order: 'showChartData',
-    ignore: ['figure', 've-image']
+    ignore: ['figure', 've-image','material'],
   },
   {
     icon: 'ios-download',
@@ -71,8 +71,8 @@ const exportChartList = [
     ignore: ['figure'],
     showChildren: false,
     children: [
-      { text: 'excel', order: 'toexcel', ignore: ['ve-image'] },
-      { text: 'csv', order: 'tocsv', ignore: ['ve-image'] },
+      { text: 'excel', order: 'toexcel', ignore: ['ve-image','material'] },
+      { text: 'csv', order: 'tocsv', ignore: ['ve-image','material'] },
       { text: '图片', order: 'exportImg' }
     ]
   }
@@ -82,7 +82,7 @@ const chartMenuList = [
     icon: 'ios-share',
     text: '查看数据',
     order: 'showChartData',
-    ignore: ['figure', 've-image']
+    ignore: ['figure', 've-image',,'material'],
   },
   {
     icon: 'ios-download',
@@ -91,8 +91,8 @@ const chartMenuList = [
     ignore: ['figure'],
     showChildren: false,
     children: [
-      { text: 'excel', order: 'toexcel', ignore: ['ve-image'] },
-      { text: 'csv', order: 'tocsv', ignore: ['ve-image'] },
+      { text: 'excel', order: 'toexcel', ignore: ['ve-image','material'] },
+      { text: 'csv', order: 'tocsv', ignore: ['ve-image','material'] },
       { text: '图片', order: 'exportImg' }
     ]
   },
@@ -328,7 +328,8 @@ export default {
         Object.keys(source).map(item => {
           if (source[item]) {
             let aliasKeys = this.handleTableColumns(
-              Object.keys(source[item][0]),item
+              Object.keys(source[item][0]),
+              item
             )
             columns.push(aliasKeys)
             rows.push(source[item])
@@ -365,13 +366,15 @@ export default {
       return exportList
     },
     // 处理表头, 按拖入的维度度量顺序排列
-    handleTableColumns(keys,label) {
-      const apiData = this.currSelected.setting.api_data  
-      let fieldList = [] 
-      if(label && label == 'labelList'){
+    handleTableColumns(keys, label) {
+      const apiData = this.currSelected.setting.api_data
+      let fieldList = []
+      if (label && label == 'labelList') {
         // 地图 -- 标记点数据
-        fieldList = [].concat(apiData.labelDimensions).concat(apiData.labelMeasures)
-      }else{
+        fieldList = []
+          .concat(apiData.labelDimensions)
+          .concat(apiData.labelMeasures)
+      } else {
         fieldList = [].concat(apiData.dimensions).concat(apiData.measures)
       }
       const column = []

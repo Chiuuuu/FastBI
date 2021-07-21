@@ -118,13 +118,16 @@ export default {
           return
         }
         self.$nextTick(() => {
-          let chart = self.$refs.chart.echarts
+          let needReset = self.currentIndex === e.dataIndex
+          // 散点图要比较seriesIndex
+          if (self.typeName === 've-scatter') {
+            needReset = self.currentIndex === e.seriesIndex
+          }
           // 重复选择数据，进行重置
-          if (self.currentIndex === e.dataIndex) {
+          if (needReset) {
             // 重置数据颜色样式
             self.resetChartStyle()
             resetOriginData(self.chartId, self.canvasMap)
-            // self.$emit('resetOriginData', self.chartId)
             return
           }
           // 如果被联动筛选过样式不改变
@@ -454,6 +457,7 @@ export default {
       }
       const series = this.chartExtend.series
       if (
+        series &&
         series.itemStyle &&
         series.itemStyle.normal &&
         series.itemStyle.normal.color
@@ -473,7 +477,6 @@ export default {
             // 重置数据颜色样式
             self.resetChartStyle()
             resetOriginData(self.chartId, self.canvasMap)
-            // self.$emit('resetOriginData', self.chartId)
             self.currentIndex = ''
           }
         })
