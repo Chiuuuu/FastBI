@@ -20,6 +20,10 @@ export async function setLinkageData(id, e, canvasMap) {
     dimensionData = apiData.dimensions[apiData.dimensions.length - 1]
   }
   dimensionData.value = [e.name]
+  // 散点图q筛选值是seriesName
+  if (selected.setting.chartType === 'v-scatter') {
+    dimensionData.value = [e.seriesName]
+  }
   // 关联的每个图表进行数据筛选
   for (let chartId of bindCharts) {
     let chart = canvasMap.find(item => item.id === chartId)
