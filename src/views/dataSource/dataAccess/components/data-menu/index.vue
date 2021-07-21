@@ -558,7 +558,6 @@ export default {
       } else if (this.resetName.type === 'reset') {
         this.handleResetName(values)
       }
-      this.resetNameVisible = false
     },
     /**
      * 新增文件夹
@@ -581,11 +580,10 @@ export default {
       if (result.code === 200) {
         this.handleGetMenuList()
         this.$message.success('新建成功')
+        this.resetNameVisible = false
       } else {
         this.$message.error(result.msg)
       }
-
-      this.resetNameVisible = false
     },
     /**
      * 修改文件夹及菜单名称
@@ -615,11 +613,10 @@ export default {
           this.$store.commit('dataAccess/SET_MODELNAME', values.name)
         }
         this.$message.success('修改成功')
+        this.resetNameVisible = false
       } else {
         this.$message.error(result.msg)
       }
-
-      this.resetNameVisible = false
     },
     /**
      * 判断是否有相同名称
