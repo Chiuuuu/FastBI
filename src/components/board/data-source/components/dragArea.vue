@@ -65,6 +65,7 @@ import { Loading } from 'element-ui'
 import _ from 'lodash'
 // import navigateList from '@/config/navigate'
 import sourceMap from './defaultData'
+import handleNullData from '@/utils/handleNullData'
 
 export default {
   props: {
@@ -669,16 +670,17 @@ export default {
       selected.setting.isEmpty = false
       // 数据源被删掉
       if (res.code === 500 && res.msg === 'IsChanged') {
-        selected.setting.isEmpty = true
+        selected.setting.isEmpty = 'noData'
         this.updateChartData()
         return
       }
       if (res.code === 200) {
+        let datas = res.rows
+        datas = await handleNullData(datas, this.currSelected.setting)
         // 保存原始数据 -- 查看数据有用
         apiData.origin_source = deepClone(res.rows || res.data || {})
         this.$store.dispatch('SetSelfDataSource', apiData)
 
-        let datas = res.rows
         // 去掉排序的数据
         if (
           apiData.options &&

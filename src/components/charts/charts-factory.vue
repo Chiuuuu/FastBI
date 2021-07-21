@@ -446,6 +446,12 @@ export default {
     },
     // 重置图表样式(图表联动)
     resetChartStyle() {
+      if (!this.chartExtend) {
+        return
+      }
+      if (this.typeName === 've-map') {
+        return
+      }
       const series = this.chartExtend.series
       if (
         series.itemStyle &&
