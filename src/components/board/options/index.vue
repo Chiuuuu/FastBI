@@ -758,7 +758,7 @@
               <a-collapse-panel
                 key="properties"
                 header="图形属性"
-                v-if="(isPie || isRing || isMultiPie) && selfConfig.series"
+                v-if="(isPie || isSun || isRing || isMultiPie) && selfConfig.series"
               >
                 <gui-field label="中心坐标">
                   <gui-inline>
@@ -855,26 +855,7 @@
                 />
                 <!-- <gui-field label="显示内容"> -->
                 显示内容
-                <!-- 旭日图独有 -->
                 <a-select
-                  v-if="chartType == 'v-sun'"
-                  mode="multiple"
-                  placeholder="选择显示内容"
-                  v-model="sunVal"
-                  style="width: 100%"
-                  @change="onChange"
-                >
-                  <a-select-option
-                    v-for="i in formatSunList"
-                    :key="i.label"
-                    :value="i.value"
-                  >
-                    {{ i.label }}
-                  </a-select-option>
-                </a-select>
-
-                <a-select
-                  v-else
                   mode="multiple"
                   placeholder="选择显示内容"
                   v-model="selfConfig.series.label.formatterSelect"
@@ -994,6 +975,43 @@
                   size="small"
                 />
                 <Heatmap3 :self-config="selfConfig" />
+              </a-collapse-panel>
+            </template>
+
+            <!-- 旭日图独有 -->
+            <template v-if="isSun">
+              <a-collapse-panel key="sun1" header="指标设置">
+                <a-switch
+                  slot="extra"
+                  v-if="collapseActive.indexOf('sun1') > -1"
+                  v-model="selfConfig.series.label.show"
+                  default-checked
+                  @change="switchChange"
+                  size="small"
+                />
+                <Sun1 :self-config="selfConfig" />
+              </a-collapse-panel>
+              <a-collapse-panel key="sun2" header="鼠标移入提示">
+                <a-switch
+                  slot="extra"
+                  v-if="collapseActive.indexOf('sun2') > -1"
+                  v-model="selfConfig.series.tooltip.show"
+                  default-checked
+                  @change="switchChange"
+                  size="small"
+                />
+                <Sun2 :self-config="selfConfig" />
+              </a-collapse-panel>
+              <a-collapse-panel key="sun3" header="图例设置">
+                <a-switch
+                  slot="extra"
+                  v-if="collapseActive.indexOf('sun3') > -1"
+                  v-model="selfConfig.visualMap.show"
+                  default-checked
+                  @change="switchChange"
+                  size="small"
+                />
+                <Sun3 :self-config="selfConfig" />
               </a-collapse-panel>
             </template>
 
@@ -3131,6 +3149,9 @@ import Treemap3 from './treemap/treemap-3.vue'
 import Heatmap1 from './heatmap/heatmap-1.vue'
 import Heatmap2 from './heatmap/heatmap-2.vue'
 import Heatmap3 from './heatmap/heatmap-3.vue'
+import Sun1 from './sun/sun-1.vue'
+import Sun2 from './sun/sun-2.vue'
+import Sun3 from './sun/sun-3.vue'
 import HighChartPie from '@/components/board/options/highchart-pie'
 import HighChartBar from '@/components/board/options/highchart-bar'
 import { Divider } from 'ant-design-vue'
@@ -3848,7 +3869,7 @@ export default {
       return this.chartType === 'v-bar'
     },
     isPie() {
-      return this.chartType === 'v-pie' || this.chartType === 'v-sun'
+      return this.chartType === 'v-pie'
     },
     isMultiPie() {
       return this.chartType === 'v-multiPie'
@@ -3886,6 +3907,9 @@ export default {
     },
     isHeatmap() {
       return this.chartType === 'v-heatmap'
+    },
+    isSun() {
+      return this.chartType === 'v-sun'
     },
     // 是否为矩形树图
     isTreemap() {
@@ -3965,6 +3989,9 @@ export default {
     Heatmap1,
     Heatmap2,
     Heatmap3,
+    Sun1,
+    Sun2,
+    Sun3,
     HighChartPie,
     HighChartBar
   }

@@ -1952,7 +1952,7 @@ const list = [{
         //   bottom: 30
         // },
         tooltip: {
-          show: true
+          trigger: 'item'
         },
         visualMap: {
           type: 'continuous',
@@ -1965,7 +1965,7 @@ const list = [{
           top: 'bottom', // 上 中 下
           // bottom: '5%',
           inRange: {
-            color: ['#ffc53d', '#13c2c2', '#1890ff', '#73d13d']
+            color: ['#f69f2e', '#0fabf1', '#ed8693', '#ffff0d', '#0d8686']
           },
           textStyle: {
             color: '#fff',
@@ -1981,13 +1981,21 @@ const list = [{
           },
           center: ['50%', '50%'],
           radius: [0, '80%'],
+          labelShowList: [], // 记录指标显示的字段
+          tooltipShowList: [], // 记录气泡显示的字段
+          tooltip: {
+            show: true,
+            formatter: '{b}',
+            position: 'top'
+          },
           label: {
             show: true,
             fontSize: 12,
             color: '#fff',
             formatter: '{b}',
             position: 'inside',
-            rotate: 'radial'
+            rotate: 'radial',
+            orient: 'vertical'
           },
           itemStyle: {
             borderColor: '#fff',

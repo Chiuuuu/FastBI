@@ -266,9 +266,7 @@ export default {
           this.currSelected.setting.chartType === 'v-treemap' ||
           this.currSelected.setting.chartType === 'v-sun'
         ) {
-          if (this.currSelected.setting.chartType !== 'v-sun') {
-            this.handleShowList(dataFile, 4)
-          }
+          this.handleShowList(dataFile, 4)
           // 矩形树图可以拖入5个维度
           if (this.fileList.length < 5) {
             this.fileList.push(dataFile)
@@ -317,9 +315,7 @@ export default {
           this.currSelected.setting.chartType === 'v-treemap' ||
           this.currSelected.setting.chartType === 'v-sun'
         ) {
-          if (this.currSelected.setting.chartType !== 'v-sun') {
-            this.handleShowList(dataFile, 0)
-          }
+          this.handleShowList(dataFile, 0)
           // 矩形树图暂时只能拉入一个度量
           this.fileList[0] = dataFile
         } else {
@@ -702,8 +698,6 @@ export default {
         // 矩形树图数据处理
         if (this.currSelected.setting.chartType === 'v-treemap') {
           return this.handleTreemapConfig(res.rows)
-        } else if (this.currSelected.setting.chartType === 'v-heatmap') {
-          
         }
         if (this.type === 'tableList') {
           let columns = []

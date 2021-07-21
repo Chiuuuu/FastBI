@@ -103,13 +103,23 @@ export default {
         let result = []
         this.apiData.dimensions.map((item, index) => {
           if (series[type + 'ShowList'].includes(item.alias)) {
-            result.push(params.data[index])
+            if (this.config.title.content === '旭日图') {
+              if (params.treePathInfo.length - 1 > index) {
+                result.push(params.treePathInfo[index + 1].name)
+              }
+            } else {
+              result.push(params.data[index])
+            }
           }
         })
         if (this.apiData.measures[0]) {
           const measureAlias = this.apiData.measures[0].alias
           if (series[type + 'ShowList'].includes(measureAlias)) {
-            result.push(params.data[params.data.length - 1])
+            if (this.config.title.content === '旭日图') {
+              result.push(params.data.value)
+            } else {
+              result.push(params.data[params.data.length - 1])
+            }
           }
         }
         return result.toString()
