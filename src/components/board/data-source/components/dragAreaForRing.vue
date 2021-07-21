@@ -304,7 +304,7 @@ export default {
       selected.setting.isEmpty = false
       // 数据源被删掉
       if (res.code === 500 && res.msg === 'IsChanged') {
-        selected.setting.isEmpty = true
+        selected.setting.isEmpty = 'noData'
         this.updateChartData()
         return
       }

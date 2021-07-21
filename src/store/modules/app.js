@@ -387,7 +387,7 @@ const app = {
                 }
                 // 图表模型被删掉
                 if (dataItem[id] === 'IsChanged') {
-                  chart.setting.isEmpty = true
+                  chart.setting.isEmpty = 'noData'
                   continue
                 }
                 chart.setting.isEmpty = false

@@ -260,7 +260,7 @@ export default {
     },
     // 点击右键显示更多
     showMore(item) {
-        this.judgeDataType(item.dataType)
+      this.judgeDataType(item.dataType)
       item.showMore = true
     },
     // 修改数据聚合方式
@@ -399,12 +399,13 @@ export default {
       selected.setting.isEmpty = false
       // 数据源被删掉
       if (res.code === 500 && res.msg === 'IsChanged') {
-        selected.setting.isEmpty = true
+        selected.setting.isEmpty = 'noData'
         this.updateChartData()
         loadingInstance.close()
         return
       }
       if (res.code === 200) {
+        res.fillList = await handleNullData(res.fillList, this.currSelected.setting)
         // 保存原始数据 -- 查看数据有用
         apiData.origin_source = deepClone(res.rows || res.data || {})
         this.$store.dispatch('SetSelfDataSource', apiData)
