@@ -334,6 +334,7 @@ export default {
           this.$store.commit('dataModel/SET_MODELNAME', form.name)
         }
         this.$message.success('修改成功')
+        this.resetName.visible = false
       } else {
         this.$message.error(result.msg)
       }
@@ -553,6 +554,7 @@ export default {
       if (result.code === 200) {
         this.$message.success('添加成功')
         this.handleGetMenuList()
+        this.resetName.visible = false
       } else {
         this.$message.error(result.msg)
       }
@@ -572,7 +574,6 @@ export default {
       } else if (this.resetName.type === 'new') {
         this._addNewFolder(values)
       }
-      this.resetName.visible = false
     }
   }
 }
