@@ -254,6 +254,13 @@ export default {
         } else if (isInBindList) {
           chartApiData.interactive = { beBinded: this.currentSelected }
         }
+        // 联动的数据不保存
+        if (chart.setting.api_data.selectData) {
+          let cloneChart = Object.assign({}, chart)
+          delete cloneChart.setting.api_data.selectData
+          updateList.push(cloneChart)
+          continue
+        }
         updateList.push(chart)
       }
       // 批量保存图表绑定关系
