@@ -42,7 +42,7 @@ async function getBindData(chart, dimensionData) {
   }
   let { pivotschemaId, dataType, value, name } = dimensionData
   let dimensionsLimit = [{ pivotschemaId, type: 1, dataType, value, name }]
-  apiData.dataLink = { ...apiData.options, dimensionsLimit }
+  apiData.dataLink = { dimensionsLimit }
   let res = await screenManage.getDataLink(chart)
   if (res.code === 200) {
     let columns = []
