@@ -435,7 +435,7 @@ export default {
         +new Date(this.form.gmtEnd) < +new Date(value)
       ) {
         this.errorState = 2
-        callback(new Error('结束时间不能小于开始时间'))
+        callback(new Error('开始时间不能大于结束时间'))
       } else {
         this.errorState = 0
         callback()
