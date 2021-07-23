@@ -442,7 +442,7 @@ export default {
             config.series.unshift(
               Object.assign({}, mapSeries, {
                 data: datas,
-                name: measure.alias,
+                name: measure.alias + 'fill',
                 pointShowList: [showName],
                 tooltipShowList: [alias, measure.alias]
               })
@@ -491,7 +491,7 @@ export default {
           config.series.unshift(
             Object.assign({}, mapSeries, {
               data: datas,
-              name: alias,
+              name: alias + 'fill',
               pointShowList: ['地区名'],
               tooltipShowList: [
                 apiData.latitude[0].alias,

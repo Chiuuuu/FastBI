@@ -10,6 +10,7 @@ export const visualMapConfig = {
     // color: ['#50a3ba', '#eac736', '#d94e5d'],
     symbolSize: [10, 16]
   },
+  calculable: true,
   textStyle: {
     color: '#fff',
     fontSize: 12
@@ -28,6 +29,7 @@ export const mapSeries = {
   showLegendSymbol: false,
   zoom: 1.1,
   roam: false,
+  legendHoverLink: false,
   mapLocation: {
     x: 'left',
     y: 'top'

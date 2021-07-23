@@ -142,7 +142,7 @@ async function setMapData(chart, newData) {
       }
       seriesObj = Object.assign(mapSeries, {
         data: datas,
-        name,
+        name: name + 'fill',
         pointShowList: [showName],
         tooltipShowList: [alias, name]
       })
@@ -175,7 +175,7 @@ async function setMapData(chart, newData) {
       }
       seriesObj = Object.assign(mapSeries, {
         data: datas,
-        name,
+        name: name + 'fill',
         pointShowList: ['地区名'],
         tooltipShowList: [
           apiData.latitude[0].alias,
