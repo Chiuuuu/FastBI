@@ -474,7 +474,6 @@ export default {
       this.fileList.splice(index, 1)
       await this.getData()
       let current = deepClone(this.currSelected)
-      console.log('777', current)
       // 维度度量删除完以后重置该图表数据
       if (this.chartType === '1' || this.chartType === '2') {
         if (
@@ -490,15 +489,12 @@ export default {
             apis.level = [['1/1', '1/2', '1/3'], ['1/4', '1/5']]
             this.$store.dispatch('SetApis', apis)
           }
-          // 立体图重置
+          // 立体图和矩形热力图 旭日图重置
           if (
-            (current.setting.chartType === 'high-pie') |
+            (current.setting.chartType === 'high-pie') ||
             (current.setting.chartType === 'high-column')
           ) {
             let res = sourceMap[current.setting.chartType]
-            // let res = navigateList[0].tabs[0].children;
-            console.log('深拷贝', JSON.parse(JSON.stringify(res)))
-            console.log('原始数据', sourceMap[current.setting.chartType])
             current.setting.config.series = JSON.parse(JSON.stringify(res))
             this.$store.dispatch('SetSelfProperty', current.setting.config)
             this.updateChartData()
@@ -514,29 +510,17 @@ export default {
           current.setting.config.chartTitle.text = '70%'
           this.$store.dispatch('SetSelfProperty', current.setting.config)
         }
-        // 矩形树图清空数据
-        if (current.setting.chartType === 'v-treemap') {
-          if (this.fileList.length === 0) {
-            current.setting.config.series.data = []
-            current.setting.config.visualMap.pieces = []
-            current.setting.config.visualMap.type = 'continuous'
-            current.setting.config.visualMap.inRange.color =
-              current.setting.config.series.continuousColors
+
+        if ((current.setting.chartType === 'v-treemap') ||
+          (current.setting.chartType === 'v-sun') ||
+          (current.setting.chartType === 'v-heatmap')) {
+
+          // 没有维度度量, 重置数据
+          if (current.setting.api_data.dimensions.length === 0 &&
+          current.setting.api_data.measures.length === 0) {
+            let res = sourceMap[current.setting.chartType]
+            current.setting.config = JSON.parse(JSON.stringify(res))
           }
-          const tooltipShowList = current.setting.config.series.tooltipShowList
-          for (let i = 0; i < tooltipShowList.length; i++) {
-            if (item.alias === tooltipShowList[i]) {
-              tooltipShowList.splice(i, 1)
-            }
-          }
-          const labelShowList = current.setting.config.series.labelShowList
-          for (let i = 0; i < labelShowList.length; i++) {
-            if (item.alias === labelShowList[i]) {
-              labelShowList.splice(i, 1)
-            }
-          }
-          this.$store.dispatch('SetSelfProperty', current.setting.config)
-        } else if (current.setting.chartType === 'v-sun' || current.setting.chartType === 'v-heatmap') {
           const tooltipShowList = current.setting.config.series.tooltipShowList
           for (let i = 0; i < tooltipShowList.length; i++) {
             if (item.alias === tooltipShowList[i]) {
@@ -705,6 +689,34 @@ export default {
         // 矩形树图数据处理
         if (this.currSelected.setting.chartType === 'v-treemap') {
           return this.handleTreemapConfig(res.rows)
+        } else if (this.currSelected.setting.chartType === 'v-sun') {
+          let setting = deepClone(this.currSelected.setting)
+          let config = setting.config
+          config.series.data = res.rows
+          this.updateChartData()
+        } else if (this.currSelected.setting.chartType === 'v-heatmap') {
+          let setting = deepClone(this.currSelected.setting)
+          let config = setting.config
+          // 维度
+          let dim = apiData.dimensions.map(x => x.alias)
+          // 度量
+          let mea = apiData.measures.map(y => y.alias)
+          if ((dim.length === 0) | (mea.length === 0)) {
+            return
+          }
+          // 获取度量数组
+          let meaarr = res.rows.map(h => h[mea[0]])
+          if (meaarr.includes(undefined)) {
+            return
+          }
+          let _series = res.rows.map(item => [
+            item[dim[0]],
+            item[dim[1]],
+            item[mea[0]]
+          ])
+          config.visualMap.max = Math.max(...meaarr)
+          config.series.data = [..._series]
+          this.$store.dispatch('SetSelfProperty', config)
         }
         if (this.type === 'tableList') {
           let columns = []

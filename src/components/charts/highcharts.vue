@@ -95,7 +95,7 @@ export default {
         // 记录当前选择数据的index
         self.currentIndex = e.point.index
         // 兼容echarts处理, echarts的e.name就是维度值
-        e.name = e.point.name
+        e.name = e.point.name || e.point.category
         setLinkageData(self.chartId, e, self.canvasMap)
       })
     },
