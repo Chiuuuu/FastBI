@@ -1999,6 +1999,7 @@ const list = [
               series: {
                 type: 'sunburst',
                 nodeClick: false,
+                sort: null,
                 emphasis: {
                   focus: 'ancestor'
                 },
@@ -2176,7 +2177,7 @@ const list = [
               },
               visualMap: {
                 show: true,
-                type: 'continuous',
+                type: 'piecewise',
                 orient: 'horizontal',
                 dimension: 1,
                 max: 0,
@@ -2185,8 +2186,16 @@ const list = [
                   fontSize: 12
                 },
                 inRange: {
-                  color: ['#ffff0d', '#f69f2e']
+                  color: ['#f69f2e', '#0fabf1', '#ed8693', '#ffff0d', '#0d8686']
                 },
+                pieces: [
+                  { label: '广州市', value: 800 },
+                  { label: '深圳市', value: 100 },
+                  { label: '东莞市', value: 100 },
+                  { label: '南京市', value: 700 },
+                  { label: '苏州市', value: 200 },
+                  { label: '无锡市', value: 100 }
+                ],
                 itemGap: 12,
                 left: 'center',
                 top: 'auto',
@@ -2817,6 +2826,7 @@ const list = [
                 gridLineWidth: 0, // 纵向网格线宽度
                 labels: {
                   rotation: 20,
+                  format: '{value}',
                   style: {
                     color: '#fff',
                     fontSize: 12,
