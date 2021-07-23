@@ -59,7 +59,7 @@
     <a-form-model-item class="form-not-required" label="默认连接库" prop="databaseName" v-if="connectStatus">
       <a-select
         v-model="form.databaseName"
-        :default-value="form.databaseName || databaseList[0].name"
+        :default-value="form.databaseName || databaseList[0] ? databaseList[0].name : ''"
         @change="handleDefaultDbSelect"
       >
         <a-select-option
@@ -282,7 +282,7 @@ export default {
               // this.form.dbid = item.id
               this.form.databaseName = item.name
             } else {
-              this.form.databaseName = this.databaseList[0].name
+              this.form.databaseName = this.databaseList[0] ? this.databaseList[0].name : ''
               // this.form.dbid = this.databaseList[0].id
             }
             this.connectStatus = true
@@ -341,6 +341,7 @@ export default {
             this.$store.dispatch('dataAccess/setModelName', this.form.name)
             this.$store.dispatch('dataAccess/setDatabaseName', this.form.databaseName)
             this.$store.dispatch('dataAccess/setModelId', result.data.id)
+                this.$store.commit('common/SET_MENUSELECTID', result.data.id)
             this.$store.commit('common/SET_PRIVILEGES', result.data.privileges)
             // this.$store.dispatch('dataAccess/setParentId', 0)
           } else {

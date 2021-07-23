@@ -414,12 +414,15 @@ export default {
       // 矩形树图
       if (this.chartType === 'v-treemap') {
         const series = options.series[0] ? options.series[0] : options.series
-        this.handleTreemapFormatter(series, 'tooltip')
-        this.handleTreemapFormatter(series, 'label')
-        // 如果有图表联动, 则渲染联动的数据
-        if (this.apiData.selectData) {
-          series.data = this.apiData.selectData.data
-          options.visualMap.pieces = this.apiData.selectData.pieces
+        // 有拖入数据才处理
+        if (this.apiData.dimensions.length > 0 && this.apiData.measures.length > 0) {
+          this.handleTreemapFormatter(series, 'tooltip')
+          this.handleTreemapFormatter(series, 'label')
+          // 如果有图表联动, 则渲染联动的数据
+          if (this.apiData.selectData) {
+            series.data = this.apiData.selectData.data
+            options.visualMap.pieces = this.apiData.selectData.pieces
+          }
         }
       }
       return options

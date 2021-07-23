@@ -134,9 +134,16 @@ export default {
         //   let max = val.series.data.map(item=>item.value);
         //   val.visualMap.max = Math.max(...max)
         // }
+        // 有拖入数据才处理
         const config = deepClone(val)
-        this.handleFormatter(config.series, 'tooltip')
-        this.handleFormatter(config.series, 'label')
+        if (this.apiData.dimensions.length > 0 && this.apiData.measures.length > 0) {
+          this.handleFormatter(config.series, 'tooltip')
+          this.handleFormatter(config.series, 'label')
+          // 如果有图表联动, 则渲染联动的数据
+          if (this.apiData.selectData) {
+            config.series.data = this.apiData.selectData.data
+          }
+        }
         this.Init(config)
       },
       deep: true
