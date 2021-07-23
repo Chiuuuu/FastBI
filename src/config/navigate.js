@@ -2826,7 +2826,6 @@ const list = [
                 gridLineWidth: 0, // 纵向网格线宽度
                 labels: {
                   rotation: 20,
-                  format: '{value}',
                   style: {
                     color: '#fff',
                     fontSize: 12,
@@ -2851,6 +2850,7 @@ const list = [
                 gridLineColor: '#fff', // 网格线颜色
                 gridLineWidth: 1, // 纵向网格线宽度
                 labels: {
+                  format: '{value}',
                   style: {
                     color: '#fff',
                     fontSize: 12,

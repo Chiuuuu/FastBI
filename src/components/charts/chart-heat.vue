@@ -48,7 +48,17 @@ export default {
     Init(val) {
       this.option = val || this.config
       this.mychart = this.$echarts.init(this.$refs.dvsheat)
-      this.mychart.setOption(val || this.config, true)
+      // 有拖入数据才处理
+      const config = this.option
+      if (this.apiData.dimensions.length > 0 && this.apiData.measures.length > 0) {
+        this.handleFormatter(config.series, 'tooltip')
+        this.handleFormatter(config.series, 'label')
+        // 如果有图表联动, 则渲染联动的数据
+        if (this.apiData.selectData) {
+          config.series.data = this.apiData.selectData.data
+        }
+      }
+      this.mychart.setOption(config, true)
     },
     clickEvent(e) {
       let self = this
@@ -136,14 +146,14 @@ export default {
         // }
         // 有拖入数据才处理
         const config = deepClone(val)
-        if (this.apiData.dimensions.length > 0 && this.apiData.measures.length > 0) {
-          this.handleFormatter(config.series, 'tooltip')
-          this.handleFormatter(config.series, 'label')
-          // 如果有图表联动, 则渲染联动的数据
-          if (this.apiData.selectData) {
-            config.series.data = this.apiData.selectData.data
-          }
-        }
+        // if (this.apiData.dimensions.length > 0 && this.apiData.measures.length > 0) {
+        //   this.handleFormatter(config.series, 'tooltip')
+        //   this.handleFormatter(config.series, 'label')
+        //   // 如果有图表联动, 则渲染联动的数据
+        //   if (this.apiData.selectData) {
+        //     config.series.data = this.apiData.selectData.data
+        //   }
+        // }
         this.Init(config)
       },
       deep: true
@@ -169,7 +179,6 @@ export default {
           if (val.selectData) {
             list = val.selectData.rows
           }
-          // 判断是否为旭日图
           if (this.config.title.content === '旭日图') {
             let max = list.map(item => item.value)
             this.option.visualMap.max = Math.max(...max)

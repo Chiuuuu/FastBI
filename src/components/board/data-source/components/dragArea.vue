@@ -514,7 +514,6 @@ export default {
         if ((current.setting.chartType === 'v-treemap') ||
           (current.setting.chartType === 'v-sun') ||
           (current.setting.chartType === 'v-heatmap')) {
-
           // 没有维度度量, 重置数据
           if (current.setting.api_data.dimensions.length === 0 &&
           current.setting.api_data.measures.length === 0) {
@@ -534,6 +533,7 @@ export default {
             }
           }
           this.$store.dispatch('SetSelfProperty', current.setting.config)
+          this.updateChartData()
         }
       }
       if (this.chartType === '3') {
