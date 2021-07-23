@@ -330,8 +330,15 @@ export default {
           return
         }
         if (res.code === 200) {
+          // 过滤空字段
           // 拆维度列表
-          dataFile.originList = res.rows.map(item => Object.values(item)[0]) // 维度全字段列表
+          let list = []
+          res.rows.forEach(item => {
+            if (item) {
+              list.push(Object.values(item)[0])
+            }
+          }) // 维度全字段列表
+          dataFile.originList = list
           dataFile.searchList = dataFile.originList
           dataFile.checkedList = [] // 勾选的字段列表
           dataFile.manualList = [] // 手动输入列表
@@ -689,7 +696,7 @@ export default {
 
         // 处理空数据
         datas = await handleNullData(datas, this.currSelected.setting)
-        
+
         // 去掉排序的数据
         if (apiData.options.sort.length) {
           let filterArr = []

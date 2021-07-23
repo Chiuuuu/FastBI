@@ -35,7 +35,8 @@ const app = {
     pageList: [],
     currentPageId: '',
     isPublish: '', // 大屏是否已发布
-    polymerizeType: [ // 聚合方式及中文映射
+    polymerizeType: [
+      // 聚合方式及中文映射
       { name: '求和', value: 'SUM' },
       { name: '平均', value: 'AVG' },
       { name: '最大值', value: 'MAX' },
@@ -303,9 +304,34 @@ const app = {
       // 图表联动数据selectData不保存后台
       if (params.setting.api_data.selectData) {
         delete params.setting.api_data.selectData
-        // if (params.setting.chartType === 'v-treemap') {
-        //   params.setting.config.series.data = chart.setting.api_data.source
-        // }
+        // 热力图旭日图还原数据
+        let dataList = params.setting.api_data.source.rows
+        if (params.setting.name === 've-sun') {
+          let max = dataList.map(item => item.value)
+          params.setting.config.visualMap.max = Math.max(...max)
+          params.setting.config.series.data = chart.setting.api_data.source.rows
+        }
+        if (params.setting.name === 've-heatmap') {
+          // 维度
+          let dim = params.setting.api_data.dimensions.map(x => x.alias)
+          // 度量
+          let mea = params.setting.api_data.measures.map(y => y.alias)
+          if ((dim.length === 0) | (mea.length === 0)) {
+            return
+          }
+          // 获取度量数组
+          let meaarr = dataList.map(h => h[mea[0]])
+          if (meaarr.includes(undefined)) {
+            return
+          }
+          let _series = dataList.map(item => [
+            item[dim[0]],
+            item[dim[1]],
+            item[mea[0]]
+          ])
+          params.setting.config.visualMap.max = Math.max(...meaarr)
+          params.setting.config.series.data = [..._series]
+        }
       }
       return screenManage.updateChart(params)
     },

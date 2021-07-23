@@ -114,12 +114,6 @@ export function resetOriginData(id, canvasMap) {
     if (!chart) {
       continue
     }
-    // // 矩形树图, 重置series.data值
-    // if (chart.setting.chartType === 'v-treemap') {
-    //   let config = deepClone(chart.setting.config)
-    //   config.series.data = chart.setting.api_data.source
-    //   store.dispatch('SetSelfProperty', config)
-    // }
     // 删除联动数据
     let apiData = chart.setting.api_data
     Vue.delete(apiData, 'selectData')

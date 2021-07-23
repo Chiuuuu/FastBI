@@ -4,12 +4,16 @@
 </template>
 <script>
 import { DEFAULT_COLORS } from '@/utils/defaultColors'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import { setLinkageData, resetOriginData } from '@/utils/setDataLink'
 import { deepClone } from '@/utils/deepClone'
 export default {
   name: 'chartHeat',
   props: {
+    chartId: {
+      type: String,
+      required: true
+    },
     config: {
       type: Object,
       required: true
@@ -45,10 +49,11 @@ export default {
     this.mychart.on('click', this.clickEvent)
   },
   methods: {
+    ...mapActions(['updateChartData']),
     Init(val) {
       this.option = val || this.config
       this.mychart = this.$echarts.init(this.$refs.dvsheat)
-      this.mychart.setOption(val || this.config, true)
+      this.mychart.setOption(this.option, true)
     },
     clickEvent(e) {
       let self = this
@@ -124,24 +129,67 @@ export default {
         }
         return result.toString()
       }
+    },
+    // 设置图表数据
+    setSeriesData(list, isDataLink) {
+      //   this.option = isNeedSave ? this.option : deepClone(this.option)
+      // 判断是否为旭日图
+      if (this.config.title.content === '旭日图') {
+        let max = list.map(item => item.value)
+        this.option.visualMap.max = Math.max(...max)
+        this.option.series.data = [...list]
+        // 构造完series数据要保存数据库
+        if (isDataLink) {
+          return
+        }
+        this.updateChartData(this.chartId)
+        // this.$store.dispatch('SetSelfProperty', this.option)
+        // 防止多次setOption
+        // this.mychart.clear()
+        // this.mychart.setOption(this.option, true)
+      } else {
+        // 维度
+        let dim = this.apiData.dimensions.map(x => x.alias)
+        // 度量
+        let mea = this.apiData.measures.map(y => y.alias)
+        if ((dim.length === 0) | (mea.length === 0)) {
+          return
+        }
+        // 获取度量数组
+        let meaarr = list.map(h => h[mea[0]])
+        if (meaarr.includes(undefined)) {
+          return
+        }
+        let _series = list.map(item => [
+          item[dim[0]],
+          item[dim[1]],
+          item[mea[0]]
+        ])
+        if (this.mychart != null) {
+          //   this.option.xAxis.data = val.source.rows.map(x=>(x[dim[0]]));
+          this.option.visualMap.max = Math.max(...meaarr)
+          this.option.series.data = [..._series]
+          // 构造完series数据要保存数据库
+          if (isDataLink) {
+            return
+          }
+          this.updateChartData(this.chartId)
+          //   this.$store.dispatch('SetSelfProperty', this.option)
+          // 防止多次setOption
+          //   this.mychart.clear()
+          //   this.mychart.setOption(this.option, true)
+        }
+      }
     }
   },
   watch: {
     config: {
       handler(val) {
-        // if(val.title.text!=="矩形热力图"){
-        //   debugger
-        //   let max = val.series.data.map(item=>item.value);
-        //   val.visualMap.max = Math.max(...max)
-        // }
         const config = deepClone(val)
         this.handleFormatter(config.series, 'tooltip')
         this.handleFormatter(config.series, 'label')
-        // 如果有图表联动, 则渲染联动的数据
-        if (this.apiData.selectData) {
-          config.series.data = this.apiData.selectData.data
-        }
-        this.Init(config)
+        this.option = val
+        this.mychart.setOption(this.option, true)
       },
       deep: true
       // immediate: true
@@ -155,55 +203,19 @@ export default {
       deep: true,
       immediate: true
     },
-    apiData: {
+    'apiData.source.rows': {
       handler(val) {
-        if (val.source) {
-          if (!val.source.rows) {
-            return
-          }
-          let list = val.source.rows
-          // 是否有联动数据
-          if (val.selectData) {
-            list = val.selectData.rows
-          }
-          // 判断是否为旭日图
-          if (this.config.title.content === '旭日图') {
-            let max = list.map(item => item.value)
-            this.option.visualMap.max = Math.max(...max)
-            this.option.series.data = [...list]
-            // this.$store.dispatch('SetSelfProperty', this.option)
-            this.mychart.setOption(this.option)
-          } else {
-            // 维度
-            let dim = val.dimensions.map(x => x.alias)
-            // 度量
-            let mea = val.measures.map(y => y.alias)
-            if ((dim.length === 0) | (mea.length === 0)) {
-              return
-            }
-            // 获取度量数组
-            let meaarr = list.map(h => h[mea[0]])
-            if (meaarr.includes(undefined)) {
-              return
-            }
-            let _series = list.map(item => [
-              item[dim[0]],
-              item[dim[1]],
-              item[mea[0]]
-            ])
-            if (this.mychart != null) {
-              //   this.option.xAxis.data = val.source.rows.map(x=>(x[dim[0]]));
-              this.option.visualMap.max = Math.max(...meaarr)
-              this.option.series.data = [..._series]
-            //   this.$store.dispatch('SetSelfProperty', this.option)
-              this.mychart.setOption(this.option)
-            }
-            // console.clear();
-          }
+        if (val) {
+          this.setSeriesData(val, false)
         }
-      },
-      deep: true
-      // immediate: true,
+      }
+    },
+    'apiData.selectData.rows': {
+      handler(val) {
+        if (val) {
+          this.setSeriesData(val, true)
+        }
+      }
     },
     background: {
       handler(objcolor) {
