@@ -250,6 +250,8 @@ export default {
                   return str.join(' ')
                 } else if (type === 've-radar') {
                   return params.value.toFixed(2)
+                } else if (chartType === 'v-treemap') {
+                  return params.value[0].toFixed(2)
                 } else {
                   return params.data.toFixed(2)
                 }

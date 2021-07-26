@@ -267,6 +267,16 @@ export default {
         measures: []
       }, // 存储维度度量数据
       apiData: {},
+      sortList: [], // 排序列表
+      arcList: [
+        { name: '无', value: '' },
+        { name: '升序', value: 1 },
+        { name: '降序', value: 0 },
+      ],
+      sortData: {
+        pivotschemaId: '', // 排序的字段
+        asc: '' // 字段排序 升序true 降序false
+      },
       refresh: {
         isRefresh: false, // 是否启用定时刷新
         frequency: 1, // 刷新频率
@@ -291,6 +301,8 @@ export default {
     currSelected: {
       handler(val) {
         if (val.setting.api_data) {
+          this.sortList = [{ name: '选择字段', id: '' }]
+          this.sortData = {}
           let apiData = deepClone(val.setting.api_data)
           this.apiData = apiData
           // 选中的维度度量组合成排序列表
