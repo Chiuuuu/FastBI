@@ -37,7 +37,7 @@ export async function setLinkageData(id, e, canvasMap) {
 async function getBindData(chart, dimensionData) {
   let apiData = chart.setting.api_data
   // 进行过数据筛选的不再执行联动
-  if (apiData.options.fileList) {
+  if (apiData.options.fileList && apiData.options.fileList.length && apiData.options.fileList.length > 0) {
     return
   }
   let { pivotschemaId, dataType, value, name } = dimensionData
