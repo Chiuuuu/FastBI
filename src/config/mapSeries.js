@@ -18,6 +18,8 @@ export const visualMapConfig = {
   left: 'left',
   top: 'bottom',
   itemGap: 10,
+  itemSymbol: 'roundRect',
+  align: 'left',
   orient: 'vertical'
 }
 

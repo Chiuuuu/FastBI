@@ -254,12 +254,13 @@ const list = [
               legend: {
                 show: true,
                 orient: 'horizontal',
+                align:'left',
                 textStyle: {
                   color: '#ffffff',
                   fontSize: 12
                 },
                 itemGap: 12,
-                icon: '',
+                icon: 'roundRect',
                 left: 'center',
                 top: 'top',
                 right: 'auto',
@@ -459,12 +460,13 @@ const list = [
               legend: {
                 show: true,
                 orient: 'horizontal',
+                align:'left',
                 textStyle: {
                   color: '#ffffff',
                   fontSize: 12
                 },
                 itemGap: 12,
-                icon: '',
+                icon: 'roundRect',
                 left: 'center',
                 top: 'top',
                 right: 'auto',
@@ -652,12 +654,13 @@ const list = [
               legend: {
                 show: true,
                 orient: 'horizontal',
+                align:'left',
                 textStyle: {
                   color: '#ffffff',
                   fontSize: 12
                 },
                 itemGap: 12,
-                icon: '',
+                icon: 'roundRect',
                 left: 'center',
                 top: 'top',
                 right: 'auto',
@@ -826,6 +829,7 @@ const list = [
               legend: {
                 show: true,
                 orient: 'horizontal',
+                align:'left',
                 // 加翻页
                 type: 'scroll',
                 pageIconColor: '#fff',
@@ -837,7 +841,7 @@ const list = [
                   fontSize: 12
                 },
                 itemGap: 12,
-                icon: '',
+                icon: 'roundRect',
                 left: 'center',
                 top: 'top',
                 right: 'auto',
@@ -989,12 +993,13 @@ const list = [
               legend: {
                 show: true,
                 orient: 'horizontal',
+                align:'left',
                 textStyle: {
                   color: '#ffffff',
                   fontSize: 12
                 },
                 itemGap: 12,
-                icon: '',
+                icon: 'roundRect',
                 left: 'center',
                 top: 'top',
                 right: 'auto',
@@ -1129,13 +1134,14 @@ const list = [
               legend: {
                 show: false,
                 orient: 'horizontal',
+                align:'left',
                 data: [],
                 textStyle: {
                   color: '#ffffff',
                   fontSize: 12
                 },
                 itemGap: 12,
-                icon: '',
+                icon: 'roundRect',
                 left: 'center',
                 top: 'top',
                 right: 'auto',
@@ -1263,12 +1269,13 @@ const list = [
                   color: DEFAULT_COLORS[0]
                 },
                 itemGap: 12,
-                icon: '',
+                icon: 'roundRect',
                 left: 'center',
                 top: 'top',
                 right: 'auto',
                 bottom: 'auto',
                 orient: 'horizontal',
+                align:'left',
                 data: ['人口']
               },
               xAxis: {
@@ -1431,13 +1438,14 @@ const list = [
               legend: {
                 show: false,
                 orient: 'horizontal',
+                align:'left',
                 data: [],
                 textStyle: {
                   color: '#ffffff',
                   fontSize: 12
                 },
                 itemGap: 12,
-                icon: '',
+                icon: 'roundRect',
                 left: 'center',
                 top: 'top',
                 right: 'auto',
@@ -1619,6 +1627,7 @@ const list = [
               legend: {
                 show: true,
                 orient: 'horizontal',
+                align:'left',
                 // 加翻页
                 type: 'scroll',
                 pageIconColor: '#fff',
@@ -1630,7 +1639,7 @@ const list = [
                   fontSize: 12
                 },
                 itemGap: 12,
-                icon: '',
+                icon: 'roundRect',
                 left: 'center',
                 top: 'top',
                 right: 'auto',
@@ -1820,6 +1829,7 @@ const list = [
               legend: {
                 show: false,
                 orient: 'horizontal',
+                align:'left',
                 // 加翻页
                 type: 'scroll',
                 pageIconColor: '#fff',
@@ -1831,7 +1841,7 @@ const list = [
                   fontSize: 12
                 },
                 itemGap: 12,
-                icon: '',
+                icon: 'roundRect',
                 left: 'center',
                 top: 'top',
                 right: 'auto',
@@ -2158,6 +2168,7 @@ const list = [
               legend: {
                 show: false,
                 orient: 'horizontal',
+                align:'left',
                 // 加翻页
                 type: 'scroll',
                 pageIconColor: '#fff',
@@ -2169,7 +2180,7 @@ const list = [
                   fontSize: 12
                 },
                 itemGap: 12,
-                icon: '',
+                icon: 'roundRect',
                 left: 'center',
                 top: 'top',
                 right: 'auto',
