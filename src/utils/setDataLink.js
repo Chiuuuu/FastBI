@@ -63,7 +63,6 @@ async function getBindData(chart, dimensionData) {
       for (let item2 of dimensionKeys) {
         obj[item2] = item[item2]
       }
-      obj[dimensionKeys] = item[dimensionKeys]
       for (let item2 of measureKeys) {
         obj[item2] = item[item2]
       }
