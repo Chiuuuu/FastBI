@@ -51,7 +51,9 @@ const getters = {
 
   modelMeasures: state => state.options.modelMeasures, // 当前度量列表
 
-  currentPageId: state => state.app.currentPageId // 当前度量列表
+  currentPageId: state => state.app.currentPageId, // 当前度量列表
+
+  polymerizeType: state => state.app.polymerizeType // 所有聚合方式及中文映射
 }
 
 export default getters

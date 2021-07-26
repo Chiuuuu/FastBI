@@ -61,7 +61,6 @@ import {
   removeResizeListener
 } from 'bin-ui/src/utils/resize-event'
 import { mapActions, mapGetters } from 'vuex'
-
 export default {
   props: {
     canEdit: {
@@ -119,17 +118,27 @@ export default {
         let noList = []
         this.pages.forEach(item => {
           if (/页面\d/.test(item.name)) {
-            noList.push(parseInt(item.name.replace(/[^0-9]/gi, '')))
+            noList.push(
+              parseInt(
+                item.name.replace(
+                  /页面(\d)(\(.*?\))?/gi,
+                  (match, targetValue) => {
+                    return targetValue
+                  }
+                )
+              )
+            )
           }
         })
-        // 去页面x最大的数字作为新页面的名称
+        // 取页面x最大的数字作为新页面的名称
         let no = noList.length === 0 ? 1 : Math.max(...noList) + 1
         let name = `页面${no}`
 
         let params = {
           name: name,
           orderNo: this.pages.length + 1,
-          screenId: this.screenId
+          screenId: this.screenId,
+          setting: this.orginPageSettings
         }
         this.$server.screenManage.addScreenTab(params).then(res => {
           if (res.code === 200) {
@@ -160,7 +169,8 @@ export default {
           name: copyName,
           orderNo: page.orderNo,
           screenId: this.screenId,
-          id: page.id
+          id: page.id,
+          setting: this.pageSettings
         }
         this.$server.screenManage.copyScreenTab(params).then(res => {
           if (res.code === 200) {
@@ -272,7 +282,14 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['screenId', 'pageList', 'currentPageId', 'isScreen']),
+    ...mapGetters([
+      'screenId',
+      'pageList',
+      'currentPageId',
+      'isScreen',
+      'pageSettings',
+      'orginPageSettings'
+    ]),
     pages: {
       get() {
         return this.pageList

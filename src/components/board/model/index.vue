@@ -1,7 +1,7 @@
 <!-- 8-14 数据模型侧栏 -->
 <template>
   <div class="board-model" :style="config.style">
-    <div style="height:100%">
+    <div style="height: 100%">
       <div class="model-header" v-show="config.title.enable">
         <a-icon
           class="model-back"
@@ -19,41 +19,52 @@
         />
       </div>
       <!-- 操作界面 -->
-      <div v-if="modelExpand" style="height:calc(100% - 150px);">
+      <div v-if="modelExpand" style="height: calc(100% - 150px)">
         <div class="model-operation" v-if="model">
           <div class="operation">
             <a-radio-group
               v-model="resourceType"
               button-style="solid"
-              style="width:100%"
+              style="width: 100%"
             >
               <a-radio-button
                 :value="8"
-                style="width:50%"
+                style="width: 50%"
                 @click.native="changeAddType(8)"
               >
                 数据模型
               </a-radio-button>
               <a-radio-button
                 :value="3"
-                style="width:50%"
+                style="width: 50%"
                 @click.native="changeAddType(3)"
               >
                 数据接入
               </a-radio-button>
             </a-radio-group>
           </div>
-          <div class="operation">
-            <a-select v-model="resourceId" style="width:62%">
+          <div class="operation cls-frstsel">
+            <a-select v-model="resourceId" style="width: 62%">
               <a-select-option
+                class="cls-mode-sel"
                 v-for="item in disableItem"
                 :value="item.tableId"
                 :key="item.id"
-                >{{ item.resourceName }}</a-select-option
+                @mouseover="getHover(item.tableId)"
               >
+                <a-tooltip :title="item.resourceName">
+                  {{ item.resourceName }}
+                </a-tooltip>
+                <a-icon
+                  class="cls-close"
+                  v-show="item.tableId === hoveDataModelId"
+                  @click="getDelDataModel(item.screenId, item.tableId)"
+                  type="close-circle"
+                />
+              </a-select-option>
             </a-select>
             <a-button
-              style="margin-left:8px"
+              style="margin-left: 8px"
               @click="resourceType === 8 ? modelAdd() : sourceAdd()"
               >添加</a-button
             >
@@ -64,7 +75,7 @@
               show-search
               :value="searchValue"
               placeholder="请输入关键字搜索"
-              style="width:100%"
+              style="width: 100%"
               :default-active-first-option="false"
               :show-arrow="false"
               :filter-option="false"
@@ -92,7 +103,7 @@
               <div class="mea_main">
                 <a-collapse
                   class="scrollbar"
-                  style="height:100%;overflow: scroll;margin-top: 10px;"
+                  style="height: 100%; overflow: scroll; margin-top: 10px"
                   v-model="dimensionsKey"
                   :bordered="false"
                 >
@@ -160,7 +171,7 @@
               <div class="mea_main">
                 <a-collapse
                   class="scrollbar"
-                  style="height:100%;overflow: scroll;margin-top: 10px;"
+                  style="height: 100%; overflow: scroll; margin-top: 10px"
                   v-model="measuresKey"
                 >
                   <a-collapse-panel
@@ -198,17 +209,6 @@
                             <a-menu-item key="3" @click="changeItem(item2, 1)"
                               >转为维度</a-menu-item
                             >
-                            <!-- <a-sub-menu key="1" title="聚合方式">
-                              <a-menu-item
-                                v-for="(aggregator,
-                                index) in polymerizationData"
-                                :key="index"
-                                @click.native="
-                                  changePolymerization(aggregator.value, item2)
-                                "
-                                >{{ aggregator.name }}</a-menu-item
-                              >
-                            </a-sub-menu> -->
                           </a-menu>
                         </a-dropdown>
                       </li>
@@ -235,11 +235,11 @@
           ></geo-setting>
         </div>
         <!-- 初始界面 -->
-        <div class="model-contain" v-else style="height:100%;">
+        <div class="model-contain" v-else style="height: 100%">
           <div class="model-search">
             <a-input-search
               placeholder="输入关键字搜索"
-              style="width:90%;margin-left:15px"
+              style="width: 90%; margin-left: 15px"
               @change="modelSearch"
             />
           </div>
@@ -301,19 +301,13 @@ export default {
       detailInfo: {}, // 聚合运算数据
       cacheDimensions: [],
       cacheMeasures: [], // 缓存自定义度量
-      polymerizationData: [
-        { name: '求和', value: 'SUM' },
-        { name: '平均', value: 'AVG' },
-        { name: '最大值', value: 'MAX' },
-        { name: '最小值', value: 'MIN' },
-        { name: '统计', value: 'CNT' }
-      ],
       createdMapData: {},
       resourceType: 8, // 当前数据类型标识（接入:3|模型:8）
       dataList: [], // 显示的菜单列表
       modelList: [], // 模型菜单
       sourceList: [], // 接入菜单
-      key: 0 // 刷新菜单
+      key: 0, // 刷新菜单
+      hoveDataModelId: '' //悬浮选中的数据模型id
     }
   },
   computed: {
@@ -368,24 +362,24 @@ export default {
           if (val.datamodelId !== '0' && val.datamodelId !== 0) {
             this.resourceId = val.datamodelId
             this.resourceType = val.setting.resourceType
-            this.dimensionsChecked = []
-            if (
-              val.setting.api_data.dimensions &&
-              val.setting.api_data.dimensions.length > 0
-            ) {
-              val.setting.api_data.dimensions.map(item => {
-                this.dimensionsChecked.push(item.id)
-              })
-            }
-            this.measuresChecked = []
-            if (
-              val.setting.api_data.measures &&
-              val.setting.api_data.measures.length > 0
-            ) {
-              val.setting.api_data.measures.map(item => {
-                this.measuresChecked.push(item.id)
-              })
-            }
+          }
+          this.dimensionsChecked = []
+          if (
+            val.setting.api_data.dimensions &&
+            val.setting.api_data.dimensions.length > 0
+          ) {
+            val.setting.api_data.dimensions.map(item => {
+              this.dimensionsChecked.push(item.id)
+            })
+          }
+          this.measuresChecked = []
+          if (
+            val.setting.api_data.measures &&
+            val.setting.api_data.measures.length > 0
+          ) {
+            val.setting.api_data.measures.map(item => {
+              this.measuresChecked.push(item.id)
+            })
           }
         }
       },
@@ -405,6 +399,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['getScreenDetail']),
     // 数据模型搜索
     modelSearch: debounce(function(event) {
       const value = event.target.value
@@ -636,14 +631,6 @@ export default {
         }
       })
     },
-    // 修改数据聚合方式
-    changePolymerization(type, item) {
-      item.showMore = false
-      if (item.defaultAggregator !== type) {
-        item.defaultAggregator = type
-      }
-      //   this.getData()
-    },
     // 维度、度量列表
     getPivoSchemaList(id, type = 1) {
       let loadingInstance = Loading.service({
@@ -718,6 +705,30 @@ export default {
         item => item.id === this.currentSelected
       )
       selected.setting.api_data.mapDatas = datas
+    },
+    getHover(val) {
+      let datamoel = this.canvasMap.map(x => x.datamodelId)
+      if (!datamoel.includes(val)) {
+        this.hoveDataModelId = val
+      } else {
+        this.hoveDataModelId = ''
+      }
+    },
+    async getDelDataModel(screenId, tableId) {
+      console.log('****', this.screenId)
+      let res = await this.$server.dataModel.delDataModel(
+        this.screenId,
+        tableId
+      )
+      if (res.code == 200) {
+        this.$message.success('删除成功')
+        this.getScreenDetail({
+          id: this.$route.query.id,
+          tabId: this.$route.query.tabId
+        })
+      } else {
+        this.$message.error(res.msg || res || '删除失败')
+      }
     }
   }
 }
@@ -733,151 +744,185 @@ export default {
 }
 
 .mod {
-    width: 100%;
-    height: 350px;
-    display: flex;
-    justify-content: space-between;
-    .modal_l {
-        .modal_dropdown {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 40px;
-            width: 257px;
-            .dropdown {
-                position relative;
-                width 120px;
-                height 32px;
-                line-height 1.5;
-                border 1px solid #d9d9d9;
-                padding 4px 11px;
-                cursor pointer;
-                &::after {
-                    content: "";
-                    display: block;
-                    width: 0;
-                    height: 0;
-                    border-style: solid dashed dashed;
-                    border-width: 6px 5px;
-                    border-color: #aaa transparent transparent transparent;
-                    position: absolute;
-                    right: 12px;
-                    top: 12px;
-                }
-            }
+  width: 100%;
+  height: 350px;
+  display: flex;
+  justify-content: space-between;
+
+  .modal_l {
+    .modal_dropdown {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 40px;
+      width: 257px;
+
+      .dropdown {
+        position: relative;
+        width: 120px;
+        height: 32px;
+        line-height: 1.5;
+        border: 1px solid #d9d9d9;
+        padding: 4px 11px;
+        cursor: pointer;
+
+        &::after {
+          content: '';
+          display: block;
+          width: 0;
+          height: 0;
+          border-style: solid dashed dashed;
+          border-width: 6px 5px;
+          border-color: #aaa transparent transparent transparent;
+          position: absolute;
+          right: 12px;
+          top: 12px;
         }
+      }
     }
-        .modal_r {
-        width: 365px;
-        padding: 20px 10px 32px;
-        background: rgba(246, 246, 246, 1);
-        display: flex;
-        justify-content: space-around;
-        .bar {
-            width: 140px;
-        }
-        .descript {
-            margin-top: 13px;
-            margin-left: 11px;
-        }
-        .list {
-            height: calc(100% - 32px)
-            border: 1px solid #d9d9d9;
-            background-color: #fff;
-            overflow-y: auto;
-        }
-        .list-item {
-            padding: 5px 12px;
-            line-height: 22px;
-            cursor: pointer;
-            &.active {
-                background-color: #40c0a8;
-                color: #fff;
-            }
-        }
-        .text {
-            padding: 10px 10px 10px 20px;
-            font-size: 12px;
-            max-height: 260px;
-            overflow: auto;
-            .tit {
-                padding-bottom: 10px;
-                font-weight: bolder;
-            }
-            .des {
-                word-break: break-all;
-                line-height: 18px;
-            }
-            .example {
-                margin-top: 10px;
-                line-height: 15px;
-                span.title {
-                    font-weight: bolder;
-                }
-            }
-        }
-    }
-}
-.cacsader{
+  }
+
+  .modal_r {
+    width: 365px;
+    padding: 20px 10px 32px;
+    background: rgba(246, 246, 246, 1);
     display: flex;
     justify-content: space-around;
 
-    }
-.geo-contain{
-    display: flex;
-    justify-content space-between;
-  // width: 750px;
-.geo-map{
-    width: 188px;
-    height 279px;
-    padding:10px;
-    background:rgba(248,248,248,1);
-    margin-top: 19px;
-    }
-.geo-set{
-    width: 580px;
-    .set-head{
-    background:rgba(248,248,248,1);
-    margin-left: 18px;
-    margin-top: 19px;
-    height: 36px;
-    display: flex;
-    justify-content space-between;
-    .g-s-s{
-    font-size:14px;
-    font-family:Microsoft YaHei;
-    font-weight:400;
-    color:rgba(1,4,15,1);
-    line-height:35px;
-    margin-left: 12px;
-    }
-.g-s-r{
-    font-size:14px;
-    font-family:Microsoft YaHei;
-    font-weight:400;
-    color:rgba(252,92,92,1);
-    line-height:35px;
-    margin-right: 12px;
-    }
-}
-.set-select{
-    display: flex;
-    justify-content: space-between;
-    margin-left: 18px;
-    margin-top: 14px;
-    .s-s-s{
-        font-size:14px;
-        font-family:Microsoft YaHei;
-        font-weight:400;
-        color:rgba(1,4,15,1);
-        }
-    }
-    .set-table{
-        margin-top: 10px;
-        margin-left: 30px;
-        width: 90%;
-        }
+    .bar {
+      width: 140px;
     }
 
+    .descript {
+      margin-top: 13px;
+      margin-left: 11px;
+    }
+
+    .list {
+      height: calc(100% - 32px);
+      border: 1px solid #d9d9d9;
+      background-color: #fff;
+      overflow-y: auto;
+    }
+
+    .list-item {
+      padding: 5px 12px;
+      line-height: 22px;
+      cursor: pointer;
+
+      &.active {
+        background-color: #40c0a8;
+        color: #fff;
+      }
+    }
+
+    .text {
+      padding: 10px 10px 10px 20px;
+      font-size: 12px;
+      max-height: 260px;
+      overflow: auto;
+
+      .tit {
+        padding-bottom: 10px;
+        font-weight: bolder;
+      }
+
+      .des {
+        word-break: break-all;
+        line-height: 18px;
+      }
+
+      .example {
+        margin-top: 10px;
+        line-height: 15px;
+
+        span.title {
+          font-weight: bolder;
+        }
+      }
+    }
+  }
+}
+
+.cacsader {
+  display: flex;
+  justify-content: space-around;
+}
+
+.geo-contain {
+  display: flex;
+  justify-content: space-between;
+
+  .geo-map {
+    width: 188px;
+    height: 279px;
+    padding: 10px;
+    background: rgba(248, 248, 248, 1);
+    margin-top: 19px;
+  }
+
+  .geo-set {
+    width: 580px;
+
+    .set-head {
+      background: rgba(248, 248, 248, 1);
+      margin-left: 18px;
+      margin-top: 19px;
+      height: 36px;
+      display: flex;
+      justify-content: space-between;
+
+      .g-s-s {
+        font-size: 14px;
+        font-family: Microsoft YaHei;
+        font-weight: 400;
+        color: rgba(1, 4, 15, 1);
+        line-height: 35px;
+        margin-left: 12px;
+      }
+
+      .g-s-r {
+        font-size: 14px;
+        font-family: Microsoft YaHei;
+        font-weight: 400;
+        color: rgba(252, 92, 92, 1);
+        line-height: 35px;
+        margin-right: 12px;
+      }
+    }
+
+    .set-select {
+      display: flex;
+      justify-content: space-between;
+      margin-left: 18px;
+      margin-top: 14px;
+
+      .s-s-s {
+        font-size: 14px;
+        font-family: Microsoft YaHei;
+        font-weight: 400;
+        color: rgba(1, 4, 15, 1);
+      }
+    }
+
+    .set-table {
+      margin-top: 10px;
+      margin-left: 30px;
+      width: 90%;
+    }
+  }
+}
+.cls-frstsel{
+  .cls-close{
+    display: none;
+  }
+}
+.cls-close {
+
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  z-index: 999;
+  font-size: 15px;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div class="main">
-    <a-empty v-if="!roleId" class="main-empty">
+    <a-empty v-if="menuSelectId === -1" class="main-empty">
       <span slot="description">请新建角色或者选中左侧角色</span>
     </a-empty>
     <template v-else>
@@ -39,13 +39,9 @@ export default {
   computed: {
     ...mapState({
       roleId: state => state.projectRoles.roleId,
-      formInfo: state => state.projectRoles.roleInfo
+      formInfo: state => state.projectRoles.roleInfo,
+      menuSelectId: state => state.common.menuSelectId
     })
-  },
-  created() {
-    if (this.roleId) {
-      this.handleGetRoleInfo()
-    }
   },
   methods: {
     handleChangeModule(key) {
@@ -53,9 +49,6 @@ export default {
       if (tab) {
         tab.handleGetData && tab.handleGetData()
       }
-    },
-    async handleGetRoleInfo() {
-      
     }
   }
 }

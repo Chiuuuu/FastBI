@@ -8,7 +8,8 @@ const state = {
   databaseId: '', // 数据库id
   datasource: null, // 数据源
   datasourceId: '',
-  selectedModelList: [] // 选中的数据模型
+  selectedModelList: [], // 选中的数据模型
+  //存储每个屏幕中使用的所有数据模型
 }
 
 const mutations = {
@@ -37,7 +38,7 @@ const mutations = {
     state.datasourceId = id
   },
   SET_SELECTEDMODELlIST(state, list) {
-    state.selectedModelList = list
+    state.selectedModelList = list || []
   }
 }
 

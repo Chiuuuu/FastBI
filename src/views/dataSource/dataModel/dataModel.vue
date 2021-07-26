@@ -1,7 +1,7 @@
 <template>
   <div class="data-model screen-manage">
-    <Menu @getModelInfo='handleEmitMainGetData'></Menu>
-    <Main ref='modelMainRef'></Main>
+    <Menu @getModelInfo="handleEmitMainGetData"></Menu>
+    <Main ref="modelMainRef"></Main>
   </div>
 </template>
 
@@ -16,17 +16,18 @@ export default {
   },
   computed: {
     ...mapState({
-      fileSelectId: state => state.dataModel.modelId
+      fileSelectId: state => state.common.menuSelectId
     })
   },
   mounted() {
     if (this.fileSelectId !== -1) {
-      this.handleEmitMainGetData()
+      this.handleEmitMainGetData(this.fileSelectId)
     }
   },
   beforeDestroy() {
     this.$store.dispatch('dataModel/setModelId', -1)
     this.$store.commit('dataModel/SET_MODELNAME', '')
+    this.$store.commit('common/SET_MENUSELECTID', -1)
   },
   methods: {
     handleEmitMainGetData(id) {

@@ -16,7 +16,11 @@
         :key="index"
         @contextmenu.prevent="showMore(item)"
       >
-        <a-dropdown :trigger="['click', 'contextmenu']" v-model="item.showMore">
+        <a-dropdown
+          :trigger="['click', 'contextmenu']"
+          v-model="item.showMore"
+          @visibleChange="v => v && showMore(item)"
+        >
           <a-icon class="icon-more" type="caret-down" />
           <a-menu slot="overlay">
             <a-sub-menu
@@ -25,19 +29,23 @@
               v-show="item.file === 'measures'"
             >
               <a-menu-item
-                v-for="(aggregator, index) in polymerizationData"
+                v-for="(aggregator, index) in polymerizationData[strornum]"
                 :key="index"
                 @click.native="changePolymerization(aggregator, item)"
                 >{{ aggregator.name }}</a-menu-item
               >
             </a-sub-menu>
-            <a-menu-item key="3" @click.native="deleteFile(item, index)"
-              >移除</a-menu-item
+            <a-menu-item key="3"
+              ><div @click.stop="deleteFile($event, item, index)">
+                移除
+              </div></a-menu-item
             >
           </a-menu>
         </a-dropdown>
-        <a-tooltip :title="item.alias">
-          <span ref="itemName" class="field-text">{{ item.alias }}</span>
+        <a-tooltip :title="formatAggregator(item)">
+          <span ref="itemName" class="field-text">{{
+            formatAggregator(item)
+          }}</span>
         </a-tooltip>
       </div>
     </div>
@@ -50,10 +58,14 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import { deepClone } from '@/utils/deepClone'
+import TreeGroupBy from '@/components/board/options/treemap/tree-groupby'
 import { sum, summary } from '@/utils/summaryList'
 import geoJson from '@/utils/guangdong.json'
 import { Loading } from 'element-ui'
 import _ from 'lodash'
+// import navigateList from '@/config/navigate'
+import sourceMap from './defaultData'
+import handleNullData from '@/utils/handleNullData'
 
 const dotSeries = {
   type: 'scatter', // scatter,effectScatter
@@ -106,22 +118,25 @@ export default {
         filter: '拖入字段',
         tableList: '拖入字段'
       },
-      polymerizationData: [
-        { name: '求和', value: 'SUM' },
-        { name: '平均', value: 'AVG' },
-        { name: '最大值', value: 'MAX' },
-        { name: '最小值', value: 'MIN' },
-        { name: '统计', value: 'CNT' }
-      ],
+      strornum: '',
+      polymerizationData: {
+        // 数字
+        num: [
+          { name: '求和', value: 'SUM' },
+          { name: '平均', value: 'AVG' },
+          { name: '最大值', value: 'MAX' },
+          { name: '最小值', value: 'MIN' },
+          { name: '计数', value: 'CNT' },
+          { name: '去重计数', value: 'DCNT' }
+        ],
+        str: [
+          { name: '计数', value: 'CNT' },
+          { name: '去重计数', value: 'DCNT' }
+        ]
+      },
       isdrag: false, // 是否拖拽中
       fileList: [], // 维度字段数组
       isVaild: false, //
-      polymerizeType: [
-        { name: '求和', value: 'SUM' },
-        { name: '平均', value: 'AVG' },
-        { name: '最大值', value: 'MAX' },
-        { name: '最小值', value: 'MIN' }
-      ] // 聚合方式
     }
   },
   inject: ['errorFile', 'initTargetMeasure'],
@@ -229,18 +244,30 @@ export default {
       'currSelected',
       'optionsTabsType',
       'dataModel',
-      'canvasMap'
+      'canvasMap',
+      'polymerizeType'
     ]),
     chartType() {
       return this.currSelected ? this.currSelected.setting.type : ''
     }
   },
   methods: {
-    ...mapActions(['saveScreenData', 'updateChartData']),
+    ...mapActions(['updateChartData']),
+    formatAggregator(item) {
+      const fun = this.polymerizeType.find(
+        x => x.value === item.defaultAggregator
+      )
+      if (item.role === 2) {
+        return `${item.alias} (${fun.name})`
+      } else {
+        return item.alias
+      }
+    },
     // 将拖动的维度到所选择的放置目标节点中
     handleDropOnFilesWD(event) {
       // h5 api
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
+
       if (
         this.currSelected.datamodelId &&
         this.currSelected.datamodelId !== '0' &&
@@ -250,11 +277,36 @@ export default {
         this.isdrag = false
         return false
       }
+      let _alias = this.polymerizeType.find(
+        x => x.value === dataFile.defaultAggregator
+      )
       dataFile.showMore = false // 是否点击显示更多
       if (this.type === 'dimensions' && this.dragFile === this.type) {
-        // 嵌套饼图可以有多个维度
-        if (this.currSelected.setting.chartType === 'v-multiPie') {
-          this.fileList.push(dataFile)
+        // 嵌套饼图可以有多个维度（最多只能2个）
+        // 矩形热力图必须2个维度一个度量(v-heatmap)
+        if (
+          this.currSelected.setting.chartType === 'v-multiPie' ||
+          this.currSelected.setting.chartType === 'v-heatmap'
+        ) {
+          if (this.currSelected.setting.chartType === 'v-heatmap') {
+            this.handleShowList(dataFile, 1)
+          }
+          if (this.fileList.length < 2) {
+            this.fileList.push(dataFile)
+          } else if (this.fileList.length === 2) {
+            this.fileList.splice(1, 1, dataFile)
+          }
+        } else if (
+          this.currSelected.setting.chartType === 'v-treemap' ||
+          this.currSelected.setting.chartType === 'v-sun'
+        ) {
+          this.handleShowList(dataFile, 4)
+          // 矩形树图可以拖入5个维度
+          if (this.fileList.length < 5) {
+            this.fileList.push(dataFile)
+          } else if (this.fileList.length === 5) {
+            this.fileList.splice(4, 1, dataFile)
+          }
         } else {
           // 维度暂时只能拉入一个字段
           this.fileList[0] = dataFile
@@ -268,11 +320,37 @@ export default {
         this.dragFile === this.type &&
         this.chartType === '1'
       ) {
-        // 饼图类型只能拉入一个度量
-        if (this.currSelected.setting.name === 've-pie') {
+        // let _alias = this.polymerizeType.find(
+        //   x => x.value === dataFile.defaultAggregator
+        // )
+        // dataFile.alias += `(${_alias.name})`
+        // 获取初始聚合方式
+        dataFile.defaultAggregator = this.judgeDataType(dataFile.dataType)
+        // 饼图类型只能拉入一个度量（包含3d和矩形热力图）
+        if (
+          (this.currSelected.setting.name === 've-pie') |
+          (this.currSelected.setting.chartType === 'high-pie') |
+          (this.currSelected.setting.chartType === 'v-heatmap')
+        ) {
+          if (this.currSelected.setting.chartType === 'v-heatmap') {
+            this.handleShowList(dataFile, 0)
+          }
           this.fileList[0] = dataFile
+        } else if (
+          this.currSelected.setting.name === 've-scatter' &&
+          this.fileList.length >= 2
+        ) {
+          // 散点图只能拉入两个度量
+          this.fileList[1] = dataFile
         } else if (this.currSelected.setting.name === 've-map') {
           // 地图类型暂时只能拉入一个度量
+          this.fileList[0] = dataFile
+        } else if (
+          this.currSelected.setting.chartType === 'v-treemap' ||
+          this.currSelected.setting.chartType === 'v-sun'
+        ) {
+          this.handleShowList(dataFile, 0)
+          // 矩形树图暂时只能拉入一个度量
           this.fileList[0] = dataFile
         } else {
           this.fileList.push(dataFile)
@@ -282,6 +360,9 @@ export default {
       }
       // 表格
       if (this.type === 'tableList') {
+        if (dataFile.file === 'measures') {
+          dataFile.defaultAggregator = this.judgeDataType(dataFile.dataType)
+        }
         this.fileList.push(dataFile)
         this.fileList = this.uniqueFun(this.fileList, 'alias')
         this.getData()
@@ -293,6 +374,7 @@ export default {
         this.dragFile === this.type
       ) {
         // 进度条只有一个度量
+        // dataFile.alias += `(${_alias.name})`
         if (this.currSelected.setting.name === 'steepBar') {
           this.fileList[0] = dataFile
         } else {
@@ -320,14 +402,24 @@ export default {
       event.preventDefault()
       this.isdrag = false
     },
+    // 判断数值类型
+    judgeDataType(dataType) {
+      // 判断数值类型
+      let isNum =
+        dataType === 'BIGINT' || dataType === 'DECIMAL' || dataType === 'DOUBLE'
+      this.strornum = isNum ? 'num' : 'str'
+      return isNum ? 'SUM' : 'CNT'
+    },
     // 点击右键显示更多
     showMore(item) {
+      // 重新根据数值类型获取聚合列表
+      this.judgeDataType(item.dataType)
       item.showMore = true
     },
     // 修改数据聚合方式
     changePolymerization(i, item) {
       item.showMore = false
-      item.alias = item.alias.replace(/\(.*?\)/, '(' + i.name + ')')
+      // item.alias = item.alias.replace(/\(.*?\)/, '(' + i.name + ')')
       item.defaultAggregator = i.value
       this.getData()
     },
@@ -340,17 +432,84 @@ export default {
       }
       return countryside.properties.center
     },
+    handleTreemapConfig(rows) {
+      let setting = deepClone(this.currSelected.setting)
+      let config = setting.config
+      const tree = new TreeGroupBy(
+        rows,
+        setting.api_data.dimensions.map(item => item.alias),
+        setting.api_data.measures
+      )
+      TreeGroupBy.handleLeafValue(tree.tree)
+      config.series.data = tree.tree
+      config.series.visualMaxList = tree.max
+      config.visualMap.max = tree.max[0]
+
+      // 若删除了维度, 且刚好指针指向了维度, 则切换映射类型
+      let index = config.series.recDimensionIndex || 0
+      if (index >= setting.api_data.dimensions.length) {
+        config.series.recDimensionIndex = index =
+          setting.api_data.dimensions.length - 1
+      }
+      if (index === setting.api_data.dimensions.length) {
+        config.visualMap.max = config.series.visualMaxList[0]
+        config.visualMap.type = 'continuous'
+        config.visualMap.inRange.color = config.series.continuousColors
+      } else {
+        let dimensionIndex = setting.api_data.dimensions.length - index - 1
+        dimensionIndex = dimensionIndex < 0 ? 0 : dimensionIndex
+        config.visualMap.dimension = dimensionIndex + 1
+        config.visualMap.max = config.series.visualMaxList[dimensionIndex]
+        config.visualMap.type = 'piecewise'
+        config.visualMap.inRange.color = config.series.piecewiseColors
+        config.visualMap.pieces = TreeGroupBy.handlePieces(
+          config.series.data,
+          index
+        )
+      }
+      this.$store.dispatch('SetSelfProperty', config)
+
+      let apiData = deepClone(this.currSelected.setting.api_data)
+      apiData.source = tree.tree
+      this.$store.dispatch('SetSelfDataSource', apiData)
+      this.updateChartData()
+    },
+    handleShowList(dataFile, maxIndex) {
+      const config = deepClone(this.currSelected.setting.config)
+      if (this.fileList.length < maxIndex + 1) {
+        if (config.series.tooltipShowList.indexOf(dataFile.alias) < 0) {
+          config.series.tooltipShowList.push(dataFile.alias)
+        }
+        if (config.series.labelShowList.indexOf(dataFile.alias) < 0) {
+          config.series.labelShowList.push(dataFile.alias)
+        }
+      } else if (this.fileList.length === maxIndex + 1) {
+        let tooltipIndex = config.series.tooltipShowList.indexOf(
+          this.fileList[maxIndex].alias
+        )
+        if (tooltipIndex < 0) {
+          config.series.tooltipShowList.push(dataFile.alias)
+        } else {
+          config.series.tooltipShowList.splice(tooltipIndex, 1, dataFile.alias)
+        }
+        let labelIndex = config.series.labelShowList.indexOf(
+          this.fileList[maxIndex].alias
+        )
+        if (labelIndex < 0) {
+          config.series.labelShowList.push(dataFile.alias)
+        } else {
+          config.series.labelShowList.splice(labelIndex, 1, dataFile.alias)
+        }
+      }
+      this.$store.dispatch('SetSelfProperty', config)
+    },
     // 删除当前维度或者度量
-    deleteFile(item, index) {
+    async deleteFile(event, item, index) {
       this.fileList.splice(index, 1)
-      this.getData()
+      await this.getData()
       let current = deepClone(this.currSelected)
       // 维度度量删除完以后重置该图表数据
       if (this.chartType === '1' || this.chartType === '2') {
-        if (current.setting.chartType === 'v-map') {
-          // 重置地图样式配置对应的度量数据
-          this.initTargetMeasure()
-        }
         if (
           current.setting.api_data.dimensions.length === 0 &&
           current.setting.api_data.measures.length === 0
@@ -358,7 +517,6 @@ export default {
           // 清空数据
           delete current.setting.api_data.source
           this.$store.dispatch('SetSelfDataSource', current.setting.api_data)
-          // 嵌套饼图apis恢复原始状态
           // 地图数据还原
           if (current.setting.chartType === 'v-map') {
             current.setting.api_data.data = [[]]
@@ -367,11 +525,21 @@ export default {
             this.$store.dispatch('SetSelfProperty', current.setting.config)
             this.updateChartData()
           }
+          // 嵌套饼图apis恢复原始状态
           if (current.setting.chartType === 'v-multiPie') {
-            let apis = {
-              level: [['1/1', '1/2', '1/3'], ['1/4', '1/5']]
-            }
+            const apis = current.setting.apis
+            apis.level = [['1/1', '1/2', '1/3'], ['1/4', '1/5']]
             this.$store.dispatch('SetApis', apis)
+          }
+          // 立体图和矩形热力图 旭日图重置
+          if (
+            (current.setting.chartType === 'high-pie') ||
+            (current.setting.chartType === 'high-column')
+          ) {
+            let res = sourceMap[current.setting.chartType]
+            current.setting.config.series = JSON.parse(JSON.stringify(res))
+            this.$store.dispatch('SetSelfProperty', current.setting.config)
+            this.updateChartData()
           }
         }
         // 如果是仪表盘，第二个度量是目标值（进度条最大值）,重置进度条范围
@@ -383,6 +551,31 @@ export default {
         if (current.setting.chartType === 'v-ring') {
           current.setting.config.chartTitle.text = '70%'
           this.$store.dispatch('SetSelfProperty', current.setting.config)
+        }
+
+        if ((current.setting.chartType === 'v-treemap') ||
+          (current.setting.chartType === 'v-sun') ||
+          (current.setting.chartType === 'v-heatmap')) {
+          // 没有维度度量, 重置数据
+          if (current.setting.api_data.dimensions.length === 0 &&
+          current.setting.api_data.measures.length === 0) {
+            let res = sourceMap[current.setting.chartType]
+            current.setting.config = JSON.parse(JSON.stringify(res))
+          }
+          const tooltipShowList = current.setting.config.series.tooltipShowList
+          for (let i = 0; i < tooltipShowList.length; i++) {
+            if (item.alias === tooltipShowList[i]) {
+              tooltipShowList.splice(i, 1)
+            }
+          }
+          const labelShowList = current.setting.config.series.labelShowList
+          for (let i = 0; i < labelShowList.length; i++) {
+            if (item.alias === labelShowList[i]) {
+              labelShowList.splice(i, 1)
+            }
+          }
+          this.$store.dispatch('SetSelfProperty', current.setting.config)
+          this.updateChartData()
         }
       }
       if (this.chartType === '3') {
@@ -434,8 +627,6 @@ export default {
         )
         selected.setting.resourceType = this.fileList[0].resourceType
       }
-      this.updateChartData()
-
       let data = this.currSelected.setting.api_data
       if (this.chartType === '1') {
         if (data.dimensions.length === 0 && data.measures.length === 0) {
@@ -456,6 +647,8 @@ export default {
           return
         }
       }
+      // }
+
       if (this.chartType === '2') {
         if (data.measures.length === 0) {
           selected.datamodelId = 0
@@ -482,9 +675,23 @@ export default {
           return
         }
       }
-
       let params = selected
       let apiData = deepClone(this.currSelected.setting.api_data)
+      // 散点图，拖入一个维度和两个度量时才请求数据
+      if (
+        this.currSelected.setting.chartType === 'v-scatter' &&
+        (apiData.dimensions.length === 0 || apiData.measures.length <= 1)
+      ) {
+        return
+      }
+      // 矩形热力图只有在2个维度和一个度量的时候，才能请求数据
+      if (
+        this.currSelected.setting.chartType === 'v-heatmap' &&
+        (apiData.dimensions.length <= 1 || apiData.measures.length === 0)
+      ) {
+        return
+      }
+
       let loadingInstance = Loading.service({
         lock: true,
         text: '加载中...',
@@ -496,12 +703,17 @@ export default {
       selected.setting.isEmpty = false
       // 数据源被删掉
       if (res.code === 500 && res.msg === 'IsChanged') {
-        selected.setting.isEmpty = true
+        selected.setting.isEmpty = 'noData'
         this.updateChartData()
         return
       }
       if (res.code === 200) {
         let datas = res.rows
+        datas = await handleNullData(datas, this.currSelected.setting)
+        // 保存原始数据 -- 查看数据有用
+        apiData.origin_source = deepClone(res.rows || res.data || {})
+        this.$store.dispatch('SetSelfDataSource', apiData)
+
         if (this.currSelected.setting.chartType === 'v-map') {
           datas = res.data.fillList
           let config = deepClone(this.currSelected.setting.config)
@@ -537,14 +749,48 @@ export default {
           this.updateChartData()
           return
         }
-        datas = res.rows
         // 去掉排序的数据
-        if (apiData.options.sort.length) {
+        if (
+          apiData.options &&
+          apiData.options.sort &&
+          apiData.options.sort.length
+        ) {
           let filterArr = []
           apiData.options.sort.forEach(item => {
             filterArr.push(`sort_${item.alias}`)
           })
           datas = datas.map(item => _.omit(item, filterArr))
+        }
+        // 矩形树图数据处理
+        if (this.currSelected.setting.chartType === 'v-treemap') {
+          return this.handleTreemapConfig(res.rows)
+        } else if (this.currSelected.setting.chartType === 'v-sun') {
+          let setting = deepClone(this.currSelected.setting)
+          let config = setting.config
+          config.series.data = res.rows
+        } else if (this.currSelected.setting.chartType === 'v-heatmap') {
+          let setting = deepClone(this.currSelected.setting)
+          let config = setting.config
+          // 维度
+          let dim = apiData.dimensions.map(x => x.alias)
+          // 度量
+          let mea = apiData.measures.map(y => y.alias)
+          if ((dim.length === 0) | (mea.length === 0)) {
+            return
+          }
+          // 获取度量数组
+          let meaarr = res.rows.map(h => h[mea[0]])
+          if (meaarr.includes(undefined)) {
+            return
+          }
+          let _series = res.rows.map(item => [
+            item[dim[0]],
+            item[dim[1]],
+            item[mea[0]]
+          ])
+          config.visualMap.max = Math.max(...meaarr)
+          config.series.data = [..._series]
+          this.$store.dispatch('SetSelfProperty', config)
         }
         if (this.type === 'tableList') {
           let columns = []
@@ -552,7 +798,9 @@ export default {
             columns.push({
               title: item.alias,
               dataIndex: item.alias,
-              key: item.alias
+              key: item.alias,
+              role: item.role,
+              defaultAggregator: item.defaultAggregator
             })
           }
           let rows = datas
@@ -603,7 +851,8 @@ export default {
             this.$store.dispatch('SetSelfDataSource', apiData)
             let config = deepClone(this.currSelected.setting.config)
             if (this.currSelected.setting.chartType === 'v-ring') {
-              config.chartTitle.text = rows[1] ? rows[1].value : rows[0].value
+              config.chartTitle.text =
+                (rows[0].value / rows[1].value) * 100 + '%'
               this.$store.dispatch('SetSelfProperty', config)
             }
             // 如果是仪表盘，第二个度量是目标值（进度条最大值）
@@ -615,13 +864,14 @@ export default {
               config.series.max = goalTotal
               this.$store.dispatch('SetSelfProperty', config)
             }
+
             this.updateChartData()
             return
           }
 
           let columns = []
           let rows = []
-          let dimensionKeys = [] // 度量key
+          let dimensionKeys = [] // 维度key
           for (let m of apiData.dimensions) {
             dimensionKeys.push(m.alias)
             columns.push(m.alias) // 默认columns第二项起为指标
@@ -637,6 +887,8 @@ export default {
           if (this.currSelected.setting.chartType === 'v-multiPie') {
             // name是各维度数据拼接，value是分类汇总过的数值
             columns = ['name', 'value']
+            const apis = deepClone(this.currSelected.setting.apis)
+            apis.level = [['1/1', '1/2', '1/3'], ['1/4', '1/5']]
             let level = []
             // 一个维度是一层饼
             dimensionKeys.forEach(item => {
@@ -647,10 +899,10 @@ export default {
               level.push(list.map(obj => obj.name)) // 按维度分层
             })
 
-            let apis = {
-              level
-            }
+            apis.level = level
             this.$store.dispatch('SetApis', apis)
+          } else if (this.currSelected.setting.chartType === 'v-sun') {
+            rows = [...datas]
           } else {
             datas.map((item, index) => {
               let obj = {}
@@ -686,6 +938,54 @@ export default {
               columns = newColumns
               rows = newRows
             }
+          }
+
+          // 散点图，两个度量分别是x，y轴的值
+          if (this.currSelected.setting.chartType === 'v-scatter') {
+            let scatterData = {}
+            let legendData = []
+            let list = []
+            let xMax = 0
+            let yMax = 0
+            rows.forEach(item => {
+              if (xMax < item[columns[1]]) {
+                xMax = item[columns[1]]
+              }
+              if (yMax < item[columns[2]]) {
+                yMax = item[columns[2]]
+              }
+              if (!scatterData[item[columns[0]]]) {
+                scatterData[item[columns[0]]] = []
+                legendData.push(item[columns[0]])
+              }
+              scatterData[item[columns[0]]].push({
+                name: '',
+                value: [
+                  item[columns[1]], // 度量1
+                  item[columns[2]], // 度量2
+                  item[columns[0]], // 维度
+                  columns[1],
+                  columns[2],
+                  columns[0]
+                ]
+              })
+            })
+            for (let i in scatterData) {
+              list.push({
+                label: i,
+                data: scatterData[i]
+              })
+            }
+            let config = deepClone(this.currSelected.setting.config)
+            config.series.data = list
+            config.series.dimensions = [columns[1], columns[2], columns[0]]
+            config.legend.data = legendData
+            this.$store.dispatch('SetSelfProperty', config)
+
+            let apis = deepClone(this.currSelected.setting.apis)
+            apis.xMax = xMax
+            apis.yMax = yMax
+            this.$store.dispatch('SetApis', apis)
           }
 
           apiData.source = {

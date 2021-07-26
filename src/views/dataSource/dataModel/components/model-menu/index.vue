@@ -242,10 +242,11 @@ export default {
     },
     fileSelectId: {
       get () {
-        return this.$store.state.dataModel.modelId
+        return this.$store.state.common.menuSelectId
       },
       set (value) {
         this.$store.commit('dataModel/SET_MODELID', value)
+        this.$store.commit('common/SET_MENUSELECTID', value)
       }
     },
     hasPermissionFolderAdd() {
@@ -333,6 +334,7 @@ export default {
           this.$store.commit('dataModel/SET_MODELNAME', form.name)
         }
         this.$message.success('修改成功')
+        this.resetName.visible = false
       } else {
         this.$message.error(result.msg)
       }
@@ -552,6 +554,7 @@ export default {
       if (result.code === 200) {
         this.$message.success('添加成功')
         this.handleGetMenuList()
+        this.resetName.visible = false
       } else {
         this.$message.error(result.msg)
       }
@@ -571,7 +574,6 @@ export default {
       } else if (this.resetName.type === 'new') {
         this._addNewFolder(values)
       }
-      this.resetName.visible = false
     }
   }
 }

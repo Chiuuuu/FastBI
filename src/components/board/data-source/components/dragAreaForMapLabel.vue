@@ -11,21 +11,25 @@
   >
     <div v-if="fileList.length > 0">
       <div
-        :class="['field', { error: item.status === 1 }]"
+        :class="['field', 'under-level', { error: item.status === 1 }]"
         v-for="(item, index) in fileList"
         :key="index"
         @contextmenu.prevent="showMore(item)"
       >
-        <a-dropdown :trigger="['click', 'contextmenu']" v-model="item.showMore">
+        <a-dropdown
+          :trigger="['click', 'contextmenu']"
+          v-model="item.showMore"
+          @visibleChange="v => v && showMore(item)"
+        >
           <a-icon class="icon-more" type="caret-down" />
           <a-menu slot="overlay">
             <a-sub-menu
               key="1"
               title="聚合方式"
-              v-show="item.file === 'labelMeasures'"
+              v-show="item.file === 'measures'"
             >
               <a-menu-item
-                v-for="(aggregator, index) in polymerizationData"
+                v-for="(aggregator, index) in polymerizationData[strornum]"
                 :key="index"
                 @click.native="changePolymerization(aggregator, item)"
                 >{{ aggregator.name }}</a-menu-item
@@ -36,12 +40,14 @@
             >
           </a-menu>
         </a-dropdown>
-        <a-tooltip :title="item.alias">
-          <span ref="itemName" class="field-text">{{ item.alias }}</span>
+        <a-tooltip :title="formatAggregator(item)">
+          <span ref="itemName" class="field-text">{{
+            formatAggregator(item)
+          }}</span>
         </a-tooltip>
       </div>
     </div>
-    <div v-else class="empty" :class="{ field: isdrag }">
+    <div v-else class="empty under-level" :class="{ field: isdrag }">
       {{ emptyText[type][dimensionType] || emptyText[type] }}
     </div>
   </div>
@@ -53,41 +59,9 @@ import { deepClone } from '@/utils/deepClone'
 import { sum, summary } from '@/utils/summaryList'
 import geoJson from '@/utils/guangdong.json'
 import reverseAddressResolution from '@/utils/reverseAddressResolution'
+import { dotSeries } from '@/config/mapSeries'
 import { Loading } from 'element-ui'
-const dotSeries = {
-  type: 'scatter', // scatter,effectScatter
-  name: '人口',
-  coordinateSystem: 'geo',
-  symbol: 'circle',
-  symbolSize: 10,
-  //   aspectScale: 0.75,
-  hoverAnimation: true,
-  showEffectOn: 'render',
-  rippleEffect: {
-    brushType: 'stroke',
-    scale: 3
-  },
-  label: {
-    show: false,
-    // formatter: '{b} ：{c}',
-    formatter: function(params) {
-      return params.data.value[2].toFixed(2)
-    },
-    fontSize: 12,
-    position: 'right', // 可选inside
-    emphasis: {
-      show: true
-    }
-  },
-  itemStyle: {
-    emphasis: {
-      borderColor: '#fff',
-      borderWidth: 1
-    }
-  },
-  zlevel: 1
-}
-
+import handleNullData from '@/utils/handleNullData'
 export default {
   props: {
     type: {
@@ -116,22 +90,24 @@ export default {
         },
         measures: '拖入度量'
       },
-      polymerizationData: [
-        { name: '求和', value: 'SUM' },
-        { name: '平均', value: 'AVG' },
-        { name: '最大值', value: 'MAX' },
-        { name: '最小值', value: 'MIN' },
-        { name: '统计', value: 'CNT' }
-      ],
+      polymerizationData: {
+        // 数字
+        num: [
+          { name: '求和', value: 'SUM' },
+          { name: '平均', value: 'AVG' },
+          { name: '最大值', value: 'MAX' },
+          { name: '最小值', value: 'MIN' },
+          { name: '计数', value: 'CNT' },
+          { name: '去重计数', value: 'DCNT' }
+        ],
+        str: [
+          { name: '计数', value: 'CNT' },
+          { name: '去重计数', value: 'DCNT' }
+        ]
+      },
+      strornum: '',
       isdrag: false, // 是否拖拽中
-      fileList: [], // 维度字段数组
-      isVaild: false, //
-      polymerizeType: [
-        { name: '求和', value: 'SUM' },
-        { name: '平均', value: 'AVG' },
-        { name: '最大值', value: 'MAX' },
-        { name: '最小值', value: 'MIN' }
-      ] // 聚合方式
+      fileList: [] // 维度字段数组
     }
   },
   inject: ['errorFile', 'initTargetMeasure'],
@@ -195,31 +171,21 @@ export default {
       'currSelected',
       'optionsTabsType',
       'dataModel',
-      'canvasMap'
+      'canvasMap',
+      'polymerizeType'
     ])
   },
   methods: {
-    ...mapActions(['saveScreenData', 'updateChartData']),
-    // 切换labelType清空数据
-    clearData() {
-      // 清空显示列表
-      this.fileList = []
-      // 清空维度度量
-      Object.assign(this.currSelected.setting.api_data, {
-        labelNormal: [],
-        labelLatitude: [],
-        labelLongitude: [],
-        labelMeasures: []
-      })
-      this.currSelected.datamodelId = 0
-      this.currSelected.isEmpty = false
-      // 清空标记点图表数据
-      let config = this.currSelected.setting.config
-      this.$set(
-        this.currSelected.setting.config,
-        'series',
-        config.series.filter(item => item.type === 'map')
+    ...mapActions(['updateChartData']),
+    formatAggregator(item) {
+      const fun = this.polymerizeType.find(
+        x => x.value === item.defaultAggregator
       )
+      if (item.role === 2) {
+        return `${item.alias} (${fun.name})`
+      } else {
+        return item.alias
+      }
     },
     // 将拖动的维度到所选择的放置目标节点中
     handleDropOnFilesWD(event) {
@@ -242,13 +208,13 @@ export default {
       }
       // 度量
       if (this.type === 'measures' && this.dragFile === this.type) {
+        // let _alias = this.polymerizeType.find(
+        //   x => x.value === dataFile.defaultAggregator
+        // )
+        // dataFile.alias += `(${_alias.name})`
+        dataFile.defaultAggregator = this.judgeDataType(dataFile.dataType)
         // 区域一个维度一个度量，经纬度度量经度维度值
-        if (this.labelType === 'area') {
-          this.fileList.push(dataFile)
-          this.fileList = this.uniqueFun(this.fileList, 'alias')
-        } else {
-          this.fileList[0] = dataFile
-        }
+        this.fileList[0] = dataFile
         this.getData()
       }
       this.isdrag = false
@@ -268,14 +234,23 @@ export default {
       event.preventDefault()
       this.isdrag = false
     },
+    // 判断数值类型
+    judgeDataType(dataType) {
+      // 判断数值类型
+      let isNum =
+        dataType === 'BIGINT' || dataType === 'DECIMAL' || dataType === 'DOUBLE'
+      this.strornum = isNum ? 'num' : 'str'
+      return isNum ? 'SUM' : 'CNT'
+    },
     // 点击右键显示更多
     showMore(item) {
+      this.judgeDataType(item.dataType)
       item.showMore = true
     },
     // 修改数据聚合方式
     changePolymerization(i, item) {
       item.showMore = false
-      item.alias = item.alias.replace(/\(.*?\)/, '(' + i.name + ')')
+      // item.alias = item.alias.replace(/\(.*?\)/, '(' + i.name + ')')
       item.defaultAggregator = i.value
       this.getData()
     },
@@ -286,7 +261,7 @@ export default {
       if (!countryside) {
         return null
       }
-      return countryside.properties.center
+      return countryside.properties.centroid
     },
     // 删除当前维度或者度量
     deleteFile(item, index) {
@@ -410,14 +385,22 @@ export default {
       selected.setting.isEmpty = false
       // 数据源被删掉
       if (res.code === 500 && res.msg === 'IsChanged') {
-        selected.setting.isEmpty = true
+        selected.setting.isEmpty = 'noData'
         this.updateChartData()
         loadingInstance.close()
         return
       }
       if (res.code === 200) {
-        let config = deepClone(this.currSelected.setting.config)
-        let legend = []
+        res.data.labelList = await handleNullData(
+          res.data.labelList,
+          this.currSelected.setting
+        )
+        // 保存原始数据 -- 查看数据有用
+        apiData.origin_source = deepClone(res.rows || res.data || {})
+        this.$store.dispatch('SetSelfDataSource', apiData)
+
+        apiData.returnDataLabel = res.data.labelList
+        let config = selected.setting.config
         // 重置series
         config.series = config.series.filter(item => item.type === 'map')
         // 类型为区域
@@ -426,7 +409,7 @@ export default {
           let alias = apiData.labelDimensions[0].alias
           // 一个度量对应一个series.data
           apiData.labelMeasures.forEach((measure, index) => {
-            legend.push(measure.alias)
+            let showName = `地区名/${alias}` // 指标显示用
             let datas = []
             for (let item of res.data.labelList) {
               // 抓取区域坐标
@@ -437,40 +420,52 @@ export default {
               }
               datas.push({
                 name: item[alias],
-                value: center.concat(item[measure.alias]) // 链接数组，坐标和值
+                value: center.concat(item[measure.alias]), // 链接数组，坐标和值
+                // 构造映射数据，给指标提示框内容显示
+                [showName]: item[alias], // 地区名/维度
+                [alias]: item[alias], // 维度
+                [measure.alias]: item[measure.alias] // 度量
               })
             }
             config.series.push(
-              Object.assign(dotSeries, { data: datas, name: measure.alias })
+              Object.assign({}, dotSeries, {
+                data: datas,
+                name: measure.alias,
+                pointShowList: [showName],
+                tooltipShowList: [alias, measure.alias]
+              })
             )
           })
         } else {
           let alias = apiData.labelMeasures[0].alias
-          legend.push(alias)
           let datas = []
           // 解析数据，获取经度，纬度，目标值
           for (let data of res.data.labelList) {
             let positionMsg = ''
             try {
               // 获取位置信息
-              positionMsg = await reverseAddressResolution([
+              let position = [
                 data[apiData.labelLatitude[0].alias],
                 data[apiData.labelLongitude[0].alias]
-              ])
+              ]
+              positionMsg = await reverseAddressResolution(position)
+              datas.push({
+                name: positionMsg.district,
+                value: [
+                  parseFloat(position[0]),
+                  parseFloat(position[1])
+                ].concat(data[alias]),
+                // 构造映射数据，给指标提示框内容显示
+                [apiData.labelLatitude[0].alias]:
+                  data[apiData.labelLatitude[0].alias], // 经度
+                [apiData.labelLongitude[0].alias]:
+                  data[apiData.labelLongitude[0].alias], // 维度
+                地区名: positionMsg.district, // 地区名
+                [alias]: data[alias] // 度量
+              })
             } catch (err) {
               continue
             }
-            datas.push(
-              Object.assign(dotSeries, {
-                data: [
-                  {
-                    name: positionMsg.direct,
-                    value: data[alias]
-                  }
-                ],
-                name: alias
-              })
-            )
           }
           if (datas.length === 0) {
             this.$message.error('经纬点解析失败')
@@ -478,11 +473,21 @@ export default {
             return
           }
           config.series.push(
-            Object.assign(dotSeries, { data: datas, name: alias })
+            Object.assign({}, dotSeries, {
+              data: datas,
+              name: alias,
+              pointShowList: ['地区名'],
+              tooltipShowList: [
+                apiData.labelLatitude[0].alias,
+                apiData.labelLongitude[0].alias,
+                alias
+              ]
+            })
           )
         }
         loadingInstance.close()
-        config.legend.data = legend
+        let scatters = config.series.filter(item => item.type === 'scatter')
+        config.legend.data = scatters.map(item => item.name)
         this.$store.dispatch('SetSelfProperty', config)
         this.$store.dispatch('SetSelfDataSource', apiData)
         this.updateChartData()

@@ -30,7 +30,8 @@ const aggregatorMap = {
   平均: 'AVG',
   最大值: 'MAX',
   最小值: 'MIN',
-  统计: 'CNT'
+  计数: 'CNT',
+  去重计数: 'DCNT'
 }
 const reg = /<span class="edit-alias" contenteditable="false">(.*?)<\/span>/g // /<span class="edit-alias" contenteditable="false">(.*?)\(.*?\)(&nbsp;){3}<\/span>/g // 字符串替换模板
 export default {
@@ -44,7 +45,7 @@ export default {
       type: Object,
       required: true
     },
-    id: {
+    chartId: {
       default: 0
     },
     apiData: {
@@ -91,7 +92,7 @@ export default {
     },
     currentSelected(val) {
       // 是否取消选中文本框
-      if (val !== this.id && this.canEdit) {
+      if (val !== this.chartId && this.canEdit) {
         // 关闭可编辑
         this.canEditByDblClick = false
       }
@@ -107,7 +108,7 @@ export default {
         this.getContent().then(res => {
           this.$refs.editorText.innerHTML = res
           this.selfConfig.title.text = res
-          this.updateChartData(this.id)
+          this.updateChartData(this.chartId)
         })
         // 关闭防止冒泡，开启拖动
         this.$refs.textBox.onmousedown = null
@@ -240,7 +241,7 @@ export default {
     })
   },
   methods: {
-    ...mapActions(['saveScreenData', 'updateChartData']),
+    ...mapActions(['updateChartData']),
     removeSelection() {
       if (this.editable) {
         return
@@ -372,7 +373,7 @@ export default {
       }
       let str = this.htmlText
       if (this.apiData.measures.length > 0) {
-        let selected = this.canvasMap.find(item => item.id === this.id)
+        let selected = this.canvasMap.find(item => item.id === this.chartId)
         let self = this
         let loadingInstance = ''
         if (!isInit) {
@@ -390,7 +391,7 @@ export default {
         }
         // 数据源被删掉
         if (res.code === 500 && res.msg === 'IsChanged') {
-          selected.setting.isEmpty = true
+          selected.setting.isEmpty = 'noData'
           return 'isChanged'
         }
         // if (res.code !== 200) {

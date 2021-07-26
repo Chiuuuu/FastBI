@@ -10,8 +10,9 @@
         >
           <a-icon type="plus-square" class="menu_icon" />
           <a-menu slot="overlay" class="drow_menu">
+            <a-menu-item @click="choose = true"> 选择大屏模版 </a-menu-item>
             <a-menu-item v-on:click="addScreen" v-if="hasPermissionSourceAdd">
-              新建大屏
+              新建空白大屏
             </a-menu-item>
             <a-menu-item
               v-if="hasPermissionFolderAdd"
@@ -82,22 +83,22 @@
         <span slot="description">暂无数据大屏</span>
       </a-empty>
     </div>
-    <div class="right scrollbar" style="overflow:hidden;">
-      <div class="right-header" v-if="fileSelectId !== ''">
+    <div class="right scrollbar" style="overflow: hidden">
+      <div class="right-header" v-if="fileSelectId">
         <span class="nav_title">{{ fileSelectName }} </span>
         <img
           v-show="isPublish === 0"
-          style="width:18px;heigth:18px;"
+          style="width: 18px; heigth: 18px"
           src="@/assets/images/chart/notpublish.png"
         />
         <img
           v-show="isPublish === 1 && releaseObj.valid"
-          style="width:18px;heigth:18px;"
+          style="width: 18px; heigth: 18px"
           src="@/assets/images/chart/published.png"
         />
         <img
           v-show="isPublish === 1 && !releaseObj.valid"
-          style="width:18px;heigth:18px;"
+          style="width: 18px; heigth: 18px"
           src="@/assets/images/chart/timeout.png"
         />
         <a-button class="btn_n1" @click="openScreen">全屏</a-button>
@@ -111,9 +112,7 @@
           >
             <a-icon class="icon-more" type="caret-down" />
             <a-menu slot="overlay" class="drow_menu">
-              <a-menu-item v-on:click="showShare">
-                查看分享
-              </a-menu-item>
+              <a-menu-item v-on:click="showShare"> 查看分享 </a-menu-item>
               <a-menu-item key="1" @click="cancelReleace">
                 撤销分享
               </a-menu-item>
@@ -176,7 +175,7 @@
             v-decorator="['parentId']"
             placeholder="选择大屏目录"
             allowClear
-            style="width:310px"
+            style="width: 310px"
           >
             <a-select-option
               v-for="(item, index) in folderSelectList"
@@ -194,9 +193,7 @@
       :title="isPublish === 1 ? '查看分享' : '发布分享'"
     >
       <template slot="footer">
-        <a-button key="cancel" @click="releaseVisible = false">
-          取消
-        </a-button>
+        <a-button key="cancel" @click="releaseVisible = false"> 取消 </a-button>
         <a-button key="submit" type="primary" @click="releaceConfirm">
           {{ isPublish === 1 ? '重新发布' : '发布' }}
         </a-button>
@@ -216,7 +213,7 @@
         </div>
         <div class="releace-line">
           <span class="label"
-            ><span style="color:#FF0000">*</span>分享链接：</span
+            ><span style="color: #ff0000">*</span>分享链接：</span
           ><span class="text">{{ releaseObj.url }}</span>
         </div>
         <div class="indent">
@@ -240,14 +237,14 @@
             maxlength="6"
             @input="handlePassword"
           />
-          <span v-else>{{ releaseObj.password }}</span>
+          <span v-else>{{ releaseObj.password || '无密码' }}</span>
         </div>
         <div class="releace-line" v-show="showLimitWarn">
           <span class="errortext">请输入6位数字+字母</span>
         </div>
         <div class="releace-line">
           <span class="label"
-            ><span style="color:#FF0000">*</span>分享时效：</span
+            ><span style="color: #ff0000">*</span>分享时效：</span
           >
           <a-radio-group v-if="isPublish === 0" v-model="releaseObj.expired">
             <a-radio :value="7">7天</a-radio>
@@ -269,6 +266,54 @@
       @cancel="hideFolder"
       @create="creatFolder"
     ></new-folder>
+
+    <!-- 选择大屏模版 -->
+    <a-drawer
+      title="选择大屏模版"
+      placement="bottom"
+      height="500"
+      :closable="false"
+      :visible="choose"
+      :bordered="false"
+      @close="choose = false"
+    >
+      <div class="dvs-head-btns">
+        <a-button type="primary" @click="getSubmit" :loading="btnloading">
+          确定
+        </a-button>
+        <a-button
+          style="marginright: 8px"
+          @click="
+            () => {
+              ;(choose = false), (chooseIndex = null)
+            }
+          "
+        >
+          取消
+        </a-button>
+      </div>
+      <div class="templeList">
+        <a-card
+          hoverable
+          style="width: 240px"
+          v-for="(item, index) in templeList"
+          :key="index"
+          :class="{ active: index === chooseIndex }"
+          @click.stop="getCardClick(item, index)"
+        >
+          <img
+            slot="cover"
+            alt="example"
+            height="240"
+            :src="item.thumbnailsUrl"
+          />
+          <a-card-meta
+            :title="item.title"
+            style="text-align:center"
+          ></a-card-meta>
+        </a-card>
+      </div>
+    </a-drawer>
   </div>
 </template>
 
@@ -371,7 +416,12 @@ export default {
         }
       ],
       searchName: '', // 搜索名称
-      componentKey: 0 // 通过改变key实现子组件强制更新,数值在0,1之间变化
+      componentKey: 0, // 通过改变key实现子组件强制更新,数值在0,1之间变化
+      choose: false,
+      chooseIndex: null,
+      chooseTemple: {}, //选中的大屏模版
+      templeList: [],
+      btnloading: false
     }
   },
   watch: {
@@ -399,10 +449,11 @@ export default {
     },
     fileSelectId: {
       get() {
-        return this.screenId
+        return this.$store.state.common.menuSelectId
       },
       set(value) {
         this.$store.dispatch('SetScreenId', value)
+        this.$store.commit('common/SET_MENUSELECTID', value)
       }
     },
     fileSelectName: {
@@ -455,17 +506,25 @@ export default {
     this.getList()
     this.$on('fileSelect', this.handleFileSelect)
 
+    this.getScreenList()
+
     window.onresize = () => {
       // 全屏下监控是否按键了ESC
       if (!this.checkFull()) {
         // 全屏下按键esc后要执行的动作
         this.componentKey -= 1
         this.$store.dispatch('SetIsScreen', false)
+        this.$store.dispatch('ToggleContextMenu')
       }
     }
   },
   methods: {
-    ...mapActions(['addScreenData', 'saveScreenData', 'SetCanvasRange']),
+    ...mapActions([
+      'addScreenData',
+      'saveScreenData',
+      'renameScreenData',
+      'SetCanvasRange'
+    ]),
     // 获取文件夹列表
     getList() {
       let params = {
@@ -477,7 +536,7 @@ export default {
           // 大屏文件保存不需要文件夹
           this.folderList = rows
           // 没有选择文件的时候默认选择第一个文件
-          if (!this.fileSelectId && this.folderList.length > 0) {
+          if (this.fileSelectId === -1 && this.folderList.length > 0) {
             this.getFirstScreen(this.folderList, 0)
           }
         }
@@ -617,10 +676,9 @@ export default {
           if (res.code === 200) {
             this.$message.success('删除成功')
             this.getList()
-            this.fileSelectId = ''
-            this.fileSelectName = ''
             this.$store.dispatch('SetParentId', '')
             this.$store.commit('common/SET_PRIVILEGES', [])
+            this.$store.commit('common/SET_MENUSELECTID', -1)
           }
         })
     },
@@ -675,19 +733,26 @@ export default {
     },
     // 新建/编辑大屏名称
     handleOk(e) {
-      this.screenForm.validateFields((err, values) => {
+      this.screenForm.validateFields(async (err, values) => {
         if (err) {
           return
         }
-        // this.fileSelectId = ''
         if (this.isAdd === 1) {
           // 新增
           // 新建大屏清空模型列表
-          this.$store.dispatch('dataModel/setSelectedModelList', [])
-          this.addScreenData({ ...values })
-          this.fileSelectName = values.name
-          // 新建默认赋予所有权限
-          this.$store.commit('common/SET_PRIVILEGES', [0])
+          const res = await this.addScreenData({ ...values })
+          if (res) {
+            this.$store.dispatch('dataModel/setSelectedModelList', [])
+            this.$router.push({
+              name: 'screenEdit',
+              query: { id: res }
+            })
+            this.fileSelectName = values.name
+            // 新建默认赋予所有权限
+            this.$store.commit('common/SET_PRIVILEGES', [0])
+          } else {
+            return
+          }
         } else if (this.isAdd === 3) {
           // 移动大屏
           // 没有选文件夹保存在外面
@@ -707,7 +772,7 @@ export default {
                     setting: this.setting,
                     ...values
                   }
-                  this.saveScreenData({ ...params }).then(res => {
+                  this.renameScreenData({ ...params }).then(res => {
                     if (res) {
                       this.$message.success('重命名成功')
                       this.fileSelectName = values.name
@@ -846,7 +911,7 @@ export default {
       }
     },
     // 获取分享信息
-    getShareData(sharedata) {
+    getShareData(sharedata = {}) {
       this.releaseObj = sharedata
     },
     // 查看分享
@@ -940,12 +1005,48 @@ export default {
           }
         }
       })
+    },
+    getSubmit() {
+      this.btnloading = true
+      this.$server.chooseScreen
+        .saveScreenData(this.chooseTemple.screenId)
+        .then(res => {
+          this.btnloading = false
+          this.$router.push({
+            name: 'screenEdit',
+            query: {
+              id: res.data.screenId,
+              tabId: res.data.tabId
+            }
+          })
+        })
+    },
+    //获取大屏模版
+    getScreenList() {
+      this.$server.chooseScreen.getScreenTemplates().then(res => {
+        this.templeList = { ...res.data }
+      })
+    },
+    getCardClick(item, index) {
+      this.chooseIndex = index
+      this.chooseTemple = { ...item }
     }
   },
-  // 跳出大屏模块清除screenId
+  // 进入大屏重置菜单选择id
+  beforeRouteEnter(to, from, next) {
+    if (from.name !== 'screenEdit') {
+      next(vm => {
+        vm.$store.commit('common/SET_MENUSELECTID', -1)
+      })
+    } else {
+      next()
+    }
+  },
+  // 跳出大屏模块清除菜单选择id
   beforeRouteLeave(to, from, next) {
     if (to.name !== 'screenEdit') {
       this.fileSelectId = ''
+      this.$store.commit('common/SET_MENUSELECTID', -1)
       next()
     } else {
       next()
@@ -955,5 +1056,5 @@ export default {
 </script>
 
 <style lang="styl" scoped>
-@import "./screenCatalog.styl";
+@import './screenCatalog.styl';
 </style>

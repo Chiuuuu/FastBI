@@ -75,6 +75,8 @@ export default {
         case 'BIGINT':
         case 'INT':
           return '整数'
+        case 'DECIMAL':
+          return '数值'
         case 'TIMESTAMP':
         case 'TIME':
           return '日期时间'

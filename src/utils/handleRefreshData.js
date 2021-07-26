@@ -1,46 +1,21 @@
 import { sum, summary } from '@/utils/summaryList'
+import handleNullData from '@/utils/handleNullData'
 import reverseAddressResolution from '@/utils/reverseAddressResolution'
 import geoJson from '@/utils/guangdong.json'
+import { visualMapConfig, mapSeries, dotSeries } from '@/config/mapSeries'
 import { message } from 'ant-design-vue'
 // 处理大屏刷新数据
-export function handleRefreshData({ chart, newData }) {
-  let apiData = chart.setting.api_data
+export async function handleRefreshData({ chart, newData, refreshType }) {
   if (chart.setting.chartType === 'v-map') {
-    // let config = chart.setting.config
-    // let legend = []
-    // let datas = []
-    // // 重置series
-    // config.series = [config.series[0]]
-    // // 只有一个维度，唯一名称
-    // let alias = apiData.dimensions[0].alias
-    // // 一个度量对应一个series.data
-    // apiData.measures.forEach((measure, index) => {
-    //   // 添加series
-    //   if (index > 0) {
-    //     config.series[index] = Object.assign({}, config.series[0])
-    //   }
-    //   config.series[index].name = measure.alias
-    //   legend.push(measure.alias)
-    //   let data = []
-    //   for (let item of newData) {
-    //     // 抓取区域坐标
-    //     let center = getCenterCoordinate(item[alias])
-    //     // 找不到对应坐标跳过
-    //     if (!center) {
-    //       continue
-    //     }
-    //     data.push({
-    //       name: item[alias],
-    //       value: center.concat(item[measure.alias]) // 链接数组，坐标和值
-    //     })
-    //   }
-    //   config.series[index].data = data
-    //   datas.push(data)
-    // })
-    // config.legend.data = legend
-    // apiData.data = datas
-    // return
+    // 假刷新获取不到null的值，遍历加上
+    if (newData.fillList) {
+      newData.fillList = await handleNullData(newData, chart.setting)
+    }
+    if (newData.labelList) {
+      newData.labelList = await handleNullData(newData, chart.setting, true)
+    }
     setMapData(chart, newData)
+    return
   }
   let source = chart.setting.api_data.source
   if (!source) {
@@ -50,7 +25,10 @@ export function handleRefreshData({ chart, newData }) {
   if (!sourceRows) {
     return
   }
+  // 假刷新获取不到null的值，遍历加上
+  newData = await handleNullData(newData, chart.setting)
   if (chart.setting.type === '2') {
+    chart.setting.api_data.returnData = newData // 记录返回的键值对，方便展示图表数据直接用
     sourceRows.forEach((row, index) => {
       // 按对应key重新取值
       if (index === 0) {
@@ -70,10 +48,13 @@ export function handleRefreshData({ chart, newData }) {
           value: datas[keys[0]]
         }
       ]
+      // 剩余数
+      let value = datas[keys[1]] - rows[0].value
+      value = value > 0 ? value : 0
       // 剩余段,目标值-当前值
       rows.push({
         type: keys[1],
-        value: datas[keys[1]] - rows[0].value
+        value
       })
       chart.setting.api_data.source.rows = rows
       chart.setting.config.chartTitle.text =
@@ -138,52 +119,34 @@ export function handleRefreshData({ chart, newData }) {
 async function setMapData(chart, newData) {
   let apiData = chart.setting.api_data
   let name = apiData.measures[0].alias
-  let legend = []
-  let series = []
+  let config = chart.setting.config
+  let originMap = config.series.find(item => item.type === 'map')
+  let originScatter = config.series.find(item => item.type === 'scatter')
   // 判断添加填充层
-  if (newData.fillList && newData.fillList.length) {
-    series.push({
-      name,
-      type: 'map',
-      map: 'guangzhou',
-      aspectScale: 0.75,
-      showLegendSymbol: false,
-      zoom: 1.1,
-      roam: false,
-      mapLocation: {
-        x: 'left',
-        y: 'top'
-      },
-      label: {
-        normal: {
-          show: true,
-          color: '#fff'
-        },
-        emphasis: {
-          show: true
-        }
-      },
-      itemStyle: {
-        normal: {
-          areaColor: 'rgba(1, 33, 92, 0.45)',
-          borderColor: '#215495',
-          borderWidth: 1
-        },
-        emphasis: {
-          borderColor: '#073684',
-          areaColor: '#061E3D'
-        },
-        data: []
-      }
-    })
+  if (newData.fillList) {
+    let seriesObj = {}
     let datas = []
+    let valueList = []
     if (apiData.options.fillType === 'area') {
+      let alias = apiData.dimensions[0].alias
+      let showName = `地区名/${alias}` // 指标显示用
       for (let item of newData.fillList) {
         datas.push({
-          name: item[apiData.dimensions[0].alias],
-          value: item[name]
+          name: item[alias],
+          value: item[name],
+          // 构造映射数据，给指标提示框内容显示
+          [showName]: item[alias], // 地区名/维度
+          [alias]: item[alias], // 维度
+          [name]: item[name] // 度量
         })
       }
+      seriesObj = Object.assign(mapSeries, {
+        data: datas,
+        name: name + 'fill',
+        pointShowList: [showName],
+        tooltipShowList: [alias, name]
+      })
+      valueList = datas.map(item => item.value)
     } else {
       for (let item of newData.fillList) {
         let positionMsg = ''
@@ -192,133 +155,131 @@ async function setMapData(chart, newData) {
             item[apiData.latitude[0].alias],
             item[apiData.longitude[0].alias]
           ])
+
+          datas.push({
+            name: positionMsg.district,
+            value: item[name],
+            // 构造映射数据，给指标提示框内容显示
+            [apiData.latitude[0].alias]: item[apiData.latitude[0].alias], // 经度
+            [apiData.longitude[0].alias]: item[apiData.longitude[0].alias], // 维度
+            地区名: positionMsg.district, // 地区名
+            [name]: item[name] // 度量
+          })
         } catch (err) {
           continue
         }
-        datas.push({
-          name: positionMsg.direct,
-          value: item[name]
-        })
       }
       if (datas.length === 0) {
         message.error('经纬度解析失败')
         return
       }
+      seriesObj = Object.assign(mapSeries, {
+        data: datas,
+        name: name + 'fill',
+        pointShowList: ['地区名'],
+        tooltipShowList: [
+          apiData.latitude[0].alias,
+          apiData.longitude[0].alias,
+          name
+        ]
+      })
+      valueList = datas.map(item => item.value)
     }
-    series[0].data = datas
-    chart.setting.config.legend.data = [name]
-    chart.setting.config.series = series
+    // 本来有填充层改数据，没有加上
+    if (originMap) {
+      originMap.data = datas
+    } else {
+      chart.setting.config.series.unshift(seriesObj)
+    }
     if (!chart.setting.config.visualMap) {
-      chart.setting.config.visualMap = {
-        show: false,
-        type: 'piecewise',
-        min: 0,
-        max: 403631060,
-        seriesIndex: [0],
-        inRange: {
-          color: ['#50a3ba', '#eac736', '#d94e5d'],
-          symbolSize: [10, 16]
-        },
-        textStyle: {
-          color: '#fff',
-          fontSize: 12
-        }
-      }
+      chart.setting.config.visualMap = visualMapConfig
+      chart.setting.visualMap.max = Math.max(...valueList)
+      chart.setting.config.visualMap.min = Math.min(...valueList)
     }
   } else {
     delete chart.setting.config.visualMap
   }
-  if (newData.labelList && newData.labelList.length) {
-    const dotSeries = {
-      type: 'scatter', // scatter,effectScatter
-      name: '人口',
-      coordinateSystem: 'geo',
-      symbol: 'circle',
-      symbolSize: 10,
-      //   aspectScale: 0.75,
-      hoverAnimation: true,
-      showEffectOn: 'render',
-      rippleEffect: {
-        brushType: 'stroke',
-        scale: 3
-      },
-      label: {
-        show: false,
-        // formatter: '{b} ：{c}',
-        formatter: function(params) {
-          return params.data.value[2].toFixed(2)
-        },
-        fontSize: 12,
-        position: 'right', // 可选inside
-        emphasis: {
-          show: true
-        }
-      },
-      itemStyle: {
-        emphasis: {
-          borderColor: '#fff',
-          borderWidth: 1
-        }
-      },
-      zlevel: 1
-    }
-    let config = chart.setting.config
+  if (newData.labelList) {
+    let seriesObj = {}
+    let datas = []
     if (apiData.options.labelType === 'area') {
       // 只有一个维度，唯一名称
       let alias = apiData.labelDimensions[0].alias
       // 一个度量对应一个series.data
-      apiData.labelMeasures.forEach((measure, index) => {
-        legend.push(measure.alias)
-        let data = []
-        for (let item of newData.labelList) {
-          // 抓取区域坐标
-          let center = getCenterCoordinate(item[alias])
-          // 找不到对应坐标跳过
-          if (!center) {
-            continue
-          }
-          data.push({
-            name: item[alias],
-            value: center.concat(item[measure.alias]) // 链接数组，坐标和值
-          })
+      let measure = apiData.labelMeasures[0]
+      let showName = `地区名/${alias}` // 指标显示用
+      for (let item of newData.labelList) {
+        // 抓取区域坐标
+        let center = getCenterCoordinate(item[alias])
+        // 找不到对应坐标跳过
+        if (!center) {
+          continue
         }
-        config.series.push(
-          Object.assign(dotSeries, { data, name: measure.alias })
-        )
+        datas.push({
+          name: item[alias],
+          value: center.concat(item[measure.alias]), // 链接数组，坐标和值
+          // 构造映射数据，给指标提示框内容显示
+          [showName]: item[alias], // 地区名/维度
+          [alias]: item[alias], // 维度
+          [measure.alias]: item[measure.alias] // 度量
+        })
+      }
+      seriesObj = Object.assign(dotSeries, {
+        data: datas,
+        name: measure.alias,
+        pointShowList: [showName],
+        tooltipShowList: [alias, measure.alias]
       })
     } else {
       let alias = apiData.labelMeasures[0].alias
-      legend.push(alias)
-      let datas = []
       // 解析数据，获取经度，纬度，目标值
       for (let data of newData.labelList) {
         let positionMsg = ''
         try {
           // 获取位置信息
-          positionMsg = await reverseAddressResolution([
+          let position = [
             data[apiData.labelLatitude[0].alias],
             data[apiData.labelLongitude[0].alias]
-          ])
+          ]
+          positionMsg = await reverseAddressResolution(position)
+
+          datas.push({
+            name: positionMsg.district,
+            value: [parseFloat(position[0]), parseFloat(position[1])].cancat(
+              data[alias]
+            ),
+            // 构造映射数据，给指标提示框内容显示
+            [apiData.labelLatitude[0].alias]:
+              data[apiData.labelLatitude[0].alias], // 经度
+            [apiData.labelLongitude[0].alias]:
+              data[apiData.labelLongitude[0].alias], // 维度
+            地区名: positionMsg.district, // 地区名
+            [alias]: data[alias] // 度量
+          })
         } catch (err) {
           continue
         }
-        datas.push(
-          Object.assign(dotSeries, {
-            data: [
-              {
-                name: positionMsg.direct,
-                value: data[alias]
-              }
-            ],
-            name: alias
-          })
-        )
       }
       if (datas.length === 0) {
         message.error('经纬点解析失败')
         return
       }
-      config.series.push(Object.assign(dotSeries, { data: datas, name: alias }))
+      seriesObj = Object.assign(dotSeries, {
+        data: datas,
+        name: alias,
+        pointShowList: ['地区名'],
+        tooltipShowList: [
+          apiData.labelLatitude[0].alias,
+          apiData.labelLongitude[0].alias,
+          alias
+        ]
+      })
+    }
+    // 本来有散点层改数据，没有加上
+    if (originScatter) {
+      originScatter.data = datas
+    } else {
+      chart.setting.config.series.push(seriesObj)
     }
   }
 }

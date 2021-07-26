@@ -126,7 +126,7 @@
     <a-form-model-item class="form-not-required" label="请选择库组" prop="databaseName" v-if="connectStatus">
       <a-select
         v-model="form.databaseName"
-        :default-value="form.databaseName || databaseList[0].name"
+        :default-value="form.databaseName || databaseList[0] ? databaseList[0].name : ''"
         @change="handleDefaultDbSelect"
       >
         <a-select-option
@@ -312,7 +312,7 @@ export default {
             if (item) {
               this.form.databaseName = item.name
             } else {
-              this.form.databaseName = this.databaseList[0].name
+              this.form.databaseName = this.databaseList[0] ? this.databaseList[0].name : ''
             }
             this.connectStatus = true
             this.$message.success('连接成功')
@@ -335,7 +335,7 @@ export default {
       })
       const obj = item.pop()
       // this.form.dbid = obj.id
-      this.form.databaseName = obj.name
+      this.form.databaseName = obj ? obj.name : ''
 
       const formInfo = Object.assign({}, this.form)
       this.$store.dispatch('dataAccess/setModelInfo', formInfo)
@@ -375,6 +375,7 @@ export default {
             this.$store.dispatch('dataAccess/setModelName', this.form.name)
             this.$store.dispatch('dataAccess/setDatabaseName', this.form.databaseName)
             this.$store.dispatch('dataAccess/setModelId', result.data.id)
+                this.$store.commit('common/SET_MENUSELECTID', result.data.id)
             this.$store.commit('common/SET_PRIVILEGES', result.data.privileges)
             // this.$store.dispatch('dataAccess/setParentId', 0)
             this.formId = result.data

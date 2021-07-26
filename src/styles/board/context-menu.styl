@@ -11,9 +11,16 @@
     height: 28px;
     border-left: 2px solid transparent;
     cursor: pointer;
-    overflow: hidden;
+    // overflow: hidden;
     padding-right: 3em;
-    display: flex;
+    position:relative;
+    color: $color-admin-context-menu-color;
+    .context-menu-item-children{
+      background: $color-admin-context-menu;
+      position:absolute;
+      right: -80px;
+      top: 0;
+    }
     .iconfont {
       margin-right: 3px;
       line-height: 28px;

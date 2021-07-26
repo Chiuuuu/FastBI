@@ -230,20 +230,17 @@ export default {
     },
     fileSelectId: {
       get () {
-        return this.$store.state.projectRoles.roleId
+        return this.$store.state.common.menuSelectId
       },
       set (value) {
         this.$store.commit('projectRoles/SET_ROLEID', value)
+        this.$store.commit('common/SET_MENUSELECTID', value)
       }
     }
   },
   mounted() {
     this.handleGetMenuList()
     this.$on('fileSelect', this.handleFileSelect)
-    if (this.roleId) {
-      this.fileSelectId = this.roleId
-      this.getRoleInfo()
-    }
   },
   methods: {
     /**
@@ -307,7 +304,6 @@ export default {
         if (newItem) result.push(newItem)
       })
       this.searchList = result
-      console.log('搜索结果', this.searchList)
     },
     /**
     * 选择左侧菜单
@@ -317,7 +313,6 @@ export default {
       this.fileSelectId = file.id
       this.getRoleInfo()
       this.$emit('handleChangeTab', 'permission')
-      this.$store.commit('projectRoles/SET_ROLEID', file.id)
       this.$store.commit('projectRoles/SET_PARENTID', file.parentId)
     },
     /**
@@ -489,7 +484,6 @@ export default {
       } else if (this.resetName.type === 'reset') {
         this.handleResetName(values)
       }
-      this.resetNameVisible = false
     },
     /**
      * 新增角色
@@ -532,11 +526,10 @@ export default {
       if (result.code === 200) {
         this.handleGetMenuList()
         this.$message.success('新建成功')
+        this.resetNameVisible = false
       } else {
         this.$message.error(result.msg)
       }
-
-      this.resetNameVisible = false
     },
     /**
      * 重命名文件夹
@@ -551,11 +544,10 @@ export default {
       if (result.code === 200) {
         this.handleGetMenuList()
         this.$message.success('修改成功')
+        this.resetNameVisible = false
       } else {
         this.$message.error(result.msg)
       }
-
-      this.resetNameVisible = false
     },
     /**
      * 判断是否有相同名称

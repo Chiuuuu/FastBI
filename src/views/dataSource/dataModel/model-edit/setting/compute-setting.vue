@@ -144,6 +144,26 @@ const expression = [
     groups: ['aggregator', 'date', 'logic']
   },
   {
+    id: 'COUNT',
+    name: '计数聚合',
+    expression: 'COUNT(表达式)',
+    description:
+      '返回表达式在所有记录中的计数值。',
+    example: 'COUNT([访问量])',
+    syntax: 'COUNT(表达式)',
+    groups: ['aggregator', 'date', 'logic']
+  },
+  {
+    id: 'COUNTD',
+    name: '去重计数聚合',
+    expression: 'COUNTD(表达式)',
+    description:
+      '返回表达式在所有记录中的去重计数值。',
+    example: 'COUNTD([访问量])',
+    syntax: 'COUNTD(表达式)',
+    groups: ['aggregator', 'date', 'logic']
+  },
+  {
     id: '+',
     name: '加法',
     expression: '表达式1 + 表达式2\\\\数值',
@@ -182,6 +202,24 @@ const expression = [
     example: '[总人口] / [城市数量]',
     syntax: '表达式1 / 表达式2',
     groups: ['calculation']
+  },
+  {
+    id: 'ABS',
+    name: '绝对值',
+    expression: 'ABS(表达式)',
+    description: '返回表达式在所有记录中的计数值。ABS只能用于数字字段。',
+    example: 'ABS([总人口])',
+    syntax: 'ABS(表达式)',
+    groups: ['calculation']
+  },
+  {
+    id: 'ROUND',
+    name: '四舍五入',
+    expression: 'ROUND(表达式, [位数])',
+    description: '返回表达式在所有记录中的四舍五入后的值。ROUND只能用于数字字段。',
+    example: 'ROUND([总人口], [位数])',
+    syntax: 'ROUND(表达式, 1)',
+    groups: ['calculation']
   }
 ]
 
@@ -189,7 +227,13 @@ export default {
   name: 'computeSetting',
   props: {
     isShow: Boolean,
-    computeType: String
+    computeType: String,
+    renameData: {
+      type: Object,
+      default() {
+        return {}
+      }
+    }
   },
   data() {
     return {
@@ -227,6 +271,9 @@ export default {
     this.debounceFn = debounce(this.check, 500)
   },
   computed: {
+    isEdit() {
+      return 'id' in this.renameData
+    },
     explain() {
       return this.expression[this.activeIndex].example.replace(/\n/gm, '<br/>')
     },
@@ -245,25 +292,33 @@ export default {
           this.errorMessage = ''
           this.dimensions = this.getDM(this.sourceDimensions)
           this.measures = this.getDM(this.sourceMeasures)
+          this.textareaValue = this.renameData.raw_expr
+          this.form = Object.assign(this.form, {
+            name: this.renameData.alias
+          })
         } else {
           this.dimensions = ''
           this.measures = ''
+          this.textareaValue = ''
+          this.form = this.$options.data().form
         }
       }
     },
     textareaValue(val) {
-      if (!val) {
+      if (val === '' && this.isShow) {
         this.errorMessage = '表达式不能为空'
       }
-      this.$refs['js-expshow'].innerHTML = ''
-      this.getExpshow(val)
+      this.$nextTick(() => {
+        this.$refs['js-expshow'].innerHTML = ''
+        this.getExpshow(val)
+      })
     }
   },
   methods: {
     validateName(rule, value, callback) {
       const arry = [...this.sourceDimensions, ...this.sourceMeasures]
       const item = arry.filter(item => item.alias === value).pop()
-      if (item) {
+      if (item && !this.isEdit) {
         callback(new Error('名称已存在'))
       } else {
         callback()
@@ -370,15 +425,22 @@ export default {
               raw_expr: this.textareaValue,
               expr: this.reverse(this.textareaValue)
             }
-            this.confirmLoading = true
-            const result = await this.$server.dataModel.addCustomizModelPivotschema(params).finally(() => {
-              this.confirmLoading = false
-            })
-
-            if (result.code === 200) {
-              this.$emit('success', result.data)
+            if (this.isEdit) {
+              const updateData = Object.assign({}, this.renameData, params, {
+                alias: params.name
+              })
+              this.$emit('success', updateData)
             } else {
-              this.$message.error(result.msg || '请求错误')
+              this.confirmLoading = true
+              const result = await this.$server.dataModel.addCustomizModelPivotschema(params).finally(() => {
+                this.confirmLoading = false
+              })
+
+              if (result.code === 200) {
+                this.$emit('success', result.data)
+              } else {
+                this.$message.error(result.msg || '请求错误')
+              }
             }
           }
         } else {

@@ -16,7 +16,11 @@
         :key="index"
         @contextmenu.prevent="showMore(item)"
       >
-        <a-dropdown :trigger="['click', 'contextmenu']" v-model="item.showMore">
+        <a-dropdown
+          :trigger="['click', 'contextmenu']"
+          v-model="item.showMore"
+          @visibleChange="v => v && showMore(item)"
+        >
           <a-icon class="icon-more" type="caret-down" />
           <a-menu slot="overlay">
             <a-sub-menu
@@ -25,7 +29,7 @@
               v-show="item.file === 'measures'"
             >
               <a-menu-item
-                v-for="(aggregator, index) in polymerizationData"
+                v-for="(aggregator, index) in polymerizationData[strornum]"
                 :key="index"
                 @click.native="changePolymerization(aggregator, item)"
                 >{{ aggregator.name }}</a-menu-item
@@ -38,8 +42,10 @@
             >
           </a-menu>
         </a-dropdown>
-        <a-tooltip :title="item.alias">
-          <span ref="itemName" class="field-text">{{ item.alias }}</span>
+        <a-tooltip :title="formatAggregator(item)">
+          <span ref="itemName" class="field-text">{{
+            formatAggregator(item)
+          }}</span>
         </a-tooltip>
       </div>
     </div>
@@ -53,10 +59,11 @@
 import { mapGetters, mapActions } from 'vuex'
 import { deepClone } from '@/utils/deepClone'
 // import TreeGroupBy from '@/components/board/options/treemap/tree-groupby'
+import TreeGroupBy from '@/components/board/options/treemap/tree-groupby'
 import { sum, summary } from '@/utils/summaryList'
-import geoJson from '@/utils/guangdong.json'
 import { Loading } from 'element-ui'
 import _ from 'lodash'
+import handleNullData from '@/utils/handleNullData'
 
 export default {
   props: {
@@ -77,22 +84,25 @@ export default {
         current: '拖入当前值',
         total: '拖入最大值'
       },
-      polymerizationData: [
-        { name: '求和', value: 'SUM' },
-        { name: '平均', value: 'AVG' },
-        { name: '最大值', value: 'MAX' },
-        { name: '最小值', value: 'MIN' },
-        { name: '统计', value: 'CNT' }
-      ],
+      polymerizationData: {
+        // 数字
+        num: [
+          { name: '求和', value: 'SUM' },
+          { name: '平均', value: 'AVG' },
+          { name: '最大值', value: 'MAX' },
+          { name: '最小值', value: 'MIN' },
+          { name: '计数', value: 'CNT' },
+          { name: '去重计数', value: 'DCNT' }
+        ],
+        str: [
+          { name: '计数', value: 'CNT' },
+          { name: '去重计数', value: 'DCNT' }
+        ]
+      },
+      strornum: '',
       isdrag: false, // 是否拖拽中
       fileList: [], // 维度字段数组
-      isVaild: false, //
-      polymerizeType: [
-        { name: '求和', value: 'SUM' },
-        { name: '平均', value: 'AVG' },
-        { name: '最大值', value: 'MAX' },
-        { name: '最小值', value: 'MIN' }
-      ] // 聚合方式
+      isVaild: false //
     }
   },
   inject: ['errorFile', 'initTargetMeasure'],
@@ -139,7 +149,8 @@ export default {
       'currSelected',
       'optionsTabsType',
       'dataModel',
-      'canvasMap'
+      'canvasMap',
+      'polymerizeType'
     ]),
     chartType() {
       return this.currSelected ? this.currSelected.setting.type : ''
@@ -147,6 +158,16 @@ export default {
   },
   methods: {
     ...mapActions(['saveScreenData', 'updateChartData']),
+    formatAggregator(item) {
+      const fun = this.polymerizeType.find(
+        x => x.value === item.defaultAggregator
+      )
+      if (item.role === 2) {
+        return `${item.alias} (${fun.name})`
+      } else {
+        return item.alias
+      }
+    },
     // 将拖动的维度到所选择的放置目标节点中
     handleDropOnFilesWD(event) {
       // h5 api
@@ -163,6 +184,13 @@ export default {
       dataFile.showMore = false // 是否点击显示更多
       // 度量
       if (this.dragFile === this.type) {
+        // let _alias = this.polymerizeType.find(
+        //   x => x.value === dataFile.defaultAggregator
+        // )
+        // if (_alias) {
+        //   dataFile.alias += `(${_alias.name})`
+        // }
+        dataFile.defaultAggregator = this.judgeDataType(dataFile.dataType)
         this.fileList[0] = dataFile
       }
       this.getData()
@@ -178,14 +206,23 @@ export default {
       event.preventDefault()
       this.isdrag = false
     },
+    // 判断数值类型
+    judgeDataType(dataType) {
+      // 判断数值类型
+      let isNum =
+        dataType === 'BIGINT' || dataType === 'DECIMAL' || dataType === 'DOUBLE'
+      this.strornum = isNum ? 'num' : 'str'
+      return isNum ? 'SUM' : 'CNT'
+    },
     // 点击右键显示更多
     showMore(item) {
+      this.judgeDataType(item.dataType)
       item.showMore = true
     },
     // 修改数据聚合方式
     changePolymerization(i, item) {
       item.showMore = false
-      item.alias = item.alias.replace(/\(.*?\)/, '(' + i.name + ')')
+      // item.alias = item.alias.replace(/\(.*?\)/, '(' + i.name + ')')
       item.defaultAggregator = i.value
       this.getData()
     },
@@ -261,7 +298,7 @@ export default {
       selected.setting.isEmpty = false
       // 数据源被删掉
       if (res.code === 500 && res.msg === 'IsChanged') {
-        selected.setting.isEmpty = true
+        selected.setting.isEmpty = 'noData'
         this.updateChartData()
         return
       }
@@ -269,9 +306,13 @@ export default {
         // 保存原始数据 -- 查看数据有用
         apiData.origin_source = deepClone(res.rows || res.data || {})
         this.$store.dispatch('SetSelfDataSource', apiData)
-
+        
         // 环形图只有一条数据
         let datas = res.rows[0]
+
+        // 处理空数据
+        datas = await handleNullData(datas, this.currSelected.setting)
+
         // 去掉排序的数据
         if (
           apiData.options &&
@@ -294,10 +335,14 @@ export default {
             value: datas[keys[0]]
           }
         ]
+
+        // 剩余数
+        let value = datas[keys[1]] - rows[0].value
+        value = value > 0 ? value : 0
         // 剩余段,目标值-当前值
         rows.push({
           type: keys[1],
-          value: datas[keys[1]] - rows[0].value
+          value
         })
         apiData.source = {
           columns,
@@ -306,7 +351,7 @@ export default {
         // 保存apidata数据
         this.$store.dispatch('SetSelfDataSource', apiData)
         let config = this.currSelected.setting.config
-         config.chartTitle.text =
+        config.chartTitle.text =
           +((rows[0].value / datas[keys[1]]) * 100).toFixed(2) + '%'
         this.$store.dispatch('SetSelfProperty', config)
 

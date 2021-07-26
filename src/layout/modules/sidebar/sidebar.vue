@@ -5,8 +5,9 @@
     </div>
     <a-menu
       class="menu-body scrollbar"
-      :defaultOpenKeys="openKeys"
+      :openKeys="openKeys"
       :selectedKeys="selectedKeys"
+      @openChange="v => openKeys = v"
       mode="inline"
       theme="dark"
     >
@@ -37,21 +38,32 @@ export default {
   data() {
     const renderRouter = getRenderRouter(this.$store.state.permission.routes)
     const menuData = this.getMenuData(renderRouter.children)
-    const path = this.$route.path
-    const defaultOpenKeys = ['/' + path.split('/').splice(1).shift()]
-    const defaultSelectedKeys = [this.$router.currentRoute.meta.sideBar || this.$router.currentRoute.name]
     return {
       menuData: menuData,
-      openKeys: defaultOpenKeys,
-      selectedKeys: defaultSelectedKeys
+      openKeys: [],
+      selectedKeys: []
     }
   },
   watch: {
-    '$route.path': function(value) {
-      this.selectedKeys = [this.$router.currentRoute.meta.sideBar || this.$router.currentRoute.name] // [value.split('/').pop()]
+    '$route.path': function() {
+      this.setSelectKeys()
     }
   },
+  created() {
+    this.setSelectKeys()
+  },
   methods: {
+    setSelectKeys() {
+      const path = this.$route.path
+      const key = '/' + path.split('/').splice(1).shift()
+      if (!this.openKeys.includes(key)) {
+        this.openKeys.push(key)
+      }
+      // this.openKeys = this.openKeys.concat(['/' + path.split('/').splice(1).shift()]).filter((path, index, list) => {
+      //   return list.indexOf(path) === index
+      // })
+      this.selectedKeys = [this.$router.currentRoute.meta.sideBar || this.$router.currentRoute.name] // [value.split('/').pop()]
+    },
     getMenuData(list) {
       const sidebar = []
       list.forEach(item => {

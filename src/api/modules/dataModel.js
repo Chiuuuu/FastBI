@@ -14,7 +14,9 @@ export default {
    * @returns
    */
   getDatabaseList(dataSourceId) {
-    return $axios.get(`/model/datasource/returnDataModelSourceList/${dataSourceId}`)
+    return $axios.get(
+      `/model/datasource/returnDataModelSourceList/${dataSourceId}`
+    )
   },
   /**
    * @description 编辑状态, 根据数据源id获取数据库
@@ -23,7 +25,9 @@ export default {
    * @returns
    */
   getDataBaseDataInfoList(id, tableId) {
-    return $axios.get(`/model/datamodel/getDataBaseDataInfoList/${id}/${tableId || '1'}`)
+    return $axios.get(
+      `/model/datamodel/getDataBaseDataInfoList/${id}/${tableId || '1'}`
+    )
   },
   /**
    * @description 编辑状态, 根据模型id获取模型信息
@@ -127,7 +131,9 @@ export default {
    * @returns
    */
   getDataSourceFieldDataInfoList(leftTableId, rightTableId) {
-    return $axios.get(`/model/datamodel/getDataSourceFieldDataInfoList/${leftTableId}/${rightTableId}`)
+    return $axios.get(
+      `/model/datamodel/getDataSourceFieldDataInfoList/${leftTableId}/${rightTableId}`
+    )
   },
   /**
    * 保存自定义SQL
@@ -211,7 +217,10 @@ export default {
    * @returns
    */
   getSingleTableInfoWithJoin(params) {
-    return $axios.post(`/model/join/getModelTableConfigInfoAndPivotschema`, params)
+    return $axios.post(
+      `/model/join/getModelTableConfigInfoAndPivotschema`,
+      params
+    )
   },
   /**
    * @description 获取维度度量信息
@@ -220,7 +229,10 @@ export default {
    * @returns
    */
   getDataModelTableInfoAndPivotshchemaInfo(params) {
-    return $axios.post(`/model/pivotschema/getDataModelTableInfoAndPivotshchemaInfo`, params)
+    return $axios.post(
+      `/model/pivotschema/getDataModelTableInfoAndPivotshchemaInfo`,
+      params
+    )
   },
   /**
    * @description 创建视图
@@ -241,5 +253,13 @@ export default {
    */
   addDataModelTable(params) {
     return $axios.post(`/model/custom/createDataModelWideTable`, params)
+  },
+  /**
+   *@description 大屏删除数据模型
+   * @param {String} screenId
+   * @param {String} tableId
+   */
+  delDataModel(screenId, tableId) {
+    return $axios.get(`/screen/pivotschema/del/${screenId}/${tableId}`)
   }
 }

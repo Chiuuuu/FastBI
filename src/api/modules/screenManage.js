@@ -115,12 +115,20 @@ const screenManage = {
     return $axios.get(`/screen/bigscreen/copyScreen/${screenId}`)
   },
   /**
-   * @description 保存大屏
+   * @description 重命名大屏
+   * @param {*} params
+   * @returns
+   */
+  renameScreen(params) {
+    return $axios.post('/screen/bigscreen/saveScreen', params)
+  },
+  /**
+   * @description 保存页签设置
    * @param {*} params
    * @returns
    */
   saveScreen(params) {
-    return $axios.post('/screen/bigscreen/saveScreen', params)
+    return $axios.post('/screen/bigscreen/updateTab', params)
   },
   /**
    * @description 保存图表
@@ -207,12 +215,12 @@ const screenManage = {
     return $axios.post('/screen/graph/dataLink', params)
   },
   /**
-   * @description 度量原始数据类型是否数值类型
+   * @description 请求展示用的图表数据(导出/查看数据)
    * @param {*} params
    * @returns
    */
-  getMeasureCheck(pivotschemaId) {
-    return $axios.get(`/screen/graph/measureCheck/${pivotschemaId}`)
+  getGraphInfo(params) {
+    return $axios.post('  /screen/graph/graphInfo', params)
   },
   /**
    * @description 根据数据筛选数据列表
@@ -274,6 +282,13 @@ const screenManage = {
    */
   getMaterials(params) {
     return $axios.post('/screen/material/picList', params)
+  },
+
+  /**
+   * 获取图表数据
+   */
+  getGraphInfo(params) {
+    return $axios.post('/screen/graph/graphInfo', params)
   }
 }
 

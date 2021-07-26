@@ -31,6 +31,7 @@ export default {
   },
   beforeDestroy() {
     this.$store.commit('projectRoles/SET_ROLEID', 0)
+    this.$store.commit('common/SET_MENUSELECTID', -1)
   }
 }
 </script>

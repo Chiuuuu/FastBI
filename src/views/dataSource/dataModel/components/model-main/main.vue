@@ -1,6 +1,6 @@
 <template>
   <div class="model-main">
-    <a-empty v-if="modelId=== -1" class="main-empty">
+    <a-empty v-if="menuSelectId=== -1" class="main-empty">
       <span slot="description">请新建模型或者选中左侧模型</span>
     </a-empty>
     <template v-else>
@@ -122,6 +122,7 @@ export default {
       modelId: state => state.dataModel.modelId,
       modelName: state => state.dataModel.modelName,
       privileges: state => state.common.privileges,
+      menuSelectId: state => state.common.menuSelectId,
       datasourceId: state => state.dataModel.datasourceId
     }),
     hasEditPermission() {

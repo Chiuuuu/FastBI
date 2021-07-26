@@ -1,6 +1,6 @@
 <template>
-  <div class="dv-admin" @click.stop.prevent="hideContextMenu">
-    <board v-if="!isScreen" :screenData="screenData">
+  <div class="dv-admin" @click.stop.prevent="hideContextMenu()">
+    <board :screenData="screenData">
       <!--头部嵌套可拖拽物品-->
       <template v-slot:headerBox>
         <drag-list :drag-list="navigate"></drag-list>
@@ -25,16 +25,20 @@
               style="width:18px;heigth:18px;"
               :src="require(`@/assets/images/chart/${transform.setting.icon}`)"
             />
-            <a-tooltip v-if="transform.setting.config.title.content.length > 7">
-              <template slot="title">{{
-                transform.setting.config.title.content
-              }}</template>
-              {{
-                transform.setting.config.title.content.substring(0, 7) + '...'
-              }}
-            </a-tooltip>
-            <span v-else>{{ transform.setting.config.title.content }}</span>
-            <!-- <span v-else> {{ transform.setting.title }}</span> -->
+            <template v-if="transform.setting.config.title.content">
+              <a-tooltip
+                v-if="transform.setting.config.title.content.length > 7"
+              >
+                <template slot="title">{{
+                  transform.setting.config.title.content
+                }}</template>
+                {{
+                  transform.setting.config.title.content.substring(0, 7) + '...'
+                }}
+              </a-tooltip>
+              <span v-else>{{ transform.setting.config.title.content }}</span>
+            </template>
+            <span v-else> {{ transform.setting.title }}</span>
           </div>
           <div v-else flex="main:center" style="padding:5px 0">
             <!-- <a-icon
@@ -52,10 +56,11 @@
           </div>
         </div>
       </template>
-      <template v-slot:canvas>
+      <template v-slot:canvas v-if="canvasMap.length > 0">
         <!--动态组件-->
         <template v-for="transform in canvasMap">
           <drag-item
+            ref="dratitem"
             :key="transform.id"
             :item="transform"
             :com-hover="hoverItem === transform.id"
@@ -70,8 +75,14 @@
             <!--数据模型不存在-->
             <chart-nodata
               v-if="transform.setting.isEmpty"
+              :isEmpty="transform.setting.isEmpty"
               :config="transform.setting.config"
             ></chart-nodata>
+            <!-- 图形 -->
+            <ChartFigure
+              v-else-if="transform.setting.name === 'figure'"
+              :setting="transform.setting"
+            />
             <!--素材库-->
             <ChartMaterial
               v-else-if="transform.setting.name === 'material'"
@@ -88,7 +99,7 @@
             <chart-text
               v-else-if="transform.setting.name === 've-text'"
               ref="veText"
-              :id="transform.id"
+              :chart-id="transform.id"
               canEdit
               :api-data="transform.setting.api_data"
               :config="transform.setting.config"
@@ -118,9 +129,40 @@
               v-else-if="transform.setting.name === 've-map'"
               :config="transform.setting.config"
               :background="transform.setting.background"></chart-map> -->
-
+            <!-- 立体饼图 -->
+            <high-charts
+              v-else-if="transform.setting.name === 'high-pie'"
+              :key="transform.id"
+              :chart-id="transform.id"
+              :setting="transform.setting"
+              :config="transform.setting.config"
+              :api-data="transform.setting.api_data"
+            ></high-charts>
+            <!-- 矩形热力图 -->
+            <chart-heart
+              v-else-if="
+                transform.setting.name === 've-heatmap' ||
+                  transform.setting.name === 've-sun'
+              "
+              :chart-id="transform.id"
+              :key="transform.id"
+              :view="transform.setting.view"
+              :config="transform.setting.config"
+              :api-data="transform.setting.api_data"
+              :background="transform.setting.background"
+            ></chart-heart>
+            <!-- <component 
+              v-else-if="transform.setting.chartType==='high-charts'"
+              :is="transform.setting.name"
+              :key="transform.id"
+              :setting='transform.setting'
+              :background="transform.setting.background"
+            ></component> -->
+            <!-- <span>{{transform.setting.background}}</span> -->
             <charts-factory
               v-else
+              ref="vChart"
+              :chart-id="transform.id"
               :key="transform.id"
               :chart-type="transform.setting.chartType"
               :type-name="transform.setting.name"
@@ -135,7 +177,7 @@
       </template>
     </board>
 
-    <screen v-if="isScreen"></screen>
+    <screen :key="isScreen"></screen>
     <b-modal
       v-model="deleteDialog"
       :styles="{ top: '300px', width: '350px' }"
@@ -167,7 +209,11 @@ import ChartImage from '@/components/tools/Image' // 图片模块
 import ChartTables from '@/components/tools/Tables' // 表格模块
 import ChartNodata from '@/components/tools/Nodata' // 数据丢失
 import ChartMaterial from '@/components/tools/Material' // 素材库
+import ChartFigure from '@/components/tools/Figure' // 素材库
+import ChartHeart from '@/components/charts/chart-heat.vue' // 旭日图/矩形热力图
+import HighCharts from '@/components/charts/highcharts.vue' // 3d图表
 import SteepBar from '@/components/tools/SteepBar' // 进度条
+import ContextMenu from '@/components/board/context-menu/index' // 右键菜单
 // import AMap from '@/components/tools/aMap' // 进度条
 import Screen from '@/views/screen' // 全屏
 
@@ -177,6 +223,7 @@ import { deepClone } from '@/utils/deepClone'
 const IconFont = Icon.createFromIconfontCN({
   scriptUrl: '//at.alicdn.com/t/font_2276651_71nv5th6v94.js'
 }) // 引入iconfont
+
 export default {
   name: 'Admin',
   data() {
@@ -189,6 +236,10 @@ export default {
       canEdit: true,
       screenData: null
     }
+  },
+  provide() {
+    // 刷新的时候重置图表联动的选中样式
+    return { resetChartStyle: this.resetChartStyle }
   },
   computed: {
     ...mapGetters([
@@ -225,6 +276,7 @@ export default {
     this.$store.dispatch('InitCanvasMaps', [])
     if (this.$route.query.id) {
       this.$store.dispatch('SetScreenId', this.$route.query.id)
+      this.$store.commit('common/SET_MENUSELECTID', this.$route.query.id)
       this.getScreenTabs().then(res => {
         this.getScreenData()
       })
@@ -241,15 +293,25 @@ export default {
       if (!this.checkFull()) {
         // 全屏下按键esc后要执行的动作
         this.$store.dispatch('SetIsScreen', false)
+        this.$store.dispatch('ToggleContextMenu')
       }
     }
   },
   methods: {
-    ...mapActions(['saveScreenData', 'deleteChartData', 'getScreenDetail']),
+    ...mapActions(['deleteChartData', 'getScreenDetail']),
     // 获取素材库
     async getMaterial() {
       let res = await this.$server.screenManage.getMaterialGroupList()
-      this.navigate[2].tabs = res.data
+      const base = this.navigate.find(item => item.type === 'Base')
+      base.tabs = res.data
+    },
+    // 重置图表样式(图表联动)
+    resetChartStyle() {
+      if (this.$refs.vChart) {
+        this.$refs.vChart.forEach(vchart => {
+          vchart.resetChartStyle()
+        })
+      }
     },
     // 获取大屏页签
     async getScreenTabs() {
@@ -282,10 +344,12 @@ export default {
     },
     // 获取大屏数据
     getScreenData() {
-      this.getScreenDetail({
-        id: this.$route.query.id,
-        tabId: this.$route.query.tabId
-      })
+      if (this.$route.query.tabId) {
+        this.getScreenDetail({
+          id: this.$route.query.id,
+          tabId: this.$route.query.tabId
+        })
+      }
     },
     // 悬停事件
     handleHover(item) {
@@ -301,9 +365,13 @@ export default {
     },
     // transform点击事件右键点击
     handleRightClickOnCanvas(item, event) {
-      let info = { x: event.pageX + 10, y: event.pageY + 10 }
-      this.$store.dispatch('ToggleContextMenu', info)
       this.$store.dispatch('SingleSelected', item.id)
+      let info = {
+        x: event.pageX + 10,
+        y: event.pageY + 10,
+        listType: 'chartMenuList'
+      }
+      this.$store.dispatch('ToggleContextMenu', info)
     },
     // 外层区域关闭右键菜单
     hideContextMenu() {
@@ -352,8 +420,12 @@ export default {
     ChartTables,
     ChartNodata,
     ChartMaterial,
+    ChartFigure,
     SteepBar,
-    Screen
+    Screen,
+    HighCharts,
+    ChartHeart,
+    ContextMenu
     // AMap
   },
   beforeDestroy() {
@@ -368,6 +440,5 @@ export default {
       next()
     }
   }
-  // test
 }
 </script>

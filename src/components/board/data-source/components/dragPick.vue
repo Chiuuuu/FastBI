@@ -193,10 +193,12 @@
 import { mapGetters, mapActions } from 'vuex'
 import { deepClone } from '@/utils/deepClone'
 import { sum, summary } from '@/utils/summaryList'
+import TreeGroupBy from '@/components/board/options/treemap/tree-groupby'
 import navigateList from '@/config/navigate' // 导航条菜单
 import _ from 'lodash'
 import { Loading } from 'element-ui'
 import { Icon } from 'ant-design-vue'
+import handleNullData from '@/utils/handleNullData'
 const IconFont = Icon.createFromIconfontCN({
   scriptUrl: '//at.alicdn.com/t/font_2276651_kjhn0ldks1j.js'
 }) // 引入iconfont
@@ -297,7 +299,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['saveScreenData', 'updateChartData']),
+    ...mapActions(['updateChartData']),
     // 将拖动的维度到所选择的放置目标节点中
     async handleDropOnFilesWD(event) {
       this.isExist = false
@@ -328,8 +330,15 @@ export default {
           return
         }
         if (res.code === 200) {
+          // 过滤空字段
           // 拆维度列表
-          dataFile.originList = res.rows.map(item => Object.values(item)[0]) // 维度全字段列表
+          let list = []
+          res.rows.forEach(item => {
+            if (item) {
+              list.push(Object.values(item)[0])
+            }
+          }) // 维度全字段列表
+          dataFile.originList = list
           dataFile.searchList = dataFile.originList
           dataFile.checkedList = [] // 勾选的字段列表
           dataFile.manualList = [] // 手动输入列表
@@ -344,24 +353,13 @@ export default {
         let { pivotschemaId, resourceType, dataType } = dataFile
         // 数据接入类型直接判断，dataType是不是BIGINT/DOUBLE类型
         if (
-          resourceType === 3 &&
           dataType !== 'BIGINT' &&
+          dataType !== 'DECIMAL' &&
           dataType !== 'DOUBLE'
         ) {
           this.$message.error('当前字段为文本类型，无法进行数值区间筛选')
           this.isdrag = false
           return
-        }
-        // 模型调接口判断
-        if (resourceType === 8) {
-          let res = await this.$server.screenManage.getMeasureCheck(
-            pivotschemaId
-          )
-          if (res.code !== 200 || !res.data) {
-            this.$message.error('当前字段为文本类型，无法进行数值区间筛选')
-            this.isdrag = false
-            return
-          }
         }
         // 通过验证初始化条件列表
         dataFile.conditionList = []
@@ -477,6 +475,15 @@ export default {
     },
     async handleOk() {
       if (this.isNoSelectData) {
+        this.screenVisible = false
+        return
+      }
+      // 度量没有添加条件不能确定
+      if (
+        this.currentFile.file === 'measures' &&
+        !this.currentFile.conditionList.length
+      ) {
+        this.screenVisible = false
         return
       }
       let apiData = deepClone(this.currSelected.setting.api_data)
@@ -655,6 +662,7 @@ export default {
       let selected = this.canvasMap.find(
         item => item.id === this.currentSelected
       )
+
       let loadingInstance = Loading.service({
         lock: true,
         text: '加载中...',
@@ -666,7 +674,7 @@ export default {
       selected.setting.isEmpty = false
       // 数据源被删掉
       if (res.code === 500 && res.msg === 'IsChanged') {
-        selected.setting.isEmpty = true
+        selected.setting.isEmpty = 'noData'
         this.updateChartData()
         return
       }
@@ -680,7 +688,15 @@ export default {
           this.updateChartData()
           return
         }
+        // 保存原始数据 -- 查看数据有用
+        apiData.origin_source = deepClone(res.rows || res.data || {})
+        this.$store.dispatch('SetSelfDataSource', apiData)
+
         let datas = res.rows
+
+        // 处理空数据
+        datas = await handleNullData(datas, this.currSelected.setting)
+
         // 去掉排序的数据
         if (apiData.options.sort.length) {
           let filterArr = []
@@ -689,6 +705,47 @@ export default {
           })
           datas = datas.map(item => _.omit(item, filterArr))
         }
+        // 矩形树图数据处理
+        if (this.currSelected.setting.chartType === 'v-treemap') {
+          let setting = deepClone(this.currSelected.setting)
+          let config = setting.config
+          const tree = new TreeGroupBy(
+            res.rows,
+            setting.api_data.dimensions.map(item => item.alias),
+            setting.api_data.measures
+          )
+          TreeGroupBy.handleLeafValue(tree.tree)
+          config.series.data = tree.tree
+          config.series.visualMaxList = tree.max
+          config.visualMap.max = tree.max[0]
+
+          // 若删除了维度, 且刚好指针指向了维度, 则切换映射类型
+          let index = config.series.recDimensionIndex || 0
+          if (index === setting.api_data.dimensions.length) {
+            config.visualMap.max = config.series.visualMaxList[0]
+            config.visualMap.type = 'continuous'
+            config.visualMap.inRange.color = config.series.continuousColors
+          } else {
+            let dimensionIndex = setting.api_data.dimensions.length - index - 1
+            dimensionIndex = dimensionIndex < 0 ? 0 : dimensionIndex
+            config.visualMap.dimension = dimensionIndex + 1
+            config.visualMap.max = config.series.visualMaxList[dimensionIndex]
+            config.visualMap.type = 'piecewise'
+            config.visualMap.inRange.color = config.series.piecewiseColors
+            config.visualMap.pieces = TreeGroupBy.handlePieces(
+              config.series.data,
+              index
+            )
+          }
+          this.$store.dispatch('SetSelfProperty', config)
+
+          let apiData = deepClone(this.currSelected.setting.api_data)
+          apiData.source = tree.tree
+          this.$store.dispatch('SetSelfDataSource', apiData)
+          this.updateChartData()
+          return
+        }
+        let rows = res.rows
         if (this.currSelected.setting.chartType === 'v-tables') {
           let columns = []
           apiData.tableList.forEach(item => {
@@ -707,6 +764,10 @@ export default {
             rows
           }
           this.$store.dispatch('SetSelfDataSource', apiData)
+        } else if (this.currSelected.setting.chartType === 'v-sun') {
+          apiData.source.rows = res.rows
+          this.$store.dispatch('SetSelfDataSource', apiData)
+          this.updateChartData()
         } else {
           // 仪表盘/环形图 只显示度量
           if (this.chartType === '2') {
@@ -732,10 +793,13 @@ export default {
                   value: datas[0][keys[0]]
                 }
               ]
+              // 剩余数
+              let value = datas[0][keys[1]] - rows[0].value
+              value = value > 0 ? value : 0
               // 剩余段,目标值-当前值
               rows.push({
                 type: keys[1],
-                value: datas[0][keys[1]] - rows[0].value
+                value
               })
               let config = this.currSelected.setting.config
               config.chartTitle.text =
@@ -748,17 +812,17 @@ export default {
             }
             // 保存apidata数据
             this.$store.dispatch('SetSelfDataSource', apiData)
-            let config = deepClone(this.currSelected.setting.config)
             // 如果是仪表盘，第二个度量是目标值（进度条最大值）
             if (
               this.currSelected.setting.chartType === 'v-gauge' &&
               apiData.measures[1]
             ) {
               let goalTotal = sum(datas, apiData.measures[1].alias)
+              let config = deepClone(this.currSelected.setting.config)
               config.series.max = goalTotal
               this.$store.dispatch('SetSelfProperty', config)
             }
-            this.updateChartData()
+            //   this.updateChartData()
             return
           }
 
@@ -780,20 +844,17 @@ export default {
           if (this.currSelected.setting.chartType === 'v-multiPie') {
             // name是各维度数据拼接，value是分类汇总过的数值
             columns = ['name', 'value']
-            let rows = datas
+            const apis = deepClone(this.currSelected.setting.apis)
             let level = []
             // 一个维度是一层饼
             dimensionKeys.forEach(item => {
               // 根据当前维度分类得到的列表
-              let list = summary(rows, item, measureKeys[0]) // 嵌套饼图度量只有一个，直接取第一个数
+              let list = summary(res.rows, item, measureKeys[0]) // 嵌套饼图度量只有一个，直接取第一个数
               rows = rows.concat(list) // 把所有维度分类出来的数组进行拼接（v-charts配置格式要求）
 
               level.push(list.map(obj => obj.name)) // 按维度分层
             })
-
-            let apis = {
-              level
-            }
+            apis.level = level
             this.$store.dispatch('SetApis', apis)
           } else {
             datas.map((item, index) => {
@@ -830,6 +891,58 @@ export default {
               columns = newColumns
               rows = newRows
             }
+          }
+
+          // 散点图，两个度量分别是x，y轴的值
+          if (
+            this.currSelected.setting.chartType === 'v-scatter' &&
+            apiData.dimensions.length == 1 &&
+            apiData.measures.length == 2
+          ) {
+            let scatterData = {}
+            let legendData = []
+            let list = []
+            let xMax = 0
+            let yMax = 0
+            rows.forEach(item => {
+              if (xMax < item[columns[1]]) {
+                xMax = item[columns[1]]
+              }
+              if (yMax < item[columns[2]]) {
+                yMax = item[columns[2]]
+              }
+              if (!scatterData[item[columns[0]]]) {
+                scatterData[item[columns[0]]] = []
+                legendData.push(item[columns[0]])
+              }
+              scatterData[item[columns[0]]].push({
+                name: '',
+                value: [
+                  item[columns[1]], // 度量1
+                  item[columns[2]], // 度量2
+                  item[columns[0]], // 维度
+                  columns[1],
+                  columns[2],
+                  columns[0]
+                ]
+              })
+            })
+            for (let i in scatterData) {
+              list.push({
+                label: i,
+                data: scatterData[i]
+              })
+            }
+            let config = deepClone(this.currSelected.setting.config)
+            config.series.data = list
+            config.series.dimensions = [columns[1], columns[2], columns[0]]
+            config.legend.data = legendData
+            this.$store.dispatch('SetSelfProperty', config)
+
+            let apis = deepClone(this.currSelected.setting.apis)
+            apis.xMax = xMax
+            apis.yMax = yMax
+            this.$store.dispatch('SetApis', apis)
           }
 
           apiData.source = {

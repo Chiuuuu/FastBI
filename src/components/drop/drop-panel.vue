@@ -31,7 +31,7 @@ export default {
   },
   components: { MapTypeView },
   methods: {
-    ...mapActions(['addChartData'], ['saveScreenData']),
+    ...mapActions(['addChartData']),
     // 元素drop
     handleDropOnCanvas: function(event) {
       // 获取节点数据

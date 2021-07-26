@@ -4,7 +4,12 @@
       <Menu @on-menuChange-componet="handleMenuChangeComponet"></Menu>
     </a-col>
     <a-col class="gutter-row screen-manage" :span="19">
-      <component :is="showWhat" @on-change-componet="handleChangeComponet" :tabindex="tabindex" :fieldInfo="fieldInfo"></component>
+      <component
+        :is="showWhat"
+        @on-change-componet="handleChangeComponet"
+        :tabindex="tabindex"
+        :fieldInfo="fieldInfo"
+      ></component>
     </a-col>
   </a-row>
 </template>
@@ -43,6 +48,7 @@ export default {
     this.$store.dispatch('dataAccess/setModelType', '')
     this.$store.dispatch('dataAccess/setModelId', 0)
     this.$store.dispatch('dataAccess/setFirstFinished', false)
+    this.$store.commit('common/SET_MENUSELECTID', -1)
   }
 }
 </script>

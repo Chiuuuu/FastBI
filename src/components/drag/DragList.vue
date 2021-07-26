@@ -23,19 +23,23 @@
       <!--素材库下拉窗尺寸变大-->
       <div
         class="list-group-body"
-        :style="i === 2 ? 'height:500px' : ''"
+        :style="category.type === 'Base' ? 'height:500px' : ''"
         flex
         v-show="category.hovered"
         @mouseenter="category.hovered = true"
         @mouseleave="category.hovered = false"
       >
-        <!-- 列表左侧 --><!--素材库下拉窗尺寸变大-->
-        <div class="left" :style="i === 2 ? 'width:100px' : ''">
+        <!-- 列表左侧 -->
+        <!--素材库下拉窗尺寸变大-->
+        <div
+          class="left"
+          :style="category.type === 'Base' ? 'width:100px' : ''"
+        >
           <div
             v-for="(tab, index) in category.tabs"
             :key="tab.title"
             :class="{ selected: index === selectedIndex }"
-            @mouseenter="selectTab(tab, index, i)"
+            @mouseenter="selectTab(tab, index, category.title)"
           >
             <p class="tab-title">{{ tab.title || tab.name }}</p>
           </div>
@@ -50,9 +54,7 @@
                   v-for="component in category.tabs[selectedIndex].children"
                   :key="component.key"
                 >
-                  <p class="material-text">
-                    {{ component.imgName }}
-                  </p>
+                  <p class="material-text">{{ component.imgName }}</p>
                   <img
                     class="material-img"
                     :src="component.url"
@@ -103,7 +105,7 @@
                 style="width:18px;heigth:18px;"
                 :src="require(`@/assets/images/chart/${component.icon}`)"
               />
-              <span> {{ component.title }}</span>
+              <span>{{ component.title }}</span>
             </div>
           </div>
         </div>
@@ -158,7 +160,7 @@ export default {
   },
   mounted() {},
   methods: {
-    ...mapActions(['addChartData', 'saveScreenData']),
+    ...mapActions(['addChartData']),
     // 拖拽图表添加到大屏
     handleDragStart(component, event) {
       component.api_data.dimensions = []
@@ -196,10 +198,9 @@ export default {
       }
       // 地图添加类型初始值
       if (component.chartType === 'v-map') {
-        component.api_data.options = {
-          fillType: 'area',
-          labelType: 'area'
-        }
+        component.api_data.options = { fillType: 'area', labelType: 'area' }
+        component.api_data.labelDimensions = []
+        component.api_data.labelMeasures = []
       }
       // 拖拽的节点数据
       let nodeInfo = {
@@ -226,7 +227,7 @@ export default {
       category.hovered = true
       this.selectedIndex = 0
       // 素材库加载第一页图片
-      if (i === 2) {
+      if (category.type === 'Base') {
         let tab = category.tabs[0]
         // 没有加载数据过才请求
         if (tab.children.length === 0) {
@@ -235,8 +236,8 @@ export default {
       }
     },
     // 切换子列表
-    selectTab(tab, index, i) {
-      if (i < 2) {
+    selectTab(tab, index, title) {
+      if (title !== '素材库') {
         return
       }
       this.selectedIndex = index
@@ -273,7 +274,7 @@ export default {
           isEmpty: false,
           imgName: imgData.name,
           url: process.env.VUE_APP_SERVICE_URL + imgData.filePath,
-          view: { width: 400, height: 400, x: 760, y: 340 }
+          view: { width: 400, height: 400, x: 760, y: 340, rotate: 0 }
         })
       }
       // 素材内容，分页信息赋值

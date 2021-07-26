@@ -117,7 +117,7 @@ export default {
      * 设置表头类型
     */
     setColumnsType(item) {
-      const type = item.dataType.toUpperCase()
+      const type = item.convertType.toUpperCase()
       switch (type) {
         case 'VARCHAR':
           return '字符串'
@@ -127,6 +127,8 @@ export default {
           return '日期'
         case 'BIGINT':
           return '整数'
+        case 'DECIMAL':
+          return '数值'
         case 'DOUBLE':
           return '小数'
         default:

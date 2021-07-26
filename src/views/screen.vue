@@ -1,15 +1,35 @@
 <template>
-  <div class="dv-screen" ref="dvScreen">
+  <div
+    class="dv-screen"
+    ref="dvScreen"
+    @contextmenu.stop.prevent="poupExportMenu($event)"
+  >
     <b-scrollbar :style="wrapStyle">
       <div :style="scrollBoxStyle">
-        <div class="canvas-panel" :style="canvasPanelStyle">
+        <div
+          class="canvas-panel"
+          :style="canvasPanelStyle"
+          @click.stop.prevent="toggleContextMenu"
+        >
           <template v-for="transform in canvasMap">
-            <preview-box :key="transform.id" :item="transform">
+            <preview-box
+              :id="transform.id"
+              :key="transform.id"
+              :item="transform"
+              @contextmenu.native.stop.prevent="
+                handleRightClickOnCanvas(transform, $event)
+              "
+            >
               <!--数据模型不存在-->
               <chart-nodata
                 v-if="transform.setting.isEmpty"
+                :isEmpty="transform.setting.isEmpty"
                 :config="transform.setting.config"
               ></chart-nodata>
+              <ChartFigure
+                v-else-if="transform.setting.name === 'figure'"
+                :setting="transform.setting"
+              />
               <!--素材库-->
               <ChartMaterial
                 v-else-if="transform.setting.name === 'material'"
@@ -25,7 +45,7 @@
               <!-- 文本 -->
               <chart-text
                 v-else-if="transform.setting.name === 've-text'"
-                :id="transform.id"
+                :chart-id="transform.id"
                 :config="transform.setting.config"
                 :background="transform.setting.background"
                 :api-data="transform.setting.api_data"
@@ -50,9 +70,33 @@
 
               <!-- 高德地图-->
               <!-- <AMap v-else-if="transform.setting.name === 'a-map'" /> -->
+              <!-- 立体饼图 -->
+              <high-charts
+                v-else-if="transform.setting.name === 'high-pie'"
+                :key="transform.id"
+                :chart-id="transform.id"
+                :setting="transform.setting"
+                :config="transform.setting.config"
+                :api-data="transform.setting.api_data"
+              ></high-charts>
+
+              <!-- 矩形热力图 -->
+              <chart-heart
+                v-else-if="
+                  (transform.setting.name === 've-heatmap') |
+                    (transform.setting.name === 've-sun')
+                "
+                :chart-id="transform.id"
+                :key="transform.id"
+                :view="transform.setting.view"
+                :config="transform.setting.config"
+                :api-data="transform.setting.api_data"
+                :background="transform.setting.background"
+              ></chart-heart>
+
               <charts-factory
                 v-else
-                :id="transform.id"
+                :chart-id="transform.id"
                 ref="chart"
                 :type-name="transform.setting.name"
                 :chart-type="transform.setting.chartType"
@@ -61,8 +105,6 @@
                 :api-data="transform.setting.api_data"
                 :apis="transform.setting.apis"
                 :background="transform.setting.background"
-                @linkage="setLinkageData"
-                @resetOriginData="resetOriginData"
               ></charts-factory>
             </preview-box>
           </template>
@@ -75,6 +117,13 @@
       @mouseenter.native="handleTabShow"
       @mouseleave.native="handleTabShow"
     ></pation>
+    <context-menu></context-menu>
+    <!-- 右键菜单 -- 查看数据 -->
+    <chartTableData
+      :show="show"
+      :chart-data="chartData"
+      @cancel="show = false"
+    ></chartTableData>
   </div>
 </template>
 
@@ -89,10 +138,16 @@ import ChartImage from '@/components/tools/Image'
 import ChartTables from '@/components/tools/Tables'
 import ChartNodata from '@/components/tools/Nodata'
 import ChartMaterial from '@/components/tools/Material'
+import ChartFigure from '@/components/tools/Figure'
+import ChartHeart from '@/components/charts/chart-heat'
+import HighCharts from '@/components/charts/highcharts'
 import SteepBar from '@/components/tools/SteepBar'
 import Pation from '@/components/board/pation/index' // 分页栏
+import ContextMenu from '@/components/board/context-menu/index' // 右键菜单
 // import AMap from '@/components/tools/aMap' // 进度条
+import chartTableData from '@/components/board/chartTableData/index' // 右键菜单
 import { Loading } from 'element-ui'
+import TreeGroupBy from '@/components/board/options/treemap/tree-groupby'
 
 import {
   addResizeListener,
@@ -100,6 +155,7 @@ import {
 } from 'bin-ui/src/utils/resize-event'
 
 import throttle from 'lodash/throttle'
+import { deepClone } from '../utils/deepClone'
 
 export default {
   name: 'screen',
@@ -111,8 +167,13 @@ export default {
     ChartTables,
     ChartNodata,
     ChartMaterial,
+    ChartFigure,
     SteepBar,
-    Pation
+    Pation,
+    HighCharts,
+    ChartHeart,
+    ContextMenu,
+    chartTableData
     // AMap
   },
   data() {
@@ -121,7 +182,15 @@ export default {
       range: '',
       chartTimer: null,
       timer: null,
-      showPageTab: false // 页签显示/隐藏
+      showPageTab: false, // 页签显示/隐藏
+      show: false, // 图表数据查看
+      chartData: {} // 图表数据
+    }
+  },
+  provide() {
+    return {
+      showChartData: this.showChartData,
+      dvScreenDom: this.getDvScreen
     }
   },
   computed: {
@@ -131,7 +200,8 @@ export default {
       'screenId',
       'orginPageSettings',
       'isPublish',
-      'isScreen'
+      'isScreen',
+      'currentSelected'
     ]),
     // 画布面板的样式
     canvasPanelStyle() {
@@ -160,7 +230,9 @@ export default {
     screenId: {
       handler(val) {
         if (val) {
-          if (this.$route.name === 'catalog') this.getScreenData()
+          if (this.$route.name === 'catalog') {
+            this.getScreenData()
+          }
         }
       },
       deep: true,
@@ -180,6 +252,15 @@ export default {
   },
   methods: {
     ...mapActions(['getScreenDetail', 'refreshScreen']),
+    toggleContextMenu() {
+      if (this.$store.getters.contextMenuInfo.isShow) {
+        this.$store.dispatch('ToggleContextMenu')
+        this.$store.dispatch('SingleSelected', null)
+      }
+    },
+    getDvScreen() {
+      return this.$refs.dvScreen
+    },
     changeTab(pageId) {
       let loadingInstance = Loading.service({
         lock: true,
@@ -222,7 +303,7 @@ export default {
           )
           this.$store.dispatch('SetPageList', pages)
           this.$store.dispatch('SetPageId', pages[0].id)
-          if (!this.screenId) {
+          if (!this.screenId || !pages[0].id) {
             loadingInstance.close()
             return
           }
@@ -248,6 +329,10 @@ export default {
     },
     // 设置定时器
     setTimer() {
+      // 编辑页面的screen不刷新（用来提前渲染导出大屏图片）
+      if (this.$route.name === 'screenEdit') {
+        return
+      }
       if (this.timer) {
         clearInterval(this.timer)
         this.timer = null
@@ -340,31 +425,13 @@ export default {
         trailing: false
       }
     ),
-    // 设置联动的图标的数据
-    async setLinkageData(id, e) {
-      let selected = this.canvasMap.find(item => item.id === id)
-      let apiData = selected.setting.api_data
-      let bindCharts = apiData.interactive.bindedList
-      // 没有关联图表不需要联动
-      if (!bindCharts) {
-        return
-      }
-      // 获取需要筛选的维度信息
-      let dimensionData = apiData.dimensions[0]
-      dimensionData.value = [e.name]
-      // 关联的每个图表进行数据筛选
-      for (let chartId of bindCharts) {
-        let chart = this.canvasMap.find(item => item.id === chartId)
-        if (!chart) {
-          continue
-        }
-        this.getBindData(chart, dimensionData)
-      }
+    // 显示/隐藏页签栏
+    handleTabShow() {
+      this.showPageTab = !this.showPageTab
     },
-    // 获取联动数据筛选数据,不需要保存
+    // 获取联动数据筛选数据,不需要保存
     async getBindData(chart, dimensionData) {
-      let apiData = chart.setting.api_data
-      // 进行过数据筛选的不再执行联动
+      let apiData = chart.setting.api_data // 进行过数据筛选的不再执行联动
       if (apiData.options.fileList) {
         return
       }
@@ -376,16 +443,16 @@ export default {
       if (res.code === 200) {
         let columns = []
         let rows = []
-        let dimensionKeys = [] // 度量key
+        let dimensionKeys = [] // 度量key
         for (let m of apiData.dimensions) {
           dimensionKeys.push(m.alias)
-          columns.push(m.alias) // 默认columns第二项起为指标
+          columns.push(m.alias) // 默认columns第二项起为指标
         }
 
-        let measureKeys = [] // 度量key
+        let measureKeys = [] // 度量key
         for (let m of apiData.measures) {
           measureKeys.push(m.alias)
-          columns.push(m.alias) // 默认columns第二项起为指标
+          columns.push(m.alias) // 默认columns第二项起为指标
         }
         res.rows.map((item, index) => {
           let obj = {}
@@ -397,8 +464,7 @@ export default {
             obj[item2] = item[item2]
           }
           rows.push(obj)
-        })
-        // 构造联动选择的数据
+        }) // 构造联动选择的数据
         this.$set(apiData, 'selectData', {
           columns,
           rows
@@ -407,23 +473,37 @@ export default {
         this.$message.error(res.msg)
       }
     },
-    // 重置被联动的图标数据
-    resetOriginData(id) {
-      let selected = this.canvasMap.find(item => item.id === id)
-      let bindCharts = selected.setting.api_data.interactive.bindedList
-      for (let chartId of bindCharts) {
-        let chart = this.canvasMap.find(item => item.id === chartId)
-        if (!chart) {
-          continue
+    // 点击事件右键点击
+    handleRightClickOnCanvas(item, event) {
+      // 全屏下图表查看数据&导出
+      if (this.isScreen) {
+        let info = {
+          x: event.pageX + 10,
+          y: event.pageY + 10,
+          listType: 'exportChartList'
         }
-        let apiData = chart.setting.api_data
-        // 删除联动数据
-        this.$delete(apiData, 'selectData')
+        this.$store.dispatch('ToggleContextMenu', info)
+        this.$store.dispatch('SingleSelected', item.id)
       }
     },
-    // 显示/隐藏页签栏
-    handleTabShow() {
-      this.showPageTab = !this.showPageTab
+    // 设置图表数据
+    showChartData(chartData) {
+      this.chartData = chartData
+      this.show = true
+    },
+    cancelSelect() {
+      this.$store.dispatch('SingleSelected', null)
+      this.$store.dispatch('ToggleContextMenu')
+    },
+    poupExportMenu(event) {
+      if (this.isScreen) {
+        let info = {
+          x: event.pageX + 10,
+          y: event.pageY + 10,
+          listType: 'screenMenuList'
+        }
+        this.$store.dispatch('ToggleContextMenu', info)
+      }
     }
   }
 }

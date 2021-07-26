@@ -37,10 +37,6 @@
         <a-icon type="block" style="font-size:18px" />
         <span>预览</span>
       </div>
-      <!-- <div class="item" flex="dir:top" @click.stop="saveScreenData({mes: '保存成功', callback:goBack})">
-          <a-icon type="save" style="font-size:18px" />
-          <span> 保存并关闭</span>
-      </div>-->
       <div class="item" flex="dir:top" @click="goBack">
         <a-icon type="close" style="font-size:18px" />
         <span>保存并关闭</span>
@@ -67,6 +63,7 @@ export default {
       screenData: null
     }
   },
+  inject: ['resetChartStyle'],
   computed: {
     ...mapGetters([
       'isScreen',
@@ -84,7 +81,12 @@ export default {
   },
   mounted() {},
   methods: {
-    ...mapActions(['saveScreenData', 'updateChartData', 'refreshScreen']),
+    ...mapActions([
+      'saveScreenData',
+      'renameScreenData',
+      'updateChartData',
+      'refreshScreen'
+    ]),
     goBack() {
       // 选了背景图片又没有上传图片的，默认选回背景颜色
       if (
@@ -115,6 +117,9 @@ export default {
         return
       }
       this.isFocus = false
+      setTimeout(this.renameScreen, 0)
+    },
+    renameScreen() {
       let params = {
         fileType: 1,
         id: this.screenId,
@@ -123,7 +128,7 @@ export default {
         setting: this.pageSettings
       }
 
-      this.saveScreenData({ ...params }).then(res => {
+      this.renameScreenData({ ...params }).then(res => {
         if (res) {
           this.$message.success('重命名成功')
           this.$store.dispatch('SetFileName', this.screenName)
@@ -137,7 +142,7 @@ export default {
       this.$store.dispatch('SingleSelected', null)
       // 位置在screen.vue,对应画板元素
       this.$nextTick(() => {
-        var docElm = document.querySelector('.dv-screen')
+        var docElm = document.querySelector('.screen-shot')
         if (docElm) {
           if (docElm.requestFullscreen) {
             // W3C
@@ -161,6 +166,7 @@ export default {
         this.$message.error('暂无数据可刷新，请先添加数据')
         return
       }
+      this.resetChartStyle()
       this.refreshScreen({
         charSeted: false,
         needLoading: true

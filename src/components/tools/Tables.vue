@@ -44,7 +44,7 @@
                 v-for="(column, index) in columns"
                 :key="index"
               >
-                {{ column.title }}
+                {{ formatAggregator(column) }}
               </th>
             </tr>
           </thead>
@@ -95,7 +95,7 @@ import {
   removeResizeListener
 } from 'bin-ui/src/utils/resize-event'
 import { formatData, convertData } from '../../utils/formatData'
-
+import { mapGetters } from 'vuex'
 export default {
   name: 'ChartsTables',
   props: {
@@ -211,6 +211,18 @@ export default {
     removeResizeListener(this.$refs.wrap, this._calcStyle)
   },
   methods: {
+    formatAggregator(item) {
+      if ('defaultAggregator' in item) {
+        const fun = this.polymerizeType.find((x) => x.value === item.defaultAggregator)
+        if (item.role === 2) {
+          return `${item.title} (${fun.name})`
+        } else {
+          return item.title
+        }
+      } else {
+        return item.title
+      }
+    },
     afterConfig(options) {
       if (this.typeName === 've-map') {
         let data = [...options.series[0].data]
@@ -218,7 +230,7 @@ export default {
       }
       return options
     },
-    _calcStyle() {
+    async _calcStyle() {
       const wrap = this.$refs.wrap
       const title = this.$refs.titles
       if (!wrap) return
@@ -231,7 +243,7 @@ export default {
       this.height = height + 'px'
 
       // 计算表格每列宽度
-      this.getColWidths()
+      await this.getColWidths()
 
       // 计算表宽(单元格宽度求和)
       this.tableWidth = this.colWidths.reduce((total, value) => {
@@ -253,7 +265,7 @@ export default {
         this.showTableSize.tableY - this.$refs.tableheader.clientHeight
     },
     // 计算单元格宽度
-    getColWidths() {
+    async getColWidths() {
       this.colWidths = []
       for (let row of this.tableData) {
         let index = 0
@@ -262,7 +274,7 @@ export default {
           if (!this.colWidths[index]) {
             // 默认取表头宽度
             this.colWidths[index] =
-              this.getActaulLen(col.title) *
+              this.getActaulLen(this.formatAggregator(col)) *
                 this.config.header.textStyle.fontSize *
                 0.6 +
               30
@@ -278,6 +290,7 @@ export default {
           index++
         }
       }
+      return true
     },
     // 汉字转换成两个字符长度
     getActaulLen(value) {
@@ -326,6 +339,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['polymerizeType']),
     titleStyle() {
       return {
         padding: '20px 10px',

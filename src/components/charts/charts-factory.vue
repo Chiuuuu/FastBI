@@ -32,6 +32,7 @@
       :extend="chartExtend"
       :options="chartOptions"
       :settings="chartSettings"
+      :after-set-option="afterSetOption"
     ></component>
     <component
       v-else
@@ -45,11 +46,11 @@
       :after-config="afterConfig"
       :title="chartType === 'v-ring' ? config.chartTitle : {}"
       :extend="chartExtend"
+      :legend="chartLegend"
       :options="chartOptions"
       :settings="chartSettings"
       :series="chartSeries"
-      :geo="geo"
-      :tooltip="mapToolTip"
+      :after-set-option="afterSetOption"
     ></component>
     <!-- <div v-else class="dv-charts-null">
       <a-icon  type="pie-chart" style="font-size:50px;" />
@@ -67,11 +68,14 @@ import { deepClone } from '@/utils/deepClone'
 import guangzhou from '@/utils/guangdong.json'
 import omit from 'lodash/omit'
 import { DEFAULT_COLORS } from '@/utils/defaultColors'
+import { setChartInstanceIdMap } from '@/utils/screenExport'
+import { setLinkageData, resetOriginData } from '@/utils/setDataLink'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'ChartsFactory',
   props: {
-    id: {
+    chartId: {
       type: String,
       default: '0'
     },
@@ -114,39 +118,53 @@ export default {
           return
         }
         self.$nextTick(() => {
-          let chart = self.$refs.chart.echarts
+          let needReset = self.currentIndex === e.dataIndex
+          // 散点图要比较seriesIndex
+          if (self.typeName === 've-scatter') {
+            needReset = self.currentIndex === e.seriesIndex
+          }
           // 重复选择数据，进行重置
-          if (self.currentIndex === e.dataIndex) {
+          if (needReset) {
             // 重置数据颜色样式
-            delete self.chartExtend.series.itemStyle.normal.color
-            // 强行渲染
-            self.key++
-            self.$emit('resetOriginData', self.id)
+            self.resetChartStyle()
+            resetOriginData(self.chartId, self.canvasMap)
             return
           }
-          // 鼠标单击时选中,选中颜色不变，其余变暗
-          if (self.typeName === 've-bar' || self.typeName === 've-histogram') {
-            // 柱状图折线图数据颜色体现在度量，用seriesIndex
-            self.chartExtend.series.itemStyle.normal.color = function(params) {
-              return params.dataIndex === e.dataIndex
-                ? DEFAULT_COLORS[params.seriesIndex]
-                : self.hexToRgba(DEFAULT_COLORS[params.seriesIndex], 0.4)
-            }
-          } else if (self.typeName === 've-pie') {
-            // 饼图数据颜色体现在维度，用dataIndex
-            self.chartExtend.series.itemStyle.normal.color = function(params) {
-              return params.dataIndex === e.dataIndex
-                ? DEFAULT_COLORS[params.dataIndex]
-                : self.hexToRgba(DEFAULT_COLORS[params.dataIndex], 0.4)
+          // 如果被联动筛选过样式不改变
+          if (!self.apiData.selectData) {
+            // 鼠标单击时选中,选中颜色不变，其余变暗
+            if (
+              self.typeName === 've-bar' ||
+              self.typeName === 've-histogram'
+            ) {
+              // 柱状图折线图数据颜色体现在度量，用seriesIndex
+              self.chartExtend.series.itemStyle.normal.color = function(
+                params
+              ) {
+                return params.dataIndex === e.dataIndex
+                  ? DEFAULT_COLORS[params.seriesIndex]
+                  : self.hexToRgba(DEFAULT_COLORS[params.seriesIndex], 0.4)
+              }
+            } else if (self.typeName === 've-pie') {
+              // 饼图数据颜色体现在维度，用dataIndex
+              self.chartExtend.series.itemStyle.normal.color = function(
+                params
+              ) {
+                return params.dataIndex === e.dataIndex
+                  ? DEFAULT_COLORS[params.dataIndex]
+                  : self.hexToRgba(DEFAULT_COLORS[params.dataIndex], 0.4)
+              }
             }
           }
           // 记录当前选择数据的index
           self.currentIndex = e.dataIndex
           // 强行渲染
           self.key++
-          self.$emit('linkage', self.id, e)
-          chart.off('click')
-          self.setChartClick()
+          setLinkageData(self.chartId, e, self.canvasMap)
+          //   self.$emit('linkage', self.chartId, e)
+          if (!self.apiData.selectData) {
+            self.setChartClick()
+          }
         })
       }
     }
@@ -169,6 +187,7 @@ export default {
       colors: [],
       geo: {},
       mapToolTip: {},
+      chartLegend: {},
       key: 0,
       currentIndex: '' // 记录当前选择的度量数据(图表联动)
     }
@@ -179,37 +198,29 @@ export default {
         if (val) {
           // 图例
           this.legendVisible = val.legend && val.legend.show
-          // this.chartExtend = { ...val }
-
           if (this.typeName === 've-map') {
             this.chartExtend = { ...omit(val, ['series']) }
-            this.chartSeries = val.series
-            if (this.chartSeries.length>0) {
-              this.chartSeries.forEach(item => {
-                if (
-                  !item.label.formatter ||
-                  item.label.formatter === '{b} ：{c}'
-                ) {
-                  // 添加标签格式回调
-                  item.label.formatter = function(params) {
-                    return params.data.value[2].toFixed(2)
-                  }
-                }
-              })
+            this.chartSeries = deepClone(val.series)
+            this.setMapFormatter()
+          } else if (this.typeName === 've-scatter') {
+            val = deepClone(val)
+            if (this.apiData.dimensions.length == 0) {
+              val.legend.data = this.apis.legendData
+              val.series.data = this.apis.seriesData
             }
-            this.geo = val.geo
-            this.mapToolTip = val.tooltip
-            if (
-              !this.mapToolTip.formatter ||
-              this.mapToolTip.formatter === '{b} ：{c}'
-            ) {
-              // 添加格式回调函数
-              this.mapToolTip.formatter = function(params) {
-                let data = params.data
-                return `${params.seriesName}<br />${data.name}：${data
-                  .value[2] || data.value}`
-              }
-            }
+            //散点图
+            this.chartExtend = { ...omit(val, ['series', 'legend']) }
+            this.chartLegend = val.legend //图例
+            // series设置
+            let series = deepClone(val.series)
+            let data = series.data
+            let list = []
+            data.map(item => {
+              list.push(deepClone(series))
+              list[list.length - 1].data = item.data
+              list[list.length - 1].name = item.label
+            })
+            this.chartSeries = list
           } else {
             this.chartExtend = deepClone(val)
             // 保留两位小数
@@ -243,6 +254,9 @@ export default {
                   return params.data.toFixed(2)
                 }
               }
+            }
+            if (this.typeName === 've-pie') {
+              this.setPieFormatter()
             }
           }
           // this.colors = [...val.colors]
@@ -287,13 +301,43 @@ export default {
               if (!val.source) {
                 return
               }
-              // 如果有联动，显示联动的数据
-              this.chartData = val.selectData ? val.selectData : val.source
+              if (this.chartType === 'v-scatter') {
+                //散点图的数据自定义显示
+                this.chartData.columns = []
+                this.chartData.rows = []
+              } else {
+                // 如果有联动，显示联动的数据
+                this.chartData = val.selectData ? val.selectData : val.source
+                // 被联动的图表恢复样式,取消原来选中状态
+                if (val.selectData) {
+                  this.resetChartStyle()
+                  this.currentIndex = ''
+                } else {
+                  this.setChartClick()
+                }
+              }
               return
             }
           }
-          this.chartData.columns = val.columns
-          this.chartData.rows = val.rows
+          // 散点图 -- 维度和度量都移除后，设置回初始默认值
+          if (
+            (val.dimensions || []).length == 0 &&
+            (val.measures || []).length == 0 &&
+            this.chartType === 'v-scatter'
+          ) {
+            this.config.legend.data = this.apis.legendData
+            this.config.series.data = this.apis.seriesData
+            this.apis.xMax = 1000 //度量1 最大值
+            this.apis.yMax = 1000 //度量2 最大值
+          }
+          if (this.chartType === 'v-scatter') {
+            //散点图的数据自定义显示
+            this.chartData.columns = []
+            this.chartData.rows = []
+          } else {
+            this.chartData.columns = val.columns
+            this.chartData.rows = val.rows
+          }
         }
       },
       deep: true,
@@ -302,7 +346,10 @@ export default {
     apis: {
       handler(val) {
         if (val) {
-          this.chartSettings = { ...val }
+          this.chartSettings = deepClone(val)
+          if (this.typeName === 've-map') {
+            this.chartSettings.mapOrigin = guangzhou
+          }
           this.$log.primary('========>chartSettings')
           this.$print(this.chartSettings)
         }
@@ -343,8 +390,118 @@ export default {
   },
   methods: {
     afterConfig(options) {
-      console.log('op', options)
+      options = deepClone(options)
+      // 散点图
+      if (this.typeName === 've-scatter') {
+        // tooltip显示
+        options.tooltip.formatter = function(params) {
+          let val = params.value
+          if (val.length < 6) {
+            return ''
+          }
+          return `${params.marker}<br/>
+                  ${val[5]}：${val[2]}<br/>
+                  ${val[3]}：${val[0]}<br/>
+                  ${val[4]}：${val[1]}<br/>
+                  `
+        }
+        options.series.forEach(item => {
+          // 图形属性 -- 散点颜色 -- 单色
+          this.apis.scatterColor === '0'
+            ? (item.color = '#68ABDA')
+            : delete item.color
+          // 散点图大小设置
+          let scatterSize = this.apis.scatterSize
+          if (scatterSize) {
+            let max = scatterSize === '0' ? this.apis.xMax : this.apis.yMax
+            item.symbolSize = function(val) {
+              let num = val[scatterSize]
+              return max === 0 ? 8 : (20 / max) * num + 8
+            }
+          }
+        })
+        // 如果有图表联动, 则渲染联动的数据
+        if (this.apiData.selectData) {
+          let seriesData = options.series[0]
+          let columns = this.apiData.selectData.columns
+          let rows1 = this.apiData.selectData.rows[0]
+          seriesData.data = [
+            {
+              name: '',
+              value: [
+                rows1[columns[1]],
+                rows1[columns[2]],
+                rows1[columns[0]],
+                columns[1],
+                columns[2],
+                columns[0]
+              ]
+            }
+          ]
+          options.series = seriesData
+          options.legend.data = [rows1[columns[0]]]
+        }
+      }
+
+      // 矩形树图
+      if (this.chartType === 'v-treemap') {
+        const series = options.series[0] ? options.series[0] : options.series
+        // 有拖入数据才处理
+        if (this.apiData.dimensions.length > 0 && this.apiData.measures.length > 0) {
+          this.handleTreemapFormatter(series, 'tooltip')
+          this.handleTreemapFormatter(series, 'label')
+          // 如果有图表联动, 则渲染联动的数据
+          if (this.apiData.selectData) {
+            series.data = this.apiData.selectData.data
+            options.visualMap.pieces = this.apiData.selectData.pieces
+          }
+        }
+      }
       return options
+    },
+    // 处理矩形树图的formatter
+    handleTreemapFormatter(series, type) {
+      let flag = false
+      if (this.apiData.measures[0]) {
+        const measureAlias = this.apiData.measures[0].alias
+        flag = series[type + 'ShowList'].includes(measureAlias)
+      }
+      series[type].formatter = params => {
+        let result = []
+        let target = params.data
+        while (target.parent) {
+          if (series[type + 'ShowList'].includes(target.column)) {
+            result.push(target.name)
+          }
+          target = target.parent
+        }
+        result = result.reverse()
+        if (flag) {
+          result.push(params.value[1])
+        }
+        return result.toString()
+      }
+    },
+    // 重置图表样式(图表联动)
+    resetChartStyle() {
+      if (!this.chartExtend) {
+        return
+      }
+      if (this.typeName === 've-map') {
+        return
+      }
+      const series = this.chartExtend.series
+      if (
+        series &&
+        series.itemStyle &&
+        series.itemStyle.normal &&
+        series.itemStyle.normal.color
+      ) {
+        delete this.chartExtend.series.itemStyle.normal.color
+      }
+      this.currentIndex = ''
+      // 强行渲染
+      this.key++
     },
     // 添加图表点击事件，可以点击非数据区域
     setChartClick() {
@@ -353,13 +510,72 @@ export default {
         this.$refs.chart.echarts.getZr().on('click', function(params) {
           if (typeof params.target === 'undefined') {
             // 重置数据颜色样式
-            delete self.chartExtend.series.itemStyle.normal.color
-            // 强行渲染，非数据变动不会自动重新渲染
-            self.key++
-            self.$emit('resetOriginData', self.id)
+            self.resetChartStyle()
+            resetOriginData(self.chartId, self.canvasMap)
+            self.currentIndex = ''
           }
         })
       })
+    },
+    // 饼图显示内容格式拼接
+    setPieFormatter() {
+      let list = this.chartExtend.series.label.formatterSelect || []
+      this.chartExtend.series.label.formatter = function(params) {
+        let str = []
+        list.forEach(item => {
+          let val = params[item]
+          if (!val) {
+            return
+          }
+          if (typeof val === 'number') {
+            val = +parseFloat(val)
+          }
+          if (item === 'percent') {
+            val += '%'
+          }
+          str.push(val)
+        })
+        return str.join(' ')
+      }
+    },
+    // 地图显示内容格式拼接
+    setMapFormatter() {
+      for (let series of this.chartSeries) {
+        // 指标内容
+        let isShowAreaName = series.pointShowList.some(
+          str => str.search('地区名') > -1
+        )
+        let orient = series.label.normal.orient
+        series.label.normal.formatter = function(params) {
+          if (!params.data) {
+            return isShowAreaName ? params.name : ''
+          }
+          let str = []
+          series.pointShowList.forEach(item => {
+            let val = params.data[item]
+            if (!val) {
+              return
+            }
+            str.push(val)
+          })
+          str = orient === 'vertical' ? str.join('\n') : str.join(':')
+          return str
+        }
+        series.tooltip.formatter = function(params) {
+          if (!params.data) {
+            return params.name
+          }
+          let str = []
+          series.tooltipShowList.forEach(item => {
+            let val = params.data[item]
+            if (!val) {
+              return
+            }
+            str.push(`${item}：${val}`)
+          })
+          return str.join('<br />')
+        }
+      }
     },
     _calcStyle() {
       const wrap = this.$refs.wrap
@@ -380,9 +596,14 @@ export default {
             '0x' + hex.slice(3, 5)
           )},${parseInt('0x' + hex.slice(5, 7))},${opacity})`
         : ''
+    },
+    afterSetOption(chartObj) {
+      // 保存echart实例，截图用
+      setChartInstanceIdMap(chartObj, this.chartId)
     }
   },
   computed: {
+    ...mapGetters(['canvasMap']),
     titleStyle() {
       return {
         padding: '20px 10px',

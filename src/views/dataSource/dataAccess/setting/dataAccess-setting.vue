@@ -35,7 +35,7 @@
             </template>
             <template slot="convertType" slot-scope="text, record">
               <field-select
-                :text="(text || record.dataType) | formatField"
+                :text="(text || record.convertType) | formatField"
                 :select-data="record"
                 :contextmenus="fieldContenxtMenu"
                 :isDimension="record.role === 1"
@@ -87,10 +87,11 @@
                 <a-form-model-item label="字段类型" prop="convertType" required>
                   <a-select default-value="BIGINT" style="width: 100px" v-model="modalForm.convertType">
                     <a-select-option value="BIGINT"> 整数 </a-select-option>
-                    <a-select-option value="TIMESTAMP"> 日期时间 </a-select-option>
-                    <a-select-option value="DATE"> 日期 </a-select-option>
-                    <a-select-option value="VARCHAR"> 字符串 </a-select-option>
                     <a-select-option value="DOUBLE"> 小数 </a-select-option>
+                    <a-select-option value="DECIMAL"> 数值 </a-select-option>
+                    <a-select-option value="VARCHAR"> 字符串 </a-select-option>
+                    <a-select-option value="DATE"> 日期 </a-select-option>
+                    <a-select-option value="TIMESTAMP"> 日期时间 </a-select-option>
                   </a-select>
                 </a-form-model-item>
               </a-form-model>
@@ -232,27 +233,32 @@ export default {
       fieldContenxtMenu: [
         {
           name: '转换为整数',
-          convertType: 'BIGINT',
+          dataType: 'BIGINT',
           onClick: this.switchFieldType
         },
         {
           name: '转换为小数',
-          convertType: 'DOUBLE',
+          dataType: 'DOUBLE',
           onClick: this.switchFieldType
         },
+        // {
+        //   name: '转换为数值',
+        //   dataType: 'DECIMAL',
+        //   onClick: this.switchFieldType
+        // },
         {
           name: '转换为字符串',
-          convertType: 'VARCHAR',
+          dataType: 'VARCHAR',
           onClick: this.switchFieldType
         },
         {
           name: '转换为日期',
-          convertType: 'DATE',
+          dataType: 'DATE',
           onClick: this.switchFieldType
         },
         {
           name: '转换为日期时间',
-          convertType: 'TIMESTAMP',
+          dataType: 'TIMESTAMP',
           onClick: this.switchFieldType
         }
       ]
@@ -310,6 +316,9 @@ export default {
         case 'DOUBLE':
           value = '小数'
           break
+        case 'DECIMAL':
+          value = '数值'
+          break
         case 'VARCHAR':
           value = '字符串'
           break
@@ -348,7 +357,8 @@ export default {
       record[key] = value
     },
     switchFieldType(e, item, vm) {
-      let convertType = item.convertType
+      debugger
+      let convertType = item.dataType
       vm.selectData.convertType = convertType
     },
     switchRoleType(e, item, vm) {

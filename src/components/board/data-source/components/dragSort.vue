@@ -42,12 +42,12 @@
             >
           </a-menu>
         </a-dropdown>
-        <a-tooltip :title="item.alias">
+        <a-tooltip :title="formatAggregator(item)">
           <span ref="itemName" class="field-text"
             ><icon-font
               style="font-weight:bolder"
               :type="item.asc === 1 ? 'icon-paixu-5' : 'icon-paixu-3'"
-            />&nbsp;&nbsp;{{ item.alias }}</span
+            />&nbsp;&nbsp;{{ formatAggregator(item) }}</span
           >
         </a-tooltip>
       </div>
@@ -64,6 +64,7 @@ import navigateList from '@/config/navigate' // 导航条菜单
 import _ from 'lodash'
 import { Loading } from 'element-ui'
 import { Icon } from 'ant-design-vue'
+import handleNullData from '@/utils/handleNullData'
 const IconFont = Icon.createFromIconfontCN({
   scriptUrl: '//at.alicdn.com/t/font_2276651_mlklp2yb77i.js'
 }) // 引入iconfont
@@ -93,11 +94,11 @@ export default {
           { name: '平均', value: 'AVG' },
           { name: '最大值', value: 'MAX' },
           { name: '最小值', value: 'MIN' },
-          { name: '统计', value: 'CNT' }
+          { name: '计数', value: 'CNT' }
         ],
         stringType: [
           { name: '计数', value: 'CNT' },
-          { name: '去重计数', value: 'MIN' }
+          { name: '去重计数', value: 'DCNT' }
         ]
       }
     }
@@ -148,7 +149,8 @@ export default {
       'currSelected',
       'optionsTabsType',
       'dataModel',
-      'canvasMap'
+      'canvasMap',
+      'polymerizeType'
     ]),
     chartType() {
       return this.currSelected ? this.currSelected.setting.type : ''
@@ -161,31 +163,17 @@ export default {
       this.isExist = false
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
       // 验证字段数值类型,非数值不能修改聚合方式
-      let type = 'number'
-      if (
-        dataFile.resourceType === 3 &&
-        dataFile.dataType !== 'BIGINT' &&
-        dataFile.dataType !== 'DOUBLE'
-      ) {
-        type = 'string'
-      }
-      // 模型调接口判断
-      if (dataFile.resourceType === 8) {
-        let res = await this.$server.screenManage.getMeasureCheck(
-          dataFile.pivotschemaId
-        )
-        if (res.code !== 200 || !res.data) {
-          type = 'string'
-        }
-      }
+      let dataType = dataFile.dataType
+      let isNum =
+        dataType === 'BIGINT' || dataType === 'DECIMAL' || dataType === 'DOUBLE'
+      let type = isNum ? 'number' : 'string'
       // 根据数值类型设置初值
       if (type === 'number') {
         dataFile.polymerizationShow = this.polymerizationData.numberType
-        dataFile.alias += '(求和)'
         dataFile.defaultAggregator = 'SUM'
       } else {
-        dataFile.alias += '(计数)'
         dataFile.polymerizationShow = this.polymerizationData.stringType
+        dataFile.defaultAggregator = 'CNT'
       }
       // 设置默认排序
       // 1：升序；2：降序
@@ -240,7 +228,7 @@ export default {
       if (item.defaultAggregator === i.value) {
         return
       }
-      item.alias = item.alias.replace(/\(.*?\)/, '(' + i.name + ')')
+      // item.alias = item.alias.replace(/\(.*?\)/, '(' + i.name + ')')
       item.defaultAggregator = i.value
       this.handleSort()
     },
@@ -305,7 +293,7 @@ export default {
       selected.setting.isEmpty = false
       // 数据源被删掉
       if (res.code === 500 && res.msg === 'IsChanged') {
-        selected.setting.isEmpty = true
+        selected.setting.isEmpty = 'noData'
         this.updateChartData()
         return
       }
@@ -319,7 +307,15 @@ export default {
           this.updateChartData()
           return
         }
+        // 保存原始数据 -- 查看数据有用
+        apiData.origin_source = deepClone(res.rows || res.data || {})
+        this.$store.dispatch('SetSelfDataSource', apiData)
+
         let datas = res.rows
+
+        // 处理空数据
+        datas = await handleNullData(datas, this.currSelected.setting)
+
         // 去掉排序的数据
         if (apiData.options.sort.length) {
           let filterArr = []
@@ -345,6 +341,9 @@ export default {
             columns,
             rows
           }
+          this.$store.dispatch('SetSelfDataSource', apiData)
+        } else if (this.currSelected.setting.chartType === 'v-sun') {
+          apiData.source.rows = res.rows
           this.$store.dispatch('SetSelfDataSource', apiData)
         } else {
           let columns = []
@@ -394,6 +393,59 @@ export default {
               rows.push(obj)
               // }
             })
+
+            // 散点图，两个度量分别是x，y轴的值
+            if (
+              this.currSelected.setting.chartType === 'v-scatter' &&
+              apiData.dimensions.length == 1 &&
+              apiData.measures.length == 2
+            ) {
+              let scatterData = {}
+              let legendData = []
+              let list = []
+              let xMax = 0
+              let yMax = 0
+              rows.forEach(item => {
+                if (xMax < item[columns[1]]) {
+                  xMax = item[columns[1]]
+                }
+                if (yMax < item[columns[2]]) {
+                  yMax = item[columns[2]]
+                }
+                if (!scatterData[item[columns[0]]]) {
+                  scatterData[item[columns[0]]] = []
+                  legendData.push(item[columns[0]])
+                }
+                scatterData[item[columns[0]]].push({
+                  name: '',
+                  value: [
+                    item[columns[1]], // 度量1
+                    item[columns[2]], // 度量2
+                    item[columns[0]], // 维度
+                    columns[1],
+                    columns[2],
+                    columns[0]
+                  ]
+                })
+              })
+              for (let i in scatterData) {
+                list.push({
+                  label: i,
+                  data: scatterData[i]
+                })
+              }
+              let config = deepClone(this.currSelected.setting.config)
+              config.series.data = list
+              config.series.dimensions = [columns[1], columns[2], columns[0]]
+              config.legend.data = legendData
+              this.$store.dispatch('SetSelfProperty', config)
+
+              let apis = deepClone(this.currSelected.setting.apis)
+              apis.xMax = xMax
+              apis.yMax = yMax
+              this.$store.dispatch('SetApis', apis)
+            }
+
             // 雷达图
             if (this.currSelected.setting.chartType === 'v-radar') {
               // 格式例子cloumns:[度量，青瓜，土豆，菜心]
