@@ -183,7 +183,7 @@ export default {
             let max = list.map(item => item.value)
             this.option.visualMap.max = Math.max(...max)
             this.option.series.data = [...list]
-            // this.$store.dispatch('SetSelfProperty', this.option)
+            this.$store.dispatch('SetSelfProperty', this.option)
             this.mychart.setOption(this.option)
           } else {
             // 维度
@@ -207,7 +207,7 @@ export default {
               //   this.option.xAxis.data = val.source.rows.map(x=>(x[dim[0]]));
               this.option.visualMap.max = Math.max(...meaarr)
               this.option.series.data = [..._series]
-            //   this.$store.dispatch('SetSelfProperty', this.option)
+              this.$store.dispatch('SetSelfProperty', this.option)
               this.mychart.setOption(this.option)
             }
             // console.clear();
