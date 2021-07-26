@@ -357,7 +357,6 @@ export default {
       record[key] = value
     },
     switchFieldType(e, item, vm) {
-      debugger
       let convertType = item.dataType
       vm.selectData.convertType = convertType
     },

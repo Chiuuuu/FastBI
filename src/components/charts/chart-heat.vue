@@ -30,7 +30,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['canvasMap']),
+    ...mapGetters(['canvasMap', 'currentSelected']),
     // 是否开启图表联动
     isClickLink() {
       return this.apiData.interactive && this.apiData.interactive.clickLink
@@ -57,10 +57,6 @@ export default {
       if (this.apiData.dimensions.length > 0 && this.apiData.measures.length > 0) {
         this.handleFormatter(config.series, 'tooltip')
         this.handleFormatter(config.series, 'label')
-        // 如果有图表联动, 则渲染联动的数据
-        if (this.apiData.selectData) {
-          config.series.data = this.apiData.selectData.data
-        }
       }
       this.mychart.setOption(config, true)
     },
@@ -187,8 +183,11 @@ export default {
             let max = list.map(item => item.value)
             this.option.visualMap.max = Math.max(...max)
             this.option.series.data = [...list]
-            this.$store.dispatch('SetSelfProperty', this.option)
-            this.mychart.setOption(this.option)
+            // 图表联动, 不需要改变配置
+            if (this.chartId === this.currentSelected) {
+              this.$store.dispatch('SetSelfProperty', this.option)
+            }
+            this.Init(this.option)
           } else {
             // 维度
             let dim = val.dimensions.map(x => x.alias)
@@ -211,8 +210,11 @@ export default {
               //   this.option.xAxis.data = val.source.rows.map(x=>(x[dim[0]]));
               this.option.visualMap.max = Math.max(...meaarr)
               this.option.series.data = [..._series]
-              this.$store.dispatch('SetSelfProperty', this.option)
-              this.mychart.setOption(this.option)
+              // 图表联动, 不需要改变配置
+              if (this.chartId === this.currentSelected) {
+                this.$store.dispatch('SetSelfProperty', this.option)
+              }
+              this.Init(this.option)
             }
             // console.clear();
           }

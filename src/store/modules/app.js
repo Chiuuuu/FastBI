@@ -304,6 +304,10 @@ const app = {
       // 图表联动数据selectData不保存后台
       if (params.setting.api_data.selectData) {
         delete params.setting.api_data.selectData
+        if (chart.setting.chartType === 'v-treemap') {
+          chart.setting.config.series.data =
+            chart.setting.api_data.source
+        }
         // 热力图旭日图还原数据
         let dataList = params.setting.api_data.source.rows
         if (params.setting.name === 've-sun') {
@@ -414,6 +418,34 @@ const app = {
                   if (chart.setting.chartType === 'v-treemap') {
                     chart.setting.config.series.data =
                       chart.setting.api_data.source
+                  }
+                  // 热力图旭日图还原数据
+                  let dataList = chart.setting.api_data.source.rows
+                  if (chart.setting.name === 've-sun') {
+                    let max = dataList.map(item => item.value)
+                    chart.setting.config.visualMap.max = Math.max(...max)
+                    chart.setting.config.series.data = chart.setting.api_data.source.rows
+                  }
+                  if (chart.setting.name === 've-heatmap') {
+                    // 维度
+                    let dim = chart.setting.api_data.dimensions.map(x => x.alias)
+                    // 度量
+                    let mea = chart.setting.api_data.measures.map(y => y.alias)
+                    if ((dim.length === 0) | (mea.length === 0)) {
+                      return
+                    }
+                    // 获取度量数组
+                    let meaarr = dataList.map(h => h[mea[0]])
+                    if (meaarr.includes(undefined)) {
+                      return
+                    }
+                    let _series = dataList.map(item => [
+                      item[dim[0]],
+                      item[dim[1]],
+                      item[mea[0]]
+                    ])
+                    chart.setting.config.visualMap.max = Math.max(...meaarr)
+                    chart.setting.config.series.data = [..._series]
                   }
                 }
                 // 素材库不需要数据

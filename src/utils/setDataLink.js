@@ -15,11 +15,11 @@ export async function setLinkageData(id, e, canvasMap) {
   }
   // 获取需要筛选的维度信息
   let dimensionData = apiData.dimensions[0]
+  dimensionData.value = [e.name]
   // 矩形树图取最后一个维度
   if (selected.setting.chartType === 'v-treemap') {
-    dimensionData = apiData.dimensions[apiData.dimensions.length - 1]
+    dimensionData.value = [e.treePathInfo[1].name]
   }
-  dimensionData.value = [e.name]
   // 散点图q筛选值是seriesName
   if (selected.setting.chartType === 'v-scatter') {
     dimensionData.value = [e.seriesName]
