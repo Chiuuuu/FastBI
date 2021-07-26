@@ -245,17 +245,9 @@
                   @change="switchChange"
                   size="small"
                 />
-                <gui-field label="标题名">
+                <gui-field label="标题名" v-if="!isText">
                   <a-input
                     v-model="selfConfig.title.content"
-                    v-if="!('text' in selfConfig.title)"
-                    size="small"
-                    :maxLength="20"
-                    @change="setSelfProperty"
-                  ></a-input>
-                  <a-input
-                    v-model="selfConfig.title.text"
-                    v-else
                     size="small"
                     :maxLength="20"
                     @change="setSelfProperty"
@@ -758,7 +750,9 @@
               <a-collapse-panel
                 key="properties"
                 header="图形属性"
-                v-if="(isPie || isSun || isRing || isMultiPie) && selfConfig.series"
+                v-if="
+                  (isPie || isSun || isRing || isMultiPie) && selfConfig.series
+                "
               >
                 <gui-field label="中心坐标">
                   <gui-inline>
@@ -1018,7 +1012,12 @@
             <!--图例-->
             <template
               v-if="
-                selfConfig.legend && !isRing && !isGauge && !isMap && !isTreemap && !isHeatmap
+                selfConfig.legend &&
+                  !isRing &&
+                  !isGauge &&
+                  !isMap &&
+                  !isTreemap &&
+                  !isHeatmap
               "
             >
               <a-collapse-panel key="legend" header="图例设置">

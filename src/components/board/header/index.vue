@@ -1,5 +1,5 @@
 <template>
-  <div class="board-header" flex>
+  <div class="board-header" flex @click.stop="cancelSelect">
     <div class="header-title">
       <!-- <span style="font-size:18px;margin-top:10px">{{fileName}}</span> -->
       <!-- <a-input placeholder="请输入大屏标题" v-model="fileName" style="border:none;background:none;color:#fff;" /> -->
@@ -171,6 +171,9 @@ export default {
         charSeted: false,
         needLoading: true
       })
+    },
+    cancelSelect() {
+      this.$store.dispatch('SingleSelected', null)
     }
   }
 }
