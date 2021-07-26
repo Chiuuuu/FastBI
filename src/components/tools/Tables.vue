@@ -75,7 +75,7 @@
                 v-for="(value, key) in row"
                 :key="key"
               >
-                {{ typeof value === 'number' ? value.toFixed(2) : value }}
+                {{ value }}
               </td>
             </tr>
           </table>
@@ -213,7 +213,9 @@ export default {
   methods: {
     formatAggregator(item) {
       if ('defaultAggregator' in item) {
-        const fun = this.polymerizeType.find((x) => x.value === item.defaultAggregator)
+        const fun = this.polymerizeType.find(
+          x => x.value === item.defaultAggregator
+        )
         if (item.role === 2) {
           return `${item.title} (${fun.name})`
         } else {

@@ -223,40 +223,6 @@ export default {
             this.chartSeries = list
           } else {
             this.chartExtend = deepClone(val)
-            // 保留两位小数
-            if (this.typeName !== 've-gauge' && this.typeName !== 've-ring') {
-              let type = this.typeName
-              let chartType = this.chartType
-              this.chartExtend.series.label.formatter = function(params) {
-                if (type === 've-line') {
-                  return params.data[1].toFixed(2)
-                } else if (type === 've-pie') {
-                  // 嵌套饼图不需要拼接显示内容
-                  if (chartType === 'v-multiPie') {
-                    return params.data.value.toFixed(2)
-                  }
-                  let list = val.series.label.formatterSelect
-                  let str = []
-                  list.forEach(item => {
-                    let val = params[item]
-                    if (typeof val === 'number') {
-                      val = +parseFloat(val).toFixed(2)
-                    }
-                    if (item === 'percent') {
-                      val += '%'
-                    }
-                    str.push(val)
-                  })
-                  return str.join(' ')
-                } else if (type === 've-radar') {
-                  return params.value.toFixed(2)
-                } else if (chartType === 'v-treemap') {
-                  return params.value[0].toFixed(2)
-                } else {
-                  return params.data.toFixed(2)
-                }
-              }
-            }
             if (this.typeName === 've-pie') {
               this.setPieFormatter()
             }

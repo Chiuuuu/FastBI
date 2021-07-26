@@ -402,7 +402,7 @@ export default {
           return res.msg
         }
         str = this.htmlText.replace(reg, (match, alias) => {
-          return res.rows[0][alias].toFixed(2)
+          return res.rows[0][alias]
         })
       }
       return str
