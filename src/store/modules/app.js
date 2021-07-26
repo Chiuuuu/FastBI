@@ -432,12 +432,12 @@ const app = {
                     // 度量
                     let mea = chart.setting.api_data.measures.map(y => y.alias)
                     if ((dim.length === 0) | (mea.length === 0)) {
-                      return
+                      continue
                     }
                     // 获取度量数组
                     let meaarr = dataList.map(h => h[mea[0]])
                     if (meaarr.includes(undefined)) {
-                      return
+                      continue
                     }
                     let _series = dataList.map(item => [
                       item[dim[0]],
