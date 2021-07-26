@@ -585,8 +585,6 @@ export default {
         )
         selected.setting.resourceType = this.fileList[0].resourceType
       }
-      // if(this.currSelected.setting.chartType!=='v-heatmap'){
-      this.updateChartData()
       let data = this.currSelected.setting.api_data
       if (this.chartType === '1') {
         if (data.dimensions.length === 0 && data.measures.length === 0) {
@@ -693,7 +691,6 @@ export default {
           let setting = deepClone(this.currSelected.setting)
           let config = setting.config
           config.series.data = res.rows
-          this.updateChartData()
         } else if (this.currSelected.setting.chartType === 'v-heatmap') {
           let setting = deepClone(this.currSelected.setting)
           let config = setting.config
