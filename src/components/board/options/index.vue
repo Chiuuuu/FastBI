@@ -2549,7 +2549,7 @@
                       :min="0"
                       :max="60"
                       @change="setSelfProperty"
-                    ></el-color-picker>
+                    ></a-input-number>
                   </gui-inline>
                 </gui-field>
               </a-collapse-panel>
