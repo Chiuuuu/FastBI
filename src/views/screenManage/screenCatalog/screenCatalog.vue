@@ -701,9 +701,7 @@ export default {
 
       // dom渲染以后才能给form赋值
       this.$nextTick(() => {
-        this.screenForm.setFieldsValue({
-          name: file.name
-        })
+        this.$refs.newFolderForm.form.name = folder.name
       })
     },
     // 在文件夹底下新建大屏
