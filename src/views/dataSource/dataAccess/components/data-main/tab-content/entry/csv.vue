@@ -36,8 +36,8 @@
                 >
                   <div class="text">{{ item.name }}</div>
                   <div>
-                    <a-icon type="retweet" style="margin-right:10px" @click.stop="handleReplaceFile(item, index)" />
-                    <a-icon type="delete" @click.stop="handleRemove(item)"></a-icon>
+                    <a-icon type="retweet" title="替换" style="margin-right:10px" @click.stop="handleReplaceFile(item, index)" />
+                    <a-icon type="delete" title="删除" @click.stop="handleRemove(item)"></a-icon>
                   </div>
                 </div>
               </template>
