@@ -96,6 +96,7 @@ import {
 } from 'bin-ui/src/utils/resize-event'
 import { formatData, convertData } from '../../utils/formatData'
 import { mapGetters } from 'vuex'
+import { deepClone } from '@/utils/deepClone'
 export default {
   name: 'ChartsTables',
   props: {
@@ -147,20 +148,17 @@ export default {
       deep: true,
       immediate: true
     },
+    // 'config.title.show':{
+    //    handler(val){
+    //        if(val){
+    //            let chart
+    //        }
+    //    }
+    // },
     apiData: {
       handler(val) {
         if (val) {
           if (val.tableList.length > 0 && val.source && val.source.columns) {
-            for (let item of val.source.columns) {
-              // 表格样式
-              //   item.customHeaderCell = this.customHeaderRow
-              // 是否自动换行
-              //   if (!this.config.ellipsis) {
-              //     item.ellipsis = true
-              //   } else {
-              //     item.ellipsis = false
-              //   }
-            }
             this.columns = val.source.columns
             let rows = val.source.rows
             let newRows = []
@@ -213,7 +211,9 @@ export default {
   methods: {
     formatAggregator(item) {
       if ('defaultAggregator' in item) {
-        const fun = this.polymerizeType.find((x) => x.value === item.defaultAggregator)
+        const fun = this.polymerizeType.find(
+          x => x.value === item.defaultAggregator
+        )
         if (item.role === 2) {
           return `${item.title} (${fun.name})`
         } else {
@@ -231,19 +231,19 @@ export default {
       return options
     },
     async _calcStyle() {
+      // 计算表格每列宽度
+      await this.getColWidths()
+
       const wrap = this.$refs.wrap
       const title = this.$refs.titles
       if (!wrap) return
       let width = wrap.clientWidth
       let height = wrap.clientHeight
-      if (this.config.title) {
+      if (this.config.title.show && title) {
         height -= title.clientHeight
       }
       this.width = width + 'px'
       this.height = height + 'px'
-
-      // 计算表格每列宽度
-      await this.getColWidths()
 
       // 计算表宽(单元格宽度求和)
       this.tableWidth = this.colWidths.reduce((total, value) => {
@@ -251,13 +251,17 @@ export default {
       })
 
       // 计算显示尺寸(比较表格内容的尺寸和缩放框的大小)
+      let currentChartSize = this.chartSize.height
+      if (this.config.title.show && title) {
+        currentChartSize -= title.offsetHeight
+      }
       this.showTableSize = {
         tableX: Math.min(this.tableWidth, this.chartSize.width),
         tableY:
           Math.min(
             this.$refs.tablebody.clientHeight +
               this.$refs.tableheader.clientHeight,
-            this.chartSize.height - title.offsetHeight
+            currentChartSize
           ) - 10 // 去掉滚动轴占高
       }
       // 获取表格内容高度
@@ -340,6 +344,9 @@ export default {
   },
   computed: {
     ...mapGetters(['polymerizeType']),
+    titleEle() {
+      return this.$refs.titles
+    },
     titleStyle() {
       return {
         padding: '20px 10px',
