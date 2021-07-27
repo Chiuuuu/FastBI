@@ -688,10 +688,9 @@ export default {
       this.id = folder.id
       this.folderVisible = true
       this.folderTitle = '重命名文件夹'
+      // dom渲染以后才能给form赋值
       this.$nextTick(() => {
-        this.$refs.newFolderForm.form.setFieldsValue({
-          name: folder.name
-        })
+        this.$refs.newFolderForm.form.name = folder.name
       })
     },
     // 重命名大屏
@@ -703,7 +702,9 @@ export default {
 
       // dom渲染以后才能给form赋值
       this.$nextTick(() => {
-        this.$refs.newFolderForm.form.name = folder.name
+        this.screenForm.setFieldsValue({
+          name: file.name
+        })
       })
     },
     // 在文件夹底下新建大屏
