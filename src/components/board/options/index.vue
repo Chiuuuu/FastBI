@@ -1047,33 +1047,28 @@
                     ></el-color-picker>
                   </gui-inline>
                 </gui-field>
-                <gui-field label="样式">
-                  <gui-inline label="图例间隔">
-                    <a-input-number
-                      v-model="selfConfig.legend.itemGap"
-                      size="small"
-                      class="f-clear-width"
-                      :min="0"
-                      :max="50"
-                      @change="setSelfProperty"
-                    ></a-input-number>
-                  </gui-inline>
-                  <gui-inline label="图标">
-                    <a-select
-                      v-model="selfConfig.legend.icon"
-                      style="width: 90px"
-                      size="small"
-                      @change="setSelfProperty"
-                    >
-                      <a-select-option value>正常</a-select-option>
-                      <a-select-option value="circle">圆形</a-select-option>
-                      <a-select-option value="rect">矩形</a-select-option>
-                      <a-select-option value="roundRect"
-                        >圆矩形</a-select-option
-                      >
-                      <a-select-option value="diamond">菱形</a-select-option>
-                    </a-select>
-                  </gui-inline>
+                <gui-field label="图例间隔">
+                  <a-input-number
+                    v-model="selfConfig.legend.itemGap"
+                    size="small"
+                    class="f-clear-width"
+                    :min="0"
+                    :max="50"
+                    @change="setSelfProperty"
+                  ></a-input-number>
+                </gui-field>
+                <gui-field label="图例形状">
+                  <a-select
+                    v-model="selfConfig.legend.icon"
+                    style="width: 90px"
+                    size="small"
+                    @change="setSelfProperty"
+                  >
+                    <a-select-option value="circle">圆形</a-select-option>
+                    <a-select-option value="rect">矩形</a-select-option>
+                    <a-select-option value="roundRect">圆矩形</a-select-option>
+                    <a-select-option value="diamond">菱形</a-select-option>
+                  </a-select>
                 </gui-field>
                 <gui-field label="位置">
                   <gui-inline>
@@ -1125,6 +1120,29 @@
                           onRadioChange($event, selfConfig.legend, 'top')
                         "
                         >底部</a-radio-button
+                      >
+                    </a-radio-group>
+                  </gui-inline>
+                </gui-field>
+                <gui-field label="图标位置">
+                  <gui-inline>
+                    <a-radio-group
+                      :value="selfConfig.legend.align"
+                      size="small"
+                    >
+                      <a-radio-button
+                        value="left"
+                        @click.native.stop="
+                          onRadioChange($event, selfConfig.legend, 'align')
+                        "
+                        >左</a-radio-button
+                      >
+                      <a-radio-button
+                        value="right"
+                        @click.native.stop="
+                          onRadioChange($event, selfConfig.legend, 'align')
+                        "
+                        >右</a-radio-button
                       >
                     </a-radio-group>
                   </gui-inline>
@@ -1220,6 +1238,24 @@
                         @change="setSelfProperty"
                       ></a-input-number>
                     </gui-field>
+                    <gui-field
+                      label="图例形状"
+                      v-show="selfConfig.visualMap.type === 'piecewise'"
+                    >
+                      <a-select
+                        v-model="selfConfig.visualMap.itemSymbol"
+                        style="width: 90px"
+                        size="small"
+                        @change="setSelfProperty"
+                      >
+                        <a-select-option value="circle">圆形</a-select-option>
+                        <a-select-option value="rect">矩形</a-select-option>
+                        <a-select-option value="roundRect"
+                          >圆矩形</a-select-option
+                        >
+                        <a-select-option value="diamond">菱形</a-select-option>
+                      </a-select>
+                    </gui-field>
                     <gui-field label="位置">
                       <gui-inline>
                         <a-radio-group
@@ -1288,6 +1324,40 @@
                               onRadioChange($event, selfConfig.visualMap, 'top')
                             "
                             >底部</a-radio-button
+                          >
+                        </a-radio-group>
+                      </gui-inline>
+                    </gui-field>
+                    <gui-field
+                      label="图标位置"
+                      v-show="selfConfig.visualMap.type === 'piecewise'"
+                    >
+                      <gui-inline>
+                        <a-radio-group
+                          :value="selfConfig.visualMap.align"
+                          size="small"
+                        >
+                          <a-radio-button
+                            value="left"
+                            @click.native.stop="
+                              onRadioChange(
+                                $event,
+                                selfConfig.visualMap,
+                                'align'
+                              )
+                            "
+                            >左</a-radio-button
+                          >
+                          <a-radio-button
+                            value="right"
+                            @click.native.stop="
+                              onRadioChange(
+                                $event,
+                                selfConfig.visualMap,
+                                'align'
+                              )
+                            "
+                            >右</a-radio-button
                           >
                         </a-radio-group>
                       </gui-inline>
@@ -1412,35 +1482,30 @@
                         ></el-color-picker>
                       </gui-inline>
                     </gui-field>
-                    <gui-field label="样式">
-                      <gui-inline label="图例间隔">
-                        <a-input-number
-                          v-model="selfConfig.legend.itemGap"
-                          size="small"
-                          class="f-clear-width"
-                          :min="0"
-                          :max="50"
-                          @change="setSelfProperty"
-                        ></a-input-number>
-                      </gui-inline>
-                      <gui-inline label="图标">
-                        <a-select
-                          v-model="selfConfig.legend.icon"
-                          style="width: 90px"
-                          size="small"
-                          @change="setSelfProperty"
+                    <gui-field label="图例间隔">
+                      <a-input-number
+                        v-model="selfConfig.legend.itemGap"
+                        size="small"
+                        class="f-clear-width"
+                        :min="0"
+                        :max="50"
+                        @change="setSelfProperty"
+                      ></a-input-number>
+                    </gui-field>
+                    <gui-field label="图例形状">
+                      <a-select
+                        v-model="selfConfig.legend.icon"
+                        style="width: 90px"
+                        size="small"
+                        @change="setSelfProperty"
+                      >
+                        <a-select-option value="circle">圆形</a-select-option>
+                        <a-select-option value="rect">矩形</a-select-option>
+                        <a-select-option value="roundRect"
+                          >圆矩形</a-select-option
                         >
-                          <a-select-option value>正常</a-select-option>
-                          <a-select-option value="circle">圆形</a-select-option>
-                          <a-select-option value="rect">矩形</a-select-option>
-                          <a-select-option value="roundRect"
-                            >圆矩形</a-select-option
-                          >
-                          <a-select-option value="diamond"
-                            >菱形</a-select-option
-                          >
-                        </a-select>
-                      </gui-inline>
+                        <a-select-option value="diamond">菱形</a-select-option>
+                      </a-select>
                     </gui-field>
                     <gui-field label="位置">
                       <gui-inline>
@@ -1498,6 +1563,29 @@
                               onRadioChange($event, selfConfig.legend, 'top')
                             "
                             >底部</a-radio-button
+                          >
+                        </a-radio-group>
+                      </gui-inline>
+                    </gui-field>
+                    <gui-field label="图标位置">
+                      <gui-inline>
+                        <a-radio-group
+                          :value="selfConfig.legend.align"
+                          size="small"
+                        >
+                          <a-radio-button
+                            value="left"
+                            @click.native.stop="
+                              onRadioChange($event, selfConfig.legend, 'align')
+                            "
+                            >左</a-radio-button
+                          >
+                          <a-radio-button
+                            value="right"
+                            @click.native.stop="
+                              onRadioChange($event, selfConfig.legend, 'align')
+                            "
+                            >右</a-radio-button
                           >
                         </a-radio-group>
                       </gui-inline>

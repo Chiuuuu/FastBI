@@ -129,7 +129,7 @@ export default {
           }
         }
       ], // 聚合列表
-      htmlText: '',
+      htmlText: '<p><br></p>',
       selfConfig: {},
       mediumEditor: null,
       canEditByDblClick: false
@@ -542,6 +542,9 @@ export default {
   padding: 5px;
   //   cursor: default;
   font-size: 26px;
+  /deep/ & > p {
+    margin: 0;
+  }
   &.cursor-text {
     cursor: text;
   }
