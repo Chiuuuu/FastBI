@@ -58,6 +58,7 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import { deepClone } from '@/utils/deepClone'
+// import TreeGroupBy from '@/components/board/options/treemap/tree-groupby'
 import TreeGroupBy from '@/components/board/options/treemap/tree-groupby'
 import { sum, summary } from '@/utils/summaryList'
 import { Loading } from 'element-ui'
@@ -156,7 +157,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['updateChartData']),
+    ...mapActions(['saveScreenData', 'updateChartData']),
     formatAggregator(item) {
       const fun = this.polymerizeType.find(
         x => x.value === item.defaultAggregator
@@ -307,10 +308,11 @@ export default {
         this.$store.dispatch('SetSelfDataSource', apiData)
         
         // 环形图只有一条数据
-        let datas = res.rows[0]
-
+        let datas = res.rows
         // 处理空数据
         datas = await handleNullData(datas, this.currSelected.setting)
+
+        datas = datas[0]
 
         // 去掉排序的数据
         if (

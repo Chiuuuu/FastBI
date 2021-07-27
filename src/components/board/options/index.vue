@@ -245,7 +245,7 @@
                   @change="switchChange"
                   size="small"
                 />
-                <gui-field label="标题名" v-if="!isText">
+                <gui-field label="标题名">
                   <a-input
                     v-model="selfConfig.title.content"
                     size="small"
@@ -253,14 +253,6 @@
                     @change="setSelfProperty"
                   ></a-input>
                 </gui-field>
-                <!-- <gui-field label="内容" v-if="isText">
-                          <a-input
-                            v-model="selfConfig.title.text"
-                            size="small"
-                            :maxLength="20"
-                            @change="setSelfProperty"
-                          ></a-input>
-                        </gui-field> -->
                 <gui-field label="文本">
                   <gui-inline label="字号">
                     <a-input-number

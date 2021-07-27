@@ -254,7 +254,7 @@ const list = [
               legend: {
                 show: true,
                 orient: 'horizontal',
-                align:'left',
+                align: 'left',
                 textStyle: {
                   color: '#ffffff',
                   fontSize: 12
@@ -333,9 +333,9 @@ const list = [
                   show: true
                 }
               },
-              tooltip:{
-                  show:true,
-                  formatter: '{b} {c}'
+              tooltip: {
+                show: true,
+                formatter: '{b} {c}'
               },
               series: {
                 type: 'line',
@@ -460,7 +460,7 @@ const list = [
               legend: {
                 show: true,
                 orient: 'horizontal',
-                align:'left',
+                align: 'left',
                 textStyle: {
                   color: '#ffffff',
                   fontSize: 12
@@ -654,7 +654,7 @@ const list = [
               legend: {
                 show: true,
                 orient: 'horizontal',
-                align:'left',
+                align: 'left',
                 textStyle: {
                   color: '#ffffff',
                   fontSize: 12
@@ -732,10 +732,10 @@ const list = [
                   show: true
                 }
               },
-              tooltip:{
-                show:true,
+              tooltip: {
+                show: true,
                 formatter: '{b} {c}'
-            },
+              },
               series: {
                 selectedMode: 'single',
                 label: {
@@ -829,7 +829,7 @@ const list = [
               legend: {
                 show: true,
                 orient: 'horizontal',
-                align:'left',
+                align: 'left',
                 // 加翻页
                 type: 'scroll',
                 pageIconColor: '#fff',
@@ -993,7 +993,7 @@ const list = [
               legend: {
                 show: true,
                 orient: 'horizontal',
-                align:'left',
+                align: 'left',
                 textStyle: {
                   color: '#ffffff',
                   fontSize: 12
@@ -1134,7 +1134,7 @@ const list = [
               legend: {
                 show: false,
                 orient: 'horizontal',
-                align:'left',
+                align: 'left',
                 data: [],
                 textStyle: {
                   color: '#ffffff',
@@ -1275,7 +1275,7 @@ const list = [
                 right: 'auto',
                 bottom: 'auto',
                 orient: 'horizontal',
-                align:'left',
+                align: 'left',
                 data: ['人口']
               },
               xAxis: {
@@ -1438,7 +1438,7 @@ const list = [
               legend: {
                 show: false,
                 orient: 'horizontal',
-                align:'left',
+                align: 'left',
                 data: [],
                 textStyle: {
                   color: '#ffffff',
@@ -1627,7 +1627,7 @@ const list = [
               legend: {
                 show: true,
                 orient: 'horizontal',
-                align:'left',
+                align: 'left',
                 // 加翻页
                 type: 'scroll',
                 pageIconColor: '#fff',
@@ -1829,7 +1829,7 @@ const list = [
               legend: {
                 show: false,
                 orient: 'horizontal',
-                align:'left',
+                align: 'left',
                 // 加翻页
                 type: 'scroll',
                 pageIconColor: '#fff',
@@ -2168,7 +2168,7 @@ const list = [
               legend: {
                 show: false,
                 orient: 'horizontal',
-                align:'left',
+                align: 'left',
                 // 加翻页
                 type: 'scroll',
                 pageIconColor: '#fff',
@@ -3017,6 +3017,7 @@ const list = [
                 total: '',
                 content: '文本',
                 textAlign: 'left',
+                htmlText: '<p><br></p>',
                 textStyle: {
                   color: '#ffffff',
                   fontSize: 20,
