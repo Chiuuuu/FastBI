@@ -689,9 +689,7 @@ export default {
       this.folderVisible = true
       this.folderTitle = '重命名文件夹'
       this.$nextTick(() => {
-        this.$refs.newFolderForm.form.setFieldsValue({
-          name: folder.name
-        })
+        this.$refs.newFolderForm.form.name = folder.name
       })
     },
     // 重命名大屏

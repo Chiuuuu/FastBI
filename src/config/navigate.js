@@ -254,7 +254,7 @@ const list = [
               legend: {
                 show: true,
                 orient: 'horizontal',
-                align:'left',
+                align: 'left',
                 textStyle: {
                   color: '#ffffff',
                   fontSize: 12
@@ -333,9 +333,9 @@ const list = [
                   show: true
                 }
               },
-              tooltip:{
-                  show:true,
-                  formatter: '{b} {c}'
+              tooltip: {
+                show: true,
+                formatter: '{b} {c}'
               },
               series: {
                 type: 'line',
@@ -460,7 +460,7 @@ const list = [
               legend: {
                 show: true,
                 orient: 'horizontal',
-                align:'left',
+                align: 'left',
                 textStyle: {
                   color: '#ffffff',
                   fontSize: 12
@@ -654,7 +654,7 @@ const list = [
               legend: {
                 show: true,
                 orient: 'horizontal',
-                align:'left',
+                align: 'left',
                 textStyle: {
                   color: '#ffffff',
                   fontSize: 12
@@ -732,10 +732,10 @@ const list = [
                   show: true
                 }
               },
-              tooltip:{
-                show:true,
+              tooltip: {
+                show: true,
                 formatter: '{b} {c}'
-            },
+              },
               series: {
                 selectedMode: 'single',
                 label: {
@@ -829,7 +829,7 @@ const list = [
               legend: {
                 show: true,
                 orient: 'horizontal',
-                align:'left',
+                align: 'left',
                 // 加翻页
                 type: 'scroll',
                 pageIconColor: '#fff',
@@ -993,7 +993,7 @@ const list = [
               legend: {
                 show: true,
                 orient: 'horizontal',
-                align:'left',
+                align: 'left',
                 textStyle: {
                   color: '#ffffff',
                   fontSize: 12
@@ -1134,7 +1134,7 @@ const list = [
               legend: {
                 show: false,
                 orient: 'horizontal',
-                align:'left',
+                align: 'left',
                 data: [],
                 textStyle: {
                   color: '#ffffff',
@@ -1275,7 +1275,7 @@ const list = [
                 right: 'auto',
                 bottom: 'auto',
                 orient: 'horizontal',
-                align:'left',
+                align: 'left',
                 data: ['人口']
               },
               xAxis: {
@@ -1439,7 +1439,7 @@ const list = [
               legend: {
                 show: true,
                 orient: 'horizontal',
-                align:'left',
+                align: 'left',
                 data: [],
                 textStyle: {
                   color: '#ffffff',
@@ -1583,27 +1583,11 @@ const list = [
               rows: [
                 {
                   日期: '1/1',
-                  访问用户: 1393
-                },
-                {
-                  日期: '1/2',
                   访问用户: 3530
                 },
                 {
-                  日期: '1/3',
-                  访问用户: 2923
-                },
-                {
-                  日期: '1/4',
-                  访问用户: 1723
-                },
-                {
-                  日期: '1/5',
-                  访问用户: 3792
-                },
-                {
-                  日期: '1/6',
-                  访问用户: 4593
+                  日期: '1/2',
+                  访问用户: 1393
                 }
               ],
               options: {}
@@ -1652,17 +1636,17 @@ const list = [
               tooltip: {
                 show: false
               },
-              grid: { left: 20, top: 20, right: 20, bottom: 30 },
+              grid: {
+                left: 20,
+                top: 20,
+                right: 20,
+                bottom: 30
+              },
               legend: {
                 show: false,
                 orient: 'horizontal',
-                align:'left',
-                // 加翻页
-                type: 'scroll',
-                pageIconColor: '#fff',
-                pageTextStyle: {
-                  color: '#fff'
-                },
+                align: 'left',
+                data: [],
                 textStyle: {
                   color: '#ffffff',
                   fontSize: 12
@@ -1675,55 +1659,29 @@ const list = [
                 bottom: 'auto'
               },
               xAxis: {
-                show: false,
-                axisLabel: {
-                  show: true,
-                  color: '#ffffff',
-                  fontSize: 12,
-                  rotate: 0
-                },
-                axisLine: {
-                  show: true,
-                  lineStyle: {
-                    color: '#cccccc'
-                  }
-                },
-                splitLine: {
-                  show: false,
-                  lineStyle: {
-                    color: '#cccccc'
-                  }
-                }
+                show: false
               },
               yAxis: {
-                show: false,
-                axisLabel: {
-                  show: true,
-                  color: '#ffffff',
-                  fontSize: 12
-                },
-                axisLine: {
-                  show: true,
-                  lineStyle: {
-                    color: '#cccccc'
-                  }
-                },
-                splitLine: {
-                  show: false,
-                  lineStyle: {
-                    color: '#cccccc'
-                  }
-                }
+                show: false
               },
               series: {
-                type: 'pie',
+                radius: ['60%', '70%'],
+                center: ['50%', '50%'],
                 label: {
-                  show: true,
-                  color: '',
-                  fontSize: 12,
-                  position: 'outside', // 可选inside
-                  formatter: '{b}: {@2012} ({d}%)',
-                  formatterSelect: ['name', 'value', 'percent']
+                  normal: {
+                    show: false,
+                    position: 'center',
+                    textStyle: {
+                      fontSize: '30'
+                    }
+                  },
+                  emphasis: {
+                    show: false,
+                    textStyle: {
+                      fontSize: '30',
+                      fontWeight: 'bold'
+                    }
+                  }
                 },
                 itemStyle: {
                   normal: {}
@@ -1860,7 +1818,7 @@ const list = [
               legend: {
                 show: false,
                 orient: 'horizontal',
-                align:'left',
+                align: 'left',
                 // 加翻页
                 type: 'scroll',
                 pageIconColor: '#fff',
@@ -2199,7 +2157,7 @@ const list = [
               legend: {
                 show: false,
                 orient: 'horizontal',
-                align:'left',
+                align: 'left',
                 // 加翻页
                 type: 'scroll',
                 pageIconColor: '#fff',

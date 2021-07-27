@@ -67,40 +67,6 @@ import _ from 'lodash'
 import sourceMap from './defaultData'
 import handleNullData from '@/utils/handleNullData'
 
-const dotSeries = {
-  type: 'scatter', // scatter,effectScatter
-  name: '人口',
-  coordinateSystem: 'geo',
-  symbol: 'circle',
-  symbolSize: 10,
-  //   aspectScale: 0.75,
-  hoverAnimation: true,
-  showEffectOn: 'render',
-  rippleEffect: {
-    brushType: 'stroke',
-    scale: 3
-  },
-  label: {
-    show: false,
-    formatter: '{b} ：{c}',
-    // formatter: function(params) {
-    //   return params.data.value[2].toFixed(2)
-    // },
-    fontSize: 12,
-    position: 'right', // 可选inside
-    emphasis: {
-      show: true
-    }
-  },
-  itemStyle: {
-    emphasis: {
-      borderColor: '#fff',
-      borderWidth: 1
-    }
-  },
-  zlevel: 1
-}
-
 export default {
   props: {
     type: {
@@ -517,14 +483,6 @@ export default {
           // 清空数据
           delete current.setting.api_data.source
           this.$store.dispatch('SetSelfDataSource', current.setting.api_data)
-          // 地图数据还原
-          if (current.setting.chartType === 'v-map') {
-            current.setting.api_data.data = [[]]
-            current.setting.config.series[0].data = [[]]
-            this.$store.dispatch('SetSelfDataSource', current.setting.api_data)
-            this.$store.dispatch('SetSelfProperty', current.setting.config)
-            this.updateChartData()
-          }
           // 嵌套饼图apis恢复原始状态
           if (current.setting.chartType === 'v-multiPie') {
             const apis = current.setting.apis
@@ -714,41 +672,6 @@ export default {
         apiData.origin_source = deepClone(res.rows || res.data || {})
         this.$store.dispatch('SetSelfDataSource', apiData)
 
-        if (this.currSelected.setting.chartType === 'v-map') {
-          datas = res.data.fillList
-          let config = deepClone(this.currSelected.setting.config)
-          let legend = []
-          let rows = []
-          // 重置series
-          config.series = []
-          // 只有一个维度，唯一名称
-          let alias = apiData.dimensions[0].alias
-          // 一个度量对应一个series.data
-          apiData.measures.forEach((measure, index) => {
-            legend.push(measure.alias)
-            let data = []
-            for (let item of datas) {
-              // 抓取区域坐标
-              let center = this.getCenterCoordinate(item[alias])
-              // 找不到对应坐标跳过
-              if (!center) {
-                continue
-              }
-              data.push({
-                name: item[alias],
-                value: center.concat(item[measure.alias]) // 链接数组，坐标和值
-              })
-            }
-            config.series.push(
-              Object.assign(dotSeries, { data, name: measure.alias })
-            )
-          })
-          config.legend.data = legend
-          this.$store.dispatch('SetSelfProperty', config)
-          this.$store.dispatch('SetSelfDataSource', apiData)
-          this.updateChartData()
-          return
-        }
         // 去掉排序的数据
         if (
           apiData.options &&
