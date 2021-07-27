@@ -103,7 +103,7 @@ export default {
         // 移除焦点
         this.removeSelection()
         // 保存文本
-        this.saveText()
+        // this.saveText()
         // 转换文本
         this.getContent().then(res => {
           this.$refs.editorText.innerHTML = res
@@ -159,6 +159,7 @@ export default {
       init: function() {
         this.subscribe('editableKeydown', this.handleKeydownEnter.bind(this))
         this.subscribe('editableKeydownDelete', this.keydownDel.bind(this))
+        this.subscribe('editableInput', self.saveText)
       },
 
       handleCreateMenu(e, wrap) {
@@ -430,12 +431,12 @@ export default {
       //   this.$store.dispatch('SetSelfDataSource', this.apiData)
     },
     // 保存富文本
-    saveText() {
+    saveText: debounce(function() {
       this.htmlText = this.$refs.editorText.innerHTML
       this.selfConfig.title.htmlText = this.htmlText
-      //   this.$store.dispatch('SetSelfProperty', this.selfConfig)
-      //   this.updateChartData(this.id)
-    }
+      this.$store.dispatch('SetSelfProperty', this.selfConfig)
+      this.updateChartData(this.id)
+    })
   },
   computed: {
     ...mapGetters([
@@ -542,6 +543,9 @@ export default {
   padding: 5px;
   //   cursor: default;
   font-size: 26px;
+  /deep/ & > p {
+    margin: 0;
+  }
   &.cursor-text {
     cursor: text;
   }

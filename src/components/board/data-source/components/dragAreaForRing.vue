@@ -308,10 +308,11 @@ export default {
         this.$store.dispatch('SetSelfDataSource', apiData)
         
         // 环形图只有一条数据
-        let datas = res.rows[0]
-
+        let datas = res.rows
         // 处理空数据
         datas = await handleNullData(datas, this.currSelected.setting)
+
+        datas = datas[0]
 
         // 去掉排序的数据
         if (
