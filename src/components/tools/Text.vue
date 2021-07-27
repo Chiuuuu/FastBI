@@ -356,6 +356,11 @@ export default {
       this.currSelected.datamodelId = measure.screenTableId
       this.currSelected.setting.api_data.modelId = measure.screenTableId
       this.currSelected.setting.resourceType = measure.resourceType
+
+      //保存插入的元素到htmlText
+      this.htmlText = this.$refs.editorText.innerHTML
+      this.saveText()
+
       // 选中插入的元素
       const t = window.getSelection()
       t.removeAllRanges()
@@ -428,7 +433,8 @@ export default {
         }
       }
       this.apiData.measures = measures
-      //   this.$store.dispatch('SetSelfDataSource', this.apiData)
+      this.$store.dispatch('SetSelfDataSource', this.apiData)
+      this.updateChartData(this.chartId)
     },
     // 保存富文本
     saveText: debounce(function() {

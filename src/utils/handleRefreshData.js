@@ -5,14 +5,18 @@ import geoJson from '@/utils/guangdong.json'
 import { visualMapConfig, mapSeries, dotSeries } from '@/config/mapSeries'
 import { message } from 'ant-design-vue'
 // 处理大屏刷新数据
-export async function handleRefreshData({ chart, newData, refreshType }) {
+export async function handleRefreshData({ chart, newData }) {
   if (chart.setting.chartType === 'v-map') {
     // 假刷新获取不到null的值，遍历加上
     if (newData.fillList) {
-      newData.fillList = await handleNullData(newData, chart.setting)
+      newData.fillList = await handleNullData(newData.fillList, chart.setting)
     }
     if (newData.labelList) {
-      newData.labelList = await handleNullData(newData, chart.setting, true)
+      newData.labelList = await handleNullData(
+        newData.labelList,
+        chart.setting,
+        true
+      )
     }
     setMapData(chart, newData)
     return
