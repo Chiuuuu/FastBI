@@ -1646,7 +1646,12 @@ const list = [
                 show: false,
                 orient: 'horizontal',
                 align: 'left',
-                data: [],
+                // 加翻页
+                type: 'scroll',
+                pageIconColor: '#fff',
+                pageTextStyle: {
+                  color: '#fff'
+                },
                 textStyle: {
                   color: '#ffffff',
                   fontSize: 12
@@ -3006,6 +3011,7 @@ const list = [
                 total: '',
                 content: '文本',
                 textAlign: 'left',
+                htmlText: '<p><br></p>',
                 textStyle: {
                   color: '#ffffff',
                   fontSize: 20,
