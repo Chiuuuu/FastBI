@@ -688,6 +688,7 @@ export default {
       this.id = folder.id
       this.folderVisible = true
       this.folderTitle = '重命名文件夹'
+      // dom渲染以后才能给form赋值
       this.$nextTick(() => {
         this.$refs.newFolderForm.form.name = folder.name
       })

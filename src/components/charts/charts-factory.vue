@@ -8,7 +8,11 @@
     <div
       class="titles"
       ref="titles"
-      v-if="config.title && config.title.show"
+      v-if="
+        config.title &&
+          ((chartType === 'v-ring' && config.chartTitle.show) ||
+            (chartType !== 'v-ring' && config.title.show))
+      "
       :style="titleStyle"
     >
       <span>{{ config.title.content }}</span>
@@ -245,11 +249,11 @@ export default {
                 return
               }
               this.chartData = val.source
-              if (this.chartType === 'v-ring') {
-                this.chartExtend.chartTitle.text = val.source.rows
-                  ? val.source.rows[0].value
-                  : ''
-              }
+              //   if (this.chartType === 'v-ring') {
+              //     this.chartExtend.chartTitle.text = val.source.rows
+              //       ? val.source.rows[0].value
+              //       : ''
+              //   }
               return
             }
           }
@@ -415,7 +419,10 @@ export default {
       if (this.chartType === 'v-treemap') {
         const series = options.series[0] ? options.series[0] : options.series
         // 有拖入数据才处理
-        if (this.apiData.dimensions.length > 0 && this.apiData.measures.length > 0) {
+        if (
+          this.apiData.dimensions.length > 0 &&
+          this.apiData.measures.length > 0
+        ) {
           this.handleTreemapFormatter(series, 'tooltip')
           this.handleTreemapFormatter(series, 'label')
           // 如果有图表联动, 则渲染联动的数据

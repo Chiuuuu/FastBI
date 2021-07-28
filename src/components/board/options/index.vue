@@ -239,7 +239,7 @@
               <a-collapse-panel key="title" :header="isText ? '文本' : '标题'">
                 <a-switch
                   slot="extra"
-                  v-if="collapseActive.indexOf('title') > -1 && !isText"
+                  v-if="collapseActive.indexOf('title') > -1 && !isText && !isRing"
                   v-model="selfConfig.title.show"
                   default-checked
                   @change="switchChange"
