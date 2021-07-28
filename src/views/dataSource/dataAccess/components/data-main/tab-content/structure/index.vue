@@ -433,10 +433,13 @@ export default {
       if (['excel', 'csv'].indexOf(this.modelType) > -1) {
         databaseName = this.databaseName
       }
-
       // 当前库组列表没有默认数据库(即没有权限)则不掉接口
       if (!databaseName) {
         this.spinning = false
+        this.data = []
+        this.$store.dispatch('dataAccess/setReadRows', this.data)
+        this.pagination.total = 0
+        this.pagination.current = 1
         return
       }
 
