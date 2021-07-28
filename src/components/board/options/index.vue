@@ -3852,7 +3852,7 @@ export default {
           labelMeasures
         )
         this.mapLabelPointSelectList = [{ alias: '地区名' }].concat(
-          mapLabelTooltipSelectList
+          this.mapLabelTooltipSelectList
         )
       }
     }

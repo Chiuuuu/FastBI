@@ -63,7 +63,7 @@ import TreeGroupBy from '@/components/board/options/treemap/tree-groupby'
 import { sum, summary } from '@/utils/summaryList'
 import { Loading } from 'element-ui'
 import _ from 'lodash'
-import handleNullData from '@/utils/handleNullData'
+import handleReturnChartData from '@/utils/handleReturnChartData'
 
 export default {
   props: {
@@ -303,14 +303,10 @@ export default {
         return
       }
       if (res.code === 200) {
-        // 保存原始数据 -- 查看数据有用
-        apiData.origin_source = deepClone(res.rows || res.data || {})
-        this.$store.dispatch('SetSelfDataSource', apiData)
-        
         // 环形图只有一条数据
         let datas = res.rows
-        // 处理空数据
-        datas = await handleNullData(datas, this.currSelected.setting)
+        // 处理图表数据
+        datas = await handleReturnChartData(datas, this.currSelected.setting)
 
         datas = datas[0]
 

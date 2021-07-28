@@ -65,7 +65,7 @@ import { Loading } from 'element-ui'
 import _ from 'lodash'
 // import navigateList from '@/config/navigate'
 import sourceMap from './defaultData'
-import handleNullData from '@/utils/handleNullData'
+import handleReturnChartData from '@/utils/handleReturnChartData'
 
 export default {
   props: {
@@ -102,7 +102,7 @@ export default {
       },
       isdrag: false, // 是否拖拽中
       fileList: [], // 维度字段数组
-      isVaild: false, //
+      isVaild: false //
     }
   },
   inject: ['errorFile', 'initTargetMeasure'],
@@ -491,8 +491,8 @@ export default {
           }
           // 立体图和矩形热力图 旭日图重置
           if (
-            (current.setting.chartType === 'high-pie') ||
-            (current.setting.chartType === 'high-column')
+            current.setting.chartType === 'high-pie' ||
+            current.setting.chartType === 'high-column'
           ) {
             let res = sourceMap[current.setting.chartType]
             current.setting.config.series = JSON.parse(JSON.stringify(res))
@@ -511,12 +511,16 @@ export default {
           this.$store.dispatch('SetSelfProperty', current.setting.config)
         }
 
-        if ((current.setting.chartType === 'v-treemap') ||
-          (current.setting.chartType === 'v-sun') ||
-          (current.setting.chartType === 'v-heatmap')) {
+        if (
+          current.setting.chartType === 'v-treemap' ||
+          current.setting.chartType === 'v-sun' ||
+          current.setting.chartType === 'v-heatmap'
+        ) {
           // 没有维度度量, 重置数据
-          if (current.setting.api_data.dimensions.length === 0 &&
-          current.setting.api_data.measures.length === 0) {
+          if (
+            current.setting.api_data.dimensions.length === 0 &&
+            current.setting.api_data.measures.length === 0
+          ) {
             let res = sourceMap[current.setting.chartType]
             current.setting.config = JSON.parse(JSON.stringify(res))
           }
@@ -667,23 +671,9 @@ export default {
       }
       if (res.code === 200) {
         let datas = res.rows
-        datas = await handleNullData(datas, this.currSelected.setting)
-        // 保存原始数据 -- 查看数据有用
-        apiData.origin_source = deepClone(res.rows || res.data || {})
-        this.$store.dispatch('SetSelfDataSource', apiData)
+        // 处理图表数据
+        datas = await handleReturnChartData(datas, this.currSelected.setting)
 
-        // 去掉排序的数据
-        if (
-          apiData.options &&
-          apiData.options.sort &&
-          apiData.options.sort.length
-        ) {
-          let filterArr = []
-          apiData.options.sort.forEach(item => {
-            filterArr.push(`sort_${item.alias}`)
-          })
-          datas = datas.map(item => _.omit(item, filterArr))
-        }
         // 矩形树图数据处理
         if (this.currSelected.setting.chartType === 'v-treemap') {
           return this.handleTreemapConfig(res.rows)
