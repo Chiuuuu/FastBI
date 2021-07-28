@@ -139,7 +139,8 @@ export default {
       'pageSettings',
       'canvasRange',
       'isScreen',
-      'fileName'
+      'fileName',
+      'polymerizeType'
     ]),
     contextMenuStyle() {
       let x =
@@ -182,6 +183,16 @@ export default {
   },
   methods: {
     ...mapActions(['deleteChartData']),
+    formatAggregator(item) {
+      const fun = this.polymerizeType.find(
+        x => x.value === item.defaultAggregator
+      )
+      if (item.role === 2) {
+        return `${item.alias} (${fun.name})`
+      } else {
+        return item.alias
+      }
+    },
     // 控制是否显示菜单栏
     showMenu(item) {
       if (!this.contextMenuInfo.isShow) {
@@ -312,37 +323,31 @@ export default {
         exportList = []
 
       if (this.currSelected.setting.chartType === 'v-map') {
-        if (source.fillList) {
-          source.fillList = await handleNullData(
-            source.fillList,
-            this.currSelected.setting
-          )
-        }
-        if (source.labelList) {
-          source.labelList = await handleNullData(
-            source.labelList,
-            this.currSelected.setting,
-            true
-          )
-        }
-        Object.keys(source).map(item => {
+        await Promise.all(Object.keys(source).map(async (item) => {
           if (source[item]) {
             let aliasKeys = this.handleTableColumns(
               Object.keys(source[item][0]),
               item
             )
             columns.push(aliasKeys)
-            rows.push(source[item])
-            let type = item == 'fillList' ? '填充' : '标记点'
+            let type = '填充'
+            let row = []
+            if (item === 'fillList') {
+              row = await handleNullData(source[item], this.currSelected.setting, false, aliasKeys.filter(item => item.role === 2))
+              type = '填充'
+            } else if (item === 'labelList') {
+              row = await handleNullData(source[item], this.currSelected.setting, true, aliasKeys.filter(item => item.role === 2))
+            }
+            rows.push(row)
             tableName.push(type)
             let aliasObj = {}
             aliasKeys.forEach((alias, index) => {
-              aliasObj['name' + index] = alias['alias']
+              aliasObj['name' + index] = alias['colName']
             })
             let cunstomRow = source[item].map(row => {
               let obj = {}
               aliasKeys.forEach((alias, index) => {
-                obj['name' + index] = row[alias['alias']]
+                obj['name' + index] = row[alias['colName']]
               })
               return obj
             })
@@ -350,20 +355,26 @@ export default {
             cunstomRow = [titleRow, aliasObj].concat(cunstomRow)
             exportList = cunstomRow.concat(exportList)
           }
-        })
+        }))
       } else {
         // 处理空数据
-        source = await handleNullData(source, this.currSelected.setting)
-        rows = [source]
         columns = [this.handleTableColumns(Object.keys(source[0]))]
+        source = await handleNullData(source, this.currSelected.setting, false, columns[0].filter(item => item.role === 2))
+        rows = [source]
         exportList = source
+        this.chartData = {
+          columns,
+          rows,
+          tableName
+        }
+        return exportList
       }
       this.chartData = {
-        columns,
-        rows,
-        tableName
-      }
-      return exportList
+          columns,
+          rows,
+          tableName
+        }
+        return exportList
     },
     // 处理表头, 按拖入的维度度量顺序排列
     handleTableColumns(keys, label) {
@@ -382,7 +393,7 @@ export default {
         if (keys.includes(item.alias)) {
           column.push({
             alias: item.alias,
-            defaultAggregator: item.defaultAggregator,
+            colName: this.formatAggregator(item),
             role: item.role
           })
         }

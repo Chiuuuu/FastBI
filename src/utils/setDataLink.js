@@ -9,6 +9,7 @@ export async function setLinkageData(id, e, canvasMap) {
   let selected = canvasMap.find(item => item.id === id)
   let apiData = selected.setting.api_data
   let bindCharts = apiData.interactive.bindedList
+  const type = selected.setting.chartType
   // 没有关联图表不需要联动
   if (!bindCharts) {
     return
@@ -16,12 +17,15 @@ export async function setLinkageData(id, e, canvasMap) {
   // 获取需要筛选的维度信息
   let dimensionData = apiData.dimensions[0]
   dimensionData.value = [e.name]
-  // 矩形树图取最后一个维度
-  if (selected.setting.chartType === 'v-treemap') {
+  // 矩形树图热力图旭日图取最后一个维度
+  if (type === 'v-treemap' || type === 'v-sun') {
     dimensionData.value = [e.treePathInfo[1].name]
   }
+  if (type === 'v-heatmap') {
+    dimensionData.value = e.value[0] ? [e.value[0]] : [e.value[1]]
+  }
   // 散点图q筛选值是seriesName
-  if (selected.setting.chartType === 'v-scatter') {
+  if (type === 'v-scatter') {
     dimensionData.value = [e.seriesName]
   }
   // 关联的每个图表进行数据筛选

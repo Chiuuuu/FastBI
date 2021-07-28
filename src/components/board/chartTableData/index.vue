@@ -23,7 +23,7 @@
               v-for="(subItem, subIndex) in item"
               :key="subIndex"
             >
-              {{ formatAggregator(subItem) }}
+              {{ subItem.colName }}
             </th>
           </tr>
           <tr
@@ -32,7 +32,7 @@
             :key="subIndex2"
           >
             <td class="table-td" v-for="(value, key) in item" :key="key">
-              {{ subItem2[value.alias || value] || '' }}
+              {{ subItem2[value.colName || value] || '' }}
             </td>
           </tr>
         </table>
@@ -61,7 +61,6 @@
   </a-modal>
 </template>
 <script>
-import { mapGetters } from 'vuex'
 export default {
   props: {
     chartData: {
@@ -81,23 +80,10 @@ export default {
       }
     }
   },
-  computed: {
-    ...mapGetters(['polymerizeType'])
-  },
   methods: {
     close() {
       this.$destroy()
       this.$el.remove()
-    },
-    formatAggregator(item) {
-      const fun = this.polymerizeType.find(
-        x => x.value === item.defaultAggregator
-      )
-      if (item.role === 2) {
-        return `${item.alias} (${fun.name})`
-      } else {
-        return item.alias
-      }
     },
     // 全屏下，内容挂在dvScreen元素下（screen.vue）可显示，默认挂在body下
     getContainer() {

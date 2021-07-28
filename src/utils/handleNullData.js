@@ -1,7 +1,7 @@
 import { reject, resolve } from 'core-js/fn/promise'
 
 // 返回空或null字段图表报错
-export default function handleNullData(returnData, setting, isLabel = false) {
+export default function handleNullData(returnData, setting, isLabel = false, formatTableColumns) {
   let promise = new Promise(resolve => {
     let apiData = setting.api_data
     let dimensions = isLabel ? 'labelDimensions' : 'dimensions'
@@ -26,6 +26,14 @@ export default function handleNullData(returnData, setting, isLabel = false) {
           // 表格赋值null
           if (setting.chartType === 'v-tables') {
             rowDatas[key] = ''
+          }
+        }
+        // 数据导出时, 度量需要拼接聚合方式
+        if (formatTableColumns) {
+          const hasFormatKey = formatTableColumns.find(item => item.alias === key)
+          if (hasFormatKey) {
+            rowDatas[hasFormatKey.colName] = rowDatas[key]
+            delete rowDatas[key]
           }
         }
       }
