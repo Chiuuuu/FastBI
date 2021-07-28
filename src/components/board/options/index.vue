@@ -235,11 +235,11 @@
             "
           >
             <!--标题 noTitle图片没有标题-->
-            <template v-if="selfConfig.title && !selfConfig.noTitle">
+            <template v-if="selfConfig.title && !selfConfig.noTitle && !isRing">
               <a-collapse-panel key="title" :header="isText ? '文本' : '标题'">
                 <a-switch
                   slot="extra"
-                  v-if="collapseActive.indexOf('title') > -1 && !isText && !isRing"
+                  v-if="collapseActive.indexOf('title') > -1 && !isText"
                   v-model="selfConfig.title.show"
                   default-checked
                   @change="switchChange"
@@ -328,6 +328,110 @@
                         value="right"
                         @click.native.stop="
                           onAlignChange(selfConfig.title, 'right')
+                        "
+                      >
+                        <a-icon type="align-right" value="right" />
+                      </a-radio-button>
+                    </a-tooltip>
+                  </a-radio-group>
+                </gui-field>
+              </a-collapse-panel>
+            </template>
+
+            <!--标题 只用于环形图，vchart读取title会覆盖api的title，标题用chartTitle对象控制-->
+            <template v-if="isRing">
+              <a-collapse-panel key="title" header="标题">
+                <a-switch
+                  slot="extra"
+                  v-if="collapseActive.indexOf('title') > -1"
+                  v-model="selfConfig.topTitle.show"
+                  default-checked
+                  @change="switchChange"
+                  size="small"
+                />
+                <gui-field label="标题名">
+                  <a-input
+                    v-model="selfConfig.topTitle.content"
+                    size="small"
+                    :maxLength="20"
+                    @change="setSelfProperty"
+                  ></a-input>
+                </gui-field>
+                <gui-field label="文本">
+                  <gui-inline label="字号">
+                    <a-input-number
+                      class="longwidth"
+                      v-model="selfConfig.topTitle.textStyle.fontSize"
+                      size="small"
+                      :min="12"
+                      :max="100"
+                      @change="setSelfProperty"
+                    ></a-input-number>
+                  </gui-inline>
+                  <gui-inline label="颜色">
+                    <el-color-picker
+                      v-model="selfConfig.topTitle.textStyle.color"
+                      @change="setSelfProperty"
+                    ></el-color-picker>
+                  </gui-inline>
+                </gui-field>
+                <gui-field label="字体">
+                  <a-select
+                    v-model="selfConfig.topTitle.textStyle.fontFamily"
+                    style="width: 164px"
+                    size="small"
+                    @change="setSelfProperty"
+                  >
+                    <a-select-option
+                      :value="font.value"
+                      v-for="(font, index) in fontFamilyList"
+                      :key="index"
+                      >{{ font.label }}</a-select-option
+                    >
+                  </a-select>
+                </gui-field>
+                <gui-field label="粗细">
+                  <a-select
+                    v-model="selfConfig.topTitle.textStyle.fontWeight"
+                    style="width: 164px"
+                    size="small"
+                    @change="setSelfProperty"
+                  >
+                    <a-select-option value="normal">正常</a-select-option>
+                    <a-select-option value="bolder">加粗</a-select-option>
+                    <a-select-option value="lighter">更细</a-select-option>
+                  </a-select>
+                </gui-field>
+                <gui-field label="对齐方式">
+                  <a-radio-group
+                    :value="selfConfig.topTitle.textAlign"
+                    size="small"
+                  >
+                    <a-tooltip placement="top" title="左对齐">
+                      <a-radio-button
+                        value="left"
+                        @click.native.stop="
+                          onAlignChange(selfConfig.topTitle, 'left')
+                        "
+                      >
+                        <a-icon type="align-left" value="left" />
+                      </a-radio-button>
+                    </a-tooltip>
+                    <a-tooltip placement="top" title="居中">
+                      <a-radio-button
+                        value="center"
+                        @click.native.stop="
+                          onAlignChange(selfConfig.topTitle, 'center')
+                        "
+                      >
+                        <a-icon type="align-center" value="center" />
+                      </a-radio-button>
+                    </a-tooltip>
+                    <a-tooltip placement="top" title="右对齐">
+                      <a-radio-button
+                        value="right"
+                        @click.native.stop="
+                          onAlignChange(selfConfig.topTitle, 'right')
                         "
                       >
                         <a-icon type="align-right" value="right" />
@@ -3572,7 +3676,10 @@ export default {
 
     // 点击选择对齐方式
     onAlignChange(data, value) {
-      if (this.selfConfig.title.textAlign) {
+      if (
+        (this.selfConfig.title && this.selfConfig.title.textAlign) ||
+        (this.isRing && this.selfConfig.topTitle.textAlign)
+      ) {
         this.$set(data, 'textAlign', value)
       } else {
         this.$set(data, 'left', value)

@@ -791,7 +791,7 @@ export default {
                 value
               })
               let config = this.currSelected.setting.config
-              config.chartTitle.text =
+              config.title.text =
                 +((rows[0].value / datas[0][keys[1]]) * 100).toFixed(2) + '%'
               this.$store.dispatch('SetSelfProperty', config)
             }

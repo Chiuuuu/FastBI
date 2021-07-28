@@ -61,7 +61,7 @@ export async function handleRefreshData({ chart, newData }) {
         value
       })
       chart.setting.api_data.source.rows = rows
-      chart.setting.config.chartTitle.text =
+      chart.setting.config.topTitle.text =
         +((rows[0].value / datas[keys[1]]) * 100).toFixed(2) + '%'
     }
     // 仪表盘

@@ -9,13 +9,14 @@
       class="titles"
       ref="titles"
       v-if="
-        config.title &&
-          ((chartType === 'v-ring' && config.chartTitle.show) ||
-            (chartType !== 'v-ring' && config.title.show))
+        (chartType === 'v-ring' && config.topTitle.show) ||
+          (chartType !== 'v-ring' && config.title && config.title.show)
       "
-      :style="titleStyle"
+      :style="chartType === 'v-ring' ? titleStyleForRing : titleStyle"
     >
-      <span>{{ config.title.content }}</span>
+      <span>{{
+        chartType === 'v-ring' ? config.topTitle.content : config.title.content
+      }}</span>
     </div>
     <component
       :key="key"
@@ -558,7 +559,10 @@ export default {
       if (!wrap) return
       let width = wrap.clientWidth
       let height = wrap.clientHeight
-      if (this.config.title && this.config.title.show) {
+      if (
+        (this.config.title && this.config.title.show) ||
+        (this.config.topTitle && this.config.topTitle.show)
+      ) {
         height -= title.clientHeight
       }
       this.width = width + 'px'
@@ -589,6 +593,19 @@ export default {
         fontWeight: this.config.title.textStyle.fontWeight,
         height: 'auto'
       }
+    },
+    titleStyleForRing() {
+      return this.config.topTitle
+        ? {
+            padding: '20px 10px',
+            color: this.config.topTitle.textStyle.color,
+            fontSize: this.config.topTitle.textStyle.fontSize + 'px',
+            textAlign: this.config.topTitle.textAlign,
+            fontFamily: this.config.topTitle.textStyle.fontFamily,
+            fontWeight: this.config.topTitle.textStyle.fontWeight,
+            height: 'auto'
+          }
+        : {}
     },
     // 是否开启图表联动
     isClickLink() {

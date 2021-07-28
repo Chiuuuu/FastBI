@@ -507,7 +507,7 @@ export default {
         }
         // 环形重置显示值
         if (current.setting.chartType === 'v-ring') {
-          current.setting.config.chartTitle.text = '70%'
+          current.setting.config.title.text = '70%'
           this.$store.dispatch('SetSelfProperty', current.setting.config)
         }
 
@@ -764,7 +764,7 @@ export default {
             this.$store.dispatch('SetSelfDataSource', apiData)
             let config = deepClone(this.currSelected.setting.config)
             if (this.currSelected.setting.chartType === 'v-ring') {
-              config.chartTitle.text =
+              config.title.text =
                 (rows[0].value / rows[1].value) * 100 + '%'
               this.$store.dispatch('SetSelfProperty', config)
             }

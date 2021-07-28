@@ -170,7 +170,7 @@ export default {
       component.api_data.refresh = {}
       component.api_data.modelId = ''
       if (component.chartType === 'v-ring') {
-        component.config.chartTitle.text = '70%'
+        component.config.topTitle.text = '70%'
       }
       this.$print('drag start:' + component.name, 'primary')
       // 拖拽的节点数据
@@ -194,7 +194,7 @@ export default {
       component.api_data.refresh = {}
       component.api_data.modelId = ''
       if (component.chartType === 'v-ring') {
-        component.config.chartTitle.text = '70%'
+        component.config.topTitle.text = '70%'
       }
       // 地图添加类型初始值
       if (component.chartType === 'v-map') {
