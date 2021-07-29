@@ -176,12 +176,6 @@ const app = {
       // 普通保存
       // 保存图层排序列表，图层操作，新增，删除顺序会变，所以这三个操作要调这个接口
       //   state.pageSettings.idList = rootGetters.canvasMapIdList // 复制大屏id列表会失效
-      // 保存图层顺序
-      let charts = rootGetters.canvasMap.concat()
-      charts.forEach((item, index) => {
-        item.seriesIndex = index
-      })
-      dispatch('InitCanvasMaps', charts)
       params.id = state.currentPageId
       params.setting = state.pageSettings
       return screenManage
@@ -189,6 +183,12 @@ const app = {
         .then(res => {
           if (res.code === 200) {
             // res.msg && message.success(res.msg)
+            // 保存图层顺序
+            let charts = rootGetters.canvasMap.concat()
+            charts.forEach((item, index) => {
+              item.setting.sortIndex = index + 1 // +1方便判断seriesIndex是否存在
+            })
+            screenManage.saveAllChart(charts)
             return true
           }
           res.msg && message.error(res.msg)
@@ -357,8 +357,8 @@ const app = {
           //   })
           // 按图层排序
           graphs = graphs.sort((prev, next) => {
-            return prev.seriesIndex && next.seriesIndex
-              ? prev.seriesIndex - next.seriesIndex
+            return prev.setting.sortIndex && next.setting.sortIndex
+              ? prev.setting.sortIndex - next.setting.sortIndex
               : 0
           })
           dispatch('InitCanvasMaps', graphs)
