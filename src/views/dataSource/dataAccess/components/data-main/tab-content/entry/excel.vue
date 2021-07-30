@@ -61,10 +61,10 @@
         </a-form-model-item>
       </a-form-model>
       <a-row class="preview-list">
-        <a-col :span="4" style="height:100%;width: 150px">
+        <a-col :span="4" style="height:100%;width: 150px;">
           <div class="preview-tab">
             <div class="tab-title">Sheet子表</div>
-            <ul>
+            <ul class="scrollbar" style="overflow-y: auto;height: calc(100% - 38px);">
               <li
                 class="preview-tab-item"
                 :title="sheet.name"

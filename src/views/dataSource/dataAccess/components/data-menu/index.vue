@@ -334,19 +334,24 @@ export default {
       if (this.fileSelectId === file.id) return
       this.fileSelectId = file.id
       this.getTableInfo(`/datasource/${file.id}`, result => {
-        if (result.data.type === 1) {
-          this.$store.dispatch('dataAccess/setModelType', 'mysql')
-        } else if (result.data.type === 2) {
-          this.$store.dispatch('dataAccess/setModelType', 'oracle')
-        } else if (result.data.type === 5) {
-          this.$store.dispatch('dataAccess/setModelType', 'hive')
-        } else if (result.data.type === 11) {
-          this.$store.dispatch('dataAccess/setModelType', 'excel')
-        } else if (result.data.type === 12) {
-          this.$store.dispatch('dataAccess/setModelType', 'csv')
+        if (result.code === 200) {
+          if (result.data.type === 1) {
+            this.$store.dispatch('dataAccess/setModelType', 'mysql')
+          } else if (result.data.type === 2) {
+            this.$store.dispatch('dataAccess/setModelType', 'oracle')
+          } else if (result.data.type === 5) {
+            this.$store.dispatch('dataAccess/setModelType', 'hive')
+          } else if (result.data.type === 11) {
+            this.$store.dispatch('dataAccess/setModelType', 'excel')
+          } else if (result.data.type === 12) {
+            this.$store.dispatch('dataAccess/setModelType', 'csv')
+          }
+          this.$store.dispatch('dataAccess/setModelInfo', result.data.properties)
+          this.$store.dispatch('dataAccess/setModelName', result.data.name)
+        } else {
+          this.$store.dispatch('dataAccess/setModelInfo', {})
+          this.$store.dispatch('dataAccess/setModelName', '')
         }
-        this.$store.dispatch('dataAccess/setModelInfo', result.data.properties)
-        this.$store.dispatch('dataAccess/setModelName', result.data.name)
       })
       this.$store.commit('dataAccess/SET_DATABASENAME', '')
       this.$store.commit('common/SET_PRIVILEGES', file.privileges || [])

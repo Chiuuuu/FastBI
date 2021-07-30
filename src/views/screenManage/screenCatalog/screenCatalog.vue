@@ -84,7 +84,7 @@
       </a-empty>
     </div>
     <div class="right scrollbar" style="overflow: hidden">
-      <div class="right-header" v-if="fileSelectId">
+      <div class="right-header" v-if="fileSelectId > 0">
         <span class="nav_title">{{ fileSelectName }} </span>
         <img
           v-show="isPublish === 0"
@@ -133,7 +133,7 @@
       </div>
       <div class="contain" ref="contain">
         <screen
-          v-if="fileSelectId"
+          v-if="fileSelectId > 0"
           ref="screen"
           :key="componentKey"
           @getShareData="getShareData"
@@ -702,7 +702,9 @@ export default {
 
       // dom渲染以后才能给form赋值
       this.$nextTick(() => {
-        this.$refs.newFolderForm.form.name = folder.name
+        this.screenForm.setFieldsValue({
+          name: file.name
+        })
       })
     },
     // 在文件夹底下新建大屏
@@ -756,31 +758,21 @@ export default {
           this.handleFileMoveCreate(values.parentId || '0')
         } else {
           if (values.name !== this.screenName) {
-            // 获取需要改名字的大屏的配置信息(因为可能会跟当前选中的大屏不是同一个)
-            this.$server.screenManage
-              .getScreenDetailById(this.id, this.pageList[0].id)
-              .then(res => {
-                if (res.code === 200) {
-                  this.setting = res.data.setting
-                  this.$store.dispatch('SetIsPublish', res.data.isPublish)
-                  // 编辑
-                  let params = {
-                    id: this.id,
-                    setting: this.setting,
-                    ...values
-                  }
-                  this.renameScreenData({ ...params }).then(res => {
-                    if (res) {
-                      this.$message.success('重命名成功')
-                      this.fileSelectName = values.name
-                      this.getList()
-                      if (this.isPublish === 1) {
-                        this.$refs.screen.getShareData()
-                      }
-                    }
-                  })
+            let params = {
+              id: this.id,
+              setting: this.setting,
+              ...values
+            }
+            this.renameScreenData({ ...params }).then(res => {
+              if (res) {
+                this.$message.success('重命名成功')
+                this.fileSelectName = values.name
+                this.getList()
+                if (this.isPublish === 1) {
+                  this.$refs.screen.getShareData()
                 }
-              })
+              }
+            })
           }
         }
         this.screenForm.resetFields()
@@ -1043,7 +1035,6 @@ export default {
   beforeRouteLeave(to, from, next) {
     if (to.name !== 'screenEdit') {
       this.fileSelectId = ''
-      this.$store.commit('common/SET_MENUSELECTID', -1)
       next()
     } else {
       next()
