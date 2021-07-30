@@ -1,7 +1,7 @@
-import { reject, resolve } from 'core-js/fn/promise'
+import _ from 'lodash'
 
 // 返回空或null字段图表报错
-export default function handleNullData(returnData, setting, isLabel = false, formatTableColumns) {
+export default function handleReturnChartData(returnData, setting, isLabel = false, formatTableColumns) {
   let promise = new Promise(resolve => {
     let apiData = setting.api_data
     let dimensions = isLabel ? 'labelDimensions' : 'dimensions'
@@ -38,7 +38,21 @@ export default function handleNullData(returnData, setting, isLabel = false, for
         }
       }
     }
+    // 去掉排序的数据
+    if (apiData.options.sort && apiData.options.sort.length) {
+      returnData = handleSortData(apiData, returnData)
+    }
     resolve(returnData)
   })
   return promise
+}
+
+// 去掉排序的数据
+function handleSortData(apiData, datas) {
+  let filterArr = []
+  apiData.options.sort.forEach(item => {
+    filterArr.push(`sort_${item.alias}`)
+  })
+  datas = datas.map(item => _.omit(item, filterArr))
+  return datas
 }

@@ -1609,7 +1609,7 @@ const list = [
               borderRadius: 0
             },
             config: {
-              title: {
+              topTitle: {
                 show: true,
                 content: '环形图',
                 textAlign: 'left',

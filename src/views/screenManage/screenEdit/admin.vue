@@ -177,7 +177,7 @@
       </template>
     </board>
 
-    <screen :key="isScreen"></screen>
+    <screen :key="isScreen" isEdit></screen>
     <b-modal
       v-model="deleteDialog"
       :styles="{ top: '300px', width: '350px' }"
@@ -323,7 +323,7 @@ export default {
               Object.assign(item, { showDropDown: false, isFocus: false })
             )
             this.$store.dispatch('SetPageList', pages)
-            this.$store.dispatch('SetPageId', pages[0].id)
+            this.$store.dispatch('SetPageId', this.$route.query.tabId || pages[0].id)
             // 默认显示大屏第一个页签的数据
             // 新建的大屏取第一个默认页的tabId
             if (!this.$route.query.tabId) {

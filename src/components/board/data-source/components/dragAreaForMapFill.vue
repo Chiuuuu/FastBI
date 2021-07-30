@@ -61,7 +61,7 @@ import geoJson from '@/utils/guangdong.json'
 import reverseAddressResolution from '@/utils/reverseAddressResolution'
 import { visualMapConfig, mapSeries } from '@/config/mapSeries'
 import { Loading } from 'element-ui'
-import handleNullData from '@/utils/handleNullData'
+import handleReturnChartData from '@/utils/handleReturnChartData'
 export default {
   props: {
     type: {
@@ -398,15 +398,11 @@ export default {
         return
       }
       if (res.code === 200) {
-        res.data.fillList = await handleNullData(
+          
+        res.data.fillList = await handleReturnChartData(
           res.data.fillList,
           this.currSelected.setting
         )
-        // 保存原始数据 -- 查看数据有用
-        apiData.origin_source = deepClone(res.rows || res.data || {})
-        this.$store.dispatch('SetSelfDataSource', apiData)
-
-        apiData.returnDataFill = res.data.fillList
         let config = selected.setting.config
         // 重置series
         config.series = config.series.filter(item => item.type === 'scatter')

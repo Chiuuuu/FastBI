@@ -1,5 +1,5 @@
 import { sum, summary } from '@/utils/summaryList'
-import handleNullData from '@/utils/handleNullData'
+import handleReturnChartData from '@/utils/handleReturnChartData'
 import reverseAddressResolution from '@/utils/reverseAddressResolution'
 import geoJson from '@/utils/guangdong.json'
 import { visualMapConfig, mapSeries, dotSeries } from '@/config/mapSeries'
@@ -9,10 +9,10 @@ export async function handleRefreshData({ chart, newData }) {
   if (chart.setting.chartType === 'v-map') {
     // 假刷新获取不到null的值，遍历加上
     if (newData.fillList) {
-      newData.fillList = await handleNullData(newData.fillList, chart.setting)
+      newData.fillList = await handleReturnChartData(newData.fillList, chart.setting)
     }
     if (newData.labelList) {
-      newData.labelList = await handleNullData(
+      newData.labelList = await handleReturnChartData(
         newData.labelList,
         chart.setting,
         true
@@ -30,7 +30,7 @@ export async function handleRefreshData({ chart, newData }) {
     return
   }
   // 假刷新获取不到null的值，遍历加上
-  newData = await handleNullData(newData, chart.setting)
+  newData = await handleReturnChartData(newData, chart.setting)
   if (chart.setting.type === '2') {
     chart.setting.api_data.returnData = newData // 记录返回的键值对，方便展示图表数据直接用
     sourceRows.forEach((row, index) => {
@@ -61,7 +61,7 @@ export async function handleRefreshData({ chart, newData }) {
         value
       })
       chart.setting.api_data.source.rows = rows
-      chart.setting.config.chartTitle.text =
+      chart.setting.config.topTitle.text =
         +((rows[0].value / datas[keys[1]]) * 100).toFixed(2) + '%'
     }
     // 仪表盘

@@ -61,7 +61,7 @@ import geoJson from '@/utils/guangdong.json'
 import reverseAddressResolution from '@/utils/reverseAddressResolution'
 import { dotSeries } from '@/config/mapSeries'
 import { Loading } from 'element-ui'
-import handleNullData from '@/utils/handleNullData'
+import handleReturnChartData from '@/utils/handleReturnChartData'
 export default {
   props: {
     type: {
@@ -391,13 +391,10 @@ export default {
         return
       }
       if (res.code === 200) {
-        res.data.labelList = await handleNullData(
+        res.data.labelList = await handleReturnChartData(
           res.data.labelList,
           this.currSelected.setting
         )
-        // 保存原始数据 -- 查看数据有用
-        apiData.origin_source = deepClone(res.rows || res.data || {})
-        this.$store.dispatch('SetSelfDataSource', apiData)
 
         apiData.returnDataLabel = res.data.labelList
         let config = selected.setting.config

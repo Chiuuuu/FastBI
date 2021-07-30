@@ -153,14 +153,8 @@ const app = {
         let { id, name, setting } = obj
         params.id = id
         params.newName = name
-        params.setting = setting
       } else {
-        // 普通保存
-        // 保存图层排序列表，图层操作，新增，删除顺序会变，所以这三个操作要调这个接口
-        state.pageSettings.idList = rootGetters.canvasMapIdList
-
         params.id = state.screenId
-        params.setting = state.pageSettings
       }
       return screenManage
         .renameScreen(params)
@@ -177,11 +171,11 @@ const app = {
         })
     },
     // 保存页面配置
-    async saveScreenData({ rootGetters, state }) {
+    async saveScreenData({ dispatch, rootGetters, state }) {
       let params = {}
       // 普通保存
       // 保存图层排序列表，图层操作，新增，删除顺序会变，所以这三个操作要调这个接口
-      state.pageSettings.idList = rootGetters.canvasMapIdList
+      //   state.pageSettings.idList = rootGetters.canvasMapIdList // 复制大屏id列表会失效
       params.id = state.currentPageId
       params.setting = state.pageSettings
       return screenManage
@@ -189,6 +183,12 @@ const app = {
         .then(res => {
           if (res.code === 200) {
             // res.msg && message.success(res.msg)
+            // 保存图层顺序
+            let charts = rootGetters.canvasMap.concat()
+            charts.forEach((item, index) => {
+              item.setting.sortIndex = index + 1 // +1方便判断seriesIndex是否存在
+            })
+            screenManage.saveAllChart(charts)
             return true
           }
           res.msg && message.error(res.msg)
@@ -209,7 +209,11 @@ const app = {
         // 素材库and图形
         name = obj.setting.name
       } else {
-        name = obj.setting.config.title.content
+        if (obj.setting.config.title) {
+          name = obj.setting.config.title.content
+        } else {
+          name = obj.setting.config.topTitle.content
+        }
       }
       let params = {
         tabId: obj.tabId,
@@ -305,8 +309,7 @@ const app = {
       if (params.setting.api_data.selectData) {
         delete params.setting.api_data.selectData
         if (chart.setting.chartType === 'v-treemap') {
-          chart.setting.config.series.data =
-            chart.setting.api_data.source
+          chart.setting.config.series.data = chart.setting.api_data.source
         }
         // 热力图旭日图还原数据
         let dataList = params.setting.api_data.source.rows
@@ -348,14 +351,17 @@ const app = {
           dispatch('SetPageSettings', res.data ? res.data.setting : {})
           // 地图加上json
           let graphs = res.data ? res.data.screenGraphs : []
-          dispatch('InitCanvasMaps', {
-            maps: graphs,
-            idList: res.data
-              ? res.data.setting
-                ? res.data.setting.idList
-                : []
-              : []
+          //   // 根据id列表对本身顺序进行重排 ----复制大屏会失效
+          //   list = list.sort((prev, next) => {
+          //     return idList.indexOf(prev.id) - idList.indexOf(next.id)
+          //   })
+          // 按图层排序
+          graphs = graphs.sort((prev, next) => {
+            return prev.setting.sortIndex && next.setting.sortIndex
+              ? prev.setting.sortIndex - next.setting.sortIndex
+              : 0
           })
+          dispatch('InitCanvasMaps', graphs)
           dispatch('dataModel/setSelectedModelList', res.list)
           commit('common/SET_PRIVILEGES', res.data.privileges || [])
           commit('SET_IS_PUBLISH', res.data.isPublish)
@@ -424,11 +430,14 @@ const app = {
                   if (chart.setting.name === 've-sun') {
                     let max = dataList.map(item => item.value)
                     chart.setting.config.visualMap.max = Math.max(...max)
-                    chart.setting.config.series.data = chart.setting.api_data.source.rows
+                    chart.setting.config.series.data =
+                      chart.setting.api_data.source.rows
                   }
                   if (chart.setting.name === 've-heatmap') {
                     // 维度
-                    let dim = chart.setting.api_data.dimensions.map(x => x.alias)
+                    let dim = chart.setting.api_data.dimensions.map(
+                      x => x.alias
+                    )
                     // 度量
                     let mea = chart.setting.api_data.measures.map(y => y.alias)
                     if ((dim.length === 0) | (mea.length === 0)) {

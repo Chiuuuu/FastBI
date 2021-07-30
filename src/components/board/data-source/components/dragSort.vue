@@ -64,7 +64,7 @@ import navigateList from '@/config/navigate' // 导航条菜单
 import _ from 'lodash'
 import { Loading } from 'element-ui'
 import { Icon } from 'ant-design-vue'
-import handleNullData from '@/utils/handleNullData'
+import handleReturnChartData from '@/utils/handleReturnChartData'
 const IconFont = Icon.createFromIconfontCN({
   scriptUrl: '//at.alicdn.com/t/font_2276651_mlklp2yb77i.js'
 }) // 引入iconfont
@@ -317,23 +317,12 @@ export default {
           this.updateChartData()
           return
         }
-        // 保存原始数据 -- 查看数据有用
-        apiData.origin_source = deepClone(res.rows || res.data || {})
-        this.$store.dispatch('SetSelfDataSource', apiData)
 
         let datas = res.rows
 
-        // 处理空数据
-        datas = await handleNullData(datas, this.currSelected.setting)
+        // 处理返回数据
+        datas = await handleReturnChartData(datas, this.currSelected.setting)
 
-        // 去掉排序的数据
-        if (apiData.options.sort.length) {
-          let filterArr = []
-          apiData.options.sort.forEach(item => {
-            filterArr.push(`sort_${item.alias}`)
-          })
-          datas = datas.map(item => _.omit(item, filterArr))
-        }
         if (this.currSelected.setting.chartType === 'v-tables') {
           let columns = []
           apiData.tableList.forEach(item => {

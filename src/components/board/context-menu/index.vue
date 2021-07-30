@@ -51,7 +51,7 @@
 import Vue from 'vue'
 import JsonExcel from 'vue-json-excel'
 import { exportImg, exportForFull, exportScreen } from '@/utils/screenExport'
-import handleNullData from '@/utils/handleNullData'
+import handleReturnChartData from '@/utils/handleReturnChartData'
 import { mapGetters, mapActions } from 'vuex'
 import { Loading } from 'element-ui'
 import chartTableData from '../chartTableData/index' // 右键菜单
@@ -62,7 +62,7 @@ const exportChartList = [
     icon: 'ios-share',
     text: '查看数据',
     order: 'showChartData',
-    ignore: ['figure', 've-image','material'],
+    ignore: ['figure', 've-image', 'material']
   },
   {
     icon: 'ios-download',
@@ -71,8 +71,8 @@ const exportChartList = [
     ignore: ['figure'],
     showChildren: false,
     children: [
-      { text: 'excel', order: 'toexcel', ignore: ['ve-image','material'] },
-      { text: 'csv', order: 'tocsv', ignore: ['ve-image','material'] },
+      { text: 'excel', order: 'toexcel', ignore: ['ve-image', 'material'] },
+      { text: 'csv', order: 'tocsv', ignore: ['ve-image', 'material'] },
       { text: '图片', order: 'exportImg' }
     ]
   }
@@ -82,7 +82,7 @@ const chartMenuList = [
     icon: 'ios-share',
     text: '查看数据',
     order: 'showChartData',
-    ignore: ['figure', 've-image',,'material'],
+    ignore: ['figure', 've-image', , 'material']
   },
   {
     icon: 'ios-download',
@@ -91,8 +91,8 @@ const chartMenuList = [
     ignore: ['figure'],
     showChildren: false,
     children: [
-      { text: 'excel', order: 'toexcel', ignore: ['ve-image','material'] },
-      { text: 'csv', order: 'tocsv', ignore: ['ve-image','material'] },
+      { text: 'excel', order: 'toexcel', ignore: ['ve-image', 'material'] },
+      { text: 'csv', order: 'tocsv', ignore: ['ve-image', 'material'] },
       { text: '图片', order: 'exportImg' }
     ]
   },
@@ -272,10 +272,9 @@ export default {
     async handleChartData(type) {
       // 查看图表数据
       if (
-        this.currSelected.setting.api_data.origin_source &&
-        JSON.stringify(this.currSelected.setting.api_data.origin_source) !=
-          '{}' &&
-        JSON.stringify(this.currSelected.setting.api_data.origin_source) != '[]'
+        this.currSelected.setting.api_data.source ||
+        (this.currSelected.setting.chartType === 'v-map' &&
+          this.currSelected.setting.config.series.length)
       ) {
         let dataList = await this.setChartData_scan()
         // 查看数据弹出展示窗
@@ -323,43 +322,60 @@ export default {
         exportList = []
 
       if (this.currSelected.setting.chartType === 'v-map') {
-        await Promise.all(Object.keys(source).map(async (item) => {
-          if (source[item]) {
-            let aliasKeys = this.handleTableColumns(
-              Object.keys(source[item][0]),
-              item
-            )
-            columns.push(aliasKeys)
-            let type = '填充'
-            let row = []
-            if (item === 'fillList') {
-              row = await handleNullData(source[item], this.currSelected.setting, false, aliasKeys.filter(item => item.role === 2))
-              type = '填充'
-            } else if (item === 'labelList') {
-              row = await handleNullData(source[item], this.currSelected.setting, true, aliasKeys.filter(item => item.role === 2))
-            }
-            rows.push(row)
-            tableName.push(type)
-            let aliasObj = {}
-            aliasKeys.forEach((alias, index) => {
-              aliasObj['name' + index] = alias['colName']
-            })
-            let cunstomRow = source[item].map(row => {
-              let obj = {}
+        await Promise.all(
+          Object.keys(source).map(async item => {
+            if (source[item]) {
+              let aliasKeys = this.handleTableColumns(
+                Object.keys(source[item][0]),
+                item
+              )
+              columns.push(aliasKeys)
+              let type = '填充'
+              let row = []
+              if (item === 'fillList') {
+                row = await handleReturnChartData(
+                  source[item],
+                  this.currSelected.setting,
+                  false,
+                  aliasKeys.filter(item => item.role === 2)
+                )
+                type = '填充'
+              } else if (item === 'labelList') {
+                row = await handleReturnChartData(
+                  source[item],
+                  this.currSelected.setting,
+                  true,
+                  aliasKeys.filter(item => item.role === 2)
+                )
+              }
+              rows.push(row)
+              tableName.push(type)
+              let aliasObj = {}
               aliasKeys.forEach((alias, index) => {
-                obj['name' + index] = row[alias['colName']]
+                aliasObj['name' + index] = alias['colName']
               })
-              return obj
-            })
-            let titleRow = { name0: type, name1: '', name2: '' }
-            cunstomRow = [titleRow, aliasObj].concat(cunstomRow)
-            exportList = cunstomRow.concat(exportList)
-          }
-        }))
+              let cunstomRow = source[item].map(row => {
+                let obj = {}
+                aliasKeys.forEach((alias, index) => {
+                  obj['name' + index] = row[alias['colName']]
+                })
+                return obj
+              })
+              let titleRow = { name0: type, name1: '', name2: '' }
+              cunstomRow = [titleRow, aliasObj].concat(cunstomRow)
+              exportList = cunstomRow.concat(exportList)
+            }
+          })
+        )
       } else {
         // 处理空数据
         columns = [this.handleTableColumns(Object.keys(source[0]))]
-        source = await handleNullData(source, this.currSelected.setting, false, columns[0].filter(item => item.role === 2))
+        source = await handleReturnChartData(
+          source,
+          this.currSelected.setting,
+          false,
+          columns[0].filter(item => item.role === 2)
+        )
         rows = [source]
         exportList = source
       }
