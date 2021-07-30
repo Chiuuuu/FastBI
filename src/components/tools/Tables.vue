@@ -15,12 +15,12 @@
     </div>
     <div class="tables">
       <div
-        class="chart-table scroller"
+        class="chart-table xscroll"
         ref="charttable"
         @scroll="getScrollLeft"
         :style="{
-          width: showTableSize.tableX + 'px',
-          height: showTableSize.tableY + 'px'
+          width: showTableSize.tableX + 25 + 'px',
+          height: showTableSize.tableY + 25 + 'px'
         }"
       >
         <table
@@ -57,7 +57,7 @@
           }"
         >
           <table
-            class="table-content table-body scrollbar"
+            class="table-content table-body yscroll"
             ref="tablebody"
             :style="{ width: tableWidth + 'px' }"
           >
@@ -140,21 +140,10 @@ export default {
           this.showHeader = val.header.show
           this._calcStyle()
         }
-        // for (let item of this.columns) {
-        // 是否自动换行
-        //   item.ellipsis = val.table.ellipsis
-        // }
       },
       deep: true,
       immediate: true
     },
-    // 'config.title.show':{
-    //    handler(val){
-    //        if(val){
-    //            let chart
-    //        }
-    //    }
-    // },
     apiData: {
       handler(val) {
         if (val) {
@@ -294,7 +283,7 @@ export default {
       return str.replace(/[\u0391-\uFFE5]/g, 'aa').length
     },
     getScrollLeft(e) {
-      this.bodyWidth = e.target.scrollLeft + this.showTableSize.tableX
+      this.bodyWidth = e.target.scrollLeft + this.showTableSize.tableX + 25
     },
     // // 设置表头样式
     // customHeaderRow() {
