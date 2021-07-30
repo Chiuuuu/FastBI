@@ -7,6 +7,7 @@ import { DEFAULT_COLORS } from '@/utils/defaultColors'
 import { mapGetters } from 'vuex'
 import { setLinkageData, resetOriginData } from '@/utils/setDataLink'
 import { deepClone } from '@/utils/deepClone'
+import { setChartInstanceIdMap } from '@/utils/screenExport'
 export default {
   name: 'chartHeat',
   props: {
@@ -47,6 +48,8 @@ export default {
   mounted() {
     this.Init()
     this.mychart.on('click', this.clickEvent)
+    // 保存echart实例，截图用
+    setChartInstanceIdMap(this.mychart, this.chartId)
   },
   methods: {
     Init(val) {
@@ -54,7 +57,10 @@ export default {
       this.mychart = this.$echarts.init(this.$refs.dvsheat)
       // 有拖入数据才处理
       const config = this.option
-      if (this.apiData.dimensions.length > 0 && this.apiData.measures.length > 0) {
+      if (
+        this.apiData.dimensions.length > 0 &&
+        this.apiData.measures.length > 0
+      ) {
         this.handleFormatter(config.series, 'tooltip')
         this.handleFormatter(config.series, 'label')
       }

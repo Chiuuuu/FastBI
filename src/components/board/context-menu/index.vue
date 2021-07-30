@@ -330,7 +330,6 @@ export default {
                 item
               )
               columns.push(aliasKeys)
-              let type = '填充'
               let row = []
               if (item === 'fillList') {
                 row = await handleReturnChartData(
@@ -339,7 +338,6 @@ export default {
                   false,
                   aliasKeys.filter(item => item.role === 2)
                 )
-                type = '填充'
               } else if (item === 'labelList') {
                 row = await handleReturnChartData(
                   source[item],
@@ -348,6 +346,7 @@ export default {
                   aliasKeys.filter(item => item.role === 2)
                 )
               }
+              let type = item === 'fillList' ? '填充' : '标记点'
               rows.push(row)
               tableName.push(type)
               let aliasObj = {}

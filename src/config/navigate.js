@@ -2395,7 +2395,7 @@ const list = [
             config: {
               title: {
                 show: true,
-                content: '',
+                content: '矩形热力图',
                 text: '矩形热力图',
                 left: 'center',
                 textStyle: {

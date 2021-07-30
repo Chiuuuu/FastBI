@@ -38,39 +38,49 @@ function createCanvas(chartId, width, height) {
 // 处理截图的dom,复制控件(不受transform影响) // targetDom(全屏:preview-wrap/编辑:dv-wrapper)
 function handleShootedDom(chart, targetDom) {
   // 非图表控件 && hightcharts可以直接深拷贝
-  if (
-    !classifyControl(chart) ||
-    chart.setting.name === 'high-pie'
-  ) {
+  if (!classifyControl(chart) || chart.setting.name === 'high-pie') {
     const domObjClone = targetDom.cloneNode(true)
     domObjClone.setAttribute('id', 'cloneShotTarget')
     return domObjClone
-  } else {
-    // 图表控件
-    // 获取显示框(全屏:preview-wrap/编辑:dv-wrapper)
-    const domObjClone = targetDom.cloneNode()
-    // 修改id
-    domObjClone.setAttribute('id', 'cloneShotTarget')
-    // 添加dv-chart
-    const dvChart = targetDom.childNodes[0]
-    domObjClone.appendChild(dvChart.cloneNode())
-    // 添加title
-    const title = dvChart.childNodes[0]
-    domObjClone.childNodes[0].appendChild(title.cloneNode(true))
-    // 添加canvas
-    // 获取原echart图表部分尺寸
+  }
+  // 获取显示框(全屏:preview-wrap/编辑:dv-wrapper)
+  const domObjClone = targetDom.cloneNode()
+  // 修改id
+  domObjClone.setAttribute('id', 'cloneShotTarget')
+  if (chart.setting.name === 've-sun' || chart.setting.name === 've-heatmap') {
+    // 旭日图热力图dom结构只有一层
     let {
       clientWidth: orginWidth,
       clientHeight: orginHeight
-    } = dvChart.childNodes[1]
+    } = targetDom.childNodes[0]
     const canvas = createCanvas(chart.id, orginWidth, orginHeight)
-    domObjClone.childNodes[0].appendChild(canvas)
+    domObjClone.appendChild(canvas)
     return domObjClone
   }
+  // 图表控件
+  // 添加dv-chart
+  const dvChart = targetDom.childNodes[0]
+  domObjClone.appendChild(dvChart.cloneNode())
+  // 添加title
+  const title = dvChart.childNodes[0]
+  domObjClone.childNodes[0].appendChild(title.cloneNode(true))
+  // 添加canvas
+  // 获取原echart图表部分尺寸
+  let {
+    clientWidth: orginWidth,
+    clientHeight: orginHeight
+  } = dvChart.childNodes[1]
+  const canvas = createCanvas(chart.id, orginWidth, orginHeight)
+  domObjClone.childNodes[0].appendChild(canvas)
+  return domObjClone
 }
 
 // 截图复制出来的dom
 function actionShoot(domClone, backColor, name) {
+  // 如果图表背景透明，按大屏背景色作为背景
+  if (!domClone.style.backgroundColor) {
+    domClone.style.backgroundColor = backColor
+  }
   document.body.appendChild(domClone)
   html2canvas(domClone, {
     width: domClone.clientWidth,
@@ -80,13 +90,13 @@ function actionShoot(domClone, backColor, name) {
     letterRendering: true,
     scrollY: 0,
     scrollX: 0,
-    useCORS: true, // 【重要】开启跨域配置
-    onclone: documentClone => {
-      const cloneDom = documentClone.getElementById('cloneShotTarget')
-      if (!cloneDom.style.backgroundColor) {
-        cloneDom.style.backgroundColor = backColor // 如果图表背景透明，按大屏背景色作为背景
-      }
-    }
+    useCORS: true // 【重要】开启跨域配置
+    // onclone: documentClone => {
+    //   const cloneDom = documentClone.getElementById('cloneShotTarget')
+    //   if (!cloneDom.style.backgroundColor) {
+    //     cloneDom.style.backgroundColor = backColor // 如果图表背景透明，按大屏背景色作为背景
+    //   }
+    // }
   }).then(canvas => {
     document.body.removeChild(domClone)
     downloadImg(canvas, name)

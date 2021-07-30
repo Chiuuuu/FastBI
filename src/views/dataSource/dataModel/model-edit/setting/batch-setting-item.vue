@@ -6,13 +6,15 @@
     :scroll="{ y: 320 }"
     :pagination="false"
     rowKey="id"
-    bordered>
+    bordered
+  >
     <template #alias="text, record">
       <a-input
         v-model="record.alias"
         :maxLength="20"
         @change="handleCheckName"
-        style="width: 156px height: 32px" />
+        style="width: 156px height: 32px"
+      />
     </template>
     <template #convertType="text, record">
       <field-select
@@ -26,22 +28,31 @@
       <field-select
         :text="text | formatRole"
         :select-data="record"
-        :contextmenus="[{
-          name: '转换为' + (text === 1 ? '度量' : '维度'),
-          roleType: text === 1 ? 2 : 1,
-          onClick: switchRoleType
-        }]"
+        :contextmenus="[
+          {
+            name: '转换为' + (text === 1 ? '度量' : '维度'),
+            roleType: text === 1 ? 2 : 1,
+            onClick: switchRoleType
+          }
+        ]"
         :isDimension="record.role === 1"
       />
     </template>
     <template #description="text, record">
-      <a-input v-model="record.description" :maxLength="200" style="width: 156px height: 32px" />
+      <a-input
+        v-model="record.description"
+        :maxLength="200"
+        style="width: 156px height: 32px"
+      />
     </template>
     <template #comment="text, record">
       <a-input v-model="record.comment" style="width: 100px height: 32px" />
     </template>
     <template #visible="text, record, index">
-      <a-select :value="`${text}`" @change="(value) => handleSelect(value, record, index)">
+      <a-select
+        :value="`${text}`"
+        @change="value => handleSelect(value, record, index)"
+      >
         <a-select-option value="true">是</a-select-option>
         <a-select-option value="false">否</a-select-option>
       </a-select>
@@ -114,8 +125,8 @@ export default {
   },
   data() {
     return {
-        column,
-        fieldContenxtMenu: [
+      column,
+      fieldContenxtMenu: [
         {
           name: '转换为整数',
           dataType: 'BIGINT',
@@ -201,8 +212,8 @@ export default {
     handleSelect(value, record, index) {
       this.$emit('change-visible', value, record, index)
     },
-    handleCheckName() {
-      this.$emit('checkName')
+    handleCheckName(e) {
+      this.$emit('checkName', e)
     },
     switchFieldType(e, item, vm) {
       let dataType = item.dataType
