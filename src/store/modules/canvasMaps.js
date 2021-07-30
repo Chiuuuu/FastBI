@@ -66,19 +66,7 @@ const canvasMaps = {
     }
   },
   actions: {
-    InitCanvasMaps({ commit }, obj) {
-      let list = []
-      let idList = []
-      if (!Array.isArray(obj)) {
-        list = obj.maps
-        idList = obj.idList
-        if (idList && idList.length > 0) {
-          // 根据id列表对本身顺序进行重排
-          list = list.sort((prev, next) => {
-            return idList.indexOf(prev.id) - idList.indexOf(next.id)
-          })
-        }
-      }
+    InitCanvasMaps({ commit }, list) {
       commit('SET_CANVAS_MAPS', list)
     },
     AddCanvasMap({ commit }, nodeInfo) {

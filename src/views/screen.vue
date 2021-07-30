@@ -2,6 +2,7 @@
   <div
     class="dv-screen"
     ref="dvScreen"
+    :style="dvScreenStyle"
     @contextmenu.stop.prevent="poupExportMenu($event)"
   >
     <b-scrollbar :style="wrapStyle">
@@ -159,6 +160,14 @@ import { deepClone } from '../utils/deepClone'
 
 export default {
   name: 'screen',
+  props: {
+    // 是否编辑大屏
+    isEdit: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
+  },
   components: {
     ChartsFactory,
     PreviewBox,
@@ -217,6 +226,11 @@ export default {
                 this.pageSettings.backgroundSrc
               }) 0% 0% / 100% 100% no-repeat`
       }
+    },
+    dvScreenStyle() {
+      return this.isEdit
+        ? { width: `${this.pageSettings.width}px`, height: 'auto' }
+        : null
     },
     scrollBoxStyle() {
       return {
@@ -396,6 +410,13 @@ export default {
         })
     },
     _calcStyle() {
+      // 编辑大屏里的screen只用来做导出,需要完整尺寸展示
+      if (this.isEdit) {
+        this.range = 1
+        this.wrapStyle = this.scrollBoxStyle
+        return
+      }
+
       const wrap = this.$refs.dvScreen
       if (!wrap) return
       // 计算wrap样式
