@@ -142,7 +142,7 @@
           @change="setSelfProperty"
         ></a-input>
       </gui-field>
-      <gui-field label="主题类型">
+      <!-- <gui-field label="主题类型">
         <a-select
           v-model="HighConfig.setting.config.themeName"
           style="width: 164px"
@@ -156,7 +156,7 @@
             >{{ theme.title }}</a-select-option
           >
         </a-select>
-      </gui-field>
+      </gui-field> -->
     </a-collapse-panel>
 
     <a-collapse-panel key="legend" header="图例设置">

@@ -2830,7 +2830,7 @@ const list = [
                 gridLineColor: '#fff', // 网格线颜色
                 gridLineWidth: 0, // 纵向网格线宽度
                 labels: {
-                  rotation: 20,
+                  rotation: 0,
                   style: {
                     color: '#fff',
                     fontSize: 12,
