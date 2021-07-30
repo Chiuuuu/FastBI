@@ -100,7 +100,7 @@ export default {
       }
       this.saveScreenData()
       this.$message.success('保存成功')
-      this.$router.go(-1)
+      this.$router.replace({ name: 'catalog' })
     },
     onfocus() {
       this.isFocus = true

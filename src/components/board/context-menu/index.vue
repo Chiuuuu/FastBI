@@ -362,19 +362,13 @@ export default {
         source = await handleNullData(source, this.currSelected.setting, false, columns[0].filter(item => item.role === 2))
         rows = [source]
         exportList = source
-        this.chartData = {
-          columns,
-          rows,
-          tableName
-        }
-        return exportList
       }
       this.chartData = {
-          columns,
-          rows,
-          tableName
-        }
-        return exportList
+        columns,
+        rows,
+        tableName
+      }
+      return exportList
     },
     // 处理表头, 按拖入的维度度量顺序排列
     handleTableColumns(keys, label) {
