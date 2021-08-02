@@ -121,7 +121,7 @@ const list = [
             background: {
               backgroundType: '1',
               backgroundColor: '',
-              borderColor: '',
+              borderColor: '#fff',
               borderWidth: 0,
               borderStyle: '',
               borderRadius: 0
@@ -228,7 +228,7 @@ const list = [
             background: {
               backgroundType: '1',
               backgroundColor: '',
-              borderColor: '',
+              borderColor: '#fff',
               borderWidth: 0,
               borderStyle: '',
               borderRadius: 0
@@ -432,7 +432,7 @@ const list = [
             background: {
               backgroundType: '1',
               backgroundColor: '',
-              borderColor: '',
+              borderColor: '#fff',
               borderWidth: 0,
               borderStyle: '',
               borderRadius: 0
@@ -628,7 +628,7 @@ const list = [
             background: {
               backgroundType: '1',
               backgroundColor: '',
-              borderColor: '',
+              borderColor: '#fff',
               borderWidth: 0,
               borderStyle: '',
               borderRadius: 0
@@ -803,7 +803,7 @@ const list = [
             background: {
               backgroundType: '1',
               backgroundColor: '',
-              borderColor: '',
+              borderColor: '#fff',
               borderWidth: 0,
               borderStyle: '',
               borderRadius: 0
@@ -967,7 +967,7 @@ const list = [
             background: {
               backgroundType: '1',
               backgroundColor: '',
-              borderColor: '',
+              borderColor: '#fff',
               borderWidth: 0,
               borderStyle: '',
               borderRadius: 0
@@ -1099,7 +1099,7 @@ const list = [
             background: {
               backgroundType: '1',
               backgroundColor: '',
-              borderColor: '',
+              borderColor: '#fff',
               borderWidth: 0,
               borderStyle: '',
               borderRadius: 0
@@ -1228,7 +1228,7 @@ const list = [
             background: {
               backgroundType: '1',
               backgroundColor: '',
-              borderColor: '',
+              borderColor: '#fff',
               borderWidth: 0,
               borderStyle: '',
               borderRadius: 0
@@ -1397,7 +1397,7 @@ const list = [
             background: {
               backgroundType: '1',
               backgroundColor: '',
-              borderColor: '',
+              borderColor: '#fff',
               borderWidth: 0,
               borderStyle: '',
               borderRadius: 0
@@ -1560,7 +1560,7 @@ const list = [
             background: {
               backgroundType: '1',
               backgroundColor: '',
-              borderColor: '',
+              borderColor: '#fff',
               borderWidth: 0,
               borderStyle: '',
               borderRadius: 0
@@ -1604,7 +1604,7 @@ const list = [
             background: {
               backgroundType: '1',
               backgroundColor: '',
-              borderColor: '',
+              borderColor: '#fff',
               borderWidth: 0,
               borderStyle: '',
               borderRadius: 0
@@ -1792,7 +1792,7 @@ const list = [
             background: {
               backgroundType: '1',
               backgroundColor: '',
-              borderColor: '',
+              borderColor: '#fff',
               borderWidth: 0,
               borderStyle: '',
               borderRadius: 0
@@ -1955,7 +1955,7 @@ const list = [
             background: {
               backgroundType: '1',
               backgroundColor: '',
-              borderColor: '',
+              borderColor: '#fff',
               borderWidth: 0,
               borderStyle: '',
               borderRadius: 0
@@ -2136,7 +2136,7 @@ const list = [
             background: {
               backgroundType: '1',
               backgroundColor: '',
-              borderColor: '',
+              borderColor: '#fff',
               borderWidth: 0,
               borderStyle: '',
               borderRadius: 0
@@ -2388,7 +2388,7 @@ const list = [
             background: {
               backgroundType: '1',
               backgroundColor: '',
-              borderColor: '',
+              borderColor: '#fff',
               borderWidth: 0,
               borderStyle: '',
               borderRadius: 0
@@ -2970,7 +2970,7 @@ const list = [
           //     background: {
           //       backgroundType: '1',
           //       backgroundColor: '',
-          //       borderColor: '',
+          //       borderColor: '#fff',
           //       borderWidth: 0,
           //       borderStyle: '',
           //       borderRadius: 0
@@ -3014,7 +3014,7 @@ const list = [
             background: {
               backgroundType: '1',
               backgroundColor: '',
-              borderColor: '',
+              borderColor: '#fff',
               borderWidth: 0,
               borderStyle: '',
               borderRadius: 0
@@ -3057,7 +3057,7 @@ const list = [
             background: {
               backgroundType: '1',
               backgroundColor: '',
-              borderColor: '',
+              borderColor: '#fff',
               borderWidth: 0,
               borderStyle: '',
               borderRadius: 0
