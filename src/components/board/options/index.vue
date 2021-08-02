@@ -1334,7 +1334,7 @@
                         @change="setSelfProperty"
                       ></a-input-number>
                     </gui-field>
-                    <gui-field
+                    <!-- <gui-field
                       label="图例形状"
                       v-show="selfConfig.visualMap.type === 'piecewise'"
                     >
@@ -1351,7 +1351,7 @@
                         >
                         <a-select-option value="diamond">菱形</a-select-option>
                       </a-select>
-                    </gui-field>
+                    </gui-field> -->
                     <gui-field label="位置">
                       <gui-inline>
                         <a-radio-group

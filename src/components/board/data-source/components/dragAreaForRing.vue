@@ -236,7 +236,7 @@ export default {
         // 清空数据
         delete current.setting.api_data.source
         this.$store.dispatch('SetSelfDataSource', current.setting.api_data)
-        current.setting.config.title.text = '70%'
+        current.setting.config.chartTitle.text = '70%'
         this.$store.dispatch('SetSelfProperty', current.setting.config)
       }
     },

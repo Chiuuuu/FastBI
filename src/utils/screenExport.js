@@ -92,7 +92,7 @@ function actionShoot(domClone, backColor, name) {
     scrollX: 0,
     useCORS: true // 【重要】开启跨域配置
   }).then(canvas => {
-    // document.body.removeChild(domClone)
+    document.body.removeChild(domClone)
     downloadImg(canvas, name)
   })
 }

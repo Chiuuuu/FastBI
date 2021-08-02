@@ -83,7 +83,10 @@ const canvasMaps = {
     },
     ToggleContextMenu({ commit }, info) {
       let menuInfo = info
-        ? Object.assign({}, info, { isShow: true })
+        ? Object.assign({}, info, {
+            isShow: true,
+            y:window.screen.height - info.y > 300 ? info.y : info.y - 150
+          })
         : { x: 0, y: 0, isShow: false }
       commit('SET_CONTEXT_MENU_INFO', menuInfo)
     },
