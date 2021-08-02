@@ -1,7 +1,7 @@
 <template>
   <a-spin class="tab-panel" :spinning="verifying">
     <div class="search_bar">
-      <a-radio-group class="search_radio" v-model="tableType" @change="handleTableTypeChange">
+      <a-radio-group v-if="showExtractBtn" class="search_radio" v-model="tableType" @change="handleTableTypeChange">
         <a-radio-button :value="0">原始表</a-radio-button>
         <a-radio-button :value="1">自定义表</a-radio-button>
       </a-radio-group>

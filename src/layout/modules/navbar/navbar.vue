@@ -51,11 +51,8 @@ export default {
             // this.reload()
             // window.location.reload() // 重刷方法1,但是会闪白
 
-            if (this.$route.name === 'dataAccess') { // 如果刚好是数据接入界面, 刷新菜单列表
-              this.$store.dispatch('dataAccess/getMenuList', this)
-              this.$store.dispatch('dataAccess/setModelType', '')
-              this.$store.dispatch('dataAccess/setModelId', 0)
-              this.$store.dispatch('dataAccess/setFirstFinished', false)
+            if (this.$route.name === 'dataAccess') { // 如果刚好是数据接入界面, 刷新路由
+              this.reload()
             } else {
               this.$router.replace('/')
             }
