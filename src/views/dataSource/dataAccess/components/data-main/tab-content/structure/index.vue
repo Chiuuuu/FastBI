@@ -101,7 +101,7 @@
           :data-source="logData"
           :loading="modalSpin"
           :footer="null"
-          :scroll="{ y: 300 }"
+          :scroll="{ y: 'calc(100vh - 360px)' }"
         >
           <template #status="text">
             <span v-if="text === '0'">成功</span>
@@ -161,7 +161,7 @@ const logColumns = [
     title: '抽取任务名称',
     align: 'center',
     ellipsis: true,
-    width: 200,
+    width: 150,
     dataIndex: 'taskName'
   },
   {
@@ -181,7 +181,7 @@ const logColumns = [
   {
     title: '耗时',
     align: 'center',
-    width: 100,
+    width: 80,
     dataIndex: 'cost',
     scopedSlots: { customRender: 'cost' }
   },
