@@ -1497,7 +1497,8 @@ const list = [
                   color: '',
                   fontSize: 12,
                   position: 'outside', // 可选inside
-                  formatter: '{b}: {@2012} ({d}%)'
+                  formatter: '{b}: {@2012} ({d}%)',
+                  formatterSelect: ['name', 'value', 'percent']
                 },
                 center: ['50%', '50%'] // 饼图可选
               },
@@ -2696,6 +2697,12 @@ const list = [
                   }
                 }
               },
+              navigation: {
+                buttonOptions: {
+                  // 关闭导出按钮，效果同上
+                  enabled: false
+                }
+              },
               series: [
                 {
                   type: 'pie',
@@ -2897,6 +2904,12 @@ const list = [
                     }
                   },
                   stacking: null // null（不进行堆叠）、"normal"（普通堆叠） 和 "percent"（百分比堆叠
+                }
+              },
+              navigation: {
+                buttonOptions: {
+                  // 关闭导出按钮，效果同上
+                  enabled: false
                 }
               },
               series: [

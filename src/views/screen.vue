@@ -161,8 +161,8 @@ import { deepClone } from '../utils/deepClone'
 export default {
   name: 'screen',
   props: {
-    // 是否编辑大屏
-    isEdit: {
+    // 截图模板
+    isShootDom: {
       type: Boolean,
       required: false,
       default: false
@@ -228,7 +228,7 @@ export default {
       }
     },
     dvScreenStyle() {
-      return this.isEdit
+      return this.isShootDom
         ? { width: `${this.pageSettings.width}px`, height: 'auto' }
         : null
     },
@@ -411,7 +411,7 @@ export default {
     },
     _calcStyle() {
       // 编辑大屏里的screen只用来做导出,需要完整尺寸展示
-      if (this.isEdit) {
+      if (this.isShootDom) {
         this.range = 1
         this.wrapStyle = this.scrollBoxStyle
         return

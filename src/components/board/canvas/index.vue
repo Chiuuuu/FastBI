@@ -22,6 +22,12 @@
             <drop-panel>
               <slot></slot>
             </drop-panel>
+            <pation
+              v-if="isScreen"
+              :style="{ opacity: showPageTab ? 1 : 0 }"
+              @mouseenter.native="handleTabShow"
+              @mouseleave.native="handleTabShow"
+            ></pation>
             <!--右键菜单-->
             <context-menu v-if="isScreen"></context-menu>
           </div>
@@ -51,7 +57,8 @@ export default {
       wrapStyle: {},
       screenStyle: {},
       range: 0.65,
-      fullScreenRange: 1 // 全屏缩放值
+      fullScreenRange: 1, // 全屏缩放值
+      showPageTab: false // 页签显示/隐藏
     }
   },
   mounted() {
@@ -88,6 +95,10 @@ export default {
         }
         this.fullScreenRange = range
       }
+    },
+    // 显示/隐藏页签栏
+    handleTabShow() {
+      this.showPageTab = !this.showPageTab
     },
     // transform点击事件
     cancelSelected() {

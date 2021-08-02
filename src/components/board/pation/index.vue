@@ -61,6 +61,7 @@ import {
   removeResizeListener
 } from 'bin-ui/src/utils/resize-event'
 import { mapActions, mapGetters } from 'vuex'
+import { Loading } from 'element-ui'
 export default {
   props: {
     canEdit: {
@@ -76,7 +77,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['SetCanvasRange', 'SetPageId']),
+    ...mapActions(['SetCanvasRange', 'SetPageId', 'getScreenDetail']),
     // 页签跳转
     toOtherPage(id) {
       // 当前页已经选中不需要跳转
@@ -84,8 +85,9 @@ export default {
         return
       }
       this.SetPageId(id)
-      if (!this.canEdit && this.isScreen) {
-        this.$parent.changeTab(id) // screen全屏下重置数据
+      if (this.isScreen) {
+        this.$parent.changeTab && this.$parent.changeTab(id) // screen全屏下重置数据
+        !this.$parent.changeTab && this.changeTab(id)
       } else {
         // 编辑页面跳转
         this.$router.replace({
@@ -96,6 +98,21 @@ export default {
           }
         })
       }
+    },
+    changeTab(pageId) {
+      let loadingInstance = Loading.service({
+        lock: true,
+        text: '加载中...',
+        target: document.querySelector('.screen-manage')
+      })
+      // 切换页签数据
+      this.getScreenDetail({
+        id: this.screenId,
+        tabId: pageId,
+        needRefresh: true
+      }).then(res => {
+        loadingInstance.close()
+      })
     },
     getTabsData() {
       return this.$server.screenManage
@@ -288,7 +305,8 @@ export default {
       'currentPageId',
       'isScreen',
       'pageSettings',
-      'orginPageSettings'
+      'orginPageSettings',
+      'screenId'
     ]),
     pages: {
       get() {
