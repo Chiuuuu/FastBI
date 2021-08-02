@@ -322,7 +322,7 @@
         </div>
       </a-drawer>
     </div>
-    <screen isShootDom></screen>
+    <screen isShootDom v-if="canvasMap && canvasMap.length"></screen>
   </div>
 </template>
 
@@ -451,7 +451,8 @@ export default {
       'isScreen',
       'parentId',
       'pageList',
-      'isPublish'
+      'isPublish',
+      'canvasMap'
     ]),
     folderSelectList() {
       return this.folderList.filter(item => item.fileType === 0)

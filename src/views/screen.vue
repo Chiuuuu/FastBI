@@ -244,7 +244,7 @@ export default {
     screenId: {
       handler(val) {
         if (val) {
-          if (this.$route.name === 'catalog') {
+          if (this.$route.name === 'catalog' && !this.isShootDom) {
             this.getScreenData()
           }
         }
