@@ -2575,8 +2575,8 @@ const list = [
             apis: {},
             background: {
               backgroundType: '1',
-              backgroundColor: '',
-              borderColor: '',
+              backgroundColor: 'rgba(0,0,0,0)',
+              borderColor: '#fff',
               borderWidth: 0,
               borderStyle: 'solid',
               borderRadius: 0
@@ -2757,8 +2757,8 @@ const list = [
             apis: {},
             background: {
               backgroundType: '1',
-              backgroundColor: '',
-              borderColor: '',
+              backgroundColor: 'rgba(0,0,0,0)',
+              borderColor: '#fff',
               borderWidth: 0,
               borderStyle: 'solid',
               borderRadius: 0
@@ -2773,7 +2773,7 @@ const list = [
               chart: {
                 backgroundColor: 'rgba(0,0,0,0)', // 背景透明
                 plotBackgroundImage: '', // 背景图片
-                borderColor: '#335cad', // 边框颜色
+                borderColor: '#fff', // 边框颜色
                 borderWidth: 0, // 边框宽度
                 borderRadius: 0, // 边框圆角
                 type: 'column', // cylinder圆柱
