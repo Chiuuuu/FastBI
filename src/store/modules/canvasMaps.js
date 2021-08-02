@@ -82,10 +82,12 @@ const canvasMaps = {
       commit('SINGLE_SELECT', selectItem)
     },
     ToggleContextMenu({ commit }, info) {
+      let len = info ? document.body.clientHeight - info.y : 0
+      console.log(len)
       let menuInfo = info
         ? Object.assign({}, info, {
             isShow: true,
-            y:window.screen.height - info.y > 300 ? info.y : info.y - 150
+            y: len > 223 ? info.y : info.y - len // 223是列表的高
           })
         : { x: 0, y: 0, isShow: false }
       commit('SET_CONTEXT_MENU_INFO', menuInfo)
