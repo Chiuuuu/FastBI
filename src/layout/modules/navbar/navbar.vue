@@ -53,6 +53,9 @@ export default {
 
             if (this.$route.name === 'dataAccess') { // 如果刚好是数据接入界面, 刷新菜单列表
               this.$store.dispatch('dataAccess/getMenuList', this)
+              this.$store.dispatch('dataAccess/setModelType', '')
+              this.$store.dispatch('dataAccess/setModelId', 0)
+              this.$store.dispatch('dataAccess/setFirstFinished', false)
             } else {
               this.$router.replace('/')
             }
