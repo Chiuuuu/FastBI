@@ -56,6 +56,8 @@
         :scroll="{ y: 'calc(100vh - 398px)', x: 770 }"
         @change="handleTableChange"
       >
+        <!-- 名称 -->
+        <span slot="nameTitle">{{dataName}}</span>
       </a-table>
     </div>
   </div>
@@ -66,30 +68,29 @@
 const column = [
   {
     title: '项目名称',
-    width: 150,
     ellipsis: true,
     dataIndex: 'projectName'
   },
   {
-    title: '数据大屏名称',
-    width: 140,
+    slots: { title: 'nameTitle' },
+    // title: '数据名称',
     ellipsis: true,
-    dataIndex: 'name'
+    dataIndex: 'name',
+    
   },
   {
     title: '操作时间',
-    width: 120,
     ellipsis: true,
     dataIndex: 'time'
   },
   {
     title: '操作者',
-    dataIndex: 'people'
+    dataIndex: 'people',
+    ellipsis: true,
   },
   {
     title: '账号',
     dataIndex: 'user',
-    width: 200,
     ellipsis: true
   },
   {
@@ -101,7 +102,6 @@ const column = [
   {
     title: '内容',
     dataIndex: 'con',
-    width: 200,
     ellipsis: true
   },
 ]
@@ -124,7 +124,10 @@ export default {
       },
       loading:false,
       column,// 表单配置
-      dataList:[],//列表数据
+      dataList:[
+        {id:'1',projectName:"项目1",name:'数据名称1',time:'2021-01-01 12:12:12',people:'李白白',user:'大黄黄',type:'操作类型',con:'内容222'},
+        {id:'2',projectName:"项目1",name:'数据名称2',time:'2021-01-01 12:12:12',people:'李白白',user:'大黄黄',type:'操作类型',con:'内容222'},
+      ],//列表数据
       pagination: {
         current: 1,
         pageSize: 10,
