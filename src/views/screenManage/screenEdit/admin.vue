@@ -25,7 +25,7 @@
               style="width:18px;heigth:18px;"
               :src="require(`@/assets/images/chart/${transform.setting.icon}`)"
             />
-            <template v-if="transform.setting.config.title.content">
+            <template v-if="transform.setting.config.title && transform.setting.config.title.content">
               <a-tooltip
                 v-if="transform.setting.config.title.content.length > 7"
               >
@@ -177,7 +177,7 @@
       </template>
     </board>
 
-    <screen :key="isScreen" isEdit></screen>
+    <screen :key="isScreen" isShootDom></screen>
     <b-modal
       v-model="deleteDialog"
       :styles="{ top: '300px', width: '350px' }"

@@ -1497,7 +1497,8 @@ const list = [
                   color: '',
                   fontSize: 12,
                   position: 'outside', // 可选inside
-                  formatter: '{b}: {@2012} ({d}%)'
+                  formatter: '{b}: {@2012} ({d}%)',
+                  formatterSelect: ['name', 'value', 'percent']
                 },
                 center: ['50%', '50%'] // 饼图可选
               },
@@ -2575,8 +2576,8 @@ const list = [
             apis: {},
             background: {
               backgroundType: '1',
-              backgroundColor: '',
-              borderColor: '',
+              backgroundColor: 'rgba(0,0,0,0)',
+              borderColor: '#fff',
               borderWidth: 0,
               borderStyle: 'solid',
               borderRadius: 0
@@ -2696,6 +2697,12 @@ const list = [
                   }
                 }
               },
+              navigation: {
+                buttonOptions: {
+                  // 关闭导出按钮，效果同上
+                  enabled: false
+                }
+              },
               series: [
                 {
                   type: 'pie',
@@ -2757,8 +2764,8 @@ const list = [
             apis: {},
             background: {
               backgroundType: '1',
-              backgroundColor: '',
-              borderColor: '',
+              backgroundColor: 'rgba(0,0,0,0)',
+              borderColor: '#fff',
               borderWidth: 0,
               borderStyle: 'solid',
               borderRadius: 0
@@ -2773,7 +2780,7 @@ const list = [
               chart: {
                 backgroundColor: 'rgba(0,0,0,0)', // 背景透明
                 plotBackgroundImage: '', // 背景图片
-                borderColor: '#335cad', // 边框颜色
+                borderColor: '#fff', // 边框颜色
                 borderWidth: 0, // 边框宽度
                 borderRadius: 0, // 边框圆角
                 type: 'column', // cylinder圆柱
@@ -2897,6 +2904,12 @@ const list = [
                     }
                   },
                   stacking: null // null（不进行堆叠）、"normal"（普通堆叠） 和 "percent"（百分比堆叠
+                }
+              },
+              navigation: {
+                buttonOptions: {
+                  // 关闭导出按钮，效果同上
+                  enabled: false
                 }
               },
               series: [

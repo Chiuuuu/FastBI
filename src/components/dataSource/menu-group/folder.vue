@@ -9,8 +9,8 @@
       @drop.stop="handleDrop"
     >
       <h4 class="title" :title="folder.name">
-        <a-icon type="folder-open" class='folder-icon' v-if="folderOpen"/>
-        <a-icon type="folder" class='folder-icon' v-else/>
+        <a-icon v-if="folderOpen" type="folder-open" class='folder-icon'/>
+        <a-icon v-else type="folder" class='folder-icon'/>
         <span class="title-span">{{ folder.name }}</span>
       </h4>
       <span class="menu" v-if="hasContextmenus">

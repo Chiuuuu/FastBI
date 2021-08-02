@@ -335,7 +335,7 @@ export default {
           let list = []
           res.rows.forEach(item => {
             if (item) {
-              list.push(Object.values(item)[0])
+              list.push(Object.values(item)[0].toString())
             }
           }) // 维度全字段列表
           dataFile.originList = list
@@ -415,7 +415,7 @@ export default {
         }
         let res = await this.$server.screenManage.getDataPick(params)
         this.currentFile.originList = res.rows.map(
-          item => Object.values(item)[0]
+          item => Object.values(item)[0].toString()
         ) // 维度全字段列表
         this.currentFile.searchList = this.currentFile.originList
         this.onChange()

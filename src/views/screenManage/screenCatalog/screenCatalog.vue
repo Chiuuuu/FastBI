@@ -1,319 +1,328 @@
 <template>
-  <div class="screen-catalog">
-    <div class="left">
-      <div class="menu_title">
-        <span>大屏目录</span>
-        <a-dropdown
-          v-if="hasPermissionSourceAdd || hasPermissionFolderAdd"
-          :trigger="['click']"
-          placement="bottomLeft"
-        >
-          <a-icon type="plus-square" class="menu_icon" />
-          <a-menu slot="overlay" class="drow_menu">
-            <a-menu-item @click="choose = true"> 选择大屏模版 </a-menu-item>
-            <a-menu-item v-on:click="addScreen" v-if="hasPermissionSourceAdd">
-              新建空白大屏
-            </a-menu-item>
-            <a-menu-item
-              v-if="hasPermissionFolderAdd"
-              key="1"
-              @click="addFolder"
-            >
-              新建文件夹
-            </a-menu-item>
-          </a-menu>
-        </a-dropdown>
-      </div>
-      <div class="menu_search">
-        <a-input
-          placeholder="搜索大屏目录"
-          v-model="searchName"
-          @change="menuSearch"
-        >
-          <a-icon class="icon_search" slot="suffix" type="search" />
-        </a-input>
-      </div>
-      <div
-        class="menu-wrap scrollbar screen-menu"
-        v-if="folderList.length > 0"
-        @dragover.stop.prevent
-        @drop.stop.prevent="handleWrapDrop"
-      >
+  <div style="overflow:hidden;height:100%">
+    <div class="screen-catalog" ref="screenCatalog">
+      <div class="left">
+        <div class="menu_title">
+          <span>大屏目录</span>
+          <a-dropdown
+            v-if="hasPermissionSourceAdd || hasPermissionFolderAdd"
+            :trigger="['click']"
+            placement="bottomLeft"
+          >
+            <a-icon type="plus-square" class="menu_icon" />
+            <a-menu slot="overlay" class="drow_menu">
+              <a-menu-item @click="choose = true"> 选择大屏模版 </a-menu-item>
+              <a-menu-item v-on:click="addScreen" v-if="hasPermissionSourceAdd">
+                新建空白大屏
+              </a-menu-item>
+              <a-menu-item
+                v-if="hasPermissionFolderAdd"
+                key="1"
+                @click="addFolder"
+              >
+                新建文件夹
+              </a-menu-item>
+            </a-menu>
+          </a-dropdown>
+        </div>
+        <div class="menu_search">
+          <a-input
+            placeholder="搜索大屏目录"
+            v-model="searchName"
+            @change="menuSearch"
+          >
+            <a-icon class="icon_search" slot="suffix" type="search" />
+          </a-input>
+        </div>
         <div
-          class="group"
-          :class="handleIsFolder(folder) ? 'is-folder' : ''"
-          v-for="(folder, index) in folderList"
-          :key="folder.id"
+          class="menu-wrap scrollbar screen-menu"
+          v-if="folderList.length > 0"
+          @dragover.stop.prevent
+          @drop.stop.prevent="handleWrapDrop"
         >
-          <template v-if="handleIsFolder(folder)">
-            <menu-folder
-              :folder="folder"
-              :index="index"
-              :contextmenus="folderContenxtMenu"
-              @fileDrop="handleFileDrop"
-            >
-              <template v-slot:file="slotProps">
+          <div
+            class="group"
+            :class="handleIsFolder(folder) ? 'is-folder' : ''"
+            v-for="(folder, index) in folderList"
+            :key="folder.id"
+          >
+            <template v-if="handleIsFolder(folder)">
+              <menu-folder
+                :folder="folder"
+                :index="index"
+                :contextmenus="folderContenxtMenu"
+                @fileDrop="handleFileDrop"
+              >
+                <template v-slot:file="slotProps">
+                  <menu-file
+                    :file="slotProps.file"
+                    :index="slotProps.index"
+                    :parent="folder"
+                    :isSelect="fileSelectId === slotProps.file.id"
+                    :contextmenus="fileContenxtMenu"
+                    @fileSelect="handleFileSelect"
+                    @fileDrag="handleFileDrag"
+                  ></menu-file>
+                </template>
+              </menu-folder>
+            </template>
+            <template v-else>
+              <ul class="items">
                 <menu-file
-                  :file="slotProps.file"
-                  :index="slotProps.index"
-                  :parent="folder"
-                  :isSelect="fileSelectId === slotProps.file.id"
+                  :file="folder"
+                  :index="index"
+                  :isSelect="fileSelectId === folder.id"
                   :contextmenus="fileContenxtMenu"
                   @fileSelect="handleFileSelect"
                   @fileDrag="handleFileDrag"
                 ></menu-file>
-              </template>
-            </menu-folder>
-          </template>
-          <template v-else>
-            <ul class="items">
-              <menu-file
-                :file="folder"
-                :index="index"
-                :isSelect="fileSelectId === folder.id"
-                :contextmenus="fileContenxtMenu"
-                @fileSelect="handleFileSelect"
-                @fileDrag="handleFileDrag"
-              ></menu-file>
-            </ul>
-          </template>
+              </ul>
+            </template>
+          </div>
         </div>
+        <a-empty v-else style="margin-top: 50px; color: rgba(0, 0, 0, 0.65)">
+          <span slot="description">暂无数据大屏</span>
+        </a-empty>
       </div>
-      <a-empty v-else style="margin-top: 50px; color: rgba(0, 0, 0, 0.65)">
-        <span slot="description">暂无数据大屏</span>
-      </a-empty>
-    </div>
-    <div class="right scrollbar" style="overflow: hidden">
-      <div class="right-header" v-if="fileSelectId > 0">
-        <span class="nav_title">{{ fileSelectName }} </span>
-        <img
-          v-show="isPublish === 0"
-          style="width: 18px; heigth: 18px"
-          src="@/assets/images/chart/notpublish.png"
-        />
-        <img
-          v-show="isPublish === 1 && releaseObj.valid"
-          style="width: 18px; heigth: 18px"
-          src="@/assets/images/chart/published.png"
-        />
-        <img
-          v-show="isPublish === 1 && !releaseObj.valid"
-          style="width: 18px; heigth: 18px"
-          src="@/assets/images/chart/timeout.png"
-        />
-        <a-button class="btn_n1" @click="openScreen">全屏</a-button>
-        <a-button v-if="hasPublishPermission" class="btn_n1" @click="release"
-          ><span>发布</span>
-          <a-dropdown
-            v-show="isPublish === 1"
-            :trigger="['click']"
-            placement="bottomCenter"
-            v-model="releaceMore"
-          >
-            <a-icon class="icon-more" type="caret-down" />
-            <a-menu slot="overlay" class="drow_menu">
-              <a-menu-item v-on:click="showShare"> 查看分享 </a-menu-item>
-              <a-menu-item key="1" @click="cancelReleace">
-                撤销分享
-              </a-menu-item>
-            </a-menu>
-          </a-dropdown>
-        </a-button>
-
-        <a-button class="btn_n2" @click="$refs.screen.refreshData()"
-          >刷新数据</a-button
-        >
-        <a-button
-          type="primary"
-          class="btn_pr"
-          v-if="hasEditPermission"
-          @click="editScreen"
-          >编辑大屏</a-button
-        >
-      </div>
-      <div class="contain" ref="contain">
-        <screen
-          v-if="fileSelectId > 0"
-          ref="screen"
-          :key="componentKey"
-          @getShareData="getShareData"
-        ></screen>
-        <div class="empty" v-else>
-          <img src="@/assets/images/icon_empty_state.png" class="empty_img" />
-          <p class="empty_word">
-            暂无内容 ， 请先添加大屏目录数据或者选择一个大屏目录 ~
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <a-modal
-      v-model="screenVisible"
-      :title="
-        isAdd === 1 ? '新建大屏' : isAdd === 2 ? '重命名大屏' : '选择文件夹'
-      "
-      @ok="handleOk"
-    >
-      <a-form
-        :form="screenForm"
-        :label-col="{ span: 5 }"
-        :wrapper-col="{ span: 12 }"
-      >
-        <a-form-item label="名称" v-if="isAdd !== 3">
-          <a-input
-            class="mod_input"
-            v-decorator="[
-              'name',
-              { rules: [{ required: true, message: '请输入大屏名称' }] }
-            ]"
-            placeholder="请输入大屏名称"
-            :maxLength="20"
-          />
-        </a-form-item>
-        <a-form-item label="保存目录" v-if="isAdd !== 2">
-          <a-select
-            v-decorator="['parentId']"
-            placeholder="选择大屏目录"
-            allowClear
-            style="width: 310px"
-          >
-            <a-select-option
-              v-for="(item, index) in folderSelectList"
-              :key="index"
-              :value="item.id"
-              >{{ item.name }}</a-select-option
-            >
-          </a-select>
-        </a-form-item>
-      </a-form>
-    </a-modal>
-
-    <a-modal
-      v-model="releaseVisible"
-      :title="isPublish === 1 ? '查看分享' : '发布分享'"
-    >
-      <template slot="footer">
-        <a-button key="cancel" @click="releaseVisible = false"> 取消 </a-button>
-        <a-button key="submit" type="primary" @click="releaceConfirm">
-          {{ isPublish === 1 ? '重新发布' : '发布' }}
-        </a-button>
-        <a-button
-          key="back"
-          v-if="isPublish === 1"
-          @click="releaseVisible = false"
-        >
-          确定
-        </a-button>
-      </template>
-      <div class="releace-box" @click="showCode = false">
-        <div class="releace-line">
-          <span class="errortext" v-if="isPublish === 1 && !releaseObj.valid"
-            >当前资源已过期，请点击下方按钮重新发布</span
-          >
-        </div>
-        <div class="releace-line">
-          <span class="label"
-            ><span style="color: #ff0000">*</span>分享链接：</span
-          ><span class="text">{{ releaseObj.url }}</span>
-        </div>
-        <div class="indent">
-          <span class="indent-text" @click="copyLink(releaseObj.url)"
-            >复制链接</span
-          >
-          <a-icon
-            type="qrcode"
-            class="qrcode"
-            :style="{ fontSize: '20px' }"
-            @click.stop="showCode = true"
-          />
-        </div>
-        <div class="releace-line">
-          <span class="label">分享密码：</span
-          ><input
-            v-if="isPublish === 0"
-            v-model="releaseObj.password"
-            :class="['mod_input', { 'has-error': showLimitWarn }, 'ant-input']"
-            placeholder="请输入6位分享密码（数字+字母）"
-            maxlength="6"
-            @input="handlePassword"
-          />
-          <span v-else>{{ releaseObj.password || '无密码' }}</span>
-        </div>
-        <div class="releace-line" v-show="showLimitWarn">
-          <span class="errortext">请输入6位数字+字母</span>
-        </div>
-        <div class="releace-line">
-          <span class="label"
-            ><span style="color: #ff0000">*</span>分享时效：</span
-          >
-          <a-radio-group v-if="isPublish === 0" v-model="releaseObj.expired">
-            <a-radio :value="7">7天</a-radio>
-            <a-radio :value="30">30天</a-radio>
-            <a-radio :value="0">永久</a-radio>
-          </a-radio-group>
-          <span v-else>{{ expiredLabel }}</span>
-        </div>
-        <div class="code-show" v-show="showCode">
-          <!-- <a-icon type="qrcode" :style="{ fontSize: '250px' }" /> -->
-          <vue-qr :size="250" :text="releaseObj.url" :margin="0"></vue-qr>
-        </div>
-      </div>
-    </a-modal>
-    <new-folder
-      ref="newFolderForm"
-      :title="folderTitle"
-      :visible="folderVisible"
-      @cancel="hideFolder"
-      @create="creatFolder"
-    ></new-folder>
-
-    <!-- 选择大屏模版 -->
-    <a-drawer
-      title="选择大屏模版"
-      placement="bottom"
-      height="500"
-      :closable="false"
-      :visible="choose"
-      :bordered="false"
-      @close="choose = false"
-    >
-      <div class="dvs-head-btns">
-        <a-button type="primary" @click="getSubmit" :loading="btnloading">
-          确定
-        </a-button>
-        <a-button
-          style="marginright: 8px"
-          @click="
-            () => {
-              ;(choose = false), (chooseIndex = null)
-            }
-          "
-        >
-          取消
-        </a-button>
-      </div>
-      <div class="templeList">
-        <a-card
-          hoverable
-          style="width: 240px"
-          v-for="(item, index) in templeList"
-          :key="index"
-          :class="{ active: index === chooseIndex }"
-          @click.stop="getCardClick(item, index)"
-        >
+      <div class="right scrollbar" style="overflow: hidden">
+        <div class="right-header" v-if="fileSelectId > 0">
+          <span class="nav_title">{{ fileSelectName }} </span>
           <img
-            slot="cover"
-            alt="example"
-            height="240"
-            :src="item.thumbnailsUrl"
+            v-show="isPublish === 0"
+            style="width: 18px; heigth: 18px"
+            src="@/assets/images/chart/notpublish.png"
           />
-          <a-card-meta
-            :title="item.title"
-            style="text-align:center"
-          ></a-card-meta>
-        </a-card>
+          <img
+            v-show="isPublish === 1 && releaseObj.valid"
+            style="width: 18px; heigth: 18px"
+            src="@/assets/images/chart/published.png"
+          />
+          <img
+            v-show="isPublish === 1 && !releaseObj.valid"
+            style="width: 18px; heigth: 18px"
+            src="@/assets/images/chart/timeout.png"
+          />
+          <a-button class="btn_n1" @click="openScreen">全屏</a-button>
+          <a-button v-if="hasPublishPermission" class="btn_n1" @click="release"
+            ><span>发布</span>
+            <a-dropdown
+              v-show="isPublish === 1"
+              :trigger="['click']"
+              placement="bottomCenter"
+              v-model="releaceMore"
+            >
+              <a-icon class="icon-more" type="caret-down" />
+              <a-menu slot="overlay" class="drow_menu">
+                <a-menu-item v-on:click="showShare"> 查看分享 </a-menu-item>
+                <a-menu-item key="1" @click="cancelReleace">
+                  撤销分享
+                </a-menu-item>
+              </a-menu>
+            </a-dropdown>
+          </a-button>
+
+          <a-button class="btn_n2" @click="$refs.screen.refreshData()"
+            >刷新数据</a-button
+          >
+          <a-button
+            type="primary"
+            class="btn_pr"
+            v-if="hasEditPermission"
+            @click="editScreen"
+            >编辑大屏</a-button
+          >
+        </div>
+        <div class="contain" ref="contain">
+          <screen
+            v-if="fileSelectId > 0"
+            ref="screen"
+            :key="componentKey"
+            @getShareData="getShareData"
+          ></screen>
+          <div class="empty" v-else>
+            <img src="@/assets/images/icon_empty_state.png" class="empty_img" />
+            <p class="empty_word">
+              暂无内容 ， 请先添加大屏目录数据或者选择一个大屏目录 ~
+            </p>
+          </div>
+        </div>
       </div>
-    </a-drawer>
+
+      <a-modal
+        v-model="screenVisible"
+        :title="
+          isAdd === 1 ? '新建大屏' : isAdd === 2 ? '重命名大屏' : '选择文件夹'
+        "
+        @ok="handleOk"
+      >
+        <a-form
+          :form="screenForm"
+          :label-col="{ span: 5 }"
+          :wrapper-col="{ span: 12 }"
+        >
+          <a-form-item label="名称" v-if="isAdd !== 3">
+            <a-input
+              class="mod_input"
+              v-decorator="[
+                'name',
+                { rules: [{ required: true, message: '请输入大屏名称' }] }
+              ]"
+              placeholder="请输入大屏名称"
+              :maxLength="20"
+            />
+          </a-form-item>
+          <a-form-item label="保存目录" v-if="isAdd !== 2">
+            <a-select
+              v-decorator="['parentId']"
+              placeholder="选择大屏目录"
+              allowClear
+              style="width: 310px"
+            >
+              <a-select-option
+                v-for="(item, index) in folderSelectList"
+                :key="index"
+                :value="item.id"
+                >{{ item.name }}</a-select-option
+              >
+            </a-select>
+          </a-form-item>
+        </a-form>
+      </a-modal>
+
+      <a-modal
+        v-model="releaseVisible"
+        :title="isPublish === 1 ? '查看分享' : '发布分享'"
+      >
+        <template slot="footer">
+          <a-button key="cancel" @click="releaseVisible = false">
+            取消
+          </a-button>
+          <a-button key="submit" type="primary" @click="releaceConfirm">
+            {{ isPublish === 1 ? '重新发布' : '发布' }}
+          </a-button>
+          <a-button
+            key="back"
+            v-if="isPublish === 1"
+            @click="releaseVisible = false"
+          >
+            确定
+          </a-button>
+        </template>
+        <div class="releace-box" @click="showCode = false">
+          <div class="releace-line">
+            <span class="errortext" v-if="isPublish === 1 && !releaseObj.valid"
+              >当前资源已过期，请点击下方按钮重新发布</span
+            >
+          </div>
+          <div class="releace-line">
+            <span class="label"
+              ><span style="color: #ff0000">*</span>分享链接：</span
+            ><span class="text">{{ releaseObj.url }}</span>
+          </div>
+          <div class="indent">
+            <span class="indent-text" @click="copyLink(releaseObj.url)"
+              >复制链接</span
+            >
+            <a-icon
+              type="qrcode"
+              class="qrcode"
+              :style="{ fontSize: '20px' }"
+              @click.stop="showCode = true"
+            />
+          </div>
+          <div class="releace-line">
+            <span class="label">分享密码：</span
+            ><input
+              v-if="isPublish === 0"
+              v-model="releaseObj.password"
+              :class="[
+                'mod_input',
+                { 'has-error': showLimitWarn },
+                'ant-input'
+              ]"
+              placeholder="请输入6位分享密码（数字+字母）"
+              maxlength="6"
+              @input="handlePassword"
+            />
+            <span v-else>{{ releaseObj.password || '无密码' }}</span>
+          </div>
+          <div class="releace-line" v-show="showLimitWarn">
+            <span class="errortext">请输入6位数字+字母</span>
+          </div>
+          <div class="releace-line">
+            <span class="label"
+              ><span style="color: #ff0000">*</span>分享时效：</span
+            >
+            <a-radio-group v-if="isPublish === 0" v-model="releaseObj.expired">
+              <a-radio :value="7">7天</a-radio>
+              <a-radio :value="30">30天</a-radio>
+              <a-radio :value="0">永久</a-radio>
+            </a-radio-group>
+            <span v-else>{{ expiredLabel }}</span>
+          </div>
+          <div class="code-show" v-show="showCode">
+            <!-- <a-icon type="qrcode" :style="{ fontSize: '250px' }" /> -->
+            <vue-qr :size="250" :text="releaseObj.url" :margin="0"></vue-qr>
+          </div>
+        </div>
+      </a-modal>
+      <new-folder
+        ref="newFolderForm"
+        :title="folderTitle"
+        :visible="folderVisible"
+        @cancel="hideFolder"
+        @create="creatFolder"
+      ></new-folder>
+
+      <!-- 选择大屏模版 -->
+      <a-drawer
+        title="选择大屏模版"
+        placement="bottom"
+        height="500"
+        :closable="false"
+        :visible="choose"
+        :bordered="false"
+        @close="choose = false"
+      >
+        <div class="dvs-head-btns">
+          <a-button type="primary" @click="getSubmit" :loading="btnloading">
+            确定
+          </a-button>
+          <a-button
+            style="marginright: 8px"
+            @click="
+              () => {
+                ;(choose = false), (chooseIndex = null)
+              }
+            "
+          >
+            取消
+          </a-button>
+        </div>
+        <div class="templeList">
+          <a-card
+            hoverable
+            style="width: 240px"
+            v-for="(item, index) in templeList"
+            :key="index"
+            :class="{ active: index === chooseIndex }"
+            @click.stop="getCardClick(item, index)"
+          >
+            <img
+              slot="cover"
+              alt="example"
+              height="240"
+              :src="item.thumbnailsUrl"
+            />
+            <a-card-meta
+              :title="item.title"
+              style="text-align:center"
+            ></a-card-meta>
+          </a-card>
+        </div>
+      </a-drawer>
+    </div>
+    <screen isShootDom v-if="canvasMap && canvasMap.length"></screen>
   </div>
 </template>
 
@@ -421,7 +430,8 @@ export default {
       chooseIndex: null,
       chooseTemple: {}, //选中的大屏模版
       templeList: [],
-      btnloading: false
+      btnloading: false,
+      catalogContentStyle: {}
     }
   },
   watch: {
@@ -441,7 +451,8 @@ export default {
       'isScreen',
       'parentId',
       'pageList',
-      'isPublish'
+      'isPublish',
+      'canvasMap'
     ]),
     folderSelectList() {
       return this.folderList.filter(item => item.fileType === 0)
@@ -507,6 +518,12 @@ export default {
     this.$on('fileSelect', this.handleFileSelect)
 
     this.getScreenList()
+    // this.$nextTick(() => {
+    //   this.catalogContentStyle = {
+    //     overflow: 'hidden',
+    //     height: '100%'
+    //   }
+    // })
 
     window.onresize = () => {
       // 全屏下监控是否按键了ESC
@@ -515,6 +532,12 @@ export default {
         this.componentKey -= 1
         this.$store.dispatch('SetIsScreen', false)
         this.$store.dispatch('ToggleContextMenu')
+        // this.$nextTick(() => {
+        //   this.catalogContentStyle = {
+        //     overflow: hidden,
+        //     height: this.$refs.screenCatalog.clientHeight + 20 + 'px'
+        //   }
+        // })
       }
     }
   },

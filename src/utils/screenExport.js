@@ -47,8 +47,8 @@ function handleShootedDom(chart, targetDom) {
   const domObjClone = targetDom.cloneNode()
   // 修改id
   domObjClone.setAttribute('id', 'cloneShotTarget')
+  // 旭日图热力图dom结构只有一层
   if (chart.setting.name === 've-sun' || chart.setting.name === 've-heatmap') {
-    // 旭日图热力图dom结构只有一层
     let {
       clientWidth: orginWidth,
       clientHeight: orginHeight
@@ -91,12 +91,6 @@ function actionShoot(domClone, backColor, name) {
     scrollY: 0,
     scrollX: 0,
     useCORS: true // 【重要】开启跨域配置
-    // onclone: documentClone => {
-    //   const cloneDom = documentClone.getElementById('cloneShotTarget')
-    //   if (!cloneDom.style.backgroundColor) {
-    //     cloneDom.style.backgroundColor = backColor // 如果图表背景透明，按大屏背景色作为背景
-    //   }
-    // }
   }).then(canvas => {
     document.body.removeChild(domClone)
     downloadImg(canvas, name)
@@ -108,6 +102,9 @@ export function exportImg(chartId, chart, pageSettings) {
   let domObj = document.getElementById(chartId)
   // 处理截图的dom
   const domClone = handleShootedDom(chart, domObj)
+  if (!domClone) {
+    return
+  }
   // 截图
   actionShoot(domClone, pageSettings.backgroundColor, chart.name)
 }
@@ -123,7 +120,8 @@ export function exportForFull(chartId, chart, pageSettings) {
 
 // 导出整个大屏
 export function exportScreen(name) {
-  let domObj = document.querySelector('.dv-screen')
+  const domObjs = document.querySelectorAll('.dv-screen')
+  const domObj = domObjs[1] || domObjs[0]
   html2canvas(domObj, {
     width: domObj.clientWidth,
     height: domObj.clientHeight,

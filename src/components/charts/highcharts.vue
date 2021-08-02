@@ -1,18 +1,14 @@
 <template>
   <!-- 3D饼图和柱状图 -->
-  <div class="dvs-high">
-    <div
-      class="container"
-      ref="container"
-      :style="styleObj"
-      @click.capture="resetBindData"
-    ></div>
+  <div class="dvs-high" :style="styleObj">
+    <div class="container" ref="container" @click.capture="resetBindData"></div>
   </div>
 </template>
 <script>
 import { DEFAULT_COLORS } from '@/utils/defaultColors'
 import { mapGetters } from 'vuex'
 import { setLinkageData, resetOriginData } from '@/utils/setDataLink'
+import Exporting from 'highcharts/modules/exporting'
 export default {
   name: 'hightCharts',
   props: {
@@ -51,16 +47,17 @@ export default {
     }
   },
   mounted() {
+    // Exporting(this.$highCharts)
     this.init()
   },
   methods: {
     init() {
-      this.getBackgroundColor(this.setting.background)
       this.setting.config.plotOptions.series.events.click = this.clickEvent
       this.mychart = this.$highCharts.chart(
         this.$refs.container,
         this.setting.config
       )
+      this.getBackgroundColor(this.setting.background)
     },
     resetBindData(e) {
       const nodeName = e.target.nodeName
