@@ -3017,13 +3017,13 @@
                     @change="setSelfProperty"
                   ></el-color-picker>
                 </gui-field>
-                <gui-field label="自动换行">
+                <!-- <gui-field label="自动换行">
                   <a-switch
                     v-model="selfConfig.table.ellipsis"
                     size="small"
                     @change="switchChange"
                   ></a-switch>
-                </gui-field>
+                </gui-field> -->
               </a-collapse-panel>
             </template>
 

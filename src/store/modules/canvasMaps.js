@@ -83,7 +83,6 @@ const canvasMaps = {
     },
     ToggleContextMenu({ commit }, info) {
       let len = info ? document.body.clientHeight - info.y : 0
-      console.log(len)
       let menuInfo = info
         ? Object.assign({}, info, {
             isShow: true,

@@ -138,6 +138,10 @@ export default {
       handler(val, oldval) {
         if (val) {
           this.showHeader = val.header.show
+        //   for (let item of this.columns) {
+        //     // 是否自动换行
+        //     item.ellipsis = val.table.ellipsis
+        //   }
           this._calcStyle()
         }
       },
@@ -250,6 +254,10 @@ export default {
       for (let row of this.tableData) {
         let index = 0
         for (let col of this.columns) {
+          if (col.ellipsis && this.config.table.columnWidth) {
+            this.colWidths[index] = this.config.table.columnWidth
+            continue
+          }
           // 计算每个单元格的大小（取每一列最长的宽度作为单位格宽度）
           if (!this.colWidths[index]) {
             // 默认取表头宽度
