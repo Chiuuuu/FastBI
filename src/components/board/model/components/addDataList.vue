@@ -4,7 +4,7 @@
     <a-collapse v-model="modelKey" :bordered="false">
       <template #expandIcon="props">
         <a-icon
-          type="folder"
+          :type="props.isActive ? 'folder-open':'folder'"
           :rotate="props.isActive ? 0 : 0"
           style="font-size:16px"
         />
