@@ -19,8 +19,8 @@
         ref="charttable"
         @scroll="getScrollLeft"
         :style="{
-          width: showTableSize.tableX + 25 + 'px',
-          height: showTableSize.tableY + 25 + 'px'
+          width: showTableSize.tableX + 'px',
+          height: showTableSize.tableY + 'px'
         }"
       >
         <table
@@ -232,6 +232,7 @@ export default {
       }
       this.showTableSize = {
         tableX: Math.min(this.tableWidth, this.chartSize.width),
+        // tableX: this.chartSize.width,
         tableY:
           Math.min(
             this.$refs.tablebody.clientHeight +
@@ -283,7 +284,7 @@ export default {
       return str.replace(/[\u0391-\uFFE5]/g, 'aa').length
     },
     getScrollLeft(e) {
-      this.bodyWidth = e.target.scrollLeft + this.showTableSize.tableX + 25
+      this.bodyWidth = e.target.scrollLeft + this.showTableSize.tableX
     },
     // // 设置表头样式
     // customHeaderRow() {

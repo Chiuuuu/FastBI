@@ -1245,14 +1245,6 @@ const list = [
                   fontWeight: 'normal'
                 }
               },
-              tooltip: {
-                trigger: 'item',
-                confine: true,
-                formatter: '{b} ：{c}'
-                // formatter(params) {
-                //   return params.name
-                // }
-              },
               grid: {
                 left: 0,
                 top: 10,
@@ -1277,47 +1269,6 @@ const list = [
                 orient: 'horizontal',
                 align: 'left',
                 data: ['人口']
-              },
-              xAxis: {
-                show: false,
-                axisLabel: {
-                  show: true,
-                  color: '#ffffff',
-                  fontSize: 12,
-                  rotate: 0
-                },
-                axisLine: {
-                  show: true,
-                  lineStyle: {
-                    color: '#cccccc'
-                  }
-                },
-                splitLine: {
-                  show: false,
-                  lineStyle: {
-                    color: '#cccccc'
-                  }
-                }
-              },
-              yAxis: {
-                show: false,
-                axisLabel: {
-                  show: true,
-                  color: '#ffffff',
-                  fontSize: 12
-                },
-                axisLine: {
-                  show: true,
-                  lineStyle: {
-                    color: '#cccccc'
-                  }
-                },
-                splitLine: {
-                  show: false,
-                  lineStyle: {
-                    color: '#cccccc'
-                  }
-                }
               },
               // 地图独有的
               geo: {
