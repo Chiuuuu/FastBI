@@ -9,7 +9,7 @@
         <a-button type="primary" @click="handleGetData">搜索</a-button>
       </a-form-model-item>
       <a-form-model-item style="margin-left: auto">
-        <a-button type="primary" icon="upload" @click="openUploadModal">上传素材</a-button>
+        <a-button :disabled="categoryId == 1" type="primary" icon="upload" @click="openUploadModal">上传素材</a-button>
       </a-form-model-item>
     </a-form-model>
     <!-- 搜索栏end -->
