@@ -306,7 +306,7 @@ export default {
           if (!this.fileInfoList[index]) return
           this.spinning = true
           const res = await this.$server.dataAccess.getFileSheetList(this.fileInfoList[index].id)
-            .catch(() => {
+            .finally(() => {
               this.spinning = false
             })
           if (res.code === 200) {
@@ -669,7 +669,8 @@ export default {
           // 写入列表, 下次点击不调用接口
           this.currentDataBase.addTable(table, index)
         } else {
-          return this.$message.error('获取内容失败')
+          this.spinning = false
+          return this.$message.error(res.msg || '获取内容失败')
         }
       }
       const columns = new Array({
