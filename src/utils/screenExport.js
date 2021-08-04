@@ -1,5 +1,6 @@
 import html2canvas from 'html2canvas'
 import JSPDF from 'jspdf'
+import json2csv from 'json2csv'
 
 let chartInstanceIdMap = {}
 
@@ -93,7 +94,7 @@ function actionShoot(domClone, backColor, name) {
     useCORS: true // 【重要】开启跨域配置
   }).then(canvas => {
     document.body.removeChild(domClone)
-    downloadImg(canvas, name)
+    download(canvas, name + '.png', 'img')
   })
 }
 
@@ -139,7 +140,6 @@ export function exportScreen(name) {
       }
     }
   }).then(canvas => {
-    // downloadImg(canvas, name)
     exportPdf(canvas, name)
   })
 }
@@ -191,16 +191,19 @@ function exportPdf(canvas, name) {
 }
 
 // 下载图片
-function downloadImg(canvas, name) {
+function download(content, name, type) {
   let a = document.createElement('a')
   a.style.display = 'none'
-  let blob = dataURLToBlob(canvas.toDataURL('image/png'))
-  a.setAttribute('href', URL.createObjectURL(blob))
+  if (type === 'img') {
+    let blob = dataURLToBlob(content.toDataURL('image/png'))
+    a.setAttribute('href', URL.createObjectURL(blob))
+  } else {
+    a.setAttribute('href', encodeURI(content))
+  }
   // 这块是保存图片操作  可以设置保存的图片的信息
-  a.setAttribute('download', name + '.png')
+  a.setAttribute('download', name)
   document.body.appendChild(a)
   a.click()
-  URL.revokeObjectURL(blob)
   document.body.removeChild(a)
 }
 // 图片格式转换方法
@@ -214,4 +217,12 @@ function dataURLToBlob(dataurl) {
     u8arr[n] = bstr.charCodeAt(n)
   }
   return new Blob([u8arr], { type: mime })
+}
+
+export function exportCsv(datas, fields, name) {
+  const result = json2csv.parse(datas, {
+    fields
+  })
+  const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + result
+  download(csvContent, name + '.csv')
 }

@@ -27,19 +27,13 @@
             @click.stop="handleCommand(menu.order, item)"
           >
             <JsonExcel
-              v-if="i < 2"
+              v-if="i === 0"
               :key="currentSelected ? currentSelected + 'index' + i : 0"
               :fetch="handleChartData"
-              :fields="
-                currSelected.setting.chartType === 'v-map'
-                  ? { ' ': 'name0', '  ': 'name1', '    ': 'name2' }
-                  : null
-              "
-              :name="i === 0 ? currSelected.name : currSelected.name + '.csv'"
-              :type="i === 0 ? 'xls' : 'csv'"
+              :name="currSelected.name"
               >{{ menu.text }}</JsonExcel
             >
-            <span v-if="i === 2">{{ menu.text }}</span>
+            <span v-else>{{ menu.text }}</span>
           </div>
         </div>
       </div>
@@ -50,7 +44,12 @@
 <script>
 import Vue from 'vue'
 import JsonExcel from 'vue-json-excel'
-import { exportImg, exportForFull, exportScreen } from '@/utils/screenExport'
+import {
+  exportImg,
+  exportForFull,
+  exportScreen,
+  exportCsv
+} from '@/utils/screenExport'
 import handleReturnChartData from '@/utils/handleReturnChartData'
 import { mapGetters, mapActions } from 'vuex'
 import { Loading } from 'element-ui'
@@ -222,6 +221,9 @@ export default {
         this.$store.dispatch('ToggleContextMenu')
         // 查看/导出数据
         this.handleChartData('view')
+      } else if (order === 'tocsv') {
+        const datas = await this.handleChartData()
+        exportCsv(datas, null, this.currSelected.name)
       } else if (order === 'exportImg') {
         this.$store.dispatch('ToggleContextMenu')
         if (this.isScreen && this.$route.name !== 'screenEdit') {
@@ -351,16 +353,16 @@ export default {
               tableName.push(type)
               let aliasObj = {}
               aliasKeys.forEach((alias, index) => {
-                aliasObj['name' + index] = alias['colName']
+                aliasObj[''.padEnd(index + 1, ' ')] = alias['colName']
               })
               let cunstomRow = source[item].map(row => {
                 let obj = {}
                 aliasKeys.forEach((alias, index) => {
-                  obj['name' + index] = row[alias['colName']]
+                  obj[''.padEnd(index + 1, ' ')] = row[alias['colName']]
                 })
                 return obj
               })
-              let titleRow = { name0: type, name1: '', name2: '' }
+              let titleRow = { ' ': type, '  ': '', '   ': '' }
               cunstomRow = [titleRow, aliasObj].concat(cunstomRow)
               exportList = cunstomRow.concat(exportList)
             }
