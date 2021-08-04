@@ -8,6 +8,7 @@
 import { DEFAULT_COLORS } from '@/utils/defaultColors'
 import { mapGetters } from 'vuex'
 import { setLinkageData, resetOriginData } from '@/utils/setDataLink'
+import sourceMap from '../board/data-source/components/defaultData'
 import Exporting from 'highcharts/modules/exporting'
 export default {
   name: 'hightCharts',
@@ -148,6 +149,10 @@ export default {
       */
         // 单维度
         if (val.dimensions.length === 0 && val.measures.length === 0) {
+          if (this.setting.chartType === 'high-column') {
+            const data = sourceMap[this.setting.chartType][0].data || []
+            this.setting.config.xAxis.categories = data.map(n => n.name)
+          }
           this.mychart = this.$highCharts.chart(
             this.$refs.container,
             this.setting.config

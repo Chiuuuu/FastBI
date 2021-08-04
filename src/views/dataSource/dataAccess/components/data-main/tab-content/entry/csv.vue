@@ -377,7 +377,7 @@ export default {
       })
       this.spinning = true
       const result = await this.$server.dataAccess.actionUploadCsvFile(formData)
-        .catch(() => {
+        .finally(() => {
           this.spinning = false
         })
       if (result.code === 200) {
@@ -396,7 +396,7 @@ export default {
       formData.append('delimiter', this.queryDelimiter)
       this.spinning = true
       const result = await this.$server.dataAccess.actionUploadCsvFile(formData, this.uploadCallback)
-        .catch(() => {
+        .finally(() => {
           this.spinning = false
           this.uploadProgress = '加载中'
         })
@@ -584,7 +584,8 @@ export default {
           table = res.rows[0].tableContent
           this.$set(this.databaseList, index, table)
         } else {
-          return this.$message.error('获取内容失败')
+          this.spinning = false
+          return this.$message.error(res.msg || '获取内容失败')
         }
       }
       const columns = new Array({

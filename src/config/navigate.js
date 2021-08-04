@@ -2527,7 +2527,7 @@ const list = [
             apis: {},
             background: {
               backgroundType: '1',
-              backgroundColor: 'rgba(0,0,0,0)',
+              backgroundColor: '',
               borderColor: '#fff',
               borderWidth: 0,
               borderStyle: 'solid',
@@ -2715,7 +2715,7 @@ const list = [
             apis: {},
             background: {
               backgroundType: '1',
-              backgroundColor: 'rgba(0,0,0,0)',
+              backgroundColor: '',
               borderColor: '#fff',
               borderWidth: 0,
               borderStyle: 'solid',

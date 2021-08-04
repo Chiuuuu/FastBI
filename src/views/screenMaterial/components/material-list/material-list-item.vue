@@ -23,9 +23,9 @@
     <!-- 操作栏 -->
     <div class="controller">
       <a-popconfirm title="是否确定删除？" ok-text="确定" cancel-text="取消" @confirm="handleDelete">
-        <a>删除</a>
+        <a :class="{ 'disabled': data.parentId == 1 }">删除</a>
       </a-popconfirm>
-      <a @click="handleReset">重命名</a>
+      <a :class="{ 'disabled': data.parentId == 1 }" @click="handleReset">重命名</a>
       <a-popconfirm ok-text="确定" cancel-text="取消" @confirm="handleChangeParent">
         <i slot="icon"></i>
         <a-select slot="title" v-model="parentId">
@@ -35,7 +35,7 @@
             :key="item.id"
           >{{ item.name }}</a-select-option>
         </a-select>
-        <a>移动到分类</a>
+        <a :class="{ 'disabled': data.parentId == 1 }">移动到分类</a>
       </a-popconfirm>
     </div>
     <!-- 操作栏end -->
@@ -80,7 +80,7 @@ export default {
   },
   computed: {
     categoryList() {
-      return this.getCategoryList()
+      return this.getCategoryList().filter(n => n.id != 1)
     },
     imageUrl() {
       return process.env.VUE_APP_SERVICE_URL + this.data.filePath
@@ -186,6 +186,12 @@ export default {
   .controller {
     display: flex;
     justify-content: space-between;
+
+    .disabled {
+      color: #ccc;
+      pointer-events: none;
+      cursor: default;
+    }
   }
 }
 </style>
