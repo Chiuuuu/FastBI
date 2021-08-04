@@ -414,8 +414,8 @@ export default {
           dimensions: [this.currentFile]
         }
         let res = await this.$server.screenManage.getDataPick(params)
-        this.currentFile.originList = res.rows.map(
-          item => Object.values(item)[0].toString()
+        this.currentFile.originList = res.rows.map(item =>
+          Object.values(item)[0].toString()
         ) // 维度全字段列表
         this.currentFile.searchList = this.currentFile.originList
         this.onChange()
@@ -734,7 +734,11 @@ export default {
           this.updateChartData()
           return
         }
-        let rows = res.rows
+        // 文本框
+        if (this.currSelected.setting.chartType === 'v-text') {
+          this.$set(this.currSelected.setting.api_data, 'refreshData', datas)
+          return
+        }
         if (this.currSelected.setting.chartType === 'v-tables') {
           let columns = []
           apiData.tableList.forEach(item => {
@@ -828,7 +832,6 @@ export default {
             measureKeys.push(m.alias)
             columns.push(m.alias) // 默认columns第二项起为指标
           }
-
           // 嵌套饼图设置apis
           if (this.currSelected.setting.chartType === 'v-multiPie') {
             // name是各维度数据拼接，value是分类汇总过的数值
