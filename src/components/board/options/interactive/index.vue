@@ -52,8 +52,8 @@
                 "
               >
                 {{
-                  chart.setting.config.title.content ||
-                    chart.setting.config.title.text
+                  chart.setting.config.title.text ||
+                    chart.setting.config.title.content
                 }}
                 <span v-if="chart.id === currentSelected">(当前报表)</span>
                 <span v-else-if="checkBeBinded(chart)">已存在于联动路径中</span>
@@ -63,7 +63,8 @@
           </a-checkbox-group>
           <a-checkbox style="margin-top:5px" default-checked disabled
             >{{
-              currSelected.setting.config.title.content
+              currSelected.setting.config.title.text ||
+                currSelected.setting.config.title.content
             }}（当前报表）</a-checkbox
           >
         </b-scrollbar>
@@ -165,9 +166,12 @@ export default {
         this.chartList = this.toBindList
         return
       }
-      this.chartList = this.toBindList.filter(
-        item => item.indexOf(this.keyword) > -1
-      )
+      this.chartList = this.toBindList.filter(item => {
+        const config = item.setting.config
+        const title = config.title || { content: '' }
+        const content = title.text || title.content
+        return content.indexOf(this.keyword) > -1
+      })
     },
     // 点击全选
     onCheckAllChange(e) {
