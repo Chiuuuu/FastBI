@@ -369,6 +369,9 @@ export default {
 
       //保存插入的元素到htmlText
       this.htmlText = this.$refs.editorText.innerHTML
+
+      // 度量插入到数据
+      this.pushMeasures(measure)
       this.saveText()
 
       // 选中插入的元素
@@ -427,6 +430,14 @@ export default {
         })
       }
       return str
+    },
+    // 插入度量数据(为了实时保存)
+    pushMeasures(measure) {
+      // 去重
+      if (!this.apiData.measures.some(item => item.alias === measure.alias)) {
+        this.apiData.measures.push(measure)
+        this.$store.dispatch('SetSelfDataSource', this.apiData)
+      }
     },
     // 添加度量数据
     getMeasureDatas() {
