@@ -89,6 +89,7 @@
                 "
                 :chart-id="transform.id"
                 :key="transform.id"
+                :chart-type="transform.setting.chartType"
                 :view="transform.setting.view"
                 :config="transform.setting.config"
                 :api-data="transform.setting.api_data"
