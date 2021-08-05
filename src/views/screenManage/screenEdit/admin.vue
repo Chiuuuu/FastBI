@@ -42,7 +42,7 @@
               </template>
               <span v-else> {{ transform.setting.title }}</span>
             </template>
-            <template v-else-if="transform.setting.config.title">
+            <template v-else-if="transform.setting.config && transform.setting.config.title">
               <!-- 某些图表是用content.title -->
               <template v-if="transform.setting.config.title.content">
                 <a-tooltip
