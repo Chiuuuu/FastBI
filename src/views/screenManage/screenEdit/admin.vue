@@ -25,19 +25,55 @@
               style="width:18px;heigth:18px;"
               :src="require(`@/assets/images/chart/${transform.setting.icon}`)"
             />
-            <template v-if="transform.setting.config.title && transform.setting.config.title.content">
-              <a-tooltip
-                v-if="transform.setting.config.title.content.length > 7"
-              >
-                <template slot="title">{{
-                  transform.setting.config.title.content
-                }}</template>
-                {{
-                  transform.setting.config.title.content.substring(0, 7) + '...'
-                }}
-              </a-tooltip>
-              <span v-else>{{ transform.setting.config.title.content }}</span>
+            <!-- 环形图title -->
+            <template v-if="transform.setting.chartType === 'v-ring'">
+              <template v-if="transform.setting.config.topTitle.content">
+                <a-tooltip
+                  v-if="transform.setting.config.topTitle.content.length > 7"
+                >
+                  <template slot="title">{{
+                    transform.setting.config.topTitle.content
+                  }}</template>
+                  {{
+                    transform.setting.config.topTitle.content.substring(0, 7) + '...'
+                  }}
+                </a-tooltip>
+                <span v-else> {{ transform.setting.config.topTitle.content }}</span>
+              </template>
+              <span v-else> {{ transform.setting.title }}</span>
             </template>
+            <template v-else-if="transform.setting.config.title">
+              <!-- 某些图表是用content.title -->
+              <template v-if="transform.setting.config.title.content">
+                <a-tooltip
+                  v-if="transform.setting.config.title.content.length > 7"
+                >
+                  <template slot="title">{{
+                    transform.setting.config.title.content
+                  }}</template>
+                  {{
+                    transform.setting.config.title.content.substring(0, 7) + '...'
+                  }}
+                </a-tooltip>
+                <span v-else>{{ transform.setting.config.title.content }}</span>
+              </template>
+              <!-- 某些图表是用content.text -->
+              <template v-else-if="transform.setting.config.title.text">
+                <a-tooltip
+                  v-if="transform.setting.config.title.text.length > 7"
+                >
+                  <template slot="title">{{
+                    transform.setting.config.title.text
+                  }}</template>
+                  {{
+                    transform.setting.config.title.text.substring(0, 7) + '...'
+                  }}
+                </a-tooltip>
+                <span v-else>{{ transform.setting.config.title.text }}</span>
+              </template>
+              <span v-else> {{ transform.setting.title }}</span>
+            </template>
+            <!-- 都没有就显示默认title -->
             <span v-else> {{ transform.setting.title }}</span>
           </div>
           <div v-else flex="main:center" style="padding:5px 0">
