@@ -109,15 +109,15 @@
               ></charts-factory>
             </preview-box>
           </template>
+          <pation
+            v-if="isScreen"
+            :style="{ opacity: showPageTab ? 1 : 0 }"
+            @mouseenter.native="handleTabShow"
+            @mouseleave.native="handleTabShow"
+          ></pation>
         </div>
       </div>
     </b-scrollbar>
-    <pation
-      v-if="isScreen"
-      :style="{ opacity: showPageTab ? 1 : 0 }"
-      @mouseenter.native="handleTabShow"
-      @mouseleave.native="handleTabShow"
-    ></pation>
     <context-menu></context-menu>
     <!-- 右键菜单 -- 查看数据 -->
     <chartTableData

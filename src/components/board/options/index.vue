@@ -591,7 +591,7 @@
                     <a-switch
                       v-model="selfConfig.radius"
                       size="small"
-                      @change="setHistogram($event, 'radius')"
+                      @change="setHistogramRadius($event)"
                     ></a-switch>
                   </gui-field>
                   <gui-field label="柱条间隔">
@@ -614,16 +614,9 @@
                     <a-switch
                       v-model="selfConfig.stack"
                       size="small"
-                      @change="setHistogram($event, 'stack')"
+                      @change="setHistogramStack($event)"
                     ></a-switch>
                   </gui-field>
-                  <!-- <gui-field label="混合状图">
-                    <a-switch
-                      v-model="selfConfig.mixed"
-                      size="small"
-                      @change="setHistogram($event, 'mixed')"
-                    ></a-switch>
-                  </gui-field> -->
                 </div>
                 <!-- 散点图 -->
                 <div v-if="isScatter">
@@ -658,9 +651,6 @@
                     </a-select>
                   </gui-field>
                 </div>
-                <!-- <gui-field label="混合状图" v-if="isHistogram && selfConfig.mixed">
-                            <a-switch v-model="selfConfig.mixed" size="small" @change="setHistogram($event, 'mixed')"></a-switch>
-                        </gui-field>-->
               </a-collapse-panel>
             </template>
             <!-- 散点图独有 -->
@@ -3757,12 +3747,10 @@ export default {
       this.setSelfProperty()
     },
 
-    // 状图图设置
-    setHistogram(val, type) {
-      let apiData = deepClone(this.apiData)
-      let columns = apiData.columns
+    // 圆角配置
+    setHistogramStack(val) {
       // 堆叠柱状图
-      if (val && type === 'stack') {
+      if (val) {
         this.apis.stack = {
           用户: []
         }
@@ -3772,28 +3760,20 @@ export default {
         this.apis.stack = {}
         this.selfConfig.series.label.position = 'top'
       }
+      this.$store.dispatch('SetSelfProperty', this.selfConfig)
+      this.setApis()
+    },
+    // 堆叠配置
+    setHistogramRadius(val) {
       // 圆形柱状图
-      if (val && type === 'radius') {
+      if (val) {
         this.selfConfig.series.itemStyle.normal.barBorderRadius = [50, 50, 0, 0]
       } else {
         this.selfConfig.series.itemStyle.normal.barBorderRadius = [0]
       }
-      // 混合柱状图
-      if (val && type === 'mixed') {
-        this.apis.showLine = [
-          columns[columns.length - 2]
-            ? columns[columns.length - 2]
-            : columns[columns.length - 1]
-        ]
-        // this.apis.axisSite = { right: columns[columns.length - 2] || [columns[columns.length - 1]] }
-      } else {
-        this.apis.showLine = []
-        this.apis.axisSite = {}
-      }
       this.$store.dispatch('SetSelfProperty', this.selfConfig)
       this.setApis()
     },
-
     // 混合柱状图
     setMixed(val) {},
     // 定时器设置

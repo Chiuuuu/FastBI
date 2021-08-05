@@ -75,6 +75,7 @@ export async function handleRefreshData({ chart, newData }) {
     // 文本框
     if (chart.setting.chartType === 'v-text') {
       chart.setting.api_data.refreshData = newData[0]
+      chart.setting.api_data.source = newData[0]
     }
   } else if (chart.setting.chartType === 'v-multiPie') {
     // 嵌套饼图设置apis

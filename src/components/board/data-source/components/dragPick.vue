@@ -737,6 +737,7 @@ export default {
         // 文本框
         if (this.currSelected.setting.chartType === 'v-text') {
           this.$set(this.currSelected.setting.api_data, 'refreshData', datas)
+          this.currSelected.setting.api_data.source = datas
           return
         }
         if (this.currSelected.setting.chartType === 'v-tables') {

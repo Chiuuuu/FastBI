@@ -21,6 +21,7 @@ import { Loading } from 'element-ui'
 import ContextMenu from '@/components/dataSource/contextmenu'
 import MediumEditor from 'medium-editor'
 import { mapActions, mapGetters } from 'vuex'
+import handleReturnChartData from '@/utils/handleReturnChartData'
 // 修改度量聚合方式
 function changePolymerization(measure, name) {
   measure.innerHTML = measure.innerHTML.replace(/\(.*?\)/, '(' + name + ')')
@@ -407,6 +408,11 @@ export default {
         if (res.code === 500) {
           return res.msg
         }
+        selected.setting.api_data.source = await handleReturnChartData(
+          res.rows,
+          selected.setting
+        )
+
         str = this.htmlText.replace(reg, (match, alias) => {
           return res.rows[0] ? res.rows[0][alias] : '空'
         })
