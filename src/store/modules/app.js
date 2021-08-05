@@ -208,6 +208,8 @@ const app = {
       if (obj.setting.name === 'material' || obj.setting.name === 'figure') {
         // 素材库and图形
         name = obj.setting.name
+        let title = { content: obj.setting.config.title }
+        obj.setting.config.title = title
       } else {
         if (obj.setting.config.title) {
           name = obj.setting.config.title.content

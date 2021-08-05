@@ -91,10 +91,15 @@ export default {
       deep: true,
       immediate: true
     },
-    config(val) {
-      if (val) {
-        this.selfConfig = val
-      }
+    config: {
+      handler(val) {
+        if (val) {
+          // 实时获取配置
+          this.selfConfig = val
+        }
+      },
+      deep: true,
+      immediate: true
     },
     currentSelected(val) {
       // 是否取消选中文本框
@@ -113,7 +118,7 @@ export default {
         // 转换文本
         this.getContent().then(res => {
           this.$refs.editorText.innerHTML = res
-          this.selfConfig.title.text = res
+          this.selfConfig.text = res
           this.updateChartData(this.chartId)
         })
         // 关闭防止冒泡，开启拖动
@@ -147,11 +152,10 @@ export default {
     this.$nextTick(() => {
       // 进入页面获取计算文本
       //   if (this.canEdit) {
-      // 获取配置,富文本
-      this.htmlText = this.config.title.htmlText || ''
+      this.htmlText = this.config.htmlText || ''
       // 使用缓存文本,再更新
-      if (this.config.title.text) {
-        this.$refs.editorText.innerHTML = this.config.title.text
+      if (this.config.text) {
+        this.$refs.editorText.innerHTML = this.config.text
       }
       // 初始化显示数据，true:不需要匹配度量数据
       this.getContent(true).then(res => {
@@ -450,7 +454,7 @@ export default {
     // 保存富文本
     saveText: debounce(function() {
       this.htmlText = this.$refs.editorText.innerHTML
-      this.selfConfig.title.htmlText = this.htmlText
+      this.selfConfig.htmlText = this.htmlText
       this.$store.dispatch('SetSelfProperty', this.selfConfig)
       this.updateChartData(this.id)
     })
@@ -464,14 +468,16 @@ export default {
       'canvasMap'
     ]),
     contentStyle() {
-      return {
-        padding: '0 10px',
-        color: this.config.title.textStyle.color,
-        fontSize: this.config.title.textStyle.fontSize + 'px',
-        textAlign: this.config.title.textAlign,
-        fontFamily: this.config.title.textStyle.fontFamily,
-        fontWeight: this.config.title.textStyle.fontWeight
-      }
+      return this.config
+        ? {
+            padding: '0 10px',
+            color: this.config.title.textStyle.color,
+            fontSize: this.config.title.textStyle.fontSize + 'px',
+            textAlign: this.config.title.textAlign,
+            fontFamily: this.config.title.textStyle.fontFamily,
+            fontWeight: this.config.title.textStyle.fontWeight
+          }
+        : null
     },
     // 当前页面是编辑页面，还要双击以后才能编辑文本框
     editable() {
