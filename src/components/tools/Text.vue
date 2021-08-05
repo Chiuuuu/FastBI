@@ -91,6 +91,11 @@ export default {
       deep: true,
       immediate: true
     },
+    config(val) {
+      if (val) {
+        this.selfConfig = val
+      }
+    },
     currentSelected(val) {
       // 是否取消选中文本框
       if (val !== this.chartId && this.canEdit) {
@@ -133,7 +138,8 @@ export default {
       htmlText: '',
       selfConfig: {},
       mediumEditor: null,
-      canEditByDblClick: false
+      canEditByDblClick: false,
+      backgroundStyle: {}
     }
   },
   mounted() {
@@ -142,7 +148,6 @@ export default {
       // 进入页面获取计算文本
       //   if (this.canEdit) {
       // 获取配置,富文本
-      this.selfConfig = this.config
       this.htmlText = this.config.title.htmlText || ''
       // 使用缓存文本,再更新
       if (this.config.title.text) {
