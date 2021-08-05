@@ -3957,6 +3957,7 @@ export default {
       handler(val) {
         if (val) {
           if (
+            val.setting.type !== '1' ||
             val.setting.name === 've-image' ||
             val.setting.name === 'figure'
           ) {
