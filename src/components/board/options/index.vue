@@ -3762,33 +3762,35 @@ export default {
       let apiData = deepClone(this.apiData)
       let columns = apiData.columns
       // 堆叠柱状图
-      if (val && type === 'stack') {
-        this.apis.stack = {
-          用户: []
+      if (type === 'stack') {
+        if (val) {
+          this.apis.stack = {
+            用户: []
+          }
+          // 堆叠了把数值显示在右边防止挤在一起
+          this.selfConfig.series.label.position = 'insideBottom'
+        } else {
+          this.apis.stack = {}
+          this.selfConfig.series.label.position = 'top'
         }
-        // 堆叠了把数值显示在右边防止挤在一起
-        this.selfConfig.series.label.position = 'insideBottom'
-      } else {
-        this.apis.stack = {}
-        this.selfConfig.series.label.position = 'top'
-      }
-      // 圆形柱状图
-      if (val && type === 'radius') {
-        this.selfConfig.series.itemStyle.normal.barBorderRadius = [50, 50, 0, 0]
-      } else {
-        this.selfConfig.series.itemStyle.normal.barBorderRadius = [0]
-      }
-      // 混合柱状图
-      if (val && type === 'mixed') {
-        this.apis.showLine = [
-          columns[columns.length - 2]
-            ? columns[columns.length - 2]
-            : columns[columns.length - 1]
-        ]
-        // this.apis.axisSite = { right: columns[columns.length - 2] || [columns[columns.length - 1]] }
-      } else {
-        this.apis.showLine = []
-        this.apis.axisSite = {}
+      } else if (type === 'radius') { // 圆形柱状图
+        if (val) {
+          this.selfConfig.series.itemStyle.normal.barBorderRadius = [50, 50, 0, 0]
+        } else {
+          this.selfConfig.series.itemStyle.normal.barBorderRadius = [0]
+        }
+      } else if (type === 'mixed') { // 混合柱状图
+        if (val) {
+          this.apis.showLine = [
+            columns[columns.length - 2]
+              ? columns[columns.length - 2]
+              : columns[columns.length - 1]
+          ]
+          // this.apis.axisSite = { right: columns[columns.length - 2] || [columns[columns.length - 1]] }
+        } else {
+          this.apis.showLine = []
+          this.apis.axisSite = {}
+        }
       }
       this.$store.dispatch('SetSelfProperty', this.selfConfig)
       this.setApis()
