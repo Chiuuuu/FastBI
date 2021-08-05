@@ -65,7 +65,7 @@ export default {
           this.$refs.editorText.innerHTML = this.htmlText.replace(
             reg,
             (match, alias) => {
-              return val[alias]
+              return val[0] ? val[0][alias] : '空'
             }
           )
         })
@@ -408,7 +408,7 @@ export default {
           return res.msg
         }
         str = this.htmlText.replace(reg, (match, alias) => {
-          return res.rows[0][alias]
+          return res.rows[0] ? res.rows[0][alias] : '空'
         })
       }
       return str

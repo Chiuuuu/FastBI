@@ -22,6 +22,9 @@ export default function handleReturnChartData(
       let nullNumber = 0
       // 行内存在空字段
       for (let key of keys) {
+        if (!rowDatas) {
+          continue
+        }
         if (!rowDatas[key.alias]) {
           nullNumber++
           // 维度才显示空
