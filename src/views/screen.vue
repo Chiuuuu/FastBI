@@ -217,7 +217,7 @@ export default {
       return {
         width: `${this.pageSettings.width}px`,
         height: `${this.pageSettings.height}px`,
-        transform: `scale(${this.range}) translate3d(0px, 0px, 0)`,
+        transform: `scale(${this.range}) translate3d(-50%, -50%, 0)`,
         transformOrigin: '0 0',
         background:
           this.pageSettings.backgroundType === '1'
