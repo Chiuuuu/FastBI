@@ -681,6 +681,7 @@ export default {
           let setting = deepClone(this.currSelected.setting)
           let config = setting.config
           config.series.data = res.rows
+          this.$store.dispatch('SetSelfProperty', config)
         } else if (this.currSelected.setting.chartType === 'v-heatmap') {
           let setting = deepClone(this.currSelected.setting)
           let config = setting.config

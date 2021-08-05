@@ -15,6 +15,10 @@ export default {
       type: String,
       default: '0'
     },
+    chartType: {
+      type: String,
+      required: true
+    },
     config: {
       type: Object,
       required: true
@@ -108,7 +112,7 @@ export default {
         })
       })
     },
-    // 处理矩形树图的formatter
+    // 处理图表的formatter
     handleFormatter(series, type) {
       let flag = false
       if (this.apiData.measures[0]) {
@@ -119,7 +123,7 @@ export default {
         let result = []
         this.apiData.dimensions.map((item, index) => {
           if (series[type + 'ShowList'].includes(item.alias)) {
-            if (this.config.title.content === '旭日图') {
+            if (this.chartType === 'v-sun') {
               if (params.treePathInfo.length - 1 > index) {
                 result.push(params.treePathInfo[index + 1].name)
               }
@@ -131,7 +135,7 @@ export default {
         if (this.apiData.measures[0]) {
           const measureAlias = this.apiData.measures[0].alias
           if (series[type + 'ShowList'].includes(measureAlias)) {
-            if (this.config.title.content === '旭日图') {
+            if (this.chartType === 'v-sun') {
               result.push(params.data.value)
             } else {
               result.push(params.data[params.data.length - 1])

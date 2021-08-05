@@ -1914,7 +1914,7 @@ const list = [
             config: {
               title: {
                 show: true,
-                content: '旭日图',
+                content: '',
                 text: '旭日图',
                 left: 'left',
                 textStyle: {
@@ -2347,7 +2347,7 @@ const list = [
             config: {
               title: {
                 show: true,
-                content: '矩形热力图',
+                content: '',
                 text: '矩形热力图',
                 left: 'center',
                 textStyle: {
