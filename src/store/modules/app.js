@@ -217,6 +217,8 @@ const app = {
           name = obj.setting.config.topTitle.content
         }
       }
+      // 旭日图热力图标题
+      name = name || obj.setting.title
       let params = {
         tabId: obj.tabId,
         name: name || '文本',
