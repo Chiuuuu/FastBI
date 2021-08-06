@@ -451,9 +451,9 @@ export default {
     handleTabShow() {
       this.showPageTab = !this.showPageTab
     },
-    // 获取联动数据筛选数据,不需要保存
+    // 获取联动数据筛选数据,不需要保存
     async getBindData(chart, dimensionData) {
-      let apiData = chart.setting.api_data // 进行过数据筛选的不再执行联动
+      let apiData = chart.setting.api_data // 进行过数据筛选的不再执行联动
       if (apiData.options.fileList) {
         return
       }
@@ -465,16 +465,16 @@ export default {
       if (res.code === 200) {
         let columns = []
         let rows = []
-        let dimensionKeys = [] // 度量key
+        let dimensionKeys = [] // 度量key
         for (let m of apiData.dimensions) {
           dimensionKeys.push(m.alias)
-          columns.push(m.alias) // 默认columns第二项起为指标
+          columns.push(m.alias) // 默认columns第二项起为指标
         }
 
-        let measureKeys = [] // 度量key
+        let measureKeys = [] // 度量key
         for (let m of apiData.measures) {
           measureKeys.push(m.alias)
-          columns.push(m.alias) // 默认columns第二项起为指标
+          columns.push(m.alias) // 默认columns第二项起为指标
         }
         res.rows.map((item, index) => {
           let obj = {}
@@ -486,7 +486,7 @@ export default {
             obj[item2] = item[item2]
           }
           rows.push(obj)
-        }) // 构造联动选择的数据
+        }) // 构造联动选择的数据
         this.$set(apiData, 'selectData', {
           columns,
           rows

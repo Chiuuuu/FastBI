@@ -2,7 +2,7 @@
   <div class="record-layout">
     <div class="list-controller">
       <a-form-model layout="inline" :model="formData" ref="formData">
-        <a-form-model-item :label="dataName+'：'" prop="name">
+        <a-form-model-item :label="dataName + '：'" prop="name">
           <a-input
             v-model="formData.name"
             class="form-item"
@@ -24,7 +24,7 @@
           ></a-input>
         </a-form-model-item>
         <a-form-model-item label="操作时间：" prop="time">
-          <a-date-picker 
+          <a-date-picker
             v-model="formData.time"
             class="form-item"
             placeholder="请选择"
@@ -32,16 +32,14 @@
           />
         </a-form-model-item>
         <a-form-model-item>
-          <a-button
-            type="primary"
-            @click="() => getList()"
-            :disabled="loading"
+          <a-button type="primary" @click="() => getList()" :disabled="loading"
             >查询</a-button
           >
         </a-form-model-item>
         <a-form-model-item>
           <a-button type="default" @click="resetForm" :disabled="loading"
-            >重置</a-button>
+            >重置</a-button
+          >
         </a-form-model-item>
       </a-form-model>
     </div>
@@ -57,11 +55,10 @@
         @change="handleTableChange"
       >
         <!-- 名称 -->
-        <span slot="nameTitle">{{dataName}}</span>
+        <span slot="nameTitle">{{ dataName }}</span>
       </a-table>
     </div>
   </div>
-
 </template>
 
 <script>
@@ -75,8 +72,7 @@ const column = [
     slots: { title: 'nameTitle' },
     // title: '数据名称',
     ellipsis: true,
-    dataIndex: 'name',
-    
+    dataIndex: 'name'
   },
   {
     title: '操作时间',
@@ -86,7 +82,7 @@ const column = [
   {
     title: '操作者',
     dataIndex: 'people',
-    ellipsis: true,
+    ellipsis: true
   },
   {
     title: '账号',
@@ -103,55 +99,73 @@ const column = [
     title: '内容',
     dataIndex: 'con',
     ellipsis: true
-  },
+  }
 ]
 export default {
-  props:{
+  props: {
     // 类型 1数据接入/2数据建模/3数据大屏
-    type:{
-      type:String,
-      require:true
+    type: {
+      type: String,
+      require: true
     }
   },
-  data(){
-    return{
+  data() {
+    return {
       // 搜索
-      formData:{
-        name:'',
-        people:'',
-        user:'',
-        time:'',
+      formData: {
+        name: '',
+        people: '',
+        user: '',
+        time: ''
       },
-      loading:false,
-      column,// 表单配置
-      dataList:[
-        {id:'1',projectName:"项目1",name:'数据名称1',time:'2021-01-01 12:12:12',people:'李白白',user:'大黄黄',type:'操作类型',con:'内容222'},
-        {id:'2',projectName:"项目1",name:'数据名称2',time:'2021-01-01 12:12:12',people:'李白白',user:'大黄黄',type:'操作类型',con:'内容222'},
-      ],//列表数据
+      loading: false,
+      column, // 表单配置
+      dataList: [
+        {
+          id: '1',
+          projectName: '项目1',
+          name: '数据名称1',
+          time: '2021-01-01 12:12:12',
+          people: '李白白',
+          user: '大黄黄',
+          type: '操作类型',
+          con: '内容222'
+        },
+        {
+          id: '2',
+          projectName: '项目1',
+          name: '数据名称2',
+          time: '2021-01-01 12:12:12',
+          people: '李白白',
+          user: '大黄黄',
+          type: '操作类型',
+          con: '内容222'
+        }
+      ], // 列表数据
       pagination: {
         current: 1,
         pageSize: 10,
         total: 0
-      },
+      }
     }
   },
-  computed:{
-    dataName(){
-      switch(this.type){
+  computed: {
+    dataName() {
+      switch (this.type) {
         case '1':
-          return '数据源名称';
+          return '数据源名称'
         case '2':
-          return '数据建模名称';
+          return '数据建模名称'
         case '3':
-          return '数据大屏名称';
+          return '数据大屏名称'
         default:
           return '--'
       }
     }
   },
-  methods:{
+  methods: {
     // 获取列表数据
-    async getList(){
+    async getList() {
       console.log(this.formData)
     },
     // 重置
@@ -163,13 +177,11 @@ export default {
     },
     // 翻页
     handleTableChange(pagination) {
-      console.log(pagination,'pagination')
+      console.log(pagination, 'pagination')
       this.getList()
-    },
+    }
   }
 }
 </script>
 
-<style lang="less" scoped>
-
-</style>
+<style lang="less" scoped></style>

@@ -8,14 +8,12 @@
 <script>
 import Main from './components/persn-main'
 export default {
-	name: 'corporatepersonnel',
+  name: 'corporatepersonnel',
   components: {
     Main
   },
   data() {
-    return {
-      
-    }
+    return {}
   }
 }
 </script>

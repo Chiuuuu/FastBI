@@ -42,7 +42,7 @@
               </template>
               <span v-else> {{ transform.setting.title }}</span>
             </template>
-            <template v-else-if="transform.setting.config.title">
+            <template v-else-if="transform.setting.config && transform.setting.config.title">
               <!-- 某些图表是用content.title -->
               <template v-if="transform.setting.config.title.content">
                 <a-tooltip
@@ -188,14 +188,6 @@
               :api-data="transform.setting.api_data"
               :background="transform.setting.background"
             ></chart-heart>
-            <!-- <component 
-              v-else-if="transform.setting.chartType==='high-charts'"
-              :is="transform.setting.name"
-              :key="transform.id"
-              :setting='transform.setting'
-              :background="transform.setting.background"
-            ></component> -->
-            <!-- <span>{{transform.setting.background}}</span> -->
             <charts-factory
               v-else
               ref="vChart"
@@ -250,7 +242,6 @@ import ChartFigure from '@/components/tools/Figure' // 素材库
 import ChartHeart from '@/components/charts/chart-heat.vue' // 旭日图/矩形热力图
 import HighCharts from '@/components/charts/highcharts.vue' // 3d图表
 import SteepBar from '@/components/tools/SteepBar' // 进度条
-import ContextMenu from '@/components/board/context-menu/index' // 右键菜单
 // import AMap from '@/components/tools/aMap' // 进度条
 import Screen from '@/views/screen' // 全屏
 
@@ -461,8 +452,7 @@ export default {
     SteepBar,
     Screen,
     HighCharts,
-    ChartHeart,
-    ContextMenu
+    ChartHeart
     // AMap
   },
   beforeDestroy() {

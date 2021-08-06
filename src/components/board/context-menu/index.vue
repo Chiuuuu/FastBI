@@ -81,7 +81,7 @@ const chartMenuList = [
     icon: 'ios-share',
     text: '查看数据',
     order: 'showChartData',
-    ignore: ['figure', 've-image', , 'material']
+    ignore: ['figure', 've-image', 'material']
   },
   {
     icon: 'ios-download',
@@ -123,6 +123,7 @@ export default {
   watch: {
     'contextMenuInfo.listType'(val) {
       if (val) {
+        // eslint-disable-next-line no-eval
         this.menuList = eval(val)
       }
     }
@@ -318,10 +319,10 @@ export default {
 
       let source = res.data || []
 
-      let columns = [],
-        rows = [],
-        tableName = [],
-        exportList = []
+      let columns = []
+      let rows = []
+      let tableName = []
+      let exportList = []
 
       if (this.currSelected.setting.chartType === 'v-map') {
         await Promise.all(
@@ -391,7 +392,7 @@ export default {
     handleTableColumns(keys, label) {
       const apiData = this.currSelected.setting.api_data
       let fieldList = []
-      if (label && label == 'labelList') {
+      if (label && label === 'labelList') {
         // 地图 -- 标记点数据
         fieldList = []
           .concat(apiData.labelDimensions)

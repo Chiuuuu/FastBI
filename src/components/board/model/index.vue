@@ -307,7 +307,7 @@ export default {
       modelList: [], // 模型菜单
       sourceList: [], // 接入菜单
       key: 0, // 刷新菜单
-      hoveDataModelId: '' //悬浮选中的数据模型id
+      hoveDataModelId: '' // 悬浮选中的数据模型id
     }
   },
   computed: {
@@ -720,7 +720,7 @@ export default {
         this.screenId,
         tableId
       )
-      if (res.code == 200) {
+      if (res.code === 200) {
         this.$message.success('删除成功')
         this.getScreenDetail({
           id: this.$route.query.id,

@@ -189,7 +189,7 @@ export default {
           if (val.selectData) {
             list = val.selectData.rows
           }
-          if (this.config.title.content === '旭日图') {
+          if (this.chartType === 'v-sun') {
             let max = list.map(item => item.value)
             this.option.visualMap.max = Math.max(...max)
             this.option.series.data = [...list]

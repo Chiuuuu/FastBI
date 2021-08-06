@@ -2,104 +2,176 @@
   <div class="data-access-setting">
     <div class="set-main">
       <div class="header">
-        <span class="data_con">{{fieldInfo.name}}</span>
+        <span class="data_con">{{ fieldInfo.name }}</span>
         <a-button class="data_btn" v-on:click="back">返回</a-button>
       </div>
       <div class="scrollable scrollbar">
         <div class="setting">
           <div class="set_bar">
-            <a-input :value="fieldKeyword" @change="handleGetFieldKeyword" placeholder="请输入关键词" class="search_input">
+            <a-input
+              :value="fieldKeyword"
+              @change="handleGetFieldKeyword"
+              placeholder="请输入关键词"
+              class="search_input"
+            >
               <a-icon slot="prefix" type="search" />
             </a-input>
-            <a-button :disabled="!fieldSetable" v-on:click="handleShowSetting('convertType')">设置字段类型</a-button>
-            <a-button :disabled="!selectDrawer" v-on:click="handleShowSetting('role')">设置字段属性</a-button>
-            <a-button :disabled="!selectDrawer" v-on:click="handleShowSetting('visible')">设置是否可见</a-button>
+            <a-button
+              :disabled="!fieldSetable"
+              v-on:click="handleShowSetting('convertType')"
+              >设置字段类型</a-button
+            >
+            <a-button
+              :disabled="!selectDrawer"
+              v-on:click="handleShowSetting('role')"
+              >设置字段属性</a-button
+            >
+            <a-button
+              :disabled="!selectDrawer"
+              v-on:click="handleShowSetting('visible')"
+              >设置是否可见</a-button
+            >
           </div>
           <div class="table">
             <a-table
-              rowKey='id'
+              rowKey="id"
               :row-selection="rowSelection"
               :columns="columns"
               :pagination="false"
               :data-source="currentData"
-              :loading='sping'
+              :loading="sping"
               :scroll="{ x: 1200, y: 'calc(100vh - 350px)' }"
             >
-            <template slot="alias" slot-scope="text, record, index">
-              <a-input
-                style="width:100%;height:32px"
-                :value="text"
-                :maxLength="20"
-                @blur.stop.prevent="handleAliasBlur($event, record, index, 'alias')"
-                @change.stop.prevent="handleChangeValue($event, record, index, 'alias')"/>
-            </template>
-            <template slot="convertType" slot-scope="text, record">
-              <field-select
-                :text="(text || record.dataType) | formatField"
-                :select-data="record"
-                :contextmenus="fieldContenxtMenu"
-                :isDimension="record.role === 1"
-              />
-            </template>
-            <template slot="role" slot-scope="text, record">
-              <field-select
-                :text="text | formatRole"
-                :select-data="record"
-                :contextmenus="[{
-                  name: '转换为' + (text === 1 ? '度量' : '维度'),
-                  roleType: text === 1 ? 2 : 1,
-                  onClick: switchRoleType
-                }]"
-                :isDimension="record.role === 1"
-              />
-            </template>
-            <template slot="description" slot-scope="text, record, index">
-              <a-input style="width:100%;height:32px" :value="text" :maxLength="200" @change.stop.prevent="handleChangeValue($event, record, index, 'description')"/>
-            </template>
-            <template slot="comment" slot-scope="comment">
-              {{ comment }}
-            </template>
-            <template slot="visible" slot-scope="text, record, index">
-              <a-select style="width:60px" :value='`${text}`' @change="(value) => handleSelectChangeValue(value, record, index, 'visible')">
-                <a-select-option value="true">
-                  是
-                </a-select-option>
-                <a-select-option value="false">
-                  否
-                </a-select-option>
-              </a-select>
-            </template>
-            <template slot="extractable" slot-scope="text, record, index">
-              <a-select style="width:60px" :value='`${text}`' @change="(value) => handleSelectChangeValue(value, record, index, 'extractable')">
-                <a-select-option value="true">
-                  是
-                </a-select-option>
-                <a-select-option value="false">
-                  否
-                </a-select-option>
-              </a-select>
-            </template>
+              <template slot="alias" slot-scope="text, record, index">
+                <a-input
+                  style="width:100%;height:32px"
+                  :value="text"
+                  :maxLength="20"
+                  @blur.stop.prevent="
+                    handleAliasBlur($event, record, index, 'alias')
+                  "
+                  @change.stop.prevent="
+                    handleChangeValue($event, record, index, 'alias')
+                  "
+                />
+              </template>
+              <template slot="convertType" slot-scope="text, record">
+                <field-select
+                  :text="(text || record.dataType) | formatField"
+                  :select-data="record"
+                  :contextmenus="fieldContenxtMenu"
+                  :isDimension="record.role === 1"
+                />
+              </template>
+              <template slot="role" slot-scope="text, record">
+                <field-select
+                  :text="text | formatRole"
+                  :select-data="record"
+                  :contextmenus="[
+                    {
+                      name: '转换为' + (text === 1 ? '度量' : '维度'),
+                      roleType: text === 1 ? 2 : 1,
+                      onClick: switchRoleType
+                    }
+                  ]"
+                  :isDimension="record.role === 1"
+                />
+              </template>
+              <template slot="description" slot-scope="text, record, index">
+                <a-input
+                  style="width:100%;height:32px"
+                  :value="text"
+                  :maxLength="200"
+                  @change.stop.prevent="
+                    handleChangeValue($event, record, index, 'description')
+                  "
+                />
+              </template>
+              <template slot="comment" slot-scope="comment">
+                {{ comment }}
+              </template>
+              <template slot="visible" slot-scope="text, record, index">
+                <a-select
+                  style="width:60px"
+                  :value="`${text}`"
+                  @change="
+                    value =>
+                      handleSelectChangeValue(value, record, index, 'visible')
+                  "
+                >
+                  <a-select-option value="true">
+                    是
+                  </a-select-option>
+                  <a-select-option value="false">
+                    否
+                  </a-select-option>
+                </a-select>
+              </template>
+              <template slot="extractable" slot-scope="text, record, index">
+                <a-select
+                  style="width:60px"
+                  :value="`${text}`"
+                  @change="
+                    value =>
+                      handleSelectChangeValue(
+                        value,
+                        record,
+                        index,
+                        'extractable'
+                      )
+                  "
+                >
+                  <a-select-option value="true">
+                    是
+                  </a-select-option>
+                  <a-select-option value="false">
+                    否
+                  </a-select-option>
+                </a-select>
+              </template>
             </a-table>
           </div>
-          <a-modal v-model="showSetting" @cancel="handleCancelModal" @ok="handleBatchSetting">
+          <a-modal
+            v-model="showSetting"
+            @cancel="handleCancelModal"
+            @ok="handleBatchSetting"
+          >
             <template v-if="setType === 'convertType'">
-              <a-form-model :model="modalForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
+              <a-form-model
+                :model="modalForm"
+                :label-col="{ span: 5 }"
+                :wrapper-col="{ span: 12 }"
+              >
                 <a-form-model-item label="字段类型" prop="convertType" required>
-                  <a-select default-value="BIGINT" style="width: 100px" v-model="modalForm.convertType">
+                  <a-select
+                    default-value="BIGINT"
+                    style="width: 100px"
+                    v-model="modalForm.convertType"
+                  >
                     <a-select-option value="BIGINT"> 整数 </a-select-option>
                     <a-select-option value="DOUBLE"> 小数 </a-select-option>
                     <a-select-option value="DECIMAL"> 数值 </a-select-option>
                     <a-select-option value="VARCHAR"> 字符串 </a-select-option>
                     <a-select-option value="DATE"> 日期 </a-select-option>
-                    <a-select-option value="TIMESTAMP"> 日期时间 </a-select-option>
+                    <a-select-option value="TIMESTAMP">
+                      日期时间
+                    </a-select-option>
                   </a-select>
                 </a-form-model-item>
               </a-form-model>
             </template>
             <template v-else-if="setType === 'role'">
-              <a-form-model :model="modalForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
+              <a-form-model
+                :model="modalForm"
+                :label-col="{ span: 5 }"
+                :wrapper-col="{ span: 12 }"
+              >
                 <a-form-model-item label="字段属性" prop="role" required>
-                  <a-radio-group name="batchRole" :default-value="1" v-model="modalForm.role">
+                  <a-radio-group
+                    name="batchRole"
+                    :default-value="1"
+                    v-model="modalForm.role"
+                  >
                     <a-radio :value="1">
                       维度
                     </a-radio>
@@ -111,9 +183,16 @@
               </a-form-model>
             </template>
             <template v-else-if="setType === 'visible'">
-              <a-form-model :model="modalForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
+              <a-form-model
+                :model="modalForm"
+                :label-col="{ span: 5 }"
+                :wrapper-col="{ span: 12 }"
+              >
                 <a-form-model-item label="是否可见" prop="visible" required>
-                  <a-radio-group name="batchVisible" v-model="modalForm.visible">
+                  <a-radio-group
+                    name="batchVisible"
+                    v-model="modalForm.visible"
+                  >
                     <a-radio value="true">
                       是
                     </a-radio>
@@ -134,9 +213,14 @@
               </a-button>
             </a-col>
             <a-col>
-              <a-button :loading="loading" type="primary" style="width:88px;height:30px;" @click="handleSaveWriteTable">
-              保存
-            </a-button>
+              <a-button
+                :loading="loading"
+                type="primary"
+                style="width:88px;height:30px;"
+                @click="handleSaveWriteTable"
+              >
+                保存
+              </a-button>
             </a-col>
           </a-row>
         </div>
@@ -278,21 +362,33 @@ export default {
     },
     fieldSetable() {
       // 相同的字段属性(维度度量)才能批量设置字段类型
-      return this.selectDrawer && !this.selectedRows.some((item, index, list) => list[0].role !== item.role)
+      return (
+        this.selectDrawer &&
+        !this.selectedRows.some(
+          (item, index, list) => list[0].role !== item.role
+        )
+      )
     },
     currentData() {
-      return this.data.filter(item => item.name.toLowerCase().indexOf(this.fieldKeyword.toLowerCase()) > -1)
+      return this.data.filter(
+        item =>
+          item.name.toLowerCase().indexOf(this.fieldKeyword.toLowerCase()) > -1
+      )
     },
     rowSelection() {
       return {
         fixed: true,
         selectedRowKeys: this.selectedRowKeys,
         onSelect: (record, selected, selectedRows) => {
+          // eslint-disable-next-line vue/no-side-effects-in-computed-properties
           this.selectedRows = selectedRows
+          // eslint-disable-next-line vue/no-side-effects-in-computed-properties
           this.selectedRowKeys = selectedRows.map(item => item.id)
         },
         onSelectAll: (selected, selectedRows, changeRows) => {
+          // eslint-disable-next-line vue/no-side-effects-in-computed-properties
           this.selectedRows = selectedRows
+          // eslint-disable-next-line vue/no-side-effects-in-computed-properties
           this.selectedRowKeys = selectedRows.map(item => item.id)
         }
       }
@@ -340,7 +436,7 @@ export default {
       const newValue = event.target.value
       record[key] = newValue
     },
-    handleGetFieldKeyword: debounce(function (e) {
+    handleGetFieldKeyword: debounce(function(e) {
       this.fieldKeyword = e.target.value
       this.selectedRowKeys = []
       this.selectedRows = []
@@ -371,16 +467,18 @@ export default {
       if (['excel', 'csv'].indexOf(this.modelType) > -1) {
         databaseName = this.databaseName
       }
-      const result = await this.$server.dataAccess.getTableFieldDetail({
-        databaseName,
-        sourceId: this.modelId,
-        sourceName: this.modelName,
-        databaseId: this.fieldInfo.databaseId,
-        tableId: this.fieldInfo.id,
-        tableName: this.fieldInfo.name
-      }).finally(() => {
-        this.sping = false
-      })
+      const result = await this.$server.dataAccess
+        .getTableFieldDetail({
+          databaseName,
+          sourceId: this.modelId,
+          sourceName: this.modelName,
+          databaseId: this.fieldInfo.databaseId,
+          tableId: this.fieldInfo.id,
+          tableName: this.fieldInfo.name
+        })
+        .finally(() => {
+          this.sping = false
+        })
 
       if (result.code === 200) {
         this.data = [].concat(result.rows)
@@ -402,7 +500,7 @@ export default {
       let value = this.modalForm[this.setType]
       this.selectedRows.forEach(item => {
         if (this.setType === 'visible') {
-          item[this.setType] = (value === 'true')
+          item[this.setType] = value === 'true'
         } else {
           item[this.setType] = value
         }
@@ -417,10 +515,11 @@ export default {
     },
     async handleSaveWriteTable() {
       this.loading = true
-      const writeResult = await this.$server.dataAccess.saveDataTable({
-        rows: this.readRows,
-        tableId: this.fieldInfo.id
-      })
+      const writeResult = await this.$server.dataAccess
+        .saveDataTable({
+          rows: this.readRows,
+          tableId: this.fieldInfo.id
+        })
         .finally(() => {
           this.loading = false
         })
@@ -437,12 +536,14 @@ export default {
       })
 
       if (result.code === 200) {
-        this.$message.success({
-          content: '保存成功',
-          duration: 0.5
-        }).then(() => {
-          this.back()
-        })
+        this.$message
+          .success({
+            content: '保存成功',
+            duration: 0.5
+          })
+          .then(() => {
+            this.back()
+          })
       } else {
         this.$message.error(result.msg)
       }

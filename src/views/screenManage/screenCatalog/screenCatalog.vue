@@ -428,7 +428,7 @@ export default {
       componentKey: 0, // 通过改变key实现子组件强制更新,数值在0,1之间变化
       choose: false,
       chooseIndex: null,
-      chooseTemple: {}, //选中的大屏模版
+      chooseTemple: {}, // 选中的大屏模版
       templeList: [],
       btnloading: false,
       catalogContentStyle: {}
@@ -1033,7 +1033,7 @@ export default {
           })
         })
     },
-    //获取大屏模版
+    // 获取大屏模版
     getScreenList() {
       this.$server.chooseScreen.getScreenTemplates().then(res => {
         this.templeList = { ...res.data }

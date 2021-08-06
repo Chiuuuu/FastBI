@@ -16,15 +16,14 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import PersonManage from '../persn-content/personManage'
-import UserProp from '../persn-content/userProp'
+// import UserProp from '../persn-content/userProp'
 
 export default {
   name: 'userMain',
   components: {
-    PersonManage,
-    UserProp
+    PersonManage
+    // UserProp
   },
   data() {
    return {

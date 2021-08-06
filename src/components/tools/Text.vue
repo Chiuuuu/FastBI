@@ -367,7 +367,7 @@ export default {
       this.currSelected.setting.api_data.modelId = measure.screenTableId
       this.currSelected.setting.resourceType = measure.resourceType
 
-      //保存插入的元素到htmlText
+      // 保存插入的元素到htmlText
       this.htmlText = this.$refs.editorText.innerHTML
 
       // 度量插入到数据

@@ -68,32 +68,32 @@
   </div>
 </template>
 <script>
-import { mapState } from "vuex";
-import debounce from "lodash/debounce";
+import { mapState } from 'vuex'
+import debounce from 'lodash/debounce'
 
 const tableColumn = [
   {
-    title: "用户名",
-    dataIndex: "username"
+    title: '用户名',
+    dataIndex: 'username'
   },
   {
-    title: "姓名",
-    dataIndex: "name"
+    title: '姓名',
+    dataIndex: 'name'
   },
   {
-    title: "创建时间",
-    dataIndex: "gmtCreate",
+    title: '创建时间',
+    dataIndex: 'gmtCreate',
     width: 200,
     ellipsis: true
   },
   {
-    title: "操作",
-    dataIndex: "config",
-    scopedSlots: { customRender: "config" }
+    title: '操作',
+    dataIndex: 'config',
+    scopedSlots: { customRender: 'config' }
   }
-];
+]
 export default {
-  name: "roleUser",
+  name: 'roleUser',
   data() {
     return {
       tableColumn,
@@ -101,21 +101,21 @@ export default {
       userList: [],
       fetching: false,
       roleForm: {
-        username: ""
+        username: ''
       },
       modalForm: {
         users: []
       },
       rules: {
-        users: [{ required: true, message: "请选择用户名" }]
+        users: [{ required: true, message: '请选择用户名' }]
       },
       loading: false,
       visible: false,
       confirmLoading: false
-    };
+    }
   },
   mounted() {
-    this.handleGetData();
+    this.handleGetData()
   },
   computed: {
     ...mapState({
@@ -124,23 +124,23 @@ export default {
   },
   methods: {
     async handleGetData() {
-      this.loading = true;
-      const res = await this.$server.projectCenter.getRoleUserInfo(this.roleId);
+      this.loading = true
+      const res = await this.$server.projectCenter.getRoleUserInfo(this.roleId)
       if (res.code === 200) {
-        this.tableData = res.rows;
-        this.loading = false;
+        this.tableData = res.rows
+        this.loading = false
       } else {
-        this.$message.error(res.msg);
+        this.$message.error(res.msg)
       }
     },
     handleShowModal() {
       // this.confirmLoading = true
-      this.visible = true;
+      this.visible = true
     },
     /** 模态窗口确定 */
     handleModalSubmit() {
-      this.confirmLoading = true;
-      this.visible = false;
+      this.confirmLoading = true
+      this.visible = false
       this.$server.projectCenter
         .addRoleUser({
           userIds: this.modalForm.users,
@@ -148,45 +148,45 @@ export default {
         })
         .then(res => {
           if (res.code === 200) {
-            this.$message.success("添加成功");
-            this.handleGetData();
+            this.$message.success('添加成功')
+            this.handleGetData()
           }
         })
         .finally(() => {
-          this.confirmLoading = false;
-          this.handleModalCancel();
-        });
+          this.confirmLoading = false
+          this.handleModalCancel()
+        })
     },
     /** 模态窗口取消 */
     handleModalCancel() {
-      this.modalForm = this.$options.data().modalForm;
-      this.$refs.modalForm.resetFields();
+      this.modalForm = this.$options.data().modalForm
+      this.$refs.modalForm.resetFields()
     },
     async handleDeleteUser({ id }, index) {
-      const res = await this.$server.projectCenter.deleRoleUser(id);
+      const res = await this.$server.projectCenter.deleRoleUser(id)
       if (res.code === 200) {
-        this.$message.success("移除成功");
-        this.handleGetData();
+        this.$message.success('移除成功')
+        this.handleGetData()
       } else {
-        this.$message.error(res.msg || "请求错误");
+        this.$message.error(res.msg || '请求错误')
       }
     },
     handleInputRole: debounce(async function(value) {
-      this.fetching = true;
+      this.fetching = true
       const res = await this.$server.projectCenter
         .getModalUserList({ keyword: value })
         .finally(() => {
-          this.fetching = false;
-        });
+          this.fetching = false
+        })
       if (res.code === 200) {
-        this.userList = res.rows;
+        this.userList = res.rows
       } else {
-        this.$message.error(res.msg || "请求错误");
+        this.$message.error(res.msg || '请求错误')
       }
     }, 400)
   }
-};
+}
 </script>
 <style lang="less" scoped>
-@import "../../../main.less";
+@import '../../../main.less';
 </style>
