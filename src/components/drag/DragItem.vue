@@ -272,7 +272,8 @@ export default {
           height: this.transformData.height + 'px'
         }
         if (!this.isLine) {
-          style.transform = `translateZ(0) rotate(${this.transformData.rotate || 0}deg)`
+          style.transform = `translateZ(0) rotate(${this.transformData.rotate ||
+            0}deg)`
         }
       }
       if (this.isScreen) {
@@ -378,8 +379,7 @@ export default {
         this.$store.dispatch('SingleSelected', this.item.id)
         this.$store.dispatch('ToggleContextMenu')
       }
-      if (!this.isSelected || this.contextMenuInfo.isShow || this.isScreen)
-        return
+      if (!this.isSelected || this.contextMenuInfo.isShow || this.isScreen) { return }
       // 计算鼠标的相对位置
       // 兼容移动端touch事件
       let e = event.targetTouches ? event.targetTouches[0] : event

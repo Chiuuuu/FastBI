@@ -398,7 +398,6 @@ export default {
         return
       }
       if (res.code === 200) {
-          
         res.data.fillList = await handleReturnChartData(
           res.data.fillList,
           this.currSelected.setting

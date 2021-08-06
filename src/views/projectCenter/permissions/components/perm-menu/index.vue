@@ -24,7 +24,13 @@
           overflowY: 'auto'
         }"
       >
-        <a-form-model :model="form" :rules="rules" width="500px" :label-col="{ span: 6 }" :wrapper-col="{ span: 12 }">
+        <a-form-model
+          :model="form"
+          :rules="rules"
+          width="500px"
+          :label-col="{ span: 6 }"
+          :wrapper-col="{ span: 12 }"
+        >
           <a-form-model-item label="角色名称" prop="name">
             <a-input placeholder="请输入角色名称"></a-input>
           </a-form-model-item>
@@ -33,7 +39,9 @@
           </a-form-model-item>
           <a-form-model-item label="存储位置" prop="parantId">
             <a-select v-model="form.parentId">
-              <a-select-option v-for="item in folderList" :key="item.id">{{ item.name }}</a-select-option>
+              <a-select-option v-for="item in folderList" :key="item.id">{{
+                item.name
+              }}</a-select-option>
             </a-select>
           </a-form-model-item>
         </a-form-model>
@@ -49,7 +57,11 @@
     </a-empty>
     <template v-else>
       <!-- <p class="menu_tips">右键文件夹或选项有添加，重命名等操作</p> -->
-      <div class="menu-wrap scrollbar" @dragover.stop="handleDragOver" @drop="handleWrapDrop">
+      <div
+        class="menu-wrap scrollbar"
+        @dragover.stop="handleDragOver"
+        @drop="handleWrapDrop"
+      >
         <div
           class="group"
           :class="handleIsFolder(folder, 'items') ? 'is-folder' : ''"
@@ -68,7 +80,7 @@
                   :file="slotProps.file"
                   :index="slotProps.index"
                   :parent="folder"
-                  :isSelect='fileSelectId === slotProps.file.id'
+                  :isSelect="fileSelectId === slotProps.file.id"
                   :contextmenus="fileContenxtMenu"
                   @fileSelect="handleFileSelect"
                   @fileDrag="handleFileDrag"
@@ -81,7 +93,7 @@
               <menu-file
                 :file="folder"
                 :index="index"
-                :isSelect='fileSelectId === folder.id'
+                :isSelect="fileSelectId === folder.id"
                 :contextmenus="fileContenxtMenu"
                 @fileSelect="handleFileSelect"
                 @fileDrag="handleFileDrag"
@@ -225,10 +237,10 @@ export default {
       return this.tableList.filter(item => item.fileType === 0)
     },
     fileSelectId: {
-      get () {
+      get() {
         return this.$store.state.projectPermissions.permissionId
       },
-      set (value) {
+      set(value) {
         this.$store.commit('projectPermissions/SET_PERMISSIONID', value)
       }
     }
@@ -239,18 +251,18 @@ export default {
   },
   methods: {
     /**
-    * 获取左侧菜单数据
-    */
+     * 获取左侧菜单数据
+     */
     handleGetMenuList() {
       this.$store.dispatch('projectPermissions/getMenuList', this)
     },
     /**
      * @description 获取表详情信息
-    */
+     */
     async getTableInfo(url, callback) {
       const result = await this.$server.common.getDetailByMenuId(url)
       if (result.code === 200) {
-        if (callback && (callback instanceof Function)) {
+        if (callback && callback instanceof Function) {
           callback(result)
         }
         this.$EventBus.$emit('setFormData')
@@ -260,7 +272,7 @@ export default {
     },
     /**
      * 打开弹窗
-    */
+     */
     showModal() {
       this.visible = true
     },
@@ -284,8 +296,8 @@ export default {
       console.log('搜索结果', this.searchList)
     },
     /**
-    * 选择左侧菜单
-    */
+     * 选择左侧菜单
+     */
     handleFileSelect(file) {
       if (this.fileSelectId === file.id) return
       this.fileSelectId = file.id
@@ -296,8 +308,8 @@ export default {
       this.$store.commit('projectPermissions/SET_PARENTID', file.parentId)
     },
     /**
-    * 删除菜单
-    */
+     * 删除菜单
+     */
     handleFileDelete(event, item, { file }) {
       this.$confirm({
         title: '确认提示',
@@ -340,8 +352,8 @@ export default {
       })
     },
     /**
-    * 修改文件夹名称
-    */
+     * 修改文件夹名称
+     */
     handleFolderResetName(event, item, { folder }) {
       this.resetNameVisible = true
       this.resetName.type = 'reset'
@@ -350,7 +362,7 @@ export default {
     },
     /**
      * 菜单重命名
-    */
+     */
     handleFileResetName(mouseEvent, event, { file, parent }) {
       this.resetName.type = 'reset'
       this.resetNameVisible = true
@@ -380,6 +392,7 @@ export default {
      * 拖动后投放到目标文件夹
      */
     async handleFileDrop(folder) {
+      // eslint-disable-next-line no-useless-return
       if (!this.dragFile || this.dragFile.parentId === folder.id) return
       // const result = await this.$server.common.putMenuFolderName('/datasource/catalog/update', {
       //   fileType: this.dragFile.fileType,

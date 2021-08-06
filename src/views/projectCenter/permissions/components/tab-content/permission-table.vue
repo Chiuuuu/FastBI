@@ -67,45 +67,45 @@
 </template>
 
 <script>
-import ModalAddPermission from "./modal-addPerm";
+import ModalAddPermission from './modal-addPerm'
 
 const sourceList = [
-  { id: "1", name: "数据源1", type: 1 },
-  { id: "2", name: "数据源2", type: 2 },
-  { id: "3", name: "数据源3", type: 3 },
-  { id: "4", name: "数据源4", type: 4 },
-  { id: "5", name: "数据源5", type: 5 }
-];
+  { id: '1', name: '数据源1', type: 1 },
+  { id: '2', name: '数据源2', type: 2 },
+  { id: '3', name: '数据源3', type: 3 },
+  { id: '4', name: '数据源4', type: 4 },
+  { id: '5', name: '数据源5', type: 5 }
+]
 
 const tableColumns = [
   {
-    title: "表名",
+    title: '表名',
     width: 200,
     ellipsis: true,
-    dataIndex: "tableName"
+    dataIndex: 'tableName'
   },
   {
-    title: "字段名",
+    title: '字段名',
     width: 200,
     ellipsis: true,
-    dataIndex: "fieldName"
+    dataIndex: 'fieldName'
   },
   {
-    title: "数据",
+    title: '数据',
     ellipsis: true,
-    dataIndex: "data"
+    dataIndex: 'data'
   }
-];
+]
 
 const tableColumnsEdit = tableColumns.concat({
-  title: "操作",
-  dataIndex: "config",
+  title: '操作',
+  dataIndex: 'config',
   width: 100,
-  scopedSlots: { customRender: "config" }
-});
+  scopedSlots: { customRender: 'config' }
+})
 
 export default {
-  name: "permissionTable",
+  name: 'permissionTable',
   components: {
     ModalAddPermission
   },
@@ -113,12 +113,12 @@ export default {
     type: {
       // 行或者列
       type: String,
-      default: "row"
+      default: 'row'
     },
     mode: {
       // 编辑模式或者查看模式
       type: String,
-      default: "show"
+      default: 'show'
     }
   },
   data() {
@@ -133,44 +133,44 @@ export default {
       },
       sourceList: [],
       tableData: [],
-      tableColumns: this.mode === "show" ? tableColumns : tableColumnsEdit
-    };
+      tableColumns: this.mode === 'show' ? tableColumns : tableColumnsEdit
+    }
   },
   created() {
-    this.handleGetSourceList();
+    this.handleGetSourceList()
   },
   methods: {
     handleGetSourceList() {
-      this.sourceList = sourceList;
+      this.sourceList = sourceList
     },
     handleGetTableData() {
-      this.loading = true;
+      this.loading = true
       setTimeout(() => {
         for (let i = 0; i < 30; i++) {
           this.tableData.push({
             id: i,
-            tableName: "dami",
-            fieldName: "sssdai",
-            data: "天河区域"
-          });
+            tableName: 'dami',
+            fieldName: 'sssdai',
+            data: '天河区域'
+          })
         }
-        this.loading = false;
-      }, 500);
+        this.loading = false
+      }, 500)
     },
     showModal() {
-      this.visible = true;
-      this.modalData = null;
+      this.visible = true
+      this.modalData = null
     },
     handleEditPermission(data) {
-      this.modalData = data;
-      this.visible = true;
+      this.modalData = data
+      this.visible = true
     },
     handleDeletePermission(id) {},
     handleAddPermission() {
-      this.visible = false;
+      this.visible = false
     }
   }
-};
+}
 </script>
 
 <style></style>

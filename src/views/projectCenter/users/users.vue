@@ -18,13 +18,13 @@
 </template>
 <script>
 import UserManage from './components/user'
-import RoleManage from './components/role'
+// import RoleManage from './components/role'
 
 export default {
   name: 'users',
   components: {
-    UserManage,
-    RoleManage
+    UserManage
+    // RoleManage
   },
   methods: {
     handleChangeModule(key) {

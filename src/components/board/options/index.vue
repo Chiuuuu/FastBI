@@ -3497,7 +3497,7 @@ export default {
           this.selfConfig.series.label.formatter = checkedValues.join('\n\r')
         }
         this.setApis()
-      } else if (this.chartType == 'v-sun') {
+      } else if (this.chartType === 'v-sun') {
         this.selfConfig.series.label.formatter = checkedValues.join(' ')
       } else {
         this.selfConfig.series.label.formatterSelect = checkedValues
@@ -3703,37 +3703,37 @@ export default {
       this.setSelfProperty()
     },
 
-    onRadioChange(e, data, key, x_yName) {
+    onRadioChange(e, data, key, xYName) {
       let val = e.target.value
       if (val === 'false') {
         val = false
       }
       // x,y轴的标题位置发生变化时，设置默认标题镖局
-      if (x_yName) {
-        if (x_yName == 'xAxis') {
-          val == 'middle' &&
+      if (xYName) {
+        if (xYName === 'xAxis') {
+          val === 'middle' &&
             this.$set(this.selfConfig.xAxis.nameTextStyle, 'padding', [
               30,
               0,
               0,
               0
             ])
-          val == 'end' &&
+          val === 'end' &&
             this.$set(this.selfConfig.xAxis.nameTextStyle, 'padding', [
               60,
               0,
               0,
               0
             ])
-        } else if (x_yName == 'yAxis') {
-          val == 'middle' &&
+        } else if (xYName === 'yAxis') {
+          val === 'middle' &&
             this.$set(this.selfConfig.yAxis.nameTextStyle, 'padding', [
               0,
               0,
               40,
               0
             ])
-          val == 'end' &&
+          val === 'end' &&
             this.$set(this.selfConfig.yAxis.nameTextStyle, 'padding', [
               0,
               0,
@@ -4129,7 +4129,7 @@ export default {
     },
     sunVal() {
       let val = this.selfConfig.series.label.formatter
-      if (val == '') {
+      if (val === '') {
         return []
       } else {
         return val.split(' ')
@@ -4141,9 +4141,9 @@ export default {
         this.currSelected.setting.api_data.dimensions.length === 1 &&
         this.currSelected.setting.api_data.measures.length === 2
       ) {
-        scatterFormatList[1].label = this.currSelected.setting.api_data.dimensions[0].alias //维度1
-        scatterFormatList[2].label = this.currSelected.setting.api_data.measures[0].alias //度量1
-        scatterFormatList[3].label = this.currSelected.setting.api_data.measures[1].alias //度量2
+        scatterFormatList[1].label = this.currSelected.setting.api_data.dimensions[0].alias // 维度1
+        scatterFormatList[2].label = this.currSelected.setting.api_data.measures[0].alias // 度量1
+        scatterFormatList[3].label = this.currSelected.setting.api_data.measures[1].alias // 度量2
       }
       return scatterFormatList
     },
@@ -4154,9 +4154,9 @@ export default {
         this.currSelected.setting.api_data.measures.length === 2
       ) {
         scatterSizeList[1].label =
-          '按' + this.currSelected.setting.api_data.measures[0].alias //度量1
+          '按' + this.currSelected.setting.api_data.measures[0].alias // 度量1
         scatterSizeList[2].label =
-          '按' + this.currSelected.setting.api_data.measures[1].alias //度量2
+          '按' + this.currSelected.setting.api_data.measures[1].alias // 度量2
       }
       return scatterSizeList
     }

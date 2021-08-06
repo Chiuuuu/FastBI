@@ -209,13 +209,13 @@ export default {
             this.setMapFormatter()
           } else if (this.typeName === 've-scatter') {
             val = deepClone(val)
-            if (this.apiData.dimensions.length == 0) {
+            if (this.apiData.dimensions.length === 0) {
               val.legend.data = this.apis.legendData
               val.series.data = this.apis.seriesData
             }
-            //散点图
+            // 散点图
             this.chartExtend = { ...omit(val, ['series', 'legend']) }
-            this.chartLegend = val.legend //图例
+            this.chartLegend = val.legend // 图例
             // series设置
             let series = deepClone(val.series)
             let data = series.data
@@ -275,7 +275,7 @@ export default {
                 return
               }
               if (this.chartType === 'v-scatter') {
-                //散点图的数据自定义显示
+                // 散点图的数据自定义显示
                 this.chartData.columns = []
                 this.chartData.rows = []
               } else {
@@ -294,17 +294,17 @@ export default {
           }
           // 散点图 -- 维度和度量都移除后，设置回初始默认值
           if (
-            (val.dimensions || []).length == 0 &&
-            (val.measures || []).length == 0 &&
+            (val.dimensions || []).length === 0 &&
+            (val.measures || []).length === 0 &&
             this.chartType === 'v-scatter'
           ) {
             this.config.legend.data = this.apis.legendData
             this.config.series.data = this.apis.seriesData
-            this.apis.xMax = 1000 //度量1 最大值
-            this.apis.yMax = 1000 //度量2 最大值
+            this.apis.xMax = 1000 // 度量1 最大值
+            this.apis.yMax = 1000 // 度量2 最大值
           }
           if (this.chartType === 'v-scatter') {
-            //散点图的数据自定义显示
+            // 散点图的数据自定义显示
             this.chartData.columns = []
             this.chartData.rows = []
           } else {

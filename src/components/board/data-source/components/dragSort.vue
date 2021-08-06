@@ -392,8 +392,8 @@ export default {
             // 散点图，两个度量分别是x，y轴的值
             if (
               this.currSelected.setting.chartType === 'v-scatter' &&
-              apiData.dimensions.length == 1 &&
-              apiData.measures.length == 2
+              apiData.dimensions.length === 1 &&
+              apiData.measures.length === 2
             ) {
               let scatterData = {}
               let legendData = []
