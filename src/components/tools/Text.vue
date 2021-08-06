@@ -152,7 +152,7 @@ export default {
     this.$nextTick(() => {
       // 进入页面获取计算文本
       //   if (this.canEdit) {
-      this.htmlText = this.config.htmlText || ''
+      this.htmlText = this.config.title.htmlText || ''
       // 使用缓存文本,再更新
       if (this.config.text) {
         this.$refs.editorText.innerHTML = this.config.text
@@ -465,7 +465,7 @@ export default {
     // 保存富文本
     saveText: debounce(function() {
       this.htmlText = this.$refs.editorText.innerHTML
-      this.selfConfig.htmlText = this.htmlText
+      this.selfConfig.title.htmlText = this.htmlText
       this.$store.dispatch('SetSelfProperty', this.selfConfig)
       this.updateChartData(this.id)
     })

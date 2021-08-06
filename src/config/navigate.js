@@ -2975,14 +2975,15 @@ const list = [
                 total: '',
                 content: '文本',
                 textAlign: 'left',
+                htmlText: '<p><br></p>',
                 textStyle: {
                   color: '#ffffff',
                   fontSize: 20,
                   fontFamily: 'not specified',
                   fontWeight: 'normal'
                 }
-              },
-              htmlText: '<p><br></p>'
+              }
+              //   htmlText: '<p><br></p>'
             },
             view: {
               width: 500,
