@@ -511,7 +511,7 @@ export default {
         if (
           this.currentFile.conditionList.some(
             item =>
-              !item.firstValue ||
+              (!item.firstValue && item.firstValue !== 0) ||
               (item.condition === 'range' && !item.secondValue)
           )
         ) {
@@ -521,11 +521,14 @@ export default {
         // 处理度量筛选数据
         // 如果是排除的，action取补集符号
         this.currentFile.conditionList.forEach(item => {
-          if (!item.firstValue) {
+          if (!item.firstValue && item.firstValue !== 0) {
             this.$message.error('请输入筛选数值')
             return
           }
-          if (item.condition === 'range' && !item.secondValue) {
+          if (
+            item.condition === 'range' &&
+            (!item.secondValue && item.secondValue !== 0)
+          ) {
             this.$message.error('请输入范围第二个筛选数值')
             return
           }
