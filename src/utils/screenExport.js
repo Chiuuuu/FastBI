@@ -99,24 +99,30 @@ function actionShoot(domClone, backColor, name) {
 }
 
 // 导出图表图片
-export function exportImg(chartId, chart, pageSettings) {
-  let domObj = document.getElementById(chartId)
+export function exportImg(chart, pageSettings) {
+  let domObj = document.getElementById(chart.id)
   // 处理截图的dom
   const domClone = handleShootedDom(chart, domObj)
   if (!domClone) {
     return
   }
+  let name = chart.setting.config.title
+    ? chart.setting.config.title.content || chart.setting.config.title.text
+    : chart.setting.config.topTitle.content
   // 截图
-  actionShoot(domClone, pageSettings.backgroundColor, chart.name)
+  actionShoot(domClone, pageSettings.backgroundColor, name)
 }
 
 // 预览导出图表图片
-export function exportForFull(chartId, chart, pageSettings) {
-  let domObj = document.getElementById(chartId)
+export function exportForFull(chart, pageSettings) {
+  let domObj = document.getElementById(chart.id)
   // 处理截图的dom
   const domClone = handleShootedDom(chart, domObj.childNodes[0]) // 预览图表多出一层preview-box
+  let name = chart.setting.config.title
+    ? chart.setting.config.title.content || chart.setting.config.title.text
+    : chart.setting.config.topTitle.content
   // 截图
-  actionShoot(domClone, pageSettings.backgroundColor, chart.name)
+  actionShoot(domClone, pageSettings.backgroundColor, name)
 }
 
 // 导出整个大屏
