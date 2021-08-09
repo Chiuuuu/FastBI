@@ -89,7 +89,7 @@ export default {
       return this.item.setting.name === 'figure'
     },
     isLine() {
-      return this.item.setting.config.title === '直线'
+      return this.item.setting.chartType === 'line'
     },
     dvWrapperStyles() {
       return {

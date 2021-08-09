@@ -208,7 +208,7 @@
               <a-input-number
                 v-model="baseProperty.height"
                 size="small"
-                :max="selfConfig.title === '直线' ? 20 : Infinity"
+                :max="currSelected.setting.chartType === 'line' ? 20 : Infinity"
                 :formatter="value => `H ${value}`"
                 :parser="value => value.replace(/\H\s?|(,*)/g, '')"
                 class="f-clear-width"
@@ -831,6 +831,7 @@
             <template v-if="selfConfig.name === 'figure'">
               <a-collapse-panel key="properties" header="图形属性">
                 <Figure
+                  :chart-type="chartType"
                   :config.sync="selfConfig"
                   :view.sync="baseProperty"
                   @refreshSelf="setSelfProperty"
