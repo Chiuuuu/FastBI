@@ -56,20 +56,20 @@
     </gui-field>
     <gui-field label="排列">
       <gui-inline>
-        <a-radio-group :value="selfConfig.series.label.orient" size="small">
-          <a-radio-button
-            value="vertical"
-            @click.native.stop="
-              onRadioChange($event, selfConfig.series.label, 'orient')
-            "
-            >垂直</a-radio-button
-          >
+        <a-radio-group :value="selfConfig.visualMap.orient" size="small">
           <a-radio-button
             value="horizontal"
             @click.native.stop="
-              onRadioChange($event, selfConfig.series.label, 'orient')
+              onRadioChange($event, selfConfig.visualMap, 'orient')
             "
             >水平</a-radio-button
+          >
+          <a-radio-button
+            value="vertical"
+            @click.native.stop="
+              onRadioChange($event, selfConfig.visualMap, 'orient')
+            "
+            >垂直</a-radio-button
           >
         </a-radio-group>
       </gui-inline>
