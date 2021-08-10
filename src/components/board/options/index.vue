@@ -3709,6 +3709,9 @@ export default {
       if (val === 'false') {
         val = false
       }
+      if (!isNaN(val)) {
+        val = +val
+      }
       // x,y轴的标题位置发生变化时，设置默认标题镖局
       if (xYName) {
         if (xYName === 'xAxis') {

@@ -1973,7 +1973,7 @@ const list = [
                   color: '#fff',
                   formatter: '{b}',
                   position: 'inside',
-                  rotate: 'radial',
+                  rotate: 0,
                   orient: 'vertical'
                 },
                 itemStyle: {
