@@ -56,20 +56,20 @@
     </gui-field>
     <gui-field label="排列">
       <gui-inline>
-        <a-radio-group :value="selfConfig.series.label.orient" size="small">
+        <a-radio-group :value="selfConfig.series.label.rotate" size="small">
           <a-radio-button
-            value="vertical"
+            :value="0"
             @click.native.stop="
-              onRadioChange($event, selfConfig.series.label, 'orient')
-            "
-            >垂直</a-radio-button
-          >
-          <a-radio-button
-            value="horizontal"
-            @click.native.stop="
-              onRadioChange($event, selfConfig.series.label, 'orient')
+              onRadioChange($event, selfConfig.series.label, 'rotate')
             "
             >水平</a-radio-button
+          >
+          <a-radio-button
+            :value="90"
+            @click.native.stop="
+              onRadioChange($event, selfConfig.series.label, 'rotate')
+            "
+            >垂直</a-radio-button
           >
         </a-radio-group>
       </gui-inline>

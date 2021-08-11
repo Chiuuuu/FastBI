@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="config.title === '直线'">
+    <div v-if="chartType === 'line'">
       <GuiField label="线条颜色">
         <el-color-picker
           :value="config.style.borderColor"
@@ -43,7 +43,7 @@
       <a-input-number :min="0" :max="360" :value="view.rotate" @change="setView($event, 'rotate')" />
     </GuiField> -->
     </div>
-    <div v-else-if="config.title === '圆形'">
+    <div v-else-if="chartType === 'circle'">
       <GuiField label="填充颜色">
         <el-color-picker
           :value="config.style.backgroundColor"
@@ -90,7 +90,7 @@
       <a-input-number :min="0" :max="360" :value="view.rotate" @change="setView($event, 'rotate')" />
     </GuiField> -->
     </div>
-    <div v-else-if="config.title === '矩形'">
+    <div v-else-if="chartType === 'rectangle'">
       <GuiField label="填充颜色">
         <el-color-picker
           :value="config.style.backgroundColor"
@@ -158,6 +158,7 @@ import GuiField from '../gui-field.vue'
 
 export default {
   props: {
+    chartType: String,
     config: {
       type: Object,
       require: true
@@ -176,7 +177,7 @@ export default {
     maxBorder() {
       const { width, height } = this.$store.getters.currSelected.setting.view
       let res = Math.min(width, height) / 2
-      if (this.config.title === '直线') {
+      if (this.chartType === 'line') {
         res = 20
       }
       return res > 20 ? 20 : res
@@ -207,7 +208,7 @@ export default {
         if (settings) {
           this.$emit('update:config', settings.config)
           this.$emit('refreshSelf')
-          if (this.config.title === '直线') {
+          if (this.chartType === 'line') {
             this.setView(1, 'height')
             this.$emit('refreshBase')
           }

@@ -208,7 +208,7 @@
               <a-input-number
                 v-model="baseProperty.height"
                 size="small"
-                :max="selfConfig.title === '直线' ? 20 : Infinity"
+                :max="currSelected.setting.chartType === 'line' ? 20 : Infinity"
                 :formatter="value => `H ${value}`"
                 :parser="value => value.replace(/\H\s?|(,*)/g, '')"
                 class="f-clear-width"
@@ -831,6 +831,7 @@
             <template v-if="selfConfig.name === 'figure'">
               <a-collapse-panel key="properties" header="图形属性">
                 <Figure
+                  :chart-type="chartType"
                   :config.sync="selfConfig"
                   :view.sync="baseProperty"
                   @refreshSelf="setSelfProperty"
@@ -3707,6 +3708,9 @@ export default {
       let val = e.target.value
       if (val === 'false') {
         val = false
+      }
+      if (!isNaN(val)) {
+        val = +val
       }
       // x,y轴的标题位置发生变化时，设置默认标题镖局
       if (xYName) {

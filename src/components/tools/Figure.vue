@@ -43,7 +43,7 @@ export default {
             ? config.borderRadius
             : config.borderRadius + 'px'
       }
-      if (this.setting.config.title === '直线') {
+      if (this.setting.chartType === 'line') {
         if (config.showShadow) {
           style.boxShadow = `0 ${view.height / 2}px ${
             view.height
