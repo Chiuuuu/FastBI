@@ -174,8 +174,8 @@ export default {
             this._calcStyle()
             return
           }
-          this.columns = val.columns
-          this.tableData = val.rows
+          this.columns = val.columns || []
+          this.tableData = val.rows || []
           this._calcStyle()
         }
       },

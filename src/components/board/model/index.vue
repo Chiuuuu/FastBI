@@ -85,7 +85,7 @@
             >
               <template>
                 <a-select-option v-for="d in searchResult" :key="d.id">{{
-                  d.name
+                  d.alias
                 }}</a-select-option>
               </template>
             </a-select>
@@ -583,12 +583,12 @@ export default {
       if (value) {
         let result = []
         this.searchList.map(item => {
-          if (item.name.includes(value)) {
+          if (item.alias.includes(value)) {
             result.push(item)
           }
         })
         if (result.length === 0) {
-          result = [{ name: '没有符合的搜索结果', id: 11 }]
+          result = [{ alias: '没有符合的搜索结果', id: 11 }]
         }
         this.searchResult = result
       } else {

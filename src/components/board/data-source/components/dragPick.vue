@@ -47,7 +47,7 @@
           确定
         </a-button>
       </template>
-      <div v-if="currentFile.file === 'dimensions'">
+      <div v-if="currentFile.dataTypeIsText">
         <a-radio-group
           v-model="currentFile.operation"
           @change="isEmpty = false"
@@ -281,13 +281,9 @@ export default {
       'dataModel',
       'canvasMap'
     ]),
-    chartType() {
-      return this.currSelected ? this.currSelected.setting.type : ''
-    },
     isNoSelectData() {
       if (
-        Object.keys(this.currentFile).length > 0 &&
-        this.currentFile.file === 'dimensions' &&
+        this.currentFile.dataTypeIsText &&
         ((this.currentFile.operation === 'list' &&
           this.currentFile.checkedList.length === 0) ||
           (this.currentFile.operation === 'manual' &&
@@ -312,64 +308,58 @@ export default {
         return
       }
 
-      dataFile.showMore = false // 是否点击显示更多
-
-      // 对应的是维度
-      if (dataFile.file === 'dimensions') {
-        // 获取维度对应字段列表
-        let params = {
-          datamodelId: dataFile.screenTableId,
-          resourceType: dataFile.resourceType,
-          dimensions: [dataFile]
-        }
-        let res = await this.$server.screenManage.getDataPick(params)
-        // 模型数据被删
-        if (res.code === 500 && res.msg === 'IsChanged') {
-          this.$message.error('模型数据不存在')
-          this.isdrag = false
-          return
-        }
-        if (res.code === 200) {
-          // 过滤空字段
-          // 拆维度列表
-          let list = []
-          res.rows.forEach(item => {
-            if (item) {
-              list.push(Object.values(item)[0])
-            }
-          }) // 维度全字段列表
-          dataFile.originList = list
-          dataFile.searchList = dataFile.originList
-          dataFile.checkedList = [] // 勾选的字段列表
-          dataFile.manualList = [] // 手动输入列表
-          dataFile.operation = 'list' // 列表/手动,'list'/'manual'
-        } else {
-          res.msg && this.$message.error(res.msg)
-          this.isdrag = false
-          return
-        }
+      // 记录字段是否文本
+      dataFile.dataTypeIsText = dataFile.dataType === 'VARCHAR'
+      // 文本类型
+      if (dataFile.dataTypeIsText) {
+        await this.initTextData(dataFile)
       } else {
-        // 对应的是度量
-        let { pivotschemaId, resourceType, dataType } = dataFile
-        // 数据接入类型直接判断，dataType是不是BIGINT/DOUBLE类型
-        if (
-          dataType !== 'BIGINT' &&
-          dataType !== 'DECIMAL' &&
-          dataType !== 'DOUBLE'
-        ) {
-          this.$message.error('当前字段为文本类型，无法进行数值区间筛选')
-          this.isdrag = false
-          return
-        }
-        // 通过验证初始化条件列表
+        // 数值类型,通过验证初始化条件列表
         dataFile.conditionList = []
       }
-      dataFile.type = 1 // 只显示、排除,'include'/'exclude'
 
-      // 显示弹窗
+      dataFile.type = 1 // 只显示、排除,'include'/'exclude'
+      dataFile.showMore = false // 是否点击显示更多
       this.currentFile = dataFile
+      // 显示弹窗
       this.screenVisible = true
       this.isdrag = false
+    },
+    // 初始化文本列表
+    async initTextData(dataFile) {
+      // 获取维度对应字段列表
+      let params = {
+        datamodelId: dataFile.screenTableId,
+        resourceType: dataFile.resourceType,
+        dimensions: [dataFile]
+      }
+      let res = await this.$server.screenManage.getDataPick(params)
+      // 模型数据被删
+      if (res.code === 500 && res.msg === 'IsChanged') {
+        this.$message.error('模型数据不存在')
+        this.isdrag = false
+        return
+      }
+      if (res.code === 200) {
+        // 过滤空字段
+        // 拆维度列表
+        let list = []
+        res.rows.forEach(item => {
+          if (item) {
+            list.push(Object.values(item)[0])
+          }
+        }) // 维度全字段列表
+        dataFile.originList = list
+        dataFile.searchList = dataFile.originList
+        dataFile.checkedList = [] // 勾选的字段列表
+        dataFile.manualList = [] // 手动输入列表
+        dataFile.operation = 'list' // 列表/手动,'list'/'manual'
+        return dataFile
+      } else {
+        res.msg && this.$message.error(res.msg)
+        this.isdrag = false
+        return
+      }
     },
     // 对象数组去重,type表示对象里面的一个属性
     uniqueFun(arr, type) {
@@ -407,7 +397,7 @@ export default {
       this.currentFile = item
       this.listValue = '' // 列表模糊查询输入值
       this.manualValue = '' // 手动输入值
-      if (item.file === 'dimensions') {
+      if (item.dataTypeIsText) {
         let params = {
           datamodelId: this.currentFile.screenTableId,
           resourceType: this.currentFile.resourceType,
@@ -473,6 +463,67 @@ export default {
     delectCondition(index) {
       this.currentFile.conditionList.splice(index, 1)
     },
+    // 构造文本类型数据传参
+    handleTextData() {
+      // 获取筛选列表
+      this.currentFile.value =
+        this.currentFile.operation === 'list'
+          ? this.currentFile.checkedList
+          : this.currentFile.manualList
+      delete this.currentFile.originList // 不上传，再点击的时候重新获取
+      delete this.currentFile.searchList // 不上传，模糊查询用的
+    },
+    handleNumData() {
+      if (
+        this.currentFile.conditionList.some(
+          item =>
+            !item.firstValue ||
+            (item.condition === 'range' && !item.secondValue)
+        )
+      ) {
+        this.$message.error('请输入筛选数值')
+        return
+      }
+      // 处理度量筛选数据
+      // 如果是排除的，action取补集符号
+      this.currentFile.conditionList.forEach(item => {
+        if (!item.firstValue) {
+          this.$message.error('请输入筛选数值')
+          return
+        }
+        if (item.condition === 'range' && !item.secondValue) {
+          this.$message.error('请输入范围第二个筛选数值')
+          return
+        }
+        switch (item.condition) {
+          case 'range':
+            item.action = item.condition
+            break
+          case 'more':
+            item.action =
+              this.currentFile.type === 1 ? item.condition : 'lessOrEqual'
+            break
+          case 'less':
+            item.action =
+              this.currentFile.type === 1 ? item.condition : 'moreOrEqual'
+            break
+          case 'moreOrEqual':
+            item.action = this.currentFile.type === 1 ? item.condition : 'less'
+            break
+          case 'lessOrEqual':
+            item.action = this.currentFile.type === 1 ? item.condition : 'more'
+            break
+          case 'equal':
+            item.action =
+              this.currentFile.type === 1 ? item.condition : 'notEqual'
+            break
+          case 'notEqual':
+            item.action = this.currentFile.type === 1 ? item.condition : 'equal'
+            break
+        }
+      })
+    },
+    // 构造数值类型数据传参
     async handleOk() {
       if (this.isNoSelectData) {
         this.screenVisible = false
@@ -480,7 +531,7 @@ export default {
       }
       // 度量没有添加条件不能确定
       if (
-        this.currentFile.file === 'measures' &&
+        !this.currentFile.dataTypeIsText &&
         !this.currentFile.conditionList.length
       ) {
         this.screenVisible = false
@@ -488,96 +539,47 @@ export default {
       }
       let apiData = deepClone(this.currSelected.setting.api_data)
 
-      let dimensionsLimitList = []
-      let measuresLimitList = []
-      // 处理维度筛选信息
-      if (this.currentFile.file === 'dimensions') {
-        // 获取筛选列表
-        this.currentFile.value =
-          this.currentFile.operation === 'list'
-            ? this.currentFile.checkedList
-            : this.currentFile.manualList
-        delete this.currentFile.originList // 不上传，再点击的时候重新获取
-        delete this.currentFile.searchList // 不上传，模糊查询用的
-        if (this.isExist) {
-          let file = this.fileList.find(
-            item => item.alias === this.currentFile.alias
-          )
-          file = this.currentFile
-        } else {
-          this.fileList.push(this.currentFile)
-        }
+      // 处理文本类型筛选信息
+      if (this.currentFile.dataTypeIsText) {
+        this.handleTextData()
       } else {
-        if (
-          this.currentFile.conditionList.some(
-            item =>
-              !item.firstValue ||
-              (item.condition === 'range' && !item.secondValue)
-          )
-        ) {
-          this.$message.error('请输入筛选数值')
-          return
-        }
-        // 处理度量筛选数据
-        // 如果是排除的，action取补集符号
-        this.currentFile.conditionList.forEach(item => {
-          if (!item.firstValue) {
-            this.$message.error('请输入筛选数值')
-            return
-          }
-          if (item.condition === 'range' && !item.secondValue) {
-            this.$message.error('请输入范围第二个筛选数值')
-            return
-          }
-          switch (item.condition) {
-            case 'range':
-              item.action = item.condition
-              break
-            case 'more':
-              item.action =
-                this.currentFile.type === 1 ? item.condition : 'lessOrEqual'
-              break
-            case 'less':
-              item.action =
-                this.currentFile.type === 1 ? item.condition : 'moreOrEqual'
-              break
-            case 'moreOrEqual':
-              item.action =
-                this.currentFile.type === 1 ? item.condition : 'less'
-              break
-            case 'lessOrEqual':
-              item.action =
-                this.currentFile.type === 1 ? item.condition : 'more'
-              break
-            case 'equal':
-              item.action =
-                this.currentFile.type === 1 ? item.condition : 'notEqual'
-              break
-            case 'notEqual':
-              item.action =
-                this.currentFile.type === 1 ? item.condition : 'equal'
-              break
-          }
-        })
-
-        if (this.isExist) {
-          let file = this.fileList.find(
-            item => item.alias === this.currentFile.alias
-          )
-          file = this.currentFile
-        } else {
-          this.fileList.push(this.currentFile)
-        }
+        // 处理数值类型筛选信息
+        this.handleNumData()
       }
+
+      if (this.isExist) {
+        let file = this.fileList.find(
+          item => item.alias === this.currentFile.alias
+        )
+        file = this.currentFile
+      } else {
+        this.fileList.push(this.currentFile)
+      }
+
+      // 构造dataDimensionsLimit,dataDimensionsLimit列表
+      let { dimensionsLimit, measuresLimit } = this.setParams()
+      let options = {
+        fileList: this.fileList,
+        dimensionsLimit,
+        measuresLimit
+      }
+      apiData.options = { ...apiData.options, ...options }
+      this.$store.dispatch('SetSelfDataSource', apiData)
 
       // 关闭弹窗
       this.screenVisible = false
 
+      await this.updateChartData()
+      this.getData()
+    },
+    setParams() {
+      let dimensionsLimit = []
+      let measuresLimit = []
       // 构造dataDimensionsLimit,dataDimensionsLimit列表
       this.fileList.forEach(item => {
-        if (item.file === 'dimensions') {
+        if (item.dataTypeIsText) {
           let { pivotschemaId, type, dataType, value, name } = item
-          dimensionsLimitList.push({
+          dimensionsLimit.push({
             pivotschemaId,
             type,
             dataType,
@@ -586,7 +588,7 @@ export default {
           })
         } else {
           let { pivotschemaId, type, dataType, conditionList, name } = item
-          measuresLimitList.push({
+          measuresLimit.push({
             pivotschemaId,
             type,
             dataType,
@@ -595,24 +597,15 @@ export default {
           })
         }
       })
-
-      let options = {
-        fileList: this.fileList,
-        dimensionsLimit: dimensionsLimitList,
-        measuresLimit: measuresLimitList
-      }
-      apiData.options = { ...apiData.options, ...options }
-      this.$store.dispatch('SetSelfDataSource', apiData)
-
-      await this.updateChartData()
-      this.getData()
+      return { dimensionsLimit, measuresLimit }
     },
     // 删除当前维度或者度量
     async deleteFile(item, index) {
       this.fileList.splice(index, 1)
       let apiData = deepClone(this.currSelected.setting.api_data)
       apiData.options.fileList = this.fileList
-      if (item.file === 'dimensions') {
+      // 文本类型对应维度字段，数值类型对应度量字段
+      if (item.dataTypeIsText) {
         _.pullAllBy(apiData.options.dimensionsLimit, [item], 'pivotschemaId')
       } else {
         _.pullAllBy(apiData.options.measuresLimit, [item], 'pivotschemaId')
@@ -759,7 +752,7 @@ export default {
           this.updateChartData()
         } else {
           // 仪表盘/环形图 只显示度量
-          if (this.chartType === '2') {
+          if (this.currSelected.setting.type === '2') {
             let columns = ['type', 'value'] // 维度固定
             for (let m of apiData.measures) {
               columns.push(m.alias) // 默认columns第二项起为指标
