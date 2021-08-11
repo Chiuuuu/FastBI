@@ -531,6 +531,7 @@ export default {
       this.$store.dispatch('dataAccess/setModelInfo', {})
       this.$store.dispatch('dataAccess/setModelName', '')
       this.$store.commit('dataAccess/SET_DATABASENAME', '')
+      this.$store.commit('common/SET_MENUSELECTID', -1)
       this.$store.commit('common/SET_PRIVILEGES', [0])
       this.$EventBus.$emit('resetForm')
       this.$emit('on-menuChange-componet', 'Main')

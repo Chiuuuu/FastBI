@@ -10,7 +10,7 @@
         >
           <a-icon type="plus-square" class="menu_icon" />
           <a-menu slot="overlay" class="drow_menu">
-            <a-menu-item @click="choose = true"> 选择大屏模版 </a-menu-item>
+            <a-menu-item @click="choose = true" v-if="hasPermissionSourceAdd"> 选择大屏模版 </a-menu-item>
             <a-menu-item v-on:click="addScreen" v-if="hasPermissionSourceAdd">
               新建空白大屏
             </a-menu-item>
