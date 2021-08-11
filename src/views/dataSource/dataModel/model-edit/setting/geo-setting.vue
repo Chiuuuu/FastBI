@@ -15,10 +15,7 @@
         style="width: 100px"
         @change="handlecountryChange"
       >
-        <a-select-option
-          v-for="country in countryData"
-          :key="country"
-        >
+        <a-select-option v-for="country in countryData" :key="country">
           {{ country }}
         </a-select-option>
       </a-select>
@@ -33,11 +30,7 @@
         </a-select-option>
       </a-select>
       <span>城市： </span>
-      <a-select
-        v-model="city"
-        style="width: 100px"
-        @change="handlecityChange"
-      >
+      <a-select v-model="city" style="width: 100px" @change="handlecityChange">
         <a-select-option v-for="city in cities" :key="city">
           {{ city }}
         </a-select-option>
@@ -81,7 +74,6 @@
 </template>
 
 <script>
-
 const colu = [
   {
     title: '您的数据',
@@ -109,11 +101,10 @@ const proData = {
   中国: ['广东省', '浙江省']
 }
 const cityData = {
-  广东省: ['广州市', '肇庆市', '深圳市', '云浮市'],
+  广东省: ['云浮市', '肇庆市', '深圳市', '云浮市'],
   浙江省: ['宁波市', '温州市', '杭州市']
 }
 const areaData = {
-  广州市: ['海珠区', '越秀区', '荔湾区'],
   深圳市: ['罗湖区', '福田区', '南山区'],
   肇庆市: ['怀集县', '四会市', '封开县'],
   云浮市: ['罗定市', '郁南县', '云安区', '云城区', '新兴县'],

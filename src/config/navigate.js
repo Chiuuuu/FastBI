@@ -2145,7 +2145,7 @@ const list = [
                   color: ['#f69f2e', '#0fabf1', '#ed8693', '#ffff0d', '#0d8686']
                 },
                 pieces: [
-                  { label: '广州市', value: 800 },
+                  { label: '云浮市', value: 800 },
                   { label: '深圳市', value: 100 },
                   { label: '东莞市', value: 100 },
                   { label: '南京市', value: 700 },
@@ -2266,7 +2266,7 @@ const list = [
                     value: [1000, 1000],
                     children: [
                       {
-                        name: '广州市',
+                        name: '云浮市',
                         value: [800, 800]
                       },
                       {

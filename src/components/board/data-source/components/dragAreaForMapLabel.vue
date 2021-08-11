@@ -57,7 +57,7 @@
 import { mapGetters, mapActions } from 'vuex'
 import { deepClone } from '@/utils/deepClone'
 import { sum, summary } from '@/utils/summaryList'
-import geoJson from '@/utils/guangdong.json'
+import geoJson from '@/utils/yunfu.json'
 import reverseAddressResolution from '@/utils/reverseAddressResolution'
 import { dotSeries } from '@/config/mapSeries'
 import { Loading } from 'element-ui'

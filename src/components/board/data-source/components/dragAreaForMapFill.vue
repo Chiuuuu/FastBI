@@ -57,7 +57,7 @@
 import { mapGetters, mapActions } from 'vuex'
 import { deepClone } from '@/utils/deepClone'
 import { sum, summary } from '@/utils/summaryList'
-import geoJson from '@/utils/guangdong.json'
+import geoJson from '@/utils/yunfu.json'
 import reverseAddressResolution from '@/utils/reverseAddressResolution'
 import { visualMapConfig, mapSeries } from '@/config/mapSeries'
 import { Loading } from 'element-ui'
@@ -269,7 +269,8 @@ export default {
       let countryside = dataList.find(item => item.properties.name === name)
       if (!countryside) {
         return null
-      } else { // 调整中心点位置(仅限云浮)
+      } else {
+        // 调整中心点位置(仅限云浮)
         countryside.properties.center[1] += 0.03
       }
       return countryside.properties.center

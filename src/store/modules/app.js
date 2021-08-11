@@ -4,7 +4,7 @@ import { message } from 'ant-design-vue'
 import { Loading } from 'element-ui'
 import { handleRefreshData } from '@/utils/handleRefreshData'
 import { messages } from 'bin-ui'
-import guangzhou from '@/utils/guangdong.json'
+import guangzhou from '@/utils/yunfu.json'
 import { deepClone } from '@/utils/deepClone'
 import _ from 'lodash'
 

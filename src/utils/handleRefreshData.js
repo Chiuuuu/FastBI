@@ -1,7 +1,7 @@
 import { sum, summary } from '@/utils/summaryList'
 import handleReturnChartData from '@/utils/handleReturnChartData'
 import reverseAddressResolution from '@/utils/reverseAddressResolution'
-import geoJson from '@/utils/guangdong.json'
+import geoJson from '@/utils/yunfu.json'
 import { visualMapConfig, mapSeries, dotSeries } from '@/config/mapSeries'
 import { message } from 'ant-design-vue'
 // 处理大屏刷新数据

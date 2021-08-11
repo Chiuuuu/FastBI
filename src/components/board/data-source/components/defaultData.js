@@ -2,61 +2,61 @@ export default {
   'high-pie': [{
     type: 'pie',
     name: '图形占比',
-    //模块名和所占比，也可以{name: '测试1',y: 12}
+    // 模块名和所占比，也可以{name: '测试1',y: 12}
     data: [{
-        name: 'Chrome',
-        y: 61.41
-      },
-      {
-        name: 'IE',
-        y: 11.84
-      },
-      {
-        name: 'Firefox',
-        y: 10.85
-      },
-      {
-        name: 'Edge',
-        y: 4.67
-      },
-      {
-        name: 'Safari',
-        y: 4.18
-      },
-      {
-        name: 'Other',
-        y: 7.05
-      }
+      name: 'Chrome',
+      y: 61.41
+    },
+    {
+      name: 'IE',
+      y: 11.84
+    },
+    {
+      name: 'Firefox',
+      y: 10.85
+    },
+    {
+      name: 'Edge',
+      y: 4.67
+    },
+    {
+      name: 'Safari',
+      y: 4.18
+    },
+    {
+      name: 'Other',
+      y: 7.05
+    }
     ]
   }],
   'high-column': [{
     // type: 'pie',
     name: '图形占比',
-    //模块名和所占比，也可以{name: '测试1',y: 12}
+    // 模块名和所占比，也可以{name: '测试1',y: 12}
     data: [{
-        name: 'Chrome',
-        y: 61.41
-      },
-      {
-        name: 'Internet Explorer',
-        y: 11.84
-      },
-      {
-        name: 'Firefox',
-        y: 10.85
-      },
-      {
-        name: 'Edge',
-        y: 4.67
-      },
-      {
-        name: 'Safari',
-        y: 4.18
-      },
-      {
-        name: 'Other',
-        y: 7.05
-      }
+      name: 'Chrome',
+      y: 61.41
+    },
+    {
+      name: 'Internet Explorer',
+      y: 11.84
+    },
+    {
+      name: 'Firefox',
+      y: 10.85
+    },
+    {
+      name: 'Edge',
+      y: 4.67
+    },
+    {
+      name: 'Safari',
+      y: 4.18
+    },
+    {
+      name: 'Other',
+      y: 7.05
+    }
     ]
   }],
   'v-sun': {
@@ -396,7 +396,7 @@ export default {
         color: ['#f69f2e', '#0fabf1', '#ed8693', '#ffff0d', '#0d8686']
       },
       pieces: [
-        { label: '广州市', value: 800 },
+        { label: '云浮市', value: 800 },
         { label: '深圳市', value: 100 },
         { label: '东莞市', value: 100 },
         { label: '南京市', value: 700 },
@@ -515,7 +515,7 @@ export default {
         name: '广东省',
         value: [1000, 1000],
         children: [{
-          name: '广州市',
+          name: '云浮市',
           value: [800, 800]
         },
         {

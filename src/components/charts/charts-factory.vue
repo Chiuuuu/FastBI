@@ -70,7 +70,7 @@ import {
 } from 'bin-ui/src/utils/resize-event'
 import { formatData, convertData } from '../../utils/formatData'
 import { deepClone } from '@/utils/deepClone'
-import guangzhou from '@/utils/guangdong.json'
+import guangzhou from '@/utils/yunfu.json'
 import omit from 'lodash/omit'
 import { DEFAULT_COLORS } from '@/utils/defaultColors'
 import { setChartInstanceIdMap } from '@/utils/screenExport'
@@ -78,7 +78,7 @@ import { setLinkageData, resetOriginData } from '@/utils/setDataLink'
 import { mapGetters } from 'vuex'
 
 export default {
-  name: "ChartsFactory",
+  name: 'ChartsFactory',
   props: {
     chartId: {
       type: String,
@@ -172,14 +172,14 @@ export default {
           }
         })
       }
-    };
+    }
     return {
       wrapStyle: {},
-      width: "500px",
-      height: "400px",
+      width: '500px',
+      height: '400px',
       chartData: {
-        columns: ["x", "y"],
-        rows: [{ x: "x", y: 100 }]
+        columns: ['x', 'y'],
+        rows: [{ x: 'x', y: 100 }]
       },
       tooltipVisible: true,
       legendVisible: true,
@@ -233,8 +233,8 @@ export default {
             }
           }
           // this.colors = [...val.colors]
-          this.$log.primary("========>chartExtend");
-          this.$print(this.chartExtend);
+          this.$log.primary('========>chartExtend')
+          this.$print(this.chartExtend)
         }
       },
       deep: true,
@@ -244,10 +244,10 @@ export default {
       handler(val) {
         if (val) {
           // 只有度量的情况
-          if (this.type === "2") {
+          if (this.type === '2') {
             if (val.measures && val.measures.length > 0) {
               if (!val.source) {
-                return;
+                return
               }
               this.chartData = val.source
               //   if (this.chartType === 'v-ring') {
@@ -264,7 +264,7 @@ export default {
               (val.dimensions.length === 0 && val.measures.length > 0) ||
               (val.dimensions.length > 0 && val.measures.length === 0)
             ) {
-              return;
+              return
             }
             if (
               val.dimensions.length > 0 &&
@@ -272,7 +272,7 @@ export default {
               val.source
             ) {
               if (!val.source) {
-                return;
+                return
               }
               if (this.chartType === 'v-scatter') {
                 // 散点图的数据自定义显示
@@ -335,15 +335,15 @@ export default {
         if (val) {
           this.backgroundStyle = {
             background:
-              val.backgroundType === "1"
+              val.backgroundType === '1'
                 ? val.backgroundColor
                 : `url(${val.backgroundSrc})`,
             //  backgroundColor: val.backgroundColor,
             borderColor: val.borderColor,
-            borderWidth: val.borderWidth + "px",
+            borderWidth: val.borderWidth + 'px',
             borderStyle: val.borderStyle,
-            borderRadius: val.borderRadius + "px"
-          };
+            borderRadius: val.borderRadius + 'px'
+          }
         }
       },
       deep: true,
@@ -359,7 +359,7 @@ export default {
     }
   },
   beforeDestroy() {
-    removeResizeListener(this.$refs.wrap, this._calcStyle);
+    removeResizeListener(this.$refs.wrap, this._calcStyle)
   },
   methods: {
     afterConfig(options) {
@@ -585,9 +585,9 @@ export default {
     ...mapGetters(['canvasMap']),
     titleStyle() {
       return {
-        padding: "20px 10px",
+        padding: '20px 10px',
         color: this.config.title.textStyle.color,
-        fontSize: this.config.title.textStyle.fontSize + "px",
+        fontSize: this.config.title.textStyle.fontSize + 'px',
         textAlign: this.config.title.textAlign,
         fontFamily: this.config.title.textStyle.fontFamily,
         fontWeight: this.config.title.textStyle.fontWeight,
@@ -612,7 +612,7 @@ export default {
       return this.apiData.interactive && this.apiData.interactive.clickLink
     }
   }
-};
+}
 </script>
 <style lang="less" scoped>
 .chart-event {
