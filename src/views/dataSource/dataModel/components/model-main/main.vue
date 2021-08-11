@@ -160,6 +160,7 @@ export default {
       } else {
         modelId = this.modelId
       }
+      if (!modelId) return
       const result = await this.$server.dataModel
         .getDataModelDetailInfo(modelId)
         .finally(() => {
