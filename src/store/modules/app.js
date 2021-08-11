@@ -199,17 +199,21 @@ const app = {
         })
     },
     // 新增图表
-    async addChartData({ dispatch, state }, obj) {
+    async addChartData({ dispatch, state }, option) {
+      const obj = deepClone(option)
       if (obj.setting.name === 've-map') {
         delete obj.setting.apis.mapOrigin
       }
       let name = ''
       // 数据格式不一样的特殊处理
-      if (obj.setting.name === 'material' || obj.setting.name === 'figure') {
-        // 素材库and图形
+      if (obj.setting.name === 'material') {
+        // 素材库
         name = obj.setting.name
         let title = { content: obj.setting.config.title }
         obj.setting.config.title = title
+      } else if (obj.setting.name === 'figure') {
+        // 图形
+        name = obj.setting.name
       } else {
         if (obj.setting.config.title) {
           name = obj.setting.config.title.content
