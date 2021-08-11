@@ -9,7 +9,11 @@
         :wrapper-col="{ span: 14 }"
       >
         <a-form-model-item label="数据源名称" prop="name">
-          <a-input placeholder="请输入数据源名称" v-model="form.name" @change="handleSetTableName" />
+          <a-input
+            placeholder="请输入数据源名称"
+            v-model="form.name"
+            @change="handleSetTableName"
+          />
         </a-form-model-item>
         <a-form-model-item label="Excel文件" required>
           <a-spin :spinning="spinning" :tip="uploadProgress">
@@ -36,8 +40,19 @@
                 >
                   <div class="text">{{ item.name }}</div>
                   <div>
-                    <a-icon type="retweet" title="替换" style="margin-right:10px" @click.stop="handleReplaceFile(item, index)" />
-                    <a-icon type="delete" title="删除" @click.stop="handleRemove(item)"></a-icon>
+                    <a-tooltip placement="top" title="替换">
+                      <a-icon
+                        type="retweet"
+                        style="margin-right:10px"
+                        @click.stop="handleReplaceFile(item, index)"
+                      />
+                    </a-tooltip>
+                    <a-tooltip placement="top" title="删除">
+                      <a-icon
+                        type="delete"
+                        @click.stop="handleRemove(item)"
+                      ></a-icon>
+                    </a-tooltip>
                   </div>
                 </div>
               </template>
@@ -54,7 +69,11 @@
             :before-upload="beforeFileUpload"
             @change="handleFileChange"
           >
-            <a-button ref="uploader" type="primary" :loading="spinning || loading">
+            <a-button
+              ref="uploader"
+              type="primary"
+              :loading="spinning || loading"
+            >
               添加文件
             </a-button>
           </a-upload>
@@ -64,15 +83,20 @@
         <a-col :span="4" style="height:100%;width: 150px;">
           <div class="preview-tab">
             <div class="tab-title">Sheet子表</div>
-            <ul class="scrollbar" style="overflow-y: auto;height: calc(100% - 38px);">
+            <ul
+              class="scrollbar"
+              style="overflow-y: auto;height: calc(100% - 38px);"
+            >
               <li
                 class="preview-tab-item"
                 :title="sheet.name"
-                :class="{ 'active': currentSheetIndex === index }"
+                :class="{ active: currentSheetIndex === index }"
                 v-for="(sheet, index) in sheetList"
                 :key="index"
                 @click="handleChangeTab(sheet, index)"
-              >{{ sheet.name }}</li>
+              >
+                {{ sheet.name }}
+              </li>
             </ul>
           </div>
         </a-col>
@@ -98,12 +122,26 @@
               <a-spin :spinning="spinning">
                 <table>
                   <thead class="sheet-head">
-                    <tr style="border: none"><th v-for="item in currentColumns" :key="item.dataIndex"><div class="cell-item">{{ item.title }}</div></th></tr>
+                    <tr style="border: none">
+                      <th v-for="item in currentColumns" :key="item.dataIndex">
+                        <div class="cell-item">{{ item.title }}</div>
+                      </th>
+                    </tr>
                   </thead>
                   <tbody class="sheet-body scrollbar">
-                    <tr v-for="(item, index) in currentFieldList" :key="item.key">
-                      <td><div class="cell-item">{{ index + 1 }}</div></td>
-                      <td v-for="col in currentColumns.slice(1)" :key="col.dataIndex"><div class="cell-item">{{ item[col.dataIndex] }}</div></td>
+                    <tr
+                      v-for="(item, index) in currentFieldList"
+                      :key="item.key"
+                    >
+                      <td>
+                        <div class="cell-item">{{ index + 1 }}</div>
+                      </td>
+                      <td
+                        v-for="col in currentColumns.slice(1)"
+                        :key="col.dataIndex"
+                      >
+                        <div class="cell-item">{{ item[col.dataIndex] }}</div>
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -134,11 +172,14 @@ export default {
   name: 'model-excel',
   data() {
     return {
-      btnPermission: [this.$PERMISSION_CODE.OPERATOR.edit, this.$PERMISSION_CODE.OPERATOR.add],
+      btnPermission: [
+        this.$PERMISSION_CODE.OPERATOR.edit,
+        this.$PERMISSION_CODE.OPERATOR.add
+      ],
       loading: false,
       spinning: false,
       uploadProgress: '加载中',
-      uploadCallback: (num) => {
+      uploadCallback: num => {
         // 使用本地 progress 事件
         if (num < 100) {
           this.uploadProgress = num + '%'
@@ -205,10 +246,12 @@ export default {
     currentDataBase() {
       return this.databaseList[this.currentFileIndex] || {}
     },
-    sheetList() { // 当前文件的sheet列表
+    sheetList() {
+      // 当前文件的sheet列表
       return this.currentDataBase.sheetList || []
     },
-    tableList() { // sheet表格数据
+    tableList() {
+      // sheet表格数据
       return this.currentDataBase.tableList || []
     },
     hasPermission() {
@@ -262,7 +305,8 @@ export default {
     handleSetFormData() {
       if (this.modelType !== 'excel') return
       this.handleResetForm()
-      if (this.modelId) { // 有id就是编辑状态
+      if (this.modelId) {
+        // 有id就是编辑状态
         this.$set(this.form, 'name', this.modelName)
         this.getFileList()
       }
@@ -270,7 +314,8 @@ export default {
     // 获取文件列表
     getFileList() {
       this.spinning = true
-      this.$server.dataAccess.getModelFileList(this.modelId)
+      this.$server.dataAccess
+        .getModelFileList(this.modelId)
         .then(res => {
           this.fileInfoList = res.rows
           const name = this.modelInfo ? this.modelInfo.databaseName : ''
@@ -302,10 +347,12 @@ export default {
       } else {
         this.currentFileIndex = index
         let database = this.databaseList[index]
-        if (!database) { // 不存在当前数据库, 调接口查询并写入
+        if (!database) {
+          // 不存在当前数据库, 调接口查询并写入
           if (!this.fileInfoList[index]) return
           this.spinning = true
-          const res = await this.$server.dataAccess.getFileSheetList(this.fileInfoList[index].id)
+          const res = await this.$server.dataAccess
+            .getFileSheetList(this.fileInfoList[index].id)
             .catch(() => {
               this.spinning = false
             })
@@ -316,7 +363,10 @@ export default {
             this.$message.error('获取表格失败')
           }
         }
-        this.$store.dispatch('dataAccess/setDatabaseName', this.fileInfoList[index].name)
+        this.$store.dispatch(
+          'dataAccess/setDatabaseName',
+          this.fileInfoList[index].name
+        )
         this.renderCurrentTable(0)
       }
     },
@@ -351,7 +401,10 @@ export default {
           this.fileInfoList.splice(index, 1)
 
           // 如果删除当前被替换的文件, 清空替换文件对象
-          if (this.replaceFile.index > -1 && file.id === this.replaceFile.info.id) {
+          if (
+            this.replaceFile.index > -1 &&
+            file.id === this.replaceFile.info.id
+          ) {
             this.clearReplaceFile()
           }
 
@@ -377,7 +430,11 @@ export default {
               break
             }
           }
-          if (!isOperation && !isNaN(file.id) && this.deleteIdList.indexOf(file.id) < 0) {
+          if (
+            !isOperation &&
+            !isNaN(file.id) &&
+            this.deleteIdList.indexOf(file.id) < 0
+          ) {
             this.deleteIdList.push({
               databaseId: file.id,
               databaseName: file.name,
@@ -456,7 +513,11 @@ export default {
       }
 
       // 校验重名
-      if (isValid && !this.replaceFile.isReplace && this.fileInfoList.some(file => file.name === name)) {
+      if (
+        isValid &&
+        !this.replaceFile.isReplace &&
+        this.fileInfoList.some(file => file.name === name)
+      ) {
         isValid = false
         this.$message.error('文件命名重复, 请重新添加')
       }
@@ -465,9 +526,12 @@ export default {
         return
       }
       // 校验excel文件类型
-      const fileType = file.name.slice(file.name.lastIndexOf('.') + 1, file.name.length)
+      const fileType = file.name.slice(
+        file.name.lastIndexOf('.') + 1,
+        file.name.length
+      )
       if (/xls|xlsx/.test(fileType)) {
-        file.id = file.uid || 'vc-upload-' + (+new Date())
+        file.id = file.uid || 'vc-upload-' + +new Date()
         if (this.replaceFile.isReplace) {
           this.actionReplaceFile(file)
         } else {
@@ -524,8 +588,12 @@ export default {
     },
     // 处理表头
     handleChangeFieldList() {
-      const currentFieldList = this.isSetTableHead ? this.noTitleFieldList : this.fieldList
-      this.currentColumns = this.isSetTableHead ? this.noTitleColumns : this.columns
+      const currentFieldList = this.isSetTableHead
+        ? this.noTitleFieldList
+        : this.fieldList
+      this.currentColumns = this.isSetTableHead
+        ? this.noTitleColumns
+        : this.columns
       this.currentFieldList = currentFieldList.slice(this.requestLine - 1)
       this.spinning = false
     },
@@ -534,7 +602,8 @@ export default {
       const formData = new FormData()
       formData.append('file', file)
       this.spinning = true
-      const result = await this.$server.dataAccess.actionUploadExcelFile(formData, this.uploadCallback)
+      const result = await this.$server.dataAccess
+        .actionUploadExcelFile(formData, this.uploadCallback)
         .finally(() => {
           this.spinning = false
           this.uploadProgress = '加载中'
@@ -582,7 +651,8 @@ export default {
       if (flag) {
         formData.append('file', file)
         this.spinning = true
-        result = await this.$server.dataAccess.actionUploadExcelFile(formData, this.uploadCallback)
+        result = await this.$server.dataAccess
+          .actionUploadExcelFile(formData, this.uploadCallback)
           .catch(() => {
             this.clearReplaceFile()
           })
@@ -594,7 +664,8 @@ export default {
         formData.append('fileList[0]', file)
         formData.append('replaceDatabaseId', this.replaceFile.info.id)
         this.spinning = true
-        result = await this.$server.dataAccess.actionReplaceExcelFile(formData, this.uploadCallback)
+        result = await this.$server.dataAccess
+          .actionReplaceExcelFile(formData, this.uploadCallback)
           .catch(() => {
             this.clearReplaceFile()
           })
@@ -655,7 +726,9 @@ export default {
       // 判断是否处理过表格信息(处理之后的是Array类型), 没有则调接口获取信息并处理
       if (!Array.isArray(table)) {
         if (!this.sheetList[index]) return
-        const res = await this.$server.dataAccess.getExcelFileTableInfo(this.sheetList[index].id)
+        const res = await this.$server.dataAccess.getExcelFileTableInfo(
+          this.sheetList[index].id
+        )
         if (res.code === 200) {
           if (!this.sheetList[index]) return
           const data = res.rows[0]
@@ -673,17 +746,19 @@ export default {
         }
       }
       const columns = new Array({
-          title: '序号',
-          dataIndex: 'no',
-          scopedSlots: {
-            customRender: 'no'
-          }
-        }).concat(table[0].map((col, index) => {
+        title: '序号',
+        dataIndex: 'no',
+        scopedSlots: {
+          customRender: 'no'
+        }
+      }).concat(
+        table[0].map((col, index) => {
           return {
             title: col,
             dataIndex: index + ''
           }
-        }))
+        })
+      )
 
       this.columns = columns
       this.noTitleColumns = columns.map((item, index) => {
@@ -752,7 +827,8 @@ export default {
             }
           })
 
-          this.$server.dataAccess.saveExcelInfo(formData)
+          this.$server.dataAccess
+            .saveExcelInfo(formData)
             .then(result => {
               if (result.code === 200) {
                 this.$message.success('保存成功')
@@ -760,8 +836,14 @@ export default {
                 this.$store.dispatch('dataAccess/setFirstFinished', true)
                 this.$store.dispatch('dataAccess/setModelName', this.form.name)
                 // this.$store.dispatch('dataAccess/setParentId', 0)
-                this.$store.dispatch('dataAccess/setModelId', result.data.datasource.id)
-                this.$store.commit('common/SET_PRIVILEGES', result.data.datasource.privileges || [])
+                this.$store.dispatch(
+                  'dataAccess/setModelId',
+                  result.data.datasource.id
+                )
+                this.$store.commit(
+                  'common/SET_PRIVILEGES',
+                  result.data.datasource.privileges || []
+                )
                 this.fileInfoList = result.data.sourceDatabases
                 // 保存后清空列表
                 this.fileList = []

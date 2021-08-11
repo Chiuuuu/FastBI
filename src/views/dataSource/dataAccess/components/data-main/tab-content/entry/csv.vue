@@ -36,8 +36,20 @@
                 >
                   <div class="text">{{ item.name }}</div>
                   <div>
-                    <a-icon type="retweet" title="替换" style="margin-right:10px" @click.stop="handleReplaceFile(item, index)" />
-                    <a-icon type="delete" title="删除" @click.stop="handleRemove(item)"></a-icon>
+                    <a-tooltip placement="top" title="替换">
+                      <a-icon
+                        type="retweet"
+                        style="margin-right:10px"
+                        @click.stop="handleReplaceFile(item, index)"
+                      />
+                    </a-tooltip>
+
+                    <a-tooltip placement="top" title="删除">
+                      <a-icon
+                        type="delete"
+                        @click.stop="handleRemove(item)"
+                      ></a-icon>
+                    </a-tooltip>
                   </div>
                 </div>
               </template>
@@ -54,13 +66,25 @@
             :before-upload="beforeFileUpload"
             @change="handleFileChange"
           >
-            <a-button ref="uploader" type="primary" :loading="spinning || loading">
+            <a-button
+              ref="uploader"
+              type="primary"
+              :loading="spinning || loading"
+            >
               添加文件
             </a-button>
           </a-upload>
         </a-form-model-item>
-        <a-form-model-item class="form-not-required" label="文件分隔符" prop="delimiter">
-          <a-radio-group style="width:100%" v-model="form.delimiter" @change="changeDelimiter">
+        <a-form-model-item
+          class="form-not-required"
+          label="文件分隔符"
+          prop="delimiter"
+        >
+          <a-radio-group
+            style="width:100%"
+            v-model="form.delimiter"
+            @change="changeDelimiter"
+          >
             <a-radio value="0">逗号</a-radio>
             <a-radio value="1">分号</a-radio>
             <a-radio value="2">空格</a-radio>
@@ -77,7 +101,9 @@
               <a-button
                 v-show="form.delimiter === '3'"
                 @click="handleRenderByDelimiter"
-                type="primary">立即解析</a-button>
+                type="primary"
+                >立即解析</a-button
+              >
             </a-radio>
           </a-radio-group>
         </a-form-model-item>
@@ -105,12 +131,26 @@
               <a-spin :spinning="spinning">
                 <table>
                   <thead class="sheet-head">
-                    <tr style="border: none"><th v-for="item in currentColumns" :key="item.dataIndex"><div class="cell-item">{{ item.title }}</div></th></tr>
+                    <tr style="border: none">
+                      <th v-for="item in currentColumns" :key="item.dataIndex">
+                        <div class="cell-item">{{ item.title }}</div>
+                      </th>
+                    </tr>
                   </thead>
                   <tbody class="sheet-body scrollbar">
-                    <tr v-for="(item, index) in currentFieldList" :key="item.key">
-                      <td><div class="cell-item">{{ index + 1 }}</div></td>
-                      <td v-for="col in currentColumns.slice(1)" :key="col.dataIndex"><div class="cell-item">{{ item[col.dataIndex] }}</div></td>
+                    <tr
+                      v-for="(item, index) in currentFieldList"
+                      :key="item.key"
+                    >
+                      <td>
+                        <div class="cell-item">{{ index + 1 }}</div>
+                      </td>
+                      <td
+                        v-for="col in currentColumns.slice(1)"
+                        :key="col.dataIndex"
+                      >
+                        <div class="cell-item">{{ item[col.dataIndex] }}</div>
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -145,7 +185,7 @@ export default {
       loading: false,
       spinning: false,
       uploadProgress: '加载中',
-      uploadCallback: (num) => {
+      uploadCallback: num => {
         // 使用本地 progress 事件
         if (num < 100) {
           this.uploadProgress = num + '%'
@@ -172,7 +212,7 @@ export default {
             message: '长度为1~20'
           }
         ],
-        delimiter: [ { validator: this.delimiterValidate } ]
+        delimiter: [{ validator: this.delimiterValidate }]
       },
       labelCol: {
         span: 4
@@ -203,15 +243,15 @@ export default {
     queryDelimiter() {
       switch (this.form.delimiter) {
         case '0':
-         return ','
+          return ','
         case '1':
-         return ';'
+          return ';'
         case '2':
-         return ' '
+          return ' '
         case '3':
-         return this.inputDelimiter
+          return this.inputDelimiter
         default:
-           return ','
+          return ','
       }
     }
   },
@@ -236,7 +276,8 @@ export default {
     handleSetFormData() {
       if (this.modelType !== 'csv') return
       this.handleResetForm()
-      if (this.modelId) { // 有id就是编辑状态
+      if (this.modelId) {
+        // 有id就是编辑状态
         this.$set(this.form, 'name', this.modelName)
         let delimiter = this.modelInfo.delimiter
         if (delimiter === ',') {
@@ -276,7 +317,8 @@ export default {
     },
     getFileList() {
       this.spinning = true
-      this.$server.dataAccess.getModelFileList(this.modelId)
+      this.$server.dataAccess
+        .getModelFileList(this.modelId)
         .then(res => {
           this.fileInfoList = res.rows
           const name = this.modelInfo ? this.modelInfo.databaseName : ''
@@ -305,7 +347,10 @@ export default {
       } else {
         this.currentFileIndex = index
         this.renderCurrentTable()
-        this.$store.dispatch('dataAccess/setDatabaseName', this.fileInfoList[index].name)
+        this.$store.dispatch(
+          'dataAccess/setDatabaseName',
+          this.fileInfoList[index].name
+        )
       }
     },
     // 校验文件
@@ -331,7 +376,11 @@ export default {
       }
 
       // 校验重名
-      if (isValid && !this.replaceFile.isReplace && this.fileInfoList.some(file => file.name === name)) {
+      if (
+        isValid &&
+        !this.replaceFile.isReplace &&
+        this.fileInfoList.some(file => file.name === name)
+      ) {
         isValid = false
         this.$message.error('文件命名重复, 请重新添加')
       }
@@ -354,9 +403,12 @@ export default {
       }
 
       // 校验csv文件类型
-      const fileType = file.name.slice(file.name.lastIndexOf('.') + 1, file.name.length)
+      const fileType = file.name.slice(
+        file.name.lastIndexOf('.') + 1,
+        file.name.length
+      )
       if (/csv/.test(fileType)) {
-        file.id = file.uid || 'vc-upload-' + (+new Date())
+        file.id = file.uid || 'vc-upload-' + +new Date()
         if (this.replaceFile.isReplace) {
           this.actionReplaceFile(file)
         } else {
@@ -376,12 +428,17 @@ export default {
         }
       })
       this.spinning = true
-      const result = await this.$server.dataAccess.actionUploadCsvFile(formData)
+      const result = await this.$server.dataAccess
+        .actionUploadCsvFile(formData)
         .catch(() => {
           this.spinning = false
         })
       if (result.code === 200) {
-        this.$set(this.databaseList, this.currentFileIndex, result.rows[0].tableContent)
+        this.$set(
+          this.databaseList,
+          this.currentFileIndex,
+          result.rows[0].tableContent
+        )
         this.$nextTick(() => {
           this.renderCurrentTable()
         })
@@ -395,7 +452,8 @@ export default {
       formData.append('csvFile', file)
       formData.append('delimiter', this.queryDelimiter)
       this.spinning = true
-      const result = await this.$server.dataAccess.actionUploadCsvFile(formData, this.uploadCallback)
+      const result = await this.$server.dataAccess
+        .actionUploadCsvFile(formData, this.uploadCallback)
         .catch(() => {
           this.spinning = false
           this.uploadProgress = '加载中'
@@ -444,7 +502,8 @@ export default {
         formData.append('csvFile', file)
         formData.append('delimiter', this.queryDelimiter)
         this.spinning = true
-        result = await this.$server.dataAccess.actionUploadCsvFile(formData, this.uploadCallback)
+        result = await this.$server.dataAccess
+          .actionUploadCsvFile(formData, this.uploadCallback)
           .catch(() => {
             this.clearReplaceFile()
           })
@@ -452,12 +511,14 @@ export default {
             this.spinning = false
             this.uploadProgress = '加载中'
           })
-      } else { // 已入库文件
+      } else {
+        // 已入库文件
         formData.append('fileList[0]', file)
         formData.append('replaceDatabaseId', this.replaceFile.info.id)
         formData.append('delimiter', this.queryDelimiter)
         this.spinning = true
-        result = await this.$server.dataAccess.actionReplaceCsvFile(formData, this.uploadCallback)
+        result = await this.$server.dataAccess
+          .actionReplaceCsvFile(formData, this.uploadCallback)
           .catch(() => {
             this.clearReplaceFile()
           })
@@ -523,7 +584,10 @@ export default {
           this.fileInfoList.splice(index, 1)
 
           // 如果删除当前被替换的文件, 清空替换文件对象
-          if (this.replaceFile.index > -1 && file.id === this.replaceFile.info.id) {
+          if (
+            this.replaceFile.index > -1 &&
+            file.id === this.replaceFile.info.id
+          ) {
             this.clearReplaceFile()
           }
 
@@ -549,7 +613,11 @@ export default {
               break
             }
           }
-          if (!isOperation && !isNaN(file.id) && this.deleteIdList.indexOf(file.id) < 0) {
+          if (
+            !isOperation &&
+            !isNaN(file.id) &&
+            this.deleteIdList.indexOf(file.id) < 0
+          ) {
             this.deleteIdList.push({
               id: file.id,
               name: file.name,
@@ -588,17 +656,19 @@ export default {
         }
       }
       const columns = new Array({
-          title: '序号',
-          dataIndex: 'no',
-          scopedSlots: {
-            customRender: 'no'
-          }
-        }).concat(table[0].map((col, index) => {
+        title: '序号',
+        dataIndex: 'no',
+        scopedSlots: {
+          customRender: 'no'
+        }
+      }).concat(
+        table[0].map((col, index) => {
           return {
             title: col,
             dataIndex: index + ''
           }
-        }))
+        })
+      )
 
       this.columns = columns
       this.noTitleColumns = columns.map((item, index) => {
@@ -664,19 +734,29 @@ export default {
           this.operation = this.operation.concat(this.deleteIdList)
           this.operation.map((item, index) => {
             for (const key in item) {
-              formData.append('csvDatabaseList[' + index + '].' + key, item[key])
+              formData.append(
+                'csvDatabaseList[' + index + '].' + key,
+                item[key]
+              )
             }
           })
 
-          this.$server.dataAccess.saveCsvInfo(formData)
+          this.$server.dataAccess
+            .saveCsvInfo(formData)
             .then(result => {
               if (result.code === 200) {
                 this.$message.success('保存成功')
                 this.$store.dispatch('dataAccess/getMenuList')
                 this.$store.dispatch('dataAccess/setFirstFinished', true)
                 this.$store.dispatch('dataAccess/setModelName', this.form.name)
-                this.$store.dispatch('dataAccess/setModelId', result.data.datasource.id)
-                this.$store.commit('common/SET_PRIVILEGES', result.data.datasource.privileges || [])
+                this.$store.dispatch(
+                  'dataAccess/setModelId',
+                  result.data.datasource.id
+                )
+                this.$store.commit(
+                  'common/SET_PRIVILEGES',
+                  result.data.datasource.privileges || []
+                )
                 this.fileInfoList = result.data.sourceDatabases
                 // this.$store.dispatch('dataAccess/setParentId', 0)
                 // 保存后清空列表
