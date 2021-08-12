@@ -118,7 +118,7 @@ export default {
         // 转换文本
         this.getContent().then(res => {
           this.$refs.editorText.innerHTML = res
-          this.selfConfig.text = res
+          this.selfConfig.title.text = res
           this.updateChartData(this.chartId)
         })
         // 关闭防止冒泡，开启拖动
