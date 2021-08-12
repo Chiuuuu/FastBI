@@ -138,10 +138,10 @@ export default {
       handler(val, oldval) {
         if (val) {
           this.showHeader = val.header.show
-        //   for (let item of this.columns) {
-        //     // 是否自动换行
-        //     item.ellipsis = val.table.ellipsis
-        //   }
+          //   for (let item of this.columns) {
+          //     // 是否自动换行
+          //     item.ellipsis = val.table.ellipsis
+          //   }
           this._calcStyle()
         }
       },
@@ -309,7 +309,8 @@ export default {
           'font-size': this.config.table.textStyle.fontSize + 'px',
           'font-weight': this.config.table.textStyle.fontWeight,
           backgroundColor: this.config.table.oddBackgroundColor,
-          'white-space': this.config.table.ellipsis ? 'normal' : 'nowrap'
+        //   'white-space': this.config.table.ellipsis ? 'normal' : 'nowrap'
+          'white-space': 'nowrap'
           //   }
         }
       } else {
@@ -320,7 +321,8 @@ export default {
           'font-size': this.config.table.textStyle.fontSize + 'px',
           'font-weight': this.config.table.textStyle.fontWeight,
           backgroundColor: this.config.table.evenBackgroundColor,
-          'white-space': this.config.table.ellipsis ? 'normal' : 'nowrap'
+          //   'white-space': this.config.table.ellipsis ? 'normal' : 'nowrap'
+          'white-space': 'nowrap'
           //   }
         }
       }
