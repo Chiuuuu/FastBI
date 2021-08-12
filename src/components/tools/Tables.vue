@@ -311,7 +311,8 @@ export default {
           'font-size': this.config.table.textStyle.fontSize + 'px',
           'font-weight': this.config.table.textStyle.fontWeight,
           backgroundColor: this.config.table.oddBackgroundColor,
-          'white-space': this.config.table.ellipsis ? 'normal' : 'nowrap'
+          //   'white-space': this.config.table.ellipsis ? 'normal' : 'nowrap'
+          'white-space': 'nowrap'
           //   }
         }
       } else {
@@ -322,7 +323,8 @@ export default {
           'font-size': this.config.table.textStyle.fontSize + 'px',
           'font-weight': this.config.table.textStyle.fontWeight,
           backgroundColor: this.config.table.evenBackgroundColor,
-          'white-space': this.config.table.ellipsis ? 'normal' : 'nowrap'
+          //   'white-space': this.config.table.ellipsis ? 'normal' : 'nowrap'
+          'white-space': 'nowrap'
           //   }
         }
       }
