@@ -250,7 +250,7 @@ async function setMapData(chart, newData) {
 
           datas.push({
             name: positionMsg.district,
-            value: [parseFloat(position[0]), parseFloat(position[1])].cancat(
+            value: [parseFloat(position[0]), parseFloat(position[1])].concat(
               data[alias]
             ),
             // 构造映射数据，给指标提示框内容显示
@@ -262,6 +262,7 @@ async function setMapData(chart, newData) {
             [alias]: data[alias] // 度量
           })
         } catch (err) {
+          console.log(err)
           continue
         }
       }
