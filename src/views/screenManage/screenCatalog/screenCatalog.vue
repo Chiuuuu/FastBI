@@ -842,7 +842,7 @@ export default {
               this.$message.success(res.msg)
               this.getList()
               // 新建文件夹后 返回空页面 不显示大屏
-              this.fileSelectId = ''
+              this.fileSelectId = -1
               this.fileSelectName = ''
             } else {
               this.$message.error(res.msg)
@@ -1057,7 +1057,7 @@ export default {
   // 跳出大屏模块清除菜单选择id
   beforeRouteLeave(to, from, next) {
     if (to.name !== 'screenEdit') {
-      this.fileSelectId = ''
+      this.fileSelectId = -1
       next()
     } else {
       next()
