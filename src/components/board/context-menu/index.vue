@@ -30,7 +30,7 @@
               v-if="i === 0"
               :key="currentSelected ? currentSelected + 'index' + i : 0"
               :fetch="handleChartData"
-              :name="currSelected.name"
+              :name="handleFileName()"
               >{{ menu.text }}</JsonExcel
             >
             <span v-else>{{ menu.text }}</span>
@@ -183,6 +183,17 @@ export default {
   },
   methods: {
     ...mapActions(['deleteChartData']),
+    // 处理文件导出的名称
+    handleFileName() {
+      const chartType = this.currSelected.setting.chartType
+      if (chartType === 'v-sun' || chartType === 'v-heatmap') {
+        return this.currSelected.setting.config.title.text
+      } else if (this.currSelected.setting.config.title.content) {
+        return this.currSelected.setting.config.title.content
+      } else {
+        return this.currSelected.setting.title
+      }
+    },
     formatAggregator(item) {
       const fun = this.polymerizeType.find(
         x => x.value === item.defaultAggregator
@@ -224,7 +235,7 @@ export default {
         this.handleChartData('view')
       } else if (order === 'tocsv') {
         const datas = await this.handleChartData()
-        exportCsv(datas, null, this.currSelected.name)
+        exportCsv(datas, null, this.handleFileName())
       } else if (order === 'exportImg') {
         this.$store.dispatch('ToggleContextMenu')
         if (this.isScreen && this.$route.name !== 'screenEdit') {
@@ -397,13 +408,14 @@ export default {
       }
       const column = []
       fieldList.map(item => {
-        if (keys.includes(item.alias)) {
+        // 数据库为NULL的字段现在不返回, 所以不能用第一行的keys初始化表头
+        // if (keys.includes(item.alias)) {
           column.push({
             alias: item.alias,
             colName: this.formatAggregator(item),
             role: item.role
           })
-        }
+        // }
       })
       return column
     }

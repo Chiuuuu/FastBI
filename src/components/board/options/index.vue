@@ -3965,7 +3965,7 @@ export default {
             val.setting.name === 've-image' ||
             val.setting.name === 'figure'
           ) {
-            this.tabsType = 0
+            this.tabsType = this.tabsType > 1 ? 0 : this.tabsType
           }
           this.baseProperty = { ...val.setting.view }
           if (val.setting.config) {
