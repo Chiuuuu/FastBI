@@ -111,7 +111,12 @@
         </div>
       </a-spin>
     </template>
-    <CheckTable v-if="detailInfo" :is-show="visible" :detailInfo="detailInfo" @close="visible = false" />
+    <CheckTable
+      v-if="detailInfo"
+      :is-show="visible"
+      :detailInfo="detailInfo"
+      @close="visible = false"
+    />
   </div>
 </template>
 
@@ -179,6 +184,9 @@ export default {
      * 获取数据
      */
     async handleGetData(id) {
+      if (!id) {
+        return
+      }
       this.spinning = true
       this.renderTables = []
       let modelId = ''
