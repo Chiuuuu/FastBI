@@ -408,13 +408,14 @@ export default {
       }
       const column = []
       fieldList.map(item => {
-        if (keys.includes(item.alias)) {
+        // 数据库为NULL的字段现在不返回, 所以不能用第一行的keys初始化表头
+        // if (keys.includes(item.alias)) {
           column.push({
             alias: item.alias,
             colName: this.formatAggregator(item),
             role: item.role
           })
-        }
+        // }
       })
       return column
     }
