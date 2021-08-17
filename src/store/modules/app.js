@@ -225,6 +225,7 @@ const app = {
       name = name || obj.setting.title
       let params = {
         tabId: obj.tabId,
+        type: name || '文本',
         name: name || '文本',
         screenId: state.screenId,
         datamodelId: obj.datamodelId || 0, // 复制的图表存在模型，先判断有没有模型
