@@ -230,7 +230,7 @@ export default {
       const res = await this.$server.corporateDomain.getProjectList({
         projectName: projectName || '',
         adminName: '',
-        pageSize: 10,
+        pageSize: 999,
         current: 1
       })
         .finally(() => {
