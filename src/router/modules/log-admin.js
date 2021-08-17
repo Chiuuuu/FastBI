@@ -9,7 +9,7 @@ export default {
   component: RouteView,
   meta: {
     title: '日志管理',
-    icon: 'cloud',
+    icon: 'cloud'
   },
   children: [
     {
@@ -17,8 +17,8 @@ export default {
       name: 'record',
       component: recordView,
       meta: {
-        title: '操作记录',
+        title: '操作记录'
       }
-    },
+    }
   ]
 }
