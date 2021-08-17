@@ -310,6 +310,7 @@ export default {
         target: document.querySelector('.screen-manage')
       })
       // 先获取大屏对应的页签信息
+      if (this.screenId === -1) return
       this.$server.screenManage.getScreenTabs(this.screenId).then(res => {
         if (res.code === 200) {
           let pages = res.rows.map(item =>
