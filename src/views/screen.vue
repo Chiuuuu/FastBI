@@ -285,7 +285,8 @@ export default {
       this.getScreenDetail({
         id: this.screenId,
         tabId: pageId,
-        needRefresh: true
+        needRefresh: true,
+        key: 'false'
       }).then(res => {
         loadingInstance.close()
         if (res) {
@@ -325,7 +326,8 @@ export default {
           this.getScreenDetail({
             id: this.screenId,
             tabId: pages[0].id,
-            needRefresh: true
+            needRefresh: true,
+            key: 'false'
           }).then(res => {
             loadingInstance.close()
             if (res) {

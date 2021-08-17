@@ -166,10 +166,11 @@ const screenManage = {
    * @description 大屏详细信息
    * @param {*} id
    * @param {*} tabId
+   * @param {string} key  / 是否记录日志 false不记录
    * @returns
    */
-  getScreenDetailById(id, tabId) {
-    return $axios.get(`/screen/bigscreen/${id}/${tabId}`)
+  getScreenDetailById(id, tabId, key = 'true') {
+    return $axios.get(`/screen/bigscreen/${id}/${tabId}/${key}`)
     // return $axios.get(`/screen/data/${id}`)
   },
   /**
