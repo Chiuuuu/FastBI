@@ -245,6 +245,14 @@ export default {
     return $axios.post(`/model/custom/createDataModelView`, params)
   },
   /**
+   * @description 复制模型
+   * @param {String} modelId modelId
+   * @returns
+   */
+  copyDataModel(modelId) {
+    return $axios.get(`/model/datamodel/copyDataModel/${modelId}`)
+  },
+  /**
    * @description 导入BI库
    * @param {Object} params 请求体
    * @param {Object} params.config 配置
