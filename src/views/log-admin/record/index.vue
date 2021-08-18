@@ -6,15 +6,15 @@
           <h1>操作记录</h1>
           <div>
             <a-select
-              v-model="projectName"
+              v-model="projectId"
               style="width: 120px"
               placeholder="请选择项目"
             >
               <a-select-option value="">
                 所有项目
               </a-select-option>
-              <a-select-option v-for="item in projectList" :key="item.id" :value="item.name">{{
-                item.name
+              <a-select-option v-for="item in projectList" :key="item.projectId" :value="item.projectId">{{
+                item.projectName
               }}</a-select-option>
             </a-select>
           </div>
@@ -22,13 +22,13 @@
         <div class="right">
           <a-tabs class="tabs" v-model="tab" @change="handleChangeModule">
             <a-tab-pane key="1" tab="数据接入">
-              <recordMain ref="manage1" :type="1" :projectName="projectName"></recordMain>
+              <recordMain ref="manage1" :type="1" :projectId="projectId"></recordMain>
             </a-tab-pane>
             <a-tab-pane key="2" tab="数据建模">
-              <recordMain ref="manage2" :type="2" :projectName="projectName"></recordMain>
+              <recordMain ref="manage2" :type="2" :projectId="projectId"></recordMain>
             </a-tab-pane>
             <a-tab-pane key="3" tab="数据大屏">
-              <recordMain ref="manage3" :type="3" :projectName="projectName"></recordMain>
+              <recordMain ref="manage3" :type="3" :projectId="projectId"></recordMain>
             </a-tab-pane>
           </a-tabs>
         </div>
@@ -46,29 +46,41 @@ export default {
   },
   data() {
     return {
-      projectName: '',
-      tab: '1'
+      projectId: '',
+      tab: '1',
+      projectList: []
     }
   },
-  computed: {
-    ...mapState({
-      projectList: state => state.user.projectList
-    })
-  },
+  // computed: {
+  //   ...mapState({
+  //     projectList: state => state.user.projectList
+  //   })
+  // },
   watch: {
-    projectName(val) {
+    projectId(val) {
       const tab = this.$refs[`manage${this.tab}`]
       if (tab) {
-        tab.handleProjectNameChange(val)
+        tab.handleProjectIdChange(val)
       }
     }
+  },
+  created() {
+    this.getOperaLogProjectList()
   },
   methods: {
     handleChangeModule(key) {
       const tab = this.$refs[`manage${key}`]
       if (tab) {
-        tab.getList({ current: 1, projectName: this.projectName })
+        tab.getList({ current: 1, projectId: this.projectId })
       }
+    },
+    async getOperaLogProjectList() {
+      let res = await this.$server.logAdmin.getOperaLogProjectList()
+      if (res.code !== 200) {
+        this.$message.error(res.msg || '项目列表获取不了')
+        return
+      }
+      this.projectList = res.data
     }
   }
 }

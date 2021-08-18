@@ -125,7 +125,8 @@ export default {
       type: Number,
       require: true
     },
-    projectName: {
+    // 项目id
+    projectId: {
       type: String,
       default: ''
     }
@@ -147,7 +148,7 @@ export default {
         pageSize: 10,
         total: 0
       },
-      prjName: ''
+      prjId: ''
     }
   },
   computed: {
@@ -165,23 +166,23 @@ export default {
     }
   },
   created() {
-    this.prjName = this.projectName
+    this.prjId = this.projectId
     this.getList()
   },
   methods: {
-    handleProjectNameChange(projectName) {
-      this.prjName = projectName
+    handleProjectIdChange(projectId) {
+      this.prjId = projectId
       this.pagination.current = 1
       this.getList()
     },
     // 获取列表数据
     async getList(data = {}) {
-      data.projectName !== undefined && (this.prjName = data.projectName)
+      data.projectId !== undefined && (this.prjId = data.projectId)
       const params = Object.assign({}, omit(trimFormData(this.formData), 'operationTime'), {
         startTime: this.formData.operationTime.length > 0 ? this.formData.operationTime[0] + ':00' : '',
         endTime: this.formData.operationTime.length > 0 ? this.formData.operationTime[1] + ':59' : '',
         catalogType: this.type,
-        projectName: this.prjName,
+        projectId: this.prjId,
         pageNum: data.current ? data.current : this.pagination.current,
         pageSize: this.pagination.pageSize
       })

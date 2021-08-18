@@ -7,5 +7,11 @@ export default {
    */
   getOperaLogList(params = {}) {
     return $axios.post(`/system/operaLog/query`, params)
+  },
+  /**
+   * @description 获取项目列表
+   */
+  getOperaLogProjectList() {
+    return $axios.get(`/system/operaLog/projectList`)
   }
 }

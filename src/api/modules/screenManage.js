@@ -216,14 +216,6 @@ const screenManage = {
     return $axios.post('/screen/graph/dataLink', params)
   },
   /**
-   * @description 请求展示用的图表数据(导出/查看数据)
-   * @param {*} params
-   * @returns
-   */
-  getGraphInfo(params) {
-    return $axios.post('  /screen/graph/graphInfo', params)
-  },
-  /**
    * @description 根据数据筛选数据列表
    * @param {*} params
    * @returns
@@ -286,11 +278,22 @@ const screenManage = {
   },
 
   /**
-   * 获取图表数据
+   * @description 请求展示用的图表数据(导出/查看数据)
+   * @param {*} params
+   * @returns
    */
   getGraphInfo(params) {
     return $axios.post('/screen/graph/graphInfo', params)
+  },
+  /**
+   * @description 请求展示用的图表数据(导出/查看数据)
+   * @param {*} params
+   * @returns
+   */
+  actionExportScreen(params) {
+    return $axios.post('/v2/screen/bigscreen/exportScreen', params)
   }
+
 }
 
 export default screenManage

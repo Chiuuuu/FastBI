@@ -9,7 +9,8 @@ export default {
   component: RouteView,
   meta: {
     title: '日志管理',
-    icon: 'cloud'
+    icon: 'cloud',
+    permissions: [PERMISSION_CODE.PAGE.logAdmin]
   },
   children: [
     {
@@ -17,7 +18,8 @@ export default {
       name: 'record',
       component: recordView,
       meta: {
-        title: '操作记录'
+        title: '操作记录',
+        permissions: [PERMISSION_CODE.PAGE.logAdmin]
       }
     }
   ]
