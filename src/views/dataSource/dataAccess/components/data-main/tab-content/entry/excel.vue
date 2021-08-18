@@ -1,5 +1,5 @@
 <template>
-  <div class="tab-excel tab-datasource">
+  <a-spin :spinning="saveLoading" :tip="saveTip" class="tab-excel tab-datasource">
     <div class="tab-datasource-model scrollbar">
       <a-form-model
         ref="fileForm"
@@ -72,7 +72,7 @@
             <a-button
               ref="uploader"
               type="primary"
-              :loading="spinning || loading"
+              :loading="spinning || saveLoading"
             >
               添加文件
             </a-button>
@@ -101,54 +101,12 @@
           </div>
         </a-col>
         <a-col :span="19" style="height:100%">
-          <!-- <div class="preview-controller">
-            <span>从第</span>
-            <div class="preview-line">
-              <a-input style="width:60px" v-model="line" @keyup.enter.stop="handleEnterLine" />
-              <div class="arrow-box" style="width:16px">
-                <div class="arrow" @click="countLine('plus')">
-                  <i class="arrow-up"></i>
-                </div>
-                <div class="arrow" @click="countLine('minus')">
-                  <i class="arrow-down"></i>
-                </div>
-              </div>
-            </div>
-            <span>行开始获取数据</span>
-            <a-checkbox style="margin-left: 50px" @change="handleCheckBox">自动生成列名</a-checkbox>
-          </div> -->
-          <div class="sheet-table scrollbar">
-            <template v-if="currentFieldList.length > 0">
-              <a-spin :spinning="spinning">
-                <table>
-                  <thead class="sheet-head">
-                    <tr style="border: none">
-                      <th v-for="item in currentColumns" :key="item.dataIndex">
-                        <div class="cell-item">{{ item.title }}</div>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody class="sheet-body scrollbar">
-                    <tr
-                      v-for="(item, index) in currentFieldList"
-                      :key="item.key"
-                    >
-                      <td>
-                        <div class="cell-item">{{ index + 1 }}</div>
-                      </td>
-                      <td
-                        v-for="col in currentColumns.slice(1)"
-                        :key="col.dataIndex"
-                      >
-                        <div class="cell-item">{{ item[col.dataIndex] }}</div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </a-spin>
-            </template>
-            <a-empty style="margin: 20px 0" v-else></a-empty>
-          </div>
+          <FileTable
+            :spinning="spinning"
+            :currentFieldList="currentFieldList"
+            :currentColumns="currentColumns"
+            :show-switch="showFieldSwitch"
+            @changeDataType="changeDataType" />
         </a-col>
       </a-row>
     </div>
@@ -156,28 +114,31 @@
       type="primary"
       class="btn_sub"
       @click="handleSaveForm"
-      :loading="spinning || loading"
+      :loading="spinning"
       v-if="hasPermission"
     >
       保存
     </a-button>
-  </div>
+  </a-spin>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 import { MapSheet } from '../util'
 import { hasPermission } from '@/utils/permission'
+import DataType from '../../file-table/data-type.vue'
+import FileTable from '../../file-table/file-table.vue'
 export default {
   name: 'model-excel',
+  components: {
+    FileTable
+  },
   data() {
     return {
-      btnPermission: [
-        this.$PERMISSION_CODE.OPERATOR.edit,
-        this.$PERMISSION_CODE.OPERATOR.add
-      ],
-      loading: false,
+      btnPermission: [this.$PERMISSION_CODE.OPERATOR.edit, this.$PERMISSION_CODE.OPERATOR.add],
+      saveLoading: false,
       spinning: false,
+      saveTip: '保存中, 请勿进行其他操作',
       uploadProgress: '加载中',
       uploadCallback: num => {
         // 使用本地 progress 事件
@@ -256,6 +217,12 @@ export default {
     },
     hasPermission() {
       return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.edit)
+    },
+    showFieldSwitch() {
+      if (!this.fileInfoList[this.currentFileIndex]) return false
+      const name = this.fileInfoList[this.currentFileIndex]
+      const target = this.operation.find(item => item.name === name.name)
+      return target && target.operation === 1 // 只有新增才可以改数据类型
     }
   },
   watch: {
@@ -275,7 +242,7 @@ export default {
   },
   methods: {
     handleChangeTab(sheet, index) {
-      if (this.loading) return
+      if (this.saveLoading) return
       this.currentSheetIndex = index
       this.renderCurrentTable(index)
     },
@@ -311,6 +278,32 @@ export default {
         this.getFileList()
       }
     },
+    // 切换表头数据类型
+    async changeDataType() {
+      this.spinning = true
+      const tableList = this.databaseList[this.currentFileIndex].tableList
+      const rows = tableList[this.currentSheetIndex].originRows
+      const data = {
+        // [this.sheetList[this.currentSheetIndex].name]: {
+          head: this.currentColumns.slice(1).map(item => ({
+            name: item.title,
+            dataType: item.dataType
+          })),
+          rows
+        // }
+      }
+      const res = await this.$server.dataAccess.actionChangeExcelType(data)
+        .finally(() => {
+          this.spinning = false
+        })
+      if (res.code === 200) {
+        tableList[this.currentSheetIndex].rows = res.data.rows
+        tableList[this.currentSheetIndex].headerList = res.data.headerList
+        this.handleChangeTab(this.sheetList[this.currentSheetIndex], this.currentSheetIndex)
+      } else {
+        this.$message.error(res.msg || '请求错误')
+      }
+    },
     // 获取文件列表
     getFileList() {
       this.spinning = true
@@ -332,13 +325,13 @@ export default {
             this.handleGetDataBase(index)
           })
         })
-        .catch(() => {
+        .finally(() => {
           this.spinning = false
         })
     },
     // 获取当前文件对应的数据库信息
     async handleGetDataBase(index) {
-      if (this.loading) return
+      if (this.saveLoading) return
       this.currentSheetIndex = 0
       if (index < 0) {
         this.currentColumns = []
@@ -351,9 +344,8 @@ export default {
           // 不存在当前数据库, 调接口查询并写入
           if (!this.fileInfoList[index]) return
           this.spinning = true
-          const res = await this.$server.dataAccess
-            .getFileSheetList(this.fileInfoList[index].id)
-            .catch(() => {
+          const res = await this.$server.dataAccess.getFileSheetList(this.fileInfoList[index].id)
+            .finally(() => {
               this.spinning = false
             })
           if (res.code === 200) {
@@ -381,7 +373,7 @@ export default {
     },
     // 替换文件
     handleReplaceFile(file, index) {
-      if (this.loading) return
+      if (this.saveLoading) return
       this.replaceFile = {
         isReplace: true,
         index: index,
@@ -391,7 +383,7 @@ export default {
     },
     // 删除文件
     handleRemove(file) {
-      if (this.loading) return
+      if (this.saveLoading) return
       this.$confirm({
         title: '确认提示',
         content: '您确定要删除该文件吗',
@@ -421,8 +413,8 @@ export default {
               // 库里有的文件, 先记录id, 保存时插入到operation最后
               if (file.id && !isNaN(file.id)) {
                 this.deleteIdList.push({
-                  databaseId: file.id,
-                  databaseName: file.name,
+                  id: file.id,
+                  name: file.name,
                   operation: 3
                 })
                 this.$store.dispatch('dataAccess/setFirstFinished', false)
@@ -436,8 +428,8 @@ export default {
             this.deleteIdList.indexOf(file.id) < 0
           ) {
             this.deleteIdList.push({
-              databaseId: file.id,
-              databaseName: file.name,
+              id: file.id,
+              name: file.name,
               operation: 3
             })
             this.$store.dispatch('dataAccess/setFirstFinished', false)
@@ -496,10 +488,6 @@ export default {
         isValid = false
       }
 
-      // if (isValid && this.fileInfoList.length > 0 && !this.replaceFile.isReplace) {
-      //   this.$message.error('只支持上传一个文件')
-      //   isValid = false
-      // }
       // 校验大小
       if (isValid && file.size > 3 * 1024 * 1024) {
         isValid = false
@@ -614,7 +602,6 @@ export default {
           return this.$message.error('解析失败')
         }
         this.$message.success('解析成功')
-        console.log(result.rows)
 
         let name = file.name
         name = name.slice(0, name.lastIndexOf('.')) // 处理掉文件后缀
@@ -623,14 +610,15 @@ export default {
           name: name
         })
         this.fileList.push(file)
-        this.operation.push({
-          databaseId: '',
-          databaseName: name,
-          operation: 1
-        })
 
         const currentIndex = this.fileInfoList.length - 1
-        const database = new MapSheet(result.rows[0].mapSheet)
+        const database = new MapSheet(result.data)
+        this.operation.push({
+          id: '',
+          name: name,
+          operation: 1,
+          database: database
+        })
 
         // 新增文件未保存前不能查看库表结构
         this.$store.dispatch('dataAccess/setFirstFinished', false)
@@ -675,7 +663,7 @@ export default {
           })
       }
       if (result.code === 200) {
-        if (result.rows && result.rows.length === 0) {
+        if (result.data && result.data.headerList.length === 0) {
           this.spinning = false
           return this.$message.error('解析失败')
         }
@@ -699,18 +687,21 @@ export default {
             break
           }
         }
+
+        // const database = new MapSheet(result.rows[0].mapSheet)
+        const database = new MapSheet(result.data)
+        this.$set(this.databaseList, currentIndex, database)
+
         // 未记录的替换文件, 插入新记录
         if (!isOperation) {
           this.fileList.push(file)
           this.operation.push({
-            databaseId: this.replaceFile.info.id,
-            databaseName: name,
-            operation: 2
+            id: this.replaceFile.info.id,
+            name: name,
+            operation: 2,
+            database: database
           })
         }
-
-        const database = new MapSheet(result.rows[0].mapSheet)
-        this.$set(this.databaseList, currentIndex, database)
         this.$nextTick(() => {
           this.handleGetDataBase(currentIndex)
         })
@@ -724,20 +715,19 @@ export default {
       // 写入表头信息
       let table = this.tableList[index]
       // 判断是否处理过表格信息(处理之后的是Array类型), 没有则调接口获取信息并处理
-      if (!Array.isArray(table)) {
+      if (!table || !Array.isArray(table.headerList)) {
         if (!this.sheetList[index]) return
-        const res = await this.$server.dataAccess.getExcelFileTableInfo(
-          this.sheetList[index].id
-        )
+        const res = await this.$server.dataAccess.getExceflFileTableInfo(this.sheetList[index].id)
         if (res.code === 200) {
           if (!this.sheetList[index]) return
-          const data = res.rows[0]
-          // 将结果处理成mapSheet结构
-          const sheetName = this.sheetList[index].name
-          const head = data.nameSheet[sheetName]
-          const tableInfo = data.mapSheet[sheetName]
-          const newTable = new Array(head)
-          table = newTable.concat(tableInfo)
+          if (!table) {
+            table = {}
+          }
+          table.headerList = res.data.headerList.map(item => ({
+            name: item,
+            dataType: ''
+          }))
+          table.rows = res.data.rows
 
           // 写入列表, 下次点击不调用接口
           this.currentDataBase.addTable(table, index)
@@ -746,15 +736,15 @@ export default {
         }
       }
       const columns = new Array({
-        title: '序号',
-        dataIndex: 'no',
-        scopedSlots: {
-          customRender: 'no'
-        }
-      }).concat(
-        table[0].map((col, index) => {
+          title: '序号',
+          dataIndex: 'no',
+          scopedSlots: {
+            customRender: 'no'
+          }
+        }).concat(table.headerList.map((col, index) => {
           return {
-            title: col,
+            title: col.name,
+            dataType: col.dataType,
             dataIndex: index + ''
           }
         })
@@ -767,13 +757,14 @@ export default {
         } else {
           return {
             title: 'F' + (index - 1),
+            dataType: item.dataType,
             dataIndex: item.dataIndex
           }
         }
       })
 
       // 写入表信息
-      const tableData = table.slice(1).map((item, index) => {
+      const tableData = table.rows.map((item, index) => {
         const data = { key: index + '' }
         if (Array.isArray(item)) {
           item.map((value, key) => {
@@ -803,29 +794,41 @@ export default {
       }
       this.$refs.fileForm.validate((pass, obj) => {
         if (pass) {
-          this.loading = true
+          this.saveLoading = true
+          this.$store.dispatch('dataAccess/setFirstFinished', false)
           const formData = new FormData()
-          let maxSize = 0
-          this.fileList.map((file, index) => {
-            formData.append('excelFileList[' + index + ']', file)
-            maxSize += file.size
-          })
-          if (maxSize > 3 * 1024 * 1024) {
-            this.loading = false
-            return this.$message.error('单次保存文件总量需小于3M')
-          }
+          formData.append('name', this.form.name)
+          formData.append('type', 11)
+          formData.append('parentId', this.parentId || '')
+          formData.append('id', this.modelId || '')
           formData.append('databaseName', this.databaseName)
-          formData.append('sourceDatasource.name', this.form.name)
-          formData.append('sourceDatasource.type', 11)
-          formData.append('sourceDatasource.parentId', this.parentId || '')
-          formData.append('sourceDatasource.id', this.modelId || '')
 
-          this.operation = this.operation.concat(this.deleteIdList)
-          this.operation.map((item, index) => {
-            for (const key in item) {
-              formData.append('operationList[' + index + '].' + key, item[key])
+          let maxSize = 0
+          const operationList = this.operation.concat(this.deleteIdList)
+          for (let index = 0; index < operationList.length; index++) {
+            const item = operationList[index]
+            if (index < this.fileList.length) {
+              const file = this.fileList[index]
+              formData.append('excelDatabaseList[' + index + '].file', file)
+              maxSize += file.size
+              if (maxSize > 50 * 1024 * 1024) {
+                this.saveLoading = false
+                return this.$message.error('单次保存文件总量需小于50M')
+              }
             }
-          })
+            for (const key in item) {
+              if (key !== 'database') {
+                formData.append('excelDatabaseList[' + index + '].' + key, item[key])
+              } else {
+                const database = item[key]
+                const params = {}
+                database.sheetList.map((item, index) => {
+                  params[item.name] = database.tableList[index].headerList
+                })
+                formData.append('excelDatabaseList[' + index + '].sheetsHeaderJson', JSON.stringify(params))
+              }
+            }
+          }
 
           this.$server.dataAccess
             .saveExcelInfo(formData)
@@ -836,14 +839,9 @@ export default {
                 this.$store.dispatch('dataAccess/setFirstFinished', true)
                 this.$store.dispatch('dataAccess/setModelName', this.form.name)
                 // this.$store.dispatch('dataAccess/setParentId', 0)
-                this.$store.dispatch(
-                  'dataAccess/setModelId',
-                  result.data.datasource.id
-                )
-                this.$store.commit(
-                  'common/SET_PRIVILEGES',
-                  result.data.datasource.privileges || []
-                )
+                this.$store.dispatch('dataAccess/setModelId', result.data.datasource.id)
+                this.$store.commit('common/SET_MENUSELECTID', result.data.datasource.id)
+                this.$store.commit('common/SET_PRIVILEGES', result.data.datasource.privileges || [])
                 this.fileInfoList = result.data.sourceDatabases
                 // 保存后清空列表
                 this.fileList = []
@@ -862,7 +860,7 @@ export default {
               }
             })
             .finally(() => {
-              this.loading = false
+              this.saveLoading = false
             })
         }
       })

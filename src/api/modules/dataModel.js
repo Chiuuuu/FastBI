@@ -245,6 +245,14 @@ export default {
     return $axios.post(`/model/custom/createDataModelView`, params)
   },
   /**
+   * @description 复制模型
+   * @param {String} modelId modelId
+   * @returns
+   */
+  copyDataModel(modelId) {
+    return $axios.get(`/model/datamodel/copyDataModel/${modelId}`)
+  },
+  /**
    * @description 导入BI库
    * @param {Object} params 请求体
    * @param {Object} params.config 配置
@@ -261,5 +269,28 @@ export default {
    */
   delDataModel(screenId, tableId) {
     return $axios.get(`/screen/pivotschema/del/${screenId}/${tableId}`)
+  },
+  /**
+   *@description 获取模型筛选排序字段
+   * @param {Object} params
+   * @param {String} params.datamodelId // 模型id
+   * @param {String} params.ruleType // 0默认 1筛选 2排序
+   */
+  getFilterOrSortRules(params) {
+    return $axios.post('/model/pivotschema/getFilterOrSortRules', params)
+  },
+  /**
+   *@description 更新模型筛选排序字段
+   * @param {Object} params
+   * @param {String} params.datamodelId // 模型id
+   * @param {String} params.pivotschemaId // 字段id
+   * @param {String} params.field // 字段名称
+   * @param {String} params.ruleType // 0all 1筛选 2排序
+   * @param {String} params.modeType // 0all 1列表 2手动
+   * @param {String} params.isInclude // 0默认 1排除 2包含
+   * @param {String} params.displayOrder // 排序序号
+   */
+  putFilterOrSortRules(params) {
+    return $axios.post('/model/pivotschema/updateFilterOrSortRule', params)
   }
 }
