@@ -316,7 +316,7 @@ export default {
           // 默认第一个
           this.handleGetDataBase(index)
         })
-        .catch(() => {
+        .finally(() => {
           this.spinning = false
         })
     },
@@ -408,7 +408,7 @@ export default {
       this.spinning = true
       const result = await this.$server.dataAccess
         .actionUploadCsvFile(formData)
-        .catch(() => {
+        .finally(() => {
           this.spinning = false
         })
       if (result.code === 200) {
@@ -429,7 +429,7 @@ export default {
       this.spinning = true
       const result = await this.$server.dataAccess
         .actionUploadCsvFile(formData, this.uploadCallback)
-        .catch(() => {
+        .finally(() => {
           this.spinning = false
           this.uploadProgress = '加载中'
         })

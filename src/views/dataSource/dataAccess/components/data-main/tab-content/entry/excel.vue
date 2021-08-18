@@ -325,7 +325,7 @@ export default {
             this.handleGetDataBase(index)
           })
         })
-        .catch(() => {
+        .finally(() => {
           this.spinning = false
         })
     },
