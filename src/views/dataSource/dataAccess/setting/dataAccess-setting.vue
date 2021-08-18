@@ -35,7 +35,7 @@
             </template>
             <template slot="convertType" slot-scope="text, record">
               <field-select
-                :text="(text || record.dataType) | formatField"
+                :text="(text || record.dataType) || formatField"
                 :select-data="record"
                 :contextmenus="fieldContenxtMenu"
                 :isDimension="record.role === 1"

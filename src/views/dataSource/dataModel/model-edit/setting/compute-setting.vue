@@ -98,7 +98,7 @@
           <div class="tit">{{expression[activeIndex].expression}}</div>
           <div class="des">{{expression[activeIndex].description}}</div>
           <div class="example">
-            <span class="title">示例: </span>
+            <span v-show="expression[activeIndex].id !== 'GROUPBY'" class="title">示例: </span>
             <span v-html="explain"/>
           </div>
         </div>
@@ -219,6 +219,15 @@ const expression = [
     description: '返回表达式在所有记录中的四舍五入后的值。ROUND只能用于数字字段。',
     example: 'ROUND([总人口], [位数])',
     syntax: 'ROUND(表达式, 1)',
+    groups: ['calculation']
+  },
+  {
+    id: 'GROUPBY',
+    name: '指定聚合',
+    expression: '',
+    description: '指定聚合 对数据进行分组后聚合计算，或者不分组直接用所有值进行计算。指定聚合方式包括：求和、平均、最大、最小、计数和去重计数。双击新建指定聚合字段',
+    example: '',
+    syntax: '',
     groups: ['calculation']
   }
 ]
@@ -508,7 +517,11 @@ export default {
      * 右侧栏选中
     */
     handleSelectExpression(express) {
-      this.insertText(this.$refs['js-textarea'], express.syntax)
+      if (express.id !== 'GROUPBY') {
+        this.insertText(this.$refs['js-textarea'], express.syntax)
+      } else {
+        this.$emit('showGroupbyModal')
+      }
     },
     /**
      * 插入到光标处
