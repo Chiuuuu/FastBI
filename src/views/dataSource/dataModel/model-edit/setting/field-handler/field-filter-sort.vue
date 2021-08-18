@@ -46,14 +46,18 @@ export default {
     FieldFilter,
     FieldSort
   },
-  mounted () {
-    this.handleGetFilterSortList(1)
-    this.handleGetFilterSortList(2)
-  },
-  data() {
-    return {
-      filterList: [],
-      sortList: []
+  props: {
+    filterList: {
+      type: Array,
+      default() {
+        return []
+      }
+    },
+    sortList: {
+      type: Array,
+      default() {
+        return []
+      }
     }
   },
   computed: {
@@ -89,8 +93,8 @@ export default {
     },
     handleClose() {
       // 关闭窗口时, 传递筛选排序的字段
-      this.$emit('getFilterList', this.filterList)
-      this.$emit('getSortList', this.sortList)
+      // this.$emit('getFilterList', this.filterList)
+      // this.$emit('getSortList', this.sortList)
       this.$emit('close')
     },
     // 处理排序顺序

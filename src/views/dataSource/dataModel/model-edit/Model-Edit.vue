@@ -275,12 +275,12 @@
         :description="detailInfo.description"
         :rename-data="panelData"
         :union-data="unionNode"
+        :filter-list="fieldFilterList"
+        :sort-list="fieldSortList"
         @showGroupbyModal="openModal('field-aggregator')"
         @get-fetch-param="handleGetFetchParams"
         @close="close"
         @success="data => componentSuccess(data)"
-        @getFilterList="list => fieldFilterList = list"
-        @getSortList="list => fieldSortList = list"
       />
 
       <div class="submit_btn">
@@ -458,6 +458,8 @@ export default {
   },
   mounted() {
     this.handleGetDatabaseList()
+    this.handleGetFilterSortList(1)
+    this.handleGetFilterSortList(2)
     if (this.model === 'add') {
       this.handleGetAddModelDatamodel()
     } else if (this.model === 'edit') {
@@ -677,6 +679,26 @@ export default {
     async handleChangeDatabase(value, data) {
       this.handleGetDatabaseTable(data.key)
       this.$store.dispatch('dataModel/setDatabaseId', data.key)
+    },
+    /**
+     * 获取筛选排序字段
+     */
+    async handleGetFilterSortList(ruleType) {
+      const res = await this.$server.dataModel.getFilterOrSortRules({
+        datamodelId: this.model === 'add' ? this.addModelId : this.modelId,
+        ruleType
+      })
+      if (res && res.code === 200) {
+        if (ruleType === 1) {
+          // 筛选
+          this.fieldFilterList = res.data
+        } else if (ruleType === 2) {
+          // 排序
+          this.fieldSortList = res.data
+        }
+      } else {
+        this.$message.error(res.msg || res.message || '获取筛选排序列表失败')
+      }
     },
     // 表上下合并
     handleTableUnion(node) {
@@ -1027,6 +1049,10 @@ export default {
     },
     close(data) {
       this.visible = false
+      if (this.modalName === 'field-filter-sort') {
+        // 保存筛选排序字段
+        this.actionSaveFilterSort()
+      }
     },
     componentSuccess(data) {
       if (this.modalName === 'sql-setting') {
