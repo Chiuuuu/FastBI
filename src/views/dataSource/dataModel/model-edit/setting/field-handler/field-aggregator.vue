@@ -197,7 +197,11 @@ export default {
     // 处理编辑时的数据展示
     handleInitEditData() {
       this.textareaValue = this.renameData.raw_expr
-      const expr = this.renameData.expr || ''
+      let expr = this.renameData.expr || ''
+      if (expr.match(/\((.+?)\)/g)) {
+        const res = expr.match(/\((.+?)\)/g)[0]
+        expr = res.slice(1, -1)
+      }
       const list = [].concat(this.sourceDimensions).concat(this.sourceMeasures)
       const field = list.find(item => item.id === expr.replace('$$', ''))
       this.currentField = field

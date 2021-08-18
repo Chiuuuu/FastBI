@@ -717,7 +717,7 @@ export default {
       // 判断是否处理过表格信息(处理之后的是Array类型), 没有则调接口获取信息并处理
       if (!table || !Array.isArray(table.headerList)) {
         if (!this.sheetList[index]) return
-        const res = await this.$server.dataAccess.getExceflFileTableInfo(this.sheetList[index].id)
+        const res = await this.$server.dataAccess.getExcelFileTableInfo(this.sheetList[index].id)
         if (res.code === 200) {
           if (!this.sheetList[index]) return
           if (!table) {
