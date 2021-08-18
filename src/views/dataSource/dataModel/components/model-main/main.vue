@@ -40,6 +40,12 @@
             <div class="detail_header">
               <span>数据模型详情</span>
               <div class="detail_btn">
+                <a-checkbox
+                  :checked="Boolean(+detailInfo.isDuplicate)"
+                  disabled
+                  style="margin-top:5px"
+                  >数据去重</a-checkbox
+                >
                 <a-button
                   v-on:click="openModal()"
                   :disabled="disableByDetailInfo"

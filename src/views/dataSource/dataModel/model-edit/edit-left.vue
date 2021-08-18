@@ -35,7 +35,7 @@
 </template>
 <script>
 import assign from 'lodash/assign'
-import RenderTableInfo from './setting/renderTableInfo.vue'
+import RenderTableInfo from './setting/render-table-info.vue'
 export default {
   name: 'model-edit-left',
   inject: ['nodeStatus'],
