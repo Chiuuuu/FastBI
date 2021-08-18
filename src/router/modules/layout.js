@@ -16,6 +16,6 @@ export default {
         screenManageRouter,
         ProjectCenterRouter,
         CorporateDomainRouter,
-        // logAdminRouter,
+        logAdminRouter,
     ]
 }

@@ -217,6 +217,7 @@ const app = {
       }
       let params = {
         tabId: obj.tabId,
+        type: name || '文本',
         name: name || '文本',
         screenId: state.screenId,
         datamodelId: obj.datamodelId || 0, // 复制的图表存在模型，先判断有没有模型
@@ -343,8 +344,8 @@ const app = {
       return screenManage.updateChart(params)
     },
     // 获取大屏详情
-    async getScreenDetail({ dispatch, commit }, { id, tabId, needRefresh }) {
-      return screenManage.getScreenDetailById(id, tabId).then(res => {
+    async getScreenDetail({ dispatch, commit }, { id, tabId, needRefresh, key = 'true' }) {
+      return screenManage.getScreenDetailById(id, tabId, key).then(res => {
         if (res.code === 200) {
           this.screenData = res.data
           dispatch('SetFileName', res.data ? res.data.name : '')

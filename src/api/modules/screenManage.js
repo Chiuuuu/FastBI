@@ -166,10 +166,11 @@ const screenManage = {
    * @description 大屏详细信息
    * @param {*} id
    * @param {*} tabId
+   * @param {string} key  / 是否记录日志 false不记录
    * @returns
    */
-  getScreenDetailById(id, tabId) {
-    return $axios.get(`/screen/bigscreen/${id}/${tabId}`)
+  getScreenDetailById(id, tabId, key = 'true') {
+    return $axios.get(`/screen/bigscreen/${id}/${tabId}/${key}`)
     // return $axios.get(`/screen/data/${id}`)
   },
   /**
@@ -213,14 +214,6 @@ const screenManage = {
    */
   getDataLink(params) {
     return $axios.post('/screen/graph/dataLink', params)
-  },
-  /**
-   * @description 请求展示用的图表数据(导出/查看数据)
-   * @param {*} params
-   * @returns
-   */
-  getGraphInfo(params) {
-    return $axios.post('  /screen/graph/graphInfo', params)
   },
   /**
    * @description 根据数据筛选数据列表
@@ -285,11 +278,22 @@ const screenManage = {
   },
 
   /**
-   * 获取图表数据
+   * @description 请求展示用的图表数据(导出/查看数据)
+   * @param {*} params
+   * @returns
    */
   getGraphInfo(params) {
     return $axios.post('/screen/graph/graphInfo', params)
+  },
+  /**
+   * @description 请求展示用的图表数据(导出/查看数据)
+   * @param {*} params
+   * @returns
+   */
+  actionExportScreen(params) {
+    return $axios.post('/v2/screen/bigscreen/exportScreen', params)
   }
+
 }
 
 export default screenManage

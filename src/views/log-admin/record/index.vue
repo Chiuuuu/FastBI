@@ -1,31 +1,34 @@
 <template>
   <a-row :gutter="16" class="screen-manage">
-    <a-col class="gutter-row screen-manage" :span="24">
+    <a-col class="gutter-row" :span="24">
       <div class="main">
         <div class="head">
           <h1>操作记录</h1>
           <div>
-             <a-select
-                v-model="project"
-                style="width: 120px"
-                placeholder="请选择项目"
-              >
-                <a-select-option v-for="item in projectList" :key="item.value">
-                  {{ item.name }}
-                </a-select-option>
-              </a-select>
+            <a-select
+              v-model="projectId"
+              style="width: 120px"
+              placeholder="请选择项目"
+            >
+              <a-select-option value="">
+                所有项目
+              </a-select-option>
+              <a-select-option v-for="item in projectList" :key="item.projectId" :value="item.projectId">{{
+                item.projectName
+              }}</a-select-option>
+            </a-select>
           </div>
         </div>
         <div class="right">
-          <a-tabs class="tabs" @change="handleChangeModule">
+          <a-tabs class="tabs" v-model="tab" @change="handleChangeModule">
             <a-tab-pane key="1" tab="数据接入">
-              <recordMain ref="tab1" type="1"></recordMain>
+              <recordMain ref="manage1" :type="1" :projectId="projectId"></recordMain>
             </a-tab-pane>
             <a-tab-pane key="2" tab="数据建模">
-              <recordMain ref="tab2" type="2"></recordMain>
+              <recordMain ref="manage2" :type="2" :projectId="projectId"></recordMain>
             </a-tab-pane>
             <a-tab-pane key="3" tab="数据大屏">
-              <recordMain ref="tab3" type="3"></recordMain>
+              <recordMain ref="manage3" :type="3" :projectId="projectId"></recordMain>
             </a-tab-pane>
           </a-tabs>
         </div>
@@ -35,41 +38,53 @@
 </template>
 <script>
 import recordMain from './components/record-main/record-main.vue'
-
+import { mapState } from 'vuex'
 export default {
   name: 'record',
   components: {
-    recordMain,
+    recordMain
   },
-  data(){
-    return{
-      project:'',
-      projectList:[
-        {value:'',name:'所有项目'},
-        {value:'11',name:'项目1'},
-        {value:'22',name:'项目2'},
-        {value:'33',name:'项目4'},
-        {value:'44',name:'项目5'},
-      ],
+  data() {
+    return {
+      projectId: '',
+      tab: '1',
+      projectList: []
     }
   },
-  watch:{
-    project(newVal,oldVal){
-
+  // computed: {
+  //   ...mapState({
+  //     projectList: state => state.user.projectList
+  //   })
+  // },
+  watch: {
+    projectId(val) {
+      const tab = this.$refs[`manage${this.tab}`]
+      if (tab) {
+        tab.handleProjectIdChange(val)
+      }
     }
+  },
+  created() {
+    this.getOperaLogProjectList()
   },
   methods: {
     handleChangeModule(key) {
-      const tab = this.$refs[`${key}Manage`]
+      const tab = this.$refs[`manage${key}`]
       if (tab) {
-        tab.getList()
+        tab.getList({ current: 1, projectId: this.projectId })
       }
     },
-    
+    async getOperaLogProjectList() {
+      let res = await this.$server.logAdmin.getOperaLogProjectList()
+      if (res.code !== 200) {
+        this.$message.error(res.msg || '项目列表获取不了')
+        return
+      }
+      this.projectList = res.data
+    }
   }
 }
 </script>
 <style lang="less" scoped>
-@import "../main.less";
+@import '../main.less';
 </style>
-

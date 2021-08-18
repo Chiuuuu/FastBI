@@ -10,6 +10,7 @@ export default {
   meta: {
     title: '日志管理',
     icon: 'cloud',
+    permissions: [PERMISSION_CODE.PAGE.logAdmin]
   },
   children: [
     {
@@ -18,7 +19,8 @@ export default {
       component: recordView,
       meta: {
         title: '操作记录',
+        permissions: [PERMISSION_CODE.PAGE.logAdmin]
       }
-    },
+    }
   ]
 }
