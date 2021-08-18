@@ -8,6 +8,8 @@
             <a-select
               v-model="projectId"
               style="width: 120px"
+              show-search
+              :filter-option="filterOption"
               placeholder="请选择项目"
             >
               <a-select-option value="">
@@ -68,12 +70,14 @@ export default {
     this.getOperaLogProjectList()
   },
   methods: {
+    // tab改变
     handleChangeModule(key) {
       const tab = this.$refs[`manage${key}`]
       if (tab) {
         tab.getList({ current: 1, projectId: this.projectId })
       }
     },
+    // 获取项目列表
     async getOperaLogProjectList() {
       let res = await this.$server.logAdmin.getOperaLogProjectList()
       if (res.code !== 200) {
@@ -81,6 +85,12 @@ export default {
         return
       }
       this.projectList = res.data
+    },
+    // 项目搜索
+    filterOption(input, option) {
+      return (
+        option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
+      )
     }
   }
 }
