@@ -143,6 +143,8 @@ export default {
       tablesEmpty: false, // 是否表为空
       dimensions: [], // 维度
       measures: [], // 度量
+      cacheDimensions: [],
+      cacheMeasures: [],
       renderTables: [], // 用来渲染树组件
       dimensionsActiveKey: [],
       measuresActiveKey: [],
@@ -177,9 +179,27 @@ export default {
      */
     handleConcat() {
       return {
-        dimensions: this.detailInfo.pivotSchema.dimensions,
-        measures: this.detailInfo.pivotSchema.measures
+        dimensions: [
+          ...this.cacheDimensions,
+          ...this.detailInfo.pivotSchema.dimensions
+        ],
+        measures: [
+          ...this.cacheMeasures,
+          ...this.detailInfo.pivotSchema.measures
+        ]
       }
+    },
+    handlePeelCustom(list, cache) {
+      if (list && list.length) {
+        return list.filter(item => {
+          if (item.tableNo === 0) {
+            cache.push(item)
+          } else {
+            return item
+          }
+        })
+      }
+      return list
     },
     /**
      * 获取数据
@@ -209,6 +229,15 @@ export default {
         this.$store.commit(
           'common/SET_PRIVILEGES',
           result.data.privileges || []
+        )
+        // 将自定义维度度量剥离处理
+        this.detailInfo.pivotSchema.dimensions = this.handlePeelCustom(
+          this.detailInfo.pivotSchema.dimensions,
+          this.cacheDimensions
+        )
+        this.detailInfo.pivotSchema.measures = this.handlePeelCustom(
+          this.detailInfo.pivotSchema.measures,
+          this.cacheMeasures
         )
         this.handleDetailWithRoot()
         this.handleDimensions()
