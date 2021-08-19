@@ -489,9 +489,9 @@ export default {
       }
 
       // 校验大小
-      if (isValid && file.size > 3 * 1024 * 1024) {
+      if (isValid && file.size > 30 * 1024 * 1024) {
         isValid = false
-        this.$message.error('文件大于3M, 无法上传')
+        this.$message.error('文件大于30M, 无法上传')
       }
 
       // 校验命名规则(中英数字下划线)
@@ -663,10 +663,6 @@ export default {
           })
       }
       if (result.code === 200) {
-        if (result.data && result.data.headerList.length === 0) {
-          this.spinning = false
-          return this.$message.error('解析失败')
-        }
         this.$message.success('替换成功')
         this.$store.dispatch('dataAccess/setFirstFinished', false)
 
@@ -717,7 +713,11 @@ export default {
       // 判断是否处理过表格信息(处理之后的是Array类型), 没有则调接口获取信息并处理
       if (!table || !Array.isArray(table.headerList)) {
         if (!this.sheetList[index]) return
+        this.spinning = true
         const res = await this.$server.dataAccess.getExcelFileTableInfo(this.sheetList[index].id)
+          .finally(() => {
+            this.spinning = false
+          })
         if (res.code === 200) {
           if (!this.sheetList[index]) return
           if (!table) {

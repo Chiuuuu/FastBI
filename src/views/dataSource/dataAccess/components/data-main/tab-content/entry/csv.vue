@@ -292,7 +292,8 @@ export default {
         })
       if (res.code === 200) {
         table.rows = res.data.rows
-        table.head = data.head
+        table.headerList = data.head
+        this.renderCurrentTable()
       } else {
         this.$message.error(res.msg || '请求错误')
       }
@@ -625,12 +626,16 @@ export default {
         } else {
           formData.append('databaseId', id)
           formData.append('delimiter', this.queryDelimiter)
-          res = await this.$server.dataAccess.getCsvFileTableInfo(formData)
+          this.spinning = true
+          res = await this.$server.dataAccess.getCsvFileTableInfo(id)
+          .finally(() => {
+            this.spinning = false
+          })
         }
         if (res.code === 200) {
           table = res.data
           table.headerList = res.data.headerList.map(item => ({
-            name: item.name,
+            name: item,
             dataType: ''
           }))
           table.originRows = table.rows

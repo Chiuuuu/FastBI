@@ -216,19 +216,6 @@ export default {
             timeout: 600000
         })
     },
-    // /**
-    // * @description 切换csv表头数据类型
-    // * @param {Object} data 参数
-    // */
-    // actionChangeCsvType(data) {
-    //     return $axios({
-    //         method: 'post',
-    //         headers: { 'Content-Type': 'multipart/form-data' },
-    //         url: '/datasource/csv/convert/read',
-    //         data,
-    //         timeout: 600000
-    //     })
-    // },
     /**
      * @description 读取数据源的文件列表
      * @param {string} id 请求参数
@@ -279,14 +266,14 @@ export default {
      * @param {String} data.tableId 表id
      * @param {String} data.delimiter 分隔符
      */
-    getCsvFileTableInfo(data) {
-        // return $axios.get('/datasource/csv/presto/read?tableId=' + tableId)
-        return $axios({
-            method: 'post',
-            headers: { 'Content-Type': 'multipart/form-data' },
-            url: '/datasource/csv/read',
-            data
-        })
+    getCsvFileTableInfo(databaseId) {
+        return $axios.get(`/datasource/csv/presto/read/${databaseId}`)
+        // return $axios({
+        //     method: 'post',
+        //     headers: { 'Content-Type': 'multipart/form-data' },
+        //     url: '/datasource/csv/read',
+        //     data
+        // })
     },
     /**
      * @description 保存csv数据源
