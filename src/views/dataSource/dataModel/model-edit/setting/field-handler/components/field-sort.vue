@@ -6,14 +6,13 @@
         <a-button
           type="primary"
           icon="plus"
-          :disabled="rows.length >= 5"
+          :disabled="tableList.length >= 5"
           @click="showModal"
         ></a-button>
       </a-col>
     </a-row>
     <a-table
       :columns="columns"
-      :pagination="false"
       :data-source="tableList"
       :scroll="tableScroll"
       rowKey="field">
@@ -87,13 +86,13 @@ export default {
     },
     // 插入新的排序字段
     handleInsertField(nodes) {
+      if (this.tableList.length >= 5) return this.$message.error('最多支持5个排序字段')
       const data = nodes[0]
       const insertData = {
         pivotschemaId: data.id,
         datamodelId: data.datamodelId,
         modelTableId: data.modelTableId,
         convertType: data.convertType || data.dataType,
-        field: data.alias,
         rule: { condition: 'asc' },
         ruleType: 2,
         modeType: 0,
@@ -102,7 +101,6 @@ export default {
       }
       this.showFieldModal = false
       this.$emit('insert', insertData)
-      console.log(this.tableList)
     },
     handleEditRows(index, type) {
       this.$emit('edit', index, type)

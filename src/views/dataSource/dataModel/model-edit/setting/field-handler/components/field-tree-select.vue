@@ -22,6 +22,7 @@
     <div class="group-tree-area">
       <div class="group-tree-block" style="margin-right: 5px">
         <SelectTree
+          ref="dimension"
           checkAllText="所有维度"
           :keyword="keyword"
           :checkable="checkable"
@@ -30,6 +31,7 @@
       </div>
       <div class="group-tree-block" style="margin-left: 5px">
         <SelectTree
+          ref="measure"
           checkAllText="所有度量"
           :keyword="keyword"
           :checkable="checkable"
@@ -81,6 +83,34 @@ export default {
     resetTree() {
       Object.assign(this.$data, this.$options.data())
     },
+    // 编辑时设置已勾选
+    setTree(checkedAlias) {
+      if (!this.$refs.dimension) {
+        return this.$nextTick(() => {
+          this.setTree(checkedAlias)
+        })
+      }
+      const checkedDimensions = []
+      const checkedMeasures = []
+      checkedAlias.forEach(item => {
+        for (let i = 0; i < this.dimensions.length; i++) {
+          const dimension = this.dimensions[i]
+          if (dimension.alias === item) {
+            checkedDimensions.push(dimension)
+            return
+          }
+        }
+        for (let i = 0; i < this.measures.length; i++) {
+          const measure = this.measures[i]
+          if (measure.alias === item) {
+            checkedMeasures.push(measure)
+            return
+          }
+        }
+      })
+      this.$refs.dimension.checkedNodes = checkedDimensions
+      this.$refs.measure.checkedNodes = checkedMeasures
+    },
     onSearch(val) {
       this.keyword = this.searchWord
     },
@@ -123,6 +153,7 @@ export default {
 
   .group-tree-block {
     flex: 1;
+    overflow: hidden;
     border: 1px solid #d9d9d9;
   }
 }

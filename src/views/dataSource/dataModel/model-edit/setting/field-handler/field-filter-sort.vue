@@ -4,7 +4,9 @@
     title="筛选排序"
     :visible="isShow"
     :bodyStyle="bodyStyle"
-    :footer="null"
+    :maskClosable="false"
+    :keyboard="false"
+    @ok="handleOk"
     @cancel="handleClose"
   >
     <a-tabs default-active-key="1" @change="changeTab">
@@ -13,10 +15,10 @@
           ref="tab1"
           :dimensions="sourceDimensions"
           :measures="sourceMeasures"
-          :table-list="filterList"
-          @insert="item => filterList.push(item)"
-          @delete="index => filterList.splice(index, 1)"
-          @edit="(data, index) => filterList.splice(index, 1, data)"
+          :table-list="filterListBackup"
+          @insert="item => filterListBackup.push(item)"
+          @delete="index => filterListBackup.splice(index, 1)"
+          @edit="(data, index) => filterListBackup.splice(index, 1, data)"
         />
       </a-tab-pane>
       <a-tab-pane key="2" tab="排序">
@@ -24,9 +26,9 @@
           ref="tab2"
           :dimensions="sourceDimensions"
           :measures="sourceMeasures"
-          :table-list="sortList"
-          @insert="item => sortList.push(item)"
-          @delete="index => sortList.splice(index, 1)"
+          :table-list="sortListBackup"
+          @insert="item => sortListBackup.push(item)"
+          @delete="index => sortListBackup.splice(index, 1)"
           @edit="handleEditSortList"
         />
       </a-tab-pane>
@@ -39,6 +41,7 @@ import { mapState } from 'vuex'
 import { mixinModal } from './mixins'
 import FieldFilter from './components/field-filter.vue'
 import FieldSort from './components/field-sort.vue'
+import cloneDeep from 'lodash/cloneDeep'
 export default {
   name: 'fieldFilterSort',
   mixins: [mixinModal],
@@ -60,6 +63,13 @@ export default {
       }
     }
   },
+  data() {
+    return {
+      // 深拷贝对象, 因为有确定和取消, 确定时才最终确定列表
+      filterListBackup: [],
+      sortListBackup: []
+    }
+  },
   computed: {
     ...mapState({
       modelId: state => state.dataModel.modelId, // 选中的菜单id
@@ -67,6 +77,14 @@ export default {
     }),
     model() {
       return this.$route.query.type
+    }
+  },
+  watch: {
+    isShow(val) {
+      if (val) {
+        this.filterListBackup = cloneDeep(this.filterList)
+        this.sortListBackup = cloneDeep(this.sortList)
+      }
     }
   },
   methods: {
@@ -78,10 +96,10 @@ export default {
       if (res && res.code === 200) {
         if (ruleType === 1) {
           // 筛选
-          this.filterList = res.data
+          this.filterListBackup = res.data
         } else if (ruleType === 2) {
           // 排序
-          this.sortList = res.data
+          this.sortListBackup = res.data
         }
       } else {
         this.$message.error(res.msg || res.message || '获取筛选排序列表失败')
@@ -92,23 +110,28 @@ export default {
       ref && ref.handleTreeData()
     },
     handleClose() {
-      // 关闭窗口时, 传递筛选排序的字段
-      // this.$emit('getFilterList', this.filterList)
-      // this.$emit('getSortList', this.sortList)
+      this.$emit('close')
+    },
+    handleOk() {
+      // 确定时, 传递筛选排序的字段
+      this.$emit('handleSaveFilterSort', {
+        fieldFilterList: this.filterListBackup,
+        fieldSortList: this.sortListBackup
+      })
       this.$emit('close')
     },
     // 处理排序顺序
     handleEditSortList(index, type) {
       if (type === 'up') {
-        this.sortList[index - 1].displayOrder++
-        const record = this.sortList.splice(index, 1)[0]
+        this.sortListBackup[index - 1].displayOrder++
+        const record = this.sortListBackup.splice(index, 1)[0]
         record.displayOrder--
-        this.sortList.splice(index - 1, 0, record)
+        this.sortListBackup.splice(index - 1, 0, record)
       } else if (type === 'down') {
-        this.sortList[index + 1].displayOrder--
-        const record = this.sortList.splice(index, 1)[0]
+        this.sortListBackup[index + 1].displayOrder--
+        const record = this.sortListBackup.splice(index, 1)[0]
         record.displayOrder++
-        this.sortList.splice(index + 1, 0, record)
+        this.sortListBackup.splice(index + 1, 0, record)
       }
     }
   }

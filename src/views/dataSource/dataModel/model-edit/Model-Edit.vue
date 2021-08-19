@@ -281,6 +281,7 @@
         @get-fetch-param="handleGetFetchParams"
         @close="close"
         @success="data => componentSuccess(data)"
+        @handleSaveFilterSort="handleSaveFilterSort"
       />
 
       <div class="submit_btn">
@@ -1049,8 +1050,13 @@ export default {
     },
     close(data) {
       this.visible = false
+    },
+    // 确认筛选排序后, 先保存, 不然查看宽表拿不到条件
+    handleSaveFilterSort({ fieldFilterList, fieldSortList }) {
       if (this.modalName === 'field-filter-sort') {
         // 保存筛选排序字段
+        this.fieldFilterList = fieldFilterList
+        this.fieldSortList = fieldSortList
         this.actionSaveFilterSort()
       }
     },

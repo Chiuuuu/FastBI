@@ -147,10 +147,18 @@ export default {
           { validator: this.validateName, trigger: ['change', 'blur'] }
         ],
         field: [
-          { required: true, message: '请选择聚合字段', trigger: ['change', 'blur'] }
+          {
+            required: true,
+            message: '请选择聚合字段',
+            trigger: ['change', 'blur']
+          }
         ],
         defaultAggregator: [
-          { required: true, message: '请选择聚合方式', trigger: ['change', 'blur'] }
+          {
+            required: true,
+            message: '请选择聚合方式',
+            trigger: ['change', 'blur']
+          }
         ]
       },
       searchWord: '',
@@ -159,7 +167,8 @@ export default {
       currentField: null, // 当前选中的字段对象
       currentAggregator: null, // 当前选中的聚合方式对象
       checkedFieldList: [], // 用于记录当前选中的维度和度量
-      textareaValue: ''
+      textareaValue: '',
+      raw_expr: {} // json文本, 传给后台记录选的字段和树结构的选项
     }
   },
   watch: {
@@ -182,13 +191,24 @@ export default {
   },
   computed: {
     fieldList() {
-      const list = [].concat(this.sourceDimensions).concat(this.sourceMeasures).filter(item => item.produceType === 0)
-      return list.filter(item => item.alias.toLowerCase().indexOf(this.searchWord.toLowerCase()) > -1)
+      const list = []
+        .concat(this.sourceDimensions)
+        .concat(this.sourceMeasures)
+        .filter(item => item.produceType === 0 && item.visible)
+      return list.filter(
+        item =>
+          item.alias.toLowerCase().indexOf(this.searchWord.toLowerCase()) > -1
+      )
     },
     aggregatorList() {
-      if (this.currentField && this.isNumber(this.currentField.convertType || this.currentField.dataType)) {
+      if (
+        this.currentField &&
+        this.isNumber(
+          this.currentField.convertType || this.currentField.dataType
+        )
+      ) {
         return this.AGGREGATOR_LIST
-        } else {
+      } else {
         return this.AGGREGATOR_LIST.slice(-2)
       }
     }
@@ -196,7 +216,7 @@ export default {
   methods: {
     // 处理编辑时的数据展示
     handleInitEditData() {
-      this.textareaValue = this.renameData.raw_expr
+      // this.textareaValue = this.renameData.raw_expr
       let expr = this.renameData.expr || ''
       if (expr.match(/\((.+?)\)/g)) {
         const res = expr.match(/\((.+?)\)/g)[0]
@@ -206,7 +226,9 @@ export default {
       const field = list.find(item => item.id === expr.replace('$$', ''))
       this.currentField = field
 
-      const defaultAggregator = this.aggregatorList.find(item => item.value === this.renameData.defaultAggregator)
+      const defaultAggregator = this.aggregatorList.find(
+        item => item.value === this.renameData.defaultAggregator
+      )
       this.currentAggregator = defaultAggregator
 
       this.form = Object.assign(this.form, {
@@ -214,6 +236,15 @@ export default {
         field: field ? field.alias : '',
         defaultAggregator: defaultAggregator ? defaultAggregator.name : ''
       })
+      if (this.renameData.raw_expr) {
+        this.$nextTick(() => {
+          const checkedList = JSON.parse(this.renameData.raw_expr).checkedList
+          if (checkedList) {
+            this.$refs.fieldSelectTree &&
+              this.$refs.fieldSelectTree.setTree(checkedList.split(','))
+          }
+        })
+      }
     },
     handleClose() {
       this.textareaValue = ''
@@ -264,14 +295,20 @@ export default {
       // 选择了字段
       if (this.currentField) {
         text = `【${this.currentField.alias}】`
+        this.raw_expr.field = this.currentField.alias
       }
       // 选择了聚合方式
       if (this.currentAggregator) {
         text += this.currentAggregator.name
+        this.raw_expr.aggregator = this.currentAggregator.name
       }
       // 勾选了树节点
       if (this.checkedFieldList.length > 0) {
-        this.textareaValue = this.checkedFieldList.map(item => `同一【${item.alias}】`).join('') + '中的' + text
+        this.textareaValue =
+          this.checkedFieldList.map(item => `同一【${item.alias}】`).join('') +
+          '中的' +
+          text
+        this.raw_expr.checkedList = this.checkedFieldList.map(item => item.alias).toString()
       } else {
         this.textareaValue = text
       }
@@ -286,29 +323,39 @@ export default {
       const pairList = [...this.sourceDimensions, ...this.sourceMeasures]
       let str = ''
       const field = this.form.field
-      const aggregator = this.aggregatorList.find(item => item.name === this.form.defaultAggregator)
-      const item = pairList.filter(item => {
-        return item.alias === field
-      }).pop()
+      const aggregator = this.aggregatorList.find(
+        item => item.name === this.form.defaultAggregator
+      )
+      const item = pairList
+        .filter(item => {
+          return item.alias === field
+        })
+        .pop()
       if (item && aggregator) {
         str = `${aggregator.value}($$${item.id})`
       }
       return str
     },
     handleSave() {
-      this.$refs.form.validate(async (ok) => {
+      this.$refs.form.validate(async ok => {
         if (ok) {
           const params = {
             name: this.form.name,
-            datamodelId: this.$parent.model === 'add' ? this.$parent.addModelId : this.$parent.modelId,
+            datamodelId:
+              this.$parent.model === 'add'
+                ? this.$parent.addModelId
+                : this.$parent.modelId,
             role: this.computeType === '维度' ? 1 : 2,
-            raw_expr: this.textareaValue,
+            // raw_expr: this.textareaValue,
+            raw_expr: JSON.stringify(this.raw_expr),
             groupByFunc: '',
             isGroupFlag: 1,
             expr: this.reverse()
           }
           if (this.checkedFieldList.length > 0) {
-            params.groupByFunc = `group by (${this.checkedFieldList.map(item => `[${item.alias}]`).toString()})`
+            params.groupByFunc = `group by (${this.checkedFieldList
+              .map(item => `[${item.alias}]`)
+              .toString()})`
             params.isGroupFlag = 2
           }
           if (this.isEdit) {
@@ -318,9 +365,11 @@ export default {
             this.$emit('success', updateData)
           } else {
             this.confirmLoading = true
-            const result = await this.$server.dataModel.addCustomizModelPivotschema(params).finally(() => {
-              this.confirmLoading = false
-            })
+            const result = await this.$server.dataModel
+              .addCustomizModelPivotschema(params)
+              .finally(() => {
+                this.confirmLoading = false
+              })
 
             if (result && result.code === 200) {
               const data = result.data

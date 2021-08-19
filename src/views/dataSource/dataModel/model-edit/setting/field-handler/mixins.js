@@ -55,12 +55,7 @@ const mixinTable = {
     return {
       showFieldModal: false,
       rows: [],
-      pagination: {
-        current: 1,
-        pageSize: 10,
-        total: 0
-      },
-      tableScroll: { y: 'calc(100vh - 350px)', x: 790 },
+      tableScroll: { y: 'calc(100vh - 610px)', x: 790 },
       treeDimensions: [],
       treeMeasures: []
     }

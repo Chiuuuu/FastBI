@@ -12,7 +12,6 @@
     </a-row>
     <a-table
       :columns="columns"
-      :pagination="pagination"
       :data-source="tableList"
       :scroll="tableScroll"
       rowKey="field">
@@ -113,12 +112,15 @@ export default {
       if (!Array.isArray(record.rule.ruleFilterList)) return ''
       let len = record.rule.ruleFilterList.length || 0
       let isInclude = ''
-      if (record.rule.isInclude === 1) {
+      if (record.isInclude === 1) {
         isInclude = '排除'
-      } else {
+      } else if (record.isInclude === 2) {
         isInclude = '只显示'
       }
-      if (+record.modeType === 0) {
+      const isNumber = this.NUMBER_LIST.includes(
+        record.convertType || record.dataType
+      )
+      if (isNumber) {
         // 数值类型
         if (len === 0) {
           return '无'
@@ -171,7 +173,8 @@ export default {
         datamodelId: data.datamodelId,
         modelTableId: data.modelTableId,
         convertType: data.convertType || data.dataType,
-        field: data.alias,
+        field: data.name,
+        alias: data.alias,
         rule: { ruleFilterList: [] },
         ruleType: 1,
         modeType: +(!isNumber),
