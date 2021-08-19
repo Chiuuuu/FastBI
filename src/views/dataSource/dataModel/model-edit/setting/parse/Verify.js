@@ -22,7 +22,7 @@ export class Verify {
         return expr
       case 'alias': {
         // TODO: 暂时不支持日期，先屏蔽
-        if (expr && expr.value && (expr.value.dataType === 'DATE' || expr.value.dataType === 'TIMESTAMP')) {
+        if (expr && expr.value && (expr.value.convertType === 'DATE' || expr.value.convertType === 'TIMESTAMP')) {
           throw new Error(`暂不支持日期类型`)
         }
         return expr
@@ -183,7 +183,7 @@ export class Verify {
       throw Error(`等式左边表达式结果必须为数字类型`)
     }
     if (left.type === 'alias') {
-      const type = left.value.dataType
+      const type = left.value.convertType
       if (type !== 'BIGINT' && type !== 'DOUBLE' && type !== 'DECIMAL') {
         throw Error(`等式左边表达式结果必须为数字类型`)
       }
@@ -193,7 +193,7 @@ export class Verify {
       throw Error(`等式右边表达式结果必须为数字类型`)
     }
     if (right.type === 'alias') {
-      const type = right.value.dataType
+      const type = right.value.convertType
       if (type !== 'BIGINT' && type !== 'DOUBLE' && type !== 'DECIMAL') {
         throw Error(`等式右边表达式结果必须为数字类型`)
       }
@@ -220,7 +220,7 @@ export class Verify {
      * @returns
      */
     function isInteger(item) {
-      return item.dataType === 'BIGINT'
+      return item.convertType === 'BIGINT'
     }
 
     /**
@@ -229,7 +229,7 @@ export class Verify {
      * @returns
      */
     function isDecimal(item) {
-      return item.dataType === 'DECIMAL'
+      return item.convertType === 'DECIMAL'
     }
 
         /**
@@ -238,7 +238,7 @@ export class Verify {
      * @returns
      */
     function isString(item) {
-      return item.dataType === 'VARCHAR'
+      return item.convertType === 'VARCHAR'
     }
 
     /**
@@ -291,32 +291,32 @@ export class Verify {
     /**
      * @description 是否为黑名单，不支持类型
      * @param {Object} item
-     * @param {Object} item.dataType 类型
+     * @param {Object} item.convertType 类型
      * @returns
      */
     function isBlackList(item, operator = '+') {
       const list = ['TIMESTAMP', 'DATE']
       if (operator === '+') {
-        return list.includes(item.dataType)
+        return list.includes(item.convertType)
       } else {
         list.push('VARCHAR')
-        return list.includes(item.dataType)
+        return list.includes(item.convertType)
       }
     }
 
     /**
      * @description 是否为白名单，支持类型
      * @param {Object} item
-     * @param {Object} item.dataType 类型
+     * @param {Object} item.convertType 类型
      * @returns
      */
     function isWhiteList(item, operator = '+') {
       const list = ['VARCHAR', 'DOUBLE', 'BIGINT', 'DECIMAL']
       if (operator === '+') {
-        return list.includes(item.dataType)
+        return list.includes(item.convertType)
       } else {
         list.shift()
-        return list.includes(item.dataType)
+        return list.includes(item.convertType)
       }
     }
 
@@ -356,16 +356,16 @@ export class Verify {
             throw new Error(`暂不支持日期类型`)
           } else if (isWhiteList(left.value)) {
             // 能识别的
-            if (left.value.dataType === right.value.dataType) {
+            if (left.value.convertType === right.value.convertType) {
               // 返回转换后的类型
               return {
-                type: reverseType(left.value.dataType),
+                type: reverseType(left.value.convertType),
                 value: true
               }
             } else {
               // 如果类型不一样
               if ((isString(left.value) && !isString(right.value)) || (!isString(left.value) && isString(right.value))) {
-                throw new Error(`${reverseCNType(left.value.dataType)}不能跟${reverseCNType(right.value.dataType)}相加`)
+                throw new Error(`${reverseCNType(left.value.convertType)}不能跟${reverseCNType(right.value.convertType)}相加`)
               } else {
                 return {
                   type: 'float',
@@ -386,7 +386,7 @@ export class Verify {
             throw new Error(`暂不支持日期类型`)
           } else if (isWhiteList(left.value)) {
             if ((isString(left.value) && rightType !== 'string') || (!isString(left.value) && rightType === 'string')) {
-              throw new Error(`${reverseCNType(left.value.dataType)}不能跟${reverseCNType(rightType)}相加`)
+              throw new Error(`${reverseCNType(left.value.convertType)}不能跟${reverseCNType(rightType)}相加`)
             } else if (isInteger(left.value) && rightType === 'integer') {
               return {
                 type: 'integer',
@@ -413,7 +413,7 @@ export class Verify {
             throw new Error(`暂不支持日期类型`)
           } else if (isWhiteList(right.value)) {
             if ((leftType === 'string' && !isString(right.value)) || (leftType !== 'string' && isString(right.value))) {
-              throw new Error(`${reverseCNType(leftType)}不能跟${reverseCNType(right.value.dataType)}相加`)
+              throw new Error(`${reverseCNType(leftType)}不能跟${reverseCNType(right.value.convertType)}相加`)
             } else if (leftType === 'integer' && isInteger(right.value)) {
               return {
                 type: 'integer',
@@ -479,13 +479,13 @@ export class Verify {
         if (leftType === rightType && leftType === 'alias') {
           if (isBlackList(left.value, '-') || isBlackList(right.value, '-')) {
             // 不支持的类型
-            throw new Error(`不支持${reverseCNType(isBlackList(left.value, '-') ? left.value.dataType : right.value.dataType)}类型`)
+            throw new Error(`不支持${reverseCNType(isBlackList(left.value, '-') ? left.value.convertType : right.value.convertType)}类型`)
           } else if (isWhiteList(left.value, '-')) {
             // 能识别的
-            if (left.value.dataType === right.value.dataType) {
+            if (left.value.convertType === right.value.convertType) {
               // 返回转换后的类型
               return {
-                type: reverseType(left.value.dataType),
+                type: reverseType(left.value.convertType),
                 value: true
               }
             } else {
@@ -505,7 +505,7 @@ export class Verify {
           // 如果left是别名，而right不是
           if (isBlackList(left.value, '-')) {
             // 不支持的类型
-            throw new Error(`不支持${reverseCNType(left.value.dataType)}类型`)
+            throw new Error(`不支持${reverseCNType(left.value.convertType)}类型`)
           } else if (isWhiteList(left.value, '-')) {
             if (isInteger(left.value) && rightType === 'integer') {
               return {
@@ -530,7 +530,7 @@ export class Verify {
         } else if (isOriginalWhiteList(leftType, '-') && rightType === 'alias') {
           if (isBlackList(right.value, '-')) {
             // 不支持的类型
-            throw new Error(`不支持${reverseCNType(right.value.dataType)}类型`)
+            throw new Error(`不支持${reverseCNType(right.value.convertType)}类型`)
           } else if (isWhiteList(right.value, '-')) {
             if (leftType === 'integer' && isInteger(right.value)) {
               return {
@@ -597,13 +597,13 @@ export class Verify {
         if (leftType === rightType && leftType === 'alias') {
           if (isBlackList(left.value, '/') || isBlackList(right.value, '/')) {
             // 不支持的类型
-            throw new Error(`不支持${reverseCNType(isBlackList(left.value, '/') ? left.value.dataType : right.value.dataType)}类型`)
+            throw new Error(`不支持${reverseCNType(isBlackList(left.value, '/') ? left.value.convertType : right.value.convertType)}类型`)
           } else if (isWhiteList(left.value, '/')) {
             // 能识别的
-            if (left.value.dataType === right.value.dataType) {
+            if (left.value.convertType === right.value.convertType) {
               // 返回转换后的类型
               return {
-                type: reverseType(left.value.dataType),
+                type: reverseType(left.value.convertType),
                 value: true
               }
             } else {
@@ -623,7 +623,7 @@ export class Verify {
           // 如果left是别名，而right不是
           if (isBlackList(left.value, '/')) {
             // 不支持的类型
-            throw new Error(`不支持${reverseCNType(left.value.dataType)}类型`)
+            throw new Error(`不支持${reverseCNType(left.value.convertType)}类型`)
           } else if (isWhiteList(left.value, '/')) {
             if (isInteger(left.value) && rightType === 'integer') {
               return {
@@ -648,7 +648,7 @@ export class Verify {
         } else if (isOriginalWhiteList(leftType, '/') && rightType === 'alias') {
           if (isBlackList(right.value, '/')) {
             // 不支持的类型
-            throw new Error(`不支持${reverseCNType(right.value.dataType)}类型`)
+            throw new Error(`不支持${reverseCNType(right.value.convertType)}类型`)
           } else if (isWhiteList(right.value, '/')) {
             if (leftType === 'integer' && isInteger(right.value)) {
               return {
@@ -708,14 +708,14 @@ export class Verify {
           throw new Error(`等式判断两边仅支持数字类型`)
         } else {
           if (rightType === 'alias') {
-            if (!numberList.includes(right.value.dataType)) {
+            if (!numberList.includes(right.value.convertType)) {
               throw new Error(`等式判断两边仅支持数字类型`)
             } else if (right.value.role !== 2) {
               throw new Error(`逻辑判断暂不支持维度字段`)
             }
             return left
           } else if (leftType === 'alias') {
-            if (!numberList.includes(left.value.dataType)) {
+            if (!numberList.includes(left.value.convertType)) {
               throw new Error(`等式判断两边仅支持数字类型`)
             } else if (left.value.role !== 2) {
               throw new Error(`逻辑判断暂不支持维度字段`)
