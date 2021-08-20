@@ -220,7 +220,11 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
+@deep: ~'>>>';
+@{deep} .ant-table-body {
+  min-height: 100px;
+}
 .icon-size {
   font-size: 20px;
   cursor: pointer;

@@ -457,17 +457,17 @@ export default {
       return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.edit)
     }
   },
-  mounted() {
+  async mounted() {
     this.handleGetDatabaseList()
-    this.handleGetFilterSortList(1)
-    this.handleGetFilterSortList(2)
     if (this.model === 'add') {
-      this.handleGetAddModelDatamodel()
+      await this.handleGetAddModelDatamodel()
     } else if (this.model === 'edit') {
-      this.handleGetData(this.$route.query.modelId)
+      await this.handleGetData(this.$route.query.modelId)
       this.$store.dispatch('dataModel/setModelId', this.$route.query.modelId)
       this.$store.commit('common/SET_MENUSELECTID', this.$route.query.modelId)
     }
+    this.handleGetFilterSortList(1)
+    this.handleGetFilterSortList(2)
     this.$EventBus.$on('tableUnion', this.handleTableUnion)
   },
   beforeDestroy() {
@@ -686,7 +686,7 @@ export default {
      */
     async handleGetFilterSortList(ruleType) {
       const res = await this.$server.dataModel.getFilterOrSortRules({
-        datamodelId: this.model === 'add' ? this.addModelId : this.modelId,
+        datamodelId: this.model === 'add' ? this.addModelId : this.$route.query.modelId,
         ruleType
       })
       if (res && res.code === 200) {
@@ -1006,8 +1006,10 @@ export default {
       this.$refs.rightTopRef.handleMapRemoveClass()
     },
     openModal(modalName, computeType) {
-      this.visible = true
       this.modalName = modalName
+      this.$nextTick(() => {
+        this.visible = true
+      })
       if (computeType) this.computeType = computeType
     },
     handleAddSQL(type, item) {

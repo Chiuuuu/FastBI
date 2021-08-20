@@ -55,7 +55,7 @@ const mixinTable = {
     return {
       showFieldModal: false,
       rows: [],
-      tableScroll: { y: 'calc(100vh - 610px)', x: 790 },
+      tableScroll: { y: 'calc(100vh - 610px)', x: 700 },
       treeDimensions: [],
       treeMeasures: []
     }
