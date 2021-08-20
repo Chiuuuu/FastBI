@@ -277,22 +277,36 @@ export default {
     // 切换表头数据类型
     async changeDataType() {
       this.spinning = true
-      const table = this.databaseList[this.currentFileIndex]
-      const rows = table.originRows
-      const data = {
-        head: this.currentColumns.slice(1).map(item => ({
-          name: item.title,
-          dataType: item.dataType
-        })),
-        rows
+      // 找到该文件对象
+      let name = this.fileInfoList[this.currentFileIndex].name
+      let file = {}
+      for (let i = 0; i < this.fileList.length; i++) {
+        const item = this.fileList[i]
+        let filename = item.name
+        filename = filename.slice(0, filename.lastIndexOf('.'))
+        if (filename === name) {
+          file = item
+          break
+        }
       }
+      const table = this.databaseList[this.currentFileIndex]
+      // const rows = table.originRows
+      const head = { [name]: this.currentColumns.slice(1).map(item => ({
+        name: item.title,
+        dataType: item.dataType
+      })) }
+      const data = new FormData()
+      data.append('sheetsHeaderJson', JSON.stringify(head))
+      data.append('sheetName', name)
+      data.append('delimiter', this.queryDelimiter)
+      data.append('file', file)
       const res = await this.$server.dataAccess.actionChangeCsvType(data)
         .finally(() => {
           this.spinning = false
         })
       if (res.code === 200) {
         table.rows = res.data.rows
-        table.headerList = data.head
+        table.headerList = res.data.headerList
         this.renderCurrentTable()
       } else {
         this.$message.error(res.msg || '请求错误')
@@ -349,10 +363,10 @@ export default {
       }
 
       // 校验大小
-      if (isValid && file.size > 30 * 1024 * 1024) {
-        isValid = false
-        this.$message.error('文件大于30M, 无法上传')
-      }
+      // if (isValid && file.size > 30 * 1024 * 1024) {
+      //   isValid = false
+      //   this.$message.error('文件大于30M, 无法上传')
+      // }
 
       // 校验重名
       if (
@@ -721,10 +735,10 @@ export default {
               const file = this.fileList[index]
               formData.append('csvDatabaseList[' + index + '].file', file)
               maxSize += file.size
-              if (maxSize > 50 * 1024 * 1024) {
-                this.saveLoading = false
-                return this.$message.error('单次保存文件总量需小于50M')
-              }
+              // if (maxSize > 50 * 1024 * 1024) {
+              //   this.saveLoading = false
+              //   return this.$message.error('单次保存文件总量需小于50M')
+              // }
             }
             for (const key in item) {
               if (key !== 'database') {

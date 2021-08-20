@@ -239,7 +239,7 @@ export default {
       if (this.renameData.raw_expr) {
         this.$nextTick(() => {
           const checkedList = JSON.parse(this.renameData.raw_expr).checkedList
-          if (checkedList) {
+          if (typeof checkedList === 'string') {
             this.$refs.fieldSelectTree &&
               this.$refs.fieldSelectTree.setTree(checkedList.split(','))
           }
@@ -308,10 +308,10 @@ export default {
           this.checkedFieldList.map(item => `同一【${item.alias}】`).join('') +
           '中的' +
           text
-        this.raw_expr.checkedList = this.checkedFieldList.map(item => item.alias).toString()
       } else {
         this.textareaValue = text
       }
+      this.raw_expr.checkedList = this.checkedFieldList.map(item => item.alias).toString()
     },
     // 勾选发生变化, 触发事件更改文本框内容
     handleGetTreeField(list) {

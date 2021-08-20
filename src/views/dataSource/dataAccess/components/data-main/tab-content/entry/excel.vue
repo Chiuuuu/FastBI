@@ -281,17 +281,28 @@ export default {
     // 切换表头数据类型
     async changeDataType() {
       this.spinning = true
-      const tableList = this.databaseList[this.currentFileIndex].tableList
-      const rows = tableList[this.currentSheetIndex].originRows
-      const data = {
-        // [this.sheetList[this.currentSheetIndex].name]: {
-          head: this.currentColumns.slice(1).map(item => ({
-            name: item.title,
-            dataType: item.dataType
-          })),
-          rows
-        // }
+      // 找到该文件对象
+      let name = this.fileInfoList[this.currentFileIndex].name
+      let file = {}
+      for (let i = 0; i < this.fileList.length; i++) {
+        const item = this.fileList[i]
+        let filename = item.name
+        filename = filename.slice(0, filename.lastIndexOf('.'))
+        if (filename === name) {
+          file = item
+          break
+        }
       }
+      const tableList = this.databaseList[this.currentFileIndex].tableList
+      const sheetName = this.sheetList[this.currentSheetIndex].name
+      const head = { [sheetName]: this.currentColumns.slice(1).map(item => ({
+        name: item.title,
+        dataType: item.dataType
+      })) }
+      const data = new FormData()
+      data.append('sheetsHeaderJson', JSON.stringify(head))
+      data.append('sheetName', sheetName)
+      data.append('file', file)
       const res = await this.$server.dataAccess.actionChangeExcelType(data)
         .finally(() => {
           this.spinning = false
@@ -489,10 +500,10 @@ export default {
       }
 
       // 校验大小
-      if (isValid && file.size > 30 * 1024 * 1024) {
-        isValid = false
-        this.$message.error('文件大于30M, 无法上传')
-      }
+      // if (isValid && file.size > 30 * 1024 * 1024) {
+      //   isValid = false
+      //   this.$message.error('文件大于30M, 无法上传')
+      // }
 
       // 校验命名规则(中英数字下划线)
       if (isValid && !/^[0-9a-zA-Z_\u4E00-\u9FA5\uF900-\uFA2D]*$/g.test(name)) {
@@ -811,10 +822,10 @@ export default {
               const file = this.fileList[index]
               formData.append('excelDatabaseList[' + index + '].file', file)
               maxSize += file.size
-              if (maxSize > 50 * 1024 * 1024) {
-                this.saveLoading = false
-                return this.$message.error('单次保存文件总量需小于50M')
-              }
+              // if (maxSize > 50 * 1024 * 1024) {
+              //   this.saveLoading = false
+              //   return this.$message.error('单次保存文件总量需小于50M')
+              // }
             }
             for (const key in item) {
               if (key !== 'database') {
