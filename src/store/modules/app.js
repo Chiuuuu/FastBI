@@ -298,6 +298,18 @@ const app = {
         delete chart.setting.apis.mapOrigin
       }
 
+      // 处理datamodelId
+      if (!chart.datamodelId || chart.datamodelId === '0') {
+        const dimensions = chart.setting.api_data.dimensions
+        const measures = chart.setting.api_data.measures
+        if (dimensions && dimensions.length > 0) {
+          chart.datamodelId = dimensions[0].screenTableId
+          chart.setting.resourceType = dimensions[0][0].resourceType
+        } else if (measures && measures.length > 0) {
+          chart.datamodelId = measures[0].screenTableId
+          chart.setting.resourceType = measures[0][0].resourceType
+        }
+      }
       let params = {
         id: chart.id,
         name: chart.name,
@@ -344,7 +356,10 @@ const app = {
       return screenManage.updateChart(params)
     },
     // 获取大屏详情
-    async getScreenDetail({ dispatch, commit }, { id, tabId, needRefresh, key = 'true' }) {
+    async getScreenDetail(
+      { dispatch, commit },
+      { id, tabId, needRefresh, key = 'true' }
+    ) {
       return screenManage.getScreenDetailById(id, tabId, key).then(res => {
         if (res.code === 200) {
           this.screenData = res.data

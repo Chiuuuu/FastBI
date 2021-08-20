@@ -307,9 +307,10 @@ export default {
         this.isdrag = false
         return
       }
-
       // 记录字段是否文本
-      dataFile.dataTypeIsText = dataFile.dataType === 'VARCHAR'
+      const dataType = dataFile.dataType
+      dataFile.dataTypeIsText =
+        dataType !== 'BIGINT' && dataType !== 'DECIMAL' && dataType !== 'DOUBLE'
       // 文本类型
       if (dataFile.dataTypeIsText) {
         await this.initTextData(dataFile)
@@ -358,7 +359,6 @@ export default {
       } else {
         res.msg && this.$message.error(res.msg)
         this.isdrag = false
-        return
       }
     },
     // 对象数组去重,type表示对象里面的一个属性
