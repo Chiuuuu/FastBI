@@ -156,6 +156,7 @@ export default {
     actionChangeExcelType(data) {
         return $axios({
             method: 'post',
+            headers: { 'Content-Type': 'multipart/form-data' },
             url: '/datasource/excel/convert/read',
             data,
             timeout: 600000
@@ -211,6 +212,7 @@ export default {
     actionChangeCsvType(data) {
         return $axios({
             method: 'post',
+            headers: { 'Content-Type': 'multipart/form-data' },
             url: '/datasource/csv/convert/read',
             data,
             timeout: 600000
@@ -257,7 +259,7 @@ export default {
             // url: '/datasource/excel/batchsave',
             url: '/datasource/excel/save',
             data,
-            timeout: 300000
+            timeout: 600000
         })
     },
     /**
@@ -294,7 +296,7 @@ export default {
             headers: { 'Content-Type': 'multipart/form-data' },
             url: '/datasource/csv/save',
             data,
-            timeout: 300000
+            timeout: 600000
         })
     },
     /**
