@@ -93,6 +93,8 @@ export default {
         datamodelId: data.datamodelId,
         modelTableId: data.modelTableId,
         convertType: data.convertType || data.dataType,
+        field: data.name,
+        alias: data.alias,
         rule: { condition: 'asc' },
         ruleType: 2,
         modeType: 0,
