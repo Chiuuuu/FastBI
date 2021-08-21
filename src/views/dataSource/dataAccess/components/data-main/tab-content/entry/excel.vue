@@ -500,10 +500,10 @@ export default {
       }
 
       // 校验大小
-      // if (isValid && file.size > 30 * 1024 * 1024) {
-      //   isValid = false
-      //   this.$message.error('文件大于30M, 无法上传')
-      // }
+      if (isValid && file.size > 50 * 1024 * 1024) {
+        isValid = false
+        this.$message.error('文件大于50M, 无法上传')
+      }
 
       // 校验命名规则(中英数字下划线)
       if (isValid && !/^[0-9a-zA-Z_\u4E00-\u9FA5\uF900-\uFA2D]*$/g.test(name)) {
@@ -690,6 +690,7 @@ export default {
           const item = this.fileList[i]
           if (item.name === file.name) {
             isOperation = true
+            file.id = this.replaceFile.info.id
             this.fileList.splice(i, 1, file)
             break
           }
@@ -822,10 +823,10 @@ export default {
               const file = this.fileList[index]
               formData.append('excelDatabaseList[' + index + '].file', file)
               maxSize += file.size
-              // if (maxSize > 50 * 1024 * 1024) {
-              //   this.saveLoading = false
-              //   return this.$message.error('单次保存文件总量需小于50M')
-              // }
+              if (maxSize > 200 * 1024 * 1024) {
+                this.saveLoading = false
+                return this.$message.error('单次保存文件总量需小于200M')
+              }
             }
             for (const key in item) {
               if (key !== 'database') {

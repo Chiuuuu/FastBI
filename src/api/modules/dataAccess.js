@@ -263,19 +263,25 @@ export default {
         })
     },
     /**
-     * @description 查询文件下的表格内容
+     * @description 查询文件下的预览表格
      * @param {Object} data 参数
-     * @param {String} data.tableId 表id
+     * @param {String} data.databaseId 文件id
      * @param {String} data.delimiter 分隔符
      */
-    getCsvFileTableInfo(databaseId) {
+    getCsvFileTableInfo(data) {
+        return $axios({
+            method: 'post',
+            headers: { 'Content-Type': 'multipart/form-data' },
+            url: '/datasource/csv/read',
+            data
+        })
+    },
+    /**
+     * @description 查询文件下的表格内容
+     * @param {String} databaseId 参数
+     */
+    getCsvPrestoTableInfo(databaseId) {
         return $axios.get(`/datasource/csv/presto/read/${databaseId}`)
-        // return $axios({
-        //     method: 'post',
-        //     headers: { 'Content-Type': 'multipart/form-data' },
-        //     url: '/datasource/csv/read',
-        //     data
-        // })
     },
     /**
      * @description 保存csv数据源

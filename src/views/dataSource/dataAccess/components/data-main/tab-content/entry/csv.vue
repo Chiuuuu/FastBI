@@ -221,6 +221,26 @@ export default {
         callback()
       }
     },
+    formatDelimiter(delimiter) {
+      if (delimiter === undefined || delimiter === null) return '0'
+      switch (delimiter) {
+        case ',':
+          return '0'
+        case ';':
+          return '1'
+        case ' ':
+          return '2'
+        default:
+          return '3'
+      }
+    },
+    // 删除operation为4的操作
+    deleteOperationDelimiter(name) {
+      const index = this.operation.findIndex(item => item.name === name)
+      if (index > -1 && this.operation[index].operation === 4) {
+        this.operation.splice(index, 1)
+      }
+    },
     // 重置表单
     handleResetForm() {
       this.form = { name: '', delimiter: '0' }
@@ -256,6 +276,36 @@ export default {
       const value = e.target.value
       if (this.fileInfoList.length === 0) {
         return
+      }
+      // 判断当前分隔符是不是'已入库文件'中记录的分隔符
+      // 如果不是库里的分隔符, 要录入操作数组operation: 4
+      const currentFile = this.fileInfoList[this.currentFileIndex]
+      const index = this.operation.findIndex(item => item.name === currentFile.name)
+      if (!isNaN(currentFile.id)) {
+        if (currentFile.delimiter === this.queryDelimiter) {
+          // 恢复了分隔符
+          if (index > -1) { // 如果operation里面有对象则的删除
+            this.operation.splice(index, 1)
+          }
+        } else {
+          // 切换了分隔符,operation有则替换分隔符没有则插入
+          if (index > -1) {
+            this.operation[index].delimiter = this.queryDelimiter
+          } else {
+            this.operation.push({
+              id: currentFile.id,
+              name: currentFile.name,
+              delimiter: this.queryDelimiter,
+              operation: 4,
+              database: this.databaseList[this.currentFileIndex]
+            })
+          }
+        }
+      } else {
+        // 未入库的文件, 修改分隔符
+        if (index > -1) {
+          this.operation[index].delimiter = this.queryDelimiter
+        }
       }
       if (value === '3' && !this.inputDelimiter) {
         return this.handleClearTable()
@@ -305,8 +355,8 @@ export default {
           this.spinning = false
         })
       if (res.code === 200) {
-        table.rows = res.data.rows
-        table.headerList = res.data.headerList
+        table.rows = res.data.rows || []
+        table.headerList = res.data.headerList || []
         this.renderCurrentTable()
       } else {
         this.$message.error(res.msg || '请求错误')
@@ -335,7 +385,7 @@ export default {
           this.spinning = false
         })
     },
-    // 获取当前文件对应的数据库信息
+    // 获取当前文件对应的数据库信息 isPresto: 是否读presto数据
     async handleGetDataBase(index) {
       if (index < 0) {
         this.currentColumns = []
@@ -343,10 +393,16 @@ export default {
         this.$store.dispatch('dataAccess/setFirstFinished', false)
       } else {
         this.currentFileIndex = index
-        this.renderCurrentTable()
+        // 首先判断该文件是否进行过操作, 如果有, 则读文件, 没有则读presto数据
+        const file = this.fileInfoList[index]
+        const target = this.operation.find(item => item.name === file.name)
+        const isPresto = !target
+        this.renderCurrentTable(isPresto)
+        // 赋值当前表单的分隔符
+        this.form.delimiter = target ? this.formatDelimiter(target.delimiter) : this.formatDelimiter(file.delimiter)
         this.$store.dispatch(
           'dataAccess/setDatabaseName',
-          this.fileInfoList[index].name
+          file.name
         )
       }
     },
@@ -363,10 +419,10 @@ export default {
       }
 
       // 校验大小
-      // if (isValid && file.size > 30 * 1024 * 1024) {
-      //   isValid = false
-      //   this.$message.error('文件大于30M, 无法上传')
-      // }
+      if (isValid && file.size > 50 * 1024 * 1024) {
+        isValid = false
+        this.$message.error('文件大于50M, 无法上传')
+      }
 
       // 校验重名
       if (
@@ -414,12 +470,11 @@ export default {
     // 读取未上传的文件
     async readUnUploadFile(id) {
       const formData = new FormData()
-      this.fileList.map(item => {
-        if (item.id === id) {
-          formData.append('csvFile', item)
-          formData.append('delimiter', this.queryDelimiter)
-        }
-      })
+      const index = this.fileList.findIndex(item => item.id === id)
+      if (index < 0) return
+      const item = this.fileList[index]
+      formData.append('csvFile', item)
+      formData.append('delimiter', this.queryDelimiter)
       this.spinning = true
       const result = await this.$server.dataAccess
         .actionUploadCsvFile(formData)
@@ -427,8 +482,19 @@ export default {
           this.spinning = false
         })
       if (result.code === 200) {
-        result.data.originRows = result.data.rows
-        this.$set(this.databaseList, this.currentFileIndex, result.data)
+        const table = {
+          headerList: result.data.headerList || [],
+          rows: result.data.rows || [],
+          originRows: result.data.rows || []
+        }
+        this.$set(this.databaseList, this.currentFileIndex, table)
+
+        // 要将新的表头存到operation对应的对象中
+        let name = item.name
+        name = name.slice(0, name.lastIndexOf('.')) // 处理掉文件后缀
+        const target = this.operation.find(item => item.name === name)
+        if (target) target.database = table
+
         this.$nextTick(() => {
           this.renderCurrentTable()
         })
@@ -459,18 +525,23 @@ export default {
         name = name.slice(0, name.lastIndexOf('.')) // 处理掉文件后缀
         this.fileInfoList.push({
           id: file.id,
-          name: name
+          name: name,
+          delimiter: this.queryDelimiter
         })
         this.fileList.push(file)
 
         const currentIndex = this.fileInfoList.length - 1
-        const database = result.data
-        database.originRows = database.rows
+        const database = {
+          headerList: result.data.headerList || [],
+          rows: result.data.rows || [],
+          originRows: result.data.rows || []
+        }
 
         this.operation.push({
           id: '',
           name: name,
           operation: 1,
+          delimiter: this.queryDelimiter,
           database: database
         })
         // 新增文件未保存前不能查看库表结构
@@ -531,7 +602,8 @@ export default {
         const currentIndex = this.replaceFile.index
         this.fileInfoList[currentIndex] = {
           id: this.replaceFile.info.id,
-          name: name
+          name: name,
+          delimiter: this.queryDelimiter
         }
         // 如果是已被替换过的文件, 则替换新文件
         let isOperation = false
@@ -539,6 +611,8 @@ export default {
           const item = this.fileList[i]
           if (item.name === file.name) {
             isOperation = true
+            // 新替换的文件id要和被替换的保持一致
+            file.id = this.replaceFile.info.id
             this.fileList.splice(i, 1, file)
             break
           }
@@ -549,11 +623,14 @@ export default {
         this.$set(this.databaseList, currentIndex, database)
         // 未记录的替换文件, 插入新记录
         if (!isOperation) {
+          // 删除切换过分隔符的operation: 4
+          this.deleteOperationDelimiter(name)
           this.fileList.push(file)
           this.operation.push({
             id: this.replaceFile.info.id,
             name: name,
             operation: 2,
+            delimiter: this.queryDelimiter,
             database: database
           })
         }
@@ -595,8 +672,10 @@ export default {
               isOperation = true
               this.fileList.splice(i, 1)
               this.operation.splice(i, 1)
+              this.deleteOperationDelimiter(file.name)
               // 库里有的文件, 先记录id, 保存时插入到operation最后
               if (file.id && !isNaN(file.id)) {
+                // 删除切换过分隔符的operation: 4
                 this.deleteIdList.push({
                   id: file.id,
                   name: file.name,
@@ -612,6 +691,7 @@ export default {
             !isNaN(file.id) &&
             this.deleteIdList.indexOf(file.id) < 0
           ) {
+            this.deleteOperationDelimiter(file.name)
             this.deleteIdList.push({
               id: file.id,
               name: file.name,
@@ -626,34 +706,61 @@ export default {
       })
     },
     // 渲染当前表格
-    async renderCurrentTable() {
+    async renderCurrentTable(isPresto = false) {
       // 写入表头信息
       let index = this.currentFileIndex
       let table = this.databaseList[index]
       // 判断是否处理过表格信息(处理之后的是Array类型), 没有则调接口获取信息并处理
       if (!table || !Array.isArray(table.headerList)) {
-        const formData = new FormData()
         const id = this.fileInfoList[index].id
         let res
+        // 已入库的id是雪花算法的数字, 否则是element生成的字符串id
         if (isNaN(id)) {
           return this.readUnUploadFile(id)
         } else {
-          formData.append('databaseId', id)
-          formData.append('delimiter', this.queryDelimiter)
-          this.spinning = true
-          res = await this.$server.dataAccess.getCsvFileTableInfo(id)
-          .finally(() => {
-            this.spinning = false
-          })
+          if (isPresto) {
+            // 单纯地读入库文件, 直接查presto
+            this.spinning = true
+            res = await this.$server.dataAccess.getCsvPrestoTableInfo(id)
+            .finally(() => {
+              this.spinning = false
+            })
+          } else {
+            // 否则需要根据id找到文件重新根据分隔符切割数据
+            const formData = new FormData()
+            formData.append('databaseId', id)
+            formData.append('delimiter', this.queryDelimiter)
+            this.spinning = true
+            res = await this.$server.dataAccess.getCsvFileTableInfo(formData)
+            .finally(() => {
+              this.spinning = false
+            })
+          }
         }
         if (res.code === 200) {
           table = res.data
-          table.headerList = res.data.headerList.map(item => ({
-            name: item,
-            dataType: ''
-          }))
+          if (!Array.isArray(res.data.headerList)) {
+            table.headerList = []
+          } else {
+            table.headerList = res.data.headerList.map(item => {
+              if (!item || typeof item === 'string') {
+                return {
+                  name: item,
+                  dataType: ''
+                }
+              } else {
+                return {
+                  name: item.name,
+                  dataType: item.dataType || ''
+                }
+              }
+            })
+          }
           table.originRows = table.rows
           this.$set(this.databaseList, index, table)
+          // 要将新的表头存到operation对应的对象中
+          const target = this.operation.find(item => item.id === id)
+          if (target) target.database = table
         } else {
           return this.$message.error('获取内容失败')
         }
@@ -735,17 +842,17 @@ export default {
               const file = this.fileList[index]
               formData.append('csvDatabaseList[' + index + '].file', file)
               maxSize += file.size
-              // if (maxSize > 50 * 1024 * 1024) {
-              //   this.saveLoading = false
-              //   return this.$message.error('单次保存文件总量需小于50M')
-              // }
+              if (maxSize > 200 * 1024 * 1024) {
+                this.saveLoading = false
+                return this.$message.error('单次保存文件总量需小于200M')
+              }
             }
             for (const key in item) {
               if (key !== 'database') {
                 formData.append('csvDatabaseList[' + index + '].' + key, item[key])
               } else {
                 const database = item[key] || {}
-                formData.append('csvDatabaseList[' + index + '].sheetsHeaderJson', JSON.stringify(database.headerList))
+                formData.append('csvDatabaseList[' + index + '].sheetsHeaderJson', JSON.stringify({ [item.name]: database.headerList }))
               }
             }
           }
