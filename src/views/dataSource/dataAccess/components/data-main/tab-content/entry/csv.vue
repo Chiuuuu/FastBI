@@ -393,13 +393,14 @@ export default {
         this.$store.dispatch('dataAccess/setFirstFinished', false)
       } else {
         this.currentFileIndex = index
-        // 首先判断该文件是否进行过操作, 如果有, 则读文件, 没有则读presto数据
         const file = this.fileInfoList[index]
         const target = this.operation.find(item => item.name === file.name)
-        const isPresto = !target
-        this.renderCurrentTable(isPresto)
         // 赋值当前表单的分隔符
         this.form.delimiter = target ? this.formatDelimiter(target.delimiter) : this.formatDelimiter(file.delimiter)
+        // 首先判断该文件是否进行过操作, 如果有, 则读文件, 没有则读presto数据
+        const isPresto = !target
+        this.renderCurrentTable(isPresto)
+
         this.$store.dispatch(
           'dataAccess/setDatabaseName',
           file.name

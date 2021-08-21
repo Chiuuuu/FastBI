@@ -267,6 +267,7 @@ export default {
       this.currentColumns = []
       this.currentFieldList = []
       this.deleteIdList = []
+      this.operation = []
     },
     // 渲染表单
     handleSetFormData() {
