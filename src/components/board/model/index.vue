@@ -307,7 +307,7 @@ export default {
       modelList: [], // 模型菜单
       sourceList: [], // 接入菜单
       key: 0, // 刷新菜单
-      hoveDataModelId: '' //悬浮选中的数据模型id
+      hoveDataModelId: '' // 悬浮选中的数据模型id
     }
   },
   computed: {
@@ -318,7 +318,8 @@ export default {
       'selectedModelList',
       'currentSelected',
       'currSelected',
-      'canvasMap'
+      'canvasMap',
+      'currentPageId'
     ]),
     // 过滤模型列表
     savedModels() {
@@ -525,7 +526,8 @@ export default {
         resourceName: item.name,
         datasourceId: '',
         databaseId: '',
-        tableId: item.id
+        tableId: item.id,
+        tabId: this.currentPageId
       }
       // 数据接入
       if (item.resourceType === 3) {
@@ -640,7 +642,7 @@ export default {
         background: 'rgb(255, 255, 255, 0.6)'
       })
       this.$server.screenManage
-        .getPivoSchemaList(id, this.screenId, type)
+        .getPivoSchemaList(id, this.currentPageId, type)
         .then(res => {
           if (res.code === 200) {
             res.data.dimensions.map(item => {

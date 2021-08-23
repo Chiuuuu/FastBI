@@ -193,10 +193,10 @@ const screenManage = {
    * @param {*} id
    * @returns
    */
-  getPivoSchemaList(tableId, screenId) {
+  getPivoSchemaList(tableId, tabId) {
     // return $axios.get(`/model/pivotschema/selectModelPivotschemaListByRole/${id}`)
     return $axios.get(
-      `/screen/pivotschema/selectModelPivotschemaListByRole/${tableId}/${screenId}`
+      `/screen/pivotschema/selectModelPivotschemaListByRole/${tableId}/${tabId}`
     )
   },
   /**
@@ -293,7 +293,6 @@ const screenManage = {
   actionExportScreen(params) {
     return $axios.post('/v2/screen/bigscreen/exportScreen', params)
   }
-
 }
 
 export default screenManage
