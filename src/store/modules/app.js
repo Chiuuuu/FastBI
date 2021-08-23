@@ -304,10 +304,10 @@ const app = {
         const measures = chart.setting.api_data.measures
         if (dimensions && dimensions.length > 0) {
           chart.datamodelId = dimensions[0].screenTableId
-          chart.setting.resourceType = dimensions[0][0].resourceType
+          chart.setting.resourceType = dimensions[0].resourceType
         } else if (measures && measures.length > 0) {
           chart.datamodelId = measures[0].screenTableId
-          chart.setting.resourceType = measures[0][0].resourceType
+          chart.setting.resourceType = measures[0].resourceType
         }
       }
       let params = {

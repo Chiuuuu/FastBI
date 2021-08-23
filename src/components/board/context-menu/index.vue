@@ -35,7 +35,7 @@
                   ? { ' ': 'name0', '  ': 'name1', '    ': 'name2' }
                   : null
               "
-              :name="i === 0 ? currSelected.name : currSelected.name + '.csv'"
+              :name="i === 0 ? chartName : chartName + '.csv'"
               :type="i === 0 ? 'xls' : 'csv'"
               >{{ menu.text }}</JsonExcel
             >
@@ -178,6 +178,15 @@ export default {
         }
       }
       return tmpObj
+    },
+    chartName() {
+      if (!this.currSelected) {
+        return ''
+      }
+      return this.currSelected.setting.config.title
+        ? this.currSelected.setting.config.title.content ||
+            this.currSelected.setting.config.title.text
+        : this.currSelected.setting.config.topTitle.content
     }
   },
   destroyed() {
@@ -341,10 +350,10 @@ export default {
 
       let source = res.data || []
 
-      let columns = [],
-        rows = [],
-        tableName = [],
-        exportList = []
+      let columns = []
+      let rows = []
+      let tableName = []
+      let exportList = []
 
       if (this.currSelected.setting.chartType === 'v-map') {
         await Promise.all(

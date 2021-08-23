@@ -273,6 +273,11 @@ export default {
           api_data: {},
           isEmpty: false,
           imgName: imgData.name,
+          config: {
+            title: imgData.name,
+            noTitle: true, // 默认写死没有标题
+            name: 'material'
+          },
           url: process.env.VUE_APP_SERVICE_URL + imgData.filePath,
           view: { width: 400, height: 400, x: 760, y: 340, rotate: 0 }
         })
