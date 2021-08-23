@@ -1,6 +1,5 @@
 import html2canvas from 'html2canvas'
 import JSPDF from 'jspdf'
-import json2csv from 'json2csv'
 
 let chartInstanceIdMap = {}
 
@@ -223,12 +222,4 @@ function dataURLToBlob(dataurl) {
     u8arr[n] = bstr.charCodeAt(n)
   }
   return new Blob([u8arr], { type: mime })
-}
-
-export function exportCsv(datas, fields, name) {
-  const result = json2csv.parse(datas, {
-    fields
-  })
-  const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + result
-  download(csvContent, name + '.csv')
 }
