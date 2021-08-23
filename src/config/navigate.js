@@ -1497,7 +1497,8 @@ const list = [
                   color: '',
                   fontSize: 12,
                   position: 'outside', // 可选inside
-                  formatter: '{b}: {@2012} ({d}%)'
+                  formatter: '{b}: {@2012} ({d}%)',
+                  formatterSelect: ['name', 'value', 'percent']
                 },
                 center: ['50%', '50%'] // 饼图可选
               },

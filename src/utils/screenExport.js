@@ -38,39 +38,49 @@ function createCanvas(chartId, width, height) {
 // 处理截图的dom,复制控件(不受transform影响) // targetDom(全屏:preview-wrap/编辑:dv-wrapper)
 function handleShootedDom(chart, targetDom) {
   // 非图表控件 && hightcharts可以直接深拷贝
-  if (
-    !classifyControl(chart) ||
-    chart.setting.name === 'high-pie'
-  ) {
+  if (!classifyControl(chart) || chart.setting.name === 'high-pie') {
     const domObjClone = targetDom.cloneNode(true)
     domObjClone.setAttribute('id', 'cloneShotTarget')
     return domObjClone
-  } else {
-    // 图表控件
-    // 获取显示框(全屏:preview-wrap/编辑:dv-wrapper)
-    const domObjClone = targetDom.cloneNode()
-    // 修改id
-    domObjClone.setAttribute('id', 'cloneShotTarget')
-    // 添加dv-chart
-    const dvChart = targetDom.childNodes[0]
-    domObjClone.appendChild(dvChart.cloneNode())
-    // 添加title
-    const title = dvChart.childNodes[0]
-    domObjClone.childNodes[0].appendChild(title.cloneNode(true))
-    // 添加canvas
-    // 获取原echart图表部分尺寸
+  }
+  // 获取显示框(全屏:preview-wrap/编辑:dv-wrapper)
+  const domObjClone = targetDom.cloneNode()
+  // 修改id
+  domObjClone.setAttribute('id', 'cloneShotTarget')
+  // 旭日图热力图dom结构只有一层
+  if (chart.setting.name === 've-sun' || chart.setting.name === 've-heatmap') {
     let {
       clientWidth: orginWidth,
       clientHeight: orginHeight
-    } = dvChart.childNodes[1]
+    } = targetDom.childNodes[0]
     const canvas = createCanvas(chart.id, orginWidth, orginHeight)
-    domObjClone.childNodes[0].appendChild(canvas)
+    domObjClone.appendChild(canvas)
     return domObjClone
   }
+  // 图表控件
+  // 添加dv-chart
+  const dvChart = targetDom.childNodes[0]
+  domObjClone.appendChild(dvChart.cloneNode())
+  // 添加title
+  const title = dvChart.childNodes[0]
+  domObjClone.childNodes[0].appendChild(title.cloneNode(true))
+  // 添加canvas
+  // 获取原echart图表部分尺寸
+  let {
+    clientWidth: orginWidth,
+    clientHeight: orginHeight
+  } = dvChart.childNodes[1]
+  const canvas = createCanvas(chart.id, orginWidth, orginHeight)
+  domObjClone.childNodes[0].appendChild(canvas)
+  return domObjClone
 }
 
 // 截图复制出来的dom
 function actionShoot(domClone, backColor, name) {
+  // 如果图表背景透明，按大屏背景色作为背景
+  if (!domClone.style.backgroundColor) {
+    domClone.style.backgroundColor = backColor
+  }
   document.body.appendChild(domClone)
   html2canvas(domClone, {
     width: domClone.clientWidth,
@@ -80,40 +90,44 @@ function actionShoot(domClone, backColor, name) {
     letterRendering: true,
     scrollY: 0,
     scrollX: 0,
-    useCORS: true, // 【重要】开启跨域配置
-    onclone: documentClone => {
-      const cloneDom = documentClone.getElementById('cloneShotTarget')
-      if (!cloneDom.style.backgroundColor) {
-        cloneDom.style.backgroundColor = backColor // 如果图表背景透明，按大屏背景色作为背景
-      }
-    }
+    useCORS: true // 【重要】开启跨域配置
   }).then(canvas => {
     document.body.removeChild(domClone)
-    downloadImg(canvas, name)
+    download(canvas, name + '.png', 'img')
   })
 }
 
 // 导出图表图片
-export function exportImg(chartId, chart, pageSettings) {
-  let domObj = document.getElementById(chartId)
+export function exportImg(chart, pageSettings) {
+  let domObj = document.getElementById(chart.id)
   // 处理截图的dom
   const domClone = handleShootedDom(chart, domObj)
+  if (!domClone) {
+    return
+  }
+  let name = chart.setting.config.title
+    ? chart.setting.config.title.content || chart.setting.config.title.text
+    : chart.setting.config.topTitle.content
   // 截图
-  actionShoot(domClone, pageSettings.backgroundColor, chart.name)
+  actionShoot(domClone, pageSettings.backgroundColor, name)
 }
 
 // 预览导出图表图片
-export function exportForFull(chartId, chart, pageSettings) {
-  let domObj = document.getElementById(chartId)
+export function exportForFull(chart, pageSettings) {
+  let domObj = document.getElementById(chart.id)
   // 处理截图的dom
   const domClone = handleShootedDom(chart, domObj.childNodes[0]) // 预览图表多出一层preview-box
+  let name = chart.setting.config.title
+    ? chart.setting.config.title.content || chart.setting.config.title.text
+    : chart.setting.config.topTitle.content
   // 截图
-  actionShoot(domClone, pageSettings.backgroundColor, chart.name)
+  actionShoot(domClone, pageSettings.backgroundColor, name)
 }
 
 // 导出整个大屏
 export function exportScreen(name) {
-  let domObj = document.querySelector('.dv-screen')
+  const domObjs = document.querySelectorAll('.dv-screen')
+  const domObj = domObjs[1] || domObjs[0]
   html2canvas(domObj, {
     width: domObj.clientWidth,
     height: domObj.clientHeight,
@@ -131,7 +145,6 @@ export function exportScreen(name) {
       }
     }
   }).then(canvas => {
-    // downloadImg(canvas, name)
     exportPdf(canvas, name)
   })
 }
@@ -183,16 +196,19 @@ function exportPdf(canvas, name) {
 }
 
 // 下载图片
-function downloadImg(canvas, name) {
+function download(content, name, type) {
   let a = document.createElement('a')
   a.style.display = 'none'
-  let blob = dataURLToBlob(canvas.toDataURL('image/png'))
-  a.setAttribute('href', URL.createObjectURL(blob))
+  if (type === 'img') {
+    let blob = dataURLToBlob(content.toDataURL('image/png'))
+    a.setAttribute('href', URL.createObjectURL(blob))
+  } else {
+    a.setAttribute('href', encodeURI(content))
+  }
   // 这块是保存图片操作  可以设置保存的图片的信息
-  a.setAttribute('download', name + '.png')
+  a.setAttribute('download', name)
   document.body.appendChild(a)
   a.click()
-  URL.revokeObjectURL(blob)
   document.body.removeChild(a)
 }
 // 图片格式转换方法
