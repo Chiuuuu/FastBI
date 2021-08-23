@@ -335,6 +335,7 @@ export default {
         // 复制成功后重置目录列表
         this.$message.success('复制成功')
         this.$store.commit('dataModel/SET_MENULIST', result.data)
+        this.handleGetModelSearchList(this.modelSearch)
       } else {
         this.$message.error(result.msg || result.message || '请求错误')
       }

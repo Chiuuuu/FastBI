@@ -28,6 +28,7 @@ const actions = {
     const result = await dataAccessApi.getMenuList('/business/role/listTree')
     if (result.code === 200) {
       commit('SET_MENULIST', result.data)
+      vm.handleGetSearchList(vm.searchValue)
     } else {
       vm.$message.error(result.msg)
     }

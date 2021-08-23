@@ -52,6 +52,7 @@ const actions = {
     const result = await dataAccessApi.getMenuList('/datasource/catalog/list/1')
     if (result.code === 200) {
       commit('SET_MENULIST', result.rows)
+      vm.handleGetSearchList(vm.searchValue)
     } else {
       vm.$message.error(result.msg)
     }
