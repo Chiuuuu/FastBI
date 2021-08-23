@@ -1440,7 +1440,6 @@ const list = [
                 show: true,
                 orient: 'horizontal',
                 align: 'left',
-                data: [],
                 textStyle: {
                   color: '#ffffff',
                   fontSize: 12
