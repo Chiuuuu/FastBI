@@ -9,7 +9,7 @@ export default {
   component: RouteView,
   meta: {
     title: '日志管理',
-    icon: 'cloud',
+    icon: 'calendar',
     permissions: [PERMISSION_CODE.PAGE.logAdmin]
   },
   children: [
