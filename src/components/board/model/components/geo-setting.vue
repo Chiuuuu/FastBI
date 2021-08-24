@@ -104,6 +104,7 @@ import optionObj from './mapOptions'
 import echarts from 'echarts'
 import guangZhouJson from '@/utils/guangdong.json'
 import matchWindow from './matchWindow'
+import { mapGetters, mapActions } from 'vuex'
 const colu = [
   {
     title: '您的数据',
@@ -195,6 +196,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['currentPageId']),
     unmatchedLen() {
       let umatcheds = this.datas.filter(item => !item.MathedVal)
       return umatcheds.length
@@ -225,7 +227,8 @@ export default {
         country: '中国',
         province: '广东省',
         city: '广州市',
-        pivotschemaId: this.dimensionsData.pivotschemaId
+        pivotschemaId: this.dimensionsData.pivotschemaId,
+        tabId: this.currentPageId
       }
       this.loading = true
       let res = await this.$server.screenManage.getGeoData(params)
@@ -295,7 +298,8 @@ export default {
         province: '广东省',
         city: '广州市',
         pivotschemaId: this.dimensionsData.pivotschemaId,
-        condition: this.condition
+        condition: this.condition,
+        tabId: this.currentPageId
       }
       let res = await this.$server.screenManage.saveGeoData(params)
       if (res.code === 500) {

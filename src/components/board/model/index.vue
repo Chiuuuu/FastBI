@@ -397,6 +397,9 @@ export default {
         return
       }
       this.getPivoSchemaList(val)
+    },
+    currentPageId(val) {
+      this.resourceId = ''
     }
   },
   methods: {
@@ -625,7 +628,8 @@ export default {
         datamodelId: item.datamodelId,
         pivotschemaId: item.pivotschemaId,
         role: num, // 转成维度传1，转成度量传2
-        screenId: this.screenId
+        screenId: this.screenId,
+        tabId: this.currentPageId
       }
       this.$server.screenManage.screenModuleTransform(params).then(res => {
         if (res.code === 200) {
