@@ -236,14 +236,9 @@ export default {
       } else if (order === 'exportImg') {
         this.$store.dispatch('ToggleContextMenu')
         if (this.isScreen && this.$route.name !== 'screenEdit') {
-          exportForFull(
-            this.currentSelected,
-            this.currSelected,
-            this.pageSettings,
-            this.canvasRange
-          )
+          exportForFull(this.currSelected, this.pageSettings)
         } else {
-          exportImg(this.currentSelected, this.currSelected, this.pageSettings)
+          exportImg(this.currSelected, this.pageSettings)
         }
       } else if (order === 'exportScreen') {
         this.$store.dispatch('ToggleContextMenu')

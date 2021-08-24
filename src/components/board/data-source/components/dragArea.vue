@@ -576,6 +576,7 @@ export default {
         selected.setting.api_data.dimensions = di
         selected.setting.api_data.measures = me
         selected.setting.api_data.tableList = this.fileList
+        this.updateChartData()
       }
 
       let data = this.currSelected.setting.api_data
