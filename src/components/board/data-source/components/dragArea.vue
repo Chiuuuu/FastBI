@@ -507,7 +507,7 @@ export default {
         }
         // 环形重置显示值
         if (current.setting.chartType === 'v-ring') {
-          current.setting.config.title.text = '70%'
+          current.setting.config.chartTitle.text = '70%'
           this.$store.dispatch('SetSelfProperty', current.setting.config)
         }
 
