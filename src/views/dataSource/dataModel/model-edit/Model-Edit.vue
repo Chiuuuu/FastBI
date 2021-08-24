@@ -1327,8 +1327,10 @@ export default {
      * 更新排序筛选
      */
     actionSaveFilterSort() {
+      const id = this.model === 'add' ? this.addModelId : this.modelId
+      if (!id) return
       const list = [].concat(this.fieldSortList).concat(this.fieldFilterList)
-      this.$server.dataModel.putFilterOrSortRules(list)
+      this.$server.dataModel.putFilterOrSortRules(id, list)
     },
     /**
      * 保存模型后再保存关联的数据源信息

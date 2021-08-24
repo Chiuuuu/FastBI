@@ -122,7 +122,7 @@ export default {
         case 'VARCHAR':
           return '字符串'
         case 'TIMESTAMP':
-          return '时间'
+          return '日期时间'
         case 'DATE':
           return '日期'
         case 'BIGINT':

@@ -290,7 +290,7 @@ export default {
    * @param {String} params.isInclude // 0默认 1排除 2包含
    * @param {String} params.displayOrder // 排序序号
    */
-  putFilterOrSortRules(params) {
-    return $axios.post('/model/pivotschema/updateFilterOrSortRule', params)
+  putFilterOrSortRules(datamodelId, params) {
+    return $axios.post(`/model/pivotschema/updateFilterOrSortRule/${datamodelId}`, params)
   }
 }
