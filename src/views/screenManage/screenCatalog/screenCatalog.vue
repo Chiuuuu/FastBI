@@ -372,6 +372,14 @@ export default {
           onClick: this.handleScreen
         },
         {
+          name: '选择大屏模版',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.add,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.screen
+          },
+          onClick: this.handleScreenTemplate
+        },
+        {
           name: '重命名',
           permission: {
             OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit,
@@ -721,6 +729,11 @@ export default {
         })
       })
     },
+    // 在文件夹底下新建大屏
+    handleScreenTemplate(event, item, { folder }) {
+      this.choose = true
+      this.$store.dispatch('SetParentId', folder.id)
+    },
     // 选择左侧菜单
     handleFileSelect(file) {
       if (this.fileSelectId === file.id) return
@@ -1001,7 +1014,7 @@ export default {
     getSubmit() {
       this.btnloading = true
       this.$server.chooseScreen
-        .saveScreenData(this.chooseTemple.screenId)
+        .saveScreenData(this.chooseTemple.screenId, this.parentId || 0)
         .then(res => {
           this.btnloading = false
           this.$router.push({
