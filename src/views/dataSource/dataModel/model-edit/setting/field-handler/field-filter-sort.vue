@@ -13,8 +13,8 @@
       <a-tab-pane key="1" tab="筛选">
         <FieldFilter
           ref="tab1"
-          :dimensions="sourceDimensions"
-          :measures="sourceMeasures"
+          :dimensions="sourceDimensions.filter(item => item.produceType === 0)"
+          :measures="sourceMeasures.filter(item => item.produceType === 0)"
           :table-list="filterListBackup"
           @insert="item => filterListBackup.push(item)"
           @delete="index => filterListBackup.splice(index, 1)"
@@ -24,8 +24,8 @@
       <a-tab-pane key="2" tab="排序">
         <FieldSort
           ref="tab2"
-          :dimensions="sourceDimensions"
-          :measures="sourceMeasures"
+          :dimensions="sourceDimensions.filter(item => item.produceType === 0)"
+          :measures="sourceMeasures.filter(item => item.produceType === 0)"
           :table-list="sortListBackup"
           @insert="item => sortListBackup.push(item)"
           @delete="index => sortListBackup.splice(index, 1)"
