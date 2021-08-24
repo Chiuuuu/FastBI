@@ -91,7 +91,7 @@ export default {
       const insertData = {
         pivotschemaId: data.id,
         datamodelId: data.datamodelId,
-        modelTableId: data.modelTableId,
+        // modelTableId: data.modelTableId,
         convertType: data.convertType || data.dataType,
         field: data.name,
         alias: data.alias,
