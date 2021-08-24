@@ -267,8 +267,8 @@ export default {
    * @param {String} screenId
    * @param {String} tableId
    */
-  delDataModel(screenId, tableId) {
-    return $axios.get(`/screen/pivotschema/del/${screenId}/${tableId}`)
+  delDataModel(tabId, tableId) {
+    return $axios.get(`/screen/pivotschema/del/${tabId}/${tableId}`)
   },
   /**
    *@description 获取模型筛选排序字段

@@ -719,7 +719,7 @@ export default {
     async getDelDataModel(screenId, tableId) {
       console.log('****', this.screenId)
       let res = await this.$server.dataModel.delDataModel(
-        this.screenId,
+        this.currentPageId,
         tableId
       )
       if (res.code == 200) {
