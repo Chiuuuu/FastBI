@@ -10,7 +10,9 @@
         >
           <a-icon type="plus-square" class="menu_icon" />
           <a-menu slot="overlay" class="drow_menu">
-            <a-menu-item @click="choose = true" v-if="hasPermissionSourceAdd"> 选择大屏模版 </a-menu-item>
+            <a-menu-item @click="choose = true" v-if="hasPermissionSourceAdd">
+              选择大屏模版
+            </a-menu-item>
             <a-menu-item v-on:click="addScreen" v-if="hasPermissionSourceAdd">
               新建空白大屏
             </a-menu-item>
@@ -347,6 +349,7 @@ export default {
       current: ['mail'],
       openKeys: ['sub1'],
       folderList: [], // 文件夹列表
+      folderOrignList: [], // 文件夹列表
       screenVisible: false, // 新建大屏弹窗
       isAdd: 1, // 1新增 2编辑 3删除
       folderVisible: false, // 新建文件夹弹窗
@@ -419,7 +422,7 @@ export default {
       componentKey: 0, // 通过改变key实现子组件强制更新,数值在0,1之间变化
       choose: false,
       chooseIndex: null,
-      chooseTemple: {}, //选中的大屏模版
+      chooseTemple: {}, // 选中的大屏模版
       templeList: [],
       btnloading: false
     }
@@ -534,7 +537,8 @@ export default {
         if (res.code === 200) {
           let rows = res.data
           // 大屏文件保存不需要文件夹
-          this.folderList = rows
+          this.folderOrignList = rows.concat()
+          this.folderList = rows.concat()
           // 没有选择文件的时候默认选择第一个文件
           if (this.fileSelectId === -1 && this.folderList.length > 0) {
             this.getFirstScreen(this.folderList, 0)
@@ -570,7 +574,7 @@ export default {
     }, 400),
     handleGetSearchList(value) {
       let result = []
-      this.folderList.map(item => {
+      this.folderOrignList.map(item => {
         const newItem = menuSearchLoop(item, value)
         if (newItem) result.push(newItem)
       })
@@ -1009,7 +1013,7 @@ export default {
           })
         })
     },
-    //获取大屏模版
+    // 获取大屏模版
     getScreenList() {
       this.$server.chooseScreen.getScreenTemplates().then(res => {
         this.templeList = { ...res.data }

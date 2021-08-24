@@ -633,62 +633,70 @@ export default {
       }
       this.$server.screenManage.screenModuleTransform(params).then(res => {
         if (res.code === 200) {
-          this.getPivoSchemaList(this.resourceId, 2)
+          this.getPivoSchemaList(this.resourceId)
         }
       })
     },
     // 维度、度量列表
-    getPivoSchemaList(id, type = 1) {
+    async getPivoSchemaList(id) {
       let loadingInstance = Loading.service({
         lock: true,
         text: '加载中...',
         target: 'body',
         background: 'rgb(255, 255, 255, 0.6)'
       })
-      this.$server.screenManage
-        .getPivoSchemaList(id, this.currentPageId, type)
-        .then(res => {
-          if (res.code === 200) {
-            res.data.dimensions.map(item => {
-              item.showMore = false
-            })
-            res.data.measures.map(item => {
-              item.showMore = false
-            })
-            let datas = res.data
-            let dimensions = datas.dimensions
-            let measures = datas.measures
-            this.dimensions = this.transData(dimensions)
-            dimensions = dimensions.map(item => {
-              return { ...item, visible: true, produceType: 0 }
-            })
-            this.measures = this.transData(measures)
-            measures = measures.map(item => {
-              return {
-                ...item,
-                visible: true,
-                produceType: 0,
-                resourceType: this.resourceType
-              }
-            })
-            this.$store.dispatch('SetModelMeasures', measures)
-            this.searchList = [...dimensions, ...measures]
+      let res = ''
+      if (this.resourceType === 8) {
+        res = await this.$server.screenManage.getDataModelList(
+          id,
+          this.currentPageId
+        )
+      }
+      if (this.resourceType === 3) {
+        res = await this.$server.screenManage.getAccessList(
+          id,
+          this.currentPageId
+        )
+      }
 
-            this.detailInfo.pivotSchema = {
-              dimensions,
-              measures
-            } // 聚合运算数据
-
-            // 获取被删除的数据(status===1)
-            this.$emit('getErrorData', {
-              dimensions: dimensions.filter(item => item.status === 1),
-              measures: measures.filter(item => item.status === 1)
-            })
+      loadingInstance.close()
+      if (res.code === 200) {
+        res.data.dimensions.map(item => {
+          item.showMore = false
+        })
+        res.data.measures.map(item => {
+          item.showMore = false
+        })
+        let datas = res.data
+        let dimensions = datas.dimensions
+        let measures = datas.measures
+        this.dimensions = this.transData(dimensions)
+        dimensions = dimensions.map(item => {
+          return { ...item, visible: true, produceType: 0 }
+        })
+        this.measures = this.transData(measures)
+        measures = measures.map(item => {
+          return {
+            ...item,
+            visible: true,
+            produceType: 0,
+            resourceType: this.resourceType
           }
         })
-        .finally(() => {
-          loadingInstance.close()
+        this.$store.dispatch('SetModelMeasures', measures)
+        this.searchList = [...dimensions, ...measures]
+
+        this.detailInfo.pivotSchema = {
+          dimensions,
+          measures
+        } // 聚合运算数据
+
+        // 获取被删除的数据(status===1)
+        this.$emit('getErrorData', {
+          dimensions: dimensions.filter(item => item.status === 1),
+          measures: measures.filter(item => item.status === 1)
         })
+      }
     },
     transData(data) {
       const result = Object.values(
