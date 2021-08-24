@@ -234,13 +234,6 @@ export default {
           return '3'
       }
     },
-    // 删除operation为4的操作
-    deleteOperationDelimiter(name) {
-      const index = this.operation.findIndex(item => item.name === name)
-      if (index > -1 && this.operation[index].operation === 4) {
-        this.operation.splice(index, 1)
-      }
-    },
     // 重置表单
     handleResetForm() {
       this.form = { name: '', delimiter: '0' }
@@ -271,13 +264,15 @@ export default {
         this.getFileList()
       }
     },
-    // 切换分隔符
-    changeDelimiter(e) {
-      const value = e.target.value
-      if (this.fileInfoList.length === 0) {
-        return
+    // 删除operation为4的操作
+    deleteOperationDelimiter(name) {
+      const index = this.operation.findIndex(item => item.name === name)
+      if (index > -1 && this.operation[index].operation === 4) {
+        this.operation.splice(index, 1)
       }
-      // 判断当前分隔符是不是'已入库文件'中记录的分隔符
+    },
+    // 判断当前分隔符是不是'已入库文件'中记录的分隔符
+    handleOperationDelimiter() {
       // 如果不是库里的分隔符, 要录入操作数组operation: 4
       const currentFile = this.fileInfoList[this.currentFileIndex]
       const index = this.operation.findIndex(item => item.name === currentFile.name)
@@ -307,6 +302,15 @@ export default {
           this.operation[index].delimiter = this.queryDelimiter
         }
       }
+    },
+    // 切换分隔符
+    changeDelimiter(e) {
+      const value = e.target.value
+      if (this.fileInfoList.length === 0) {
+        return
+      }
+      // 处理operation
+      this.handleOperationDelimiter()
       if (value === '3' && !this.inputDelimiter) {
         return this.handleClearTable()
       } else {
@@ -316,8 +320,11 @@ export default {
         })
       }
     },
+    // 立即解析
     handleRenderByDelimiter() {
       if (this.inputDelimiter) {
+        // 处理operation
+        this.handleOperationDelimiter()
         this.databaseList = []
         this.$nextTick(() => {
           this.renderCurrentTable()
