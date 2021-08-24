@@ -189,15 +189,16 @@ const screenManage = {
     return $axios.get(`/model/catalog/list/2`)
   },
   /**
-   * @description 数据模型--维度、度量列表
-   * @param {*} id
-   * @returns
+   * 获取模型維度度量
    */
-  getPivoSchemaList(tableId, tabId) {
-    // return $axios.get(`/model/pivotschema/selectModelPivotschemaListByRole/${id}`)
-    return $axios.get(
-      `/screen/pivotschema/selectModelPivotschemaListByRole/${tableId}/${tabId}`
-    )
+  getDataModelList(screenTableId, tabId) {
+    return $axios.get(`/screen/pivotschema/model/${screenTableId}/${tabId}`)
+  },
+  /**
+   * 获取接入維度度量
+   */
+  getAccessList(screenTableId, tabId) {
+    return $axios.get(`/screen/pivotschema/access/${screenTableId}/${tabId}`)
   },
   /**
    * @description 根据维度度量获取数据
