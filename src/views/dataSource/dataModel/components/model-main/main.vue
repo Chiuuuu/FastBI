@@ -230,6 +230,9 @@ export default {
           'common/SET_PRIVILEGES',
           result.data.privileges || []
         )
+        this.handleDetailWithRoot()
+        this.handleDimensions()
+        this.handleMeasures()
         // 将自定义维度度量剥离处理
         this.detailInfo.pivotSchema.dimensions = this.handlePeelCustom(
           this.detailInfo.pivotSchema.dimensions,
@@ -239,9 +242,6 @@ export default {
           this.detailInfo.pivotSchema.measures,
           this.cacheMeasures
         )
-        this.handleDetailWithRoot()
-        this.handleDimensions()
-        this.handleMeasures()
       } else {
         this.$message.error(result.msg)
       }

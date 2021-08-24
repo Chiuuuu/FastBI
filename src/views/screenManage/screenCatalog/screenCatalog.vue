@@ -575,7 +575,6 @@ export default {
         if (newItem) result.push(newItem)
       })
       this.folderList = result
-      console.log('搜索结果', this.folderList)
     },
     // 是否为文件夹 fileType|1:文件;0:文件夹
     handleIsFolder(item) {

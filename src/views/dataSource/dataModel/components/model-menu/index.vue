@@ -535,7 +535,6 @@ export default {
         if (newItem) result.push(newItem)
       })
       this.sourceSearchList = result
-      console.log('搜索结果', this.sourceSearchList)
     },
     /**
      * 搜索目录列表
@@ -555,7 +554,6 @@ export default {
         if (newItem) result.push(newItem)
       })
       this.modelSearchList = result
-      console.log('搜索结果', this.modelSearchList)
     },
     /**
      * 新增文件夹
