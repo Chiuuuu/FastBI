@@ -172,7 +172,7 @@
             >
             <a-button
               v-on:click="openModal('create-view')"
-              :disabled="disableByDetailInfo"
+              :disabled="disableByDetailInfo || model === 'add'"
               >导入BI库</a-button
             >
             <a-button
