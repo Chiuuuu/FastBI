@@ -210,6 +210,8 @@ export default {
       }
       this.spinning = true
       this.renderTables = []
+      this.cacheDimensions = []
+      this.cacheMeasures = []
       let modelId = ''
       if (typeof id === 'string') {
         modelId = id
