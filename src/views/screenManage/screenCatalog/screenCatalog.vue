@@ -1,46 +1,39 @@
 <template>
-  <div class="screen-catalog">
-    <div class="left">
-      <div class="menu_title">
-        <span>大屏目录</span>
-        <a-dropdown
-          v-if="hasPermissionSourceAdd || hasPermissionFolderAdd"
-          :trigger="['click']"
-          placement="bottomLeft"
-        >
-          <a-icon type="plus-square" class="menu_icon" />
-          <a-menu slot="overlay" class="drow_menu">
-            <a-menu-item @click="chooseScreenTemplate" v-if="hasPermissionSourceAdd">
-              选择大屏模版
-            </a-menu-item>
-            <a-menu-item v-on:click="addScreen" v-if="hasPermissionSourceAdd">
-              新建空白大屏
-            </a-menu-item>
-            <a-menu-item
-              v-if="hasPermissionFolderAdd"
-              key="1"
-              @click="addFolder"
-            >
-              新建文件夹
-            </a-menu-item>
-          </a-menu>
-        </a-dropdown>
-      </div>
-      <div class="menu_search">
-        <a-input
-          placeholder="搜索大屏目录"
-          v-model="searchName"
-          @change="menuSearch"
-        >
-          <a-icon class="icon_search" slot="suffix" type="search" />
-        </a-input>
-      </div>
-      <div
-        class="menu-wrap scrollbar screen-menu"
-        v-if="folderList.length > 0"
-        @dragover.stop.prevent
-        @drop.stop.prevent="handleWrapDrop"
-      >
+  <div style="overflow:hidden;height:100%">
+    <div class="screen-catalog" ref="screenCatalog">
+      <div class="left">
+        <div class="menu_title">
+          <span>大屏目录</span>
+          <a-dropdown
+            v-if="hasPermissionSourceAdd || hasPermissionFolderAdd"
+            :trigger="['click']"
+            placement="bottomLeft"
+          >
+            <a-icon type="plus-square" class="menu_icon" />
+            <a-menu slot="overlay" class="drow_menu">
+              <a-menu-item @click="choose = true"> 选择大屏模版 </a-menu-item>
+              <a-menu-item v-on:click="addScreen" v-if="hasPermissionSourceAdd">
+                新建空白大屏
+              </a-menu-item>
+              <a-menu-item
+                v-if="hasPermissionFolderAdd"
+                key="1"
+                @click="addFolder"
+              >
+                新建文件夹
+              </a-menu-item>
+            </a-menu>
+          </a-dropdown>
+        </div>
+        <div class="menu_search">
+          <a-input
+            placeholder="搜索大屏目录"
+            v-model="searchName"
+            @change="menuSearch"
+          >
+            <a-icon class="icon_search" slot="suffix" type="search" />
+          </a-input>
+        </div>
         <div
           class="menu-wrap scrollbar screen-menu"
           v-if="folderList.length > 0"
