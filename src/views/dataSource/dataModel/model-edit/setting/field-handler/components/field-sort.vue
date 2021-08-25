@@ -89,6 +89,7 @@ export default {
       if (this.tableList.length >= 5) return this.$message.error('最多支持5个排序字段')
       const data = nodes[0]
       const insertData = {
+        fieldId: data.fieldId,
         pivotschemaId: data.id,
         datamodelId: data.datamodelId,
         // modelTableId: data.modelTableId,

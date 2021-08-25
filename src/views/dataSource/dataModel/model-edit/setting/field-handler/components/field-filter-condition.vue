@@ -239,16 +239,16 @@ export default {
       if (this.fieldData) {
         Object.assign(data, this.fieldData)
         data.pivotschemaId = this.fieldData.id
-        params.datamodelId = data.datamodelId
+        params.fieldId = this.fieldData.fieldId
         // params.modelTableId = data.modelTableId
       } else {
         Object.assign(data, this.conditionData)
-        params.datamodelId = data.datamodelId
+        params.fieldId = data.fieldId
         // params.modelTableId = data.modelTableId
       }
       this.spinning = true
-      const res = await this.$server.screenManage
-        .getDataPick(params)
+      const res = await this.$server.dataModel
+        .getModelData(params)
         .finally(() => {
           this.spinning = false
         })

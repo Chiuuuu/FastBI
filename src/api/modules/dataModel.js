@@ -271,6 +271,15 @@ export default {
     return $axios.get(`/screen/pivotschema/del/${tabId}/${tableId}`)
   },
   /**
+   *@description 获取模型字段数据
+   * @param {Object} params
+   * @param {String} params.datamodelId // 模型id
+   * @param {String} params.ruleType // 0默认 1筛选 2排序
+   */
+  getModelData(params) {
+    return $axios.post('/model/pivotschema/getFieldData', params)
+  },
+  /**
    *@description 获取模型筛选排序字段
    * @param {Object} params
    * @param {String} params.datamodelId // 模型id

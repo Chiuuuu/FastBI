@@ -169,6 +169,7 @@ export default {
         data.convertType || data.dataType
       )
       const insertData = {
+        fieldId: data.fieldId,
         pivotschemaId: data.id,
         datamodelId: data.datamodelId,
         // modelTableId: data.modelTableId,
