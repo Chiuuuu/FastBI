@@ -1316,6 +1316,7 @@ export default {
           })
           .then(() => {
             this.$store.commit('dataModel/SET_MODELID', result.data.id)
+            this.$store.commit('common/SET_MENUSELECTID', result.data.id)
             this.exit()
           })
       } else {
