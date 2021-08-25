@@ -579,6 +579,18 @@ export default {
         this.updateChartData()
       }
 
+      if (
+        (!selected.datamodelId || selected.datamodelId === '0') &&
+        this.fileList.length > 0
+      ) {
+        // modelId 赋值
+        selected.datamodelId = this.fileList[0].screenTableId
+        selected.setting.api_data.modelId = parseInt(
+          this.fileList[0].screenTableId
+        )
+        selected.setting.resourceType = this.fileList[0].resourceType
+      }
+
       let data = this.currSelected.setting.api_data
       if (this.chartType === '1') {
         if (data.dimensions.length === 0 && data.measures.length === 0) {
