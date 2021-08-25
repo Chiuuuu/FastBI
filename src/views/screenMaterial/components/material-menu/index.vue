@@ -89,6 +89,11 @@ export default {
       return this.searchValue ? this.searchList : this.categoryList
     }
   },
+  watch: {
+    categoryList() {
+      this.handleGetSearchList(this.searchValue)
+    }
+  },
   mounted() {
     this.handleGetMenuList()
   },
@@ -102,6 +107,7 @@ export default {
         this.$emit('update:categoryList', result.data)
         this.$emit('update:categoryId', result.data[0].id)
         this.modalOptions.list = result.data.slice(1)
+        this.handleGetSearchList(this.searchValue)
       } else {
         this.$message.error(result.msg || '查询分组失败')
       }

@@ -39,6 +39,19 @@
           <div class="detail">
             <div class="detail_header">
               <span>数据模型详情</span>
+              <div class="detail_btn">
+                <a-checkbox
+                  :checked="Boolean(+detailInfo.isDuplicate)"
+                  disabled
+                  style="margin-top:5px"
+                  >数据去重</a-checkbox
+                >
+                <a-button
+                  v-on:click="openModal()"
+                  :disabled="disableByDetailInfo"
+                  >查看宽表</a-button
+                >
+              </div>
             </div>
             <div class="detail_main">
               <div class="dimensionality">
@@ -104,11 +117,13 @@
         </div>
       </a-spin>
     </template>
+    <CheckTable v-if="detailInfo" :is-show="visible" :detailInfo="detailInfo" @close="visible = false" />
   </div>
 </template>
 
 <script>
 import TreeNode from './show-tree-node'
+import CheckTable from '../../model-edit/setting/check-table'
 import { Node, conversionTree } from '../../util'
 import { hasPermission } from '@/utils/permission'
 import { mapState } from 'vuex'
@@ -117,15 +132,19 @@ import keys from 'lodash/keys'
 export default {
   name: 'model-main',
   components: {
-    TreeNode
+    TreeNode,
+    CheckTable
   },
   data() {
     return {
       spinning: false, // 获取数据loading
+      visible: false,
       detailInfo: '', // 详情信息
       tablesEmpty: false, // 是否表为空
-      dimensions: '', // 维度
-      measures: '', // 度量
+      dimensions: [], // 维度
+      measures: [], // 度量
+      cacheDimensions: [],
+      cacheMeasures: [],
       renderTables: [], // 用来渲染树组件
       dimensionsActiveKey: [],
       measuresActiveKey: [],
@@ -142,9 +161,46 @@ export default {
     }),
     hasEditPermission() {
       return hasPermission(this.privileges, this.$PERMISSION_CODE.OPERATOR.edit)
+    },
+    disableByDetailInfo() {
+      if (this.detailInfo === '') {
+        return true
+      }
+
+      return (
+        this.detailInfo.config.tables &&
+        this.detailInfo.config.tables.length === 0
+      )
     }
   },
   methods: {
+    /**
+     * 合并维度度量数据
+     */
+    handleConcat() {
+      return {
+        dimensions: [
+          ...this.cacheDimensions,
+          ...this.detailInfo.pivotSchema.dimensions
+        ],
+        measures: [
+          ...this.cacheMeasures,
+          ...this.detailInfo.pivotSchema.measures
+        ]
+      }
+    },
+    handlePeelCustom(list, cache) {
+      if (list && list.length) {
+        return list.filter(item => {
+          if (item.tableNo === 0) {
+            cache.push(item)
+          } else {
+            return item
+          }
+        })
+      }
+      return list
+    },
     /**
      * 获取数据
      */
@@ -154,6 +210,8 @@ export default {
       }
       this.spinning = true
       this.renderTables = []
+      this.cacheDimensions = []
+      this.cacheMeasures = []
       let modelId = ''
       if (typeof id === 'string') {
         modelId = id
@@ -178,6 +236,15 @@ export default {
         this.handleDetailWithRoot()
         this.handleDimensions()
         this.handleMeasures()
+        // 将自定义维度度量剥离处理
+        this.detailInfo.pivotSchema.dimensions = this.handlePeelCustom(
+          this.detailInfo.pivotSchema.dimensions,
+          this.cacheDimensions
+        )
+        this.detailInfo.pivotSchema.measures = this.handlePeelCustom(
+          this.detailInfo.pivotSchema.measures,
+          this.cacheMeasures
+        )
       } else {
         this.$message.error(result.msg)
       }
@@ -196,6 +263,10 @@ export default {
         datsource.data[0].datasourceId
       )
       return datsource.data[0].datasourceId
+    },
+    // 打开模态框
+    openModal() {
+      this.visible = true
     },
     /**
      * 跳转编辑状态

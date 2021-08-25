@@ -50,6 +50,7 @@ export class MapSheet {
   formatTable(list) {
     let tableList = []
     list.map(([key, value]) => {
+      value.originRows = value.rows
       tableList.push(value)
     })
     this.tableList = tableList
@@ -66,6 +67,7 @@ export class MapSheet {
   addTable(table, index) {
     if (index !== undefined) {
       this.tableList[index] = table
+      table.originRows = table.rows
     } else {
       this.tableList.push(table)
     }

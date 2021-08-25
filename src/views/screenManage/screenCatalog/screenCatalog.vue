@@ -1,39 +1,46 @@
 <template>
-  <div style="overflow:hidden;height:100%">
-    <div class="screen-catalog" ref="screenCatalog">
-      <div class="left">
-        <div class="menu_title">
-          <span>大屏目录</span>
-          <a-dropdown
-            v-if="hasPermissionSourceAdd || hasPermissionFolderAdd"
-            :trigger="['click']"
-            placement="bottomLeft"
-          >
-            <a-icon type="plus-square" class="menu_icon" />
-            <a-menu slot="overlay" class="drow_menu">
-              <a-menu-item @click="choose = true"> 选择大屏模版 </a-menu-item>
-              <a-menu-item v-on:click="addScreen" v-if="hasPermissionSourceAdd">
-                新建空白大屏
-              </a-menu-item>
-              <a-menu-item
-                v-if="hasPermissionFolderAdd"
-                key="1"
-                @click="addFolder"
-              >
-                新建文件夹
-              </a-menu-item>
-            </a-menu>
-          </a-dropdown>
-        </div>
-        <div class="menu_search">
-          <a-input
-            placeholder="搜索大屏目录"
-            v-model="searchName"
-            @change="menuSearch"
-          >
-            <a-icon class="icon_search" slot="suffix" type="search" />
-          </a-input>
-        </div>
+  <div class="screen-catalog">
+    <div class="left">
+      <div class="menu_title">
+        <span>大屏目录</span>
+        <a-dropdown
+          v-if="hasPermissionSourceAdd || hasPermissionFolderAdd"
+          :trigger="['click']"
+          placement="bottomLeft"
+        >
+          <a-icon type="plus-square" class="menu_icon" />
+          <a-menu slot="overlay" class="drow_menu">
+            <a-menu-item @click="chooseScreenTemplate" v-if="hasPermissionSourceAdd">
+              选择大屏模版
+            </a-menu-item>
+            <a-menu-item v-on:click="addScreen" v-if="hasPermissionSourceAdd">
+              新建空白大屏
+            </a-menu-item>
+            <a-menu-item
+              v-if="hasPermissionFolderAdd"
+              key="1"
+              @click="addFolder"
+            >
+              新建文件夹
+            </a-menu-item>
+          </a-menu>
+        </a-dropdown>
+      </div>
+      <div class="menu_search">
+        <a-input
+          placeholder="搜索大屏目录"
+          v-model="searchName"
+          @change="menuSearch"
+        >
+          <a-icon class="icon_search" slot="suffix" type="search" />
+        </a-input>
+      </div>
+      <div
+        class="menu-wrap scrollbar screen-menu"
+        v-if="folderList.length > 0"
+        @dragover.stop.prevent
+        @drop.stop.prevent="handleWrapDrop"
+      >
         <div
           class="menu-wrap scrollbar screen-menu"
           v-if="folderList.length > 0"
@@ -356,6 +363,7 @@ export default {
       current: ['mail'],
       openKeys: ['sub1'],
       folderList: [], // 文件夹列表
+      folderOrignList: [], // 文件夹列表
       screenVisible: false, // 新建大屏弹窗
       isAdd: 1, // 1新增 2编辑 3删除
       folderVisible: false, // 新建文件夹弹窗
@@ -376,6 +384,14 @@ export default {
             OBJECT: this.$PERMISSION_CODE.OBJECT.screen
           },
           onClick: this.handleScreen
+        },
+        {
+          name: '选择大屏模版',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.add,
+            OBJECT: this.$PERMISSION_CODE.OBJECT.screen
+          },
+          onClick: this.handleScreenTemplate
         },
         {
           name: '重命名',
@@ -557,7 +573,8 @@ export default {
         if (res.code === 200) {
           let rows = res.data
           // 大屏文件保存不需要文件夹
-          this.folderList = rows
+          this.folderOrignList = rows.concat()
+          this.folderList = rows.concat()
           // 没有选择文件的时候默认选择第一个文件
           if (this.fileSelectId === -1 && this.folderList.length > 0) {
             this.getFirstScreen(this.folderList, 0)
@@ -593,12 +610,11 @@ export default {
     }, 400),
     handleGetSearchList(value) {
       let result = []
-      this.folderList.map(item => {
+      this.folderOrignList.map(item => {
         const newItem = menuSearchLoop(item, value)
         if (newItem) result.push(newItem)
       })
       this.folderList = result
-      console.log('搜索结果', this.folderList)
     },
     // 是否为文件夹 fileType|1:文件;0:文件夹
     handleIsFolder(item) {
@@ -740,6 +756,15 @@ export default {
           parentId: folder.id
         })
       })
+    },
+    chooseScreenTemplate() {
+      this.$store.dispatch('SetParentId', '')
+      this.choose = true
+    },
+    // 在文件夹底下新建大屏
+    handleScreenTemplate(event, item, { folder }) {
+      this.choose = true
+      this.$store.dispatch('SetParentId', folder.id)
     },
     // 选择左侧菜单
     handleFileSelect(file) {
@@ -1021,7 +1046,7 @@ export default {
     getSubmit() {
       this.btnloading = true
       this.$server.chooseScreen
-        .saveScreenData(this.chooseTemple.screenId)
+        .saveScreenData(this.chooseTemple.screenId, this.parentId || 0)
         .then(res => {
           this.btnloading = false
           this.$router.push({

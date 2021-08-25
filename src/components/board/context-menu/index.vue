@@ -140,7 +140,9 @@ export default {
       'canvasRange',
       'isScreen',
       'fileName',
-      'polymerizeType'
+      'polymerizeType',
+      'pageList',
+      'currentPageId'
     ]),
     contextMenuStyle() {
       let x =
@@ -176,6 +178,15 @@ export default {
         }
       }
       return tmpObj
+    },
+    chartName() {
+      if (!this.currSelected) {
+        return ''
+      }
+      return this.currSelected.setting.config.title
+        ? this.currSelected.setting.config.title.content ||
+            this.currSelected.setting.config.title.text
+        : this.currSelected.setting.config.topTitle.content
     }
   },
   destroyed() {
@@ -239,7 +250,7 @@ export default {
       } else if (order === 'exportImg') {
         this.$store.dispatch('ToggleContextMenu')
         if (this.isScreen && this.$route.name !== 'screenEdit') {
-          exportForFull(this.currSelected, this.pageSettings, this.canvasRange)
+          exportForFull(this.currSelected, this.pageSettings)
         } else {
           exportImg(this.currSelected, this.pageSettings)
         }
@@ -265,7 +276,21 @@ export default {
     // },
     // 导出大屏数据
     exportScreen() {
+      // 导出大屏数据
       exportScreen(this.fileName)
+
+      // 记录日志
+      let tabName = ''
+      this.pageList.forEach(item => {
+        if (this.currentPageId === item.id) {
+          tabName = item.name
+        }
+      })
+      let params = {
+        screenName: this.fileName,
+        tabName: tabName
+      }
+      this.$server.screenManage.actionExportScreen(params)
     },
     startDownload() {
       this.$message.info('正在导出')
@@ -306,9 +331,18 @@ export default {
     },
     // 查看/导出数据 -- 构造数据
     async setChartData_scan() {
+      let tabName = ''
+      this.pageList.forEach(item => {
+        if (this.currSelected.tabId === item.id) {
+          tabName = item.name
+        }
+      })
       let params = {
         id: this.currSelected.id,
-        type: this.currSelected.setting && this.currSelected.setting.chartType
+        type: this.currSelected.setting && this.currSelected.setting.chartType,
+        screenName: this.fileName,
+        tabName: tabName,
+        graphName: this.currSelected.type
       }
       let loadingInstance = Loading.service({
         lock: true,

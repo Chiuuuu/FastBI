@@ -218,6 +218,13 @@ export default {
           onClick: this.handleFileResetName
         },
         {
+          name: '复制',
+          permission: {
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit
+          },
+          onClick: this.handleFileCopy
+        },
+        {
           name: '删除',
           permission: {
             OPERATOR: this.$PERMISSION_CODE.OPERATOR.remove
@@ -318,6 +325,20 @@ export default {
       this.resetName.item = file
       this.resetName.visible = true
       this.resetName.parentId = parent ? parent.id : 0
+    },
+    /**
+     * 模型复制
+     */
+    async handleFileCopy(mouseEvent, event, { file }) {
+      const result = await this.$server.dataModel.copyDataModel(file.id)
+      if (result && result.code === 200) {
+        // 复制成功后重置目录列表
+        this.$message.success('复制成功')
+        this.$store.commit('dataModel/SET_MENULIST', result.data)
+        this.handleGetModelSearchList(this.modelSearch)
+      } else {
+        this.$message.error(result.msg || result.message || '请求错误')
+      }
     },
     async _resetName(form) {
       const result = await this.$server.common.putMenuFolderName('/model/catalog/edit', {
@@ -514,7 +535,6 @@ export default {
         if (newItem) result.push(newItem)
       })
       this.sourceSearchList = result
-      console.log('搜索结果', this.sourceSearchList)
     },
     /**
      * 搜索目录列表
@@ -534,7 +554,6 @@ export default {
         if (newItem) result.push(newItem)
       })
       this.modelSearchList = result
-      console.log('搜索结果', this.modelSearchList)
     },
     /**
      * 新增文件夹

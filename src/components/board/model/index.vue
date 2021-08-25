@@ -318,7 +318,8 @@ export default {
       'selectedModelList',
       'currentSelected',
       'currSelected',
-      'canvasMap'
+      'canvasMap',
+      'currentPageId'
     ]),
     // 过滤模型列表
     savedModels() {
@@ -396,6 +397,9 @@ export default {
         return
       }
       this.getPivoSchemaList(val)
+    },
+    currentPageId(val) {
+      this.resourceId = ''
     }
   },
   methods: {
@@ -525,7 +529,8 @@ export default {
         resourceName: item.name,
         datasourceId: '',
         databaseId: '',
-        tableId: item.id
+        tableId: item.id,
+        tabId: this.currentPageId
       }
       // 数据接入
       if (item.resourceType === 3) {
@@ -623,66 +628,75 @@ export default {
         datamodelId: item.datamodelId,
         pivotschemaId: item.pivotschemaId,
         role: num, // 转成维度传1，转成度量传2
-        screenId: this.screenId
+        screenId: this.screenId,
+        tabId: this.currentPageId
       }
       this.$server.screenManage.screenModuleTransform(params).then(res => {
         if (res.code === 200) {
-          this.getPivoSchemaList(this.resourceId, 2)
+          this.getPivoSchemaList(this.resourceId)
         }
       })
     },
     // 维度、度量列表
-    getPivoSchemaList(id, type = 1) {
+    async getPivoSchemaList(id) {
       let loadingInstance = Loading.service({
         lock: true,
         text: '加载中...',
         target: 'body',
         background: 'rgb(255, 255, 255, 0.6)'
       })
-      this.$server.screenManage
-        .getPivoSchemaList(id, this.screenId, type)
-        .then(res => {
-          if (res.code === 200) {
-            res.data.dimensions.map(item => {
-              item.showMore = false
-            })
-            res.data.measures.map(item => {
-              item.showMore = false
-            })
-            let datas = res.data
-            let dimensions = datas.dimensions
-            let measures = datas.measures
-            this.dimensions = this.transData(dimensions)
-            dimensions = dimensions.map(item => {
-              return { ...item, visible: true, produceType: 0 }
-            })
-            this.measures = this.transData(measures)
-            measures = measures.map(item => {
-              return {
-                ...item,
-                visible: true,
-                produceType: 0,
-                resourceType: this.resourceType
-              }
-            })
-            this.$store.dispatch('SetModelMeasures', measures)
-            this.searchList = [...dimensions, ...measures]
+      let res = ''
+      if (this.resourceType === 8) {
+        res = await this.$server.screenManage.getDataModelList(
+          id,
+          this.currentPageId
+        )
+      }
+      if (this.resourceType === 3) {
+        res = await this.$server.screenManage.getAccessList(
+          id,
+          this.currentPageId
+        )
+      }
 
-            this.detailInfo.pivotSchema = {
-              dimensions,
-              measures
-            } // 聚合运算数据
-
-            // 获取被删除的数据(status===1)
-            this.$emit('getErrorData', {
-              dimensions: dimensions.filter(item => item.status === 1),
-              measures: measures.filter(item => item.status === 1)
-            })
+      loadingInstance.close()
+      if (res.code === 200) {
+        res.data.dimensions.map(item => {
+          item.showMore = false
+        })
+        res.data.measures.map(item => {
+          item.showMore = false
+        })
+        let datas = res.data
+        let dimensions = datas.dimensions
+        let measures = datas.measures
+        this.dimensions = this.transData(dimensions)
+        dimensions = dimensions.map(item => {
+          return { ...item, visible: true, produceType: 0 }
+        })
+        this.measures = this.transData(measures)
+        measures = measures.map(item => {
+          return {
+            ...item,
+            visible: true,
+            produceType: 0,
+            resourceType: this.resourceType
           }
         })
-        .finally(() => {
-          loadingInstance.close()
+        this.$store.dispatch('SetModelMeasures', measures)
+        this.searchList = [...dimensions, ...measures]
+
+        this.detailInfo.pivotSchema = {
+          dimensions,
+          measures
+        } // 聚合运算数据
+
+        // 获取被删除的数据(status===1)
+        this.$emit('getErrorData', {
+          dimensions: dimensions.filter(item => item.status === 1),
+          measures: measures.filter(item => item.status === 1)
         })
+      }
     },
     transData(data) {
       const result = Object.values(
@@ -717,7 +731,7 @@ export default {
     async getDelDataModel(screenId, tableId) {
       console.log('****', this.screenId)
       let res = await this.$server.dataModel.delDataModel(
-        this.screenId,
+        this.currentPageId,
         tableId
       )
       if (res.code === 200) {

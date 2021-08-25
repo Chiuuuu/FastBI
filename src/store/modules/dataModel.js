@@ -47,6 +47,7 @@ const actions = {
     const result = await dataAccessApi.getMenuList('/model/catalog/list/2')
     if (result.code === 200) {
       commit('SET_MENULIST', result.data)
+      vm.handleGetModelSearchList(vm.modelSearch)
     } else {
       vm.$message.error(result.msg)
     }
