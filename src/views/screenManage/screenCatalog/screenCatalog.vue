@@ -10,7 +10,7 @@
         >
           <a-icon type="plus-square" class="menu_icon" />
           <a-menu slot="overlay" class="drow_menu">
-            <a-menu-item @click="choose = true" v-if="hasPermissionSourceAdd">
+            <a-menu-item @click="chooseScreenTemplate" v-if="hasPermissionSourceAdd">
               选择大屏模版
             </a-menu-item>
             <a-menu-item v-on:click="addScreen" v-if="hasPermissionSourceAdd">
@@ -728,6 +728,10 @@ export default {
           parentId: folder.id
         })
       })
+    },
+    chooseScreenTemplate() {
+      this.$store.dispatch('SetParentId', '')
+      this.choose = true
     },
     // 在文件夹底下新建大屏
     handleScreenTemplate(event, item, { folder }) {
