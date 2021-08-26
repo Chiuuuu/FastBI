@@ -11,7 +11,7 @@
   >
     <div v-if="fileList.length > 0">
       <div
-        :class="['field', { error: item.status === 1 }]"
+        :class="['field', { error: item.status === 1 || item.isChanged }]"
         v-for="(item, index) in fileList"
         :key="index"
         @contextmenu.prevent="showMore(item)"
@@ -256,6 +256,35 @@ export default {
       this.fileList.splice(index, 1)
       this.handleSort()
     },
+    // 处理isChanged标红
+    handleRedList(list, selected) {
+      // 如果存在对应列表id，替换成红色
+      if (list) {
+        selected.setting.api_data.dimensions.forEach(item => {
+          if (!list.includes(item.pivotschemaId)) {
+            item.isChanged = true
+          }
+        })
+        selected.setting.api_data.measures.forEach(item => {
+          if (!list.includes(item.pivotschemaId)) {
+            item.isChanged = true
+          }
+        })
+        selected.setting.api_data.options.fileList &&
+          selected.setting.api_data.options.fileList.forEach(item => {
+            if (!list.includes(item.pivotschemaId)) {
+              item.isChanged = true
+            }
+          })
+        selected.setting.api_data.options.sort &&
+          selected.setting.api_data.options.sort.forEach(item => {
+            if (!list.includes(item.pivotschemaId)) {
+              item.isChanged = true
+            }
+          })
+        this.$store.dispatch('SetSelfDataSource', selected.setting.api_data)
+      }
+    },
     // 根据维度度量获取数据
     async getData() {
       let apiData = deepClone(this.currSelected.setting.api_data)
@@ -304,6 +333,7 @@ export default {
       // 数据源被删掉
       if (res.code === 500 && res.msg === 'IsChanged') {
         selected.setting.isEmpty = 'noData'
+        this.handleRedList(res.data, selected)
         this.updateChartData()
         return
       }

@@ -194,6 +194,19 @@ export default {
   },
   methods: {
     ...mapActions(['deleteChartData']),
+    // 处理文件导出的名称
+    handleFileName() {
+      const chartType = this.currSelected.setting.chartType
+      if (chartType === 'v-sun' || chartType === 'v-heatmap') {
+        return this.currSelected.setting.config.title.text
+      } else if (chartType === 'v-ring') {
+        return this.currSelected.setting.config.topTitle.content
+      } else if (this.currSelected.setting.config.title.content) {
+        return this.currSelected.setting.config.title.content
+      } else {
+        return this.currSelected.setting.title
+      }
+    },
     formatAggregator(item) {
       const fun = this.polymerizeType.find(
         x => x.value === item.defaultAggregator
@@ -429,13 +442,14 @@ export default {
       }
       const column = []
       fieldList.map(item => {
-        if (keys.includes(item.alias)) {
-          column.push({
-            alias: item.alias,
-            colName: this.formatAggregator(item),
-            role: item.role
-          })
-        }
+        // 数据库为NULL的字段现在不返回, 所以不能用第一行的keys初始化表头
+        // if (keys.includes(item.alias)) {
+        column.push({
+          alias: item.alias,
+          colName: this.formatAggregator(item),
+          role: item.role
+        })
+        // }
       })
       return column
     }

@@ -412,6 +412,35 @@ const app = {
       return screenManage
         .actionRefreshScreen({ params })
         .then(res => {
+          // 处理isChanged标红
+          function handleRedList(list, selected) {
+            // 如果存在对应列表id，替换成红色
+            if (list) {
+              selected.setting.api_data.dimensions.forEach(item => {
+                if (!list.includes(item.pivotschemaId)) {
+                  item.isChanged = true
+                }
+              })
+              selected.setting.api_data.measures.forEach(item => {
+                if (!list.includes(item.pivotschemaId)) {
+                  item.isChanged = true
+                }
+              })
+              selected.setting.api_data.options.fileList &&
+                selected.setting.api_data.options.fileList.forEach(item => {
+                  if (!list.includes(item.pivotschemaId)) {
+                    item.isChanged = true
+                  }
+                })
+              selected.setting.api_data.options.sort &&
+                selected.setting.api_data.options.sort.forEach(item => {
+                  if (!list.includes(item.pivotschemaId)) {
+                    item.isChanged = true
+                  }
+                })
+            //   dispatch('SetSelfDataSource', selected.setting.api_data)
+            }
+          }
           if (res.code === 200) {
             let dataItem = res.data
             let ids = Object.keys(dataItem)
@@ -478,8 +507,9 @@ const app = {
                   continue
                 }
                 // 图表模型被删掉
-                if (dataItem[id] === 'IsChanged') {
+                if (dataItem[id].msg === 'IsChanged') {
                   chart.setting.isEmpty = 'noData'
+                  handleRedList(dataItem[id].data, chart)
                   continue
                 }
                 chart.setting.isEmpty = false
