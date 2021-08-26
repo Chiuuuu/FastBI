@@ -224,9 +224,9 @@ const expression = [
   {
     id: 'GROUPBY',
     name: '指定聚合',
-    expression: '',
-    description: '指定聚合 对数据进行分组后聚合计算，或者不分组直接用所有值进行计算。指定聚合方式包括：求和、平均、最大、最小、计数和去重计数。双击新建指定聚合字段',
-    example: '',
+    expression: '指定聚合',
+    description: '对数据进行分组后聚合计算，或者不分组直接用所有值进行计算。指定聚合方式包括：求和、平均、最大、最小、计数和去重计数。',
+    example: '双击新建指定聚合字段',
     syntax: '',
     groups: ['calculation']
   }
