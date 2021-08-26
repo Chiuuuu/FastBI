@@ -50,16 +50,10 @@ export default {
     FieldSort
   },
   props: {
-    filterList: {
-      type: Array,
-      default() {
-        return []
-      }
-    },
-    sortList: {
-      type: Array,
-      default() {
-        return []
+    detailInfo: {
+      type: Object,
+      default: () => {
+        return {}
       }
     }
   },
@@ -82,29 +76,12 @@ export default {
   watch: {
     isShow(val) {
       if (val) {
-        this.filterListBackup = cloneDeep(this.filterList)
-        this.sortListBackup = cloneDeep(this.sortList)
+        this.filterListBackup = cloneDeep(this.detailInfo.modelPivotschemaRule.filterRules)
+        this.sortListBackup = cloneDeep(this.detailInfo.modelPivotschemaRule.sortRules)
       }
     }
   },
   methods: {
-    async handleGetFilterSortList(ruleType) {
-      const res = await this.$server.dataModel.getFilterOrSortRules({
-        datamodelId: this.model === 'add' ? this.addModelId : this.modelId,
-        ruleType
-      })
-      if (res && res.code === 200) {
-        if (ruleType === 1) {
-          // 筛选
-          this.filterListBackup = res.data
-        } else if (ruleType === 2) {
-          // 排序
-          this.sortListBackup = res.data
-        }
-      } else {
-        this.$message.error(res.msg || res.message || '获取筛选排序列表失败')
-      }
-    },
     changeTab(key) {
       const ref = this.$refs['tab' + key]
       ref && ref.handleTreeData()
