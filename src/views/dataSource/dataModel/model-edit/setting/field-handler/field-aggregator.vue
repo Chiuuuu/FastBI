@@ -303,7 +303,6 @@ export default {
     },
     // 文本框重新书写value
     changeTextArea() {
-      debugger
       let text = ''
       // 选择了字段
       if (this.currentField) {

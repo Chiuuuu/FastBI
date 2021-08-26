@@ -60,7 +60,7 @@ export default {
       columns: [
         {
           title: '排序字段',
-          dataIndex: 'field',
+          dataIndex: 'alias',
           ellipsis: true,
           width: 200
         },
@@ -92,7 +92,7 @@ export default {
         fieldId: data.fieldId,
         pivotschemaId: data.id,
         datamodelId: data.datamodelId,
-        // modelTableId: data.modelTableId,
+        modelTableId: data.modelTableId,
         convertType: data.convertType || data.dataType,
         field: data.name,
         alias: data.alias,

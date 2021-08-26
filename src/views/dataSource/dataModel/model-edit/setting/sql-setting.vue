@@ -1,6 +1,6 @@
 <template>
   <a-modal
-    title="添加自定义SQL视图"
+    :title="(this.status === 'new' ? '添加' : '编辑') + '自定义SQL视图'"
     :visible="isShow"
     destroyOnClose
     :confirmLoading="loading"
