@@ -225,24 +225,24 @@ export default {
       const list = [].concat(this.sourceDimensions).concat(this.sourceMeasures)
       const field = list.find(item => item.id === expr.replace('$$', ''))
       this.currentField = field
-
-      const defaultAggregator = this.aggregatorList.find(
-        item => item.value === this.renameData.defaultAggregator
-      )
-      this.currentAggregator = defaultAggregator
-
       this.form = Object.assign(this.form, {
         name: this.renameData.alias,
-        field: field ? field.alias : '',
-        defaultAggregator: defaultAggregator ? defaultAggregator.name : ''
+        field: field ? field.alias : ''
       })
+
       if (this.renameData.raw_expr) {
         this.$nextTick(() => {
-          const checkedList = JSON.parse(this.renameData.raw_expr).checkedList
+          const { checkedList, aggregator } = JSON.parse(this.renameData.raw_expr)
           if (typeof checkedList === 'string') {
             this.$refs.fieldSelectTree &&
               this.$refs.fieldSelectTree.setTree(checkedList.split(','))
           }
+
+          const defaultAggregator = this.aggregatorList.find(
+            item => item.name === aggregator
+          )
+          this.currentAggregator = defaultAggregator
+          this.form.defaultAggregator = defaultAggregator ? defaultAggregator.name : ''
         })
       }
     },
