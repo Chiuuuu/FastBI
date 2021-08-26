@@ -11,7 +11,7 @@
   >
     <div v-if="fileList.length > 0">
       <div
-        :class="['field', { error: item.status === 1 }]"
+        :class="['field', { error: item.status === 1 || item.isChanged }]"
         v-for="(item, index) in fileList"
         :key="index"
         @contextmenu.prevent="showMore(item)"
@@ -36,11 +36,7 @@
         <a-button key="cancel" @click="screenVisible = false">
           取消
         </a-button>
-        <a-button
-          key="submit"
-          type="primary"
-          @click="handleOk"
-        >
+        <a-button key="submit" type="primary" @click="handleOk">
           确定
         </a-button>
       </template>
@@ -553,10 +549,7 @@ export default {
         return this.$message.error('请添加条件')
       }
       // 度量没有添加条件不能确定
-      if (
-        !this.currentFile.dataTypeIsText &&
-        !this.validConditionList()
-      ) {
+      if (!this.currentFile.dataTypeIsText && !this.validConditionList()) {
         return
       }
       let apiData = deepClone(this.currSelected.setting.api_data)
@@ -636,6 +629,34 @@ export default {
       await this.updateChartData()
       this.getData()
     },
+    // 处理isChanged标红
+    handleRedList(list, selected) {
+      // 如果存在对应列表id，替换成红色
+      if (list) {
+        selected.setting.api_data.dimensions.forEach(item => {
+          if (!list.includes(item.pivotschemaId)) {
+            item.isChanged = true
+          }
+        })
+        selected.setting.api_data.measures.forEach(item => {
+          if (!list.includes(item.pivotschemaId)) {
+            item.isChanged = true
+          }
+        })
+        selected.setting.api_data.options.fileList &&
+          selected.setting.api_data.options.fileList.forEach(item => {
+            if (!list.includes(item.pivotschemaId)) {
+              item.isChanged = true
+            }
+          })
+        selected.setting.api_data.options.sort &&
+          selected.setting.api_data.options.sort.forEach(item => {
+            if (!list.includes(item.pivotschemaId)) {
+              item.isChanged = true
+            }
+          })
+      }
+    },
     // 根据维度度量获取数据
     async getData() {
       let apiData = deepClone(this.currSelected.setting.api_data)
@@ -690,6 +711,7 @@ export default {
       // 数据源被删掉
       if (res.code === 500 && res.msg === 'IsChanged') {
         selected.setting.isEmpty = 'noData'
+        this.handleRedList(res.data, selected)
         this.updateChartData()
         return
       }

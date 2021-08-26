@@ -199,6 +199,8 @@ export default {
       const chartType = this.currSelected.setting.chartType
       if (chartType === 'v-sun' || chartType === 'v-heatmap') {
         return this.currSelected.setting.config.title.text
+      } else if (chartType === 'v-ring') {
+        return this.currSelected.setting.config.topTitle.content
       } else if (this.currSelected.setting.config.title.content) {
         return this.currSelected.setting.config.title.content
       } else {
@@ -444,11 +446,11 @@ export default {
       fieldList.map(item => {
         // 数据库为NULL的字段现在不返回, 所以不能用第一行的keys初始化表头
         // if (keys.includes(item.alias)) {
-          column.push({
-            alias: item.alias,
-            colName: this.formatAggregator(item),
-            role: item.role
-          })
+        column.push({
+          alias: item.alias,
+          colName: this.formatAggregator(item),
+          role: item.role
+        })
         // }
       })
       return column
