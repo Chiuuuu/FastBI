@@ -187,6 +187,7 @@ export default {
             }
             this.form.defaultAggregator = '计数'
             this.currentAggregator = this.AGGREGATOR_LIST.find(item => item.value === 'COUNT')
+            this.changeTextArea()
           }
         } else {
           this.dimensions = ''
@@ -302,6 +303,7 @@ export default {
     },
     // 文本框重新书写value
     changeTextArea() {
+      debugger
       let text = ''
       // 选择了字段
       if (this.currentField) {
