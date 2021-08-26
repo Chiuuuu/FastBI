@@ -289,6 +289,16 @@ export default {
         this[`${type}Visible`] = false
         if (type === 'field') {
           this.form.field = item.alias
+          // 如果旧字段是数值型且新字段是非数值型, 重置聚合方式
+          if (this.isNumber(this.currentField.convertType || this.currentField.dataType)) {
+            // 判断是否为新字段没有的聚合方式
+            const aggregator = this.form.defaultAggregator
+            if (aggregator !== '计数' && aggregator !== '去重计数' && !this.isNumber(item.convertType || item.dataType)) {
+              this.form.defaultAggregator = '计数'
+              this.currentAggregator = this.AGGREGATOR_LIST.find(item => item.value === 'COUNT')
+              this.changeTextArea()
+            }
+          }
           this.currentField = item
         } else {
           this.form.defaultAggregator = item.name
@@ -303,7 +313,6 @@ export default {
     },
     // 文本框重新书写value
     changeTextArea() {
-      debugger
       let text = ''
       // 选择了字段
       if (this.currentField) {
