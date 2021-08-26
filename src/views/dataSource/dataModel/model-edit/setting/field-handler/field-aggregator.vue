@@ -175,8 +175,20 @@ export default {
     isShow: {
       immediate: true,
       handler(value) {
-        if (value && this.isEdit) {
-          this.handleInitEditData()
+        if (value) {
+          if (this.isEdit) {
+            // 编辑
+            this.handleInitEditData()
+          } else {
+            // 新建
+            if (this.fieldList.length && this.fieldList.length > 0) {
+              this.currentField = this.fieldList[0]
+              this.form.field = this.currentField.alias
+            }
+            this.form.defaultAggregator = '计数'
+            this.currentAggregator = this.AGGREGATOR_LIST.find(item => item.value === 'COUNT')
+            this.changeTextArea()
+          }
         } else {
           this.dimensions = ''
           this.measures = ''
@@ -225,24 +237,24 @@ export default {
       const list = [].concat(this.sourceDimensions).concat(this.sourceMeasures)
       const field = list.find(item => item.id === expr.replace('$$', ''))
       this.currentField = field
-
-      const defaultAggregator = this.aggregatorList.find(
-        item => item.value === this.renameData.defaultAggregator
-      )
-      this.currentAggregator = defaultAggregator
-
       this.form = Object.assign(this.form, {
         name: this.renameData.alias,
-        field: field ? field.alias : '',
-        defaultAggregator: defaultAggregator ? defaultAggregator.name : ''
+        field: field ? field.alias : ''
       })
+
       if (this.renameData.raw_expr) {
         this.$nextTick(() => {
-          const checkedList = JSON.parse(this.renameData.raw_expr).checkedList
+          const { checkedList, aggregator } = JSON.parse(this.renameData.raw_expr)
           if (typeof checkedList === 'string') {
             this.$refs.fieldSelectTree &&
               this.$refs.fieldSelectTree.setTree(checkedList.split(','))
           }
+
+          const defaultAggregator = this.aggregatorList.find(
+            item => item.name === aggregator
+          )
+          this.currentAggregator = defaultAggregator
+          this.form.defaultAggregator = defaultAggregator ? defaultAggregator.name : ''
         })
       }
     },
@@ -291,6 +303,7 @@ export default {
     },
     // 文本框重新书写value
     changeTextArea() {
+      debugger
       let text = ''
       // 选择了字段
       if (this.currentField) {

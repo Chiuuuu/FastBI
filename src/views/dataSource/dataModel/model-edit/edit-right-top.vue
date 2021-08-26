@@ -188,6 +188,7 @@ export default {
         this.detailInfo.pivotSchema = result.data.pivotSchema
         this.$parent.handleDimensions()
         this.$parent.handleMeasures()
+        this.$parent.handleFilterSort()
       } else {
         this.$message.error(result.msg)
       }

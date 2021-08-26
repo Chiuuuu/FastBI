@@ -218,13 +218,51 @@ export default {
     delectCondition(index) {
       this.customData.splice(index, 1)
     },
+    // 遍历条件列表, 检验input框是否有空值
+    valitateCustomData() {
+      for (const item of this.customData) {
+        if (item.condition === 'range') {
+          const { startValue, endValue } = item
+          if (startValue === '' || endValue === '') {
+            this.$message.error('请完善添加的条件')
+            return false
+          } else if (isNaN(startValue) || isNaN(endValue)) {
+            this.$message.error('请完善添加的条件')
+            return false
+          } else if (startValue > endValue) {
+            this.$message.error('范围起始值大于末尾值')
+            return false
+          }
+        } else {
+          if (isNaN(item.startValue)) {
+            this.$message.error('请完善添加的条件')
+            return false
+          }
+        }
+      }
+      return true
+    },
     // 点击确认时, 赋值给rule
     resultConditionData() {
       if (!this.isNumber) {
+        if (this.checkedData.length < 1) {
+          this.$message.error('请添加条件')
+          return false
+        }
         this.conditionData.rule.ruleFilterList = this.checkedData
       } else {
+        if (this.customData.length < 1) {
+          this.$message.error('请添加条件')
+          return false
+        } else {
+          const res = this.valitateCustomData()
+          if (!res) {
+            return false
+          }
+        }
         this.conditionData.rule.ruleFilterList = this.customData
       }
+      return true
     },
     async getFieldData() {
       // 获取维度对应字段列表
