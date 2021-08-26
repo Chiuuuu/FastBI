@@ -29,6 +29,7 @@ export async function setLinkageData(id, e, canvasMap) {
     dimensionData.value = [e.seriesName]
   }
   // 关联的每个图表进行数据筛选
+  debugger
   for (let chartId of bindCharts) {
     let chart = canvasMap.find(item => item.id === chartId)
     if (!chart) {
@@ -41,9 +42,9 @@ export async function setLinkageData(id, e, canvasMap) {
 async function getBindData(chart, dimensionData) {
   let apiData = chart.setting.api_data
   // 进行过数据筛选的不再执行联动
-  if (apiData.options.fileList && apiData.options.fileList.length && apiData.options.fileList.length > 0) {
-    return
-  }
+  // if (apiData.options.fileList && apiData.options.fileList.length && apiData.options.fileList.length > 0) {
+  //   return
+  // }
   let { pivotschemaId, dataType, value, name } = dimensionData
   let dimensionsLimit = [{ pivotschemaId, type: 1, dataType, value, name }]
   apiData.dataLink = { dimensionsLimit }
