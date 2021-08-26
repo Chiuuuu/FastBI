@@ -94,7 +94,8 @@ export default {
           { name: '平均', value: 'AVG' },
           { name: '最大值', value: 'MAX' },
           { name: '最小值', value: 'MIN' },
-          { name: '计数', value: 'CNT' }
+          { name: '计数', value: 'CNT' },
+          { name: '去重计数', value: 'DCNT' }
         ],
         stringType: [
           { name: '计数', value: 'CNT' },
