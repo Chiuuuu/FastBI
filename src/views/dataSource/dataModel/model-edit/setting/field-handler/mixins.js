@@ -70,7 +70,7 @@ const mixinTable = {
     },
     // 树结构需要过滤掉已经排序的字段(每次改动列表, 重新处理一遍)
     handleFilterPivotSchema(list) {
-      return list.filter(item => !this.tableList.some(n => n.field === item.alias))
+      return list.filter(item => !this.tableList.some(n => n.alias === item.alias))
     }
   }
 }

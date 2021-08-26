@@ -275,8 +275,6 @@
         :description="detailInfo.description"
         :rename-data="panelData"
         :union-data="unionNode"
-        :filter-list="fieldFilterList"
-        :sort-list="fieldSortList"
         @showGroupbyModal="openModal('field-aggregator')"
         @get-fetch-param="handleGetFetchParams"
         @close="close"
@@ -406,9 +404,6 @@ export default {
       computeType: '', // 新建计算字段类型(维度, 度量)
       databaseList: [], // 数据库列表
       createViewName: '',
-
-      fieldFilterList: [], // 数据筛选列表
-      fieldSortList: [] // 数据排序列表
     }
   },
   computed: {
@@ -466,8 +461,6 @@ export default {
       this.$store.dispatch('dataModel/setModelId', this.$route.query.modelId)
       this.$store.commit('common/SET_MENUSELECTID', this.$route.query.modelId)
     }
-    this.handleGetFilterSortList(1)
-    this.handleGetFilterSortList(2)
     this.$EventBus.$on('tableUnion', this.handleTableUnion)
   },
   beforeDestroy() {
@@ -680,26 +673,6 @@ export default {
     async handleChangeDatabase(value, data) {
       this.handleGetDatabaseTable(data.key)
       this.$store.dispatch('dataModel/setDatabaseId', data.key)
-    },
-    /**
-     * 获取筛选排序字段
-     */
-    async handleGetFilterSortList(ruleType) {
-      const res = await this.$server.dataModel.getFilterOrSortRules({
-        datamodelId: this.model === 'add' ? this.addModelId : this.$route.query.modelId,
-        ruleType
-      })
-      if (res && res.code === 200) {
-        if (ruleType === 1) {
-          // 筛选
-          this.fieldFilterList = res.data
-        } else if (ruleType === 2) {
-          // 排序
-          this.fieldSortList = res.data
-        }
-      } else {
-        this.$message.error(res.msg || res.message || '获取筛选排序列表失败')
-      }
     },
     // 表上下合并
     handleTableUnion(node) {
@@ -927,6 +900,26 @@ export default {
       }
     },
     /**
+     * 表格变更时, 处理筛选排序的列表
+     */
+    handleFilterSort() {
+      const tables = this.detailInfo.config.tables
+      if (Array.isArray(tables)) {
+        const modelTableIdList = tables.map(item => item.id)
+        const { filterRules, sortRules } = this.detailInfo.modelPivotschemaRule
+        if (sortRules.length > 0) {
+          this.detailInfo.modelPivotschemaRule.sortRules = sortRules.filter(item => modelTableIdList.includes(item.modelTableId))
+          // 重置order顺序
+          this.detailInfo.modelPivotschemaRule.sortRules.map((item, index) => {
+            item.displayOrder = index + 1
+          })
+        }
+        if (filterRules > 0) {
+          this.detailInfo.modelPivotschemaRule.filterRules = filterRules.filter(item => modelTableIdList.includes(item.modelTableId))
+        }
+      }
+    },
+    /**
      * 编辑时获取模型数据
      */
     async handleGetData(id) {
@@ -938,7 +931,7 @@ export default {
         })
 
       if (result.code === 200) {
-        this.$message.success('获取数据成功')
+        // this.$message.success('获取数据成功')
         this.createViewName = result.data.alias
         this.detailInfo = result.data
         // 将自定义维度度量剥离处理
@@ -1057,9 +1050,8 @@ export default {
     handleSaveFilterSort({ fieldFilterList, fieldSortList }) {
       if (this.modalName === 'field-filter-sort') {
         // 保存筛选排序字段
-        this.fieldFilterList = fieldFilterList
-        this.fieldSortList = fieldSortList
-        this.actionSaveFilterSort()
+        this.detailInfo.modelPivotschemaRule.sortRules = fieldSortList
+        this.detailInfo.modelPivotschemaRule.filterRules = fieldFilterList
       }
     },
     componentSuccess(data) {
@@ -1111,6 +1103,14 @@ export default {
         ...tables[index],
         ...node.props
       })
+
+      // 如果之前没有筛选排序, 则初始化一个对象
+      if (!this.detailInfo.modelPivotschemaRule) {
+        this.detailInfo.modelPivotschemaRule = {
+          sortRules: [],
+          filterRules: []
+        }
+      }
 
       // 由于层次过深，需要set
       this.$set(
@@ -1275,7 +1275,7 @@ export default {
         },
         parentId: this.parentId
       }
-      if (!this.modelId) {
+      if (this.model === 'add') {
         this.actionSaveModel(params, false)
       } else {
         this.$confirm({
@@ -1296,9 +1296,6 @@ export default {
      * 模型保存接口 cover: 是否覆盖大屏
      */
     async actionSaveModel(params, cover) {
-      // 保存筛选排序字段
-      this.actionSaveFilterSort()
-
       let result
       if (cover) {
         result = await this.$server.dataModel.saveModelCover(params)
@@ -1323,15 +1320,6 @@ export default {
         this.$message.error(result.msg)
       }
       this.$store.dispatch('dataModel/setParentId', '')
-    },
-    /**
-     * 更新排序筛选
-     */
-    actionSaveFilterSort() {
-      const id = this.model === 'add' ? this.addModelId : this.modelId
-      if (!id) return
-      const list = [].concat(this.fieldSortList).concat(this.fieldFilterList)
-      this.$server.dataModel.putFilterOrSortRules(id, list)
     },
     /**
      * 保存模型后再保存关联的数据源信息
