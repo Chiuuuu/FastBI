@@ -910,6 +910,7 @@ export default {
      * 表格变更时, 处理筛选排序的列表
      */
     handleFilterSort() {
+      debugger
       const tables = this.detailInfo.config.tables
       if (Array.isArray(tables)) {
         const modelTableIdList = tables.map(item => item.id)
@@ -921,7 +922,7 @@ export default {
             item.displayOrder = index + 1
           })
         }
-        if (filterRules > 0) {
+        if (filterRules.length > 0) {
           this.detailInfo.modelPivotschemaRule.filterRules = filterRules.filter(item => modelTableIdList.includes(item.modelTableId))
         }
       }
