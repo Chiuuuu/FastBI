@@ -85,7 +85,7 @@
         <span slot="description">暂无数据大屏</span>
       </a-empty>
     </div>
-    <div class="right scrollbar" style="overflow: hidden">
+    <div class="right scrollbar">
       <div class="right-header" v-if="fileSelectId > 0">
         <span class="nav_title">{{ fileSelectName }} </span>
         <img
@@ -1016,7 +1016,12 @@ export default {
       })
     },
     getSubmit() {
+      if (!this.chooseTemple.screenId) {
+        this.$message.info('请选中大屏模板')
+        return
+      }
       this.btnloading = true
+
       this.$server.chooseScreen
         .saveScreenData(this.chooseTemple.screenId, this.parentId || 0)
         .then(res => {
