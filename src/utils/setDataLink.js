@@ -29,7 +29,6 @@ export async function setLinkageData(id, e, canvasMap) {
     dimensionData.value = [e.seriesName]
   }
   // 关联的每个图表进行数据筛选
-  debugger
   for (let chartId of bindCharts) {
     let chart = canvasMap.find(item => item.id === chartId)
     if (!chart) {
