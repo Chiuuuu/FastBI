@@ -37,7 +37,7 @@
       </template>
     </a-table>
 
-    <a-modal v-model="showFieldModal" title="选择字段" destroyOnClose>
+    <a-modal v-model="showFieldModal" :title="modalType === 'tree' ? '选择字段' : '添加条件'" destroyOnClose>
       <template #footer>
         <template v-if="modalType === 'condition'">
           <a-button @click="showFieldModal = false">取消</a-button>
@@ -197,12 +197,13 @@ export default {
     },
     handleOk() {
       if (this.$refs.condition) {
-        this.$refs.condition.resultConditionData()
-      }
-      if (!this.isEdit) {
-        this.$emit('insert', this.conditionData)
-      } else {
-        this.$emit('edit', this.conditionData, this.editIndex)
+        const result = this.$refs.condition.resultConditionData()
+        if (!result) return
+        if (!this.isEdit) {
+          this.$emit('insert', this.conditionData)
+        } else {
+          this.$emit('edit', this.conditionData, this.editIndex)
+        }
       }
       this.showFieldModal = false
     },
