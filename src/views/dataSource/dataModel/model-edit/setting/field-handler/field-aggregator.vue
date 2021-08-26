@@ -175,8 +175,20 @@ export default {
     isShow: {
       immediate: true,
       handler(value) {
-        if (value && this.isEdit) {
-          this.handleInitEditData()
+        if (value) {
+          if (this.isEdit) {
+            // 编辑
+            this.handleInitEditData()
+          } else {
+            // 新建
+            if (this.fieldList.length && this.fieldList.length > 0) {
+              this.currentField = this.fieldList[0]
+              this.form.field = this.currentField.alias
+            }
+            this.form.defaultAggregator = '计数'
+            this.currentAggregator = this.AGGREGATOR_LIST.find(item => item.value === 'COUNT')
+            this.changeTextArea()
+          }
         } else {
           this.dimensions = ''
           this.measures = ''
@@ -291,6 +303,7 @@ export default {
     },
     // 文本框重新书写value
     changeTextArea() {
+      debugger
       let text = ''
       // 选择了字段
       if (this.currentField) {

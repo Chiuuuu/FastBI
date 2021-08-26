@@ -376,6 +376,7 @@ export default {
           if (result.code === 200) {
             this.handleGetMenuList()
             this.$store.dispatch('dataModel/setModelId', -1)
+            this.$store.commit('common/SET_MENUSELECTID', -1)
             this.$store.commit('dataModel/SET_MODELNAME', '')
             this.$message.success('删除成功')
           } else {

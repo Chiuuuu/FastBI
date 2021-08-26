@@ -39,9 +39,6 @@
         <a-button
           key="submit"
           type="primary"
-          :style="{
-            background: isNoSelectData ? 'grey' : '#617BFF'
-          }"
           @click="handleOk"
         >
           确定
@@ -523,18 +520,43 @@ export default {
         }
       })
     },
+    validConditionList() {
+      if (this.currentFile.conditionList.length < 1) {
+        this.$message.error('请添加条件')
+        return false
+      }
+      for (const item of this.currentFile.conditionList) {
+        if (item.condition === 'range') {
+          const { firstValue, secondValue } = item
+          if (firstValue === '' || secondValue === '') {
+            this.$message.error('请完善添加的条件')
+            return false
+          } else if (isNaN(firstValue) || isNaN(secondValue)) {
+            this.$message.error('请填写正确的数字')
+            return false
+          } else if (firstValue > secondValue) {
+            this.$message.error('范围起始值大于末尾值')
+            return false
+          }
+        } else {
+          if (isNaN(item.firstValue)) {
+            this.$message.error('请完善添加的条件')
+            return false
+          }
+        }
+      }
+      return true
+    },
     // 构造数值类型数据传参
     async handleOk() {
       if (this.isNoSelectData) {
-        this.screenVisible = false
-        return
+        return this.$message.error('请添加条件')
       }
       // 度量没有添加条件不能确定
       if (
         !this.currentFile.dataTypeIsText &&
-        !this.currentFile.conditionList.length
+        !this.validConditionList()
       ) {
-        this.screenVisible = false
         return
       }
       let apiData = deepClone(this.currSelected.setting.api_data)
