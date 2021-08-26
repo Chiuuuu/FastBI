@@ -602,6 +602,13 @@ export default {
       const result = await this.$server.dataModel.getAddModelDatamodel()
       if (result.code === 200) {
         this.detailInfo = result.data
+        // 如果之前没有筛选排序, 则初始化一个对象
+        if (!this.detailInfo.modelPivotschemaRule) {
+          this.detailInfo.modelPivotschemaRule = {
+            sortRules: [],
+            filterRules: []
+          }
+        }
         this.$store.dispatch('dataModel/setAddModelId', result.data.id)
         this.$store.commit('common/SET_PRIVILEGES', [0]) // 新增赋予所有权限
         this.$nextTick(() => {
@@ -934,6 +941,13 @@ export default {
         // this.$message.success('获取数据成功')
         this.createViewName = result.data.alias
         this.detailInfo = result.data
+        // 如果之前没有筛选排序, 则初始化一个对象
+        if (!this.detailInfo.modelPivotschemaRule) {
+          this.detailInfo.modelPivotschemaRule = {
+            sortRules: [],
+            filterRules: []
+          }
+        }
         // 将自定义维度度量剥离处理
         this.detailInfo.pivotSchema.dimensions = this.handlePeelCustom(
           this.detailInfo.pivotSchema.dimensions,
@@ -1103,14 +1117,6 @@ export default {
         ...tables[index],
         ...node.props
       })
-
-      // 如果之前没有筛选排序, 则初始化一个对象
-      if (!this.detailInfo.modelPivotschemaRule) {
-        this.detailInfo.modelPivotschemaRule = {
-          sortRules: [],
-          filterRules: []
-        }
-      }
 
       // 由于层次过深，需要set
       this.$set(
