@@ -321,15 +321,36 @@ export default {
               filed.status = 1
               // 缺失文案替换
               if (filterDimension) {
-                filed.raw_expr = this.replaceWithMissing(filed.raw_expr, filterDimension.alias)
+                // 非指定聚合
+                if (!filed.groupByFunc) {
+                  filed.raw_expr = this.replaceWithMissing(filed.raw_expr, filterDimension.alias)
+                } else {
+                  this.missingGroupByFunc(filed)
+                }
               }
               if (filterMeasure) {
-                filed.raw_expr = this.replaceWithMissing(filed.raw_expr, filterMeasure.alias)
+                // 非指定聚合
+                if (!filed.groupByFunc) {
+                  filed.raw_expr = this.replaceWithMissing(filed.raw_expr, filterMeasure.alias)
+                } else {
+                  this.missingGroupByFunc(filed)
+                }
               }
             }
           })
         }
       })
+    },
+    // 处理指定聚合的缺失字段
+    missingGroupByFunc(filed) {
+      let rawExpr = {}
+      try {
+        rawExpr = JSON.parse(filed.raw_expr)
+      } catch (error) {
+        return
+      }
+      rawExpr.field = ''
+      filed.raw_expr = JSON.stringify(rawExpr)
     },
     // 替换为缺失文案
     replaceWithMissing(rawExpr, alias) {

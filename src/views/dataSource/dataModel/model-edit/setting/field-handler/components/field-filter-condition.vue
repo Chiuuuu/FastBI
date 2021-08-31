@@ -139,10 +139,18 @@ export default {
         return {}
       }
     },
+    // 当前编辑的对象
     conditionData: {
       type: Object,
       default() {
         return {}
+      }
+    },
+    // 当前维度度量列表
+    pivotSchema: {
+      type: Array,
+      default() {
+        return []
       }
     }
   },
@@ -175,8 +183,20 @@ export default {
         data.convertType || data.dataType
       )
     }
+    // isNumber() {
+    //   const field = this.getPivotSchemaData()
+    //   return this.NUMBER_LIST.includes(
+    //     field.convertType || field.dataType
+    //   )
+    // }
   },
   methods: {
+    // 从父组件的维度度量中获取当前对象
+    // getPivotSchemaData() {
+    //   const data = this.fieldData || this.conditionData
+    //   const field = this.pivotSchema.find(item => item.alias === data.alias)
+    //   return field || data
+    // },
     onSearch() {
       const keyword = (this.searchWord || '').toLowerCase()
       this.dataRowsResult = this.dataRows.filter(
@@ -261,6 +281,12 @@ export default {
           }
         }
         this.conditionData.rule.ruleFilterList = this.customData
+        // const data = this.getPivotSchemaData()
+        // this.conditionData.convertType = data.convertType || data.dataType
+      }
+      // 重新编辑确认后, 有标黄的记录要去掉
+      if (this.conditionData.status === 3) {
+        this.conditionData.status = 0
       }
       return true
     },
@@ -278,10 +304,12 @@ export default {
         Object.assign(data, this.fieldData)
         data.pivotschemaId = this.fieldData.id
         params.fieldId = this.fieldData.fieldId
+        params.dataModelId = this.fieldData.datamodelId
         // params.modelTableId = data.modelTableId
       } else {
         Object.assign(data, this.conditionData)
         params.fieldId = data.fieldId
+        params.dataModelId = data.datamodelId
         // params.modelTableId = data.modelTableId
       }
       this.spinning = true
@@ -296,7 +324,13 @@ export default {
         return
       }
       if (res.code === 200) {
-        this.dataRows = res.rows.map(item => Object.values(item).toString())
+        this.dataRows = res.rows.map(item => {
+          if (Object.prototype.toString.call(item) === '[object Object]') {
+            return Object.values(item).toString()
+          } else {
+            return ''
+          }
+        })
       }
       this.dataRowsResult = this.dataRows
     }

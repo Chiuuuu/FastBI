@@ -277,7 +277,7 @@ export default {
    * @param {String} params.ruleType // 0默认 1筛选 2排序
    */
   getModelData(params) {
-    return $axios.post('/model/pivotschema/getFieldData', params)
+    return $axios.post('/model/pivotschema/getFieldsData', params)
   },
   /**
    *@description 获取模型筛选排序字段

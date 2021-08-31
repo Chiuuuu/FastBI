@@ -15,6 +15,20 @@
       :data-source="tableList"
       :scroll="tableScroll"
       rowKey="field">
+      <template #alias="text, record">
+        <!-- status: 2, 即引用字段不可见, 置灰处理 -->
+        <template v-if="record.status === 2">
+          <span :title="text" class="line-through">{{ text }}</span>
+        </template>
+        <!-- status: 3, 即引用字段类型改变, 标黄 -->
+        <template v-else-if="record.status === 3">
+          <a-tooltip title="该字段类型发生改变, 规则已不适用" placement="top">
+            <a-icon class="tips" theme="filled" type="exclamation-circle" />
+          </a-tooltip>
+          <span :title="text">{{ text }}</span>
+        </template>
+        <span :title="text" v-else>{{ text }}</span>
+      </template>
       <template #rules="text, record">
         <a-tooltip :title="formatColumnRule(record, 'title')" placement="top">
           {{ formatColumnRule(record, 'list') }}
@@ -50,7 +64,12 @@
         :measures="treeMeasures"
         @changeTree="handleSelectField"
       />
-      <FieldCondition ref="condition" v-else-if="modalType === 'condition'" :condition-data="conditionData" :field-data="fieldData" />
+      <FieldCondition
+        ref="condition"
+        v-else-if="modalType === 'condition'"
+        :condition-data="conditionData"
+        :field-data="fieldData"
+        :pivotSchema="pivotSchema" />
     </a-modal>
   </div>
 </template>
@@ -68,6 +87,15 @@ export default {
   provide() {
     return { conditionOptions: this.conditionOptions }
   },
+  props: {
+    // 当前维度度量列表
+    pivotSchema: {
+      type: Array,
+      default() {
+        return []
+      }
+    }
+  },
   data() {
     return {
       isEdit: false,
@@ -77,7 +105,8 @@ export default {
           title: '筛选字段',
           dataIndex: 'alias',
           ellipsis: true,
-          width: 200
+          width: 200,
+          scopedSlots: { customRender: 'alias' }
         },
         {
           title: '规则',
@@ -107,6 +136,13 @@ export default {
     }
   },
   methods: {
+    // 判断字段是否为数值类型
+    isNumber(data) {
+      if (!data) return false
+      return this.NUMBER_LIST.includes(
+        data.convertType || data.dataType
+      )
+    },
     // 格式化规则显示 type: title显示全部 list做截取处理
     formatColumnRule(record, type) {
       if (!Array.isArray(record.rule.ruleFilterList)) return ''
@@ -117,10 +153,9 @@ export default {
       } else if (record.isInclude === 2) {
         isInclude = '只显示'
       }
-      const isNumber = this.NUMBER_LIST.includes(
-        record.convertType || record.dataType
-      )
-      if (isNumber) {
+      // 校验的是当前最新的类型而不是之前存的类型
+      let field = this.pivotSchema.find(item => item.alias === record.alias)
+      if (this.isNumber(record)) {
         // 数值类型
         if (len === 0) {
           return '无'
@@ -128,6 +163,7 @@ export default {
           const list = record.rule.ruleFilterList.map(item => {
             const option = this.conditionOptions.find(o => item.condition === o.op)
             if (!option) return ''
+            // 仅当选项是范围时才有2个值
             if (option.op === 'range') {
               return `${option.label}${item.startValue}~${item.endValue}`
             } else {
@@ -165,22 +201,22 @@ export default {
     // 树节点选中字段, 初始化数据
     handleSelectField(nodes) {
       const data = nodes[0]
-      const isNumber = this.NUMBER_LIST.includes(
-        data.convertType || data.dataType
-      )
       const insertData = {
         fieldId: data.fieldId,
         pivotschemaId: data.id,
         datamodelId: data.datamodelId,
         modelTableId: data.modelTableId,
-        convertType: data.convertType || data.dataType,
+        convertType: data.convertType,
+        dataType: data.dataType,
+        expr: data.expr,
         field: data.name,
         alias: data.alias,
         rule: { ruleFilterList: [] },
         ruleType: 1,
-        modeType: +(!isNumber),
+        modeType: 1,
         isInclude: 2,
-        displayOrder: 0
+        displayOrder: 0,
+        status: 0
       }
       this.conditionData = insertData
       this.fieldData = data
@@ -191,6 +227,14 @@ export default {
       this.isEdit = true
       this.editIndex = index
       this.conditionData = cloneDeep(record)
+      // 如果类型发生了改变, 则清空规则
+      const field = this.pivotSchema.find(item => item.alias === record.alias)
+      if (field && this.isNumber(record) !== this.isNumber(field)) {
+        this.conditionData.convertType = field.convertType || field.dataType
+        this.conditionData.rule.ruleFilterList = []
+        this.conditionData.modeType = 1
+      }
+
       this.fieldData = null
       this.showFieldModal = true
       this.modalType = 'condition'
@@ -231,5 +275,13 @@ export default {
   font-size: 20px;
   cursor: pointer;
   margin: 0 4px;
+}
+.line-through {
+  color: #ccc;
+  text-decoration: line-through;
+}
+.tips {
+  color: #ffc34f;
+  margin-right: 2px;
 }
 </style>

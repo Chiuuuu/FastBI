@@ -288,6 +288,7 @@
           v-if="hasBtnPermissionSave"
           type="primary"
           @click="handleSave"
+          :loading="spinning"
           :disabled="!detailInfo"
           >保 存</a-button
         >
@@ -348,7 +349,7 @@ export default {
   provide() {
     return {
       nodeStatus: this.globalStatus,
-      NUMBER_LIST: ['BIGINT', 'DOUBLE', 'DECIMAL'],
+      NUMBER_LIST: this.NUMBER_LIST,
       AGGREGATOR_LIST: [
         // 聚合方式及中文映射
         { name: '求和', value: 'SUM' },
@@ -362,6 +363,7 @@ export default {
   },
   data() {
     return {
+      NUMBER_LIST: ['BIGINT', 'DOUBLE', 'DECIMAL'],
       DimensionsIcon,
       MeasureIcon,
       modelForm: this.$form.createForm(this, { name: 'modelForm' }),
@@ -403,7 +405,7 @@ export default {
       },
       computeType: '', // 新建计算字段类型(维度, 度量)
       databaseList: [], // 数据库列表
-      createViewName: '',
+      createViewName: ''
     }
   },
   computed: {
@@ -545,6 +547,8 @@ export default {
     switchFieldType(e, item, vm) {
       let dataType = item.dataType
       vm.itemData.convertType = dataType
+      // 转换类型后, 需要同步更新筛选排序列表的状态
+      this.handleFilterSort()
     },
     handleEditField(event, handler, vm) {
       const role = vm.itemData.role
@@ -581,6 +585,7 @@ export default {
           this.handleMeasures()
         }
       }
+      this.handleFilterSort()
     },
     async handleGetDatabaseList() {
       const result = await this.$server.dataModel.getDatabaseList(
@@ -906,24 +911,66 @@ export default {
         measures: this.handleConcatMeasures(true)
       }
     },
+    // 判断字段是否为数值类型
+    isNumber(data) {
+      return this.NUMBER_LIST.includes(
+        data.convertType || data.dataType
+      )
+    },
     /**
      * 表格变更时, 处理筛选排序的列表
      */
     handleFilterSort() {
-      debugger
       const tables = this.detailInfo.config.tables
       if (Array.isArray(tables)) {
         const modelTableIdList = tables.map(item => item.id)
         const { filterRules, sortRules } = this.detailInfo.modelPivotschemaRule
+        const { dimensions, measures } = this.detailInfo.pivotSchema
+        const fieldList = [].concat(dimensions).concat(measures)
         if (sortRules.length > 0) {
-          this.detailInfo.modelPivotschemaRule.sortRules = sortRules.filter(item => modelTableIdList.includes(item.modelTableId))
+          const result = []
+          sortRules.forEach(item => {
+            // visible为false(不可见)字段要置灰
+            const field = fieldList.find(f => f.alias === item.alias)
+            if (field && field.visible === false) {
+              item.status = 2
+            }
+
+            /**
+             * 字段已被删除, 则同步删除排序列表
+             * 将没被删除的插入到新的数组里
+             */
+            if (field && modelTableIdList.includes(item.modelTableId)) {
+              result.push(item)
+            }
+          })
           // 重置order顺序
-          this.detailInfo.modelPivotschemaRule.sortRules.map((item, index) => {
+          this.detailInfo.modelPivotschemaRule.sortRules = result.map((item, index) => {
             item.displayOrder = index + 1
           })
         }
         if (filterRules.length > 0) {
-          this.detailInfo.modelPivotschemaRule.filterRules = filterRules.filter(item => modelTableIdList.includes(item.modelTableId))
+          const result = []
+          filterRules.forEach(item => {
+            // visible为false(不可见)字段要置灰
+            const field = fieldList.find(f => f.alias === item.alias)
+            if (field && field.visible === false) {
+              item.status = 2
+            }
+            // 字段类型修改, 数值->非数值 or 非数值->数值, 需标黄
+            if (field && this.isNumber(item) !== this.isNumber(field)) {
+              item.status = 3
+            }
+
+            /**
+             * 字段已被删除, 则同步删除排序列表
+             * 将没被删除的插入到新的数组里
+             */
+            if (field && modelTableIdList.includes(item.modelTableId)) {
+              result.push(item)
+            }
+          })
+          this.detailInfo.modelPivotschemaRule.filterRules = result
         }
       }
     },
@@ -958,7 +1005,6 @@ export default {
           this.detailInfo.pivotSchema.measures,
           this.cacheMeasures
         )
-
         // 校验缺失字段
         this.doWithMissing(this.cacheDimensions, result.data.pivotSchema)
         this.doWithMissing(this.cacheMeasures, result.data.pivotSchema)
@@ -979,20 +1025,46 @@ export default {
     },
     // 替换为缺失文案
     doWithMissing(list, pivotSchema) {
-      list.forEach(filed => {
-        const matchs = filed.raw_expr.match(/(\[)(.*?)(\])/g)
+      list.forEach(field => {
+        const isGroup = field.groupByFunc
+        // 指定聚合用groupByFunc字段, 其余的用raw_expr
+        const str = isGroup ? field.groupByFunc : field.raw_expr
+        const matchs = str.match(/(\[)(.*?)(\])/g)
         if (matchs) {
           matchs.forEach(value => {
             const matchStr = value.match(/(\[)(.+)(\])/)
             const key = matchStr[2] ? matchStr[2] : ''
-            const pairList = [
-              ...pivotSchema.dimensions,
-              ...pivotSchema.measures
-            ]
+            let pairList = []
+            if (isGroup) {
+              pairList = [
+                ...this.cacheDimensions,
+                ...pivotSchema.dimensions,
+                ...this.cacheMeasures,
+                ...pivotSchema.measures
+              ]
+            } else {
+              pairList = [
+                ...pivotSchema.dimensions,
+                ...pivotSchema.measures
+              ]
+            }
             const missing = pairList.filter(item => item.alias === key).pop()
             if (!missing) {
-              filed.status = 1
-              filed.raw_expr = filed.raw_expr.replace(value, '<此位置字段丢失>')
+              field.status = 1
+              // 指定聚合
+              if (isGroup) {
+                let rawExpr = {}
+                try {
+                  rawExpr = JSON.parse(field.raw_expr)
+                } catch (error) {
+                  return
+                }
+                rawExpr.field = ''
+                field.raw_expr = JSON.stringify(rawExpr)
+              } else {
+                // 常规的自定义字段
+                field.raw_expr = field.raw_expr.replace(value, '<此位置字段丢失>')
+              }
             }
           })
         }
@@ -1143,6 +1215,7 @@ export default {
 
       this.handleDimensions()
       this.handleMeasures()
+      this.handleFilterSort()
     },
     doWithBatchSetting(data) {
       if (data) {
@@ -1172,6 +1245,7 @@ export default {
         )
         this.handleDimensions()
         this.handleMeasures()
+        this.handleFilterSort()
       }
     },
     doWithComputeSetting(data) {
@@ -1282,32 +1356,41 @@ export default {
         },
         parentId: this.parentId
       }
-      if (this.model === 'add') {
-        this.actionSaveModel(params, false)
-      } else {
-        this.$confirm({
-          title: '确认提示?',
-          content: '是否覆盖大屏的数据',
-          okText: '覆盖',
-          cancelText: '仅保存',
-          onOk: () => {
-            this.actionSaveModel(params, true)
-          },
-          onCancel: () => {
-            this.actionSaveModel(params, false)
-          }
-        })
-      }
+      this.actionSaveModel(params, true)
+      // 现版本只要保存就覆盖
+      // if (this.model === 'add') {
+      //   this.actionSaveModel(params, false)
+      // } else {
+      //   this.$confirm({
+      //     title: '确认提示?',
+      //     content: '是否覆盖大屏的数据',
+      //     okText: '覆盖',
+      //     cancelText: '仅保存',
+      //     onOk: () => {
+      //       this.actionSaveModel(params, true)
+      //     },
+      //     onCancel: () => {
+      //       this.actionSaveModel(params, false)
+      //     }
+      //   })
+      // }
     },
     /**
      * 模型保存接口 cover: 是否覆盖大屏
      */
     async actionSaveModel(params, cover) {
       let result
+      this.spinning = true
       if (cover) {
         result = await this.$server.dataModel.saveModelCover(params)
+          .finally(() => {
+            this.spinning = false
+          })
       } else {
         result = await this.$server.dataModel.saveModel(params)
+          .finally(() => {
+            this.spinning = false
+          })
       }
       if (result.code === 200) {
         if (this.model === 'add') {

@@ -337,10 +337,12 @@ export default {
       if (res.code === 200) {
         // 过滤空字段
         // 拆维度列表
-        let list = []
-        res.rows.forEach(item => {
-          if (item) {
-            list.push(Object.values(item)[0])
+        let list = res.rows.map(item => {
+          // 需将null值空值也当做条件显示出来
+          if (Object.prototype.toString.call(item) === '[object Object]') {
+            return Object.values(item).toString()
+          } else {
+            return ''
           }
         }) // 维度全字段列表
         dataFile.originList = list
@@ -397,9 +399,13 @@ export default {
           dimensions: [this.currentFile]
         }
         let res = await this.$server.screenManage.getDataPick(params)
-        this.currentFile.originList = res.rows.map(item =>
-          Object.values(item)[0].toString()
-        ) // 维度全字段列表
+        this.currentFile.originList = res.rows.map(item => {
+          if (Object.prototype.toString.call(item) === '[object Object]') {
+            return Object.values(item).toString()
+          } else {
+            return ''
+          }
+        }) // 维度全字段列表
         this.currentFile.searchList = this.currentFile.originList
         this.onChange()
       }

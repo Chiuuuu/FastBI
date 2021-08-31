@@ -111,8 +111,8 @@
           ref="fieldSelectTree"
           showTips
           checkable
-          :dimensions="sourceDimensions.filter(item => item.produceType === 0)"
-          :measures="sourceMeasures.filter(item => item.produceType === 0)"
+          :dimensions="sourceDimensions.filter(item => item.status === 0)"
+          :measures="sourceMeasures.filter(item => item.status === 0)"
           @changeTree="handleGetTreeField"
         />
       </div>
@@ -206,7 +206,7 @@ export default {
       const list = []
         .concat(this.sourceDimensions)
         .concat(this.sourceMeasures)
-        .filter(item => item.produceType === 0 && item.visible)
+        .filter(item => item.visible)
       return list.filter(
         item =>
           item.alias.toLowerCase().indexOf(this.searchWord.toLowerCase()) > -1

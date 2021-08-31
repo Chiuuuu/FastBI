@@ -20,11 +20,11 @@ const mixinModal = {
       return 'id' in this.renameData
     },
     sourceDimensions() {
-      if (!this.$parent || !this.$parent.detailInfo) return []
+      if (!this.$parent || !this.$parent.detailInfo || !this.$parent.detailInfo.pivotSchema) return []
       return [...this.$parent.detailInfo.pivotSchema.dimensions, ...this.$parent.cacheDimensions]
     },
     sourceMeasures() {
-      if (!this.$parent || !this.$parent.detailInfo) return []
+      if (!this.$parent || !this.$parent.detailInfo || !this.$parent.detailInfo.pivotSchema) return []
       return [...this.$parent.detailInfo.pivotSchema.measures, ...this.$parent.cacheMeasures]
     }
   },
