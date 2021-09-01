@@ -1026,45 +1026,49 @@ export default {
     // 替换为缺失文案
     doWithMissing(list, pivotSchema) {
       list.forEach(field => {
-        const isGroup = field.groupByFunc
-        // 指定聚合用groupByFunc字段, 其余的用raw_expr
-        const str = isGroup ? field.groupByFunc : field.raw_expr
-        const matchs = str.match(/(\[)(.*?)(\])/g)
-        if (matchs) {
+        // 判断是否是指定聚合
+        const isGroup = field.isGroupFlag > 0
+        // 根据id判断字段是否还存在
+        const matchs = field.expr.match(/(?<=\$\$)(\d)+/g)
+        // 非指定聚合
+        if (!isGroup) {
+          if (matchs) {
+            matchs.forEach(value => {
+              const pairList = [
+                ...pivotSchema.dimensions,
+                ...pivotSchema.measures
+              ]
+              const missing = pairList.filter(item => item.id === value).pop()
+              if (!missing) {
+                field.status = 1
+                field.raw_expr = field.raw_expr.replace(value, '<此位置字段丢失>')
+              } else {
+                field.status = 0
+              }
+            })
+          }
+        } else {
+          // 制定聚合
           matchs.forEach(value => {
-            const matchStr = value.match(/(\[)(.+)(\])/)
-            const key = matchStr[2] ? matchStr[2] : ''
-            let pairList = []
-            if (isGroup) {
-              pairList = [
-                ...this.cacheDimensions,
-                ...pivotSchema.dimensions,
-                ...this.cacheMeasures,
-                ...pivotSchema.measures
-              ]
-            } else {
-              pairList = [
-                ...pivotSchema.dimensions,
-                ...pivotSchema.measures
-              ]
-            }
-            const missing = pairList.filter(item => item.alias === key).pop()
+            const pairList = [
+              ...this.cacheDimensions,
+              ...pivotSchema.dimensions,
+              ...this.cacheMeasures,
+              ...pivotSchema.measures
+            ]
+            const missing = pairList.filter(item => item.id === value).pop()
             if (!missing) {
               field.status = 1
-              // 指定聚合
-              if (isGroup) {
-                let rawExpr = {}
-                try {
-                  rawExpr = JSON.parse(field.raw_expr)
-                } catch (error) {
-                  return
-                }
-                rawExpr.field = ''
-                field.raw_expr = JSON.stringify(rawExpr)
-              } else {
-                // 常规的自定义字段
-                field.raw_expr = field.raw_expr.replace(value, '<此位置字段丢失>')
+              let rawExpr = {}
+              try {
+                rawExpr = JSON.parse(field.raw_expr)
+              } catch (error) {
+                return
               }
+              rawExpr.field = ''
+              field.raw_expr = JSON.stringify(rawExpr)
+            } else {
+              field.status = 0
             }
           })
         }

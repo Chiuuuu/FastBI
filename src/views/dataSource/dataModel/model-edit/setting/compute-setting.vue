@@ -436,7 +436,8 @@ export default {
             }
             if (this.isEdit) {
               const updateData = Object.assign({}, this.renameData, params, {
-                alias: params.name
+                alias: params.name,
+                status: 0
               })
               this.$emit('success', updateData)
             } else {
