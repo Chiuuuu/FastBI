@@ -239,6 +239,9 @@ export default {
     }
   },
   mounted() {
+    if (this.fileSelectId !== -1) {
+      this.getRoleInfo()
+    }
     this.handleGetMenuList()
     this.$on('fileSelect', this.handleFileSelect)
   },
@@ -556,7 +559,6 @@ export default {
       const isHas = list.filter(item => {
         return item.name === values.name
       })
-      console.log(isHas)
       return !!(isHas && isHas.length > 0)
     }
   }

@@ -215,6 +215,7 @@ export default {
             this.$message.error(res[1].msg || '保存数据源类型失败')
           }
           if (isBack) {
+            this.$store.commit('common/SET_MENUSELECTID', this.roleId)
             this.$message.success('保存成功')
             this.back()
           }

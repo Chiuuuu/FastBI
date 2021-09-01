@@ -220,7 +220,7 @@ export default {
         {
           name: '复制',
           permission: {
-            OPERATOR: this.$PERMISSION_CODE.OPERATOR.edit
+            OPERATOR: this.$PERMISSION_CODE.OPERATOR.duplicate
           },
           onClick: this.handleFileCopy
         },

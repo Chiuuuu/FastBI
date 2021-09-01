@@ -54,7 +54,8 @@ const PERMISSION_CODE = {
         rename: 11, // 重命名
         move: 12, // 移动
         enable: 13, // 启用
-        disable: 14 // 禁用
+        disable: 14, // 禁用
+        lock: 16 // 编辑锁定
     }
 }
 
