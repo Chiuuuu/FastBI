@@ -256,6 +256,7 @@ export default {
      * @description 获取角色详情信息
     */
     async getRoleInfo() {
+      if (!this.roleId || this.roleId === -1) return
       const roleInfo = await this.$server.projectCenter.getRoleInfo(this.fileSelectId)
       // const rolePermission = await this.$server.projectCenter.getRolePermission(this.fileSelectId)
       if (roleInfo.code === 200) {

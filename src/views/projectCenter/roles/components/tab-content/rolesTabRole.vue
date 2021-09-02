@@ -109,9 +109,7 @@ export default {
     }
   },
   mounted() {
-    if (this.$route.params.id) {
-      this.handleGetData()
-    }
+    this.handleGetData()
     this.$EventBus.$on('roleFileSelect', this.handleGetData)
   },
   beforeDestroy() {

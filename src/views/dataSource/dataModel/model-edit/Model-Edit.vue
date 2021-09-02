@@ -469,6 +469,7 @@ export default {
     this.$EventBus.$off('deleteBelongCustom', this.handleDeleteCustomDimMea)
     this.$EventBus.$off('tableUnion', this.handleTableUnion)
     this.$store.dispatch('dataModel/setAddModelId', -1)
+    this.$store.commit('common/SET_MENUSELECTID', -1)
   },
   methods: {
     /** 组合右键菜单 */

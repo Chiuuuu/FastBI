@@ -1,6 +1,6 @@
 <template>
   <div class="model-main">
-    <a-empty v-if="menuSelectId === -1" class="main-empty">
+    <a-empty v-if="!modelId || modelId === -1" class="main-empty">
       <span slot="description">请新建模型或者选中左侧模型</span>
     </a-empty>
     <template v-else>
@@ -137,6 +137,7 @@ export default {
   },
   data() {
     return {
+      NUMBER_LIST: ['BIGINT', 'DOUBLE', 'DECIMAL'],
       spinning: false, // 获取数据loading
       visible: false,
       detailInfo: '', // 详情信息
@@ -224,7 +225,7 @@ export default {
       } else {
         modelId = this.modelId
       }
-      if (!modelId) return
+      if (!this.modelId || this.modelId === -1) return
       const result = await this.$server.dataModel
         .getDataModelDetailInfo(modelId)
         .finally(() => {
@@ -329,6 +330,12 @@ export default {
     handleMeasures() {
       this.measures = groupBy(this.detailInfo.pivotSchema.measures, 'tableNo')
       this.measuresActiveKey = [].concat(keys(this.measures))
+    },
+    // 判断字段是否为数值类型
+    isNumber(data) {
+      return this.NUMBER_LIST.includes(
+        data.convertType || data.dataType
+      )
     },
     /**
      * 表格变更时, 处理筛选排序的列表

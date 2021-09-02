@@ -98,6 +98,9 @@ export default {
     this.$store.commit('projectRoles/SET_ROLEID', this.$route.params.id)
     this.$store.commit('common/SET_MENUSELECTID', this.$route.params.id)
   },
+  beforeDestroy() {
+    this.$store.commit('common/SET_MENUSELECTID', -1)
+  },
   methods: {
     async handleGetRoleInfo() {
       const roleInfo = await this.$server.projectCenter.getRoleInfo(this.$route.params.id)

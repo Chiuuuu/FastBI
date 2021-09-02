@@ -119,13 +119,14 @@ export default {
   },
   computed: {
     ...mapState({
-      roleId: state => state.projectRoles.roleId
+      roleId: state => state.projectRoles.roleId,
+      menuSelectId: state => state.common.menuSelectId
     })
   },
   methods: {
     async handleGetData() {
       this.loading = true
-      const res = await this.$server.projectCenter.getRoleUserInfo(this.roleId)
+      const res = await this.$server.projectCenter.getRoleUserInfo(this.menuSelectId)
       if (res.code === 200) {
         this.tableData = res.rows
         this.loading = false
