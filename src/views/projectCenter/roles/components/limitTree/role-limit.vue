@@ -24,7 +24,7 @@
       </a-col>
       <a-col :span="2" align="left" v-for="item in injectActionList" :key="item.permission">
         <span>{{ item.name }}</span>
-        <a-tooltip v-if="item.permission === 'lock'" placement="top" title="锁定后原模型仅项目管理员和企业域管理员可编辑">
+        <a-tooltip v-if="item.permission === 'lock'" placement="top" title="锁定后仅原模型仅模型添加者、项目管理员和企业域管理员可编辑">
           <a-icon style="margin-left: 2px" type="question-circle" />
         </a-tooltip>
       </a-col>

@@ -751,9 +751,10 @@ export default {
             })
           }
           let rows = datas
-          if (rows.length > 10) {
-            rows.length = 10
-          }
+          // 不明需求, 暂时注释
+          // if (rows.length > 10) {
+          //   rows.length = 10
+          // }
           apiData.source = {
             columns,
             rows
