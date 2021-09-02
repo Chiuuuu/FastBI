@@ -161,12 +161,16 @@ export default {
         }
       } else {
         const index = item.permissions.indexOf(permission)
-        item.permissions.splice(index, 1)
+        if (index > -1) {
+          item.permissions.splice(index, 1)
+        }
 
         // 数据模型取消勾选编辑权限, 同时要去掉编辑锁定权限
         if (this.injectRoleTab === 2 && permission === EDIT_PERMISSION) {
-          const index = item.permissions.indexOf(EDIT_LOCK_PERMISSION)
-          item.permissions.splice(index, 1)
+          const lockIndex = item.permissions.indexOf(EDIT_LOCK_PERMISSION)
+          if (lockIndex > -1) {
+            item.permissions.splice(lockIndex, 1)
+          }
         }
       }
       this.$emit('getChangeItem', this.injectRoleTab, item)

@@ -24,7 +24,7 @@
       </a-col>
       <a-col :span="2" align="left" v-for="item in injectActionList" :key="item.permission">
         <span>{{ item.name }}</span>
-        <a-tooltip v-if="item.permission === 'lock'" placement="top" title="锁定后仅原模型仅模型添加者、项目管理员和企业域管理员可编辑">
+        <a-tooltip v-if="item.permission === 'lock'" placement="top" title="锁定后原模型仅模型添加者、项目管理员和企业域管理员可编辑">
           <a-icon style="margin-left: 2px" type="question-circle" />
         </a-tooltip>
       </a-col>
@@ -190,11 +190,15 @@ export default {
             this.injectAllPermission.splice(0)
           } else {
             const index = this.injectAllPermission.indexOf(permission)
-            this.injectAllPermission.splice(index, 1)
+            if (index > -1) {
+              this.injectAllPermission.splice(index, 1)
+            }
             // 数据模型取消勾选编辑权限, 同时要去掉编辑锁定权限
             if (this.injectRoleTab === 2 && permission === EDIT_PERMISSION) {
-              const index = this.injectAllPermission.indexOf(EDIT_LOCK_PERMISSION)
-              this.injectAllPermission.splice(index, 1)
+              const lockIndex = this.injectAllPermission.indexOf(EDIT_LOCK_PERMISSION)
+              if (lockIndex > -1) {
+                this.injectAllPermission.splice(lockIndex, 1)
+              }
             }
           }
         }
