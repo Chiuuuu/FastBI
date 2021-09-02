@@ -368,7 +368,8 @@ export default {
     },
     /** 编辑操作 */
     handleEditUser({ id }, index) {
-      const item = this.usersData[index]
+      const { pageSize, current } = this.pagination
+      const item = this.usersData[index + pageSize * (current - 1)]
       this.modalUserList.push({
         id: item.id,
         username: item.username
@@ -380,10 +381,11 @@ export default {
     },
     /** 移除操作 */
     async handleDeleteUser({ id }, index) {
+      const { pageSize, current } = this.pagination
       const result = await this.$server.projectCenter.deleUserById(id)
       if (result.code === 200) {
         this.$message.success('移除成功')
-        this.usersData.splice(index, 1)
+        this.usersData.splice(index + pageSize * (current - 1), 1)
       } else {
         this.$message.error(result.msg || '请求错误')
       }
