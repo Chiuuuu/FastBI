@@ -14,7 +14,7 @@
         :class="[
           'field',
           'under-level',
-          { error: item.status === 1 || item.isChanged }
+          { error: item.status === 1 || item.isChanged || ('visible' in item && !item.visible) }
         ]"
         v-for="(item, index) in fileList"
         :key="index"

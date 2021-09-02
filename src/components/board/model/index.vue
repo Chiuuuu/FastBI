@@ -119,10 +119,11 @@
                         class="filelist"
                         :class="[
                           { active: item2.id === searchSelected },
-                          { error: item2.status === 1 }
+                          { error: item2.status === 1 },
+                          { 'line-through': !item2.visible }
                         ]"
                         :key="index2 + '_'"
-                        :draggable="item2.status === 0"
+                        :draggable="item2.status === 0 && item2.visible"
                         @click="fileClick(item2.id, item2.status)"
                         @dragstart="dragstart(item2, 'dimensions', $event)"
                         @dragend="dragsend(item2, $event)"
@@ -186,10 +187,11 @@
                         class="filelist"
                         :class="[
                           { active: item2.id === searchSelected },
-                          { error: item2.status === 1 }
+                          { error: item2.status === 1 },
+                          { 'line-through': !item2.visible }
                         ]"
                         :key="index2 + '_'"
-                        :draggable="item2.status === 0"
+                        :draggable="item2.status === 0 && item2.visible"
                         @click="fileClick(item2.id, item2.status)"
                         @dragstart="dragstart(item2, 'measures', $event)"
                         @dragend="dragsend(item2, $event)"

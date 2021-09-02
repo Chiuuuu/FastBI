@@ -11,7 +11,10 @@
   >
     <div v-if="fileList.length > 0">
       <div
-        :class="['field', { error: item.status === 1 || item.isChanged }]"
+        :class="[
+          'field',
+          { error: item.status === 1 || item.isChanged || ('visible' in item && !item.visible) }
+        ]"
         v-for="(item, index) in fileList"
         :key="index"
         @contextmenu.prevent="showMore(item)"
