@@ -589,36 +589,27 @@ export default {
       // 校验当前图表的字段是否被隐藏, 隐藏则标红
       chartFields.forEach(item => {
         for (const field of fieldList) {
-          if (
-            item.pivotschemaId === field.pivotschemaId &&
-            'visible' in field &&
-            !field.visible
-          ) {
-            item.isChanged = true
+          if (item.pivotschemaId === field.pivotschemaId) {
+            item.isChanged = 'visible' in field && !field.visible
+            break
           }
         }
       })
       selected.setting.api_data.options.fileList &&
         selected.setting.api_data.options.fileList.forEach(item => {
           for (const field of fieldList) {
-            if (
-              item.pivotschemaId === field.pivotschemaId &&
-              'visible' in field &&
-              !field.visible
-            ) {
-              item.isChanged = true
+            if (item.pivotschemaId === field.pivotschemaId) {
+              item.isChanged = 'visible' in field && !field.visible
+              break
             }
           }
         })
       selected.setting.api_data.options.sort &&
         selected.setting.api_data.options.sort.forEach(item => {
           for (const field of fieldList) {
-            if (
-              item.pivotschemaId === field.pivotschemaId &&
-              'visible' in field &&
-              !field.visible
-            ) {
-              item.isChanged = true
+            if (item.pivotschemaId === field.pivotschemaId) {
+              item.isChanged = 'visible' in field && !field.visible
+              break
             }
           }
         })
