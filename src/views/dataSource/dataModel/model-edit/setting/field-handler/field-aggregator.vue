@@ -206,7 +206,7 @@ export default {
       const list = []
         .concat(this.sourceDimensions)
         .concat(this.sourceMeasures)
-        .filter(item => item.visible)
+        .filter(item => item.visible && item.produceType === 0)
       return list.filter(
         item =>
           item.alias.toLowerCase().indexOf(this.searchWord.toLowerCase()) > -1

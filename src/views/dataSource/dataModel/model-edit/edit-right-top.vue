@@ -77,6 +77,8 @@ export default {
       this.$parent.cacheMeasures = []
       this.$parent.handleDimensions()
       this.$parent.handleMeasures()
+      this.$parent.handleFilterSort()
+      this.$parent.handleGroupField()
     },
     /**
      * 处理树形组件
@@ -189,6 +191,7 @@ export default {
         this.$parent.handleDimensions()
         this.$parent.handleMeasures()
         this.$parent.handleFilterSort()
+        this.$parent.handleGroupField()
       } else {
         this.$message.error(result.msg)
       }
@@ -208,6 +211,8 @@ export default {
       this.detailInfo.pivotSchema.measures = [...this.detailInfo.pivotSchema.measures, ...measures]
       this.$parent.handleDimensions()
       this.$parent.handleMeasures()
+      this.$parent.handleFilterSort()
+      this.$parent.handleGroupField()
     }
   }
 }

@@ -586,6 +586,7 @@ export default {
         }
       }
       this.handleFilterSort()
+      this.handleGroupField()
     },
     async handleGetDatabaseList() {
       const result = await this.$server.dataModel.getDatabaseList(
@@ -742,6 +743,7 @@ export default {
       }
       this.handleDimensions()
       this.handleMeasures()
+      this.handleGroupField()
     },
     getTargetIndex(list, target) {
       return list.findIndex(item => item.alias === target)
@@ -785,9 +787,11 @@ export default {
         if (isDimension) {
           this.cacheDimensions.push(newField)
           this.handleDimensions()
+          this.handleGroupField()
         } else if (isMeasures) {
           this.cacheMeasures.push(newField)
           this.handleMeasures()
+          this.handleGroupField()
         } else {
           this.$message.error('无法复制字段, 请刷新重试')
         }
@@ -926,6 +930,7 @@ export default {
         const { filterRules, sortRules } = this.detailInfo.modelPivotschemaRule
         const { dimensions, measures } = this.detailInfo.pivotSchema
         const fieldList = [].concat(dimensions).concat(measures).concat(this.cacheDimensions).concat(this.cacheMeasures)
+
         if (sortRules.length > 0) {
           const result = []
           sortRules.forEach(item => {
@@ -966,6 +971,28 @@ export default {
           this.detailInfo.modelPivotschemaRule.filterRules = result
         }
       }
+    },
+    /**
+     * 字段变更时, 处理分了组的指定聚合, 把删掉的字段去掉
+     */
+    handleGroupField() {
+      const { dimensions, measures } = this.detailInfo.pivotSchema
+      const fieldList = [].concat(dimensions).concat(measures).concat(this.cacheDimensions).concat(this.cacheMeasures)
+      const groupList = fieldList.filter(item => item.isGroupFlag === 2)
+      groupList.forEach(field => {
+        // 制定聚合
+        let rawExpr = {}
+        try {
+          rawExpr = JSON.parse(field.raw_expr)
+        } catch (error) {}
+        // 分组的字段数组, 要清除被删除的字段
+        const list = rawExpr.checkedList.split(',').filter(item => fieldList.some(p => p.alias === item))
+        if (list.length === 0) {
+          field.isGroupFlag = 1
+        }
+        rawExpr.checkedList = list.toString()
+        field.raw_expr = JSON.stringify(rawExpr)
+      })
     },
     /**
      * 编辑时获取模型数据
@@ -1009,6 +1036,7 @@ export default {
 
         this.handleDimensions()
         this.handleMeasures()
+        this.handleGroupField()
         this.$nextTick(() => {
           this.handleGetDatabase()
         })
@@ -1020,7 +1048,7 @@ export default {
     doWithMissing(list, pivotSchema) {
       list.forEach(field => {
         // 判断是否是指定聚合
-        const isGroup = field.isGroupFlag > 0
+        const isGroup = field.groupByFunc
         // 根据id判断字段是否还存在
         const matchs = field.expr.match(/(?<=\$\$)(\d)+/g)
         // 非指定聚合
@@ -1042,22 +1070,22 @@ export default {
           }
         } else {
           // 制定聚合
+          let rawExpr = {}
+          try {
+            rawExpr = JSON.parse(field.raw_expr)
+          } catch (error) {}
+
+          const pairList = [
+            ...this.cacheDimensions,
+            ...pivotSchema.dimensions,
+            ...this.cacheMeasures,
+            ...pivotSchema.measures
+          ]
+
           matchs.forEach(value => {
-            const pairList = [
-              ...this.cacheDimensions,
-              ...pivotSchema.dimensions,
-              ...this.cacheMeasures,
-              ...pivotSchema.measures
-            ]
             const missing = pairList.filter(item => item.id === value).pop()
             if (!missing) {
               field.status = 1
-              let rawExpr = {}
-              try {
-                rawExpr = JSON.parse(field.raw_expr)
-              } catch (error) {
-                return
-              }
               rawExpr.field = ''
               field.raw_expr = JSON.stringify(rawExpr)
             } else {
@@ -1213,6 +1241,7 @@ export default {
       this.handleDimensions()
       this.handleMeasures()
       this.handleFilterSort()
+      this.handleGroupField()
     },
     doWithBatchSetting(data) {
       if (data) {
@@ -1243,6 +1272,7 @@ export default {
         this.handleDimensions()
         this.handleMeasures()
         this.handleFilterSort()
+        this.handleGroupField()
       }
     },
     doWithComputeSetting(data) {
@@ -1260,6 +1290,7 @@ export default {
       }
       this.handleDimensions()
       this.handleMeasures()
+      this.handleGroupField()
     },
     doWithCreateView(data) {
       this.createViewName = data

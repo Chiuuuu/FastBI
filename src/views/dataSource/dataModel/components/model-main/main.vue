@@ -242,6 +242,8 @@ export default {
         this.handleDetailWithRoot()
         this.handleDimensions()
         this.handleMeasures()
+        this.handleFilterSort()
+        this.handleGroupField()
         // 将自定义维度度量剥离处理
         this.detailInfo.pivotSchema.dimensions = this.handlePeelCustom(
           this.detailInfo.pivotSchema.dimensions,
@@ -327,6 +329,79 @@ export default {
     handleMeasures() {
       this.measures = groupBy(this.detailInfo.pivotSchema.measures, 'tableNo')
       this.measuresActiveKey = [].concat(keys(this.measures))
+    },
+    /**
+     * 表格变更时, 处理筛选排序的列表
+     */
+    handleFilterSort() {
+      const tables = this.detailInfo.config.tables
+      if (Array.isArray(tables)) {
+        const { filterRules, sortRules } = this.detailInfo.modelPivotschemaRule
+        const { dimensions, measures } = this.detailInfo.pivotSchema
+        const fieldList = [].concat(dimensions).concat(measures).concat(this.cacheDimensions).concat(this.cacheMeasures)
+
+        if (sortRules.length > 0) {
+          const result = []
+          sortRules.forEach(item => {
+            const field = fieldList.find(f => f.id === item.pivotschemaId)
+            if (field) {
+              if (field.visible === false) {
+                // visible为false(不可见)字段要置灰
+                item.status = 2
+              } else {
+                item.status = 0
+              }
+              result.push(item)
+            }
+          })
+          // 重置order顺序
+          this.detailInfo.modelPivotschemaRule.sortRules = result.map((item, index) => {
+            item.displayOrder = index + 1
+            return item
+          })
+        }
+        if (filterRules.length > 0) {
+          const result = []
+          filterRules.forEach(item => {
+            const field = fieldList.find(f => f.id === item.pivotschemaId)
+            if (field) {
+              if (field.visible === false) {
+                // visible为false(不可见)字段要置灰
+                item.status = 2
+              } else if (this.isNumber(item) !== this.isNumber(field)) {
+                // 字段类型修改, 数值->非数值 or 非数值->数值, 需标黄
+                item.status = 3
+              } else {
+                item.status = 0
+              }
+              result.push(item)
+            }
+          })
+          this.detailInfo.modelPivotschemaRule.filterRules = result
+        }
+      }
+    },
+    /**
+     * 字段变更时, 处理分了组的指定聚合, 把删掉的字段去掉
+     */
+    handleGroupField() {
+      const { dimensions, measures } = this.detailInfo.pivotSchema
+      const fieldList = [].concat(dimensions).concat(measures).concat(this.cacheDimensions).concat(this.cacheMeasures)
+      const groupList = fieldList.filter(item => item.isGroupFlag === 2)
+      groupList.forEach(field => {
+        // 制定聚合
+        let rawExpr = {}
+        try {
+          rawExpr = JSON.parse(field.raw_expr)
+        } catch (error) {}
+        // 分组的字段数组, 要清除被删除的字段
+        const list = rawExpr.checkedList.split(',').filter(item => fieldList.some(p => p.alias === item))
+        if (list.length === 0) {
+          field.isGroupFlag = 1
+        }
+        rawExpr.checkedList = list.toString()
+        field.raw_expr = JSON.stringify(rawExpr)
+      })
     }
   }
 }

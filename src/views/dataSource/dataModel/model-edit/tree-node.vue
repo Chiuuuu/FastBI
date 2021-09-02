@@ -254,6 +254,7 @@ export default {
           if (this.detailInfo.config.tables.length < 1) {
             // 无根节点的情况
             this.root.$parent.handleFilterSort()
+            this.root.$parent.handleGroupField()
             return this.root.handleClearRenderTables()
           }
           // 更新维度度量
