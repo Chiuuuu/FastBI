@@ -14,7 +14,7 @@
         :class="[
           'field',
           'under-level',
-          { error: item.status === 1 || item.isChanged || ('visible' in item && !item.visible) }
+          { error: item.status === 1 || item.isChanged }
         ]"
         v-for="(item, index) in fileList"
         :key="index"
@@ -332,6 +332,95 @@ export default {
         })
       }
     },
+    // 处理不可见字段
+    handleInvisible(selected) {
+      const {
+        modelDimensions = [],
+        modelMeasures = []
+      } = this.$store.state.options
+      const chartFields = selected.setting.api_data.dimensions.concat(
+        selected.setting.api_data.measures
+      )
+      const fieldList = [].concat(modelDimensions).concat(modelMeasures)
+      // 校验当前图表的字段是否被隐藏, 隐藏则标红
+      chartFields.forEach(item => {
+        for (const field of fieldList) {
+          if (
+            item.pivotschemaId === field.pivotschemaId &&
+            'visible' in field &&
+            !field.visible
+          ) {
+            item.isChanged = true
+          }
+        }
+      })
+      selected.setting.api_data.options.labelDimensions.forEach(item => {
+        for (const field of fieldList) {
+          if (
+            item.pivotschemaId === field.pivotschemaId &&
+            'visible' in field &&
+            !field.visible
+          ) {
+            item.isChanged = true
+          }
+        }
+      })
+      selected.setting.api_data.options.labelMeasures.forEach(item => {
+        for (const field of fieldList) {
+          if (
+            item.pivotschemaId === field.pivotschemaId &&
+            'visible' in field &&
+            !field.visible
+          ) {
+            item.isChanged = true
+          }
+        }
+      })
+      selected.setting.api_data.options.longitude.forEach(item => {
+        for (const field of fieldList) {
+          if (
+            item.pivotschemaId === field.pivotschemaId &&
+            'visible' in field &&
+            !field.visible
+          ) {
+            item.isChanged = true
+          }
+        }
+      })
+      selected.setting.api_data.options.latitude.forEach(item => {
+        for (const field of fieldList) {
+          if (
+            item.pivotschemaId === field.pivotschemaId &&
+            'visible' in field &&
+            !field.visible
+          ) {
+            item.isChanged = true
+          }
+        }
+      })
+      selected.setting.api_data.options.labelLongitude.forEach(item => {
+        for (const field of fieldList) {
+          if (
+            item.pivotschemaId === field.pivotschemaId &&
+            'visible' in field &&
+            !field.visible
+          ) {
+            item.isChanged = true
+          }
+        }
+      })
+      selected.setting.api_data.options.labelLatitude.forEach(item => {
+        for (const field of fieldList) {
+          if (
+            item.pivotschemaId === field.pivotschemaId &&
+            'visible' in field &&
+            !field.visible
+          ) {
+            item.isChanged = true
+          }
+        }
+      })
+    },
     // 根据维度度量获取数据
     async getData() {
       let selected = this.canvasMap.find(
@@ -442,6 +531,7 @@ export default {
         return
       }
       if (res.code === 200) {
+        this.handleInvisible(selected)
         res.data.labelList = await handleReturnChartData(
           res.data.labelList,
           this.currSelected.setting

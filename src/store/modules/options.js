@@ -4,7 +4,8 @@ const options = {
     dataModel: {}, // 选中的数据模型
     optionsTabsType: 0, // 页面设置选中项 样式/数据/交互
     modelFile: {},
-    modelMeasures: [] // 当前度量
+    modelMeasures: [], // 当前度量
+    modelDimensions: [] // 当前维度
   },
   mutations: {
     SET_DRAG_FILE: (state, val) => {
@@ -18,6 +19,9 @@ const options = {
     },
     SET_MODEL_MEASURES: (state, val) => {
       state.modelMeasures = val
+    },
+    SET_MODEL_DIMENSIONS: (state, val) => {
+      state.modelDimensions = val
     }
   },
   actions: {
@@ -32,6 +36,9 @@ const options = {
     },
     SetModelMeasures: ({ commit }, val) => {
       commit('SET_MODEL_MEASURES', val)
+    },
+    SetModelDimensions: ({ commit }, val) => {
+      commit('SET_MODEL_DIMENSIONS', val)
     }
   }
 }

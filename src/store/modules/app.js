@@ -1,4 +1,5 @@
 import router from '../../router'
+import store from '../../store'
 import screenManage from '../../api/modules/screenManage'
 import { message } from 'ant-design-vue'
 import { Loading } from 'element-ui'
@@ -449,6 +450,37 @@ const app = {
             //   dispatch('SetSelfDataSource', selected.setting.api_data)
             }
           }
+          // 处理不可见字段
+          function handleInvisible(selected) {
+            const { modelDimensions = [], modelMeasures = [] } = store.state.options
+            const chartFields = selected.setting.api_data.dimensions.concat(selected.setting.api_data.measures)
+            const fieldList = [].concat(modelDimensions).concat(modelMeasures)
+            // 校验当前图表的字段是否被隐藏, 隐藏则标红
+            chartFields.forEach(item => {
+              for (const field of fieldList) {
+                if (item.pivotschemaId === field.pivotschemaId && 'visible' in field && !field.visible) {
+                  console.log(item)
+                  item.isChanged = true
+                }
+              }
+            })
+            selected.setting.api_data.options.fileList &&
+              selected.setting.api_data.options.fileList.forEach(item => {
+                for (const field of fieldList) {
+                  if (item.pivotschemaId === field.pivotschemaId && 'visible' in field && !field.visible) {
+                    item.isChanged = true
+                  }
+                }
+              })
+            selected.setting.api_data.options.sort &&
+              selected.setting.api_data.options.sort.forEach(item => {
+                for (const field of fieldList) {
+                  if (item.pivotschemaId === field.pivotschemaId && 'visible' in field && !field.visible) {
+                    item.isChanged = true
+                  }
+                }
+              })
+          }
           if (res.code === 200) {
             let dataItem = res.data
             let ids = Object.keys(dataItem)
@@ -514,6 +546,7 @@ const app = {
                 if (chart.name === 'material') {
                   continue
                 }
+                handleInvisible(chart)
                 // 图表模型被删掉
                 if (dataItem[id].msg === 'IsChanged') {
                   chart.setting.isEmpty = 'noData'

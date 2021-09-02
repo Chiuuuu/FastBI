@@ -11,10 +11,7 @@
   >
     <div v-if="fileList.length > 0">
       <div
-        :class="[
-          'field',
-          { error: item.status === 1 || item.isChanged || ('visible' in item && !item.visible) }
-        ]"
+        :class="['field', { error: item.status === 1 || item.isChanged }]"
         v-for="(item, index) in fileList"
         :key="index"
         @contextmenu.prevent="showMore(item)"
@@ -266,6 +263,53 @@ export default {
           })
       }
     },
+    // 处理不可见字段
+    handleInvisible(selected) {
+      const {
+        modelDimensions = [],
+        modelMeasures = []
+      } = this.$store.state.options
+      const chartFields = selected.setting.api_data.dimensions.concat(
+        selected.setting.api_data.measures
+      )
+      const fieldList = [].concat(modelDimensions).concat(modelMeasures)
+      // 校验当前图表的字段是否被隐藏, 隐藏则标红
+      chartFields.forEach(item => {
+        for (const field of fieldList) {
+          if (
+            item.pivotschemaId === field.pivotschemaId &&
+            'visible' in field &&
+            !field.visible
+          ) {
+            item.isChanged = true
+          }
+        }
+      })
+      selected.setting.api_data.options.fileList &&
+        selected.setting.api_data.options.fileList.forEach(item => {
+          for (const field of fieldList) {
+            if (
+              item.pivotschemaId === field.pivotschemaId &&
+              'visible' in field &&
+              !field.visible
+            ) {
+              item.isChanged = true
+            }
+          }
+        })
+      selected.setting.api_data.options.sort &&
+        selected.setting.api_data.options.sort.forEach(item => {
+          for (const field of fieldList) {
+            if (
+              item.pivotschemaId === field.pivotschemaId &&
+              'visible' in field &&
+              !field.visible
+            ) {
+              item.isChanged = true
+            }
+          }
+        })
+    },
     // 根据维度度量获取数据
     async getData() {
       let selected = this.canvasMap.find(
@@ -330,6 +374,7 @@ export default {
         return
       }
       if (res.code === 200) {
+        this.handleInvisible(selected)
         // 环形图只有一条数据
         let datas = res.rows
         // 处理图表数据
