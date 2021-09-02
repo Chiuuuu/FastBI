@@ -923,24 +923,20 @@ export default {
     handleFilterSort() {
       const tables = this.detailInfo.config.tables
       if (Array.isArray(tables)) {
-        const modelTableIdList = tables.map(item => item.id)
         const { filterRules, sortRules } = this.detailInfo.modelPivotschemaRule
         const { dimensions, measures } = this.detailInfo.pivotSchema
-        const fieldList = [].concat(dimensions).concat(measures)
+        const fieldList = [].concat(dimensions).concat(measures).concat(this.cacheDimensions).concat(this.cacheMeasures)
         if (sortRules.length > 0) {
           const result = []
           sortRules.forEach(item => {
-            // visible为false(不可见)字段要置灰
-            const field = fieldList.find(f => f.alias === item.alias)
-            if (field && field.visible === false) {
-              item.status = 2
-            }
-
-            /**
-             * 字段已被删除, 则同步删除排序列表
-             * 将没被删除的插入到新的数组里
-             */
-            if (field && modelTableIdList.includes(item.modelTableId)) {
+            const field = fieldList.find(f => f.id === item.pivotschemaId)
+            if (field) {
+              if (field.visible === false) {
+                // visible为false(不可见)字段要置灰
+                item.status = 2
+              } else {
+                item.status = 0
+              }
               result.push(item)
             }
           })
@@ -952,21 +948,17 @@ export default {
         if (filterRules.length > 0) {
           const result = []
           filterRules.forEach(item => {
-            // visible为false(不可见)字段要置灰
-            const field = fieldList.find(f => f.alias === item.alias)
-            if (field && field.visible === false) {
-              item.status = 2
-            }
-            // 字段类型修改, 数值->非数值 or 非数值->数值, 需标黄
-            if (field && this.isNumber(item) !== this.isNumber(field)) {
-              item.status = 3
-            }
-
-            /**
-             * 字段已被删除, 则同步删除排序列表
-             * 将没被删除的插入到新的数组里
-             */
-            if (field && modelTableIdList.includes(item.modelTableId)) {
+            const field = fieldList.find(f => f.id === item.pivotschemaId)
+            if (field) {
+              if (field.visible === false) {
+                // visible为false(不可见)字段要置灰
+                item.status = 2
+              } else if (this.isNumber(item) !== this.isNumber(field)) {
+                // 字段类型修改, 数值->非数值 or 非数值->数值, 需标黄
+                item.status = 3
+              } else {
+                item.status = 0
+              }
               result.push(item)
             }
           })

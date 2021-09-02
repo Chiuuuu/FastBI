@@ -154,7 +154,6 @@ export default {
         isInclude = '只显示'
       }
       // 校验的是当前最新的类型而不是之前存的类型
-      let field = this.pivotSchema.find(item => item.alias === record.alias)
       if (this.isNumber(record)) {
         // 数值类型
         if (len === 0) {
@@ -228,7 +227,7 @@ export default {
       this.editIndex = index
       this.conditionData = cloneDeep(record)
       // 如果类型发生了改变, 则清空规则
-      const field = this.pivotSchema.find(item => item.alias === record.alias)
+      const field = this.pivotSchema.find(item => item.id === record.pivotschemaId)
       if (field && this.isNumber(record) !== this.isNumber(field)) {
         this.conditionData.convertType = field.convertType || field.dataType
         this.conditionData.rule.ruleFilterList = []
