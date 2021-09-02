@@ -22,7 +22,12 @@
       <a-col :span="(injectRoleTab === 3 ? 22 : 24) - injectActionList.length * 2">
         <span>所有目录</span>
       </a-col>
-      <a-col :span="2" align="left" v-for="item in injectActionList" :key="item.permission">{{item.name}}</a-col>
+      <a-col :span="2" align="left" v-for="item in injectActionList" :key="item.permission">
+        <span>{{ item.name }}</span>
+        <a-tooltip v-if="item.permission === 'lock'" placement="top" title="锁定后原模型仅项目管理员和企业域管理员可编辑">
+          <a-icon style="margin-left: 2px" type="question-circle" />
+        </a-tooltip>
+      </a-col>
       <a-col :span="2" align="left" v-if="injectRoleTab === 3">
         <span>可见库组</span>
       </a-col>
@@ -133,6 +138,7 @@ export default {
         case 'read':
           return 'folderRead'
         case 'edit':
+        case 'lock':
           return 'folderEdit'
         case 'remove':
           return 'folderRemove'
@@ -150,6 +156,8 @@ export default {
     handleCheckbox({ permission }, e) {
       const checked = e.target.checked
       const READ_PERMISSION = 'read'
+      const EDIT_PERMISSION = 'edit'
+      const EDIT_LOCK_PERMISSION = 'lock'
       // 调用limit-tree组件的递归方法赋值权限
       const handleCheckbox = this.$refs.tree.handleCheckbox
       // 遍历树结构
@@ -183,6 +191,11 @@ export default {
           } else {
             const index = this.injectAllPermission.indexOf(permission)
             this.injectAllPermission.splice(index, 1)
+            // 数据模型取消勾选编辑权限, 同时要去掉编辑锁定权限
+            if (this.injectRoleTab === 2 && permission === EDIT_PERMISSION) {
+              const index = this.injectAllPermission.indexOf(EDIT_LOCK_PERMISSION)
+              this.injectAllPermission.splice(index, 1)
+            }
           }
         }
       } else {
@@ -193,6 +206,10 @@ export default {
             !this.injectAllPermission.includes(READ_PERMISSION)
           ) {
             this.injectAllPermission.push(READ_PERMISSION)
+          }
+          // 数据模型模块 勾选了编辑锁定权限同时要勾选编辑权限
+          if (permission === EDIT_LOCK_PERMISSION && !this.injectAllPermission.includes(EDIT_PERMISSION)) {
+            this.injectAllPermission.push(EDIT_PERMISSION)
           }
         }
       }

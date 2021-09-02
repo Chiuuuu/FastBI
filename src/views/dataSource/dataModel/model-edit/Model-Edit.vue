@@ -943,6 +943,7 @@ export default {
           // 重置order顺序
           this.detailInfo.modelPivotschemaRule.sortRules = result.map((item, index) => {
             item.displayOrder = index + 1
+            return item
           })
         }
         if (filterRules.length > 0) {

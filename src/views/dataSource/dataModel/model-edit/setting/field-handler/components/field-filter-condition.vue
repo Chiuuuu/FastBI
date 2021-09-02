@@ -254,7 +254,7 @@ export default {
             return false
           }
         } else {
-          if (isNaN(item.startValue)) {
+          if (item.startValue === '' || isNaN(item.startValue)) {
             this.$message.error('请完善添加的条件')
             return false
           }
