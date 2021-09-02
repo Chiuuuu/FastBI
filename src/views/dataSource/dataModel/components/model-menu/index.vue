@@ -429,6 +429,7 @@ export default {
             const isSame = file.id === this.fileSelectId
             if (isSame) {
               this.$store.dispatch('dataModel/setModelId', -1)
+              this.$store.commit('common/SET_MENUSELECTID', -1)
               this.$store.commit('dataModel/SET_MODELNAME', '')
             }
           } else {

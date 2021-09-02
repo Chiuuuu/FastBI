@@ -330,6 +330,7 @@ export default {
           if (result.code === 200) {
             this.handleGetMenuList()
             this.$message.success('删除成功')
+            this.$store.commit('common/SET_MENUSELECTID', -1)
             const isSame = file.id === this.fileSelectId
             if (isSame) {
               this.$store.commit('projectRoles/SET_ROLEID', 0)
@@ -355,7 +356,7 @@ export default {
           if (result.code === 200) {
             this.handleGetMenuList()
             this.$message.success('删除成功')
-            const isSame = folder.id === this.fileSelectId
+            this.$store.commit('common/SET_MENUSELECTID', -1)
           } else {
             this.$message.error(result.msg)
           }
