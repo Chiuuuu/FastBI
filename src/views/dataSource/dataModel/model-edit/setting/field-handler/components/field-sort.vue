@@ -15,7 +15,7 @@
       :columns="columns"
       :data-source="tableList"
       :scroll="tableScroll"
-      rowKey="field">
+      rowKey="pivotschemaId">
       <template #alias="text, record">
         <!-- status: 2, 即引用字段不可见, 置灰处理 -->
         <template v-if="record.status === 2">

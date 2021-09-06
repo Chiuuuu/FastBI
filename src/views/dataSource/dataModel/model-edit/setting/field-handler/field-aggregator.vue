@@ -111,8 +111,8 @@
           ref="fieldSelectTree"
           showTips
           checkable
-          :dimensions="sourceDimensions.filter(item => item.status === 0)"
-          :measures="sourceMeasures.filter(item => item.status === 0)"
+          :dimensions="sourceDimensions.filter(item => item.status === 0 && item.isGroupFlag < 1)"
+          :measures="sourceMeasures.filter(item => item.status === 0 && item.isGroupFlag < 1)"
           @changeTree="handleGetTreeField"
         />
       </div>
@@ -168,7 +168,8 @@ export default {
       currentAggregator: null, // 当前选中的聚合方式对象
       checkedFieldList: [], // 用于记录当前选中的维度和度量
       textareaValue: '',
-      raw_expr: {} // json文本, 传给后台记录选的字段和树结构的选项
+      expr: '', // 记录选中的字段和聚合方式 例: COUNT($${id})
+      raw_expr: {}
     }
   },
   watch: {
@@ -206,7 +207,7 @@ export default {
       const list = []
         .concat(this.sourceDimensions)
         .concat(this.sourceMeasures)
-        .filter(item => item.visible && item.produceType === 0)
+        .filter(item => item.isGroupFlag < 1)
       return list.filter(
         item =>
           item.alias.toLowerCase().indexOf(this.searchWord.toLowerCase()) > -1
@@ -229,13 +230,14 @@ export default {
     // 处理编辑时的数据展示
     handleInitEditData() {
       // this.textareaValue = this.renameData.raw_expr
+      this.expr = this.renameData.expr
       let expr = this.renameData.expr || ''
-      if (expr.match(/\((.+?)\)/g)) {
-        const res = expr.match(/\((.+?)\)/g)[0]
-        expr = res.slice(1, -1)
+      let id = ''
+      if (expr.match(/(?<=\$\$)(\d)+/g)) {
+        id = expr.match(/(?<=\$\$)(\d)+/g)[0]
       }
       const list = [].concat(this.sourceDimensions).concat(this.sourceMeasures)
-      const field = list.find(item => item.id === expr.replace('$$', ''))
+      const field = list.find(item => item.id === id)
       this.currentField = field
       this.form = Object.assign(this.form, {
         name: this.renameData.alias,
@@ -245,13 +247,20 @@ export default {
       if (this.renameData.raw_expr) {
         this.$nextTick(() => {
           const { checkedList, aggregator } = JSON.parse(this.renameData.raw_expr)
-          if (typeof checkedList === 'string') {
-            this.$refs.fieldSelectTree &&
-              this.$refs.fieldSelectTree.setTree(checkedList.split(','))
-          }
+          // const expr = this.renameData.expr
+          // let checkedList = []
+          // if (typeof this.renameData.raw_expr === 'string') {
+          //   checkedList = this.renameData.raw_expr.slice(1, -1).split(', ')
+          // } else if (Array.isArray(this.renameData.raw_expr)) {
+          //   checkedList = this.renameData.raw_expr
+          // }
+          this.$refs.fieldSelectTree &&
+            // this.$refs.fieldSelectTree.setTree(checkedList.split(','))
+            this.$refs.fieldSelectTree.setTree(checkedList)
 
           const defaultAggregator = this.aggregatorList.find(
             item => item.name === aggregator
+            // item => expr.indexOf(item.value) > -1
           )
           this.currentAggregator = defaultAggregator
           this.form.defaultAggregator = defaultAggregator ? defaultAggregator.name : ''
@@ -318,11 +327,19 @@ export default {
       if (this.currentField) {
         text = `【${this.currentField.alias}】`
         this.raw_expr.field = this.currentField.alias
+        const match = this.expr.match(/(?<=\$\$)(\d)+/g)
+        if (match) {
+          this.expr = this.expr.replace(/(?<=\$\$)(\d)+/g, this.currentField.id || '')
+        } else {
+          this.expr = `$$${this.currentField.id}`
+        }
       }
       // 选择了聚合方式
       if (this.currentAggregator) {
         text += this.currentAggregator.name
         this.raw_expr.aggregator = this.currentAggregator.name
+        const match = this.expr.match(/(?<=\$\$)(\d)+/g)
+        this.expr = `${this.currentAggregator.value}(${match ? `$$${match[0]}` : ''})`
       }
       // 勾选了树节点
       if (this.checkedFieldList.length > 0) {
@@ -333,30 +350,12 @@ export default {
       } else {
         this.textareaValue = text
       }
-      this.raw_expr.checkedList = this.checkedFieldList.map(item => item.alias).toString()
+      this.raw_expr.checkedList = this.checkedFieldList.map(item => `$$${item.id}`)
     },
     // 勾选发生变化, 触发事件更改文本框内容
     handleGetTreeField(list) {
       this.checkedFieldList = list
       this.changeTextArea()
-    },
-    // 暂时使用的方法，把原生表达式的[]替换掉
-    reverse() {
-      const pairList = [...this.sourceDimensions, ...this.sourceMeasures]
-      let str = ''
-      const field = this.form.field
-      const aggregator = this.aggregatorList.find(
-        item => item.name === this.form.defaultAggregator
-      )
-      const item = pairList
-        .filter(item => {
-          return item.alias === field
-        })
-        .pop()
-      if (item && aggregator) {
-        str = `${aggregator.value}($$${item.id})`
-      }
-      return str
     },
     handleSave() {
       this.$refs.form.validate(async ok => {
@@ -368,22 +367,22 @@ export default {
                 ? this.$parent.addModelId
                 : this.$parent.modelId,
             role: this.computeType === '维度' ? 1 : 2,
-            // raw_expr: this.textareaValue,
             raw_expr: JSON.stringify(this.raw_expr),
+            // raw_expr: this.checkedFieldList.map(c => `$$${c.id}`),
             groupByFunc: '',
             isGroupFlag: 1,
-            expr: this.reverse()
+            expr: this.expr
           }
           if (this.checkedFieldList.length > 0) {
             params.groupByFunc = `group by (${this.checkedFieldList
-              .map(item => `[${item.alias}]`)
+              .map(item => `$$${item.id}`)
               .toString()})`
             params.isGroupFlag = 2
           }
           if (this.isEdit) {
             const updateData = Object.assign({}, this.renameData, params, {
               alias: params.name,
-              status: 0
+              status: 0 // 重置状态
             })
             this.$emit('success', updateData)
           } else {
