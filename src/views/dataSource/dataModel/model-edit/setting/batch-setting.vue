@@ -181,11 +181,11 @@ export default {
         })
       }
     },
-    handleCheckName: debounce(function(event) {
+    handleCheckName: debounce(function(event, id) {
       const value = event.target.value
       let hasSame = false
       Object.values(this.tables).forEach(list => {
-        if (list.some(item => item.alias === value)) {
+        if (list.some((item, index) => item.alias === value && item.id !== id)) {
           hasSame = true
         }
       })

@@ -71,7 +71,6 @@ export default {
             }
             for (const item of sortRules) {
               if (item.pivotschemaId === id) {
-                console.log(item.alias, this.form.name)
                 item.alias = this.form.rename
               }
             }
