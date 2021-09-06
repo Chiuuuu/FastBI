@@ -228,8 +228,9 @@ export default {
       this.conditionData = cloneDeep(record)
       // 如果类型发生了改变, 则清空规则
       const field = this.pivotSchema.find(item => item.id === record.pivotschemaId)
+      // 更新类型
+      this.conditionData.convertType = field.convertType || field.dataType
       if (field && this.isNumber(record) !== this.isNumber(field)) {
-        this.conditionData.convertType = field.convertType || field.dataType
         this.conditionData.rule.ruleFilterList = []
         this.conditionData.modeType = 1
       }
