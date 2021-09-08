@@ -301,29 +301,24 @@ export default {
     handleRedList(list, selected) {
       // 如果存在对应列表id，替换成红色
       if (list) {
-        selected.setting.api_data.dimensions.forEach(item => {
-          return !list.includes(item.id) ? { ...item, isChanged: true } : item
-        })
-        selected.setting.api_data.measures.forEach(item => {
-          return !list.includes(item.id) ? !{ ...item, isChanged: true } : item
-        })
-        selected.setting.api_data.labelDimensions.forEach(item => {
-          return !list.includes(item.id) ? !{ ...item, isChanged: true } : item
-        })
-        selected.setting.api_data.labelMeasures.forEach(item => {
-          return !list.includes(item.id) ? !{ ...item, isChanged: true } : item
-        })
-        selected.setting.api_data.longitude.forEach(item => {
-          return !list.includes(item.id) ? { ...item, isChanged: true } : item
-        })
-        selected.setting.api_data.latitude.forEach(item => {
-          return !list.includes(item.id) ? !{ ...item, isChanged: true } : item
-        })
-        selected.setting.api_data.labelLongitude.forEach(item => {
-          return !list.includes(item.id) ? !{ ...item, isChanged: true } : item
-        })
-        selected.setting.api_data.labelLatitude.forEach(item => {
-          return !list.includes(item.id) ? !{ ...item, isChanged: true } : item
+        const keys = [
+          'dimensions',
+          'measures',
+          'labelDimensions',
+          'labelMeasures',
+          'longitude',
+          'latitude',
+          'labelLongitude',
+          'labelLatitude'
+        ]
+        keys.forEach(key => {
+          if (selected.setting.api_data[key]) {
+            selected.setting.api_data[key].forEach(item => {
+              if (list.includes(item.id)) {
+                item.isChanged = true
+              }
+            })
+          }
         })
       }
     },

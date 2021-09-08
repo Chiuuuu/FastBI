@@ -290,44 +290,23 @@ export default {
     handleRedList(list, selected) {
       // 如果存在对应列表id，替换成红色
       if (list) {
-        selected.setting.api_data.dimensions.forEach(item => {
-          if (!list.includes(item.pivotschemaId)) {
-            item.isChanged = true
-          }
-        })
-        selected.setting.api_data.measures.forEach(item => {
-          if (!list.includes(item.pivotschemaId)) {
-            item.isChanged = true
-          }
-        })
-        selected.setting.api_data.labelDimensions.forEach(item => {
-          if (!list.includes(item.pivotschemaId)) {
-            item.isChanged = true
-          }
-        })
-        selected.setting.api_data.labelMeasures.forEach(item => {
-          if (!list.includes(item.pivotschemaId)) {
-            item.isChanged = true
-          }
-        })
-        selected.setting.api_data.longitude.forEach(item => {
-          if (!list.includes(item.pivotschemaId)) {
-            item.isChanged = true
-          }
-        })
-        selected.setting.api_data.latitude.forEach(item => {
-          if (!list.includes(item.pivotschemaId)) {
-            item.isChanged = true
-          }
-        })
-        selected.setting.api_data.labelLongitude.forEach(item => {
-          if (!list.includes(item.pivotschemaId)) {
-            item.isChanged = true
-          }
-        })
-        selected.setting.api_data.labelLatitude.forEach(item => {
-          if (!list.includes(item.pivotschemaId)) {
-            item.isChanged = true
+        const keys = [
+          'dimensions',
+          'measures',
+          'labelDimensions',
+          'labelMeasures',
+          'longitude',
+          'latitude',
+          'labelLongitude',
+          'labelLatitude'
+        ]
+        keys.forEach(key => {
+          if (selected.setting.api_data[key]) {
+            selected.setting.api_data[key].forEach(item => {
+              if (list.includes(item.id)) {
+                item.isChanged = true
+              }
+            })
           }
         })
       }
