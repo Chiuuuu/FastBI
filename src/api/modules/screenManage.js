@@ -293,6 +293,24 @@ const screenManage = {
    */
   actionExportScreen(params) {
     return $axios.post('/v2/screen/bigscreen/exportScreen', params)
+  },
+
+  /**
+   * @description 导出数据时，记录日志
+   * @param {*} params
+   * @returns
+   */
+   exportGraph(params) {
+    return $axios.post('/screen/graph/exportGraph', params)
+  },
+
+  /**
+   * @description 查看数据时，记录日志
+   * @param {*} params
+   * @returns
+   */
+   readGraphInfo(params) {
+    return $axios.post('/screen/graph/readGraphInfo', params)
   }
 }
 

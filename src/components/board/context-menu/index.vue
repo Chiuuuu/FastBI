@@ -246,9 +246,11 @@ export default {
         this.$store.dispatch('ToggleContextMenu')
         // 查看/导出数据
         this.handleChartData('view')
+        this.readGraphInfo()
       } else if (order === 'tocsv') {
         const datas = await this.handleChartData()
         exportCsv(datas, null, this.handleFileName())
+        this.exportGraph()
       } else if (order === 'exportImg') {
         this.$store.dispatch('ToggleContextMenu')
         if (this.isScreen && this.$route.name !== 'screenEdit') {
@@ -256,6 +258,9 @@ export default {
         } else {
           exportImg(this.currSelected, this.pageSettings)
         }
+        this.exportGraph()
+      } else if (order === 'toexcel') {
+        this.exportGraph()
       } else if (order === 'exportScreen') {
         this.$store.dispatch('ToggleContextMenu')
         this.exportScreen()
@@ -263,19 +268,6 @@ export default {
         this.$store.dispatch('ContextMenuCommand', order)
       }
     },
-    // 查看数据
-    // viewChartData() {
-    //   const _Menu = Vue.extend(chartTableData)
-    //   this.menuCompont = new _Menu({
-    //     propsData: {
-    //       chartData: this.chartData
-    //     }
-    //   }).$mount()
-    //   const currentParentName = this.isScreen ? '.dv-screen' : '.board-layout'
-    //   document
-    //     .querySelector(currentParentName)
-    //     .appendChild(this.menuCompont.$el)
-    // },
     // 导出大屏数据
     exportScreen() {
       // 导出大屏数据
@@ -330,6 +322,40 @@ export default {
         })
         message.error('该图表没有拖入图表数据')
       }
+    },
+    exportGraph() {
+      // 导出数据 -- 记录日志
+      let tabName = ''
+      this.pageList.forEach(item => {
+        if (this.currSelected.tabId === item.id) {
+          tabName = item.name
+        }
+      })
+      let params = {
+        id: this.currSelected.id,
+        type: this.currSelected.setting && this.currSelected.setting.chartType,
+        screenName: this.fileName,
+        tabName: tabName,
+        graphName: this.currSelected.type
+      }
+      this.$server.screenManage.exportGraph(params)
+    },
+    readGraphInfo() {
+      // 查看数据 -- 记录日志
+      let tabName = ''
+      this.pageList.forEach(item => {
+        if (this.currSelected.tabId === item.id) {
+          tabName = item.name
+        }
+      })
+      let params = {
+        id: this.currSelected.id,
+        type: this.currSelected.setting && this.currSelected.setting.chartType,
+        screenName: this.fileName,
+        tabName: tabName,
+        graphName: this.currSelected.type
+      }
+      this.$server.screenManage.readGraphInfo(params)
     },
     // 查看/导出数据 -- 构造数据
     async setChartData_scan() {
