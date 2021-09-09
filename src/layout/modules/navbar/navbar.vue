@@ -57,6 +57,9 @@ export default {
               this.$router.replace('/')
             }
             this.$store.commit('common/SET_MENUSELECTID', -1)
+            // TODO: 临时方案, 之后再系统解决
+            this.$store.commit('projectRoles/SET_ROLEID', 0)
+            this.$store.dispatch('dataModel/setModelId', -1)
           } else {
             this.$message.error(result.msg || '请求错误')
           }
