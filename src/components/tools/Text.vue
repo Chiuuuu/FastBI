@@ -117,9 +117,11 @@ export default {
         // this.saveText()
         // 转换文本
         this.getContent().then(res => {
-          this.$refs.editorText.innerHTML = res
-          this.selfConfig.title.text = res
-          this.updateChartData(this.chartId)
+          if (res) {
+            this.$refs.editorText.innerHTML = res
+            this.selfConfig.title.text = res
+            this.updateChartData(this.chartId)
+          }
         })
         // 关闭防止冒泡，开启拖动
         this.$refs.textBox.onmousedown = null
@@ -397,13 +399,13 @@ export default {
         let selected = this.canvasMap.find(item => item.id === this.chartId)
         let self = this
         let loadingInstance = ''
-          loadingInstance = Loading.service({
-            lock: true,
-            text: '加载中...',
-            // target: 'body',
-            target: self.$refs.textBox,
-            background: 'rgb(255, 255, 255, 0.6)'
-          })
+        loadingInstance = Loading.service({
+          lock: true,
+          text: '加载中...',
+          // target: 'body',
+          target: self.$refs.textBox,
+          background: 'rgb(255, 255, 255, 0.6)'
+        })
         let res = await this.$server.screenManage.getData(selected)
         if (loadingInstance) {
           loadingInstance.close()

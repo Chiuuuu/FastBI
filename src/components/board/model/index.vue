@@ -50,7 +50,7 @@
                 v-for="item in disableItem"
                 :value="item.tableId"
                 :key="item.id"
-                @mouseover="getHover(item.tableId)"
+                @mouseenter="getHover(item.tableId)"
               >
                 <a-tooltip :title="item.resourceName">
                   {{ item.resourceName }}
