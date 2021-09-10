@@ -31,6 +31,12 @@ export async function handleRefreshData({ chart, newData }) {
   }
   // 假刷新获取不到null的值，遍历加上
   newData = await handleReturnChartData(newData, chart.setting)
+  // 带维度的图标直接截取前50条数据
+  if (chart.setting.type === '1' && chart.setting.chartType !== 'v-treemap') {
+    if (newData.length && newData.length > 50) {
+      newData.length = 50
+    }
+  }
   if (chart.setting.type === '2') {
     chart.setting.api_data.returnData = newData // 记录返回的键值对，方便展示图表数据直接用
     sourceRows.forEach((row, index) => {
@@ -229,6 +235,11 @@ async function setMapData(chart, newData) {
           [measure.alias]: item[measure.alias] // 度量
         })
       }
+      datas.map(item => {
+        if (item.length > 20) {
+          item.length = 20
+        }
+      })
       seriesObj = Object.assign(dotSeries, {
         data: datas,
         name: measure.alias,
