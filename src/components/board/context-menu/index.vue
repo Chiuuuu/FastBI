@@ -24,10 +24,10 @@
             v-for="(menu, i) in item.children"
             :key="menu.order"
             v-show="showMenu(menu)"
-            @click.stop="handleCommand(menu.order, item)"
+            @click.stop="handleCommand(menu.order, item, menu.key)"
           >
             <JsonExcel
-              v-if="i === 0"
+              v-if="menu.order === 'toexcel'"
               :key="currentSelected ? currentSelected + 'index' + i : 0"
               :fetch="handleChartData"
               :name="handleFileName()"
@@ -58,12 +58,6 @@ import { deepClone } from '@/utils/deepClone'
 import { message } from 'ant-design-vue'
 const exportChartList = [
   {
-    icon: 'ios-share',
-    text: '查看数据',
-    order: 'showChartData',
-    ignore: ['figure', 've-image', 'material']
-  },
-  {
     icon: 'ios-download',
     text: '导出',
     order: 'export',
@@ -77,12 +71,6 @@ const exportChartList = [
   }
 ]
 const chartMenuList = [
-  {
-    icon: 'ios-share',
-    text: '查看数据',
-    order: 'showChartData',
-    ignore: ['figure', 've-image', 'material']
-  },
   {
     icon: 'ios-download',
     text: '导出',
@@ -112,7 +100,15 @@ export default {
   components: { JsonExcel },
   data() {
     return {
-      menuList: chartMenuList, // 菜单列表
+      menuList: [
+        {
+          icon: 'ios-share',
+          text: '查看数据',
+          order: 'showChartData',
+          ignore: ['figure', 've-image', 'material']
+        },
+        ...chartMenuList
+      ], // 菜单列表
       chartData: { rows: [] }, // 图表数据(按最后展示格式)
       chartDataForMap: null, // 同上(地图标记层)
       menuCompont: null,
@@ -123,8 +119,43 @@ export default {
   watch: {
     'contextMenuInfo.listType'(val) {
       if (val) {
-        // eslint-disable-next-line no-eval
-        this.menuList = eval(val)
+        const isMap =
+          this.currSelected && this.currSelected.setting.chartType === 'v-map'
+        const showTableData = isMap
+          ? {
+              icon: 'ios-share',
+              text: '查看数据',
+              order: 'showMapChartData',
+              ignore: ['figure', 've-image', 'material'],
+              showChildren: false,
+              children: [
+                {
+                  text: '填充层',
+                  order: 'showFillList',
+                  key: 'fillList',
+                  ignore: ['ve-image', 'material']
+                },
+                {
+                  text: '标记层',
+                  order: 'showLabelList',
+                  key: 'labelList',
+                  ignore: ['ve-image', 'material']
+                }
+              ]
+            }
+          : {
+              icon: 'ios-share',
+              text: '查看数据',
+              order: 'showChartData',
+              ignore: ['figure', 've-image', 'material']
+            }
+        if (val === 'exportChartList') {
+          this.menuList = [showTableData, ...exportChartList]
+        } else if (val === 'screenMenuList') {
+          this.menuList = screenMenuList
+        } else {
+          this.menuList = [showTableData, ...chartMenuList]
+        }
       }
     }
   },
@@ -231,7 +262,7 @@ export default {
       }
     },
     //  执行菜单命令
-    async handleCommand(order, item) {
+    async handleCommand(order, item, mapKey) {
       if (item) {
         item.showChildren = false
       }
@@ -242,10 +273,14 @@ export default {
         // 如果是删除操作则弹出一个对话框来确认
         // this.$EventBus.$emit('context/menu/delete')
         this.deleteOne()
-      } else if (order === 'showChartData') {
+      } else if (
+        order === 'showChartData' ||
+        order === 'showFillList' ||
+        order === 'showLabelList'
+      ) {
         this.$store.dispatch('ToggleContextMenu')
         // 查看/导出数据
-        this.handleChartData('view')
+        this.handleChartData('view', mapKey)
         this.readGraphInfo()
       } else if (order === 'tocsv') {
         const datas = await this.handleChartData()
@@ -297,14 +332,14 @@ export default {
       this.deleteChartData()
     },
     // 处理查看/导出数据
-    async handleChartData(type) {
+    async handleChartData(type, mapKey) {
       // 查看图表数据
       if (
         this.currSelected.setting.api_data.source ||
         (this.currSelected.setting.chartType === 'v-map' &&
           this.currSelected.setting.config.series.length)
       ) {
-        let dataList = await this.setChartData_scan()
+        let dataList = await this.setChartData_scan(mapKey)
         // 查看数据弹出展示窗
         if (type === 'view') {
           this.showChartData(this.chartData)
@@ -358,7 +393,7 @@ export default {
       this.$server.screenManage.readGraphInfo(params)
     },
     // 查看/导出数据 -- 构造数据
-    async setChartData_scan() {
+    async setChartData_scan(mapKey) {
       let tabName = ''
       this.pageList.forEach(item => {
         if (this.currSelected.tabId === item.id) {
@@ -393,60 +428,100 @@ export default {
       let exportList = []
 
       if (this.currSelected.setting.chartType === 'v-map') {
-        await Promise.all(
-          Object.keys(source).map(async item => {
-            if (source[item]) {
-              let aliasKeys = this.handleTableColumns(
-                Object.keys(source[item][0]),
-                item
-              )
-              columns.push(aliasKeys)
-              let row = []
-              if (item === 'fillList') {
-                row = await handleReturnChartData(
-                  source[item],
-                  this.currSelected.setting,
-                  false,
-                  aliasKeys.filter(item => item.role === 2)
-                )
-              } else if (item === 'labelList') {
-                row = await handleReturnChartData(
-                  source[item],
-                  this.currSelected.setting,
-                  true,
-                  aliasKeys.filter(item => item.role === 2)
-                )
-              }
-              let type = item === 'fillList' ? '填充' : '标记点'
-              rows.push(row)
-              tableName.push(type)
-              let aliasObj = {}
-              aliasKeys.forEach((alias, index) => {
-                aliasObj[''.padEnd(index + 1, ' ')] = alias['colName']
-              })
-              let cunstomRow = source[item].map(row => {
-                let obj = {}
-                aliasKeys.forEach((alias, index) => {
-                  obj[''.padEnd(index + 1, ' ')] = row[alias['colName']]
-                })
-                return obj
-              })
-              let titleRow = { ' ': type, '  ': '', '   ': '' }
-              cunstomRow = [titleRow, aliasObj].concat(cunstomRow)
-              exportList = cunstomRow.concat(exportList)
-            }
+        if (mapKey) {
+          let aliasKeys = this.handleTableColumns(
+            Object.keys(source[mapKey][0]),
+            mapKey
+          )
+          columns = aliasKeys
+          let type = '填充'
+          let row = []
+          if (mapKey === 'fillList') {
+            row = await handleReturnChartData(
+              source[mapKey],
+              this.currSelected.setting,
+              false,
+              aliasKeys.filter(item => item.role === 2)
+            )
+          } else if (mapKey === 'labelList') {
+            row = await handleReturnChartData(
+              source[mapKey],
+              this.currSelected.setting,
+              true,
+              aliasKeys.filter(item => item.role === 2)
+            )
+          }
+          rows = row
+          let aliasObj = {}
+          aliasKeys.forEach((alias, index) => {
+            aliasObj['name' + index] = alias['colName']
           })
-        )
+          let cunstomRow = source[mapKey].map(row => {
+            let obj = {}
+            aliasKeys.forEach((alias, index) => {
+              obj['name' + index] = row[alias['colName']]
+            })
+            return obj
+          })
+          let titleRow = { name0: type, name1: '', name2: '' }
+          cunstomRow = [titleRow, aliasObj].concat(cunstomRow)
+          exportList = cunstomRow.concat(exportList)
+        } else {
+          await Promise.all(
+            Object.keys(source).map(async item => {
+              if (source[item]) {
+                let aliasKeys = this.handleTableColumns(
+                  Object.keys(source[item][0]),
+                  item
+                )
+                columns.push(aliasKeys)
+                let row = []
+                if (item === 'fillList') {
+                  row = await handleReturnChartData(
+                    source[item],
+                    this.currSelected.setting,
+                    false,
+                    aliasKeys.filter(item => item.role === 2)
+                  )
+                } else if (item === 'labelList') {
+                  row = await handleReturnChartData(
+                    source[item],
+                    this.currSelected.setting,
+                    true,
+                    aliasKeys.filter(item => item.role === 2)
+                  )
+                }
+                let type = item === 'fillList' ? '填充' : '标记点'
+                rows.push(row)
+                tableName.push(type)
+                let aliasObj = {}
+                aliasKeys.forEach((alias, index) => {
+                  aliasObj[''.padEnd(index + 1, ' ')] = alias['colName']
+                })
+                let cunstomRow = source[item].map(row => {
+                  let obj = {}
+                  aliasKeys.forEach((alias, index) => {
+                    obj[''.padEnd(index + 1, ' ')] = row[alias['colName']]
+                  })
+                  return obj
+                })
+                let titleRow = { ' ': type, '  ': '', '   ': '' }
+                cunstomRow = [titleRow, aliasObj].concat(cunstomRow)
+                exportList = cunstomRow.concat(exportList)
+              }
+            })
+          )
+        }
       } else {
         // 处理空数据
-        columns = [this.handleTableColumns(Object.keys(source[0]))]
+        columns = this.handleTableColumns(Object.keys(source[0]))
         source = await handleReturnChartData(
           source,
           this.currSelected.setting,
           false,
-          columns[0].filter(item => item.role === 2)
+          columns.filter(item => item.role === 2)
         )
-        rows = [source]
+        rows = source
         exportList = source
       }
       this.chartData = {

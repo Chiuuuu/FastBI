@@ -691,15 +691,6 @@ export default {
             }
           }
         })
-      selected.setting.api_data.options.sort &&
-        selected.setting.api_data.options.sort.forEach(item => {
-          for (const field of fieldList) {
-            if (item.pivotschemaId === field.pivotschemaId) {
-              item.isChanged = 'visible' in field && !field.visible
-              break
-            }
-          }
-        })
     },
     // 根据维度度量获取数据
     async getData() {
@@ -832,10 +823,6 @@ export default {
             })
           })
           let rows = datas
-          // 不明需求, 暂时注释
-          // if (rows.length > 10) {
-          //   rows.length = 10
-          // }
           apiData.source = {
             columns,
             rows

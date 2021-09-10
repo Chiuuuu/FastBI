@@ -341,7 +341,7 @@ export default {
           }
         }
       })
-      selected.setting.api_data.options.labelDimensions.forEach(item => {
+      selected.setting.api_data.labelDimensions.forEach(item => {
         for (const field of fieldList) {
           if (item.pivotschemaId === field.pivotschemaId) {
             item.isChanged = 'visible' in field && !field.visible
@@ -349,39 +349,7 @@ export default {
           }
         }
       })
-      selected.setting.api_data.options.labelMeasures.forEach(item => {
-        for (const field of fieldList) {
-          if (item.pivotschemaId === field.pivotschemaId) {
-            item.isChanged = 'visible' in field && !field.visible
-            break
-          }
-        }
-      })
-      selected.setting.api_data.options.longitude.forEach(item => {
-        for (const field of fieldList) {
-          if (item.pivotschemaId === field.pivotschemaId) {
-            item.isChanged = 'visible' in field && !field.visible
-            break
-          }
-        }
-      })
-      selected.setting.api_data.options.latitude.forEach(item => {
-        for (const field of fieldList) {
-          if (item.pivotschemaId === field.pivotschemaId) {
-            item.isChanged = 'visible' in field && !field.visible
-            break
-          }
-        }
-      })
-      selected.setting.api_data.options.labelLongitude.forEach(item => {
-        for (const field of fieldList) {
-          if (item.pivotschemaId === field.pivotschemaId) {
-            item.isChanged = 'visible' in field && !field.visible
-            break
-          }
-        }
-      })
-      selected.setting.api_data.options.labelLatitude.forEach(item => {
+      selected.setting.api_data.labelMeasures.forEach(item => {
         for (const field of fieldList) {
           if (item.pivotschemaId === field.pivotschemaId) {
             item.isChanged = 'visible' in field && !field.visible

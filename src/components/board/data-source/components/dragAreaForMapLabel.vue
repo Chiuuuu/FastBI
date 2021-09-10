@@ -330,54 +330,6 @@ export default {
           }
         }
       })
-      selected.setting.api_data.options.labelDimensions.forEach(item => {
-        for (const field of fieldList) {
-          if (item.pivotschemaId === field.pivotschemaId) {
-            item.isChanged = 'visible' in field && !field.visible
-            break
-          }
-        }
-      })
-      selected.setting.api_data.options.labelMeasures.forEach(item => {
-        for (const field of fieldList) {
-          if (item.pivotschemaId === field.pivotschemaId) {
-            item.isChanged = 'visible' in field && !field.visible
-            break
-          }
-        }
-      })
-      selected.setting.api_data.options.longitude.forEach(item => {
-        for (const field of fieldList) {
-          if (item.pivotschemaId === field.pivotschemaId) {
-            item.isChanged = 'visible' in field && !field.visible
-            break
-          }
-        }
-      })
-      selected.setting.api_data.options.latitude.forEach(item => {
-        for (const field of fieldList) {
-          if (item.pivotschemaId === field.pivotschemaId) {
-            item.isChanged = 'visible' in field && !field.visible
-            break
-          }
-        }
-      })
-      selected.setting.api_data.options.labelLongitude.forEach(item => {
-        for (const field of fieldList) {
-          if (item.pivotschemaId === field.pivotschemaId) {
-            item.isChanged = 'visible' in field && !field.visible
-            break
-          }
-        }
-      })
-      selected.setting.api_data.options.labelLatitude.forEach(item => {
-        for (const field of fieldList) {
-          if (item.pivotschemaId === field.pivotschemaId) {
-            item.isChanged = 'visible' in field && !field.visible
-            break
-          }
-        }
-      })
     },
     // 根据维度度量获取数据
     async getData() {
@@ -490,11 +442,15 @@ export default {
       }
       if (res.code === 200) {
         this.handleInvisible(selected)
+        // if (res.data.labelList.length && res.data.labelList.length > 200) {
+        //   this.$message.error('当前图例数量过大, 已截取部分数据展示')
+        //   res.data.labelList.length = 200
+        // }
         res.data.labelList = await handleReturnChartData(
           res.data.labelList,
           this.currSelected.setting
         )
-
+        // res.data.labelList = data
         apiData.returnDataLabel = res.data.labelList
         let config = selected.setting.config
         // 重置series
@@ -567,6 +523,16 @@ export default {
             this.$message.error('经纬点解析失败')
             loadingInstance.close()
             return
+          }
+          let overload = false
+          datas.map(item => {
+            if (item.length > 20) {
+              overload = true
+              item.length = 20
+            }
+          })
+          if (overload) {
+            this.$message.error('当前图表数据量过大, 已截取部分数据展示')
           }
           config.series.push(
             Object.assign({}, dotSeries, {
