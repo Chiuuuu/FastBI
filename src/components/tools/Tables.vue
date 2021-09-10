@@ -55,6 +55,7 @@
             width: bodyWidth + 'px',
             height: bodyHeight + 'px'
           }"
+          @scroll="handleScroll"
         >
           <table
             class="table-content table-body yscroll"
@@ -68,7 +69,7 @@
                 :style="{ width: value + 'px' }"
               />
             </colgroup>
-            <tr v-for="(row, index) in tableData" :key="index">
+            <tr v-for="(row, index) in tableData" :key="index" class="js-table-tr">
               <td
                 :style="customRow(index)"
                 class="data data-body"
@@ -121,7 +122,7 @@ export default {
     return {
       width: '500px',
       height: '400px',
-      tableData: [],
+      chartData: [],
       columns: [],
       colors: [],
       showHeader: true,
@@ -130,7 +131,16 @@ export default {
       tableWidth: '',
       bodyHeight: '',
       bodyWidth: '',
-      colWidths: []
+      colWidths: [],
+      tableData: [], // 展示的表格数据slice(headIndex * pageSize, footIndex * pageSize)
+      // 展示500行数据
+      pagination: {
+        lastScrollTop: 0, // 记录上次滚动位置
+        totalIndex: 0, // 最大页数
+        headIndex: 0, // 头部截取下标
+        footIndex: 4, // 脚部截取下标
+        pageSize: 25 // 每次加载数
+      }
     }
   },
   watch: {
@@ -163,12 +173,12 @@ export default {
               }
               newRows.push(newObj)
             }
-            this.tableData = newRows
+            this.chartData = newRows
             this._calcStyle()
             return
           }
           this.columns = val.columns || []
-          this.tableData = val.rows || []
+          this.chartData = val.rows || []
           this._calcStyle()
         }
       },
@@ -196,12 +206,81 @@ export default {
   },
   mounted() {
     this._calcStyle()
+    this.initScrollData()
     addResizeListener(this.$refs.wrap, this._calcStyle)
   },
   beforeDestroy() {
     removeResizeListener(this.$refs.wrap, this._calcStyle)
   },
   methods: {
+    /**
+     * @description 每次数据变化, 初始化滚动数据
+     */
+    initScrollData() {
+      const len = this.chartData.length
+      const { headIndex, footIndex, pageSize } = this.pagination
+      if (len > (footIndex + 1) * pageSize) {
+        this.pagination.totalIndex = Math.ceil(len / pageSize)
+      }
+      this.tableData = this.chartData.slice(headIndex * pageSize, footIndex * pageSize)
+    },
+    /**
+     * @description 监听滚动事件处理分页
+     */
+    handleScroll(e) {
+      const area = e.target
+      const { scrollTop, scrollHeight, scrollWidth } = area
+      const clientHeight = area.clientHeight
+      let {
+        totalIndex,
+        headIndex,
+        footIndex,
+        pageSize,
+        lastScrollTop
+      } = this.pagination
+      const cell = area.querySelector('.js-table-tr')
+      if (!cell) return
+      const cellHeight = cell.clientHeight
+      // 临界距离取当前高度的1/5或者5个单元格的高
+      const distance = Math.min(clientHeight / 5, cellHeight * 5)
+      // 向上滚动到顶部临界值
+      if (lastScrollTop >= scrollTop && scrollTop < distance) {
+        if (--headIndex < 0) {
+          headIndex = 0
+          footIndex = 4
+        } else {
+          footIndex--
+          this.tableData = this.chartData.slice(
+            headIndex * pageSize,
+            footIndex * pageSize
+          )
+          // 滚动条回滚
+          area.scrollTo(scrollWidth, scrollTop + cellHeight * pageSize)
+        }
+      } else if (
+        lastScrollTop <= scrollTop &&
+        scrollHeight - clientHeight - scrollTop < distance
+      ) {
+        // 向下滚动到底部临界值
+        if (++footIndex > totalIndex) {
+          footIndex = totalIndex
+          headIndex = totalIndex - 4
+        } else {
+          headIndex++
+          this.tableData = this.chartData.slice(
+            headIndex * pageSize,
+            footIndex * pageSize
+          )
+          // 滚动条回滚
+          area.scrollTo(scrollWidth, scrollTop - cellHeight * pageSize)
+        }
+      }
+      Object.assign(this.pagination, {
+        headIndex,
+        footIndex,
+        lastScrollTop: scrollTop
+      })
+    },
     afterConfig(options) {
       if (this.typeName === 've-map') {
         let data = [...options.series[0].data]
@@ -251,7 +330,7 @@ export default {
     // 计算单元格宽度
     async getColWidths() {
       this.colWidths = []
-      for (let row of this.tableData) {
+      for (let row of this.chartData) {
         let index = 0
         for (let col of this.columns) {
           if (col.ellipsis && this.config.table.columnWidth) {

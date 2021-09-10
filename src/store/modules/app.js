@@ -44,7 +44,8 @@ const app = {
       { name: '最小值', value: 'MIN' },
       { name: '计数', value: 'CNT' },
       { name: '计数', value: 'COUNT' },
-      { name: '去重计数', value: 'DCNT' }
+      { name: '去重计数', value: 'DCNT' },
+      { name: '去重计数', value: 'COUNTD' }
     ]
   },
   mutations: {

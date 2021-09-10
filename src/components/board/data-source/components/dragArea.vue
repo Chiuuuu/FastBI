@@ -595,24 +595,6 @@ export default {
           }
         }
       })
-      selected.setting.api_data.options.fileList &&
-        selected.setting.api_data.options.fileList.forEach(item => {
-          for (const field of fieldList) {
-            if (item.pivotschemaId === field.pivotschemaId) {
-              item.isChanged = 'visible' in field && !field.visible
-              break
-            }
-          }
-        })
-      selected.setting.api_data.options.sort &&
-        selected.setting.api_data.options.sort.forEach(item => {
-          for (const field of fieldList) {
-            if (item.pivotschemaId === field.pivotschemaId) {
-              item.isChanged = 'visible' in field && !field.visible
-              break
-            }
-          }
-        })
     },
     // 根据维度度量获取数据
     async getData() {
@@ -741,6 +723,10 @@ export default {
         return
       }
       if (res.code === 200) {
+        if (this.chartType === '1' && this.currSelected.setting.chartType !== 'v-map' && this.currSelected.setting.chartType !== 'v-treemap' && res.rows.length && res.rows.length > 50) {
+          this.$message.error('当前图表数据量过大, 已截取部分数据展示')
+          res.rows.length = 50
+        }
         this.handleInvisible(selected)
         let datas = res.rows
         // 处理图表数据
@@ -790,10 +776,6 @@ export default {
             })
           }
           let rows = datas
-          // 不明需求, 暂时注释
-          // if (rows.length > 10) {
-          //   rows.length = 10
-          // }
           apiData.source = {
             columns,
             rows

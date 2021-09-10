@@ -7,36 +7,36 @@
     @cancel="$emit('cancel')"
     :getContainer="getContainer"
   >
-    <div class="scrollbar" style="width:100%;height:400px;overflow-y:scroll;">
-      <div
-        style="margin: 0 0 10px;"
-        v-for="(item, index) in chartData.columns"
-        :key="index"
-      >
-        <h3 style="margin: 0 0 2px;" v-if="chartData.tableName[index]">
-          {{ chartData.tableName[index] }}
-        </h3>
-        <table class="chartdata-table">
-          <tr class="table-tr">
-            <th
-              class="table-td"
-              v-for="(subItem, subIndex) in item"
-              :key="subIndex"
-            >
-              {{ subItem.colName }}
-            </th>
-          </tr>
-          <tr
-            class="table-tr"
-            v-for="(subItem2, subIndex2) in chartData.rows[index]"
-            :key="subIndex2"
+    <div
+      class="scrollbar"
+      style="width:100%;height:400px;overflow-y:scroll;"
+      @scroll="handleScroll"
+    >
+      <table class="chartdata-table">
+        <tr class="table-tr">
+          <th
+            class="table-td"
+            v-for="(item, index) in chartData.columns"
+            :key="index"
           >
-            <td class="table-td" v-for="(value, key) in item" :key="key">
-              {{ subItem2[value.colName || value] || '' }}
-            </td>
-          </tr>
-        </table>
-      </div>
+            {{ item.colName }}
+          </th>
+        </tr>
+        <tr
+          class="table-tr js-table-tr"
+          v-for="(subItem, subIndex) in tableData"
+          :key="subIndex"
+        >
+          <td
+            class="table-td"
+            v-for="(value, key) in chartData.columns"
+            :key="key"
+          >
+            {{ subItem[value.colName || value] || '' }}
+          </td>
+        </tr>
+      </table>
+
       <!-- <table class="chartdata-table">
         <tr class="table-tr">
           <th
@@ -76,7 +76,31 @@ export default {
   watch: {
     show(val) {
       if (val) {
-        console.log(111111, this.chartData)
+        const len = this.chartData.rows.length
+        const { headIndex, footIndex, pageSize } = this.pagination
+        if (len > (footIndex + 1) * pageSize) {
+          this.pagination.totalIndex = Math.ceil(len / pageSize)
+        }
+        this.tableData = this.chartData.rows.slice(
+          headIndex * pageSize,
+          footIndex * pageSize
+        )
+      } else {
+        this.tableData = []
+        this.pagination = this.$options.data().pagination
+      }
+    }
+  },
+  data() {
+    return {
+      tableData: [], // 展示的表格数据slice(headIndex * pageSize, footIndex * pageSize)
+      // 展示500行数据
+      pagination: {
+        lastScrollTop: 0, // 记录上次滚动位置
+        totalIndex: 0, // 最大页数
+        headIndex: 0, // 头部截取下标
+        footIndex: 4, // 脚部截取下标
+        pageSize: 30 // 每次加载数
       }
     }
   },
@@ -84,6 +108,61 @@ export default {
     close() {
       this.$destroy()
       this.$el.remove()
+    },
+    // 滚动分页处理
+    handleScroll(e) {
+      const area = e.target
+      const { scrollTop, scrollHeight, scrollWidth } = area
+      const clientHeight = area.clientHeight
+      let {
+        totalIndex,
+        headIndex,
+        footIndex,
+        pageSize,
+        lastScrollTop
+      } = this.pagination
+      const cell = area.querySelector('.js-table-tr')
+      if (!cell) return
+      const cellHeight = cell.clientHeight
+      // 临界距离取当前高度的1/5或者5个单元格的高
+      const distance = Math.min(clientHeight / 5, cellHeight * 5)
+      // 向上滚动到顶部临界值
+      if (lastScrollTop >= scrollTop && scrollTop < distance) {
+        if (--headIndex < 0) {
+          headIndex = 0
+          footIndex = 4
+        } else {
+          footIndex--
+          this.tableData = this.chartData.rows.slice(
+            headIndex * pageSize,
+            footIndex * pageSize
+          )
+          // 滚动条回滚
+          area.scrollTo(scrollWidth, scrollTop + cellHeight * pageSize)
+        }
+      } else if (
+        lastScrollTop <= scrollTop &&
+        scrollHeight - clientHeight - scrollTop < distance
+      ) {
+        // 向下滚动到底部临界值
+        if (++footIndex > totalIndex) {
+          footIndex = totalIndex
+          headIndex = totalIndex - 4
+        } else {
+          headIndex++
+          this.tableData = this.chartData.rows.slice(
+            headIndex * pageSize,
+            footIndex * pageSize
+          )
+          // 滚动条回滚
+          area.scrollTo(scrollWidth, scrollTop - cellHeight * pageSize)
+        }
+      }
+      Object.assign(this.pagination, {
+        headIndex,
+        footIndex,
+        lastScrollTop: scrollTop
+      })
     },
     // 全屏下，内容挂在dvScreen元素下（screen.vue）可显示，默认挂在body下
     getContainer() {
