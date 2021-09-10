@@ -129,9 +129,10 @@ export function exportForFull(chart, pageSettings) {
 export function exportScreen(name) {
   const domObjs = document.querySelectorAll('.dv-screen')
   const domObj = domObjs[1] || domObjs[0]
-  html2canvas(domObj, {
-    width: domObj.clientWidth,
-    height: domObj.clientHeight,
+  const screen = domObj.querySelector('.canvas-panel')
+  html2canvas(screen, {
+    width: screen.clientWidth,
+    height: screen.clientHeight,
     scale: 1,
     dpi: 300,
     letterRendering: true,

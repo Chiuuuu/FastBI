@@ -142,7 +142,7 @@ export default {
       this.$store.dispatch('SingleSelected', null)
       // 位置在screen.vue,对应画板元素
       this.$nextTick(() => {
-        var docElm = document.querySelector('.screen-shot')
+        var docElm = document.querySelector('.drop-panel')
         if (docElm) {
           if (docElm.requestFullscreen) {
             // W3C

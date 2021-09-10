@@ -11,26 +11,26 @@
     >
       <b-scrollbar style="height:100%;">
         <div class="screen-shot" :style="screenStyle" ref="screenInner">
-          <div
-            class="canvas-panel"
-            :id="screenId"
-            :style="canvasPanelStyle"
-            @click.stop.prevent="cancelSelected"
-            @contextmenu.stop.prevent="showScreenContextMenu($event)"
-            :data-spm-anchor-id="$route.params.id"
-          >
-            <drop-panel>
-              <slot></slot>
-            </drop-panel>
-            <pation
-              v-if="isScreen"
-              :style="{ opacity: showPageTab ? 1 : 0 }"
-              @mouseenter.native="handleTabShow"
-              @mouseleave.native="handleTabShow"
-            ></pation>
-            <!--右键菜单-->
-            <context-menu v-if="isScreen"></context-menu>
-          </div>
+          <drop-panel :style="screenPreview">
+            <div
+              class="canvas-panel"
+              :id="screenId"
+              :style="canvasPanelStyle"
+              @click.stop.prevent="cancelSelected"
+              @contextmenu.stop.prevent="showScreenContextMenu($event)"
+              :data-spm-anchor-id="$route.params.id"
+            >
+                <slot></slot>
+              <pation
+                v-if="isScreen"
+                :style="{ opacity: showPageTab ? 1 : 0 }"
+                @mouseenter.native="handleTabShow"
+                @mouseleave.native="handleTabShow"
+              ></pation>
+              <!--右键菜单-->
+              <context-menu v-if="isScreen"></context-menu>
+            </div>
+          </drop-panel>
         </div>
       </b-scrollbar>
     </div>
@@ -166,19 +166,42 @@ export default {
     // 画布面板的样式
     canvasPanelStyle() {
       let range = this.isScreen ? this.fullScreenRange : this.canvasRange
-      return {
-        width: `${this.pageSettings.width}px`,
-        height: `${this.pageSettings.height}px`,
-        transform: `scale(${range}) translate3d(-50%, -50%, 0)`,
-        background:
-          this.pageSettings.backgroundType === '1'
-            ? this.pageSettings.backgroundColor
-            : `url(${
-                this.pageSettings.backgroundSrc
-              }) 0% 0% / 100% 100% no-repeat`
+      if (this.isScreen) {
+        return {
+          width: `${this.pageSettings.width}px`,
+          height: `${this.pageSettings.height}px`,
+          left: 0,
+          top: 0,
+          background:
+            this.pageSettings.backgroundType === '1'
+              ? this.pageSettings.backgroundColor
+              : `url(${
+                  this.pageSettings.backgroundSrc
+                }) 0% 0% / 100% 100% no-repeat`
 
-        // backgroundColor: this.pageSettings.backgroundColor
+          // backgroundColor: this.pageSettings.backgroundColor
+        }
+      } else {
+        return {
+          width: `${this.pageSettings.width}px`,
+          height: `${this.pageSettings.height}px`,
+          transform: `scale(${range}) translate3d(-50%, -50%, 0)`,
+          background:
+            this.pageSettings.backgroundType === '1'
+              ? this.pageSettings.backgroundColor
+              : `url(${
+                  this.pageSettings.backgroundSrc
+                }) 0% 0% / 100% 100% no-repeat`
+
+          // backgroundColor: this.pageSettings.backgroundColor
+        }
       }
+    },
+    screenPreview() {
+      return this.isScreen ? {
+        width: document.body.clientWidth + 'px',
+        height: document.body.clientHeight + 'px'
+      } : null
     }
   },
   components: { DropPanel, EditSlider, Pation, ContextMenu }
