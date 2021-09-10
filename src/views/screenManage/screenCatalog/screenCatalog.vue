@@ -136,6 +136,7 @@
           <screen
             v-if="fileSelectId > 0"
             ref="screen"
+            type="menu"
             :key="componentKey"
             @getShareData="getShareData"
           ></screen>
@@ -322,7 +323,7 @@
         </div>
       </a-drawer>
     </div>
-    <screen isShootDom v-if="canvasMap && canvasMap.length"></screen>
+    <screen type="preview" v-if="canvasMap && canvasMap.length"></screen>
   </div>
 </template>
 

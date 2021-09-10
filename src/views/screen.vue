@@ -5,7 +5,7 @@
     :style="dvScreenStyle"
     @contextmenu.stop.prevent="poupExportMenu($event)"
   >
-    <b-scrollbar :style="wrapStyle">
+    <div class="scrollbar" style="overflow: auto" :style="wrapStyle">
       <div :style="scrollBoxStyle">
         <div
           class="canvas-panel"
@@ -118,7 +118,7 @@
           ></pation>
         </div>
       </div>
-    </b-scrollbar>
+    </div>
     <context-menu></context-menu>
     <!-- 右键菜单 -- 查看数据 -->
     <chartTableData
@@ -162,6 +162,11 @@ import { deepClone } from '../utils/deepClone'
 export default {
   name: 'screen',
   props: {
+    type: {
+      type: String,
+      required: true,
+      default: 'menu'
+    },
     // 截图模板
     isShootDom: {
       type: Boolean,
@@ -215,28 +220,45 @@ export default {
     ]),
     // 画布面板的样式
     canvasPanelStyle() {
-      return {
-        width: `${this.pageSettings.width}px`,
-        height: `${this.pageSettings.height}px`,
-        transform: `scale(${this.range}) translate3d(-50%, -50%, 0)`,
-        transformOrigin: '0 0',
-        background:
-          this.pageSettings.backgroundType === '1'
-            ? this.pageSettings.backgroundColor
-            : `url(${
-                this.pageSettings.backgroundSrc
-              }) 0% 0% / 100% 100% no-repeat`
+      if (this.type === 'preview') {
+        return {
+          width: `${this.pageSettings.width}px`,
+          height: `${this.pageSettings.height}px`,
+          transform: `translate3d(-50%, -50%, 0)`,
+          transformOrigin: '0 0',
+          background:
+            this.pageSettings.backgroundType === '1'
+              ? this.pageSettings.backgroundColor
+              : `url(${
+                  this.pageSettings.backgroundSrc
+                }) 0% 0% / 100% 100% no-repeat`
+        }
+      } else {
+        return {
+          width: `${this.pageSettings.width}px`,
+          height: `${this.pageSettings.height}px`,
+          transform: `scale(${this.range}) translate3d(-50%, -50%, 0)`,
+          transformOrigin: '0 0',
+          background:
+            this.pageSettings.backgroundType === '1'
+              ? this.pageSettings.backgroundColor
+              : `url(${
+                  this.pageSettings.backgroundSrc
+                }) 0% 0% / 100% 100% no-repeat`
+        }
       }
     },
     dvScreenStyle() {
-      return this.isShootDom
-        ? { width: `${this.pageSettings.width}px`, height: 'auto' }
-        : null
+      // return this.type !== 'menu'
+      //   ? { width: `${this.pageSettings.width}px`, height: 'auto' }
+      //   : null
+      return null
     },
     scrollBoxStyle() {
       return {
         width: `${this.pageSettings.width * this.range}px`,
         height: `${this.pageSettings.height * this.range}px`,
+        position: 'relative',
         overFlow: 'hidden'
       }
     }
@@ -245,7 +267,7 @@ export default {
     screenId: {
       handler(val) {
         if (val) {
-          if (this.$route.name === 'catalog' && !this.isShootDom) {
+          if (this.$route.name === 'catalog' && this.type === 'menu') {
             this.getScreenData()
           }
         }
@@ -418,7 +440,7 @@ export default {
     },
     _calcStyle() {
       // 编辑大屏里的screen只用来做导出,需要完整尺寸展示
-      if (this.isShootDom) {
+      if (this.type === 'edit') {
         this.range = 1
         this.wrapStyle = this.scrollBoxStyle
         return

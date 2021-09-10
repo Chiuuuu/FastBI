@@ -206,7 +206,7 @@
       </template>
     </board>
 
-    <screen :key="isScreen" isShootDom></screen>
+    <screen :key="isScreen" type="edit"></screen>
     <b-modal
       v-model="deleteDialog"
       :styles="{ top: '300px', width: '350px' }"
