@@ -206,7 +206,6 @@ export default {
   },
   mounted() {
     this._calcStyle()
-    this.initScrollData()
     addResizeListener(this.$refs.wrap, this._calcStyle)
   },
   beforeDestroy() {
@@ -223,6 +222,7 @@ export default {
         this.pagination.totalIndex = Math.ceil(len / pageSize)
       }
       this.tableData = this.chartData.slice(headIndex * pageSize, footIndex * pageSize)
+      console.log(this.tableData)
     },
     /**
      * @description 监听滚动事件处理分页
@@ -326,6 +326,9 @@ export default {
       // 获取表格内容高度
       this.bodyHeight =
         this.showTableSize.tableY - this.$refs.tableheader.clientHeight
+
+      // 处理完宽度, 初始化表格
+      this.initScrollData()
     },
     // 计算单元格宽度
     async getColWidths() {

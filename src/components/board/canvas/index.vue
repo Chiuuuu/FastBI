@@ -170,7 +170,7 @@ export default {
         return {
           width: `${this.pageSettings.width}px`,
           height: `${this.pageSettings.height}px`,
-          left: 0,
+          transform: `translateX(-50%)`,
           top: 0,
           background:
             this.pageSettings.backgroundType === '1'
