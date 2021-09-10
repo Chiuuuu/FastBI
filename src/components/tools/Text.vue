@@ -159,7 +159,9 @@ export default {
       }
       // 初始化显示数据，true:不需要匹配度量数据
       this.getContent(true).then(res => {
-        this.$refs.editorText.innerHTML = res
+        if (res) {
+          this.$refs.editorText.innerHTML = res
+        }
       })
       //   }
     })
@@ -395,7 +397,6 @@ export default {
         let selected = this.canvasMap.find(item => item.id === this.chartId)
         let self = this
         let loadingInstance = ''
-        if (!isInit) {
           loadingInstance = Loading.service({
             lock: true,
             text: '加载中...',
@@ -403,7 +404,6 @@ export default {
             target: self.$refs.textBox,
             background: 'rgb(255, 255, 255, 0.6)'
           })
-        }
         let res = await this.$server.screenManage.getData(selected)
         if (loadingInstance) {
           loadingInstance.close()
