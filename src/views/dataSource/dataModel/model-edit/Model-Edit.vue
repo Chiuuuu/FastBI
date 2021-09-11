@@ -357,9 +357,9 @@ export default {
         { name: '平均', value: 'AVG' },
         { name: '最大值', value: 'MAX' },
         { name: '最小值', value: 'MIN' },
-        { name: '计数', value: 'CNT' },
+        // { name: '计数', value: 'CNT' },
         { name: '计数', value: 'COUNT' },
-        { name: '去重计数', value: 'DCNT' },
+        // { name: '去重计数', value: 'DCNT' },
         { name: '去重计数', value: 'COUNTD' }
       ]
     }
@@ -1316,6 +1316,11 @@ export default {
         list = this.cacheDimensions
       } else {
         list = this.cacheMeasures
+      }
+      if (data.defaultAggregator === 'COUNT') {
+        data.defaultAggregator = 'CNT'
+      } else if (data.defaultAggregator === 'COUNTD') {
+        data.defaultAggregator = 'DCNT'
       }
       let index = list.findIndex(item => item.id === data.id)
       if (index < 0) {
