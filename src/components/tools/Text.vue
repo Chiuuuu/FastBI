@@ -63,6 +63,13 @@ export default {
     'apiData.refreshData'(val) {
       if (val && !this.editable) {
         this.$nextTick(async () => {
+let loadingInstance = Loading.service({
+          lock: true,
+          text: '加载中...',
+          // target: 'body',
+          target: this.$refs.textBox,
+          background: 'rgb(255, 255, 255, 0.6)'
+        })
           const promises = []
           this.htmlText.replace(
             reg,
@@ -78,6 +85,9 @@ export default {
             }
           )
           const aliass = await Promise.all(promises)
+                  if (loadingInstance) {
+          loadingInstance.close()
+        }
           const str = this.htmlText.replace(
             reg,
             (match, id, alias) => {
@@ -86,14 +96,14 @@ export default {
                 }
                 // 兼容旧的，没有保存id，id就是test
                 if (val[0][id]) {
-                    return val[0][id]
+                    return val[0][id] || '空'
                 }
                 // 直接找得到说明alias没有变
                 if (val[0][alias]) {
-                    return val[0][alias]
+                    return val[0][alias] || '空'
                 }
                 const newalias = aliass.find(item => item.id === id).alias
-                return val[0][newalias]
+                return val[0][newalias] || '空'
             })
             this.$refs.editorText.innerHTML = str
                         this.canvasMap.forEach(item => {
@@ -450,12 +460,12 @@ export default {
           background: 'rgb(255, 255, 255, 0.6)'
         })
         let res = await this.$server.screenManage.getData(selected)
-        if (loadingInstance) {
-          loadingInstance.close()
-        }
         // 数据源被删掉
         if (res.code === 500 && res.msg === 'IsChanged') {
           selected.setting.isEmpty = 'noData'
+                  if (loadingInstance) {
+          loadingInstance.close()
+        }
           return 'isChanged'
         }
         // if (res.code !== 200) {
@@ -463,6 +473,9 @@ export default {
         //   return 'isChanged'
         // }
         if (res.code === 500) {
+                    if (loadingInstance) {
+          loadingInstance.close()
+        }
           return res.msg
         }
         selected.setting.api_data.source = await handleReturnChartData(
@@ -485,22 +498,25 @@ const promises = []
             }
           )
           const aliass = await Promise.all(promises)
+                  if (loadingInstance) {
+          loadingInstance.close()
+        }
            str = this.htmlText.replace(
             reg,
             (match, id, alias) => {
                 if (!res.rows[0]) {
-                    return '空'
+                    return '空' || '空'
                 }
                 // 兼容旧的，没有保存id，id就是test
                 if (res.rows[0][id]) {
-                    return res.rows[0][id]
+                    return res.rows[0][id] || '空'
                 }
                 // 直接找得到说明alias没有变,不需要请求度量信息
                 if (res.rows[0][alias]) {
-                    return res.rows[0][alias]
+                    return res.rows[0][alias] || '空'
                 }
                 const newalias = aliass.find(item => item.id === id).alias
-                return res.rows[0][newalias]
+                return res.rows[0][newalias] || '空'
             })
       }
       return str
@@ -515,6 +531,9 @@ const promises = []
     },
     // 添加度量数据
     getMeasureDatas() {
+        if (!this.currentmeasure.length) {
+            return
+        }
       let reg = /<span class="edit-alias" contenteditable="false" data-id="(.*?)">.*?<\/span>/g // /<span class="edit-alias" contenteditable="false">(.*?)(&nbsp;){3}<\/span>/g
       let measures = []
       let matchList = this.htmlText.match(reg)
