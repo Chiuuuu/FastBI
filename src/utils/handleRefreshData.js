@@ -9,7 +9,10 @@ export async function handleRefreshData({ chart, newData }) {
   if (chart.setting.chartType === 'v-map') {
     // 假刷新获取不到null的值，遍历加上
     if (newData.fillList) {
-      newData.fillList = await handleReturnChartData(newData.fillList, chart.setting)
+      newData.fillList = await handleReturnChartData(
+        newData.fillList,
+        chart.setting
+      )
     }
     if (newData.labelList) {
       newData.labelList = await handleReturnChartData(
@@ -129,7 +132,8 @@ export async function handleRefreshData({ chart, newData }) {
 }
 async function setMapData(chart, newData) {
   let apiData = chart.setting.api_data
-  let name = apiData.measures[0].alias
+  let name =
+    apiData.measures && apiData.measures[0] ? apiData.measures[0].alias : ''
   let config = chart.setting.config
   let originMap = config.series.find(item => item.type === 'map')
   let originScatter = config.series.find(item => item.type === 'scatter')
@@ -215,7 +219,10 @@ async function setMapData(chart, newData) {
     let datas = []
     if (apiData.options.labelType === 'area') {
       // 只有一个维度，唯一名称
-      let alias = apiData.labelDimensions[0].alias
+      let alias =
+        apiData.labelDimensions && apiData.labelDimensions[0]
+          ? apiData.labelDimensions[0].alias
+          : ''
       // 一个度量对应一个series.data
       let measure = apiData.labelMeasures[0]
       let showName = `地区名/${alias}` // 指标显示用
