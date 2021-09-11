@@ -11,7 +11,7 @@
   >
     <div v-if="fileList.length > 0">
       <div
-        :class="['field', { error: item.status === 1 || item.isChanged || (currSelected.datamodelId && currentSelected!==item.screenTableId) }]"
+        :class="['field', { error: item.status === 1 || item.isChanged }]"
         v-for="(item, index) in fileList"
         :key="index"
         @contextmenu.prevent="showMore(item)"
