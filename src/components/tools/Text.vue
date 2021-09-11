@@ -78,7 +78,7 @@ export default {
             }
           )
           const aliass = await Promise.all(promises)
-          this.$refs.editorText.innerHTML = this.htmlText.replace(
+          const str = this.htmlText.replace(
             reg,
             (match, id, alias) => {
                 if (!val[0]) {
@@ -95,6 +95,13 @@ export default {
                 const newalias = aliass.find(item => item.id === id).alias
                 return val[0][newalias]
             })
+            this.$refs.editorText.innerHTML = str
+                        this.canvasMap.forEach(item => {
+                if (item.id === this.chartId) {
+                    item.setting.config.title.text = str
+                }
+            })
+            this.updateChartData(this.chartId)
         })
       }
     },
@@ -172,7 +179,8 @@ export default {
       selfConfig: {},
       mediumEditor: null,
       canEditByDblClick: false,
-      backgroundStyle: {}
+      backgroundStyle: {},
+      currentmeasure: []
     }
   },
   mounted() {
@@ -189,6 +197,12 @@ export default {
       this.getContent(true).then(res => {
         if (res) {
           this.$refs.editorText.innerHTML = res
+               this.canvasMap.forEach(item => {
+                if (item.id === this.chartId) {
+                    item.setting.config.title.text = res
+                }
+            })
+            this.updateChartData(this.chartId)
         }
       })
       //   }
@@ -331,6 +345,7 @@ export default {
         this.currSelected.datamodelId = '0'
         this.currSelected.setting.resourceType = ''
         this.currSelected.setting.api_data.modelId = ''
+        this.currentmeasure = []
       }
     }, 400),
     // 插入度量元素的点击事件，弹出聚合方式菜单
@@ -400,6 +415,7 @@ export default {
 
       // 保存插入的元素到htmlText
       this.htmlText = this.$refs.editorText.innerHTML
+      this.currentmeasure = this.modelMeasures
 
       // 度量插入到数据
       this.pushMeasures(measure)
@@ -509,7 +525,7 @@ const promises = []
           // 验重
           if (!measures.some(item => item.id === id)) {
             // 添加度量到图表数据
-            let measure = this.modelMeasures.find(item => item.id === id)
+            let measure = this.currentmeasure.find(item => item.id === id)
             // 添加聚合方式值
             // measure.defaultAggregator = aggregatorMap[aliasArr[2]]
             measures.push(measure)
