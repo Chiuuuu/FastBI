@@ -300,7 +300,7 @@ const screenManage = {
    * @param {*} params
    * @returns
    */
-   exportGraph(params) {
+  exportGraph(params) {
     return $axios.post('/screen/graph/exportGraph', params)
   },
 
@@ -309,8 +309,16 @@ const screenManage = {
    * @param {*} params
    * @returns
    */
-   readGraphInfo(params) {
+  readGraphInfo(params) {
     return $axios.post('/screen/graph/readGraphInfo', params)
+  },
+  /**
+   * @description 根据获取alias
+   * @param {*} params
+   * @returns
+   */
+  getAlias(id) {
+    return $axios.get(`/screen/pivotschema/${id}`)
   }
 }
 

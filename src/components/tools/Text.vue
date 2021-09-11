@@ -34,7 +34,7 @@ const aggregatorMap = {
   计数: 'CNT',
   去重计数: 'DCNT'
 }
-const reg = /<span class="edit-alias" contenteditable="false">(.*?)<\/span>/g // /<span class="edit-alias" contenteditable="false">(.*?)\(.*?\)(&nbsp;){3}<\/span>/g // 字符串替换模板
+const reg = /<span class="edit-alias" contenteditable="false" data-id="(.*?)">(.*?)<\/span>/g // /<span class="edit-alias" contenteditable="false">(.*?)\(.*?\)(&nbsp;){3}<\/span>/g // 字符串替换模板
 export default {
   name: 'mediumEidtor',
   props: {
@@ -62,13 +62,39 @@ export default {
     // 如果存在刷新数据，非编辑模式下重新计算显示文本
     'apiData.refreshData'(val) {
       if (val && !this.editable) {
-        this.$nextTick(() => {
-          this.$refs.editorText.innerHTML = this.htmlText.replace(
+        this.$nextTick(async () => {
+          const promises = []
+          this.htmlText.replace(
             reg,
-            (match, alias) => {
-              return val[0] ? val[0][alias] : '空'
+            (match, id) => {
+              const promise = async () => {
+                const resAlias = await this.$server.screenManage.getAlias(id)
+                if (resAlias.data) {
+                  return { id, alias: resAlias.data.alias }
+                }
+                return null
+              }
+              promises.push(promise())
             }
           )
+          const aliass = await Promise.all(promises)
+          this.$refs.editorText.innerHTML = this.htmlText.replace(
+            reg,
+            (match, id, alias) => {
+                if (!val[0]) {
+                    return '空'
+                }
+                // 兼容旧的，没有保存id，id就是test
+                if (val[0][id]) {
+                    return val[0][id]
+                }
+                // 直接找得到说明alias没有变
+                if (val[0][alias]) {
+                    return val[0][alias]
+                }
+                const newalias = aliass.find(item => item.id === id).alias
+                return val[0][newalias]
+            })
         })
       }
     },
@@ -352,7 +378,8 @@ export default {
       const span = document.createElement('span')
       span.className = 'edit-alias'
       span.contentEditable = false
-      span.innerHTML = `${arg}` //  `${arg}(求和)&nbsp;&nbsp;&nbsp;` // 给下拉三角样式留空
+      span.innerHTML = `${arg.alias}` //  `${arg}(求和)&nbsp;&nbsp;&nbsp;` // 给下拉三角样式留空
+      span.setAttribute('data-id', arg.id)
       // 添加点击事件
       // span.onclick = this.clickMeasure
       return span
@@ -362,7 +389,7 @@ export default {
       // 删除*
       antor.remove()
       // 生成数据元素
-      let parseDom = this.parseDom(measure.alias)
+      let parseDom = this.parseDom(measure)
       // 在光标处插入dom
       wrap.insertNode(parseDom)
       wrap.selectNode(parseDom)
@@ -427,9 +454,38 @@ export default {
           selected.setting
         )
 
-        str = this.htmlText.replace(reg, (match, alias) => {
-          return res.rows[0] ? res.rows[0][alias] : '空'
-        })
+const promises = []
+          this.htmlText.replace(
+            reg,
+            (match, id) => {
+              const promise = async () => {
+                const resAlias = await this.$server.screenManage.getAlias(id)
+                if (resAlias.data) {
+                  return { id, alias: resAlias.data.alias }
+                }
+                return null
+              }
+              promises.push(promise())
+            }
+          )
+          const aliass = await Promise.all(promises)
+           str = this.htmlText.replace(
+            reg,
+            (match, id, alias) => {
+                if (!res.rows[0]) {
+                    return '空'
+                }
+                // 兼容旧的，没有保存id，id就是test
+                if (res.rows[0][id]) {
+                    return res.rows[0][id]
+                }
+                // 直接找得到说明alias没有变,不需要请求度量信息
+                if (res.rows[0][alias]) {
+                    return res.rows[0][alias]
+                }
+                const newalias = aliass.find(item => item.id === id).alias
+                return res.rows[0][newalias]
+            })
       }
       return str
     },
@@ -443,17 +499,17 @@ export default {
     },
     // 添加度量数据
     getMeasureDatas() {
-      let reg = /<span class="edit-alias" contenteditable="false">.*?<\/span>/g // /<span class="edit-alias" contenteditable="false">(.*?)(&nbsp;){3}<\/span>/g
+      let reg = /<span class="edit-alias" contenteditable="false" data-id="(.*?)">.*?<\/span>/g // /<span class="edit-alias" contenteditable="false">(.*?)(&nbsp;){3}<\/span>/g
       let measures = []
       let matchList = this.htmlText.match(reg)
       if (matchList) {
         for (let matchStr of matchList) {
-          let aliasArr = matchStr.match(/>(.*?)</) // />(.*?)\((.*?)\)(&nbsp;){3}</
-          let alias = aliasArr[1]
+          let idStr = matchStr.match(/data-id="(.*?)"/) // />(.*?)\((.*?)\)(&nbsp;){3}</
+          let id = idStr[1]
           // 验重
-          if (!measures.some(item => item.alias === alias)) {
+          if (!measures.some(item => item.id === id)) {
             // 添加度量到图表数据
-            let measure = this.modelMeasures.find(item => item.alias === alias)
+            let measure = this.modelMeasures.find(item => item.id === id)
             // 添加聚合方式值
             // measure.defaultAggregator = aggregatorMap[aliasArr[2]]
             measures.push(measure)

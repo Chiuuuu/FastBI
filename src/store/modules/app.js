@@ -8,6 +8,8 @@ import { messages } from 'bin-ui'
 import guangzhou from '@/utils/guangdong.json'
 import { deepClone } from '@/utils/deepClone'
 import _ from 'lodash'
+import options from './options'
+import { getMetadata } from 'core-js/fn/reflect'
 
 let orginPageSettings = {
   width: 1920,
@@ -243,6 +245,10 @@ const app = {
             dispatch('AddCanvasMap', res.data)
             // 保存图层顺序
             dispatch('saveScreenData')
+            // 复制的还要调一次getData
+            if (option.copy) {
+                screenManage.getData(res.data)
+            }
             return true
           } else {
             res.msg && message.error(res.msg)
@@ -448,13 +454,18 @@ const app = {
                     item.isChanged = true
                   }
                 })
-            //   dispatch('SetSelfDataSource', selected.setting.api_data)
+              //   dispatch('SetSelfDataSource', selected.setting.api_data)
             }
           }
           // 处理不可见字段
           function handleInvisible(selected) {
-            const { modelDimensions = [], modelMeasures = [] } = store.state.options
-            const chartFields = selected.setting.api_data.dimensions.concat(selected.setting.api_data.measures)
+            const {
+              modelDimensions = [],
+              modelMeasures = []
+            } = store.state.options
+            const chartFields = selected.setting.api_data.dimensions.concat(
+              selected.setting.api_data.measures
+            )
             const fieldList = [].concat(modelDimensions).concat(modelMeasures)
             // 校验当前图表的字段是否被隐藏, 隐藏则标红
             chartFields.forEach(item => {

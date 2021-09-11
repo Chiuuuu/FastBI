@@ -157,6 +157,7 @@ const canvasMaps = {
           // 修改复制出来的位置信息
           newMap.setting.view.x += 20
           newMap.setting.view.y += 20
+          newMap.copy = true
           // 新增图表
           let res = await dispatch('addChartData', newMap)
           if (res) {
