@@ -831,15 +831,16 @@ export default {
     handleSameName(list) {
       if (Array.isArray(list) && list.length > 1) {
         const map = new Map()
+        const cacheFields = [].concat(this.cacheDimensions, this.cacheMeasures).map(item => item.alias)
         list.forEach(element => {
           if (element.tableNo !== 0) {
-            this.changeAlias(map, element.alias, element)
+            this.changeAlias(map, element.alias, element, cacheFields)
           }
         })
       }
       return list
     },
-    changeAlias(map, alias, element) {
+    changeAlias(map, alias, element, cacheFields) {
       if (map.has(alias)) {
         const target = map.get(alias)
         let value = target.value
@@ -848,10 +849,20 @@ export default {
           alias = `${element.alias}(${element.tableName})`
         } else if (value > 1 && target.tableName === element.tableName) {
           // 同表名同字段且已经存在过(value > 1)
-          alias = `${element.alias}(${element.tableName})(${value})`
+          const newAlias = `${element.alias}(${element.tableName})(${value})`
+          if (cacheFields.includes(newAlias)) {
+            alias = `${element.alias}(${element.tableName})(${value + 1})`
+          } else {
+            alias = newAlias
+          }
         } else {
           // 同表名同字段
-          alias = `${element.alias}(${value})`
+          const newAlias = `${element.alias}(${value})`
+          if (cacheFields.includes(newAlias)) {
+            alias = `${element.alias}(${value + 1})`
+          } else {
+            alias = newAlias
+          }
         }
         if (map.has(alias)) {
           value++
@@ -859,7 +870,7 @@ export default {
             value,
             tableName: element.tableName
           })
-          this.changeAlias(map, alias, element)
+          this.changeAlias(map, alias, element, cacheFields)
         } else {
           map.set(alias, {
             value: 1,
