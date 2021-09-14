@@ -473,8 +473,7 @@ const list = [
                 bottom: 'auto'
               },
               tooltip: {
-                show: true,
-                formatter: '{b} {c}'
+                show: true
               },
               xAxis: {
                 name: '',
@@ -2508,7 +2507,7 @@ const list = [
               x: 760,
               y: 340
             }
-          },
+          }
           // {
           //   title: '立体饼图',
           //   name: 'high-pie',

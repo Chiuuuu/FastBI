@@ -433,6 +433,11 @@ export default {
           }
         }
       }
+
+      // 柱状图
+      if (this.chartType === 'v-histogram') {
+          delete options.tooltip.formatter
+      }
       return options
     },
     // 处理矩形树图的formatter
