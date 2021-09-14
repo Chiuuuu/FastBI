@@ -293,7 +293,6 @@ export default {
     async handleDropOnFilesWD(event) {
       this.isExist = false
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
-
       // 验重
       if (this.fileList.some(item => dataFile.alias === item.alias)) {
         this.$message.error(`${dataFile.alias}已存在`)
@@ -337,14 +336,22 @@ export default {
       if (res.code === 200) {
         // 过滤空字段
         // 拆维度列表
-        let list = res.rows.map(item => {
+        const list = []
+        let hasNull = false
+        res.rows.forEach(item => {
           // 需将null值空值也当做条件显示出来
           if (Object.prototype.toString.call(item) === '[object Object]') {
-            return Object.values(item).toString()
+            const value = Object.values(item)
+            if (value[0]) {
+              list.push(value.toString())
+            } else {
+              hasNull = true
+            }
           } else {
-            return ''
+            hasNull = true
           }
         }) // 维度全字段列表
+        if (hasNull) list.unshift('')
         dataFile.originList = list
         dataFile.searchList = dataFile.originList
         dataFile.checkedList = [] // 勾选的字段列表
@@ -399,13 +406,23 @@ export default {
           dimensions: [this.currentFile]
         }
         let res = await this.$server.screenManage.getDataPick(params)
-        this.currentFile.originList = res.rows.map(item => {
+        const list = []
+        let hasNull = false
+        res.rows.forEach(item => {
+          // 需将null值空值也当做条件显示出来
           if (Object.prototype.toString.call(item) === '[object Object]') {
-            return Object.values(item).toString()
+            const value = Object.values(item)
+            if (value[0]) {
+              list.push(value.toString())
+            } else {
+              hasNull = true
+            }
           } else {
-            return ''
+            hasNull = true
           }
         }) // 维度全字段列表
+        if (hasNull) list.unshift('')
+        this.currentFile.originList = list // 维度全字段列表
         this.currentFile.searchList = this.currentFile.originList
         this.onChange()
       }
