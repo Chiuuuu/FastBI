@@ -34,7 +34,7 @@
           :formatter="value => `左 ${value}`"
           class="f-clear-width"
           :min="0"
-          :max="60"
+          :max="80"
           @change="setSelfProperty"
         ></a-input-number>
       </gui-inline>
