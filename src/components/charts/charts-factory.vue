@@ -438,6 +438,15 @@ export default {
       if (this.chartType === 'v-histogram') {
           delete options.tooltip.formatter
       }
+
+      // 柱状图
+      if (this.chartType === 'v-line') {
+          options.series.forEach(item => {
+              item.data.forEach(d => {
+                  d[0] = d[0].toString()
+              })
+          })
+      }
       return options
     },
     // 处理矩形树图的formatter
