@@ -13,7 +13,7 @@
         @dragover.prevent.stop
         @drop.stop="handleDrop($event, nodeData, dataIndex)"
       >
-        {{ nodeData.props.name }}
+        {{ nodeData.props.alias }}
       </h6>
       <div v-if="nodeData.props.type === 2" class="union"></div>
       <a-popover v-model="visible" trigger="click" overlayClassName='model-popover-box' @visibleChange="(v)=> handleVisibleChange(v, nodeData)">
@@ -30,7 +30,7 @@
                 <div class="wap" @click="handlePopoverType(item, nodeData)">
                   <div class="inner" :class="item.type === nodeData.props.joinType ? 'active' : ''">
                     <div class="img" :class="'img-0' + (index + 1)"></div>
-                    <div class="txt">{{item.name}}</div>
+                    <div class="txt">{{item.alias}}</div>
                   </div>
                 </div>
               </li>
@@ -494,8 +494,8 @@ export default {
       const leftNodeProps = node.parent.getProps()
       const rightNodeProps = node.getProps()
 
-      this.popoverLeftTable = leftNodeProps.name
-      this.popoverRightTable = rightNodeProps.name
+      this.popoverLeftTable = leftNodeProps.alias
+      this.popoverRightTable = rightNodeProps.alias
       this.handleGetLRTableList(leftNodeProps.tableId, rightNodeProps.tableId)
     },
     async handleGetLRTableList(leftTableId, rightTableId) {

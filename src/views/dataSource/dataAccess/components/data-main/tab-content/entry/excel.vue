@@ -507,10 +507,10 @@ export default {
       }
 
       // 校验中文名
-      if (isValid && /[\u4E00-\u9FA5\uF900-\uFA2D]/.test(name)) {
-        isValid = false
-        this.$message.error('暂不支持中文表名文件')
-      }
+      // if (isValid && /[\u4E00-\u9FA5\uF900-\uFA2D]/.test(name)) {
+      //   isValid = false
+      //   this.$message.error('暂不支持中文表名文件')
+      // }
 
       // 校验命名规则(中英数字下划线)
       if (isValid && !/^[0-9a-zA-Z_\u4E00-\u9FA5\uF900-\uFA2D]*$/g.test(name)) {

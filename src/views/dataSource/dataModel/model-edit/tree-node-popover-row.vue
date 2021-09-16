@@ -14,7 +14,7 @@
             :key="item.id"
             :valule="item.id"
           >
-            {{ item.name }}
+            {{ item.alias }}
           </a-select-option>
         </a-select>
       </a-col>
@@ -34,7 +34,7 @@
             :key="item.id"
             :valule="item.id"
           >
-            {{ item.name }}
+            {{ item.alias }}
           </a-select-option>
         </a-select>
       </a-col>

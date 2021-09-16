@@ -2,7 +2,7 @@
   <a-modal
     class="widthModal"
     :visible="isShow"
-    :title="item.name"
+    :title="item.alias"
     :bodyStyle="bodyStyle"
     width="1000px"
     @cancel="handleClose"
@@ -21,7 +21,10 @@
     />
     <a-button
       class="arrow arrow-right"
-      :disabled="colPagination.config.page * colPagination.config.size >= colPagination.config.total"
+      :disabled="
+        colPagination.config.page * colPagination.config.size >=
+          colPagination.config.total
+      "
       type="primary"
       icon="right"
       @click="handleChangePage('add')"
@@ -41,7 +44,7 @@
                 <th :key="item.name">
                   <div class="wrap">
                     <div class="txt" :title="item.name">
-                      <span class='txt-title'>{{item.name}}</span>
+                      <span class="txt-title">{{ item.name }}</span>
                     </div>
                   </div>
                 </th>
@@ -49,17 +52,26 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item,index) in colPagination.tableData" :key="index">
-              <td><div class="txt txt-order">{{index+1}}</div></td>
+            <tr v-for="(item, index) in colPagination.tableData" :key="index">
+              <td>
+                <div class="txt txt-order">{{ index + 1 }}</div>
+              </td>
               <td
                 v-for="(col, i) in colPagination.currentCol"
                 :key="i"
                 :title="item[col.name]"
-              ><div class="txt" :title="item[col.name]">{{ item[col.name] }}</div></td>
+              >
+                <div class="txt" :title="item[col.name]">
+                  {{ item[col.name] }}
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
-        <a-empty v-if="colPagination.tableData.length === 0" class="main-empty"></a-empty>
+        <a-empty
+          v-if="colPagination.tableData.length === 0"
+          class="main-empty"
+        ></a-empty>
       </div>
     </a-spin>
   </a-modal>
@@ -72,13 +84,17 @@ export default {
   props: {
     isShow: Boolean,
     item: {
-        type: Object,
-        default: () => {}
+      type: Object,
+      default: () => {}
     }
   },
   data() {
     return {
-      bodyStyle: { height: 'calc(100vh - 240px)', 'overflow-y': 'auto', padding: '0' },
+      bodyStyle: {
+        height: 'calc(100vh - 240px)',
+        'overflow-y': 'auto',
+        padding: '0'
+      },
       colPagination: new ColPagination({
         total: 0,
         size: 50,
@@ -102,7 +118,7 @@ export default {
   methods: {
     /**
      * 获取数据
-    */
+     */
     async handleGetData() {
       const { size, page } = this.colPagination.config
       if (!this.colPagination.validPageSection()) {
@@ -117,7 +133,10 @@ export default {
 
         if (result.code === 200) {
           this.colPagination.config.total = result.data.total
-          this.colPagination.handleColCache(result.data.columnNameList, result.data.rows)
+          this.colPagination.handleColCache(
+            result.data.columnNameList,
+            result.data.rows
+          )
           this.$nextTick(() => {
             this.loading = false
           })
@@ -145,7 +164,7 @@ export default {
 <style lang="less" scoped>
 @deep: ~'>>>';
 .widthModal {
-  @{deep} .ant-modal-body{
+  @{deep} .ant-modal-body {
     padding: 0;
   }
 }
@@ -165,7 +184,8 @@ export default {
     word-wrap: break-word;
     word-break: break-all;
   }
-  th,td {
+  th,
+  td {
     padding: 0 12px;
     height: 30px;
     line-height: 30px;

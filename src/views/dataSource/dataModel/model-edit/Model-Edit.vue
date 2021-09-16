@@ -936,6 +936,18 @@ export default {
         data.convertType || data.dataType
       )
     },
+    // 判断字段是否为时间日期类型
+    isDate(data) {
+      return (data.convertType || data.dataType) === 'DATE'
+    },
+    // 判断字段是否为时间日期类型
+    isTimestamp(data) {
+      return (data.convertType || data.dataType) === 'TIMESTAMP'
+    },
+    // 判断字段是否为文本类型
+    isVarchar(data) {
+      return (data.convertType || data.dataType) === 'VARCHAR'
+    },
     /**
      * 表格变更时, 处理筛选排序的列表
      */
@@ -975,8 +987,11 @@ export default {
               if (field.visible === false) {
                 // visible为false(不可见)字段要置灰
                 item.status = 2
-              } else if (this.isNumber(item) !== this.isNumber(field)) {
-                // 字段类型修改, 数值->非数值 or 非数值->数值, 需标黄
+              } else if (this.isNumber(item) !== this.isNumber(field) ||
+              this.isDate(item) !== this.isDate(field) ||
+              this.isTimestamp(item) !== this.isTimestamp(field) ||
+              this.isVarchar(item) !== this.isVarchar(field)) {
+                // 字段类型修改, 不是转成同类型的, 需标黄
                 item.status = 3
               } else {
                 item.status = 0
@@ -1249,7 +1264,7 @@ export default {
     },
     doWithUnionSetting(data) {
       const tables = this.detailInfo.config.tables
-      this.unionNode.setField('name', data.form.name)
+      this.unionNode.setField('alias', data.form.name)
       this.unionNode.setField('type', 2)
       this.unionNode.setField('union', data.union)
 
@@ -1411,10 +1426,6 @@ export default {
           return
         }
       }
-
-      this.detailInfo.config.tables.map(table => {
-        table.alias = table.name
-      })
 
       const { dimensions, measures } = this.handleConcat() // 处理维度度量
       const params = {

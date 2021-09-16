@@ -8,7 +8,7 @@
     okText="导出宽表"
     :destroyOnClose="true"
     :okButtonProps="{
-      props: { disabled: data.length > 0 ? false : true },
+      props: { disabled: data.length > 0 ? false : true }
     }"
     @cancel="handleClose"
   >
@@ -40,15 +40,17 @@
                   <div class="hr" data-resize="true"></div>
                 </div>
               </th>
-              <template v-for="(item,index) in columnsList">
+              <template v-for="(item, index) in columnsList">
                 <th :key="item.title">
                   <div class="wrap">
                     <!-- <div class="menu-left">
                       <i class="u-icn u-icn-string"></i>
                     </div> -->
                     <div class="txt" :title="item.name">
-                      <span class='txt-title'>{{item.name}}</span>
-                      <span class='columns-type'>{{setColumnsType(columnsList[index])}}</span>
+                      <span class="txt-title">{{ item.name }}</span>
+                      <span class="columns-type">{{
+                        setColumnsType(columnsList[index])
+                      }}</span>
                     </div>
                   </div>
                 </th>
@@ -56,10 +58,12 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item,index) in data" :key="index">
-              <td><div class="txt txt-order">{{index+1}}</div></td>
-              <td v-for="(subitem,subIndex) in item" :key="subIndex">
-                <div class="txt" :title="subitem">{{subitem}}</div>
+            <tr v-for="(item, index) in data" :key="index">
+              <td>
+                <div class="txt txt-order">{{ index + 1 }}</div>
+              </td>
+              <td v-for="(subitem, subIndex) in item" :key="subIndex">
+                <div class="txt" :title="subitem">{{ subitem }}</div>
               </td>
             </tr>
           </tbody>
@@ -103,19 +107,22 @@ export default {
   },
   computed: {
     hasEditPermission() {
-      return hasPermission(this.$store.state.common.privileges, this.$PERMISSION_CODE.OPERATOR.export)
+      return hasPermission(
+        this.$store.state.common.privileges,
+        this.$PERMISSION_CODE.OPERATOR.export
+      )
     }
   },
   methods: {
     /**
      * 重置data数据
-    */
+     */
     handleResetData() {
       Object.assign(this.$data, this.$options.data())
     },
     /**
      * 设置表头类型
-    */
+     */
     setColumnsType(item) {
       const type = item.convertType.toUpperCase()
       switch (type) {
@@ -137,7 +144,7 @@ export default {
     },
     /**
      * 获取数据
-    */
+     */
     async handleGetData() {
       this.handleResetData()
 
@@ -173,7 +180,7 @@ export default {
     },
     /**
      * 处理表头
-    */
+     */
     handleDoWithColumn(obj) {
       if (obj) {
         Object.keys(obj).map(key => {
@@ -196,9 +203,11 @@ export default {
           ...this.$parent.handleConcat() // 处理维度度量
         }
       }
-      const result = await this.$server.dataModel.actionDownloadfile(params).finally(() => {
-        this.confirmLoading = false
-      })
+      const result = await this.$server.dataModel
+        .actionDownloadfile(params)
+        .finally(() => {
+          this.confirmLoading = false
+        })
 
       if (result['code'] && result['code'] !== 200) {
         // xlsx有错的情况，将blob对象转成json
@@ -211,7 +220,8 @@ export default {
         return
       }
       let blob = new Blob([result], {
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        type:
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       })
       let url = window.URL.createObjectURL(blob) // 通过URL.createObjectURL生成文件路径
       let a = document.createElement('a') // 创建a标签
@@ -233,7 +243,7 @@ export default {
 <style lang="less" scoped>
 @deep: ~'>>>';
 .widthModal {
-  @{deep} .ant-modal-body{
+  @{deep} .ant-modal-body {
     padding: 0;
   }
 }
@@ -253,7 +263,8 @@ export default {
     word-wrap: break-word;
     word-break: break-all;
   }
-  th,td {
+  th,
+  td {
     padding: 0 12px;
     height: 30px;
     line-height: 30px;
