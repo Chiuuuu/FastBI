@@ -644,7 +644,7 @@ export default {
         }
         this.modelMeasures.forEach(item => {
           // 过滤已更改的度量
-          if (item.status === 0) {
+          if (item.status === 0 && item.visible) {
             list.push({
               name: item.alias,
               onClick: (event, handler, vm, wrap, antor) => {
