@@ -1,7 +1,7 @@
 <!-- 8-14 数据模型侧栏 -->
 <template>
-  <div class="board-model" :style="config.style">
-    <div style="height: 100%">
+  <div class="board-model" :style="modelStyle">
+    <div style="height: 100%; width: 100%">
       <div class="model-header" v-show="config.title.enable">
         <a-icon
           class="model-back"
@@ -19,7 +19,7 @@
         />
       </div>
       <!-- 操作界面 -->
-      <div v-if="modelExpand" style="height: calc(100% - 150px)">
+      <div v-if="modelExpand" style="height: calc(100% - 50px)">
         <div class="model-operation" v-if="model">
           <div class="operation">
             <a-radio-group
@@ -334,6 +334,12 @@ export default {
     // 根据类型显示对应列表
     disableItem() {
       return this.resourceType === 8 ? this.savedModels : this.savedSources
+    },
+    modelStyle() {
+      return this.modelExpand ? this.config.style : {
+        ...this.config.style,
+        width: '50px'
+      }
     }
   },
   watch: {

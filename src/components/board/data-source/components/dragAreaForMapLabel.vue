@@ -442,10 +442,6 @@ export default {
       }
       if (res.code === 200) {
         this.handleInvisible(selected)
-        // if (res.data.labelList.length && res.data.labelList.length > 200) {
-        //   this.$message.error('当前图例数量过大, 已截取部分数据展示')
-        //   res.data.labelList.length = 200
-        // }
         res.data.labelList = await handleReturnChartData(
           res.data.labelList,
           this.currSelected.setting

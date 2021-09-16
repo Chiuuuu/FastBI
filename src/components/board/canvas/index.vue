@@ -1,6 +1,7 @@
 <template>
   <div
     class="canvas-main"
+    :style="canvasMainStyle"
     ref="canvasMain"
     @contextmenu.stop.prevent="hideContextMenu($event)"
   >
@@ -49,11 +50,13 @@ import Pation from '../pation/index' // 分页栏
 import DropPanel from '../../drop/drop-panel'
 import { mapActions, mapGetters } from 'vuex'
 import ContextMenu from '../context-menu/index' // 右键菜单
+import config from '../../../config/board'
 
 export default {
   name: 'CanvasMain',
   data() {
     return {
+      config,
       wrapStyle: {},
       screenStyle: {},
       range: 0.65,
@@ -161,8 +164,15 @@ export default {
       'contextMenuInfo',
       'screenId',
       'isScreen',
-      'orginPageSettings'
+      'orginPageSettings',
+      'optionsExpand'
     ]),
+    canvasMainStyle() {
+      const optionsWidth = this.config.options.style.width
+      return {
+        width: this.optionsExpand ? `calc(100% - ${optionsWidth})` : '100%'
+      }
+    },
     // 画布面板的样式
     canvasPanelStyle() {
       let range = this.isScreen ? this.fullScreenRange : this.canvasRange

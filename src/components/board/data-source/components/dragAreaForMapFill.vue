@@ -550,6 +550,16 @@ export default {
             loadingInstance.close()
             return
           }
+          let overload = false
+          datas.map(item => {
+            if (item.length > 20) {
+              overload = true
+              item.length = 20
+            }
+          })
+          if (overload) {
+            this.$message.error('当前图表数据量过大, 已截取部分数据展示')
+          }
           config.series.unshift(
             Object.assign({}, mapSeries, {
               data: datas,

@@ -8,7 +8,7 @@
   right: 0;
   bottom: 0;
   box-sizing: border-box;
-  z-index: 0;
+  z-index: 201;
   background: #ffffff;
   box-shadow: -2px 0 2px 0 rgba(0, 0, 0, 0.1);
   transition: all 0.3s;
@@ -46,16 +46,22 @@
   }
 
   .model-contain {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     .model-search {
       margin-top: 16px;
     }
     .model-main{
-      height: 100%;
+      flex: 1;
       overflow-y: scroll;
     }
   }
 
   .model-operation {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     .operation {
       margin: 10px 15px 0 15px;
     }
@@ -74,10 +80,10 @@
       background: #ededed;
       }
     .operation_main {
-      // overflow-y: scroll;
-      height:800px;
+      overflow-y: auto;
+      flex: 1;
       .operation {
-        height:32%;
+        height: calc(50% - 10px);
         border-bottom: 1px solid #EFEFEF;
         .header {
           display flex;
