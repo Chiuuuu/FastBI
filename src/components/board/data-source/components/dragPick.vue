@@ -777,6 +777,10 @@ export default {
           this.updateChartData()
           return
         }
+        if (this.currSelected.setting.type === '1' && this.currSelected.setting.chartType !== 'v-map' && this.currSelected.setting.chartType !== 'v-treemap' && res.rows.length && res.rows.length > 50) {
+          this.$message.error('当前图表数据量过大, 已截取部分数据展示')
+          res.rows.length = 50
+        }
 
         this.handleInvisible(selected)
         let datas = res.rows
