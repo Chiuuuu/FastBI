@@ -835,7 +835,7 @@ export default {
       const list = [].concat(this.handleConcatDimensions(), this.handleConcatMeasures())
       if (Array.isArray(list) && list.length > 1) {
         const map = new Map()
-        const cacheFields = [].concat(this.cacheDimensions, this.cacheMeasures).map(item => item.alias)
+        const cacheFields = list.map(item => item.alias)
         list.forEach(element => {
           if (element.tableNo !== 0) {
             // this.changeAlias(map, element.alias, element, cacheFields)
