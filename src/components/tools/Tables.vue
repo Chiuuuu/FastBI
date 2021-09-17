@@ -69,12 +69,16 @@
                 :style="{ width: value + 'px' }"
               />
             </colgroup>
-            <tr v-for="(row, index) in tableData" :key="index" class="js-table-tr">
+            <tr
+              v-for="(row, index) in tableData"
+              :key="index"
+              class="js-table-tr"
+            >
               <td
                 :style="customRow(index)"
                 class="data data-body"
-                v-for="(value, key) in row"
-                :key="key"
+                v-for="(value, index) in row"
+                :key="index"
               >
                 {{ value }}
               </td>
@@ -167,11 +171,11 @@ export default {
             let newRows = []
             // 给列数据key重新排序
             for (let row of rows) {
-              let newObj = {}
+              let newList = []
               for (let col of this.columns) {
-                newObj[col.key] = row[col.key]
+                newList.push(row[col.key])
               }
-              newRows.push(newObj)
+              newRows.push(newList)
             }
             this.chartData = newRows
             this._calcStyle()
@@ -221,8 +225,10 @@ export default {
       if (len > (footIndex + 1) * pageSize) {
         this.pagination.totalIndex = Math.ceil(len / pageSize)
       }
-      this.tableData = this.chartData.slice(headIndex * pageSize, footIndex * pageSize)
-      console.log(this.tableData)
+      this.tableData = this.chartData.slice(
+        headIndex * pageSize,
+        footIndex * pageSize
+      )
     },
     /**
      * @description 监听滚动事件处理分页
@@ -334,11 +340,10 @@ export default {
     async getColWidths() {
       this.colWidths = []
       for (let row of this.chartData) {
-        let index = 0
-        for (let col of this.columns) {
+        this.columns.forEach((col, index) => {
           if (col.ellipsis && this.config.table.columnWidth) {
             this.colWidths[index] = this.config.table.columnWidth
-            continue
+            return
           }
           // 计算每个单元格的大小（取每一列最长的宽度作为单位格宽度）
           if (!this.colWidths[index]) {
@@ -350,15 +355,14 @@ export default {
               30
           }
           let colWidth =
-            this.getActaulLen(row[col.key]) *
+            this.getActaulLen(row[index]) *
               this.config.table.textStyle.fontSize *
               0.6 +
             30
           if (colWidth > this.colWidths[index]) {
             this.colWidths[index] = colWidth
           }
-          index++
-        }
+        })
       }
       return true
     },
