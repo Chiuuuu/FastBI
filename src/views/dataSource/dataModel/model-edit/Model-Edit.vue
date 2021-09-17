@@ -745,6 +745,7 @@ export default {
           this.detailInfo.pivotSchema.dimensions.push(data)
         }
       }
+      this.handleSameName()
       this.handleDimensions()
       this.handleMeasures()
       this.handleGroupField()
@@ -790,10 +791,12 @@ export default {
         )
         if (isDimension) {
           this.cacheDimensions.push(newField)
+          this.handleSameName()
           this.handleDimensions()
           this.handleGroupField()
         } else if (isMeasures) {
           this.cacheMeasures.push(newField)
+          this.handleSameName()
           this.handleMeasures()
           this.handleGroupField()
         } else {
@@ -828,7 +831,8 @@ export default {
     /**
      * 同字段名处理
      */
-    handleSameName(list) {
+    handleSameName() {
+      const list = [].concat(this.handleConcatDimensions(), this.handleConcatMeasures())
       if (Array.isArray(list) && list.length > 1) {
         const map = new Map()
         const cacheFields = [].concat(this.cacheDimensions, this.cacheMeasures).map(item => item.alias)
@@ -931,7 +935,7 @@ export default {
      */
     handleDimensions() {
       const arry = this.handleConcatDimensions()
-      this.handleSameName(arry)
+      // this.handleSameName(arry)
       this.dimensions = groupBy(arry, 'tableNo')
       this.dimensionsActiveKey = keys(this.dimensions)
     },
@@ -949,7 +953,7 @@ export default {
      */
     handleMeasures() {
       const arry = this.handleConcatMeasures()
-      this.handleSameName(arry)
+      // this.handleSameName(arry)
       this.measures = groupBy(arry, 'tableNo')
       this.measuresActiveKey = keys(this.measures)
     },
@@ -1118,6 +1122,7 @@ export default {
           result.data.privileges || []
         )
 
+        this.handleSameName()
         this.handleDimensions()
         this.handleMeasures()
         this.handleGroupField()
@@ -1331,6 +1336,7 @@ export default {
         data.form.name
       )
 
+      this.handleSameName()
       this.handleDimensions()
       this.handleMeasures()
       this.handleFilterSort()
@@ -1362,6 +1368,7 @@ export default {
           cacheMeasures,
           this.cacheMeasures
         )
+        this.handleSameName()
         this.handleDimensions()
         this.handleMeasures()
         this.handleFilterSort()
@@ -1386,6 +1393,7 @@ export default {
       } else {
         list.splice(index, 1, data)
       }
+      this.handleSameName()
       this.handleDimensions()
       this.handleMeasures()
       this.handleGroupField()
