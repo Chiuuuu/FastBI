@@ -834,7 +834,8 @@ export default {
         const cacheFields = [].concat(this.cacheDimensions, this.cacheMeasures).map(item => item.alias)
         list.forEach(element => {
           if (element.tableNo !== 0) {
-            this.changeAlias(map, element.alias, element, cacheFields)
+            // this.changeAlias(map, element.alias, element, cacheFields)
+            this.renameAlias(map, element.alias, element, cacheFields)
           }
         })
       }
@@ -879,6 +880,37 @@ export default {
           element.alias = alias
         }
       } else {
+        map.set(element.alias, {
+          value: 1,
+          tableName: element.tableName
+        })
+      }
+    },
+    renameAlias(map, alias, element, cacheFields) {
+      if (map.has(alias)) {
+        const target = map.get(alias)
+        let value = target.value
+        if (target.tableName === element.tableName) {
+          // 同表名同字段, 直接+1
+          let newAlias = `${alias}(${value++})`
+          // 先检验自定义表有没有重名, 重名再+1
+          while (cacheFields.includes(newAlias)) {
+            newAlias = `${alias}(${value++})`
+          }
+          element.alias = newAlias
+          map.set(alias, {
+            value,
+            tableName: element.tableName
+          })
+        } else if (target.tableName !== element.tableName) {
+          // 不同表名同字段, 后面跟表名
+          const newAlias = `${alias}(${element.tableName})`
+          // 若还有重复则再+1, 没重复则录入map
+          this.renameAlias(map, newAlias, element, cacheFields)
+        }
+      } else {
+        // 未出现重复, 则直接重写alias
+        element.alias = alias
         map.set(element.alias, {
           value: 1,
           tableName: element.tableName
@@ -1387,6 +1419,12 @@ export default {
         name: 'modelShow'
       })
     },
+    // 保存前校验每个字段的类型和默认聚合是否匹配
+    handleDefaultAggregator(item) {
+      if (!this.isNumber(item) && ['COUNT', 'CNT', 'DCNT', 'COUNTD'].includes(item.defaultAggregator)) {
+        item.defaultAggregator = 'CNT'
+      }
+    },
     handleSave() {
       let formAllRight = true
       if (this.model === 'add') {
@@ -1432,12 +1470,16 @@ export default {
         ...this.detailInfo,
         pivotSchema: {
           dimensions: dimensions.map(item => {
+            // 处理非数值类型的defaultaggregator不是计数和去重计数的问题
+            this.handleDefaultAggregator(item)
             if (item.isGroupFlag === null) { // 兼容老数据
               item.isGroupFlag = 0
             }
             return item
           }),
           measures: measures.map(item => {
+            // 处理非数值类型的defaultaggregator不是计数和去重计数的问题
+            this.handleDefaultAggregator(item)
             if (item.isGroupFlag === null) { // 兼容老数据
               item.isGroupFlag = 0
             }

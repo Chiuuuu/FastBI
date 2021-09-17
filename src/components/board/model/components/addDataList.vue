@@ -34,7 +34,7 @@
                     <a-collapse-panel
                       :showArrow="false"
                       :key="item3.id"
-                      :header="item3.name"
+                      :header="item3.alias"
                       :style="customStyle"
                       :class="disableList.includes(item3.id) ? 'disable' : ''"
                       @click.native="fileHandle(item3)"
@@ -48,7 +48,7 @@
                             disableList.includes(item4.id) ? 'disable' : ''
                           "
                         >
-                          {{ item4.name }}
+                          {{ item4.alias }}
                         </p>
                       </div>
                     </a-collapse-panel>
