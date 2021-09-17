@@ -312,7 +312,7 @@ export default {
       // 计算表宽(单元格宽度求和)
       this.tableWidth = this.colWidths.reduce((total, value) => {
         return total + value
-      })
+      }, 0)
 
       // 计算显示尺寸(比较表格内容的尺寸和缩放框的大小)
       let currentChartSize = this.chartSize.height
