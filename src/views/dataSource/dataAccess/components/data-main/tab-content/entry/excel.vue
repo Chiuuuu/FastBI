@@ -89,13 +89,13 @@
             >
               <li
                 class="preview-tab-item"
-                :title="sheet.name"
+                :title="sheet.alias"
                 :class="{ active: currentSheetIndex === index }"
                 v-for="(sheet, index) in sheetList"
                 :key="index"
                 @click="handleChangeTab(sheet, index)"
               >
-                {{ sheet.name }}
+                {{ sheet.alias }}
               </li>
             </ul>
           </div>
@@ -295,7 +295,7 @@ export default {
         }
       }
       const tableList = this.databaseList[this.currentFileIndex].tableList
-      const sheetName = this.sheetList[this.currentSheetIndex].name
+      const sheetName = this.sheetList[this.currentSheetIndex].alias
       const head = { [sheetName]: this.currentColumns.slice(1).map(item => ({
         name: item.title,
         dataType: item.dataType
@@ -507,10 +507,10 @@ export default {
       }
 
       // 校验中文名
-      if (isValid && /[\u4E00-\u9FA5\uF900-\uFA2D]/.test(name)) {
-        isValid = false
-        this.$message.error('暂不支持中文表名文件')
-      }
+      // if (isValid && /[\u4E00-\u9FA5\uF900-\uFA2D]/.test(name)) {
+      //   isValid = false
+      //   this.$message.error('暂不支持中文表名文件')
+      // }
 
       // 校验命名规则(中英数字下划线)
       if (isValid && !/^[0-9a-zA-Z_\u4E00-\u9FA5\uF900-\uFA2D]*$/g.test(name)) {
@@ -843,7 +843,7 @@ export default {
                 const database = item[key]
                 const params = {}
                 database.sheetList.map((item, index) => {
-                  params[item.name] = database.tableList[index].headerList
+                  params[item.alias] = database.tableList[index].headerList
                 })
                 formData.append('excelDatabaseList[' + index + '].sheetsHeaderJson', JSON.stringify(params))
               }

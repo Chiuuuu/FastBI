@@ -534,7 +534,7 @@ export default {
     async saveData(item) {
       let params = {
         screenId: this.screenId,
-        resourceName: item.name,
+        resourceName: item.alias,
         datasourceId: '',
         databaseId: '',
         tableId: item.id,
@@ -554,7 +554,7 @@ export default {
         params.origin = 8 // 数据源:3,模型:8
       }
       await this.$server.screenManage.screenModuleSave(params)
-      item.resourceName = item.name
+      item.resourceName = item.alias
       item.tableId = item.id
       let list = this.selectedModelList.concat([item])
       this.$store.dispatch('dataModel/setSelectedModelList', list)
