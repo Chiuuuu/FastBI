@@ -34,7 +34,7 @@
                     <a-collapse-panel
                       :showArrow="false"
                       :key="item3.id"
-                      :header="item3.alias"
+                      :header="item3.alias || item3.name"
                       :style="customStyle"
                       :class="disableList.includes(item3.id) ? 'disable' : ''"
                       @click.native="fileHandle(item3)"
