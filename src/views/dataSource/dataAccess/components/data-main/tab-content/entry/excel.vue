@@ -89,13 +89,13 @@
             >
               <li
                 class="preview-tab-item"
-                :title="sheet.name"
+                :title="sheet.alias"
                 :class="{ active: currentSheetIndex === index }"
                 v-for="(sheet, index) in sheetList"
                 :key="index"
                 @click="handleChangeTab(sheet, index)"
               >
-                {{ sheet.name }}
+                {{ sheet.alias }}
               </li>
             </ul>
           </div>
@@ -295,7 +295,7 @@ export default {
         }
       }
       const tableList = this.databaseList[this.currentFileIndex].tableList
-      const sheetName = this.sheetList[this.currentSheetIndex].name
+      const sheetName = this.sheetList[this.currentSheetIndex].alias
       const head = { [sheetName]: this.currentColumns.slice(1).map(item => ({
         name: item.title,
         dataType: item.dataType
@@ -843,7 +843,7 @@ export default {
                 const database = item[key]
                 const params = {}
                 database.sheetList.map((item, index) => {
-                  params[item.name] = database.tableList[index].headerList
+                  params[item.alias] = database.tableList[index].headerList
                 })
                 formData.append('excelDatabaseList[' + index + '].sheetsHeaderJson', JSON.stringify(params))
               }

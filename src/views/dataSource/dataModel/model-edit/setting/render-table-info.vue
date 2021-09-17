@@ -135,7 +135,7 @@ export default {
           this.colPagination.config.total = result.data.total
           this.colPagination.handleColCache(
             result.data.columnNameList,
-            result.data.rows
+            result.data.rows.filter(item => item)
           )
           this.$nextTick(() => {
             this.loading = false
