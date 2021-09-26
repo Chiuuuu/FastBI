@@ -36,9 +36,11 @@
       </template>
       <template #config="text, record, index">
         <a-tooltip placement="bottom" title="编辑">
-          <a-icon class="icon-size" type="edit" @click="handleEditRows(record, index)" />
+          <a-icon v-if="record.locked < 2" class="icon-size" type="edit" @click="handleEditRows(record, index)" />
+          <a-icon v-else class="icon-size-disabled" type="edit" />
         </a-tooltip>
         <a-popconfirm
+          v-if="record.locked === 0"
           title="是否确定删除？"
           ok-text="确定"
           cancel-text="取消"
@@ -48,6 +50,9 @@
             <a-icon class="icon-size" type="delete" />
           </a-tooltip>
         </a-popconfirm>
+        <a-tooltip v-else placement="bottom" title="删除">
+          <a-icon class="icon-size-disabled" type="delete" />
+        </a-tooltip>
       </template>
     </a-table>
 
@@ -210,9 +215,10 @@ export default {
         expr: data.expr,
         field: data.name,
         alias: data.alias,
+        locked: 0,
         rule: { ruleFilterList: [] },
         ruleType: 1,
-        modeType: 1,
+        modeType: this.isNumber(data) ? 0 : 1,
         isInclude: 2,
         displayOrder: 0,
         status: 0
@@ -232,7 +238,7 @@ export default {
       this.conditionData.convertType = field.convertType || field.dataType
       if (field && this.isNumber(record) !== this.isNumber(field)) {
         this.conditionData.rule.ruleFilterList = []
-        this.conditionData.modeType = 1
+        this.conditionData.modeType = this.isNumber(field) ? 0 : 1
       }
 
       this.fieldData = null
@@ -275,6 +281,12 @@ export default {
   font-size: 20px;
   cursor: pointer;
   margin: 0 4px;
+}
+.icon-size-disabled {
+  color: #ccc;
+  font-size: 20px;
+  margin: 0 4px;
+  cursor: not-allowed;
 }
 .line-through {
   color: #ccc;
