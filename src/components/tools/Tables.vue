@@ -221,6 +221,14 @@ export default {
      */
     initScrollData() {
       const len = this.chartData.length
+      // 初始化分页信息
+      this.pagination = {
+        lastScrollTop: 0, // 记录上次滚动位置
+        totalIndex: 0, // 最大页数
+        headIndex: 0, // 头部截取下标
+        footIndex: 4, // 脚部截取下标
+        pageSize: 25 // 每次加载数
+      }
       const { headIndex, footIndex, pageSize } = this.pagination
       if (len > (footIndex + 1) * pageSize) {
         this.pagination.totalIndex = Math.ceil(len / pageSize)
