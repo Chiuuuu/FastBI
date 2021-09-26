@@ -3,7 +3,7 @@
     <div v-if="!isNumber">
       <a-radio-group v-model="conditionData.modeType" @change="checkedData = []">
         <a-radio :value="1">列表</a-radio>
-        <a-radio :value="2">手动</a-radio>
+        <!-- <a-radio :value="2">手动</a-radio> -->
       </a-radio-group>
       <template v-if="+conditionData.modeType === 1">
         <a-input
@@ -22,11 +22,12 @@
         </a-input>
         <a-spin :spinning="spinning" class="condition-list hasBorder scrollbar">
           <a-checkbox
+            v-if="dataRowsResult.length > 0"
             :indeterminate="
               checkedData.length > 0 &&
-                checkedData.length < dataRows.length
+                checkedData.length < dataRowsResult.length
             "
-            :checked="checkedData.length === dataRows.length"
+            :checked="checkedData.length === dataRowsResult.length"
             @change="onCheckAllChange"
             >全选</a-checkbox
           >
@@ -202,11 +203,12 @@ export default {
       this.dataRowsResult = this.dataRows.filter(
         item => (item || '').toLowerCase().indexOf(keyword) > -1
       )
+      this.checkedData = []
     },
     onCheckAllChange(e) {
       const value = e.target.checked
       if (value) {
-        this.checkedData = this.dataRows
+        this.checkedData = this.dataRowsResult
       } else {
         this.checkedData = []
       }

@@ -15,20 +15,32 @@
     <a-checkbox v-model="clickLink" @click.native="openLink" />
 
     <!--创建联动弹窗-->
-    <a-modal v-model="visible" title="图表联动" @ok="setLinkage">
-      <input
-        type="text"
-        :class="['ant-input', 'pick-input']"
+    <a-modal v-model="visible" title="图表联动" @ok="setLinkage" @cancel="keyword = ''">
+      <a-input
         v-model="keyword"
+        class="pick-search-area"
+        style="margin: 10px 0"
         placeholder="请输入搜索内容"
-      />
-      <button class="ant-btn ant-btn-primary pick-btn" @click="search">
-        搜索
-      </button>
+        @keyup.enter.stop="search"
+      >
+        <a-button
+          style="height: 30px"
+          type="primary"
+          slot="addonAfter"
+          @click="search"
+          >查询</a-button
+        >
+      </a-input>
       <!--模型列表多选-->
       <div class="pick-checkbox-box">
         <b-scrollbar style="height:100%;">
-          <a-checkbox :checked="checkAll" @change="onCheckAllChange"
+          <a-checkbox
+            v-if="chartList.length > 0"
+            :checked="bindList.length === chartList.length"
+            :indeterminate="
+              bindList.length > 0 &&
+                bindList.length < chartList.length
+            " @change="onCheckAllChange"
             >全选</a-checkbox
           >
           <div class="data-title">{{ currentData || '没有符合的结果' }}</div>
@@ -124,7 +136,7 @@ export default {
     },
     // 显示的绑定列表中有效数据(过滤禁用项，用来判断全选)
     vaildList() {
-      return this.toBindList.filter(
+      return this.chartList.filter(
         chart => !this.checkBeBinded(chart) && !this.checkHaveBind(chart)
       )
     },
@@ -162,6 +174,7 @@ export default {
     },
     // 模糊查询
     search() {
+      this.bindList = []
       if (!this.keyword) {
         this.chartList = this.toBindList
         return
@@ -270,6 +283,7 @@ export default {
       // 批量保存图表绑定关系
       await this.$server.screenManage.saveAllChart(updateList)
       this.visible = false
+      this.keyword = ''
     }
   }
 }
