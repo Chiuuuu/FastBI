@@ -3,13 +3,13 @@
     <div v-if="!isNumber">
       <a-radio-group v-model="conditionData.modeType" @change="checkedData = []">
         <a-radio :value="1">列表</a-radio>
-        <a-radio :value="2">手动</a-radio>
+        <!-- <a-radio :value="2">手动</a-radio> -->
       </a-radio-group>
       <template v-if="+conditionData.modeType === 1">
         <a-input
           v-model="searchWord"
           class="input-area"
-          placeholder="请输入搜索的关键词"
+          placeholder="请输入搜索的关键词(如: A,B,C)"
           @keyup.enter.stop="onSearch"
         >
           <a-button
@@ -22,11 +22,12 @@
         </a-input>
         <a-spin :spinning="spinning" class="condition-list hasBorder scrollbar">
           <a-checkbox
+            v-if="dataRowsResult.length > 0"
             :indeterminate="
               checkedData.length > 0 &&
-                checkedData.length < dataRows.length
+                checkedData.length < dataRowsResult.length
             "
-            :checked="checkedData.length === dataRows.length"
+            :checked="checkedData.length === dataRowsResult.length"
             @change="onCheckAllChange"
             >全选</a-checkbox
           >
@@ -120,10 +121,10 @@
         </div>
       </div>
     </div>
-    <a-radio-group v-model="conditionData.isInclude">
+    <!-- <a-radio-group v-model="conditionData.isInclude" :disabled="conditionData.locked > 0">
       <a-radio :value="2">只显示</a-radio>
       <a-radio :value="1">排除</a-radio>
-    </a-radio-group>
+    </a-radio-group> -->
   </div>
 </template>
 
@@ -199,14 +200,21 @@ export default {
     // },
     onSearch() {
       const keyword = (this.searchWord || '').toLowerCase()
-      this.dataRowsResult = this.dataRows.filter(
-        item => (item || '').toLowerCase().indexOf(keyword) > -1
-      )
+      const list = keyword.split(',')
+      this.dataRowsResult = this.dataRows.filter(item => {
+        let match = false
+        list.forEach(k => {
+          if ((item || '').indexOf(k) > -1) {
+            match = true
+          }
+        })
+        return match
+      })
     },
     onCheckAllChange(e) {
       const value = e.target.checked
       if (value) {
-        this.checkedData = this.dataRows
+        this.checkedData = this.dataRowsResult
       } else {
         this.checkedData = []
       }
@@ -269,7 +277,8 @@ export default {
           this.$message.error('请添加条件')
           return false
         }
-        this.conditionData.rule.ruleFilterList = this.checkedData
+        // 只保存当前数据列表里有的数据
+        this.conditionData.rule.ruleFilterList = this.checkedData.filter(item => this.dataRows.includes(item))
       } else {
         if (this.customData.length < 1) {
           this.$message.error('请添加条件')

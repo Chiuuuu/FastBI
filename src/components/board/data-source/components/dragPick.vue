@@ -46,45 +46,54 @@
           @change="isEmpty = false"
         >
           <a-radio :value="'list'">列表</a-radio>
-          <a-radio :value="'manual'">手动</a-radio>
+          <!-- <a-radio :value="'manual'">手动</a-radio> -->
         </a-radio-group>
         <br />
-        <input
+        <a-input
           v-show="currentFile.operation === 'list'"
-          type="text"
-          :class="['ant-input', 'pick-input', { redborder: isEmpty }]"
           v-model="listValue"
-          placeholder="请输入搜索内容"
-          @input="isEmpty = false"
-        />
-        <button
-          v-show="currentFile.operation === 'list'"
-          class="ant-btn ant-btn-primary pick-btn"
-          @click="search"
+          class="pick-search-area"
+          style="margin: 10px 0"
+          placeholder="请输入搜索的关键词(如: A,B,C)"
+          @keyup.enter.stop="search"
         >
-          查询
-        </button>
-        <input
+          <a-button
+            style="height: 30px"
+            type="primary"
+            slot="addonAfter"
+            @click="search"
+            >查询</a-button
+          >
+        </a-input>
+        <a-input
           v-show="currentFile.operation === 'manual'"
-          type="text"
-          :class="['ant-input', 'pick-input', { redborder: isEmpty }]"
           v-model="manualValue"
-          placeholder="请输入内容"
-          @input="isEmpty = false"
-        />
-        <button
-          v-show="currentFile.operation === 'manual'"
-          class="ant-btn ant-btn-primary"
-          @click="addManualProperty"
+          class="pick-search-area"
+          style="margin: 10px 0"
+          placeholder="请输入条件名称"
+          @keyup.enter.stop="addManualProperty"
         >
-          添加
-        </button>
+          <a-button
+            style="height: 30px"
+            type="primary"
+            slot="addonAfter"
+            @click="addManualProperty"
+            >查询</a-button
+          >
+        </a-input>
         <div
           class="pick-checkbox-box hasborder"
           v-show="currentFile.operation === 'list'"
         >
           <b-scrollbar style="height:100%;">
-            <a-checkbox :checked="checkAll" @change="onCheckAllChange"
+            <a-checkbox
+              v-if="currentFile && currentFile.searchList && currentFile.searchList.length > 0"
+              :checked="currentFile.checkedList.length === currentFile.searchList.length"
+              :indeterminate="
+                currentFile.checkedList.length > 0 &&
+                  currentFile.checkedList.length < currentFile.searchList.length
+              "
+              @change="onCheckAllChange"
               >全选</a-checkbox
             >
             <a-checkbox-group
@@ -292,6 +301,7 @@ export default {
     // 将拖动的维度到所选择的放置目标节点中
     async handleDropOnFilesWD(event) {
       this.isExist = false
+      this.listValue = ''
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
       // 验重
       if (this.fileList.some(item => dataFile.alias === item.alias)) {
@@ -387,11 +397,22 @@ export default {
       if (!this.listValue) {
         this.currentFile.searchList = this.currentFile.originList
         this.isEmpty = true
-        return
+        // 不强制刷新的话, 不会触发updated()
+        return this.$forceUpdate()
       }
-      this.currentFile.searchList = this.currentFile.originList.filter(
-        item => item.indexOf(this.listValue) > -1
-      )
+      const keyword = (this.listValue || '').toLowerCase()
+      const list = keyword.split(',')
+      this.currentFile.searchList = [].concat(this.currentFile.originList.filter(item => {
+        let match = false
+        list.forEach(k => {
+          if ((item || '').indexOf(k) > -1) {
+            match = true
+          }
+        })
+        return match
+      }))
+      // 不强制刷新的话, 不会触发updated()
+      this.$forceUpdate()
     },
     // 点击再次打开数据筛选弹窗
     async showSelect(item) {
@@ -438,7 +459,7 @@ export default {
     onCheckAllChange(e) {
       this.checkAll = e.target.checked
       this.currentFile.checkedList = e.target.checked
-        ? this.currentFile.originList
+        ? this.currentFile.searchList
         : []
     },
     // 手动，添加字段

@@ -267,11 +267,13 @@ export default {
         this.modelId
       )
       console.log('根据modelId获取数据源', datsource)
+      const data = datsource.data[0]
+      const datasourceId = data ? data.datasourceId : ''
       this.$store.dispatch(
         'dataModel/setDatasourceId',
-        datsource.data[0].datasourceId
+        datasourceId
       )
-      return datsource.data[0].datasourceId
+      return datasourceId
     },
     // 打开模态框
     openModal() {

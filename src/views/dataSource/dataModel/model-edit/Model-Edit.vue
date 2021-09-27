@@ -166,7 +166,7 @@
             <a-checkbox
               :checked="Boolean(+detailInfo.isDuplicate)"
               :disabled="disableByDetailInfo"
-              @change="e => $set(detailInfo, 'isDuplicate', +(e.target.checked))"
+              @change="e => $set(detailInfo, 'isDuplicate', +e.target.checked)"
               style="margin-top:5px"
               >数据去重</a-checkbox
             >
@@ -593,6 +593,7 @@ export default {
       this.handleGroupField()
     },
     async handleGetDatabaseList() {
+      if (!this.$route.query.datasourceId) return (this.datasourceName = '')
       const result = await this.$server.dataModel.getDatabaseList(
         this.$route.query.datasourceId
       )
@@ -638,6 +639,11 @@ export default {
       let tableId = ''
       if (len > 0) {
         tableId = this.detailInfo.config.tables[len - 1].tableId
+      }
+      if (!this.$route.query.datasourceId) {
+        this.databaseList = []
+        this.databaseName = ''
+        return
       }
       const result = await this.$server.dataModel.getDataBaseDataInfoList(
         this.$route.query.datasourceId,
@@ -832,7 +838,10 @@ export default {
      * 同字段名处理
      */
     handleSameName() {
-      const list = [].concat(this.handleConcatDimensions(), this.handleConcatMeasures())
+      const list = [].concat(
+        this.handleConcatDimensions(),
+        this.handleConcatMeasures()
+      )
       if (Array.isArray(list) && list.length > 1) {
         const map = new Map()
         const cacheFields = list.map(item => item.alias)
@@ -943,10 +952,7 @@ export default {
      * 合并度量数据
      */
     handleConcatMeasures() {
-      return [
-        ...this.cacheMeasures,
-        ...this.detailInfo.pivotSchema.measures
-      ]
+      return [...this.cacheMeasures, ...this.detailInfo.pivotSchema.measures]
     },
     /**
      * 度量数据处理
@@ -968,9 +974,7 @@ export default {
     },
     // 判断字段是否为数值类型
     isNumber(data) {
-      return this.NUMBER_LIST.includes(
-        data.convertType || data.dataType
-      )
+      return this.NUMBER_LIST.includes(data.convertType || data.dataType)
     },
     // 判断字段是否为时间日期类型
     isDate(data) {
@@ -992,7 +996,11 @@ export default {
       if (Array.isArray(tables)) {
         const { filterRules, sortRules } = this.detailInfo.modelPivotschemaRule
         const { dimensions, measures } = this.detailInfo.pivotSchema
-        const fieldList = [].concat(dimensions).concat(measures).concat(this.cacheDimensions).concat(this.cacheMeasures)
+        const fieldList = []
+          .concat(dimensions)
+          .concat(measures)
+          .concat(this.cacheDimensions)
+          .concat(this.cacheMeasures)
 
         if (sortRules.length > 0) {
           const result = []
@@ -1010,10 +1018,12 @@ export default {
             }
           })
           // 重置order顺序
-          this.detailInfo.modelPivotschemaRule.sortRules = result.map((item, index) => {
-            item.displayOrder = index + 1
-            return item
-          })
+          this.detailInfo.modelPivotschemaRule.sortRules = result.map(
+            (item, index) => {
+              item.displayOrder = index + 1
+              return item
+            }
+          )
         }
         if (filterRules.length > 0) {
           const result = []
@@ -1023,10 +1033,12 @@ export default {
               if (field.visible === false) {
                 // visible为false(不可见)字段要置灰
                 item.status = 2
-              } else if (this.isNumber(item) !== this.isNumber(field) ||
-              this.isDate(item) !== this.isDate(field) ||
-              this.isTimestamp(item) !== this.isTimestamp(field) ||
-              this.isVarchar(item) !== this.isVarchar(field)) {
+              } else if (
+                this.isNumber(item) !== this.isNumber(field) ||
+                this.isDate(item) !== this.isDate(field) ||
+                this.isTimestamp(item) !== this.isTimestamp(field) ||
+                this.isVarchar(item) !== this.isVarchar(field)
+              ) {
                 // 字段类型修改, 不是转成同类型的, 需标黄
                 item.status = 3
               } else {
@@ -1045,7 +1057,11 @@ export default {
      */
     handleGroupField() {
       const { dimensions, measures } = this.detailInfo.pivotSchema
-      const fieldList = [].concat(dimensions).concat(measures).concat(this.cacheDimensions).concat(this.cacheMeasures)
+      const fieldList = []
+        .concat(dimensions)
+        .concat(measures)
+        .concat(this.cacheDimensions)
+        .concat(this.cacheMeasures)
       const groupList = fieldList.filter(item => item.isGroupFlag === 2)
       groupList.forEach(field => {
         // 制定聚合
@@ -1055,14 +1071,16 @@ export default {
         } catch (error) {}
         // 分组的字段数组, 要清除被删除的字段
         const idList = []
-        const list = rawExpr.checkedList.filter(item => fieldList.some(p => {
-          if (`$$${p.id}` === item) {
-            idList.push(`$$${p.id}`)
-            return true
-          } else {
-            return false
-          }
-        }))
+        const list = rawExpr.checkedList.filter(item =>
+          fieldList.some(p => {
+            if (`$$${p.id}` === item) {
+              idList.push(`$$${p.id}`)
+              return true
+            } else {
+              return false
+            }
+          })
+        )
         rawExpr.checkedList = list
         field.raw_expr = JSON.stringify(rawExpr)
         field.groupByFunc = `group by (${idList.toString()})`
@@ -1151,7 +1169,10 @@ export default {
               const missing = pairList.filter(item => item.id === value).pop()
               if (!missing) {
                 field.status = 1
-                field.raw_expr = field.raw_expr.replace(value, '<此位置字段丢失>')
+                field.raw_expr = field.raw_expr.replace(
+                  value,
+                  '<此位置字段丢失>'
+                )
               } else {
                 field.status = 0
               }
@@ -1276,7 +1297,10 @@ export default {
         this.doWithBatchSetting(data)
       }
 
-      if (this.modalName === 'compute-setting' || this.modalName === 'field-aggregator') {
+      if (
+        this.modalName === 'compute-setting' ||
+        this.modalName === 'field-aggregator'
+      ) {
         this.doWithComputeSetting(data)
       }
 
@@ -1429,7 +1453,10 @@ export default {
     },
     // 保存前校验每个字段的类型和默认聚合是否匹配
     handleDefaultAggregator(item) {
-      if (!this.isNumber(item) && ['COUNT', 'CNT', 'DCNT', 'COUNTD'].includes(item.defaultAggregator)) {
+      if (
+        !this.isNumber(item) &&
+        ['COUNT', 'CNT', 'DCNT', 'COUNTD'].includes(item.defaultAggregator)
+      ) {
         item.defaultAggregator = 'CNT'
       }
     },
@@ -1480,7 +1507,8 @@ export default {
           dimensions: dimensions.map(item => {
             // 处理非数值类型的defaultaggregator不是计数和去重计数的问题
             this.handleDefaultAggregator(item)
-            if (item.isGroupFlag === null) { // 兼容老数据
+            if (item.isGroupFlag === null) {
+              // 兼容老数据
               item.isGroupFlag = 0
             }
             return item
@@ -1488,7 +1516,8 @@ export default {
           measures: measures.map(item => {
             // 处理非数值类型的defaultaggregator不是计数和去重计数的问题
             this.handleDefaultAggregator(item)
-            if (item.isGroupFlag === null) { // 兼容老数据
+            if (item.isGroupFlag === null) {
+              // 兼容老数据
               item.isGroupFlag = 0
             }
             return item
@@ -1522,15 +1551,15 @@ export default {
       let result
       this.spinning = true
       if (cover) {
-        result = await this.$server.dataModel.saveModelCover(params)
+        result = await this.$server.dataModel
+          .saveModelCover(params)
           .finally(() => {
             this.spinning = false
           })
       } else {
-        result = await this.$server.dataModel.saveModel(params)
-          .finally(() => {
-            this.spinning = false
-          })
+        result = await this.$server.dataModel.saveModel(params).finally(() => {
+          this.spinning = false
+        })
       }
       if (result.code === 200) {
         if (this.model === 'add') {
@@ -1562,6 +1591,7 @@ export default {
     },
     handleGetFetchParams(data) {
       if (this.modalName === 'sql-setting') {
+        if (!this.$route.query.datasourceId) return
         this.$refs.componentRef.pushFetchParam({
           sourceId: this.$route.query.datasourceId,
           databaseName: this.databaseName,
