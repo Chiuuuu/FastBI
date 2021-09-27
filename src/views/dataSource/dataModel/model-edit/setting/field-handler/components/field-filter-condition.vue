@@ -121,10 +121,10 @@
         </div>
       </div>
     </div>
-    <a-radio-group v-model="conditionData.isInclude" :disabled="conditionData.locked > 0">
+    <!-- <a-radio-group v-model="conditionData.isInclude" :disabled="conditionData.locked > 0">
       <a-radio :value="2">只显示</a-radio>
       <a-radio :value="1">排除</a-radio>
-    </a-radio-group>
+    </a-radio-group> -->
   </div>
 </template>
 
