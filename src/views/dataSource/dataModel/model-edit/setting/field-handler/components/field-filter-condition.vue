@@ -9,7 +9,7 @@
         <a-input
           v-model="searchWord"
           class="input-area"
-          placeholder="请输入搜索的关键词"
+          placeholder="请输入搜索的关键词(如: A,B,C)"
           @keyup.enter.stop="onSearch"
         >
           <a-button
@@ -121,7 +121,7 @@
         </div>
       </div>
     </div>
-    <a-radio-group v-model="conditionData.isInclude">
+    <a-radio-group v-model="conditionData.isInclude" :disabled="conditionData.locked > 0">
       <a-radio :value="2">只显示</a-radio>
       <a-radio :value="1">排除</a-radio>
     </a-radio-group>
@@ -200,10 +200,16 @@ export default {
     // },
     onSearch() {
       const keyword = (this.searchWord || '').toLowerCase()
-      this.dataRowsResult = this.dataRows.filter(
-        item => (item || '').toLowerCase().indexOf(keyword) > -1
-      )
-      this.checkedData = []
+      const list = keyword.split(',')
+      this.dataRowsResult = this.dataRows.filter(item => {
+        let match = false
+        list.forEach(k => {
+          if ((item || '').indexOf(k) > -1) {
+            match = true
+          }
+        })
+        return match
+      })
     },
     onCheckAllChange(e) {
       const value = e.target.checked
@@ -271,7 +277,8 @@ export default {
           this.$message.error('请添加条件')
           return false
         }
-        this.conditionData.rule.ruleFilterList = this.checkedData
+        // 只保存当前数据列表里有的数据
+        this.conditionData.rule.ruleFilterList = this.checkedData.filter(item => this.dataRows.includes(item))
       } else {
         if (this.customData.length < 1) {
           this.$message.error('请添加条件')

@@ -54,7 +54,7 @@
           v-model="listValue"
           class="pick-search-area"
           style="margin: 10px 0"
-          placeholder="请输入搜索的关键词"
+          placeholder="请输入搜索的关键词(如: A,B,C)"
           @keyup.enter.stop="search"
         >
           <a-button
@@ -301,6 +301,7 @@ export default {
     // 将拖动的维度到所选择的放置目标节点中
     async handleDropOnFilesWD(event) {
       this.isExist = false
+      this.listValue = ''
       let dataFile = JSON.parse(event.dataTransfer.getData('dataFile'))
       // 验重
       if (this.fileList.some(item => dataFile.alias === item.alias)) {
@@ -393,15 +394,25 @@ export default {
     },
     // 列表模糊查询
     search() {
-      this.currentFile.checkedList = []
       if (!this.listValue) {
         this.currentFile.searchList = this.currentFile.originList
         this.isEmpty = true
-        return
+        // 不强制刷新的话, 不会触发updated()
+        return this.$forceUpdate()
       }
-      this.currentFile.searchList = this.currentFile.originList.filter(
-        item => item.indexOf(this.listValue) > -1
-      )
+      const keyword = (this.listValue || '').toLowerCase()
+      const list = keyword.split(',')
+      this.currentFile.searchList = [].concat(this.currentFile.originList.filter(item => {
+        let match = false
+        list.forEach(k => {
+          if ((item || '').indexOf(k) > -1) {
+            match = true
+          }
+        })
+        return match
+      }))
+      // 不强制刷新的话, 不会触发updated()
+      this.$forceUpdate()
     },
     // 点击再次打开数据筛选弹窗
     async showSelect(item) {

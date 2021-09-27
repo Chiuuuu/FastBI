@@ -20,7 +20,7 @@
         v-model="keyword"
         class="pick-search-area"
         style="margin: 10px 0"
-        placeholder="请输入搜索内容"
+        placeholder="请输入搜索内容(如: A,B,C)"
         @keyup.enter.stop="search"
       >
         <a-button
@@ -174,16 +174,23 @@ export default {
     },
     // 模糊查询
     search() {
-      this.bindList = []
       if (!this.keyword) {
         this.chartList = this.toBindList
         return
       }
+      const keyword = (this.keyword || '').toLowerCase()
+      const list = keyword.split(',')
       this.chartList = this.toBindList.filter(item => {
         const config = item.setting.config
         const title = config.title || { content: '' }
         const content = title.text || title.content
-        return content.indexOf(this.keyword) > -1
+        let match = false
+        list.forEach(k => {
+          if (content.indexOf(k) > -1) {
+            match = true
+          }
+        })
+        return match
       })
     },
     // 点击全选
