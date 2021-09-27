@@ -327,22 +327,24 @@ export default {
       if (this.config.title.show && title) {
         currentChartSize -= title.offsetHeight
       }
-      this.showTableSize = {
-        tableX: Math.min(this.tableWidth, this.chartSize.width),
-        // tableX: this.chartSize.width,
-        tableY:
-          Math.min(
-            this.$refs.tablebody.clientHeight +
-              this.$refs.tableheader.clientHeight,
-            currentChartSize
-          ) - 10 // 去掉滚动轴占高
-      }
-      // 获取表格内容高度
-      this.bodyHeight =
-        this.showTableSize.tableY - this.$refs.tableheader.clientHeight
-
       // 处理完宽度, 初始化表格
       this.initScrollData()
+      // 获取表格内容高度
+      this.$nextTick(() => {
+        this.showTableSize = {
+          tableX: Math.min(this.tableWidth, this.chartSize.width),
+          // tableX: this.chartSize.width,
+          tableY:
+            Math.min(
+              this.$refs.tablebody.clientHeight +
+                this.$refs.tableheader.clientHeight,
+              currentChartSize
+            ) - 10 // 去掉滚动轴占高
+        }
+        this.bodyHeight =
+          this.showTableSize.tableY - this.$refs.tableheader.clientHeight
+        console.log(this.bodyHeight)
+      })
     },
     // 计算单元格宽度
     async getColWidths() {
