@@ -47,6 +47,10 @@ export default {
             message: '请填写名称'
           },
           {
+            pattern: /^[\u4E00-\u9FA5\uF900-\uFA2Da-zA-Z\d]*$/g,
+            message: '仅支持中英文数字名称'
+          },
+          {
             type: 'string',
             min: 1,
             max: 20,
