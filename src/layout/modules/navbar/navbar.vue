@@ -17,17 +17,26 @@
         /></span>
         <a-menu slot="overlay">
           <a-menu-item>
+            <a href="javascript:;" @click="editPassword">修改密码</a>
+          </a-menu-item>
+          <a-menu-item>
             <a href="javascript:;" @click="quitBtn">退出登录</a>
           </a-menu-item>
         </a-menu>
       </a-dropdown>
     </div>
+    <!-- 修改密码 -->
+    <Password ref="password" @updateOk="quitBtn"></Password>
   </a-row>
 </template>
 <script>
 import { mapState } from 'vuex'
+import Password from '../password/password'
 export default {
   inject: ['reload'],
+  components: {
+    Password
+  },
   computed: {
     // 侧边栏展开收起
     sidebarUnfold() {
@@ -84,6 +93,10 @@ export default {
       } else {
         this.$store.commit('common/set_sidebarUnfold', true)
       }
+    },
+    // 修改密码
+    editPassword() {
+      this.$refs.password.init()
     }
   }
 }
