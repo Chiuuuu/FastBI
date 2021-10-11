@@ -427,9 +427,9 @@ export default {
       }
 
       // 校验大小
-      if (isValid && file.size > 50 * 1024 * 1024) {
+      if (isValid && file.size > 200 * 1024 * 1024) {
         isValid = false
-        this.$message.error('文件大于50M, 无法上传')
+        this.$message.error('文件大于200M, 无法上传')
       }
 
       // 校验重名
