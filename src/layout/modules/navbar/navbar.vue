@@ -81,7 +81,7 @@ export default {
       window.sessionStorage.clear()
       window.localStorage.clear()
       this.$store.commit('user/CLEAR_PERMISSIONS')
-      this.$router.push({
+      this.$router.replace({
         path: '/login'
       })
     },

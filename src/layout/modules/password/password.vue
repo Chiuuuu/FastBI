@@ -111,9 +111,7 @@ export default {
       })
       if (res.code === 200) {
         this.$message.success('修改成功，请重新登录')
-        setTimeout(() => {
-          this.$emit('updateOk')
-        }, 2000)
+        this.$emit('updateOk')
       } else {
         this.$message.error(res.msg)
       }

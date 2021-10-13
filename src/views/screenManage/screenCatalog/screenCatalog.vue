@@ -672,6 +672,7 @@ export default {
         .then(res => {
           if (res.code === 200) {
             this.getList()
+            this.$store.dispatch('user/getInfo') // 刷新权限
             this.$message.success(res.msg)
           } else {
             this.$message.error(res.msg)
