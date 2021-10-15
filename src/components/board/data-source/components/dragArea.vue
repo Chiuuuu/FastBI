@@ -522,8 +522,10 @@ export default {
             current.setting.api_data.dimensions.length === 0 &&
             current.setting.api_data.measures.length === 0
           ) {
-            let res = sourceMap[current.setting.chartType]
-            current.setting.config = JSON.parse(JSON.stringify(res))
+            let res = JSON.parse(JSON.stringify(sourceMap[current.setting.chartType]))
+            Object.assign(current.setting.config.visualMap, res.visualMap)
+            Object.assign(current.setting.config.series, res.series)
+            // current.setting.config = JSON.parse(JSON.stringify(res))
           }
           const tooltipShowList = current.setting.config.series.tooltipShowList
           for (let i = 0; i < tooltipShowList.length; i++) {
