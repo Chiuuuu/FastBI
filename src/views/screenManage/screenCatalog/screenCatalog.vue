@@ -40,45 +40,47 @@
           @dragover.stop.prevent
           @drop.stop.prevent="handleWrapDrop"
         >
-          <div
-            class="group"
-            :class="handleIsFolder(folder) ? 'is-folder' : ''"
-            v-for="(folder, index) in folderList"
-            :key="folder.id"
-          >
-            <template v-if="handleIsFolder(folder)">
-              <menu-folder
-                :folder="folder"
-                :index="index"
-                :contextmenus="folderContenxtMenu"
-                @fileDrop="handleFileDrop"
-              >
-                <template v-slot:file="slotProps">
+          <a-spin :spinning="spinning">
+            <div
+              class="group"
+              :class="handleIsFolder(folder) ? 'is-folder' : ''"
+              v-for="(folder, index) in folderList"
+              :key="folder.id"
+            >
+              <template v-if="handleIsFolder(folder)">
+                <menu-folder
+                  :folder="folder"
+                  :index="index"
+                  :contextmenus="folderContenxtMenu"
+                  @fileDrop="handleFileDrop"
+                >
+                  <template v-slot:file="slotProps">
+                    <menu-file
+                      :file="slotProps.file"
+                      :index="slotProps.index"
+                      :parent="folder"
+                      :isSelect="fileSelectId === slotProps.file.id"
+                      :contextmenus="fileContenxtMenu"
+                      @fileSelect="handleFileSelect"
+                      @fileDrag="handleFileDrag"
+                    ></menu-file>
+                  </template>
+                </menu-folder>
+              </template>
+              <template v-else>
+                <ul class="items">
                   <menu-file
-                    :file="slotProps.file"
-                    :index="slotProps.index"
-                    :parent="folder"
-                    :isSelect="fileSelectId === slotProps.file.id"
+                    :file="folder"
+                    :index="index"
+                    :isSelect="fileSelectId === folder.id"
                     :contextmenus="fileContenxtMenu"
                     @fileSelect="handleFileSelect"
                     @fileDrag="handleFileDrag"
                   ></menu-file>
-                </template>
-              </menu-folder>
-            </template>
-            <template v-else>
-              <ul class="items">
-                <menu-file
-                  :file="folder"
-                  :index="index"
-                  :isSelect="fileSelectId === folder.id"
-                  :contextmenus="fileContenxtMenu"
-                  @fileSelect="handleFileSelect"
-                  @fileDrag="handleFileDrag"
-                ></menu-file>
-              </ul>
-            </template>
-          </div>
+                </ul>
+              </template>
+            </div>
+          </a-spin>
         </div>
         <a-empty v-else style="margin-top: 50px; color: rgba(0, 0, 0, 0.65)">
           <span slot="description">暂无数据大屏</span>
@@ -354,6 +356,7 @@ export default {
   },
   data() {
     return {
+      spinning: false,
       current: ['mail'],
       openKeys: ['sub1'],
       folderList: [], // 文件夹列表
@@ -563,6 +566,7 @@ export default {
       let params = {
         type: 3
       }
+      this.spinning = true
       this.$server.screenManage.getFolderList({ params }).then(res => {
         if (res.code === 200) {
           let rows = res.data
@@ -574,6 +578,8 @@ export default {
             this.getFirstScreen(this.folderList, 0)
           }
         }
+      }).finally(() => {
+        this.spinning = false
       })
     },
     // 获取目录的第一个大屏
