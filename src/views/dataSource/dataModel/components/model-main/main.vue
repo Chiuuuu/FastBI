@@ -19,6 +19,18 @@
             <span class="d-s" :title="detailInfo.description"
               >描述：{{ detailInfo.description }}</span
             >
+            <template v-if="detailInfo.resourceTraceabilityDTO">
+              <br>
+              <span class="d-s">
+                创建人： <template v-if="!detailInfo.resourceTraceabilityDTO.userDeleted">{{ detailInfo.resourceTraceabilityDTO.userName }}</template>
+                <template v-else style="color:red">用户已被删除</template>
+              </span>
+              <span class="d-s">&nbsp;&nbsp;创建日期： {{ detailInfo.resourceTraceabilityDTO.gmtCreate }}</span>
+              <span class="d-s" v-if="detailInfo.resourceTraceabilityDTO.resourceName">
+                &nbsp;&nbsp;来源模型： <template v-if="!detailInfo.resourceTraceabilityDTO.resourceDeleted">{{ detailInfo.resourceTraceabilityDTO.resourceName }}</template>
+                <template v-else style="color:red">模型已被删除</template>
+              </span>
+            </template>
           </div>
           <!-- <p class="tips"><a-icon theme="filled" type="exclamation-circle" style="margin-right: 2px;" />下方表显示红色表示表在数据源已被删除，请您删除此表。表显示黄色表示表中列字段发生了变动，请您重新构建表关联关系。</p> -->
           <div class="draw_board scrollbar">

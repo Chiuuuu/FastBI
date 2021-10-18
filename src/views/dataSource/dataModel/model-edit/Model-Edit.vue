@@ -133,14 +133,24 @@
         </a-form>
       </div>
       <div class="description">
-        <span class="d-s" :title="detailInfo.description"
-          >描述： {{ detailInfo.description }}</span
-        >
+        <span class="d-s" :title="detailInfo.description">描述： {{ detailInfo.description }}</span>
         <a-icon
           type="edit"
           v-on:click="openModal('describe-setting')"
           class="d-s-icon"
         />
+        <template v-if="detailInfo.resourceTraceabilityDTO">
+          <br>
+          <span class="d-s">
+            创建人： <template v-if="!detailInfo.resourceTraceabilityDTO.userDeleted">{{ detailInfo.resourceTraceabilityDTO.userName }}</template>
+            <template v-else style="color:red">用户已被删除</template>
+          </span>
+          <span class="d-s">&nbsp;&nbsp;创建日期： {{ detailInfo.resourceTraceabilityDTO.gmtCreate }}</span>
+          <span class="d-s" v-if="detailInfo.resourceTraceabilityDTO.resourceName">
+            &nbsp;&nbsp;来源模型： <template v-if="!detailInfo.resourceTraceabilityDTO.resourceDeleted">{{ detailInfo.resourceTraceabilityDTO.resourceName }}</template>
+            <template v-else style="color:red">模型已被删除</template>
+          </span>
+        </template>
       </div>
       <p class="tips">
         <a-icon

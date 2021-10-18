@@ -501,9 +501,9 @@ export default {
       }
 
       // 校验大小
-      if (isValid && file.size > 250 * 1024 * 1024) {
+      if (isValid && file.size > 200 * 1024 * 1024) {
         isValid = false
-        this.$message.error('文件大于250M, 无法上传')
+        this.$message.error('文件大于200M, 无法上传')
       }
 
       // 校验中文名
@@ -831,9 +831,9 @@ export default {
               const file = this.fileList[index]
               formData.append('excelDatabaseList[' + index + '].file', file)
               maxSize += file.size
-              if (maxSize > 250 * 1024 * 1024) {
+              if (maxSize > 200 * 1024 * 1024) {
                 this.saveLoading = false
-                return this.$message.error('单次保存文件总量需小于250M')
+                return this.$message.error('单次保存文件总量需小于200M')
               }
             }
             for (const key in item) {
