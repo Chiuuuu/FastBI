@@ -5,6 +5,7 @@
     :visible="show"
     :maskClosable="false"
     :confirmLoading="confirmLoading"
+    destroyOnClose
     @ok="handleOk"
     @cancel="handleModalCancel">
     <a-spin :spinning="spinning">
