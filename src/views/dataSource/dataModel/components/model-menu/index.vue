@@ -27,44 +27,46 @@
       </a-input>
       <router-link to="/dataSource/dataAccess" class="modal-item hover">新建数据接入</router-link>
       <div class="menu-wrap modal-wrap scrollbar">
-        <div
-          class="group"
-          :class="handleIsFolder(folder) ? 'is-folder' : ''"
-          v-for="(folder, index) in sourceResultList"
-          :key="folder.id"
-        >
-          <template v-if="handleIsFolder(folder)">
-            <menu-folder
-              :folder="folder"
-              :index="index"
-              @fileDrop="handleFileDrop"
-            >
-              <template v-slot:file="slotProps">
+        <a-spin :spinning="sourceSpinning">
+          <div
+            class="group"
+            :class="handleIsFolder(folder) ? 'is-folder' : ''"
+            v-for="(folder, index) in sourceResultList"
+            :key="folder.id"
+          >
+            <template v-if="handleIsFolder(folder)">
+              <menu-folder
+                :folder="folder"
+                :index="index"
+                @fileDrop="handleFileDrop"
+              >
+                <template v-slot:file="slotProps">
+                  <menu-file
+                    icon="dataSource"
+                    :file="slotProps.file"
+                    :index="slotProps.index"
+                    :isSelect='modalFileSelectId === slotProps.file.id'
+                    :parent="folder"
+                    @fileSelect="(file) => handleFileSelect(file, 'modal')"
+                    @fileDrag="handleFileDrag"
+                  ></menu-file>
+                </template>
+              </menu-folder>
+            </template>
+            <template v-else>
+              <ul class="items">
                 <menu-file
                   icon="dataSource"
-                  :file="slotProps.file"
-                  :index="slotProps.index"
-                  :isSelect='modalFileSelectId === slotProps.file.id'
-                  :parent="folder"
+                  :file="folder"
+                  :index="index"
+                  :isSelect='modalFileSelectId === folder.id'
                   @fileSelect="(file) => handleFileSelect(file, 'modal')"
-                  @fileDrag="handleFileDrag"
+                    @fileDrag="handleFileDrag"
                 ></menu-file>
-              </template>
-            </menu-folder>
-          </template>
-          <template v-else>
-            <ul class="items">
-              <menu-file
-                icon="dataSource"
-                :file="folder"
-                :index="index"
-                :isSelect='modalFileSelectId === folder.id'
-                @fileSelect="(file) => handleFileSelect(file, 'modal')"
-                  @fileDrag="handleFileDrag"
-              ></menu-file>
-            </ul>
-          </template>
-        </div>
+              </ul>
+            </template>
+          </div>
+        </a-spin>
       </div>
     </a-modal>
     <div class="menu_search">
@@ -78,47 +80,49 @@
     <template v-else>
       <!-- <p class="menu_tips">右键文件夹或选项有添加，重命名等操作</p> -->
       <div class="menu-wrap scrollbar" @dragover.stop="handleDragOver" @drop="handleWrapDrop">
-        <div
-          class="group"
-          :class="handleIsFolder(folder) ? 'is-folder' : ''"
-          v-for="(folder, index) in modelResultList"
-          :key="folder.id"
-        >
-          <template v-if="handleIsFolder(folder)">
-            <menu-folder
-              :folder="folder"
-              :index="index"
-              :contextmenus="folderContenxtMenu"
-              @fileDrop="handleFileDrop"
-            >
-              <template v-slot:file="slotProps">
+        <a-spin :spinning="spinning">
+          <div
+            class="group"
+            :class="handleIsFolder(folder) ? 'is-folder' : ''"
+            v-for="(folder, index) in modelResultList"
+            :key="folder.id"
+          >
+            <template v-if="handleIsFolder(folder)">
+              <menu-folder
+                :folder="folder"
+                :index="index"
+                :contextmenus="folderContenxtMenu"
+                @fileDrop="handleFileDrop"
+              >
+                <template v-slot:file="slotProps">
+                  <menu-file
+                    icon="dataModel"
+                    :file="slotProps.file"
+                    :index="slotProps.index"
+                    :parent="folder"
+                    :isSelect='fileSelectId === slotProps.file.id'
+                    :contextmenus="fileContenxtMenu"
+                    @fileSelect="handleFileSelect"
+                    @fileDrag="handleFileDrag"
+                  ></menu-file>
+                </template>
+              </menu-folder>
+            </template>
+            <template v-else>
+              <ul class="items">
                 <menu-file
                   icon="dataModel"
-                  :file="slotProps.file"
-                  :index="slotProps.index"
-                  :parent="folder"
-                  :isSelect='fileSelectId === slotProps.file.id'
+                  :file="folder"
+                  :index="index"
+                  :isSelect='fileSelectId === folder.id'
                   :contextmenus="fileContenxtMenu"
                   @fileSelect="handleFileSelect"
                   @fileDrag="handleFileDrag"
                 ></menu-file>
-              </template>
-            </menu-folder>
-          </template>
-          <template v-else>
-            <ul class="items">
-              <menu-file
-                icon="dataModel"
-                :file="folder"
-                :index="index"
-                :isSelect='fileSelectId === folder.id'
-                :contextmenus="fileContenxtMenu"
-                @fileSelect="handleFileSelect"
-                @fileDrag="handleFileDrag"
-              ></menu-file>
-            </ul>
-          </template>
-        </div>
+              </ul>
+            </template>
+          </div>
+        </a-spin>
       </div>
     </template>
     <reset-name-modal
@@ -158,6 +162,8 @@ export default {
   },
   data() {
     return {
+      spinning: false,
+      sourceSpinning: false,
       visible: false,
       resetName: {
         visible: false,
@@ -275,7 +281,10 @@ export default {
     * 获取数据源数据
     */
     async handleGetDataSourceList() {
-      const result = await this.$server.common.getMenuList('/datasource/catalog/list/1')
+      this.sourceSpinning = true
+      const result = await this.$server.common.getMenuList('/datasource/catalog/list/1').finally(() => {
+        this.sourceSpinning = true
+      })
 
       if (result.code === 200) {
         this.sourceList = result.rows
@@ -530,7 +539,6 @@ export default {
       this.sourceSearch = value
       if (value) {
         this.handleGetSourceSearchList(value)
-        console.log('input', value)
       }
     }, 400),
     handleGetSourceSearchList(value) {
@@ -553,7 +561,6 @@ export default {
     }, 400),
     handleGetModelSearchList(value) {
       let result = []
-      console.log(this.modelList)
       this.modelList.map(item => {
         const newItem = menuSearchLoop(item, value)
         if (newItem) result.push(newItem)
