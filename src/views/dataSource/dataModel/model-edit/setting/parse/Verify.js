@@ -127,6 +127,10 @@ export class Verify {
 
   // 针对不同的函数作出调整
   validateFun(arg, index, func) {
+    function isInteger(item) {
+      console.log((item.convertType || item.dataType) === 'BIGINT')
+      return (item.convertType || item.dataType) === 'BIGINT'
+    }
     switch (func.value) {
       // 财务运算-年金函数
       case 'PMT': {
@@ -163,6 +167,32 @@ export class Verify {
           throw new Error('位数仅支持整数类型')
         }
         return this.validate(arg)
+      }
+      // REPLACE2替换2
+      case 'REPLACE2': {
+        const result = this.validate(arg)
+        // 第2和第3个参数必须为整数
+        if (index === 1) {
+          if (result.type === 'alias') {
+            if (!isInteger(result.value)) {
+              throw new Error('替换开始数仅支持整数类型')
+            }
+          } else if (result.type !== 'integer') {
+            throw new Error('替换开始数仅支持整数类型')
+          }
+        } else if (index === 2) {
+          if (result.type === 'alias') {
+            if (!isInteger(result.value)) {
+              throw new Error('替换数量仅支持整数类型')
+            }
+          } else if (result.type !== 'integer') {
+            throw new Error('替换数量仅支持整数类型')
+          }
+        }
+        return {
+          type: result.type,
+          value: true
+        }
       }
 
       default:
@@ -221,7 +251,7 @@ export class Verify {
      * @returns
      */
     function isInteger(item) {
-      return item.convertType === 'BIGINT' || item.dataType === 'BIGINT'
+      return (item.convertType || item.dataType) === 'BIGINT'
     }
 
     /**
@@ -230,7 +260,7 @@ export class Verify {
      * @returns
      */
     function isDecimal(item) {
-      return item.convertType === 'DECIMAL' || item.dataType === 'DECIMAL'
+      return (item.convertType || item.dataType) === 'DECIMAL'
     }
 
         /**
@@ -239,7 +269,7 @@ export class Verify {
      * @returns
      */
     function isString(item) {
-      return item.convertType === 'VARCHAR' || item.dataType === 'VARCHAR'
+      return (item.convertType || item.dataType) === 'VARCHAR'
     }
 
     /**
