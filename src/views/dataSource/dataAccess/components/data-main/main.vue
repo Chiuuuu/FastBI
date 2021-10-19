@@ -74,6 +74,8 @@ export default {
             return 'Excel'
           case 'csv':
             return 'Csv'
+          case 'customSql':
+            return '自定义SQL'
         }
       },
       modelName: state => state.dataAccess.modelName,

@@ -34,11 +34,11 @@
               >
                 <img
                   slot="cover"
-                  :alt="item.name"
+                  :alt="item.text"
                   class="card-img"
                   :src="item.imgurl"
                 />
-                <div class="card-title">{{ item.name }}</div>
+                <div class="card-title">{{ item.text }}</div>
               </a-card>
             </a-col>
           </template>
@@ -132,11 +132,12 @@ import MenuFolder from '@/components/dataSource/menu-group/folder'
 import debounce from 'lodash/debounce'
 
 const modelList = [
-  { name: 'mysql', type: '1' },
-  { name: 'oracle', type: '2' },
-  { name: 'hive', type: '5' },
-  { name: 'excel', type: '11' },
-  { name: 'csv', type: '12' }
+  { name: 'mysql', text: 'mysql', type: '1' },
+  { name: 'oracle', text: 'oracle', type: '2' },
+  { name: 'hive', text: 'hive', type: '5' },
+  { name: 'excel', text: 'excel', type: '11' },
+  { name: 'csv', text: 'csv', type: '12' },
+  { name: 'customSql', text: '自定义SQL', type: '13' }
 ]
 export default {
   name: 'dataMenu',
