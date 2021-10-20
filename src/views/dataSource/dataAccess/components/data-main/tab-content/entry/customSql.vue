@@ -11,7 +11,7 @@
     @validate="handleValidateFiled"
   >
     <a-form-model-item label="数据库类型" prop="type">
-      <a-select v-model="form.type" @change="handleChangeDatabaseType" :disabled="modelId">
+      <a-select v-model="form.type" @change="handleChangeDatabaseType" :readonly="modelId">
         <a-select-option :value="1">Mysql</a-select-option>
         <a-select-option :value="2">Oracle</a-select-option>
         <a-select-option :value="5">Hive</a-select-option>
@@ -22,10 +22,10 @@
     <OracleForm v-if="form.type === 2" :form="form" :rules="rules" @handleSetTableName="handleSetTableName" />
     <HiveForm v-if="form.type === 5" :form="form" :rules="rules" @handleSetTableName="handleSetTableName" />
     <a-form-model-item label="自定义表名" prop="tableName">
-      <a-input v-model="form.tableName"></a-input>
+      <a-input v-model="form.tableName" placeholder="请填写自定义表名"></a-input>
     </a-form-model-item>
     <a-form-model-item label="自定义SQL语句" prop="sql">
-      <a-textarea v-model="form.sql" :disabled="modelId"></a-textarea>
+      <a-textarea v-model="form.sql" :readonly="modelId" placeholder="请填写自定义SQL语句"></a-textarea>
     </a-form-model-item>
   </a-form-model>
   <a-button
@@ -255,7 +255,7 @@ export default {
 
           if (result.code === 200) {
             this.$message.success('保存成功，可抽取库表')
-            this.$store.dispatch('dataAccess/getMenuList')
+            this.$store.dispatch('dataAccess/getMenuList', this.accessInstance.$refs.menu)
             this.$store.dispatch('dataAccess/setFirstFinished', true)
             this.$store.dispatch('dataAccess/setModelInfo', this.form)
             this.$store.dispatch('dataAccess/setModelName', this.form.name)

@@ -62,6 +62,7 @@ export default {
     MysqlForm
   },
   mixins: [formValidateMixin.mysql.mixin],
+  inject: ['accessInstance'],
   data() {
     return {
       labelCol: {
@@ -251,7 +252,7 @@ export default {
 
           if (result.code === 200) {
             this.$message.success('保存成功，可抽取库表')
-            this.$store.dispatch('dataAccess/getMenuList')
+            this.$store.dispatch('dataAccess/getMenuList', this.accessInstance.$refs.menu)
             this.$store.dispatch('dataAccess/setFirstFinished', true)
             this.$store.dispatch('dataAccess/setModelInfo', this.form)
             this.$store.dispatch('dataAccess/setModelName', this.form.name)
