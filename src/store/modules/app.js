@@ -425,6 +425,10 @@ const app = {
           target: document.querySelector('.screen-manage')
         })
       }
+      // 超时强行关闭
+      setTimeout(() => {
+        loadingInstance.close()
+      }, 10 * 1000)
       return screenManage
         .actionRefreshScreen({ params })
         .then(res => {

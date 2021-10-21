@@ -304,6 +304,9 @@ export default {
         text: '加载中...',
         target: document.querySelector('.screen-manage')
       })
+      this.$once('hook:beforeDestroy', () => {
+        loadingInstance.close()
+      })
       // 切换页签数据
       this.getScreenDetail({
         id: this.screenId,
@@ -338,6 +341,9 @@ export default {
         loadingInstance.close()
         return
       }
+      this.$once('hook:beforeDestroy', () => {
+        loadingInstance.close()
+      })
       this.$server.screenManage.getScreenTabs(this.screenId).then(res => {
         if (res.code === 200) {
           let pages = res.rows.map(item =>
