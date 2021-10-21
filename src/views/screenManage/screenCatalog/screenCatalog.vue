@@ -680,6 +680,9 @@ export default {
         .finally(() => {
           loadingInstance.close()
         })
+      this.$once('hook:beforeDestroy', () => {
+        loadingInstance.close()
+      })
     },
     // 右键删除文件夹
     handleFolderDelete(event, item, { folder }) {
