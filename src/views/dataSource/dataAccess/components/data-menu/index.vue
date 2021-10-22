@@ -137,7 +137,7 @@ const modelList = [
   { name: 'hive', text: 'hive', type: '5' },
   { name: 'excel', text: 'excel', type: '11' },
   { name: 'csv', text: 'csv', type: '12' },
-  { name: 'customSql', text: '自定义SQL', type: '13' }
+  // { name: 'customSql', text: '自定义SQL', type: '13' }
 ]
 export default {
   name: 'dataMenu',

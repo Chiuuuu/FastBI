@@ -23,14 +23,14 @@ export default {
         permissions: [PERMISSION_CODE.PAGE.systemManage]
       }
     },
-    {
-      path: 'OAManage',
-      name: 'OAManage',
-      component: OAView,
-      meta: {
-        title: 'OA发布管理',
-        permissions: [PERMISSION_CODE.PAGE.systemManage]
-      }
-    }
+    // {
+    //   path: 'OAManage',
+    //   name: 'OAManage',
+    //   component: OAView,
+    //   meta: {
+    //     title: 'OA发布管理',
+    //     permissions: [PERMISSION_CODE.PAGE.systemManage]
+    //   }
+    // }
   ]
 }

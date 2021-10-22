@@ -93,7 +93,7 @@
           <a v-on:click="showSetting('single', row)">定时设置</a>
         </span>
       </a-table>
-      <a-modal width="920px" title="定时抽取记录" :bodyStyle="bodyStyle" :visible="visible1" @cancel="handleCloseExtractLog">
+      <a-modal width="920px" title="定时抽取记录" :bodyStyle="bodyStyle" :visible="visible1" :footer="null" @cancel="handleCloseExtractLog">
         <a-table
           row-key="id"
           size="small"
