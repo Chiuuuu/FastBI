@@ -220,7 +220,7 @@
           <div class="releace-line">
             <span class="label"
               ><span style="color: #ff0000">*</span>分享链接：</span
-            ><span class="text">{{ releaseObj.url }}</span>
+            ><span class="text">{{ releaseObj.url || '' }}</span>
           </div>
           <div class="indent">
             <span class="indent-text" @click="copyLink(releaseObj.url)"
@@ -262,6 +262,10 @@
               <a-radio :value="0">永久</a-radio>
             </a-radio-group>
             <span v-else>{{ expiredLabel }}</span>
+          </div>
+          <div class="releace-line">
+            <span class="label"><span style="color: #ff0000">*</span>发布：</span>
+            <a-checkbox :disabled="isPublish !== 0" v-model="releaseObj.publishOa">同步发布至OA</a-checkbox>
           </div>
           <div class="code-show" v-show="showCode">
             <!-- <a-icon type="qrcode" :style="{ fontSize: '250px' }" /> -->
@@ -941,7 +945,7 @@ export default {
     release() {
       if (this.isPublish === 0) {
         this.$server.screenManage.getScreenLink(this.screenId).then(res => {
-          this.releaseObj = { url: res.data, expired: 7, password: '' }
+          this.releaseObj = { url: res.data, expired: 7, password: '', publishOa: false }
           this.releaseVisible = true
         })
       } else {
@@ -1005,7 +1009,8 @@ export default {
         screenId: this.screenId,
         password: this.releaseObj.password,
         expired: this.releaseObj.expired,
-        valid: true
+        publishOa: this.releaseObj.publishOa,
+        valid: 1
       }
       // 未发布
       if (this.isPublish === 0) {
@@ -1023,7 +1028,7 @@ export default {
         this.$server.screenManage.reShareScreen(params).then(res => {
           if (res.code === 200) {
             this.$message.success('发布成功')
-            this.releaseObj.valid = true
+            this.releaseObj.valid = 1
           }
         })
       }
@@ -1033,9 +1038,10 @@ export default {
         title: '确认撤销',
         content: `是否确认撤销分享?`,
         onOk: async () => {
-          const res = await this.$server.screenManage.delShareScreen(
-            this.screenId
-          )
+          const res = await this.$server.screenManage.delShareScreen({
+            screenId: this.screenId,
+            id: this.releaseObj.id
+          })
           if (res.code === 200) {
             this.$message.success('撤销成功')
             // 状态改为未发布

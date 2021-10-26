@@ -64,7 +64,7 @@ const screenManage = {
    * @returns
    */
   getScreenLink(screenId) {
-    return $axios.get(`/screen/bigscreen/getShortUrl/${screenId}`)
+    return $axios.get(`/screen/share/getShortUrl/${screenId}`)
   },
   /**
    * @description 查看发布信息
@@ -72,7 +72,7 @@ const screenManage = {
    * @returns
    */
   showScreenRelease(screenId) {
-    return $axios.get(`/screen/bigscreen/getScreenShare/${screenId}`)
+    return $axios.get(`/screen/share/info/${screenId}`)
   },
   /**
    * @description 发布大屏
@@ -80,7 +80,7 @@ const screenManage = {
    * @returns
    */
   releaseScreen(params) {
-    return $axios.post('/screen/bigscreen/shareScreen', params)
+    return $axios.post('/screen/share', params)
   },
   /**
    * @description 重新发布大屏
@@ -88,15 +88,55 @@ const screenManage = {
    * @returns
    */
   reShareScreen(params) {
-    return $axios.post('/screen/bigscreen/reShareScreen', params)
+    return $axios.post('/screen/share/republish', params)
   },
   /**
    * @description 撤销发布大屏
-   * @param {*} screenId
+   * @param {*} params
    * @returns
    */
-  delShareScreen(screenId) {
-    return $axios.get(`/screen/bigscreen/removeScreenShare/${screenId}`)
+  delShareScreen(params) {
+    return $axios.post('/screen/share/remove', params)
+  },
+  /**
+   * @description 查询OA发布大屏
+   * @param {*} params
+   * @returns
+   */
+  getOAScreenList(params) {
+    return $axios.post('/screen/share/share2oaList', params)
+  },
+  /**
+   * @description OA大屏置顶
+   * @param {string} id
+   * @returns
+   */
+   actionTopOAScreen(id) {
+    return $axios.get(`/screen/share/top/${id}`)
+  },
+  /**
+   * @description OA大屏取消置顶
+   * @param {*} params
+   * @returns
+   */
+   deleTopOAScreen(params) {
+    return $axios.post('/screen/share/cancelTop', params)
+  },
+  /**
+   * @description OA大屏置顶上移
+   * @param {*} params
+   * @returns
+   */
+   actionUpOAScreen(params) {
+    return $axios.post('/screen/share/upRow', params)
+  },
+  /**
+   * @description OA大屏置顶下移
+   * @param {*} params
+   * @returns
+   */
+   actionDownOAScreen(params) {
+    return $axios.post('/screen/share/downRow', params)
   },
   /**
    * @description 新建大屏
