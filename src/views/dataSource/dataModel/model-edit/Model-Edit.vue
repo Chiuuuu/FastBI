@@ -1430,6 +1430,7 @@ export default {
       this.handleSameName()
       this.handleDimensions()
       this.handleMeasures()
+      this.handleFilterSort()
       this.handleGroupField()
     },
     doWithCreateView(data) {
