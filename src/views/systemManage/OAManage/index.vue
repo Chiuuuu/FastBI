@@ -7,7 +7,7 @@
     <OASearch @search="handleSearch" />
 
     <!-- 表格 -->
-    <OATable :list="screenList" />
+    <OATable :list="screenList" @refresh="handleGetData" />
 
     <!-- 分页器 -->
     <a-pagination
@@ -35,6 +35,11 @@ export default {
   data() {
     return {
       spinning: false,
+      lastPagination: {
+        current: 1,
+        pageSize: 30,
+        total: 0
+      }, // 记录变化前的分页器数据
       searchForm: {}, // 搜索栏表单
       screenList: [], // 表格数据
       projectId: '' // 当前项目
@@ -61,79 +66,24 @@ export default {
     },
     // 获取数据列表
     async handleGetData() {
-      // this.spinning = true
-      // const result = await this.$server.screenMaterial
-      //   .getMaterialList({
-      //     ...this.searchForm,
-      //     projectId: this.projectId,
-      //     current: this.pagination.current,
-      //     pageSize: this.pagination.pageSize
-      //   })
-      //   .finally(() => {
-      //     this.spinning = false
-      //   })
-      // if (result.code === 200) {
-      //   this.screenList = result.rows
-      //   this.pagination.total = result.total
-      // } else {
-      //   this.$message.error(result.msg || '查询失败')
-      // }
-      this.screenList = [
-        {
-          name: '2021年9月政企大屏',
-          createTime: '2021-10-15 14:00:21',
-          project: '项目1',
-          isTop: true,
-          status: 1,
-          url: '47.115.14.69:8081/share/ieE7fe',
-          password: 'z11111'
-        },
-        {
-          name: '2021年8月政企大屏',
-          createTime: '2021-10-15 14:00:21',
-          project: '项目1',
-          isTop: true,
-          status: 1,
-          url: '47.115.14.69:8081/share/ieE7fe',
-          password: 'z11111'
-        },
-        {
-          name: '2021年7月政企大屏',
-          createTime: '2021-10-15 14:00:21',
-          project: '项目1',
-          isTop: true,
-          status: 2,
-          url: '47.115.14.69:8081/share/ieE7fe',
-          password: 'z11111'
-        },
-        {
-          name: '2021年6月政企大屏',
-          createTime: '2021-10-15 14:00:21',
-          project: '项目1',
-          isTop: false,
-          status: 1,
-          url: '47.115.14.69:8081/share/ieE7fe',
-          password: ''
-        },
-        {
-          name: '2021年5月政企大屏',
-          createTime: '2021-10-15 14:00:21',
-          project: '项目1',
-          isTop: false,
-          status: 3,
-          url: '47.115.14.69:8081/share/ieE7fe',
-          password: ''
-        },
-        {
-          name: '2021年4月政企大屏',
-          createTime: '2021-10-15 14:00:21',
-          project: '项目1',
-          isTop: false,
-          status: 2,
-          url: '47.115.14.69:8081/share/ieE7fe',
-          password: ''
-        }
-      ]
+      this.spinning = true
+      const result = await this.$server.screenManage
+        .getOAScreenList({
+          ...this.searchForm,
+          projectId: this.projectId,
+          current: this.pagination.current,
+          pageSize: this.pagination.pageSize
+        })
+        .finally(() => {
+          this.spinning = false
+        })
+      if (result.code === 200) {
+        this.screenList = result.rows
+        this.pagination.total = result.total
+        this.lastPagination = this.pagination
+      } else {
+        this.$message.error(result.msg || '查询失败')
+      }
     }
   }
 }

@@ -431,6 +431,11 @@ export class Verify {
                 type: 'decimal',
                 value: true
               }
+            } else if (leftType === 'string' && isString(right.value)) {
+              return {
+                type: 'string',
+                value: true
+              }
             } else {
               return {
                 type: 'float',
@@ -457,6 +462,11 @@ export class Verify {
             } else if (leftType === 'decimal' && isDecimal(right.value)) {
               return {
                 type: 'decimal',
+                value: true
+              }
+            } else if (leftType === 'string' && isString(right.value)) {
+              return {
+                type: 'string',
                 value: true
               }
             } else {
@@ -555,6 +565,11 @@ export class Verify {
                 type: 'decimal',
                 value: true
               }
+            } else if (leftType === 'string' && isString(right.value)) {
+              return {
+                type: 'string',
+                value: true
+              }
             } else {
               return {
                 type: 'float',
@@ -579,6 +594,11 @@ export class Verify {
             } else if (leftType === 'decimal' && isDecimal(right.value)) {
               return {
                 type: 'decimal',
+                value: true
+              }
+            } else if (leftType === 'string' && isString(right.value)) {
+              return {
+                type: 'string',
                 value: true
               }
             } else {
@@ -677,6 +697,11 @@ export class Verify {
                 type: 'decimal',
                 value: true
               }
+            } else if (leftType === 'string' && isString(right.value)) {
+              return {
+                type: 'string',
+                value: true
+              }
             } else {
               return {
                 type: 'float',
@@ -701,6 +726,11 @@ export class Verify {
             } else if (leftType === 'decimal' && isDecimal(right.value)) {
               return {
                 type: 'decimal',
+                value: true
+              }
+            } else if (leftType === 'string' && isString(right.value)) {
+              return {
+                type: 'string',
                 value: true
               }
             } else {
