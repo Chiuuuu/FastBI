@@ -115,10 +115,10 @@ export default {
       } else if (type === 'down') {
         // 最后一页
         if (Math.ceil(total / pageSize) === current) {
-          return ++index !== (total % pageSize) && this.list[index].no > 0
+          return ++index !== (total % pageSize) && (this.list[index] && this.list[index].no > 0)
         } else {
           // 假如当前页最后一个也是置顶, 则点击时需判断下一页第一个是否有置顶
-          return ++index === pageSize || this.list[index].no > 0
+          return ++index === pageSize || (this.list[index] && this.list[index].no > 0)
         }
       }
     },
