@@ -141,7 +141,6 @@ export default {
     /** 模态窗口确定 */
     handleModalSubmit() {
       this.confirmLoading = true
-      this.visible = false
       this.$server.projectCenter
         .addRoleUser({
           userIds: this.modalForm.users,
@@ -149,8 +148,11 @@ export default {
         })
         .then(res => {
           if (res.code === 200) {
+            this.visible = false
             this.$message.success('添加成功')
             this.handleGetData()
+          } else {
+            this.$message.error(res.msg || '请求错误')
           }
         })
         .finally(() => {
