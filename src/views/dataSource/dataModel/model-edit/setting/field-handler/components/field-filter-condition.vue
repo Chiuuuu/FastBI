@@ -20,23 +20,25 @@
             >查询</a-button
           >
         </a-input>
-        <a-spin :spinning="spinning" class="condition-list hasBorder scrollbar">
-          <a-checkbox
-            v-if="dataRowsResult.length > 0"
-            :indeterminate="
-              checkedData.length > 0 &&
-                checkedData.length < dataRowsResult.length
-            "
-            :checked="checkedData.length === dataRowsResult.length"
-            @change="onCheckAllChange"
-            >全选</a-checkbox
-          >
-          <br />
-          <a-checkbox-group
-            class="block-checkbox"
-            v-model="checkedData"
-            :options="dataRowsResult"
-          />
+        <a-spin :spinning="spinning" class="condition-list hasBorder">
+          <ScrollPage :rows="dataRowsResult" :row-height="22" @change="v => pageDataRows = v">
+            <a-checkbox
+              v-if="dataRowsResult.length > 0"
+              :indeterminate="
+                checkedData.length > 0 &&
+                  checkedData.length < dataRowsResult.length
+              "
+              :checked="checkedData.length === dataRowsResult.length"
+              @change="onCheckAllChange"
+              >全选</a-checkbox
+            >
+            <br />
+            <a-checkbox-group
+              class="block-checkbox"
+              v-model="checkedData"
+              :options="pageDataRows"
+            />
+          </ScrollPage>
         </a-spin>
       </template>
       <!--手动筛选-->
@@ -129,9 +131,13 @@
 </template>
 
 <script>
+import ScrollPage from '@/components/scroll'
 export default {
   name: '',
   inject: ['rootInstance', 'NUMBER_LIST', 'conditionOptions'],
+  components: {
+    ScrollPage
+  },
   props: {
     fieldData: {
       // 字段对象, 用于获取数据
@@ -163,7 +169,8 @@ export default {
       checkedData: [], // 选中的列表
       customData: [], // 手动添加的列表
       dataRows: [], // 该字段查询出来的数据
-      dataRowsResult: [] // 搜索筛选的数据
+      dataRowsResult: [], // 搜索筛选的数据
+      pageDataRows: [] // 当前分页展示的数据
     }
   },
   created() {
@@ -277,6 +284,7 @@ export default {
           this.$message.error('请添加条件')
           return false
         }
+        this.spinning = true
         // 只保存当前数据列表里有的数据
         this.conditionData.rule.ruleFilterList = this.checkedData.filter(item => this.dataRows.includes(item))
       } else {
@@ -289,6 +297,7 @@ export default {
             return false
           }
         }
+        this.spinning = true
         this.conditionData.rule.ruleFilterList = this.customData
         // const data = this.getPivotSchemaData()
         // this.conditionData.convertType = data.convertType || data.dataType
@@ -297,6 +306,7 @@ export default {
       if (this.conditionData.status === 3) {
         this.conditionData.status = 0
       }
+      this.spinning = false
       return true
     },
     async getFieldData() {
@@ -360,7 +370,7 @@ export default {
         if (hasNull) list.unshift('')
         this.dataRows = list
       }
-      this.dataRowsResult = this.dataRows || []
+      this.dataRowsResult = this.dataRows
     }
   }
 }
