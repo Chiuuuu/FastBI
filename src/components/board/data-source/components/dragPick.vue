@@ -85,7 +85,8 @@
           class="pick-checkbox-box hasborder"
           v-show="currentFile.operation === 'list'"
         >
-          <b-scrollbar style="height:100%;">
+          <!-- <b-scrollbar style="height:100%;"> -->
+          <ScrollPage :rows="currentFile.searchList" :row-height="22" @change="v => pageDataRows = v">
             <a-checkbox
               v-if="currentFile && currentFile.searchList && currentFile.searchList.length > 0"
               :checked="currentFile.checkedList.length === currentFile.searchList.length"
@@ -99,10 +100,11 @@
             <a-checkbox-group
               class="f-flexcolumn"
               v-model="currentFile.checkedList"
-              :options="currentFile.searchList"
+              :options="pageDataRows"
               @change="onChange"
             />
-          </b-scrollbar>
+          </ScrollPage>
+          <!-- </b-scrollbar> -->
         </div>
         <!--手动筛选-->
         <div
@@ -200,6 +202,7 @@ import navigateList from '@/config/navigate' // 导航条菜单
 import _ from 'lodash'
 import { Loading } from 'element-ui'
 import { Icon } from 'ant-design-vue'
+import ScrollPage from '@/components/scroll'
 import handleReturnChartData from '@/utils/handleReturnChartData'
 const IconFont = Icon.createFromIconfontCN({
   scriptUrl: '//at.alicdn.com/t/font_2276651_kjhn0ldks1j.js'
@@ -229,6 +232,7 @@ export default {
       checkAll: false, // 是否全选标识
       currentFile: {}, // 当前选中的维度/度量数据
       current: {},
+      pageDataRows: [], // 当前页的可选数据
       isdrag: false, // 是否拖拽中
       fileList: [], // 维度字段数组
       isVaild: false, //
@@ -237,7 +241,8 @@ export default {
   },
   inject: ['errorFile'],
   components: {
-    IconFont
+    IconFont,
+    ScrollPage
   },
   watch: {
     currSelected: {
