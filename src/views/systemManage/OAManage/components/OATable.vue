@@ -142,7 +142,7 @@ export default {
         this.checkType = 'edit'
       } else if (valid === 2) {
         // 已撤销重新发布
-        this.publishDetail = {}
+        this.publishDetail = record
         this.publishType = 'publish'
         this.visible = true
         this.checkType = 'edit'
