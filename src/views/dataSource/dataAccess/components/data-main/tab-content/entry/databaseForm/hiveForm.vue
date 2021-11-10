@@ -23,7 +23,7 @@
             <span>hive数据库暂时支持2.1.0常用版本。</span>
           </div>
         </template>
-        <a-icon class="database_tips" type="info-circle" theme="filled" />
+        <a-icon class="database_tips" type="info-circle" theme="filled" style="color:#617bff" />
       </a-popover>
     </a-form-model-item>
     <a-form-model-item label="连接模式" prop="linkMode">
