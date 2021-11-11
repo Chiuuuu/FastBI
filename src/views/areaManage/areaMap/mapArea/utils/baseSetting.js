@@ -10,7 +10,8 @@ const BaseSetting = {
     fillOpacity: 0.3
   },
   marker: {
-    fillColor: '#f69f2e'
+    fillColor: '#f69f2e',
+    list: []
   }
 }
 

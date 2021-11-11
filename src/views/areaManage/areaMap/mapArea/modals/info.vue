@@ -1,11 +1,11 @@
 <template>
   <!-- 弹窗配置片区样式 -->
-  <a-modal :visible="show" :title="type === 'polygon' ? name : '查看标记点'" :footer="null" @cancel="handleCloseSetting">
+  <a-modal :visible="show" :title="type === 'polygon' ? data.name : '查看标记点'" :footer="null" @cancel="handleCloseSetting">
     <!-- 片区信息载体 -->
     <template v-if="type === 'polygon'">
       <div class="setting-row">
         <div class="setting-label">片区名称</div>
-        <div class="setting-value">{{ name }}</div>
+        <div class="setting-value">{{ data.name }}</div>
       </div>
       <!-- <div class="setting-row" v-for="item in setting.fields" :key="item.id">
         <div class="setting-label">{{ item.key }}</div>
@@ -15,10 +15,10 @@
 
     <!-- 标记点信息载体 -->
     <template v-if="type === 'marker'">
-      <!-- <div class="setting-row" v-for="item in setting.fields" :key="item.id">
-        <div class="setting-label">{{ item.key }}</div>
-        <div class="setting-value">{{ setting.value }}</div>
-      </div> -->
+      <div class="setting-row" v-for="([key, value], index) in Object.entries(data.info)" :key="index">
+        <div class="setting-label">{{ key }}</div>
+        <div class="setting-value">{{ value }}</div>
+      </div>
     </template>
   </a-modal>
 </template>
@@ -34,10 +34,6 @@ export default {
     show: {
       type: Boolean,
       default: false
-    },
-    name: {
-      type: String,
-      default: ''
     },
     data: {
       type: Object,

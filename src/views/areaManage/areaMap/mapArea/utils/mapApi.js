@@ -12,6 +12,20 @@ function getMarkerIcon(color) {
   return `<svg t="1635838135487" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2693" width="32" height="32" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><style type="text/css"></style></defs><path d="M512 64c-172.3 0-312 139.7-312 312 0 139.8 205.3 437 282.8 544.3 7.2 9.9 18.2 14.9 29.2 14.9s22-5 29.2-14.9C618.7 813 824 515.8 824 376c0-172.3-139.7-312-312-312z m0 424c-64.1 0-116-51.9-116-116s51.9-116 116-116 116 51.9 116 116-51.9 116-116 116z" p-id="2694" data-spm-anchor-id="a313x.7781069.0.i6" class="selected" fill="${color}"></path></svg>`
 }
 
+const distrctMapId = {
+  天河区: '1',
+  白云区: '2',
+  越秀区: '3',
+  海珠区: '4',
+  荔湾区: '5',
+  番禺区: '6',
+  黄埔区: '7',
+  花都区: '8',
+  南沙区: '9',
+  从化区: '10',
+  增城区: '11'
+}
+
 export default class MapEditor {
   /**
    * @param {*} options 地图初始化配置项
@@ -21,6 +35,9 @@ export default class MapEditor {
    */
   constructor(options = {}) {
     this.map = new AMap.Map(options.container, options.mapOptions) // 当前地图
+    this.map.on('click', ({ lnglat }) => {
+      const { lng, lat } = lnglat
+    })
     this.contextMenu = null // 右键事件
     this.mouseTool = null // 鼠标实例(绘制片区)
 
@@ -31,6 +48,7 @@ export default class MapEditor {
 
     this.companyGroup = null // 行政区(分公司)
     this.companyTextGroup = null // 行政区标题
+    this.infoWindow = null // 行政区信息窗口
 
     this.polygonList = null // 多边形列表(对应片区)
     this.polygonTextList = [] // 每个片区单独有一个AMap.Text实例(在中心显示片区名称)
@@ -68,6 +86,7 @@ export default class MapEditor {
         fillColor: 'rgba(97, 123, 255, .1)',
         zIndex: 1,
         extData: {
+          id: distrctMapId[item.properties.name],
           origin: item.properties.centroid,
           name: item.properties.name
         }
@@ -85,12 +104,11 @@ export default class MapEditor {
 
     /* ---------------------------------------注册事件--------------------------------------- */
     // 双击聚焦当前行政区
-    let infoWindow = null
     let mouseOverTarget = ''
 
     // 双击放大当前分公司
     this.companyGroup.on('dblclick', e => {
-      if (infoWindow) infoWindow.close()
+      if (this.infoWindow) this.infoWindow.close()
       const fit = this.map.getFitZoomAndCenterByOverlays([e.target])
       this.map.setZoomAndCenter(...fit)
       this.subscribe.execute('dblclick', {
@@ -109,10 +127,10 @@ export default class MapEditor {
       `<div style="margin-bottom: 5px">分公司名称: <span style="font-weight: 600">${extData.name}</span> </div>` +
       `<div>数量: <span style="font-weight: 600">${extData.num || 0}</span></div>` +
       `</div>`
-      infoWindow = new AMap.InfoWindow({
+      this.infoWindow = new AMap.InfoWindow({
         content: infoWindowContent
       })
-      infoWindow.open(this.map, extData.origin)
+      this.infoWindow.open(this.map, extData.origin)
       mouseOverTarget = extData.name
       this.subscribe.execute('mouseover', {
         type: 'company',
@@ -155,14 +173,19 @@ export default class MapEditor {
    */
   initMarkers(area) {
     const marker = area.setting.marker
-    if (!marker.path || !marker.path.length) return
-    const markers = area.setting.marker.path.map(item => {
+    if (!marker.list || !marker.list.length) return
+    const path = marker.list.map(item => item)
+    const markers = path.map(item => {
       const icon = getMarkerIcon(area.setting.marker.fillColor)
       const marker = new AMap.Marker({
-        position: item,
+        position: item.path,
         offset: [-8, -16],
         content: icon,
-        extData: area
+        extData: {
+          parentId: area.id,
+          id: item.id,
+          info: item.info
+        }
       })
       return marker
     })
@@ -256,27 +279,22 @@ export default class MapEditor {
    * @description 绘制多边形片区
    * @param {*} options
    * @param {*} options.data 片区数据
-   * @param {*} options.setting 片区配置
+   * @param {*} options.polygonSetting 片区配置
    * @param {*} options.drawn 绘制结束的回调
    */
   drawPolygon(options) {
-    const { data, drawn, setting } = options
+    const { data, drawn, polygonSetting } = options
     const map = this.map
     // 创建鼠标绘制工具
     map.plugin(['AMap.MouseTool'], () => {
       const mouseTool = new AMap.MouseTool(map)
       mouseTool.polygon({
-        ...setting,
+        ...polygonSetting,
         zIndex: 5,
         extData: deepClone(data)
       })
       // 监听绘制完成事件
       mouseTool.on('draw', ({ obj }) => {
-        mouseTool.close()
-        // this.subscribe.execute('draw', {
-        //   type: 'polygon',
-        //   target: obj
-        // })
         if (typeof drawn === 'function') drawn(obj)
       })
       this.mouseTool = mouseTool
@@ -327,8 +345,8 @@ export default class MapEditor {
       // })
     })
     this.currentPolygon.off('click')
-    this.currentPolygon.on('click', event => {
-      const { lnglat: { lng, lat }, target } = event
+    this.currentPolygon.on('click', e => {
+      const { lnglat: { lng, lat }, target } = e
       const pos = [lng, lat]
       const data = target.getOptions()
       this.contextMenu && this.contextMenu.close()
@@ -336,6 +354,15 @@ export default class MapEditor {
       //   type: 'polygon',
       //   target: event.target
       // })
+    })
+    this.currentPolygon.off('dblclick')
+    this.currentPolygon.on('dblclick', e => {
+      const fit = this.map.getFitZoomAndCenterByOverlays([e.target])
+      this.map.setZoomAndCenter(...fit)
+      this.subscribe.execute('dblclick', {
+        type: 'polygon',
+        target: e.target
+      })
     })
     this.handlePolygonTitle()
 
@@ -429,9 +456,6 @@ export default class MapEditor {
    * @param {*} callback 回调
    */
   focusCompany(target, areaList, callbcak) {
-    // 隐藏所有行政区轮廓
-    this.companyGroup.hide()
-    this.companyTextGroup.hide()
     // 显示当前行政区的片区
     const extData = target.getExtData()
     this.updateArea(areaList)
@@ -439,6 +463,10 @@ export default class MapEditor {
       const fit = this.map.getFitZoomAndCenterByOverlays([target])
       callbcak(fit)
     }
+    // 隐藏所有行政区轮廓
+    this.companyGroup.hide()
+    this.companyTextGroup.hide()
+    this.infoWindow && this.infoWindow.close()
   }
 
   /**
@@ -452,9 +480,9 @@ export default class MapEditor {
         const area = this.areaList.find(item => item.id === id)
         this.polygonList.removeOverlay(item)
         // 重新初始化一个多边形
-        const setting = deepClone(BaseSetting.polygon)
+        const polygonSetting = deepClone(BaseSetting.polygon)
         const polygon = new AMap.Polygon({
-          ...setting,
+          ...polygonSetting,
           bubble: true,
           extData: area
         })
@@ -462,7 +490,7 @@ export default class MapEditor {
         this.subscribe.execute('remove', {
           type: 'polygon',
           target: polygon,
-          setting
+          polygonSetting
         })
 
         if (this.editor && this.editor.getTarget().getExtData().id === id) {
@@ -514,8 +542,8 @@ export default class MapEditor {
     // 先清空之前的标记点
     if (this.markerList) {
       this.map.remove(this.markerList)
+      this.markerList = null
     }
-    this.markerList = null
     area && this.initMarkers(area)
   }
 
@@ -683,7 +711,7 @@ export default class MapEditor {
       this.subscribe.execute('closeEditor', {
         type: 'editor',
         target: this.currentPolygon,
-        setting: defaultSetting
+        polygonSetting: defaultSetting
       })
       this.editor.close()
       this.stack = null

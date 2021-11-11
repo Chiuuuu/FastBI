@@ -4,7 +4,7 @@
     <div id="mapArea" style="width:100%;height:100%"></div>
 
     <!-- 片区搜索下拉框 -->
-    <div v-if="mode === 'edit'" class="map-area-searchbar">
+    <div class="map-area-searchbar">
       <a-button class="searchbar-btn" icon="search" @click="showSearch = !showSearch"></a-button>
       <div :class="['bar-select', { show: showSearch }]">
         <a-select style="width: 80px" v-model="searchType">
@@ -15,13 +15,13 @@
         <a-select
           v-if="searchType === 'company'"
           class="area"
-          v-model="areaId"
+          v-model="companyId"
           placeholder="输入关键字搜索"
           show-search
           allowClear
           :filter-option="filterOption"
           @change="handleSearch">
-          <!-- <a-select-option v-for="item in areaList" :key="item.id" :value="item.id" :disabled="validDrawn(item)">{{ item.name }}</a-select-option> -->
+          <a-select-option v-for="item in companyList" :key="item.id" :value="item.id">{{ item.name }}</a-select-option>
         </a-select>
         <a-select
           v-if="searchType === 'area'"
@@ -108,58 +108,18 @@
     </a-modal>
 
     <!-- 弹窗配置片区样式 -->
-    <AreaInfo :type="infoType" :data="infoData.setting" :name="infoData.name" :show.sync="showInfo" />
-    <AreaSetting :data="currentArea.setting" :name="currentArea.name" :show.sync="showSetting" @save="handleSaveSetting" />
+    <AreaInfo :type="infoType" :data="infoData" :show.sync="showInfo" />
+    <AreaSetting :data="infoData" :show.sync="showSetting" @save="handleSaveSetting" />
   </a-spin>
 </template>
 
 <script>
 import MapEditor from './utils/mapApi'
-import AreaSetting from './setting.vue'
-import AreaInfo from './info.vue'
+import AreaSetting from './modals/setting.vue'
+import AreaInfo from './modals/info.vue'
 import { BaseSetting, MapSetting } from './utils/baseSetting'
 import { deepClone } from '@/utils/deepClone'
-
-const path = [
-  [
-    112.998461,
-    23.245383
-  ],
-  [
-    113.611202,
-    23.248952
-  ],
-  [
-    113.349986,
-    23.051628
-  ],
-  [
-    112.882904,
-    23.082898
-  ]
-]
-const areaList = [
-  { id: '1',
-    name: '同泰片区',
-    setting: { polygon: {
-    strokeColor: '#f69f2e',
-    strokeOpacity: 1,
-    strokeWeight: 2,
-    strokeStyle: 'solid',
-    titleFontSize: 20,
-    titleColor: '#000000',
-    fillColor: '#f69f2e',
-    fillOpacity: 0.3,
-    path: path
-  },
-  marker: { fillColor: '#ff0000', path: path } } },
-  { id: '2', name: '新市片区', setting: { polygon: {}, marker: { fillColor: '#ff0000', path: path } } },
-  { id: '3', name: '金沙洲片区', setting: { polygon: {}, marker: { fillColor: '#ff0000', path: path } } },
-  { id: '4', name: '恒视西片区', setting: { polygon: {}, marker: { fillColor: '#ff0000', path: path } } },
-  { id: '5', name: '海珠片区', setting: { polygon: {}, marker: { fillColor: '#ff0000', path: path } } },
-  { id: '6', name: '恒视东片区', setting: { polygon: {}, marker: { fillColor: '#ff0000', path: path } } },
-  { id: '7', name: '综合片区', setting: { polygon: {}, marker: { fillColor: '#ff0000', path: path } } }
-]
+import mockData from './utils/mock'
 
 export default {
   name: 'mapArea',
@@ -180,9 +140,10 @@ export default {
       currentArea: {}, // 当前配置的片区
       contextMenu: [],
       markers: [],
+      companyId: undefined,
       areaId: undefined,
       companyList: [], // 行政区(分公司)列表
-      areaList: areaList, // 片区列表
+      areaList: [], // 片区列表
 
       searchType: 'company', // 搜索下拉框类别(分公司 | 片区)
       showSearch: false, // 搜索下拉框
@@ -256,6 +217,7 @@ export default {
             }
             self.currentArea = self.areaList.find(item => item.id === id)
             self.handleOpenEditor(polygon)
+            self.mapInstance.initMarkers(self.currentArea)
           }
         },
         {
@@ -281,7 +243,7 @@ export default {
               title: '确认提示',
               content: '移除片区将会删除当前片区数据，确定要移除吗',
               onOk: () => {
-                self.currentArea.setting = deepClone(BaseSetting)
+                self.currentArea.setting.polygon = deepClone(BaseSetting.polygon)
                 self.mapInstance.removePolygon(id)
                 this.showEdit = false
               }
@@ -302,7 +264,8 @@ export default {
         }
       ]
     }
-    this.areaList = areaList
+    this.companyList = mockData
+    this.areaList = mockData.reduce((pre, next) => pre.concat(next.areaList), [])
     this.initMapInstance()
   },
   methods: {
@@ -317,9 +280,13 @@ export default {
       // 订阅相关事件
       this.mapInstance.subscribe.on('click', ({ type, target }) => {
         if (type === 'marker') {
-          const id = target.getExtData().id
+          const data = target.getExtData()
+          const id = data.id
+          const parentId = data.parentId
           this.infoType = 'marker'
-          this.infoData = this.areaList.find(item => item.id === id)
+          const area = this.areaList.find(item => item.id === parentId)
+          const marker = area.setting.marker.list.find(item => item.id === id)
+          this.infoData = marker
           this.showInfo = true
         }
       })
@@ -341,7 +308,7 @@ export default {
         }
       })
       this.mapInstance.subscribe.on('saveEditor', ({ setting }) => {
-        this.currentArea.setting = setting
+        this.currentArea.setting.polygon = setting.polygon
         this.currentArea = {}
         this.showEdit = false
         this.disabledToolbar = false
@@ -352,12 +319,12 @@ export default {
         this.disabledToolbar = false
         this.mapInstance.updataMarkers()
       })
-      this.mapInstance.subscribe.on('remove', ({ type, target, setting }) => {
+      this.mapInstance.subscribe.on('remove', ({ type, target, polygonSetting }) => {
         if (type === 'polygon') {
           const id = target.getExtData().id
           this.areaList.forEach(item => {
             if (item.id === id) {
-              item.setting = setting
+              item.setting.polygon = polygonSetting
             }
           })
         }
@@ -383,8 +350,8 @@ export default {
       let index = --this.floor
       if (index === 0) { // 行政区层
         // 重新绘制行政区轮廓
-        this.areaList = []
-        this.mapInstance.updateArea(this.areaList)
+        this.areaList = mockData.reduce((pre, next) => pre.concat(next.areaList), [])
+        this.mapInstance.updateArea([])
         this.mapInstance.companyGroup.show()
         this.mapInstance.companyTextGroup.show()
 
@@ -418,24 +385,38 @@ export default {
       this.mapInstance.mouseTool && this.mapInstance.mouseTool.close(true)
       this.showCancelDraw = false
       this.disabledToolbar = false
+      this.mapInstance.updataMarkers()
     },
     // 弹窗确认
     handleOk() {
       this.$refs.form.validate(ok => {
         if (ok) {
           this.currentArea = this.areaList.find(item => item.id === this.form.selectId)
+          const backup = deepClone(this.currentArea)
           if (this.visibleType === 'draw') {
+            const setting = {
+              polygon: deepClone(BaseSetting.polygon),
+              marker: backup.setting.marker
+            }
             // 绘制新片区
             this.showCancelDraw = true
             this.disabledToolbar = true
-            const data = Object.assign(this.currentArea, {
-              setting: deepClone(BaseSetting)
-            })
+            const data = {
+              ...backup,
+              setting
+            }
             this.mapInstance.drawPolygon({
               data,
-              setting: deepClone(BaseSetting.polygon),
+              polygonSetting: setting.polygon,
               drawn: (polygon) => {
+                // 小于3个顶点不构成片区
+                const options = polygon.getOptions()
+                if (options.path && options.path.length < 3) {
+                  this.handleCancelDraw()
+                  return
+                }
                 // 绘制完成, 进入当前片区的编辑模式
+                this.mapInstance.mouseTool.close()
                 this.showCancelDraw = false
                 this.handleOpenEditor(polygon)
               }
@@ -472,16 +453,20 @@ export default {
     handleSaveSetting(setting) {
       if (!this.mapInstance.editor) {
         this.handleOpenEditor()
+        this.mapInstance.initMarkers(this.currentArea)
       }
-      this.currentArea.setting = setting
+      this.currentArea.setting.polygon = setting
       this.mapInstance.updateStyle(setting)
     },
     // 聚焦行政区(分公司)
     handleFocusCompany(target) {
       this.floor = 1
       // 获取该分公司的片区列表
-      this.areaList = areaList
+      const company = this.companyList.find(item => item.id === target.getExtData().id)
+      if (!company) return
+      this.areaList = company.areaList
       this.mapInstance.focusCompany(target, this.areaList, fit => {
+        this.mapInstance.map.setZoomAndCenter(...fit)
         this.floorZoomAndCenter = {
           zoom: fit[0],
           center: fit[1]
@@ -510,8 +495,8 @@ export default {
           }
         })
         if (!target) return
-        this.focusCompany(target)
-        this.mapInstance.focusPolygon(id)
+        this.handleFocusCompany(target)
+        this.handleFocusPolygon(id)
       } else if (this.searchType === 'company') { // 聚焦分公司
         let target = null
         this.mapInstance.companyGroup.eachOverlay(item => {
@@ -519,7 +504,7 @@ export default {
             target = item
           }
         })
-        if (!target) {
+        if (target) {
           this.handleFocusCompany(target)
         }
       }
