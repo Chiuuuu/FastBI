@@ -16,7 +16,8 @@ const PERMISSION_CODE = {
         dataPermission: 5, // 数据权限管理
         personnel: 4, // 人员管理
         project: 4, // 项目管理
-        systemManage: 6 // 项目管理
+        systemManage: 6, // 日志管理
+        areaManage: 7 // 片区地图管理
     },
     OBJECT: {
         all: '0000', // 该模块下所有对象

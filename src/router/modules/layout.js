@@ -3,6 +3,7 @@ import screenManageRouter from './screenMange'
 import CorporateDomainRouter from './corporateDomain'
 import ProjectCenterRouter from './projectCenter'
 import systemManageRouter from './systemManage'
+import areaManageRouter from './areaManage'
 
 const BaseLayout = () => import('@/layout/index')
 
@@ -16,6 +17,7 @@ export default {
         screenManageRouter,
         ProjectCenterRouter,
         CorporateDomainRouter,
-        systemManageRouter
+        systemManageRouter,
+        areaManageRouter
     ]
 }
