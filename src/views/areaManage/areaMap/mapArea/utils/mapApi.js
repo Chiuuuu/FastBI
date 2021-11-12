@@ -109,8 +109,6 @@ export default class MapEditor {
     // 双击放大当前分公司
     this.companyGroup.on('dblclick', e => {
       if (this.infoWindow) this.infoWindow.close()
-      const fit = this.map.getFitZoomAndCenterByOverlays([e.target])
-      this.map.setZoomAndCenter(...fit)
       this.subscribe.execute('dblclick', {
         type: 'company',
         target: e.target
@@ -265,8 +263,6 @@ export default class MapEditor {
       })
     })
     this.polygonList.on('dblclick', e => {
-      const fit = this.map.getFitZoomAndCenterByOverlays([e.target])
-      this.map.setZoomAndCenter(...fit)
       this.subscribe.execute('dblclick', {
         type: 'polygon',
         target: e.target
@@ -357,8 +353,6 @@ export default class MapEditor {
     })
     this.currentPolygon.off('dblclick')
     this.currentPolygon.on('dblclick', e => {
-      const fit = this.map.getFitZoomAndCenterByOverlays([e.target])
-      this.map.setZoomAndCenter(...fit)
       this.subscribe.execute('dblclick', {
         type: 'polygon',
         target: e.target
@@ -567,6 +561,13 @@ export default class MapEditor {
       }
     })
   }
+
+  /**
+   * @description 更新右键选项
+   */
+   updateContextMenu(contextMenu) {
+     this.initContextMenu(contextMenu)
+   }
 
   // 撤回操作
   undoStack() {

@@ -1,6 +1,12 @@
 <template>
   <!-- 弹窗配置片区样式 -->
-  <a-modal :visible="show" :title="type === 'polygon' ? data.name : '查看标记点'" :footer="null" @cancel="handleCloseSetting">
+  <a-modal
+    :visible="show"
+    :title="type === 'polygon' ? data.name : '查看标记点'"
+    :getContainer="getContainer"
+    :footer="null"
+    @cancel="handleCloseSetting"
+    >
     <!-- 片区信息载体 -->
     <template v-if="type === 'polygon'">
       <div class="setting-row">
@@ -48,6 +54,10 @@ export default {
     }
   },
   methods: {
+    // 窗口挂载对象
+    getContainer() {
+      return document.querySelector('#mapArea')
+    },
     // 点击取消编辑样式
     handleCloseSetting() {
       this.$emit('update:show', false)
