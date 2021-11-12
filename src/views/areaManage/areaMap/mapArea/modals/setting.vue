@@ -1,6 +1,6 @@
 <template>
   <!-- 弹窗配置片区样式 -->
-  <a-modal v-if="data.setting" :visible="show" :title="data.name" @cancel="handleCloseSetting">
+  <a-modal v-if="setting" :visible="show" :title="data.name" @cancel="handleCloseSetting">
     <template #footer>
       <a-button @click="handleResetSetting">恢复默认设置</a-button>
       <a-button key="back" @click="handleCloseSetting">取消</a-button>
@@ -10,12 +10,12 @@
     </template>
 
     <!-- 片区配置 -->
-    <template v-if="data.setting.polygon">
+    <template v-if="setting.polygon">
       <div class="setting-row">
         <div class="setting-label">颜色</div>
         <div class="setting-value">
           <el-color-picker
-            v-model="data.setting.polygon.fillColor"
+            v-model="setting.polygon.fillColor"
           />
         </div>
       </div>
@@ -23,7 +23,7 @@
         <div class="setting-label">透明度</div>
         <div class="setting-value">
           <a-input-number
-            v-model="data.setting.polygon.fillOpacity"
+            v-model="setting.polygon.fillOpacity"
             :max="1"
             :min="0"
             :step="0.01"
@@ -33,7 +33,7 @@
       <div class="setting-row">
         <div class="setting-label">边框线型</div>
         <div class="setting-value">
-          <a-select v-model="data.setting.polygon.strokeStyle">
+          <a-select v-model="setting.polygon.strokeStyle">
             <a-select-option value="solid">实线</a-select-option>
             <a-select-option value="dashed">虚线</a-select-option>
           </a-select>
@@ -43,7 +43,7 @@
         <div class="setting-label">边框颜色</div>
         <div class="setting-value">
           <el-color-picker
-            v-model="data.setting.polygon.strokeColor"
+            v-model="setting.polygon.strokeColor"
           />
         </div>
       </div>
@@ -51,7 +51,7 @@
         <div class="setting-label">边框宽度</div>
         <div class="setting-value">
           <a-input-number
-            v-model="data.setting.polygon.strokeWeight"
+            v-model="setting.polygon.strokeWeight"
             :max="20"
             :min="0"
           ></a-input-number>
@@ -61,10 +61,10 @@
         <div class="setting-label">标题字体</div>
         <div class="setting-value">
           <el-color-picker
-            v-model="data.setting.polygon.titleColor"
+            v-model="setting.polygon.titleColor"
           />
           <a-input-number
-            v-model="data.setting.polygon.titleFontSize"
+            v-model="setting.polygon.titleFontSize"
             :max="100"
             :min="0"
           ></a-input-number>
@@ -73,11 +73,11 @@
     </template>
 
     <!-- 标记点配置 -->
-    <div v-if="data.setting.marker" class="setting-row">
+    <div v-if="setting.marker" class="setting-row">
       <div class="setting-label">片区标记点</div>
       <div class="setting-value">
         <el-color-picker
-          v-model="data.setting.marker.fillColor"
+          v-model="setting.marker.fillColor"
         />
       </div>
     </div>
@@ -103,7 +103,7 @@ export default {
   },
   watch: {
     show(newValue, oldValue) {
-      this.setting = newValue ? deepClone(this.data) : {}
+      this.setting = newValue ? deepClone(this.data.setting) : {}
     }
   },
   data() {

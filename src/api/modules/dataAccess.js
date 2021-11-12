@@ -9,6 +9,14 @@ export default {
         return $axios.post(`/datasource/connect`, params)
     },
     /**
+     * @description 测试连接数据库(自定义sql)
+     * @param {Object} [params={}] 请求参数
+     * @returns
+     */
+    actionTestConnect(params = {}) {
+        return $axios.post('/datasource/customize/testConnection', params)
+    },
+    /**
      * @description 获取表的具体字段信息
      * @param {string} type 类型
      * @param {Object} [params={}] 请求参数
