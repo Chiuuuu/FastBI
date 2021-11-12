@@ -145,8 +145,8 @@ export default {
             name: '', // 数据源名
             ip: '', // 服务器ip
             port: '', // 端口号
-            hiveserver: '', // 服务器ip
-            hdfsPort: '', // hdfs端口号
+            hiveserver: '', // NameNode IP
+            hdfsPort: '', // NameNode端口号
             namescape: '', // 命名空间
             user: '', // 用户名
             password: '', // 密码

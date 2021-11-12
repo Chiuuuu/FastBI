@@ -83,6 +83,7 @@ export default {
     ...mapState({
       modelInfo: state => state.dataAccess.modelInfo,
       modelId: state => state.dataAccess.modelId,
+      parentId: state => state.dataAccess.parentId,
       modelName: state => state.dataAccess.modelName,
       tableList: state => state.dataAccess.menuList,
       modelType: state => state.dataAccess.modelType, // 数据类型
