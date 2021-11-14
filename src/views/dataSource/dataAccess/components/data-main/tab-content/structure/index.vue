@@ -774,6 +774,7 @@ export default {
           if (this.$refs.extract) this.$refs.extract.modalSpin = false
         }
       }
+      this.$refs.extract.modalSpin = false
       if (code === 'hasDelete' || code === 'error') return
       this.visible2 = true
     }

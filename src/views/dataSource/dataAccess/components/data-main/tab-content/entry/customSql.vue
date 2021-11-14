@@ -11,16 +11,16 @@
     @validate="handleValidateFiled"
   >
     <a-form-model-item label="数据库类型">
-      <a-select v-model="databaseType" @change="handleChangeDatabaseType" :disabled="Boolean(modelId)">
+      <a-select v-model="form.type" @change="handleChangeDatabaseType" :disabled="Boolean(modelId)">
         <a-select-option :value="101">Mysql</a-select-option>
         <a-select-option :value="201">Oracle</a-select-option>
         <a-select-option :value="501">Hive</a-select-option>
       </a-select>
     </a-form-model-item>
     <!-- 连接信息 -->
-    <MysqlForm v-if="databaseType === 101" :form="form" :rules="rules" @handleSetTableName="handleSetTableName" />
-    <OracleForm v-if="databaseType === 201" :form="form" :rules="rules" @handleSetTableName="handleSetTableName" />
-    <HiveForm v-if="databaseType === 501" :form="form" :rules="rules" @handleSetTableName="handleSetTableName" />
+    <MysqlForm v-if="form.type === 101" :form="form" :rules="rules" @handleSetTableName="handleSetTableName" />
+    <OracleForm v-if="form.type === 201" :form="form" :rules="rules" @handleSetTableName="handleSetTableName" />
+    <HiveForm v-if="form.type === 501" :form="form" :rules="rules" @handleSetTableName="handleSetTableName" />
     <a-form-model-item label="自定义表名" prop="tableName">
       <a-input v-model="form.tableName" placeholder="请填写自定义表名"></a-input>
     </a-form-model-item>
@@ -67,7 +67,7 @@ export default {
   data() {
     const { form, rules } = formValidateMixin.mysql.mixin.data()
     return {
-      databaseType: 101, // 数据库类型 101: mysql, 201: oracle, 501: hive
+      sourceType: 13,
       labelCol: {
         xs: { span: 4 },
         sm: { span: 3 },
@@ -76,12 +76,17 @@ export default {
       },
       form: {
         ...form,
+        type: 101,
         tableName: '',
         querySql: ''
       },
       rules: {
         ...rules,
-        tableName: { required: true, message: '请填写自定义表名' },
+        tableName: [
+          { required: true, message: '请填写自定义表名' },
+          { max: 20, min: 1, message: '请填写1-20字的自定义表名' },
+          { pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: '表名仅支持英文开头及数字下划线' }
+        ],
         querySql: { required: true, message: '请填写自定义SQL语句' }
       },
       wrapperCol: { span: 14 },
@@ -110,6 +115,7 @@ export default {
         const { form, rules } = target.mixin.data()
         this.form = {
           ...form,
+          type,
           tableName: '',
           querySql: ''
         }
@@ -155,7 +161,6 @@ export default {
       this.connectPassword = ''
       this.$refs['dbForm'] && this.$refs.dbForm.resetFields()
       this.form = this.$options.data().form
-      this.databaseType = 101
       this.connectStatus = false
     },
     /**
@@ -169,7 +174,7 @@ export default {
             id: this.modelId,
             parentId: this.parentId,
             name: this.modelName,
-            type: this.databaseType,
+            type: this.sourceType,
             property: this.form
           }).finally(() => {
             this.connectBtn = false
@@ -205,7 +210,7 @@ export default {
             parentId: this.parentId,
             name: this.modelName,
             property: this.form,
-            type: this.databaseType
+            type: this.sourceType
           }
           const result = await this.$server.dataAccess.saveTableInfo('/datasource/customize/save', params)
             .finally(() => {

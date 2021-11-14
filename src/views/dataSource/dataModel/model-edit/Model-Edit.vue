@@ -36,7 +36,7 @@
           v-for="database in databaseList"
           :key="database.id"
           :value="database.name"
-          >{{ database.name }}</a-select-option
+          >{{ database.name || datasourceName }}</a-select-option
         >
       </a-select>
       <a-divider />
