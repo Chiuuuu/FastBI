@@ -391,7 +391,6 @@ export default {
           this.showInfo = true
         }
       })
-      this.mapInstance.subscribe.on('rightclick', ({ type, target }) => {})
       this.mapInstance.subscribe.on('dblclick', ({ type, target }) => {
         if (this.showEdit) {
           return this.$message.error('请先结束当前片区编辑')

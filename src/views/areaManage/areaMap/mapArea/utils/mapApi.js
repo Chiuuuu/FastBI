@@ -303,7 +303,7 @@ export default class MapEditor {
    * @param {*} options.polygon 片区对象
    */
   editPolygon(options) {
-    const { polygon, editEnd } = options
+    const { polygon } = options
 
     // 先获取片区实例对象
     if (polygon instanceof AMap.Polygon) {
@@ -406,13 +406,15 @@ export default class MapEditor {
       const polygon = event.target
       const setting = polygon.getOptions()
       const path = setting.path
+      if (path.length < 3) {
+      }
       this.stack.do({ polygon: { path } }, () => {
         this.handlePolygonTitle()
       })
-      // this.subscribe.execute('removenode', {
-      //   type: 'editor',
-      //   target: event.target
-      // })
+      this.subscribe.execute('removenode', {
+        type: 'editor',
+        target: event.target
+      })
     })
 
     // 编辑结束事件
@@ -585,6 +587,10 @@ export default class MapEditor {
        */
       this.currentPolygon.setOptions(stack.polygon)
       this.handlePolygonTitle()
+      // 如果之前清除过, 重新渲染
+      if (!this.currentPolygon.getOptions().map) {
+        this.map.add(this.polygonList)
+      }
     })
   }
 
