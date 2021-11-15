@@ -22,7 +22,7 @@
     <OracleForm v-if="form.type === 201" :form="form" :rules="rules" @handleSetTableName="handleSetTableName" />
     <HiveForm v-if="form.type === 501" :form="form" :rules="rules" @handleSetTableName="handleSetTableName" />
     <a-form-model-item label="自定义表名" prop="tableName">
-      <a-input v-model="form.tableName" placeholder="请填写自定义表名"></a-input>
+      <a-input v-model="form.tableName" :disabled="Boolean(modelId)" placeholder="请填写自定义表名"></a-input>
     </a-form-model-item>
     <a-form-model-item label="自定义SQL语句" prop="querySql">
       <a-textarea v-model="form.querySql" :disabled="Boolean(modelId)" placeholder="请填写自定义SQL语句"></a-textarea>
