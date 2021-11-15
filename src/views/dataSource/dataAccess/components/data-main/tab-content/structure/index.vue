@@ -35,7 +35,7 @@
             </a-button>
             <a-button
               v-if="hasBtnPermissionEdit || hasBtnPermissionSchedule"
-              v-show="showExtractBtn"
+              v-show="showExtractBtn || modelType === 'customSql'"
               type="primary"
               class="select_button"
               style="margin-left: 10px"
@@ -54,23 +54,34 @@
             >
               批量定时抽取
             </a-button>
-            <a-dropdown v-if="['excel', 'csv'].indexOf(modelType) === -1" :trigger="['click']">
-              <a-button type="primary" style="margin-left: 10px">
-                更多
-                <a-icon type="down" />
-              </a-button>
-              <a-menu slot="overlay">
-                <a-menu-item>
-                  <span @click="handleSyncTable">同步库表结构</span>
-                </a-menu-item>
-                <a-menu-item v-if="tableType === 0 && hasBtnPermissionSchedule" v-show="showExtractBtn">
-                  <span @click="showExtractLog">定时抽取记录</span>
-                </a-menu-item>
-                <a-menu-item v-if="tableType === 0 && hasBtnPermissionSchedule" v-show="showExtractBtn">
-                  <span @click="showSetting('batchList')">批量任务列表</span>
-                </a-menu-item>
-              </a-menu>
-            </a-dropdown>
+            <a-button
+              v-if="modelType === 'customSql'"
+              type="primary"
+              style="margin-left: 10px"
+              @click="showExtractLog"
+              class="select_button"
+            >
+              定时抽取记录
+            </a-button>
+            <template v-else>
+              <a-dropdown v-if="['excel', 'csv'].indexOf(modelType) === -1" :trigger="['click']">
+                <a-button type="primary" style="margin-left: 10px">
+                  更多
+                  <a-icon type="down" />
+                </a-button>
+                <a-menu slot="overlay">
+                  <a-menu-item>
+                    <span @click="handleSyncTable">同步库表结构</span>
+                  </a-menu-item>
+                  <a-menu-item v-if="tableType === 0 && hasBtnPermissionSchedule" v-show="showExtractBtn">
+                    <span @click="showExtractLog">定时抽取记录</span>
+                  </a-menu-item>
+                  <a-menu-item v-if="tableType === 0 && hasBtnPermissionSchedule" v-show="showExtractBtn">
+                    <span @click="showSetting('batchList')">批量任务列表</span>
+                  </a-menu-item>
+                </a-menu>
+              </a-dropdown>
+            </template>
           </a-row>
         </a-col>
       </a-row>
@@ -111,7 +122,6 @@
       </a-table>
       <a-modal width="920px" title="定时抽取记录" :bodyStyle="bodyStyle" :visible="visible1" :footer="null" @cancel="handleCloseExtractLog">
         <a-table
-          row-key="id"
           size="small"
           :columns="logColumns"
           :data-source="logData"
@@ -272,7 +282,7 @@ export default {
       modelName: state => state.dataAccess.modelName,
       modelType: state => state.dataAccess.modelType,
       privileges: state => state.common.privileges,
-      showExtractBtn: state => ['mysql', 'oracle', 'hive', 'customSql'].indexOf(state.dataAccess.modelType) > -1
+      showExtractBtn: state => ['mysql', 'oracle', 'hive'].indexOf(state.dataAccess.modelType) > -1
     }),
     rowSelection() {
       return {
