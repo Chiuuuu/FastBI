@@ -752,10 +752,9 @@ export default {
           })
           if (code === 'hasDelete' || code === 'error') {
             return code
-          } else {
-            this.regData = res.data
           }
         }
+        this.regData = res.data
       } else {
         this.$message.error(res.msg)
         if (this.$refs.extract.modalSpin) this.$refs.extract.modalSpin = false

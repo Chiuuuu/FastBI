@@ -57,7 +57,7 @@
               @change="handleSelectIncreaseField"
             >
               <a-select-option
-                v-for="item in increaseList[0].fieldList"
+                v-for="item in increaseList[0] ? increaseList[0].fieldList : []"
                 :key="item.name"
                 :value="item.name"
               >{{ item.name }}</a-select-option>
