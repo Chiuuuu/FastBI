@@ -194,7 +194,6 @@ export default class MapEditor {
         target: e.target
       })
     })
-    // return OverlayGroup
     this.map.add(this.markerList)
   }
 
@@ -240,35 +239,46 @@ export default class MapEditor {
           text: title
         })
       }
+      // 注册事件
+      this.subscribePolygonEvent(polygon)
       return polygon
     })
     this.polygonList = new AMap.OverlayGroup(polygons)
-    this.polygonList.on('rightclick', e => {
+    this.map.add(this.polygonList)
+  }
+
+  /**
+   * 注册多边形事件监听
+   * @param {*} polygon 实例对象
+   */
+  subscribePolygonEvent(polygon) {
+    polygon.on('rightclick', e => {
       const id = e.target.getExtData().id
-      // 右键打开contextMenu
       if (!this.currentPolygon || this.currentPolygon.getExtData().id === id) {
         this.currentPolygon = e.target
         this.contextMenu.open(this.map, e.lnglat)
       }
-      this.subscribe.execute('rightclick', {
-        type: 'polygon',
-        target: e.target
-      })
+      // this.subscribe.execute('rightclick', {
+      //   type: 'polygon',
+      //   target: e.target
+      // })
     })
-    this.polygonList.on('click', event => {
-      this.contextMenu.close()
-      this.subscribe.execute('click', {
-        type: 'polygon',
-        target: event.target
-      })
+    polygon.on('click', e => {
+      const { lnglat: { lng, lat }, target } = e
+      const pos = [lng, lat]
+      const data = target.getOptions()
+      this.contextMenu && this.contextMenu.close()
+      // this.subscribe.execute('click', {
+      //   type: 'polygon',
+      //   target: event.target
+      // })
     })
-    this.polygonList.on('dblclick', e => {
+    polygon.on('dblclick', e => {
       this.subscribe.execute('dblclick', {
         type: 'polygon',
         target: e.target
       })
     })
-    this.map.add(this.polygonList)
   }
 
   /**
@@ -315,6 +325,8 @@ export default class MapEditor {
           this.polygonList.addOverlay(polygon)
         }
       })
+      // 注册点击事件(弹窗配置样式)
+      this.subscribePolygonEvent(polygon)
       this.currentPolygon = polygon
     } else {
       // 根据id找到当前多边形
@@ -327,37 +339,6 @@ export default class MapEditor {
       this.currentPolygon = target
       if (!target) return
     }
-    // 注册点击事件(弹窗配置样式)
-    this.currentPolygon.off('rightclick')
-    this.currentPolygon.on('rightclick', e => {
-      const id = e.target.getExtData().id
-      if (!this.currentPolygon || this.currentPolygon.getExtData().id === id) {
-        this.currentPolygon = e.target
-        this.contextMenu.open(this.map, e.lnglat)
-      }
-      // this.subscribe.execute('rightclick', {
-      //   type: 'polygon',
-      //   target: e.target
-      // })
-    })
-    this.currentPolygon.off('click')
-    this.currentPolygon.on('click', e => {
-      const { lnglat: { lng, lat }, target } = e
-      const pos = [lng, lat]
-      const data = target.getOptions()
-      this.contextMenu && this.contextMenu.close()
-      // this.subscribe.execute('click', {
-      //   type: 'polygon',
-      //   target: event.target
-      // })
-    })
-    this.currentPolygon.off('dblclick')
-    this.currentPolygon.on('dblclick', e => {
-      this.subscribe.execute('dblclick', {
-        type: 'polygon',
-        target: e.target
-      })
-    })
     this.handlePolygonTitle()
 
     // 创建编辑组件
@@ -381,10 +362,6 @@ export default class MapEditor {
       this.stack.do({ polygon: { path } }, () => {
         this.handlePolygonTitle()
       })
-      // this.subscribe.execute('addnode', {
-      //   type: 'editor',
-      //   target: event.target
-      // })
     })
 
     // 点位变化事件
@@ -395,10 +372,6 @@ export default class MapEditor {
       this.stack.do({ polygon: { path } }, () => {
         this.handlePolygonTitle()
       })
-      // this.subscribe.execute('adjust', {
-      //   type: 'editor',
-      //   target: event.target
-      // })
     })
 
     // 删除节点事件
@@ -410,10 +383,6 @@ export default class MapEditor {
       }
       this.stack.do({ polygon: { path } }, () => {
         this.handlePolygonTitle()
-      })
-      this.subscribe.execute('removenode', {
-        type: 'editor',
-        target: event.target
       })
     })
 
@@ -554,13 +523,7 @@ export default class MapEditor {
       this.currentPolygon.setExtData(extData)
       this.currentPolygon.setOptions(res.polygon)
       this.handlePolygonTitle()
-      if (setting.marker.fillColor !== res.marker.fillColor) {
-        const id = extData.id
-        const target = this.markerList.find(item => item.getExtData().id === id)
-        // target.setOptions({
-        //   content
-        // })
-      }
+      this.updataMarkers(extData)
     })
   }
 

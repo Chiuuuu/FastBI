@@ -223,7 +223,6 @@ export default {
       spinning: false,
       mapInstance: null, // 地图编辑器实例
       currentArea: {}, // 当前配置的片区
-      markers: [],
       companyId: undefined,
       areaId: undefined,
       companyList: [], // 行政区(分公司)列表
@@ -579,7 +578,6 @@ export default {
     handleSaveSetting(setting) {
       if (!this.mapInstance.editor) {
         this.handleOpenEditor()
-        this.mapInstance.initMarkers(this.currentArea)
         this.disabledToolbar = true
       }
       this.currentArea.setting = setting
