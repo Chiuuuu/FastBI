@@ -235,52 +235,6 @@ import { message } from 'ant-design-vue'
 import FieldSelect from '@/components/dataSource/field-select/select'
 import debounce from 'lodash/debounce'
 
-const columns = [
-  {
-    title: '原名',
-    ellipsis: true,
-    width: 200,
-    dataIndex: 'originName'
-  },
-  {
-    title: '别名',
-    dataIndex: 'alias',
-    scopedSlots: { customRender: 'alias' }
-  },
-  {
-    title: '字段类型',
-    dataIndex: 'convertType',
-    scopedSlots: { customRender: 'convertType' }
-  },
-  {
-    title: '字段属性',
-    dataIndex: 'role',
-    scopedSlots: { customRender: 'role' }
-  },
-  {
-    title: '字段说明',
-    dataIndex: 'description',
-    scopedSlots: { customRender: 'description' }
-  },
-  {
-    title: '注释',
-    dataIndex: 'comment',
-    ellipsis: true,
-    width: 200,
-    scopedSlots: { customRender: 'comment' }
-  },
-  {
-    title: '是否可见',
-    dataIndex: 'visible',
-    scopedSlots: { customRender: 'visible' }
-  },
-  {
-    title: '是否抽取',
-    dataIndex: 'extractable',
-    scopedSlots: { customRender: 'extractable' }
-  }
-]
-
 export default {
   props: {
     fieldInfo: {
@@ -294,6 +248,51 @@ export default {
     FieldSelect
   },
   data() {
+    const columns = [
+      {
+        title: '原名',
+        ellipsis: true,
+        width: 200,
+        dataIndex: 'originName'
+      },
+      {
+        title: '别名',
+        dataIndex: 'alias',
+        scopedSlots: { customRender: 'alias' }
+      },
+      {
+        title: '字段类型',
+        dataIndex: 'convertType',
+        scopedSlots: { customRender: 'convertType' }
+      },
+      {
+        title: '字段属性',
+        dataIndex: 'role',
+        scopedSlots: { customRender: 'role' }
+      },
+      {
+        title: '字段说明',
+        dataIndex: 'description',
+        scopedSlots: { customRender: 'description' }
+      },
+      {
+        title: '注释',
+        dataIndex: 'comment',
+        ellipsis: true,
+        width: 200,
+        scopedSlots: { customRender: 'comment' }
+      },
+      {
+        title: '是否可见',
+        dataIndex: 'visible',
+        scopedSlots: { customRender: 'visible' }
+      },
+      {
+        title: '是否抽取',
+        dataIndex: 'extractable',
+        scopedSlots: { customRender: 'extractable' }
+      }
+    ]
     return {
       data: [],
       fieldKeyword: '',
