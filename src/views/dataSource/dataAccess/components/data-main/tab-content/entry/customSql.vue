@@ -84,7 +84,7 @@ export default {
         ...rules,
         tableName: [
           { required: true, message: '请填写自定义表名' },
-          { max: 20, min: 1, message: '请填写1-20字的自定义表名' },
+          { max: 30, min: 1, message: '请填写1-30字的自定义表名' },
           { pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: '表名仅支持英文开头及数字下划线' }
         ],
         querySql: { required: true, message: '请填写自定义SQL语句' }
@@ -122,7 +122,11 @@ export default {
         this.rules = {
           ...rules,
           type: { required: true, message: '请选择数据库类型' },
-          tableName: { required: true, message: '请填写自定义表名' },
+          tableName: [
+            { required: true, message: '请填写自定义表名' },
+            { max: 30, min: 1, message: '请填写1-30字的自定义表名' },
+            { pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: '表名仅支持英文开头及数字下划线' }
+          ],
           querySql: { required: true, message: '请填写自定义SQL语句' }
         }
       }
