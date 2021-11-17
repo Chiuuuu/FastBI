@@ -7,7 +7,7 @@
       </a-radio-group>
       <a-row type="flex" align="middle">
         <a-col :span="6" style="padding-left: 20px">
-          <a-input :value="tableKeyword" @change="handleGetTableKeyword" placeholder="请输入表名">
+          <a-input v-if="modelType !== 'customSql'" :value="tableKeyword" @change="handleGetTableKeyword" placeholder="请输入表名">
             <a-icon slot="prefix" type="search" />
           </a-input>
         </a-col>

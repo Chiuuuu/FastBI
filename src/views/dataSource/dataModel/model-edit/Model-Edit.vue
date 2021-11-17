@@ -40,8 +40,8 @@
         >
       </a-select>
       <a-divider />
-      <div class="table_list" :class="{ 'no-sql': !isDatabase }">
-        <div class="menu_search">
+      <div class="table_list" :class="{ 'no-sql': !isDatabase || isCustomSql }">
+        <div class="menu_search" v-if="!isCustomSql">
           <span class="search_span">表</span>
           <a-input
             placeholder="请输入关键词搜索"
@@ -60,7 +60,7 @@
         ></edit-left>
       </div>
       <!-- <a-divider /> -->
-      <div v-if="isDatabase" class="SQL_View table_list">
+      <div v-if="isDatabase && !isCustomSql" class="SQL_View table_list">
         <div class="menu_search">
           <span class="search_span">自定义SQL视图</span>
           <a-icon
@@ -384,6 +384,7 @@ export default {
       detailInfo: '',
       datasourceName: '',
       isDatabase: false, // 是否是SQL数据源, 控制自定义SQL渲染
+      isCustomSql: false, // 是否自定义Sql标识
       tableSearch: '', // 表搜索关键字
       searchList: [],
       databaseName: '', // 当前数据库
@@ -639,6 +640,7 @@ export default {
         const baseBalck = [11, 12] // 黑名单
         const type = result.data.type
         this.isDatabase = !baseBalck.some(item => item === type)
+        this.isCustomSql = type === 13
         this.datasourceName = result.data.name
       } else {
         this.$message.error(result.msg)
