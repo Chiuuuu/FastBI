@@ -410,7 +410,7 @@ export default {
       this.currentFile.searchList = [].concat(this.currentFile.originList.filter(item => {
         let match = false
         list.forEach(k => {
-          if ((item || '').indexOf(k) > -1) {
+          if ((item || '').toLowerCase().indexOf(k) > -1) {
             match = true
           }
         })
