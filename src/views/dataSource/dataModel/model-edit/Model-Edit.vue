@@ -1055,6 +1055,8 @@ export default {
                 item.status = 0
               }
               item.expr = field.expr
+              item.alias = field.alias
+              item.role = field.role
               result.push(item)
             }
           })
@@ -1086,6 +1088,8 @@ export default {
                 item.status = 0
               }
               item.expr = field.expr
+              item.alias = field.alias
+              item.role = field.role
               result.push(item)
             }
           })
