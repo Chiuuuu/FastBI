@@ -260,13 +260,19 @@ export default {
      * @param {String} 'parentId' parentId
      * @param {String} 'id' id
      */
-    saveExcelInfo(data) {
+    saveExcelInfo(data, callback = () => {}) {
         return $axios({
             method: 'post',
             headers: { 'Content-Type': 'multipart/form-data' },
             // url: '/datasource/excel/batchsave',
             url: '/datasource/excel/save',
             data,
+            onUploadProgress: progressEvent => {
+              if (progressEvent.lengthComputable) {
+                let num = Math.round((progressEvent.loaded / progressEvent.total) * 100)
+                callback(num)
+              }
+            },
             timeout: 600000
         })
     },
@@ -304,12 +310,18 @@ export default {
      * @param {String} 'id' id
      * @param {String} 'delimiter' 分隔符
      */
-    saveCsvInfo(data) {
+    saveCsvInfo(data, callback = () => {}) {
         return $axios({
             method: 'post',
             headers: { 'Content-Type': 'multipart/form-data' },
             url: '/datasource/csv/save',
             data,
+            onUploadProgress: progressEvent => {
+              if (progressEvent.lengthComputable) {
+                let num = Math.round((progressEvent.loaded / progressEvent.total) * 100)
+                callback(num)
+              }
+            },
             timeout: 600000
         })
     },

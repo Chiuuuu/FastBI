@@ -137,9 +137,7 @@ export default {
   data() {
     return {
       btnPermission: [this.$PERMISSION_CODE.OPERATOR.edit, this.$PERMISSION_CODE.OPERATOR.add],
-      saveLoading: false,
       spinning: false,
-      saveTip: '保存中, 请勿进行其他操作',
       uploadProgress: '加载中',
       uploadCallback: num => {
         // 使用本地 progress 事件
@@ -147,6 +145,30 @@ export default {
           this.uploadProgress = num + '%'
         } else {
           this.uploadProgress = '文件解析中'
+        }
+      },
+      saveLoading: false,
+      saveTip: '保存中, 请勿进行其他操作',
+      saveCallback: num => {
+        const loop = n => {
+          console.log(n)
+          if (n <= 95) {
+            n += 3
+            this.saveTip = n.toFixed(1) + '%'
+            let timer = setTimeout(() => {
+              loop(n)
+            }, 10000)
+            this.$once('hook:beforeDestroy', () => {
+              clearTimeout(timer)
+              timer = null
+            })
+          }
+        }
+        if (num < 100) {
+          this.saveTip = (num * 0.5).toFixed(1) + '%'
+        } else {
+          this.saveTip = '50%'
+          loop(50)
         }
       },
       isDragenter: false,
@@ -254,6 +276,8 @@ export default {
       this.fileInfoList = []
       this.databaseList = []
       this.operation = []
+      this.saveLoading = false
+      this.saveTip = '保存中, 请勿进行其他操作'
       this.handleClearTable()
       this.clearReplaceFile()
     },
@@ -852,7 +876,7 @@ export default {
           }
 
           this.$server.dataAccess
-            .saveExcelInfo(formData)
+            .saveExcelInfo(formData, this.saveCallback)
             .then(result => {
               if (result.code === 200) {
                 this.$message.success('保存成功')
