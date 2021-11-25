@@ -127,9 +127,9 @@ export class Verify {
 
   // 针对不同的函数作出调整
   validateFun(arg, index, func) {
-    function isInteger(item) {
-      console.log((item.convertType || item.dataType) === 'BIGINT')
-      return (item.convertType || item.dataType) === 'BIGINT'
+    function isString(result) {
+      if (result.type === 'string') return true
+      return result.type === 'alias' && (result.value.convertType || result.value.dataType) === 'VARCHAR'
     }
     switch (func.value) {
       // 财务运算-年金函数
@@ -168,31 +168,35 @@ export class Verify {
         }
         return this.validate(arg)
       }
-      // REPLACE2替换2
-      case 'REPLACE2': {
+      // REPLACE替换1
+      case 'REPLACE': {
+        // 每个参数必须为字符串类型
         const result = this.validate(arg)
-        // 第2和第3个参数必须为整数
-        if (index === 1) {
-          if (result.type === 'alias') {
-            if (!isInteger(result.value)) {
-              throw new Error('替换开始数仅支持整数类型')
-            }
-          } else if (result.type !== 'integer') {
-            throw new Error('替换开始数仅支持整数类型')
+        if (index === 0 && !isString(result)) {
+          throw new Error('参数' + (++index) + '仅支持字符串类型')
+        } else if (result.type !== 'string') {
+          throw new Error('参数' + (++index) + '仅支持纯字符串')
+        }
+        return this.validate(arg)
+      }
+      // REPLACE1替换2
+      case 'REPLACE1': {
+        const result = this.validate(arg)
+        // 第1和第4参数必须为字符串, 第2和第3个参数必须为正整数
+        if (index === 0 && !isString(result)) {
+          throw new Error('参数1仅支持字符串类型')
+        } else if (index === 1) {
+          if (result.type !== 'integer' || result.value <= 0) {
+            throw new Error('参数2仅支持正整数')
           }
         } else if (index === 2) {
-          if (result.type === 'alias') {
-            if (!isInteger(result.value)) {
-              throw new Error('替换数量仅支持整数类型')
-            }
-          } else if (result.type !== 'integer') {
-            throw new Error('替换数量仅支持整数类型')
+          if (result.type !== 'integer' || result.value <= 0) {
+            throw new Error('参数3仅支持正整数')
           }
+        } else if (index === 3 && result.type !== 'string') {
+          throw new Error('参数4仅支持纯字符串')
         }
-        return {
-          type: result.type,
-          value: true
-        }
+        return this.validate(arg)
       }
 
       default:

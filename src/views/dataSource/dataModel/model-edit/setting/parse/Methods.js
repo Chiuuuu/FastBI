@@ -202,10 +202,10 @@ export class Methods {
   // PMT(arg) {
   //   console.log('arg', arg)
   // }
+  REPLACE(arg) {
+    return this.methods.common.call(this, arg, 'REPLACE')
+  }
   REPLACE1(arg) {
     return this.methods.common.call(this, arg, 'REPLACE1')
-  }
-  REPLACE2(arg) {
-    return this.methods.common.call(this, arg, 'REPLACE2')
   }
 }

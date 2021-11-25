@@ -77,11 +77,11 @@ export class TokenStream {
       max: 2
     },
     {
-      name: 'REPLACE1', // 四舍五入
+      name: 'REPLACE', // 替换1
       got: 3
     },
     {
-      name: 'REPLACE2', // 四舍五入
+      name: 'REPLACE1', // 替换2
       got: 4
     },
     // {
