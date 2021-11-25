@@ -42,7 +42,7 @@ export class Methods {
     const { type, value } = arg
     return {
       type,
-      value: true
+      value
     }
   }
 
@@ -64,12 +64,12 @@ export class Methods {
       if (isInteger(value)) {
         return {
           type: 'integer',
-          value: true
+          value
         }
       } else if (isFloat(value)) {
         return {
           type: 'float',
-          value: true
+          value
         }
       } else {
         throw new Error(`方法${methodName}参数：只能用数字类型`)
@@ -90,7 +90,7 @@ export class Methods {
       if (isString(value)) {
         return {
           type: 'string',
-          value: true
+          value
         }
       } else {
         throw new Error(`方法${methodName}参数：只能用字符串类型`)
@@ -120,12 +120,12 @@ export class Methods {
       if (isInteger(value)) {
         return {
           type: 'integer',
-          value: true
+          value
         }
       } else if (isFloat(value)) {
         return {
           type: 'float',
-          value: true
+          value
         }
       } else {
         throw new Error(`方法${methodName}参数：只能用数字类型`)
@@ -134,7 +134,7 @@ export class Methods {
 
     return {
       type,
-      value: true
+      value
     }
   }
 
