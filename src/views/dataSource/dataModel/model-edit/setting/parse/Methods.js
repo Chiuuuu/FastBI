@@ -46,6 +46,18 @@ export class Methods {
     }
   }
 
+  // 替换函数校验
+  replaceCommon(arg, methodName) {
+    if (this.methods.dmType === 'measures') {
+      throw new Error(`替换函数不能用于度量`)
+    }
+    const { type, value } = arg
+    return {
+      type,
+      value
+    }
+  }
+
   // 数值类型通用校验
   numberCommon(arg, methodName) {
     if (this.methods.dmType === 'dimessions') {
@@ -203,9 +215,9 @@ export class Methods {
   //   console.log('arg', arg)
   // }
   REPLACE(arg) {
-    return this.methods.common.call(this, arg, 'REPLACE')
+    return this.methods.replaceCommon.call(this, arg, 'REPLACE')
   }
   REPLACE1(arg) {
-    return this.methods.common.call(this, arg, 'REPLACE1')
+    return this.methods.replaceCommon.call(this, arg, 'REPLACE1')
   }
 }
