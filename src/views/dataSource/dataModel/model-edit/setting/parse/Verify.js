@@ -174,7 +174,7 @@ export class Verify {
         const result = this.validate(arg)
         if (index === 0 && !isString(result)) {
           throw new Error('参数' + (++index) + '仅支持字符串类型')
-        } else if (result.type !== 'string') {
+        } else if (index > 0 && result.type !== 'string') {
           throw new Error('参数' + (++index) + '仅支持纯字符串')
         }
         return this.validate(arg)
