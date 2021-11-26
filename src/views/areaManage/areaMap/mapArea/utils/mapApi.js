@@ -168,10 +168,12 @@ export default class MapEditor {
    */
   initMarkers(markers, area) {
     if (!markers.length) return
+    let fillColor = BaseSetting.marker.fillColor
     // TODO: 更新点位的时候可能会有问题
-    area.setting.marker.cnt = markers.length
-
-    const fillColor = area && area.setting && area.setting.marker ? area.setting.marker.fillColor : BaseSetting.marker.fillColor
+    if (area && area.setting && area.setting.marker) {
+      fillColor = area.setting.marker.fillColor
+      area.setting.marker.cnt = markers.length
+    }
     const icon = getMarkerIcon(fillColor)
     const markerList = markers.map(item => {
       const marker = new AMap.Marker({
