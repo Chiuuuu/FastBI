@@ -9,35 +9,18 @@ import { deepClone } from '@/utils/deepClone'
 import guangzhou from '@/utils/guangdong.json'
 
 function getMarkerIcon(color) {
-  return `<svg t="1635838135487" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2693" width="32" height="32" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><style type="text/css"></style></defs><path d="M512 64c-172.3 0-312 139.7-312 312 0 139.8 205.3 437 282.8 544.3 7.2 9.9 18.2 14.9 29.2 14.9s22-5 29.2-14.9C618.7 813 824 515.8 824 376c0-172.3-139.7-312-312-312z m0 424c-64.1 0-116-51.9-116-116s51.9-116 116-116 116 51.9 116 116-51.9 116-116 116z" p-id="2694" data-spm-anchor-id="a313x.7781069.0.i6" class="selected" fill="${color}"></path></svg>`
+  return `<svg t="1635838135487" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2693" width="48" height="48" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><style type="text/css"></style></defs><path d="M512 64c-172.3 0-312 139.7-312 312 0 139.8 205.3 437 282.8 544.3 7.2 9.9 18.2 14.9 29.2 14.9s22-5 29.2-14.9C618.7 813 824 515.8 824 376c0-172.3-139.7-312-312-312z m0 424c-64.1 0-116-51.9-116-116s51.9-116 116-116 116 51.9 116 116-51.9 116-116 116z" p-id="2694" data-spm-anchor-id="a313x.7781069.0.i6" class="selected" fill="${color}"></path></svg>`
 }
-
-const distrctMapId = {
-  天河区: '1',
-  白云区: '2',
-  越秀区: '3',
-  海珠区: '4',
-  荔湾区: '5',
-  番禺区: '6',
-  黄埔区: '7',
-  花都区: '8',
-  南沙区: '9',
-  从化区: '10',
-  增城区: '11'
-}
-
 export default class MapEditor {
   /**
    * @param {*} options 地图初始化配置项
    * @param {*} options.container 挂载的dom
    * @param {*} options.mapOptions 挂载的dom
    * @param {*} options.contextMenu 右键事件注册
+   * @param {*} options.companyList 右键事件注册
    */
   constructor(options = {}) {
     this.map = new AMap.Map(options.container, options.mapOptions) // 当前地图
-    this.map.on('click', ({ lnglat }) => {
-      const { lng, lat } = lnglat
-    })
     this.contextMenu = null // 右键事件
     this.mouseTool = null // 鼠标实例(绘制片区)
 
@@ -46,6 +29,7 @@ export default class MapEditor {
 
     this.areaList = [] // 片区数据列表
 
+    this.companyList = options.companyList
     this.companyGroup = null // 行政区(分公司)
     this.companyTextGroup = null // 行政区标题
     this.infoWindow = null // 行政区信息窗口
@@ -54,7 +38,7 @@ export default class MapEditor {
     this.polygonTextList = [] // 每个片区单独有一个AMap.Text实例(在中心显示片区名称)
     this.currentPolygon = null // 当前多边形实例
     this.editor = null // 编辑器实例
-    this.markerList = [] // 每个片区的标记点列表
+    this.markerList = [] // 每个片区的网格点列表
 
     this.initCompany()
     this.initContextMenu(options.contextMenu)
@@ -67,11 +51,23 @@ export default class MapEditor {
     const companyList = []
     const companyTextList = []
     guangzhou.features.forEach(item => {
+      let areaCnt = 0
+      const district = item.properties.name
+      const sections = this.companyList.find(item => {
+        let companyName = item.headOfficeName
+        // 越荔分公司特殊处理
+        if (companyName === '越荔分公司') {
+          companyName = ['越秀区', '荔湾区']
+        }
+        console.log(companyName.indexOf(district.slice(0, -1)) > -1)
+        return companyName.indexOf(district.slice(0, -1)) > -1
+      })
+      if (sections) areaCnt = sections.sections.length
       // 中心文字
       companyTextList.push(new AMap.Text({
         position: item.properties.centroid,
         anchor: 'bottom-center',
-        text: item.properties.name,
+        text: district,
         clickable: false,
         style: {
           'background-color': 'transparent',
@@ -86,9 +82,9 @@ export default class MapEditor {
         fillColor: 'rgba(97, 123, 255, .1)',
         zIndex: 1,
         extData: {
-          id: distrctMapId[item.properties.name],
           origin: item.properties.centroid,
-          name: item.properties.name
+          name: district.slice(0, -1), // 筛选掉'区'字
+          areaCnt: areaCnt
         }
       }))
     })
@@ -123,7 +119,7 @@ export default class MapEditor {
       let infoWindowContent =
       `<div style="background:#fff;">` +
       `<div style="margin-bottom: 5px">分公司名称: <span style="font-weight: 600">${extData.name}</span> </div>` +
-      `<div>数量: <span style="font-weight: 600">${extData.num || 0}</span></div>` +
+      `<div>片区数量: <span style="font-weight: 600">${extData.areaCnt || 0}</span></div>` +
       `</div>`
       this.infoWindow = new AMap.InfoWindow({
         content: infoWindowContent
@@ -166,28 +162,29 @@ export default class MapEditor {
   }
 
   /**
-   * 根据片区数据初始化一个标记点群组
-   * @param {*} area 片区数据
+   * 根据片区数据初始化一个网格点群组
+   * @param {*} markers 网格点
+   * @param {*} area 片区信息
    */
-  initMarkers(area) {
-    const marker = area.setting.marker
-    if (!marker.list || !marker.list.length) return
-    const path = marker.list.map(item => item)
-    const markers = path.map(item => {
-      const icon = getMarkerIcon(area.setting.marker.fillColor)
+  initMarkers(markers, area) {
+    if (!markers.length) return
+    // TODO: 更新点位的时候可能会有问题
+    area.setting.marker.cnt = markers.length
+
+    const fillColor = area && area.setting && area.setting.marker ? area.setting.marker.fillColor : BaseSetting.marker.fillColor
+    const icon = getMarkerIcon(fillColor)
+    const markerList = markers.map(item => {
       const marker = new AMap.Marker({
-        position: item.path,
+        position: [item.longitude, item.latitude],
         offset: [-8, -16],
         content: icon,
         extData: {
-          parentId: area.id,
-          id: item.id,
-          info: item.info
+          ...deepClone(item)
         }
       })
       return marker
     })
-    this.markerList = new AMap.OverlayGroup(markers)
+    this.markerList = new AMap.OverlayGroup(markerList)
     this.markerList.on('click', e => {
       this.subscribe.execute('click', {
         type: 'marker',
@@ -195,6 +192,26 @@ export default class MapEditor {
       })
     })
     this.map.add(this.markerList)
+
+    // 如果点位过于密集, 用海量点做渲染
+    // const data = markers.map(item => {
+    //   item.lnglat = [item.longitude, item.latitude]
+    //   return item
+    // })
+    // const markerList = new AMap.MassMarks(data, {
+    //   style: {
+    //     url: 'https://webapi.amap.com/images/mass/mass1.png',
+    //     size: new AMap.Size(16, 16)
+    //   }
+    // })
+    // this.markerList = markerList
+    // this.markerList.on('click', e => {
+    //   this.subscribe.execute('click', {
+    //     type: 'marker',
+    //     target: e.data
+    //   })
+    // })
+    // this.markerList.setMap(this.map)
   }
 
   /**
@@ -230,12 +247,12 @@ export default class MapEditor {
         clickable: false
       })
       title.setMap(this.map)
-      const target = this.polygonTextList.find(item => item.id === area.id)
+      const target = this.polygonTextList.find(item => item.name === area.name)
       if (target) {
         target.text = title
       } else {
         this.polygonTextList.push({
-          id: area.id,
+          name: area.name,
           text: title
         })
       }
@@ -253,8 +270,8 @@ export default class MapEditor {
    */
   subscribePolygonEvent(polygon) {
     polygon.on('rightclick', e => {
-      const id = e.target.getExtData().id
-      if (!this.currentPolygon || this.currentPolygon.getExtData().id === id) {
+      const name = e.target.getExtData().name
+      if (!this.currentPolygon || this.currentPolygon.getExtData().name === name) {
         this.currentPolygon = e.target
         this.contextMenu.open(this.map, e.lnglat)
       }
@@ -318,21 +335,25 @@ export default class MapEditor {
     // 先获取片区实例对象
     if (polygon instanceof AMap.Polygon) {
       // 如果是刚绘制好的对象, 替换列表中的初始对象
-      const data = polygon.getExtData()
-      this.polygonList.eachOverlay(item => {
-        if (item.getExtData().id === data.id) {
-          this.polygonList.removeOverlay(item)
-          this.polygonList.addOverlay(polygon)
-        }
-      })
+      // const data = polygon.getExtData()
+      // debugger
+      // this.polygonList.eachOverlay(item => {
+      //   if (item.getExtData().name === data.name) {
+      //     debugger
+      //     this.polygonList.removeOverlay(item)
+      //     this.polygonList.addOverlay(polygon)
+      //   }
+      // })
+      // 如果是刚绘制好的对象, 插入到组里
+      this.polygonList.addOverlay(polygon)
       // 注册点击事件(弹窗配置样式)
       this.subscribePolygonEvent(polygon)
       this.currentPolygon = polygon
     } else {
-      // 根据id找到当前多边形
+      // 根据name找到当前多边形
       let target = null
       this.polygonList.eachOverlay(item => {
-        if (item.getExtData().id === polygon.id) {
+        if (item.getExtData().name === polygon.name) {
           target = item
         }
       })
@@ -394,12 +415,12 @@ export default class MapEditor {
 
   /**
    * @description 聚焦当前片区
-   * @param {*} id 片区id
+   * @param {*} name 片区名称
    */
-  focusPolygon(id, area) {
+  focusPolygon(name) {
     this.polygonList.eachOverlay(item => {
-      const data = item.getExtData()
-      if (data.id === id) {
+      const target = item.getExtData()
+      if (target.name === name) {
         // 隐藏所有片区轮廓
         this.polygonList.hide()
         this.clearPolygonTitle()
@@ -408,7 +429,10 @@ export default class MapEditor {
         if (path) {
           const fit = this.map.getFitZoomAndCenterByOverlays([item])
           this.map.setZoomAndCenter(...fit)
-          this.updataMarkers(area)
+          this.subscribe.execute('focus', {
+            type: 'polygon',
+            target: item
+          })
         }
       }
     })
@@ -418,31 +442,32 @@ export default class MapEditor {
    * @description 聚焦当前分公司
    * @param {*} target 实例
    * @param {*} areaList 片区列表
-   * @param {*} callback 回调
    */
-  focusCompany(target, areaList, callbcak) {
+  focusCompany(target, areaList) {
     // 显示当前行政区的片区
     const extData = target.getExtData()
     this.updateArea(areaList)
-    if (typeof callbcak === 'function') {
-      const fit = this.map.getFitZoomAndCenterByOverlays([target])
-      callbcak(fit)
-    }
     // 隐藏所有行政区轮廓
     this.companyGroup.hide()
     this.companyTextGroup.hide()
     this.infoWindow && this.infoWindow.close()
+    const fit = this.map.getFitZoomAndCenterByOverlays([target])
+    this.subscribe.execute('focus', {
+      type: 'company',
+      fit,
+      target
+    })
   }
 
   /**
    * @description 删除当前片区
-   * @param {*} id 片区id
+   * @param {*} name 片区name
    */
-  removePolygon(id) {
+  removePolygon(name) {
     // 删除多边形
     this.polygonList.eachOverlay(item => {
-      if (item && item.getExtData().id === id) {
-        const area = this.areaList.find(item => item.id === id)
+      if (item && item.getExtData().name === name) {
+        const area = this.areaList.find(item => item.name === name)
         this.polygonList.removeOverlay(item)
         // 重新初始化一个多边形
         const polygonSetting = deepClone(BaseSetting.polygon)
@@ -458,13 +483,13 @@ export default class MapEditor {
           polygonSetting
         })
 
-        if (this.editor && this.editor.getTarget().getExtData().id === id) {
+        if (this.editor && this.editor.getTarget().getExtData().name === name) {
           this.closeEditor()
         }
       }
     })
     // 删除文字标题
-    const textIndex = this.polygonTextList.findIndex(item => item.id === id)
+    const textIndex = this.polygonTextList.findIndex(item => item.name === name)
     if (textIndex > -1) {
       this.polygonTextList[textIndex].text.remove()
       this.polygonTextList.splice(textIndex, 1)
@@ -477,45 +502,40 @@ export default class MapEditor {
    */
   updateArea(areaList) {
     this.areaList = areaList
-    // 先清空之前的标记点和标题
+    // 先清空之前的网格点和标题
     if (this.markerList) {
       this.map.remove(this.markerList)
+      this.markerList.clear && this.markerList.clear()
     }
     this.markerList = null
     this.clearPolygonTitle()
 
-    if (areaList.length) {
-      // 先清空之前的群组
-      if (this.polygonList) {
-        this.map.remove(this.polygonList)
-      }
-      // 片区实例化及事件监听
-      this.initPolygon()
-    } else {
-      if (this.polygonList) {
-        this.map.remove(this.polygonList)
-      }
-      this.polygonList = null
+    // 先清空之前的群组
+    if (this.polygonList) {
+      this.map.remove(this.polygonList)
     }
+    // 片区实例化及事件监听
+    this.initPolygon()
   }
 
   /**
-   * @description 渲染标记点
+   * @description 渲染网格点
    * @param {*} area
    */
-  updataMarkers(area) {
-    // 先清空之前的标记点
+  updateMarkers(markers, area) {
+    // 先清空之前的网格点
     if (this.markerList) {
       this.map.remove(this.markerList)
+      this.markerList.clear && this.markerList.clear()
       this.markerList = null
     }
-    area && this.initMarkers(area)
+    markers && this.initMarkers(markers, area)
   }
 
   /**
    * @description 更新样式配置
    */
-  updateStyle(setting) {
+  updateStyle(markers, setting) {
     if (!this.currentPolygon || !(this.currentPolygon instanceof AMap.Polygon)) return
     this.stack.do(setting, res => {
       const extData = this.currentPolygon.getExtData()
@@ -523,7 +543,7 @@ export default class MapEditor {
       this.currentPolygon.setExtData(extData)
       this.currentPolygon.setOptions(res.polygon)
       this.handlePolygonTitle()
-      this.updataMarkers(extData)
+      this.updateMarkers(markers, extData)
     })
   }
 
@@ -603,7 +623,7 @@ export default class MapEditor {
     }
 
     // 寻找
-    const target = this.polygonTextList.find(item => item.id === data.id)
+    const target = this.polygonTextList.find(item => item.name === data.name)
     if (target) {
       target.text.setPosition(position)
       target.text.setStyle(style)
@@ -618,16 +638,16 @@ export default class MapEditor {
       })
       title.setMap(this.map)
       this.polygonTextList.push({
-        id: data.id,
+        name: data.name,
         text: title
       })
     }
   }
 
   // 清空全部或指定片区的title
-  clearPolygonTitle(id) {
-    if (id) {
-      const index = this.polygonTextList.findIndex(item => item.id === id)
+  clearPolygonTitle(name) {
+    if (name) {
+      const index = this.polygonTextList.findIndex(item => item.name === name)
       if (index > -1) {
         this.polygonTextList[index].text.remove()
         this.polygonTextList.splice(index, 1)
@@ -669,7 +689,7 @@ export default class MapEditor {
       // 没有形成图形, 将文字删除
       if (defaultSetting.polygon.path.length === 0) {
         this.currentPolygon.destroy()
-        const index = this.polygonTextList.findIndex(item => item.id === extData.id)
+        const index = this.polygonTextList.findIndex(item => item.name === extData.name)
         this.polygonTextList[index].text.remove()
         index > -1 && this.polygonTextList.splice(index, 1)
       } else {

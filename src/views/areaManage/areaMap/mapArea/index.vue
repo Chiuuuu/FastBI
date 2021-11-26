@@ -1,5 +1,5 @@
 <template>
-  <a-spin :spinning="spinning" tip="地图加载中" class="map-area">
+  <a-spin :spinning="spinning || selectLoading" tip="地图加载中" class="map-area">
     <!-- 地图载体(修改了id记得修改AreaInfo里的挂载函数) -->
     <div id="mapArea" style="width:100%;height:100%"></div>
 
@@ -19,7 +19,7 @@
         <a-select
           v-if="searchType === 'company'"
           class="area"
-          :value="companyId"
+          :value="companyName"
           placeholder="输入关键字搜索"
           show-search
           allowClear
@@ -27,17 +27,18 @@
           @change="handleSearch"
           @pressEnter="handleSearch"
         >
+          <a-spin v-if="selectLoading" slot="notFoundContent" size="small" />
           <a-select-option
-            v-for="item in companyList"
-            :key="item.id"
-            :value="item.id"
-            >{{ item.name }}</a-select-option
+            v-for="(item, index) in companyList"
+            :key="index"
+            :value="item.headOfficeName"
+            >{{ item.headOfficeName }}</a-select-option
           >
         </a-select>
         <a-select
           v-if="searchType === 'area'"
           class="area"
-          :value="areaId"
+          :value="areaName"
           placeholder="输入关键字搜索"
           show-search
           allowClear
@@ -45,12 +46,13 @@
           @change="handleSearch"
           @pressEnter="handleSearch"
         >
+          <a-spin v-if="selectLoading" slot="notFoundContent" size="small" />
           <a-select-option
-            v-for="item in areaList"
-            :key="item.id"
-            :value="item.id"
+            v-for="(item, index) in areaList"
+            :key="index"
+            :value="item"
             :disabled="validDrawn(item)"
-            >{{ item.name }}</a-select-option
+            >{{ item }}</a-select-option
           >
         </a-select>
       </div>
@@ -144,10 +146,10 @@
             :filter-option="filterOption"
           >
             <a-select-option
-              v-for="item in undrawList"
-              :key="item.id"
-              :value="item.id"
-              >{{ item.name }}</a-select-option
+              v-for="(item, index) in undrawList"
+              :key="index"
+              :value="item"
+              >{{ item }}</a-select-option
             >
           </a-select>
 
@@ -163,7 +165,7 @@
             <a-select-option
               v-for="item in drawnList"
               :key="item.id"
-              :value="item.id"
+              :value="item.name"
               >{{ item.name }}</a-select-option
             >
           </a-select>
@@ -180,7 +182,7 @@
             <a-select-option
               v-for="item in drawnList"
               :key="item.id"
-              :value="item.id"
+              :value="item.name"
               >{{ item.name }}</a-select-option
             >
           </a-select>
@@ -221,12 +223,15 @@ export default {
   data() {
     return {
       spinning: false,
+      selectLoading: false,
       mapInstance: null, // 地图编辑器实例
       currentArea: {}, // 当前配置的片区
-      companyId: undefined,
-      areaId: undefined,
+      companyName: undefined,
+      areaName: undefined,
       companyList: [], // 行政区(分公司)列表
       areaList: [], // 片区列表
+      drawnList: [], // 已绘制片区列表
+      markerList: [], // 网格列表
 
       searchType: 'company', // 搜索下拉框类别(分公司 | 片区)
       showSearch: false, // 搜索下拉框
@@ -253,29 +258,18 @@ export default {
     }
   },
   computed: {
-    drawnList() {
-      if (!this.mapInstance || !this.mapInstance.polygonList) return []
-      const list = []
-      this.mapInstance.polygonList.eachOverlay(item => {
-        if (item.getBounds()) {
-          const id = item.getExtData().id
-          const target = this.areaList.find(a => a.id === id)
-          target && list.push(target)
-        }
-      })
-      return list
-    },
     undrawList() {
-      if (!this.mapInstance || !this.mapInstance.polygonList) return []
-      const list = []
-      this.mapInstance.polygonList.eachOverlay(item => {
-        if (!item.getBounds()) {
-          const id = item.getExtData().id
-          const target = this.areaList.find(a => a.id === id)
-          target && list.push(target)
-        }
-      })
-      return list
+      // if (!this.mapInstance || !this.mapInstance.polygonList) return []
+      // const list = []
+      // this.mapInstance.polygonList.eachOverlay(item => {
+      //   if (!item.getBounds()) {
+      //     const id = item.getExtData().id
+      //     const target = this.areaList.find(a => a.id === id)
+      //     target && list.push(target)
+      //   }
+      // })
+      // return list
+      return this.areaList.filter(item => !this.drawnList.some(n => n.name === item))
     }
   },
   watch: {
@@ -285,15 +279,143 @@ export default {
       }
     }
   },
-  mounted() {
-    this.companyList = mockData
-    this.areaList = mockData.reduce(
-      (pre, next) => pre.concat(next.areaList),
-      []
-    )
+  async mounted() {
+    await this.handleGetCompanyList()
+    await this.getAreaSettingList()
     this.initMapInstance()
   },
   methods: {
+    // 获取分公司列表
+    async handleGetCompanyList() {
+      this.selectLoading = true
+      this.companyList = []
+      this.areaList = []
+      const res = await this.$server.mapArea.getCompanyList().finally(() => {
+        this.selectLoading = false
+      })
+      if (res && res.code === 200) {
+        this.companyList = res.data
+        this.areaList = res.data.reduce((prev, next) => {
+          return prev.concat(next.sections)
+        }, [])
+      } else {
+        this.$message.error(res.msg || '请求错误')
+      }
+    },
+    // 获取片区列表
+    async handleGetAreaList(name) {
+      const res = await this.$server.mapArea.getAreaList({ name })
+      if (res && res.code === 200) {
+        this.areaList = res.data
+      } else {
+        this.$message.error(res.msg || '请求错误')
+      }
+    },
+    // 获取已绘制的片区
+    async getAreaSettingList(name = '') {
+      this.spinning = true
+      const res = await this.$server.mapArea.getAreaSettingList({
+        name
+      }).catch(() => {
+        return 'error'
+      }).finally(() => {
+        this.spinning = false
+      })
+      if (res && res.code === 200) {
+        this.drawnList = res.data
+      } else {
+        this.$message.error(res.msg || '请求错误')
+        return 'error'
+      }
+    },
+    // 获取片区网格点位
+    async getMarkerList(params) {
+      if (!params) {
+        params = {
+          section: this.currentArea.name
+        }
+      }
+      this.spinning = true
+      const res = await this.$server.mapArea.getMarkerList(params)
+      .finally(() => {
+        this.spinning = false
+      })
+      if (res && res.code === 200) {
+        return res.data
+      } else {
+        this.$message.error(res.msg || '请求错误')
+      }
+    },
+    // 添加绘制的片区
+    async addAreaSetting() {
+      if (!this.currentArea || !this.currentArea.name) return
+      this.spinning = true
+      const { name, setting } = this.currentArea
+      const res = await this.$server.mapArea.addAreaSetting({
+        name,
+        setting
+      }).catch(() => {
+        return 'error'
+      }).finally(() => {
+        this.spinning = false
+      })
+      if (res && res.code === 200) {
+        this.$message.success('保存成功')
+        const id = res.msg
+        this.drawnList.push({
+          id,
+          name,
+          setting
+        })
+        return id
+      } else {
+        this.$message.error(res.msg || '请求错误')
+        return 'error'
+      }
+    },
+    // 更新绘制的片区
+    async updateAreaSetting() {
+      if (!this.currentArea || !this.currentArea.id) return
+      this.spinning = true
+      const { id, name, setting } = this.currentArea
+      const res = await this.$server.mapArea.updateAreaSetting({
+        id,
+        name,
+        setting
+      }).catch(() => {
+        return 'error'
+      }).finally(() => {
+        this.spinning = false
+      })
+      if (res && res.code === 200) {
+        this.$message.success('保存成功')
+      } else {
+        this.$message.error(res.msg || '请求错误')
+        return 'error'
+      }
+    },
+    // 删除绘制的片区
+    async deleteAreaSetting(id) {
+      this.spinning = true
+      const res = await this.$server.mapArea.deleteAreaSetting(id)
+      .finally(() => {
+        this.spinning = false
+      })
+      if (res && res.code === 200) {
+        this.$message.success('删除成功')
+        this.mapInstance.removePolygon(this.currentArea.name)
+        for (let i = 0; i < this.drawnList.length; i++) {
+          const item = this.drawnList[i]
+          if (item.id === id) {
+            this.drawnList.splice(i, 1)
+            this.currentArea = {}
+            break
+          }
+        }
+      } else {
+        this.$message.error(res.msg || '请求错误')
+      }
+    },
     handleContextMenu() {
       const self = this
       let contextMenu = []
@@ -302,53 +424,56 @@ export default {
           {
             text: '查看信息',
             callback(polygon) {
-              const id = polygon.getExtData().id
+              const name = polygon.getExtData().name
               self.infoType = 'polygon'
-              self.infoData = self.areaList.find(item => item.id === id)
+              self.infoData = self.drawnList.find(item => item.name === name)
               self.showInfo = true
             }
           },
           {
             text: '编辑片区',
-            callback(polygon) {
-              const id = polygon.getExtData().id
-              if (self.showEdit && id !== self.currentArea.id) {
+            callback: async function(polygon) {
+              const name = polygon.getExtData().name
+              if (self.showEdit && name !== self.currentArea.name) {
                 return self.$message.error('请先结束当前片区编辑')
               }
-              self.currentArea = self.areaList.find(item => item.id === id)
+              self.currentArea = self.drawnList.find(item => item.name === name)
               self.handleOpenEditor(polygon)
-              self.mapInstance.initMarkers(self.currentArea)
               self.disabledToolbar = true
+              self.markerList = await self.getMarkerList()
+              if (self.markerList.length) {
+                self.mapInstance.initMarkers(self.markerList, self.currentArea)
+              }
             }
           },
           {
             text: '配置样式',
             callback(polygon) {
-              const id = polygon.getExtData().id
-              if (self.showEdit && id !== self.currentArea.id) {
+              const name = polygon.getExtData().name
+              if (self.showEdit && name !== self.currentArea.name) {
                 return self.$message.error('请先结束当前片区编辑')
               }
-              self.currentArea = self.areaList.find(item => item.id === id)
+              self.currentArea = self.drawnList.find(item => item.name === name)
               self.showSetting = true
             }
           },
           {
             text: '移除片区',
             callback(polygon) {
-              const id = polygon.getExtData().id
-              if (self.showEdit && id !== self.currentArea.id) {
+              const name = polygon.getExtData().name
+              if (self.showEdit && name !== self.currentArea.name) {
                 return self.$message.error('请先结束当前片区编辑')
               }
-              self.currentArea = self.areaList.find(item => item.id === id)
+              self.currentArea = self.drawnList.find(item => item.name === name)
               self.$confirm({
                 title: '确认提示',
                 content: '移除片区将会删除当前片区数据，确定要移除吗',
                 onOk: () => {
-                  self.currentArea.setting.polygon = deepClone(
-                    BaseSetting.polygon
-                  )
-                  self.mapInstance.removePolygon(id)
-                  this.showEdit = false
+                  // self.currentArea.setting.polygon = deepClone(
+                  //   BaseSetting.polygon
+                  // )
+                  self.showEdit = false
+                  self.deleteAreaSetting(self.currentArea.id)
                 }
               })
             }
@@ -359,9 +484,9 @@ export default {
           {
             text: '查看信息',
             callback: (polygon) => {
-              const id = polygon.getExtData().id
+              const name = polygon.getExtData().name
               self.infoType = 'polygon'
-              self.infoData = self.areaList.find(item => item.id === id)
+              self.infoData = self.drawnList.find(item => item.name === name)
               self.showInfo = true
             }
           }
@@ -374,19 +499,18 @@ export default {
       this.mapInstance = new MapEditor({
         container: 'mapArea',
         mapOptions: Object.assign({}, MapSetting),
-        contextMenu: this.handleContextMenu()
+        contextMenu: this.handleContextMenu(),
+        companyList: this.companyList
       })
 
       // 订阅相关事件
       this.mapInstance.subscribe.on('click', ({ type, target }) => {
         if (type === 'marker') {
-          const data = target.getExtData()
-          const id = data.id
-          const parentId = data.parentId
           this.infoType = 'marker'
-          const area = this.areaList.find(item => item.id === parentId)
-          const marker = area.setting.marker.list.find(item => item.id === id)
-          this.infoData = marker
+          const data = target.getExtData()
+          this.infoData = data
+          // const data = target
+          // this.infoData = data
           this.showInfo = true
         }
       })
@@ -398,37 +522,64 @@ export default {
         this.mapInstance.map.setZoomAndCenter(...fit)
         // 双击行政区, 显示片区
         if (type === 'company') {
-          this.spinning = true
-          setTimeout(() => {
-            this.spinning = false
-          }, 500)
           this.handleFocusCompany(target)
         }
 
-        // 双击片区, 显示标记点
+        // 双击片区, 显示网格点
         if (type === 'polygon') {
-          this.handleFocusPolygon(target.getExtData().id)
+          this.handleFocusPolygon(target.getExtData().name)
         }
       })
-      this.mapInstance.subscribe.on('saveEditor', ({ setting }) => {
+      this.mapInstance.subscribe.on('focus', async ({ type, target, fit }) => {
+        // 聚焦公司
+        if (type === 'company') {
+          this.mapInstance.map.setZoomAndCenter(...fit)
+          this.floorZoomAndCenter = {
+            zoom: fit[0],
+            center: fit[1]
+          }
+        }
+        // 聚焦片区
+        if (type === 'polygon') {
+          const name = target.getExtData().name
+          this.markerList = await this.getMarkerList({
+            section: name
+          }) || []
+          if (this.markerList.length) {
+            this.mapInstance.initMarkers(this.markerList, this.currentArea)
+          }
+        }
+      })
+      this.mapInstance.subscribe.on('saveEditor', async ({ setting }) => {
         this.currentArea.setting.polygon = setting.polygon
-        this.currentArea = {}
-        this.showEdit = false
-        this.disabledToolbar = false
-        this.mapInstance.updataMarkers()
+        let res = null
+        if (this.currentArea.id) {
+          res = await this.updateAreaSetting()
+        } else {
+          res = await this.addAreaSetting()
+        }
+        if (res !== 'error') {
+          if (!this.currentArea.id) {
+            this.currentArea.id = res
+          }
+          this.currentArea = {}
+          this.showEdit = false
+          this.disabledToolbar = false
+          this.mapInstance.updateMarkers()
+        }
       })
       this.mapInstance.subscribe.on('closeEditor', ({ setting }) => {
         this.showEdit = false
         this.disabledToolbar = false
-        this.mapInstance.updataMarkers()
+        this.mapInstance.updateMarkers()
       })
       this.mapInstance.subscribe.on(
         'remove',
         ({ type, target, polygonSetting }) => {
           if (type === 'polygon') {
-            const id = target.getExtData().id
+            const name = target.getExtData().name
             this.areaList.forEach(item => {
-              if (item.id === id) {
+              if (item.name === name) {
                 item.setting.polygon = polygonSetting
               }
             })
@@ -438,15 +589,7 @@ export default {
     },
     // 判断片区是否已绘制
     validDrawn(item) {
-      if (!this.mapInstance || !this.mapInstance.polygonList) return false
-      let target = null
-      this.mapInstance.polygonList.eachOverlay(p => {
-        if (p.getExtData().id === item.id) {
-          target = p
-        }
-      })
-      // console.log(item.name, !target || !target.getBounds())
-      return !target || !target.getBounds()
+      return !this.drawnList.some(n => n.name === item)
     },
     filterOption(input, option) {
       return (
@@ -460,13 +603,11 @@ export default {
       let index = --this.floor
       if (index === 0) { // 行政区层
         // 清空下拉框
-        this.companyId = undefined
-        this.areaId = undefined
+        this.companyName = undefined
+        this.areaName = undefined
         // 重新绘制行政区轮廓
-        this.areaList = mockData.reduce(
-          (pre, next) => pre.concat(next.areaList),
-          []
-        )
+        this.handleGetCompanyList()
+        this.getAreaSettingList()
         this.mapInstance.updateArea([])
         this.mapInstance.companyGroup.show()
         this.mapInstance.companyTextGroup.show()
@@ -481,9 +622,9 @@ export default {
         // 手动清空片区标题
         this.mapInstance.clearPolygonTitle()
       } else if (index === 1) { // 片区层
-        this.areaId = undefined
+        this.areaName = undefined
         // 重新绘制片区层
-        this.mapInstance.updateArea(this.areaList)
+        this.mapInstance.updateArea(this.drawnList)
         this.mapInstance.map.setZoomAndCenter(
           this.floorZoomAndCenter.zoom,
           this.floorZoomAndCenter.center
@@ -508,26 +649,28 @@ export default {
       this.mapInstance.mouseTool && this.mapInstance.mouseTool.close(true)
       this.showCancelDraw = false
       this.disabledToolbar = false
-      this.mapInstance.updataMarkers()
+      this.mapInstance.updateMarkers()
     },
     // 弹窗确认
     handleOk() {
-      this.$refs.form.validate(ok => {
+      this.$refs.form.validate(async (ok) => {
         if (ok) {
-          this.currentArea = this.areaList.find(
-            item => item.id === this.form.selectId
+          const name = this.areaList.find(
+            item => item === this.form.selectId
           )
-          const backup = deepClone(this.currentArea)
+          this.currentArea = this.drawnList.find(item => item.name === name)
+          // 绘制片区确认
           if (this.visibleType === 'draw') {
-            const setting = {
-              polygon: deepClone(BaseSetting.polygon),
-              marker: backup.setting.marker
+            this.currentArea = {
+              name,
+              setting: deepClone(BaseSetting)
             }
             // 绘制新片区
             this.showCancelDraw = true
             this.disabledToolbar = true
+            const setting = deepClone(BaseSetting)
             const data = {
-              ...backup,
+              name,
               setting
             }
             this.mapInstance.drawPolygon({
@@ -546,16 +689,27 @@ export default {
                 this.handleOpenEditor(polygon)
               }
             })
-            this.mapInstance.initMarkers(this.currentArea)
+            this.handleCancelModal()
+            this.markerList = await this.getMarkerList({
+              section: name
+            }) || []
+            if (this.markerList.length) {
+              this.mapInstance.initMarkers(this.markerList, this.currentArea)
+            }
           } else if (this.visibleType === 'edit') {
             // 编辑片区
             this.disabledToolbar = true
             this.handleOpenEditor()
-            this.mapInstance.initMarkers(this.currentArea)
+            this.markerList = await this.getMarkerList() || []
+            if (this.markerList.length) {
+              this.mapInstance.initMarkers(this.markerList, this.currentArea)
+            }
+            this.handleCancelModal()
           } else if (this.visibleType === 'delete') {
-            this.mapInstance.removePolygon(this.currentArea.id)
+            // 删除片区
+            this.deleteAreaSetting(this.currentArea.id)
+            this.handleCancelModal()
           }
-          this.handleCancelModal()
         }
       })
     },
@@ -575,71 +729,95 @@ export default {
       this.mapInstance.saveEditor()
     },
     // 保存片区样式
-    handleSaveSetting(setting) {
+    async handleSaveSetting(setting) {
       if (!this.mapInstance.editor) {
         this.handleOpenEditor()
         this.disabledToolbar = true
       }
       this.currentArea.setting = setting
-      this.mapInstance.updateStyle(setting)
+      this.markerList = await this.getMarkerList({
+        section: this.currentArea.name
+      }) || []
+      this.mapInstance.updateStyle(this.markerList, setting)
     },
     // 聚焦行政区(分公司)
-    handleFocusCompany(target) {
-      this.floor = 1
+    async handleFocusCompany(target) {
       // 获取该分公司的片区列表
-      const company = this.companyList.find(
-        item => item.id === target.getExtData().id
-      )
-      if (!company) return
-      this.areaList = company.areaList
-      this.mapInstance.focusCompany(target, this.areaList, fit => {
-        this.mapInstance.map.setZoomAndCenter(...fit)
-        this.floorZoomAndCenter = {
-          zoom: fit[0],
-          center: fit[1]
+      const company = this.companyList.find(item => {
+        let name = item.headOfficeName
+        const companyName = target.getExtData().name
+        // 越荔分公司特殊处理
+        if (name === '越荔分公司') {
+          return ['越秀', '荔湾'].indexOf(companyName) > -1
+        } else {
+          return name.indexOf(companyName) > -1
         }
       })
+      if (!company) return
+      await this.handleGetAreaList(company.headOfficeName)
+      // 如果该公司下有片区, 则渲染片区
+      if (this.areaList.length) {
+        const res = await this.getAreaSettingList(company.headOfficeName)
+        if (res !== 'error') {
+          this.mapInstance.focusCompany(target, this.drawnList)
+        }
+      } else {
+        // 没有片区, 直接渲染网格点
+        this.drawnList = []
+        this.mapInstance.focusCompany(target, this.drawnList)
+        this.markerList = await this.getMarkerList({
+          headOffice: company.headOfficeName
+        }) || []
+        if (this.markerList.length) {
+          this.mapInstance.initMarkers(this.markerList, this.currentArea)
+        }
+      }
+      this.floor = 1
     },
     // 聚焦多边形
-    handleFocusPolygon(id) {
+    handleFocusPolygon(name) {
       this.floor = 2
-      this.currentArea = this.areaList.find(item => item.id === id)
-      this.mapInstance.focusPolygon(id, this.currentArea)
+      this.currentArea = this.drawnList.find(item => item.name === name)
+      this.mapInstance.focusPolygon(name)
     },
-    handleSearch(id) {
+    async handleSearch(name) {
       if (this.showEdit) {
         return this.$message.error('请先结束当前片区编辑')
       }
       if (this.searchType === 'area') {
-        this.areaId = id
-        this.companyId = undefined
-        if (!id) return
+        this.areaName = name
+        this.companyName = undefined
+        if (!name) return
         // 聚焦片区
         if (this.floor === 1) {
-          this.handleFocusPolygon(id)
+          this.handleFocusPolygon(name)
           return
         }
         // 找到片区归属分公司的id
-        const company = this.getCompanyIdByAreaId(id)
+        const company = this.getCompanyByAreaName(name)
         if (!company) return
-        const companyId = company.id
+        let companyName = company.headOfficeName
+        // 越荔分公司2个行政区合并, 特殊处理
+        if (companyName === '越荔分公司') {
+          companyName = '越秀'
+        }
         let target = null
         this.mapInstance.companyGroup.eachOverlay(item => {
-          if (item.getExtData().id === companyId) {
+          if (companyName.indexOf(item.getExtData().name) > -1) {
             target = item
           }
         })
         if (!target) return
-        this.handleFocusCompany(target)
-        this.handleFocusPolygon(id)
+        await this.handleFocusCompany(target)
+        this.handleFocusPolygon(name)
       } else if (this.searchType === 'company') {
-        this.companyId = id
-        this.areaId = undefined
-        if (!id) return
+        this.companyName = name
+        this.areaName = undefined
+        if (!name) return
         // 聚焦分公司
         let target = null
         this.mapInstance.companyGroup.eachOverlay(item => {
-          if (item.getExtData().id === id) {
+          if (name.indexOf(item.getExtData().name) > -1) {
             target = item
           }
         })
@@ -649,9 +827,9 @@ export default {
       }
     },
     // 根据片区id获取分公司id
-    getCompanyIdByAreaId(id) {
+    getCompanyByAreaName(name) {
       for (const company of this.companyList) {
-        if (company.areaList.some(item => item.id === id)) {
+        if (company.sections.some(item => item === name)) {
           return company
         }
       }

@@ -9,6 +9,7 @@ import corporateDomain from '@/api/modules/corporateDomain'
 import user from '@/api/modules/user'
 import chooseScreen from '@/api/modules/chooseScreen'
 import systemManage from '@/api/modules/systemManage'
+import mapArea from '@/api/modules/mapArea'
 
 const server = {
   user,
@@ -21,7 +22,8 @@ const server = {
   projectCenter,
   corporateDomain,
   chooseScreen,
-  systemManage
+  systemManage,
+  mapArea
 }
 
 export default server

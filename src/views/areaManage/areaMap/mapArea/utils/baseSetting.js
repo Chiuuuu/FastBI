@@ -11,7 +11,7 @@ const BaseSetting = {
   },
   marker: {
     fillColor: '#f69f2e',
-    list: []
+    cnt: 0
   }
 }
 
