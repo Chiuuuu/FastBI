@@ -665,22 +665,33 @@ export default class MapEditor {
 
   // 保存片区
   saveEditor() {
-    this.stack.finish(setting => {
-      const data = this.currentPolygon.getExtData()
-
-      this.editor.close()
-      this.stack = null
-      this.editor = null
-      this.currentPolygon.setOptions(setting.polygon)
-      // 路径需单独设置, 否则会出现无效的情况
-      this.currentPolygon.setPath(setting.polygon.path || [])
+    // 判断多边形是否还存在
+    const path = this.currentPolygon.getPath()
+    if (!path || !path.length) {
       this.subscribe.execute('saveEditor', {
         type: 'editor',
         target: this.currentPolygon,
-        setting
+        setting: {
+          polygon: this.currentPolygon.getOptions()
+        }
       })
-      this.currentPolygon = null
-    })
+    } else {
+      // 存在则关闭操作栈
+      this.stack.finish(setting => {
+        this.editor.close()
+        this.stack = null
+        this.editor = null
+        this.currentPolygon.setOptions(setting.polygon)
+        // 路径需单独设置, 否则会出现无效的情况
+        this.currentPolygon.setPath(setting.polygon.path || [])
+        this.subscribe.execute('saveEditor', {
+          type: 'editor',
+          target: this.currentPolygon,
+          setting
+        })
+        this.currentPolygon = null
+      })
+    }
   }
   // 取消编辑
   closeEditor() {

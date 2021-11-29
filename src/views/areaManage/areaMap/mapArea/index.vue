@@ -434,7 +434,7 @@ export default {
             text: '编辑片区',
             callback: async function(polygon) {
               const name = polygon.getExtData().name
-              if (self.showEdit && name !== self.currentArea.name) {
+              if (self.showEdit) {
                 return self.$message.error('请先结束当前片区编辑')
               }
               self.currentArea = self.drawnList.find(item => item.name === name)
@@ -461,7 +461,7 @@ export default {
             text: '移除片区',
             callback(polygon) {
               const name = polygon.getExtData().name
-              if (self.showEdit && name !== self.currentArea.name) {
+              if (self.showEdit) {
                 return self.$message.error('请先结束当前片区编辑')
               }
               self.currentArea = self.drawnList.find(item => item.name === name)
@@ -551,7 +551,10 @@ export default {
         }
       })
       this.mapInstance.subscribe.on('saveEditor', async ({ setting }) => {
-        this.currentArea.setting.polygon = setting.polygon
+        const { path } = setting.polygon
+        if (!path || !path.length) {
+          return this.$message.error('请至少绘制3个点')
+        }
         let res = null
         if (this.currentArea.id) {
           res = await this.updateAreaSetting()
@@ -814,6 +817,10 @@ export default {
         this.companyName = name
         this.areaName = undefined
         if (!name) return
+        // TODO: 越荔分公司2个行政区合并, 特殊处理
+        if (name === '越荔分公司') {
+          name = '越秀'
+        }
         // 聚焦分公司
         let target = null
         this.mapInstance.companyGroup.eachOverlay(item => {
