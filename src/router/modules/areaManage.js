@@ -4,6 +4,7 @@ const RouteView = () => import('@/layout/routeView')
 const areaMapView = () => import('@/views/areaManage/areaMap')
 const areaMapPreview = () => import('@/views/areaManage/areaMap/preview')
 const areaMapEditView = () => import('@/views/areaManage/areaMap/edit')
+const areaMapListView = () => import('@/views/areaManage/areaList')
 
 export default {
   path: '/areaManage',
@@ -44,6 +45,15 @@ export default {
           }
         }
       ]
+    },
+    {
+      path: 'areaList',
+      name: 'areaList',
+      component: areaMapListView,
+      meta: {
+        title: '片区地址',
+        permissions: [PERMISSION_CODE.PAGE.areaManage]
+      }
     }
   ]
 }

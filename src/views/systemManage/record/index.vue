@@ -27,25 +27,32 @@
         <div class="right">
           <a-tabs class="tabs" v-model="tab" @change="handleChangeModule">
             <a-tab-pane key="1" tab="数据接入">
-              <recordMain
+              <RecordMain
                 ref="manage1"
                 :type="1"
                 :projectId="projectId"
-              ></recordMain>
+              ></RecordMain>
             </a-tab-pane>
             <a-tab-pane key="2" tab="数据建模">
-              <recordMain
+              <RecordMain
                 ref="manage2"
                 :type="2"
                 :projectId="projectId"
-              ></recordMain>
+              ></RecordMain>
             </a-tab-pane>
             <a-tab-pane key="3" tab="数据大屏">
-              <recordMain
+              <RecordMain
                 ref="manage3"
                 :type="3"
                 :projectId="projectId"
-              ></recordMain>
+              ></RecordMain>
+            </a-tab-pane>
+            <a-tab-pane key="4" tab="片区地址">
+              <RecordArea
+                ref="manage4"
+                :type="4"
+                :projectId="projectId"
+              ></RecordArea>
             </a-tab-pane>
           </a-tabs>
         </div>
@@ -54,12 +61,14 @@
   </a-row>
 </template>
 <script>
-import recordMain from './components/record-main/record-main.vue'
+import RecordMain from './components/record-main/record-main.vue'
+import RecordArea from './components/record-main/record-area.vue'
 import { mapState } from 'vuex'
 export default {
   name: 'record',
   components: {
-    recordMain
+    RecordMain,
+    RecordArea
   },
   data() {
     return {

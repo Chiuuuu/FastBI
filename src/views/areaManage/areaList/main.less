@@ -1,0 +1,49 @@
+@deep: ~'>>>';
+.main {
+  background: #fff;
+  width: 100%;
+  height: 100%;
+
+  .head {
+    padding: 16px 15px 0;
+    h1 {
+      color: #01040f;
+      font-weight: bold;
+      font-size: 16px;
+    }
+  }
+
+  @{deep} .tabs {
+    height: 100%;
+    .ant-tabs-content {
+      height: calc(100% - 60px);
+    }
+    .ant-tabs-tabpane {
+      height: 100%;
+    }
+  }
+}
+.table-area {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: calc(100% - 60px);
+  overflow-y: auto;
+
+  .area-searchbar {
+    padding: 0 16px;
+    margin-bottom: 16px;
+  }
+
+  .area-table {
+    flex: 1;
+  }
+
+  .area-pagination {
+    width: 100%;
+    height: 32px;
+    margin-top: 15px;
+    display: flex;
+    justify-content: flex-end;
+  }
+}

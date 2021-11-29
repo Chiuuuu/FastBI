@@ -62,4 +62,20 @@ export default {
   deleteAreaSetting(id) {
     return $axios.get(`/zoneInfo/del/${id}`)
   },
+  /**
+   * @description 获取片区表
+   * @param {Object} [params={}] 请求参数
+   * @returns
+   */
+  getFieldList(params = {}) {
+    return $axios.post('/zone/dataList', params)
+  },
+  /**
+   * @description 更新片区表数据(一行)
+   * @param {Object} [params={}] 请求参数
+   * @returns
+   */
+  updateFields(params = {}) {
+    return $axios.post('/zone/data/edit', params)
+  }
 }
