@@ -55,11 +55,10 @@ export default class MapEditor {
       const district = item.properties.name
       const sections = this.companyList.find(item => {
         let companyName = item.headOfficeName
-        // 越荔分公司特殊处理
+        // TODO: 越荔分公司特殊处理
         if (companyName === '越荔分公司') {
-          companyName = ['越秀区', '荔湾区']
+          companyName = ['越秀', '荔湾']
         }
-        console.log(companyName.indexOf(district.slice(0, -1)) > -1)
         return companyName.indexOf(district.slice(0, -1)) > -1
       })
       if (sections) areaCnt = sections.sections.length

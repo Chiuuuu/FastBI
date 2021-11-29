@@ -746,7 +746,7 @@ export default {
       const company = this.companyList.find(item => {
         let name = item.headOfficeName
         const companyName = target.getExtData().name
-        // 越荔分公司特殊处理
+        // TODO: 越荔分公司特殊处理
         if (name === '越荔分公司') {
           return ['越秀', '荔湾'].indexOf(companyName) > -1
         } else {
@@ -797,7 +797,7 @@ export default {
         const company = this.getCompanyByAreaName(name)
         if (!company) return
         let companyName = company.headOfficeName
-        // 越荔分公司2个行政区合并, 特殊处理
+        // TODO: 越荔分公司2个行政区合并, 特殊处理
         if (companyName === '越荔分公司') {
           companyName = '越秀'
         }
