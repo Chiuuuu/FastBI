@@ -41,7 +41,7 @@
           </a-range-picker>
         </a-form-model-item>
         <a-form-model-item>
-          <a-button type="primary" @click="() => getList()" :disabled="loading"
+          <a-button type="primary" @click="handleSearch" :disabled="loading"
             >查询</a-button
           >
         </a-form-model-item>
@@ -170,6 +170,10 @@ export default {
     this.getList()
   },
   methods: {
+    handleSearch() {
+      this.pagination.current = 1
+      this.getList()
+    },
     handleProjectIdChange(projectId) {
       this.prjId = projectId
       this.pagination.current = 1
