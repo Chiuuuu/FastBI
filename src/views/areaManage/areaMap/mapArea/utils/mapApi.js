@@ -337,10 +337,8 @@ export default class MapEditor {
     if (polygon instanceof AMap.Polygon) {
       // 如果是刚绘制好的对象, 替换列表中的初始对象
       // const data = polygon.getExtData()
-      // debugger
       // this.polygonList.eachOverlay(item => {
       //   if (item.getExtData().name === data.name) {
-      //     debugger
       //     this.polygonList.removeOverlay(item)
       //     this.polygonList.addOverlay(polygon)
       //   }
@@ -465,36 +463,26 @@ export default class MapEditor {
    * @param {*} name 片区name
    */
   removePolygon(name) {
-    // 删除多边形
-    this.polygonList.eachOverlay(item => {
-      if (item && item.getExtData().name === name) {
-        const area = this.areaList.find(item => item.name === name)
-        this.polygonList.removeOverlay(item)
-        // 重新初始化一个多边形
-        const polygonSetting = deepClone(BaseSetting.polygon)
-        const polygon = new AMap.Polygon({
-          ...polygonSetting,
-          bubble: true,
-          extData: area
-        })
-        this.polygonList.addOverlay(polygon)
-        this.subscribe.execute('remove', {
-          type: 'polygon',
-          target: polygon,
-          polygonSetting
-        })
-
-        if (this.editor && this.editor.getTarget().getExtData().name === name) {
-          this.closeEditor()
-        }
-      }
-    })
     // 删除文字标题
     const textIndex = this.polygonTextList.findIndex(item => item.name === name)
     if (textIndex > -1) {
       this.polygonTextList[textIndex].text.remove()
       this.polygonTextList.splice(textIndex, 1)
     }
+    // 删除多边形
+    this.polygonList.eachOverlay(item => {
+      if (item && item.getExtData().name === name) {
+        this.polygonList.removeOverlay(item)
+        // this.subscribe.execute('remove', {
+        //   type: 'polygon',
+        //   target: item,
+        // })
+
+        if (this.editor && this.editor.getTarget().getExtData().name === name) {
+          this.closeEditor()
+        }
+      }
+    })
   }
 
   /**
@@ -570,6 +558,10 @@ export default class MapEditor {
        * 编辑器开启后需要重新覆盖样式配置, 否则边框是默认的蓝色
        */
       this.currentPolygon.setOptions(stack.polygon)
+      const icon = getMarkerIcon(stack.marker.fillColor)
+      this.markerList.setOptions({
+        content: icon
+      })
       this.handlePolygonTitle()
       // 如果之前清除过, 重新渲染
       if (!this.currentPolygon.getOptions().map) {
@@ -593,6 +585,10 @@ export default class MapEditor {
        * 编辑器开启后需要重新覆盖样式配置, 否则边框是默认的蓝色
        */
       this.currentPolygon.setOptions(stack.polygon)
+      const icon = getMarkerIcon(stack.marker.fillColor)
+      this.markerList.setOptions({
+        content: icon
+      })
       this.handlePolygonTitle()
     })
   }

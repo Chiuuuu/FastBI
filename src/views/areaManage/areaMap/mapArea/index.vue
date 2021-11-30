@@ -426,7 +426,12 @@ export default {
             callback(polygon) {
               const name = polygon.getExtData().name
               self.infoType = 'polygon'
-              self.infoData = self.drawnList.find(item => item.name === name)
+              const data = self.drawnList.find(item => item.name === name)
+              if (data) {
+                self.infoData = data
+              } else {
+                self.infoData = self.currentArea
+              }
               self.showInfo = true
             }
           },
@@ -453,7 +458,10 @@ export default {
               if (self.showEdit && name !== self.currentArea.name) {
                 return self.$message.error('请先结束当前片区编辑')
               }
-              self.currentArea = self.drawnList.find(item => item.name === name)
+              const data = self.drawnList.find(item => item.name === name)
+              if (data) {
+                self.currentArea = data
+              }
               self.showSetting = true
             }
           },
@@ -464,7 +472,10 @@ export default {
               if (self.showEdit) {
                 return self.$message.error('请先结束当前片区编辑')
               }
-              self.currentArea = self.drawnList.find(item => item.name === name)
+              const data = self.drawnList.find(item => item.name === name)
+              if (data) {
+                self.currentArea = data
+              }
               self.$confirm({
                 title: '确认提示',
                 content: '移除片区将会删除当前片区数据，确定要移除吗',
@@ -555,10 +566,13 @@ export default {
         if (!path || !path.length) {
           return this.$message.error('请至少绘制3个点')
         }
+        // 备份网格点个数, 存在前端setting大文本, 不然需要调一次后端接口获取
+        const markerLen = this.currentArea.setting.marker.cnt
         this.currentArea.setting = setting
+        this.currentArea.setting.marker.cnt = markerLen
         let res = null
         if (this.currentArea.id) {
-          res = await this.updateAreaSetting(setting)
+          res = await this.updateAreaSetting()
         } else {
           res = await this.addAreaSetting()
         }
@@ -577,19 +591,19 @@ export default {
         this.disabledToolbar = false
         this.mapInstance.updateMarkers()
       })
-      this.mapInstance.subscribe.on(
-        'remove',
-        ({ type, target, polygonSetting }) => {
-          if (type === 'polygon') {
-            const name = target.getExtData().name
-            this.areaList.forEach(item => {
-              if (item.name === name) {
-                item.setting.polygon = polygonSetting
-              }
-            })
-          }
-        }
-      )
+      // this.mapInstance.subscribe.on(
+      //   'remove',
+      //   ({ type, target, polygonSetting }) => {
+          // if (type === 'polygon') {
+          //   const name = target.getExtData().name
+          //   this.areaList.forEach(item => {
+          //     if (item.name === name) {
+          //       item.setting.polygon = polygonSetting
+          //     }
+          //   })
+          // }
+        // }
+      // )
     },
     // 判断片区是否已绘制
     validDrawn(item) {
@@ -727,6 +741,11 @@ export default {
     // 点击取消编辑
     handleCloseEdit() {
       this.mapInstance.closeEditor()
+      const name = this.currentArea.name
+      const newPolygon = this.drawnList.find(item => item.name === name)
+      if (!newPolygon) {
+        this.mapInstance.removePolygon(name)
+      }
     },
     // 点击保存编辑
     handleSaveEdit() {
