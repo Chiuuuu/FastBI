@@ -6,21 +6,21 @@
           <a-input
             v-model="formData.resourceName"
             class="form-item"
-            placeholder="请输入"
+            :placeholder="'请输入' + dataName"
           ></a-input>
         </a-form-model-item>
         <a-form-model-item label="操作者：" prop="operator">
           <a-input
             v-model="formData.operator"
             class="form-item"
-            placeholder="请输入"
+            placeholder="请输入操作者"
           ></a-input>
         </a-form-model-item>
         <a-form-model-item label="账号：" prop="userName">
           <a-input
             v-model="formData.userName"
             class="form-item"
-            placeholder="请输入"
+            placeholder="请输入账号"
           ></a-input>
         </a-form-model-item>
         <a-form-model-item label="操作时间：" prop="operationTime">
