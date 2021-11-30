@@ -9,11 +9,11 @@
             placeholder="请输入标准地址编号"
           ></a-input>
         </a-form-model-item>
-        <a-form-model-item label="楼盘名称编码" prop="operateType">
+        <a-form-model-item label="楼盘编号" prop="operateType">
           <a-input
             v-model="formData.operateType"
             class="form-item"
-            placeholder="请输入楼盘名称编码"
+            placeholder="请输入楼盘编号"
           ></a-input>
         </a-form-model-item>
         <a-form-model-item label="操作者" prop="operator">
@@ -96,7 +96,7 @@ const column = [
     width: 180
   },
   {
-    title: '楼盘名称编码',
+    title: '楼盘编号',
     ellipsis: true,
     dataIndex: 'operateType',
     width: 180
@@ -135,7 +135,7 @@ export default {
       // 搜索
       formData: {
         resourceName: '', // 当前模块下对应 ->标准地址编号
-        operateType: '', // 当前模块下对应 ->楼盘名称编码
+        operateType: '', // 当前模块下对应 ->楼盘编号
         content: '',
         operator: '',
         userName: '',
