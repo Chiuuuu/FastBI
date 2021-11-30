@@ -555,9 +555,10 @@ export default {
         if (!path || !path.length) {
           return this.$message.error('请至少绘制3个点')
         }
+        this.currentArea.setting = setting
         let res = null
         if (this.currentArea.id) {
-          res = await this.updateAreaSetting()
+          res = await this.updateAreaSetting(setting)
         } else {
           res = await this.addAreaSetting()
         }
