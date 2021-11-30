@@ -145,6 +145,7 @@
                             >
                             <a-sub-menu
                               key="4"
+                              v-if="item2.tableNo > 0"
                               title="创建地理字段"
                               @click="openGeoSetting(item2)"
                             >
