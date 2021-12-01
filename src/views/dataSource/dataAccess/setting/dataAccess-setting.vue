@@ -283,14 +283,14 @@ export default {
         scopedSlots: { customRender: 'comment' }
       },
       {
-        title: '是否可见',
-        dataIndex: 'visible',
-        scopedSlots: { customRender: 'visible' }
-      },
-      {
         title: '是否抽取',
         dataIndex: 'extractable',
         scopedSlots: { customRender: 'extractable' }
+      },
+      {
+        title: '是否可见',
+        dataIndex: 'visible',
+        scopedSlots: { customRender: 'visible' }
       }
     ]
     return {

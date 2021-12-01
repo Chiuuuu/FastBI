@@ -78,9 +78,9 @@ export default {
   },
   created () {
     // 如果是自定义sql, 隐藏是否可见设置
-    if (this.isCustomSql) {
-      this.column.pop()
-    }
+    // if (this.isCustomSql) {
+    //   this.column.pop()
+    // }
   },
   data() {
     const column = [
