@@ -77,7 +77,7 @@
         :slot="'custom_' + i"
         slot-scope="text, record, index"
       >
-        <a-input :maxLength="handleMaxLength(col.dataIndex)" v-model="editRow[col.dataIndex]" v-if="activeIndex === index" :key="i"></a-input>
+        <a-input :maxLength="handleMaxLength(col.dataIndex)" @change="change($event, col.dataIndex, i)" v-model="editRow[col.dataIndex]" v-if="activeIndex === index" :key="i"></a-input>
         <span v-else :key="i" :title="text">{{ text }}</span>
       </template>
 
@@ -176,14 +176,14 @@ export default {
           dataIndex: 'provider',
           ellipsis: true,
           width: 200
-          // scopedSlots: { customRender: 'custom_9' }
+          // scopedSlots: { customRender: 'custom_4' }
         },
         {
           title: '楼盘信息与标准地址关系是否有效',
           dataIndex: 'match',
           ellipsis: true,
           width: 250,
-          scopedSlots: { customRender: 'custom_4' }
+          scopedSlots: { customRender: 'custom_5' }
         },
         {
           title: '标准地址归属分公司',
@@ -211,7 +211,7 @@ export default {
           dataIndex: 'serviceSection',
           ellipsis: true,
           width: 150
-          // scopedSlots: { customRender: 'custom_5' }
+          // scopedSlots: { customRender: 'custom_9' }
         },
         {
           title: '地市',
@@ -285,6 +285,9 @@ export default {
     this.handleGetData()
   },
   methods: {
+    change(e, key, i) {
+      console.log(e, key, i)
+    },
     async handleGetData() {
       if (this.activeIndex > -1) {
         return this.$message.error('请先保存当前编辑行')
