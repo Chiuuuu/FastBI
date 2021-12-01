@@ -22,6 +22,7 @@ export default class MapEditor {
   constructor(options = {}) {
     this.map = new AMap.Map(options.container, options.mapOptions) // 当前地图
     this.contextMenu = null // 右键事件
+    this.contextMenuTarget = null // 当前右键点击的对象({ type: '', target: null })
     this.mouseTool = null // 鼠标实例(绘制片区)
 
     this.stack = null // 操作栈实例
@@ -61,31 +62,36 @@ export default class MapEditor {
         }
         return companyName.indexOf(district.slice(0, -1)) > -1
       })
-      if (sections) areaCnt = sections.sections.length
-      // 中心文字
-      companyTextList.push(new AMap.Text({
-        position: item.properties.centroid,
-        anchor: 'bottom-center',
-        text: district,
-        clickable: false,
-        style: {
-          'background-color': 'transparent',
-          border: 0,
-          fontWeight: 700,
-          padding: 0
+      if (sections) {
+        areaCnt = sections.sections.length
+        // 中心文字(越荔分公司只显示一个)
+        if (district !== '越秀区') {
+          companyTextList.push(new AMap.Text({
+            position: item.properties.centroid,
+            anchor: 'bottom-center',
+            text: sections.headOfficeName,
+            clickable: false,
+            style: {
+              'background-color': 'transparent',
+              border: 0,
+              fontWeight: 700,
+              padding: 0
+            }
+          }))
         }
-      }))
-      // 区域轮廓
-      companyList.push(new AMap.Polygon({
-        path: item.geometry.coordinates[0],
-        fillColor: 'rgba(97, 123, 255, .1)',
-        zIndex: 1,
-        extData: {
-          origin: item.properties.centroid,
-          name: district.slice(0, -1), // 筛选掉'区'字
-          areaCnt: areaCnt
-        }
-      }))
+        // 区域轮廓
+        companyList.push(new AMap.Polygon({
+          path: item.geometry.coordinates[0],
+          fillColor: 'rgba(97, 123, 255, .1)',
+          zIndex: 1,
+          extData: {
+            origin: item.properties.centroid,
+            // name: district.slice(0, -1), // 筛选掉'区'字
+            name: sections.headOfficeName, // 筛选掉'区'字
+            areaCnt: areaCnt
+          }
+        }))
+      }
     })
     if (this.companyGroup) {
       this.map.remove(this.companyGroup)
@@ -98,8 +104,6 @@ export default class MapEditor {
     this.map.add([this.companyGroup, this.companyTextGroup])
 
     /* ---------------------------------------注册事件--------------------------------------- */
-    // 双击聚焦当前行政区
-    let mouseOverTarget = ''
 
     // 双击放大当前分公司
     this.companyGroup.on('dblclick', e => {
@@ -110,26 +114,38 @@ export default class MapEditor {
       })
     })
 
-    // 鼠标移入显示分公司信息
-    this.companyGroup.on('mouseover', e => {
-      // 如果鼠标一直在同一片区，则InfoWindow不显示
-      if (e.target.getExtData().name === mouseOverTarget) return
-      const extData = e.target.getExtData()
-      let infoWindowContent =
-      `<div style="background:#fff;">` +
-      `<div style="margin-bottom: 5px">分公司名称: <span style="font-weight: 600">${extData.name}</span> </div>` +
-      `<div>片区数量: <span style="font-weight: 600">${extData.areaCnt || 0}</span></div>` +
-      `</div>`
-      this.infoWindow = new AMap.InfoWindow({
-        content: infoWindowContent
-      })
-      this.infoWindow.open(this.map, extData.origin)
-      mouseOverTarget = extData.name
-      this.subscribe.execute('mouseover', {
+    // 单击显示分公司信息
+    this.companyGroup.on('rightclick', e => {
+      this.contextMenuTarget = {
         type: 'company',
         target: e.target
-      })
+      }
+      this.contextMenu.close()
+      this.contextMenu.open(this.map, e.lnglat)
     })
+
+    // 鼠标移入显示分公司信息
+    // 双击聚焦当前行政区
+    // let mouseOverTarget = ''
+    // this.companyGroup.on('mouseover', e => {
+    //   // 如果鼠标一直在同一片区，则InfoWindow不显示
+    //   if (e.target.getExtData().name === mouseOverTarget) return
+    //   const extData = e.target.getExtData()
+    //   let infoWindowContent =
+    //   `<div style="background:#fff;">` +
+    //   `<div style="margin-bottom: 5px">分公司名称: <span style="font-weight: 600">${extData.name}</span> </div>` +
+    //   `<div>片区数量: <span style="font-weight: 600">${extData.areaCnt || 0}</span></div>` +
+    //   `</div>`
+    //   this.infoWindow = new AMap.InfoWindow({
+    //     content: infoWindowContent
+    //   })
+    //   this.infoWindow.open(this.map, extData.origin)
+    //   mouseOverTarget = extData.name
+    //   this.subscribe.execute('mouseover', {
+    //     type: 'company',
+    //     target: e.target
+    //   })
+    // })
   }
 
   /**
@@ -140,12 +156,9 @@ export default class MapEditor {
     const contextMenu = new AMap.ContextMenu()
     callbacks.forEach(item => {
       contextMenu.addItem(item.text, e => {
-        item.callback(this.currentPolygon)
-        this.subscribe.execute('open', {
-          type: 'contextMenu',
-          target: contextMenu
-        })
+        item.callback(this.contextMenuTarget)
         contextMenu.close()
+        this.contextMenuTarget = null
       })
     })
     contextMenu.on('close', () => {
@@ -186,11 +199,13 @@ export default class MapEditor {
       return marker
     })
     this.markerList = new AMap.OverlayGroup(markerList)
-    this.markerList.on('click', e => {
-      this.subscribe.execute('click', {
+    this.markerList.on('rightclick', e => {
+      this.contextMenuTarget = {
         type: 'marker',
         target: e.target
-      })
+      }
+      this.contextMenu.close()
+      this.contextMenu.open(this.map, e.lnglat)
     })
     this.map.add(this.markerList)
 
@@ -274,6 +289,11 @@ export default class MapEditor {
       const name = e.target.getExtData().name
       if (!this.currentPolygon || this.currentPolygon.getExtData().name === name) {
         this.currentPolygon = e.target
+        this.contextMenuTarget = {
+          type: 'polygon',
+          target: e.target
+        }
+        this.contextMenu.close()
         this.contextMenu.open(this.map, e.lnglat)
       }
       // this.subscribe.execute('rightclick', {
@@ -283,9 +303,10 @@ export default class MapEditor {
     })
     polygon.on('click', e => {
       const { lnglat: { lng, lat }, target } = e
-      const pos = [lng, lat]
-      const data = target.getOptions()
-      this.contextMenu && this.contextMenu.close()
+      if (this.contextMenu) {
+        this.contextMenu.close()
+        this.contextMenuTarget = null
+      }
       // this.subscribe.execute('click', {
       //   type: 'polygon',
       //   target: event.target
@@ -444,7 +465,6 @@ export default class MapEditor {
    */
   focusCompany(target, areaList) {
     // 显示当前行政区的片区
-    const extData = target.getExtData()
     this.updateArea(areaList)
     // 隐藏所有行政区轮廓
     this.companyGroup.hide()

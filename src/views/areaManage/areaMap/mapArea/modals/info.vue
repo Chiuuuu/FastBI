@@ -7,6 +7,18 @@
     :footer="null"
     @cancel="handleCloseSetting"
     >
+    <!-- 分公司信息载体 -->
+    <template v-if="type === 'company'">
+      <div class="setting-row">
+        <div class="setting-label">公司名称</div>
+        <div class="setting-value">{{ data.name }}</div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">{{ data.name === '从化' || data.name === '增城' ? '网格数量' : '片区数量' }}</div>
+        <div class="setting-value">{{ data.areaCnt || 0 }}</div>
+      </div>
+    </template>
+
     <!-- 片区信息载体 -->
     <template v-if="type === 'polygon'">
       <div class="setting-row">

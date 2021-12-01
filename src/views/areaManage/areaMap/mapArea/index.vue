@@ -277,6 +277,9 @@ export default {
       if (this.mapInstance) {
         this.mapInstance.updateContextMenu(this.handleContextMenu())
       }
+    },
+    floor() { // 每次层级变化,重新渲染右键
+      this.mapInstance.updateContextMenu(this.handleContextMenu())
     }
   },
   async mounted() {
@@ -419,31 +422,50 @@ export default {
     handleContextMenu() {
       const self = this
       let contextMenu = []
-      if (this.mode === 'edit' && !this.$parent.fullScreen) {
+      if (self.floor === 1 && self.mode === 'edit' && !self.$parent.fullScreen) {
         contextMenu = [
           {
             text: '查看信息',
-            callback(polygon) {
-              const name = polygon.getExtData().name
-              self.infoType = 'polygon'
-              const data = self.drawnList.find(item => item.name === name)
-              if (data) {
+            callback: async ({ type, target }) => {
+              self.infoType = type
+              if (type === 'company') {
+                const data = target.getExtData()
+                // 增城从化特殊处理(需调接口获取网格数量)
+                if ((data.name === '从化' || data.name === '增城') && !data.areaCnt) {
+                  self.markerList = await self.getMarkerList({
+                    headOffice: data.name
+                  }) || []
+                  data.areaCnt = self.markerList.length
+                }
+                self.infoType = 'company'
                 self.infoData = data
-              } else {
-                self.infoData = self.currentArea
+              }
+              if (type === 'polygon') {
+                const name = target.getExtData().name
+                const data = self.drawnList.find(item => item.name === name)
+                if (data) {
+                  self.infoData = data
+                } else {
+                  self.infoData = self.currentArea
+                }
+              }
+              if (type === 'marker') {
+                self.infoType = 'marker'
+                const data = target.getExtData()
+                self.infoData = data
               }
               self.showInfo = true
             }
           },
           {
             text: '编辑片区',
-            callback: async function(polygon) {
-              const name = polygon.getExtData().name
+            callback: async function({ type, target }) {
+              const name = target.getExtData().name
               if (self.showEdit) {
                 return self.$message.error('请先结束当前片区编辑')
               }
               self.currentArea = self.drawnList.find(item => item.name === name)
-              self.handleOpenEditor(polygon)
+              self.handleOpenEditor(target)
               self.disabledToolbar = true
               self.markerList = await self.getMarkerList()
               if (self.markerList.length) {
@@ -453,8 +475,8 @@ export default {
           },
           {
             text: '配置样式',
-            callback(polygon) {
-              const name = polygon.getExtData().name
+            callback({ type, target }) {
+              const name = target.getExtData().name
               if (self.showEdit && name !== self.currentArea.name) {
                 return self.$message.error('请先结束当前片区编辑')
               }
@@ -467,8 +489,8 @@ export default {
           },
           {
             text: '移除片区',
-            callback(polygon) {
-              const name = polygon.getExtData().name
+            callback({ type, target }) {
+              const name = target.getExtData().name
               if (self.showEdit) {
                 return self.$message.error('请先结束当前片区编辑')
               }
@@ -494,10 +516,34 @@ export default {
         contextMenu = [
           {
             text: '查看信息',
-            callback: (polygon) => {
-              const name = polygon.getExtData().name
-              self.infoType = 'polygon'
-              self.infoData = self.drawnList.find(item => item.name === name)
+            callback: async ({ type, target }) => {
+              self.infoType = type
+              if (type === 'company') {
+                const data = target.getExtData()
+                // 增城从化特殊处理(需调接口获取网格数量)
+                if ((data.name === '从化' || data.name === '增城') && !data.areaCnt) {
+                  self.markerList = await self.getMarkerList({
+                    headOffice: data.name
+                  }) || []
+                  data.areaCnt = self.markerList.length
+                }
+                self.infoType = 'company'
+                self.infoData = data
+              }
+              if (type === 'polygon') {
+                const name = target.getExtData().name
+                const data = self.drawnList.find(item => item.name === name)
+                if (data) {
+                  self.infoData = data
+                } else {
+                  self.infoData = self.currentArea
+                }
+              }
+              if (type === 'marker') {
+                self.infoType = 'marker'
+                const data = target.getExtData()
+                self.infoData = data
+              }
               self.showInfo = true
             }
           }
@@ -515,7 +561,28 @@ export default {
       })
 
       // 订阅相关事件
-      this.mapInstance.subscribe.on('click', ({ type, target }) => {
+      this.mapInstance.subscribe.on('click', async ({ type, target }) => {
+        if (type === 'company') {
+          const data = target.getExtData()
+          // 增城从化特殊处理(需调接口获取网格数量)
+          if (data.name === '从化' || data.name === '增城') {
+            this.markerList = await this.getMarkerList({
+              headOffice: data.name
+            }) || []
+            data.areaCnt = this.markerList.length
+          }
+          this.infoType = 'company'
+          this.infoData = data
+          this.showInfo = true
+        }
+        if (type === 'area') {
+          this.infoType = 'area'
+          const data = target.getExtData()
+          this.infoData = data
+          // const data = target
+          // this.infoData = data
+          this.showInfo = true
+        }
         if (type === 'marker') {
           this.infoType = 'marker'
           const data = target.getExtData()
