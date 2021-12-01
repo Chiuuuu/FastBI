@@ -59,7 +59,7 @@ export default {
       if (this.$refs.MapArea && this.$refs.MapArea.showEdit) {
         return this.$message.error('请先结束当前片区编辑')
       }
-      const docElm = document.querySelector('#mapArea')
+      const docElm = document.querySelector('#map')
       if (docElm) {
         if (docElm.requestFullscreen) {
           // W3C

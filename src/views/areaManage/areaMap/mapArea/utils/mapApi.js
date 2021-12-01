@@ -106,6 +106,10 @@ export default class MapEditor {
     /* ---------------------------------------注册事件--------------------------------------- */
 
     // 双击放大当前分公司
+    this.companyGroup.on('click', e => {
+      this.contextMenu.close()
+      this.contextMenuTarget = null
+    })
     this.companyGroup.on('dblclick', e => {
       if (this.infoWindow) this.infoWindow.close()
       this.subscribe.execute('dblclick', {
@@ -206,6 +210,10 @@ export default class MapEditor {
       }
       this.contextMenu.close()
       this.contextMenu.open(this.map, e.lnglat)
+    })
+    this.markerList.on('click', e => {
+      this.contextMenu.close()
+      this.contextMenuTarget = null
     })
     this.map.add(this.markerList)
 

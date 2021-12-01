@@ -1,5 +1,5 @@
 <template>
-  <a-spin :spinning="spinning || selectLoading" tip="地图加载中" class="map-area">
+  <a-spin :spinning="spinning || selectLoading" tip="地图加载中" id="map" class="map-area">
     <!-- 地图载体(修改了id记得修改AreaInfo里的挂载函数) -->
     <div id="mapArea" style="width:100%;height:100%"></div>
 
@@ -11,7 +11,7 @@
         @click="showSearch = !showSearch"
       ></a-button>
       <div :class="['bar-select', { show: showSearch }]">
-        <a-select style="width: 80px" v-model="searchType">
+        <a-select style="width: 80px" v-model="searchType" :getPopupContainer="getPopupContainer">
           <a-select-option value="company">分公司</a-select-option>
           <a-select-option value="area">片区</a-select-option>
         </a-select>
@@ -24,6 +24,7 @@
           show-search
           allowClear
           :filter-option="filterOption"
+          :getPopupContainer="getPopupContainer"
           @change="handleSearch"
           @pressEnter="handleSearch"
         >
@@ -43,6 +44,7 @@
           show-search
           allowClear
           :filter-option="filterOption"
+          :getPopupContainer="getPopupContainer"
           @change="handleSearch"
           @pressEnter="handleSearch"
         >
@@ -59,7 +61,7 @@
     </div>
 
     <!-- 右侧操作栏 -->
-    <div v-if="mode === 'edit' && floor === 1" class="map-area-toolbar">
+    <div v-if="mode === 'edit' && floor === 1 && !this.$parent.fullScreen" class="map-area-toolbar">
       <a-tooltip title="绘制片区">
         <a-button
           icon="block"
@@ -206,7 +208,6 @@ import AreaSetting from './modals/setting.vue'
 import AreaInfo from './modals/info.vue'
 import { BaseSetting, MapSetting } from './utils/baseSetting'
 import { deepClone } from '@/utils/deepClone'
-import mockData from './utils/mock'
 
 export default {
   name: 'mapArea',
@@ -288,6 +289,9 @@ export default {
     this.initMapInstance()
   },
   methods: {
+    getPopupContainer() {
+      return document.querySelector('#map')
+    },
     // 获取分公司列表
     async handleGetCompanyList() {
       this.selectLoading = true

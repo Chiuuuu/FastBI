@@ -24,7 +24,7 @@ export default {
   methods: {
     // 点击全屏按钮
     handleFullScreen() {
-      const docElm = document.querySelector('#mapArea')
+      const docElm = document.querySelector('#map')
       if (docElm) {
         if (docElm.requestFullscreen) {
           // W3C
