@@ -686,6 +686,10 @@ export default {
     // 返回上一层
     backFloor() {
       let index = --this.floor
+      // 针对没有片区的分公司, 直接回到首层
+      if (!this.areaList.length && this.floor === 1) {
+        index = --this.floor
+      }
       if (index === 0) { // 行政区层
         // 清空下拉框
         this.companyName = undefined
@@ -843,6 +847,7 @@ export default {
         if (res !== 'error') {
           this.mapInstance.focusCompany(target, this.drawnList)
         }
+        this.floor = 1
       } else {
         // 没有片区, 直接渲染网格点
         this.drawnList = []
@@ -853,8 +858,8 @@ export default {
         if (this.markerList.length) {
           this.mapInstance.initMarkers(this.markerList, this.currentArea)
         }
+        this.floor = 2
       }
-      this.floor = 1
     },
     // 聚焦多边形
     handleFocusPolygon(name) {
