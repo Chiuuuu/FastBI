@@ -77,7 +77,7 @@
         :slot="'custom_' + i"
         slot-scope="text, record, index"
       >
-        <a-input :maxLength="handleMaxLength(col.dataIndex)" @change="change($event, col.dataIndex, i)" v-model="editRow[col.dataIndex]" v-if="activeIndex === index" :key="i"></a-input>
+        <a-input :maxLength="handleMaxLength(col.dataIndex)" v-model="editRow[col.dataIndex]" v-if="activeIndex === index" :key="i"></a-input>
         <span v-else :key="i" :title="text">{{ text }}</span>
       </template>
 
@@ -285,9 +285,6 @@ export default {
     this.handleGetData()
   },
   methods: {
-    change(e, key, i) {
-      console.log(e, key, i)
-    },
     async handleGetData() {
       if (this.activeIndex > -1) {
         return this.$message.error('请先保存当前编辑行')

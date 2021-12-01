@@ -705,6 +705,10 @@ export default class MapEditor {
         this.currentPolygon.setOptions(defaultSetting)
         this.currentPolygon.setPath(defaultSetting.polygon.path || [])
         this.handlePolygonTitle()
+        // 如果之前清除过, 重新渲染
+        if (!this.currentPolygon.getOptions().map) {
+          this.map.add(this.polygonList)
+        }
       }
       this.subscribe.execute('closeEditor', {
         type: 'editor',
