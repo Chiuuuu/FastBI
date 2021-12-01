@@ -61,57 +61,6 @@
 </template>
 <script>
 import FieldSelect from '@/components/dataSource/field-select/select'
-const column = [
-  {
-    title: '原名',
-    dataIndex: 'originName'
-  },
-  {
-    title: '别名',
-    dataIndex: 'alias',
-    width: 150,
-    scopedSlots: {
-      customRender: 'alias'
-    }
-  },
-  {
-    title: '字段类型',
-    dataIndex: 'convertType',
-    scopedSlots: {
-      customRender: 'convertType'
-    }
-  },
-  {
-    title: '字段属性',
-    dataIndex: 'role',
-    scopedSlots: {
-      customRender: 'role'
-    }
-  },
-  {
-    title: '字段说明',
-    dataIndex: 'description',
-    width: 150,
-    scopedSlots: {
-      customRender: 'description'
-    }
-  },
-  {
-    title: '注释',
-    dataIndex: 'comment',
-    width: 100,
-    scopedSlots: {
-      customRender: 'comment'
-    }
-  },
-  {
-    title: '是否可见',
-    dataIndex: 'visible',
-    scopedSlots: {
-      customRender: 'visible'
-    }
-  }
-]
 export default {
   name: 'batchSettingItem',
   components: {
@@ -134,6 +83,57 @@ export default {
     }
   },
   data() {
+    const column = [
+      {
+        title: '原名',
+        dataIndex: 'originName'
+      },
+      {
+        title: '别名',
+        dataIndex: 'alias',
+        width: 150,
+        scopedSlots: {
+          customRender: 'alias'
+        }
+      },
+      {
+        title: '字段类型',
+        dataIndex: 'convertType',
+        scopedSlots: {
+          customRender: 'convertType'
+        }
+      },
+      {
+        title: '字段属性',
+        dataIndex: 'role',
+        scopedSlots: {
+          customRender: 'role'
+        }
+      },
+      {
+        title: '字段说明',
+        dataIndex: 'description',
+        width: 150,
+        scopedSlots: {
+          customRender: 'description'
+        }
+      },
+      {
+        title: '注释',
+        dataIndex: 'comment',
+        width: 100,
+        scopedSlots: {
+          customRender: 'comment'
+        }
+      },
+      {
+        title: '是否可见',
+        dataIndex: 'visible',
+        scopedSlots: {
+          customRender: 'visible'
+        }
+      }
+    ]
     return {
       column,
       fieldContenxtMenu: [
