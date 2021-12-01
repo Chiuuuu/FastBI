@@ -307,7 +307,11 @@ export default {
     },
     // 获取片区列表
     async handleGetAreaList(name) {
-      const res = await this.$server.mapArea.getAreaList({ name })
+      this.selectLoading = true
+      this.areaList = []
+      const res = await this.$server.mapArea.getAreaList({ name }).finally(() => {
+        this.selectLoading = false
+      })
       if (res && res.code === 200) {
         this.areaList = res.data
       } else {
@@ -596,8 +600,6 @@ export default {
         if (this.showEdit) {
           return this.$message.error('请先结束当前片区编辑')
         }
-        const fit = this.mapInstance.map.getFitZoomAndCenterByOverlays([target])
-        this.mapInstance.map.setZoomAndCenter(...fit)
         // 双击行政区, 显示片区
         if (type === 'company') {
           this.handleFocusCompany(target)
@@ -624,6 +626,7 @@ export default {
             section: name
           }) || []
           if (this.markerList.length) {
+            this.mapInstance.map.setZoomAndCenter(...fit)
             this.mapInstance.initMarkers(this.markerList, this.currentArea)
           }
         }

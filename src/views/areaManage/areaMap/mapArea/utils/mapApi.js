@@ -65,7 +65,7 @@ export default class MapEditor {
       if (sections) {
         areaCnt = sections.sections.length
         // 中心文字(越荔分公司只显示一个)
-        if (district !== '越秀区') {
+        if (district !== '荔湾区') {
           companyTextList.push(new AMap.Text({
             position: item.properties.centroid,
             anchor: 'bottom-center',
@@ -448,10 +448,10 @@ export default class MapEditor {
         const path = item.getBounds()
         if (path) {
           const fit = this.map.getFitZoomAndCenterByOverlays([item])
-          this.map.setZoomAndCenter(...fit)
           this.subscribe.execute('focus', {
             type: 'polygon',
-            target: item
+            target: item,
+            fit
           })
         }
       }
