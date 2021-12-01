@@ -833,16 +833,8 @@ export default {
     // 聚焦行政区(分公司)
     async handleFocusCompany(target) {
       // 获取该分公司的片区列表
-      const company = this.companyList.find(item => {
-        let name = item.headOfficeName
-        const companyName = target.getExtData().name
-        // TODO: 越荔分公司特殊处理
-        if (name === '越荔分公司') {
-          return ['越秀', '荔湾'].indexOf(companyName) > -1
-        } else {
-          return name.indexOf(companyName) > -1
-        }
-      })
+      const name = target.getExtData().name
+      const company = this.companyList.find(item => item.headOfficeName === name)
       if (!company) return
       await this.handleGetAreaList(company.headOfficeName)
       // 如果该公司下有片区, 则渲染片区
@@ -887,13 +879,9 @@ export default {
         const company = this.getCompanyByAreaName(name)
         if (!company) return
         let companyName = company.headOfficeName
-        // TODO: 越荔分公司2个行政区合并, 特殊处理
-        if (companyName === '越荔分公司') {
-          companyName = '越秀'
-        }
         let target = null
         this.mapInstance.companyGroup.eachOverlay(item => {
-          if (companyName.indexOf(item.getExtData().name) > -1) {
+          if (companyName === item.getExtData().name) {
             target = item
           }
         })
@@ -904,14 +892,10 @@ export default {
         this.companyName = name
         this.areaName = undefined
         if (!name) return
-        // TODO: 越荔分公司2个行政区合并, 特殊处理
-        if (name === '越荔分公司') {
-          name = '越秀'
-        }
         // 聚焦分公司
         let target = null
         this.mapInstance.companyGroup.eachOverlay(item => {
-          if (name.indexOf(item.getExtData().name) > -1) {
+          if (name === item.getExtData().name) {
             target = item
           }
         })
