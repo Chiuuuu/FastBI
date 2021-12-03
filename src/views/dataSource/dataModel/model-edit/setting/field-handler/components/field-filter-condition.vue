@@ -178,9 +178,7 @@ export default {
       this.getFieldData()
     }
     // 列表赋值
-    if (!this.isNumber) {
-      this.checkedData = [].concat(this.conditionData.rule.ruleFilterList || [])
-    } else {
+    if (this.isNumber) {
       this.customData = [].concat(this.conditionData.rule.ruleFilterList || [])
     }
   },
@@ -285,8 +283,7 @@ export default {
           return false
         }
         this.spinning = true
-        // 只保存当前数据列表里有的数据
-        this.conditionData.rule.ruleFilterList = this.checkedData.filter(item => this.dataRows.includes(item))
+        this.conditionData.rule.ruleFilterList = this.checkedData
       } else {
         if (this.customData.length < 1) {
           this.$message.error('请添加条件')
@@ -369,6 +366,10 @@ export default {
         }) // 维度全字段列表
         if (hasNull) list.unshift('')
         this.dataRows = list
+        // 从最新数据中过滤掉被删除的行数据
+        const checkedData = this.conditionData.rule.ruleFilterList.filter(item => this.dataRows.includes(item)) || []
+        this.checkedData = checkedData
+        this.conditionData.rule.ruleFilterList = checkedData
       }
       this.dataRowsResult = this.dataRows
     }
