@@ -104,11 +104,14 @@ export default class MapEditor {
     this.map.add([this.companyGroup, this.companyTextGroup])
 
     /* ---------------------------------------注册事件--------------------------------------- */
-
     // 双击放大当前分公司
-    this.companyGroup.on('click', e => {
+    this.companyTextGroup.on('dblclick', e => {
       this.contextMenu.close()
       this.contextMenuTarget = null
+      this.subscribe.execute('dblclick', {
+        type: 'text',
+        target: e.target
+      })
     })
     this.companyGroup.on('dblclick', e => {
       if (this.infoWindow) this.infoWindow.close()
@@ -118,7 +121,12 @@ export default class MapEditor {
       })
     })
 
-    // 单击显示分公司信息
+    this.companyGroup.on('click', e => {
+      this.contextMenu.close()
+      this.contextMenuTarget = null
+    })
+
+    // 右键显示分公司信息
     this.companyGroup.on('rightclick', e => {
       this.contextMenuTarget = {
         type: 'company',
@@ -269,6 +277,15 @@ export default class MapEditor {
         text: area.name,
         zIndex: 9,
         clickable: false
+      })
+      title.on('dblclick', e => {
+        // 双击放大当前片区
+        this.contextMenu.close()
+        this.contextMenuTarget = null
+        this.subscribe.execute('dblclick', {
+          type: 'text',
+          target: e.target
+        })
       })
       title.setMap(this.map)
       const target = this.polygonTextList.find(item => item.name === area.name)

@@ -613,6 +613,18 @@ export default {
         if (type === 'polygon') {
           this.handleFocusPolygon(target.getExtData().name)
         }
+
+        // 双击文字标题, 聚焦当前区域
+        if (type === 'text') {
+          const text = target.getText()
+          // 判断层级
+          if (this.floor === 0) {
+            this.searchType = 'company'
+          } else if (this.floor === 1) {
+            this.searchType = 'area'
+          }
+          this.handleSearch(text)
+        }
       })
       this.mapInstance.subscribe.on('focus', async ({ type, target, fit }) => {
         // 聚焦公司
