@@ -97,12 +97,21 @@
               @change="onCheckAllChange"
               >全选</a-checkbox
             >
-            <a-checkbox-group
+            <!-- <a-checkbox-group
               class="f-flexcolumn"
               v-model="currentFile.checkedList"
               :options="pageDataRows"
               @change="onChange"
-            />
+            /> -->
+            <a-checkbox
+              class="block-checkbox"
+              v-for="item in pageDataRows"
+              :key="item"
+              :checked="currentFile.checkedList.includes(item)"
+              @change="onCheckChange($event, item)"
+            >
+              {{ item }}
+            </a-checkbox>
           </ScrollPage>
           <!-- </b-scrollbar> -->
         </div>
@@ -399,6 +408,7 @@ export default {
     },
     // 列表模糊查询
     search() {
+      const checkAll = this.currentFile.checkedList.length === this.currentFile.searchList.length
       if (!this.listValue) {
         this.currentFile.searchList = this.currentFile.originList
         this.isEmpty = true
@@ -416,6 +426,13 @@ export default {
         })
         return match
       }))
+      // 如果是全选状态, 选中当前所有筛选项
+      if (checkAll) {
+        this.currentFile.checkedList = [].concat(this.currentFile.searchList)
+      } else {
+        // 不是全选状态, 过滤掉非当前搜索结果
+        this.currentFile.checkedList = this.currentFile.searchList.filter(item => this.currentFile.checkedList.includes(item))
+      }
       // 不强制刷新的话, 不会触发updated()
       this.$forceUpdate()
     },
@@ -460,11 +477,26 @@ export default {
         this.currentFile.checkedList.length ===
         this.currentFile.originList.length // 判断是否全选
     },
+    onCheckChange(e, value) {
+      const checked = e.target.checked
+      if (checked) {
+        this.currentFile.checkedList.push(value)
+      } else {
+        const len = this.currentFile.checkedList.length
+        for (let i = 0; i < len; i++) {
+          const item = this.currentFile.checkedList[i]
+          if (item === value) {
+            this.currentFile.checkedList.splice(i, 1)
+            break
+          }
+        }
+      }
+    },
     // 点击全选
     onCheckAllChange(e) {
       this.checkAll = e.target.checked
       this.currentFile.checkedList = e.target.checked
-        ? this.currentFile.searchList
+        ? [].concat(this.currentFile.searchList)
         : []
     },
     // 手动，添加字段
@@ -1071,4 +1103,9 @@ export default {
 }
 </script>
 
-<style></style>
+<style scoped>
+.block-checkbox {
+  display: block;
+  margin-left: 0 !important;
+}
+</style>

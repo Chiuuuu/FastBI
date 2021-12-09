@@ -33,11 +33,20 @@
               >全选</a-checkbox
             >
             <br />
-            <a-checkbox-group
+            <!-- <a-checkbox-group
               class="block-checkbox"
               v-model="checkedData"
               :options="pageDataRows"
-            />
+            /> -->
+            <a-checkbox
+              class="block-checkbox"
+              v-for="item in pageDataRows"
+              :key="item"
+              :checked="checkedData.includes(item)"
+              @change="onCheckChange($event, item)"
+            >
+              {{ item }}
+            </a-checkbox>
           </ScrollPage>
         </a-spin>
       </template>
@@ -203,7 +212,22 @@ export default {
     //   const field = this.pivotSchema.find(item => item.alias === data.alias)
     //   return field || data
     // },
+    onCheckChange(e, value) {
+      const checked = e.target.checked
+      if (checked) {
+        this.checkedData.push(value)
+      } else {
+        for (let i = 0; i < this.checkedData.length; i++) {
+          const item = this.checkedData[i]
+          if (item === value) {
+            this.checkedData.splice(i, 1)
+            break
+          }
+        }
+      }
+    },
     onSearch() {
+      const checkAll = this.checkedData.length === this.dataRowsResult.length
       const keyword = (this.searchWord || '').toLowerCase()
       const list = keyword.split(',')
       this.dataRowsResult = this.dataRows.filter(item => {
@@ -215,11 +239,18 @@ export default {
         })
         return match
       })
+      // 如果是全选状态, 选中当前所有筛选项
+      if (checkAll) {
+        this.checkedData = [].concat(this.dataRowsResult)
+      } else {
+        // 不是全选状态, 过滤掉非当前搜索结果
+        this.checkedData = this.dataRowsResult.filter(item => this.checkedData.includes(item))
+      }
     },
     onCheckAllChange(e) {
       const value = e.target.checked
       if (value) {
-        this.checkedData = this.dataRowsResult
+        this.checkedData = [].concat(this.dataRowsResult)
       } else {
         this.checkedData = []
       }
@@ -393,6 +424,10 @@ export default {
 }
 .input-area {
   margin: 10px 0;
+}
+.block-checkbox {
+  display: block;
+  margin-left: 0 !important;
 }
 .block-checkbox @{deep} .ant-checkbox-group-item {
   display: block;
