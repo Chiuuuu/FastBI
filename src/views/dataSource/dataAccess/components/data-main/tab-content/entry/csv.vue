@@ -1,5 +1,9 @@
 <template>
-  <a-spin :spinning="saveLoading" :tip="saveTip" class="tab-excel tab-datasource">
+  <a-spin
+    :spinning="saveLoading"
+    :tip="saveTip"
+    class="tab-excel tab-datasource"
+  >
     <div class="tab-datasource-model scrollbar">
       <a-form-model
         ref="fileForm"
@@ -115,7 +119,8 @@
             :currentFieldList="currentFieldList"
             :currentColumns="currentColumns"
             :show-switch="showFieldSwitch"
-            @changeDataType="changeDataType" />
+            @changeDataType="changeDataType"
+          />
         </a-col>
       </a-row>
     </div>
@@ -299,11 +304,14 @@ export default {
     handleOperationDelimiter() {
       // 如果不是库里的分隔符, 要录入操作数组operation: 4
       const currentFile = this.fileInfoList[this.currentFileIndex]
-      const index = this.operation.findIndex(item => item.name === currentFile.name)
+      const index = this.operation.findIndex(
+        item => item.name === currentFile.name
+      )
       if (!isNaN(currentFile.id)) {
         if (currentFile.delimiter === this.queryDelimiter) {
           // 恢复了分隔符
-          if (index > -1) { // 如果operation里面有对象则的删除
+          if (index > -1) {
+            // 如果operation里面有对象则的删除
             this.operation.splice(index, 1)
           }
         } else {
@@ -372,16 +380,19 @@ export default {
       }
       const table = this.databaseList[this.currentFileIndex]
       // const rows = table.originRows
-      const head = { [name]: this.currentColumns.slice(1).map(item => ({
-        name: item.title,
-        dataType: item.dataType
-      })) }
+      const head = {
+        [name]: this.currentColumns.slice(1).map(item => ({
+          name: item.title,
+          dataType: item.dataType
+        }))
+      }
       const data = new FormData()
       data.append('sheetsHeaderJson', JSON.stringify(head))
       data.append('sheetName', name)
       data.append('delimiter', this.queryDelimiter)
       data.append('file', file)
-      const res = await this.$server.dataAccess.actionChangeCsvType(data)
+      const res = await this.$server.dataAccess
+        .actionChangeCsvType(data)
         .finally(() => {
           this.spinning = false
         })
@@ -427,15 +438,14 @@ export default {
         const file = this.fileInfoList[index]
         const target = this.operation.find(item => item.name === file.name)
         // 赋值当前表单的分隔符
-        this.form.delimiter = target ? this.formatDelimiter(target.delimiter) : this.formatDelimiter(file.delimiter)
+        this.form.delimiter = target
+          ? this.formatDelimiter(target.delimiter)
+          : this.formatDelimiter(file.delimiter)
         // 首先判断该文件是否进行过操作, 如果有, 则读文件, 没有则读presto数据
         const isPresto = !target
         this.renderCurrentTable(isPresto)
 
-        this.$store.dispatch(
-          'dataAccess/setDatabaseName',
-          file.name
-        )
+        this.$store.dispatch('dataAccess/setDatabaseName', file.name)
       }
     },
     // 校验文件
@@ -665,6 +675,11 @@ export default {
             delimiter: this.queryDelimiter,
             database: database
           })
+        } else {
+          const target = this.operation.find(item => item.name === name)
+          if (target) {
+            target.database = database
+          }
         }
 
         this.$nextTick(() => {
@@ -753,20 +768,22 @@ export default {
           if (isPresto) {
             // 单纯地读入库文件, 直接查presto
             this.spinning = true
-            res = await this.$server.dataAccess.getCsvPrestoTableInfo(id)
-            .finally(() => {
-              this.spinning = false
-            })
+            res = await this.$server.dataAccess
+              .getCsvPrestoTableInfo(id)
+              .finally(() => {
+                this.spinning = false
+              })
           } else {
             // 否则需要根据id找到文件重新根据分隔符切割数据
             const formData = new FormData()
             formData.append('databaseId', id)
             formData.append('delimiter', this.queryDelimiter)
             this.spinning = true
-            res = await this.$server.dataAccess.getCsvFileTableInfo(formData)
-            .finally(() => {
-              this.spinning = false
-            })
+            res = await this.$server.dataAccess
+              .getCsvFileTableInfo(formData)
+              .finally(() => {
+                this.spinning = false
+              })
           }
         }
         if (res.code === 200) {
@@ -799,12 +816,13 @@ export default {
         }
       }
       const columns = new Array({
-          title: '序号',
-          dataIndex: 'no',
-          scopedSlots: {
-            customRender: 'no'
-          }
-        }).concat(table.headerList.map((col, index) => {
+        title: '序号',
+        dataIndex: 'no',
+        scopedSlots: {
+          customRender: 'no'
+        }
+      }).concat(
+        table.headerList.map((col, index) => {
           return {
             title: col.name,
             dataType: col.dataType,
@@ -882,10 +900,16 @@ export default {
             }
             for (const key in item) {
               if (key !== 'database') {
-                formData.append('csvDatabaseList[' + index + '].' + key, item[key])
+                formData.append(
+                  'csvDatabaseList[' + index + '].' + key,
+                  item[key]
+                )
               } else {
                 const database = item[key] || {}
-                formData.append('csvDatabaseList[' + index + '].sheetsHeaderJson', JSON.stringify({ [item.name]: database.headerList }))
+                formData.append(
+                  'csvDatabaseList[' + index + '].sheetsHeaderJson',
+                  JSON.stringify({ [item.name]: database.headerList })
+                )
               }
             }
           }
@@ -895,12 +919,24 @@ export default {
             .then(result => {
               if (result.code === 200) {
                 this.$message.success('保存成功')
-                this.$store.dispatch('dataAccess/getMenuList', this.accessInstance.$refs.menu)
+                this.$store.dispatch(
+                  'dataAccess/getMenuList',
+                  this.accessInstance.$refs.menu
+                )
                 this.$store.dispatch('dataAccess/setFirstFinished', true)
                 this.$store.dispatch('dataAccess/setModelName', this.form.name)
-                this.$store.dispatch('dataAccess/setModelId', result.data.datasource.id)
-                this.$store.commit('common/SET_MENUSELECTID', result.data.datasource.id)
-                this.$store.commit('common/SET_PRIVILEGES', result.data.datasource.privileges || [])
+                this.$store.dispatch(
+                  'dataAccess/setModelId',
+                  result.data.datasource.id
+                )
+                this.$store.commit(
+                  'common/SET_MENUSELECTID',
+                  result.data.datasource.id
+                )
+                this.$store.commit(
+                  'common/SET_PRIVILEGES',
+                  result.data.datasource.privileges || []
+                )
                 this.fileInfoList = result.data.sourceDatabases
                 // this.$store.dispatch('dataAccess/setParentId', 0)
                 // 保存后清空列表
