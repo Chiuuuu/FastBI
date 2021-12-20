@@ -3,7 +3,7 @@
     <!-- 全选按钮 -->
     <a-checkbox
       v-if="checkable"
-      :checked="totalCheckedKeys.length === fieldList.length"
+      :checked="totalCheckedKeys.length > 0 && totalCheckedKeys.length === fieldList.filter(item => item.visible).length"
       @change="handleCheckAll($event, 'dimension')"
       >{{ checkAllText }}</a-checkbox
     >
@@ -110,12 +110,12 @@ export default {
       } else {
         nodes = new Array(nodeData)
       }
-      this.updateNodes(nodes, info.checked)
+      this.updateNodes(nodes.filter(item => item.visible), info.checked)
     },
     // 点击全选
     handleCheckAll(event) {
       const value = event.target.checked
-      this.checkedNodes = value ? this.fieldList : []
+      this.checkedNodes = value ? this.fieldList.filter(item => item.visible) : []
     },
     // 更新选中的节点
     updateNodes(nodes, checked) {
