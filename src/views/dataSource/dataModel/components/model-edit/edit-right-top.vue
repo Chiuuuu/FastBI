@@ -22,7 +22,7 @@
   </div>
 </template>
 <script>
-import { Utils, Node, conversionTree } from '../util'
+import { Utils, Node, conversionTree } from '../../util'
 import { mapState } from 'vuex'
 import TreeNode from './tree-node'
 import groupBy from 'lodash/groupBy'

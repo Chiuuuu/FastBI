@@ -86,7 +86,7 @@
   </div>
 </template>
 <script>
-import { Utils, Node } from '../util'
+import { Utils, Node } from '../../util'
 import findIndex from 'lodash/findIndex'
 import pullAllBy from 'lodash/pullAllBy'
 import TreeNodePoporverRow from './tree-node-popover-row'
@@ -717,7 +717,7 @@ export default {
                 width: 48px;
                 height: 30px;
                 margin: 10px auto 8px;
-                background: #fff url("../../../../assets/images/tableRelat.png") no-repeat;
+                background: #fff url("../../../../../assets/images/tableRelat.png") no-repeat;
                 &-01{
                   background-position: 0 0
                 }

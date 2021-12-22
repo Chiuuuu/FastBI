@@ -1,8 +1,13 @@
-@import "../dataModel-common.styl";
+@import "../../dataModel-common.styl";
 .Model-Edit {
     .left {
-        position relative
-        z-index 501
+        position: relative;
+        z-index: 501;
+        .source-select-options {
+            display: flex;
+            justify-content: space-between;  
+            align-items: center;  
+        }
         .sheet_list {
             margin-top: 15px;
             color: #01040f;
@@ -54,20 +59,20 @@
         .table_list.no-sql {
             height: calc(100% - 250px);
         }
+        .view_icon {
+            float: right;
+            margin-top: 5px;
+            margin-right: 10px;
+            font-size: 16px;
+            color: #617bff;
+            cursor: pointer;
+        }
         .SQL_View {
             color: #000;
             
             .view_title {
                 line-height: normal;
             }
-            .view_icon {
-                float: right;
-                margin-top: 5px;
-                margin-right: 10px;
-                font-size: 16px;
-                color: #617bff;
-                cursor: pointer;
-            } 
             .sheet_list_item {
                 padding-right: 70px;
                 text-align: left;

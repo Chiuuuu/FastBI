@@ -20,7 +20,10 @@ export default class MapEditor {
    * @param {*} options.companyList 右键事件注册
    */
   constructor(options = {}) {
-    this.map = new AMap.Map(options.container, options.mapOptions) // 当前地图
+    this.map = new AMap.Map(options.container, {
+      ...options.mapOptions,
+      // mapStyle: 'amap://styles/04f4373ed7932271ac3c6c80dec8487e'
+    }) // 当前地图
     this.contextMenu = null // 右键事件
     this.contextMenuTarget = null // 当前右键点击的对象({ type: '', target: null })
     this.mouseTool = null // 鼠标实例(绘制片区)

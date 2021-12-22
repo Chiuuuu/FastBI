@@ -1,11 +1,16 @@
 <template>
   <div class="Model-Edit">
     <div class="left">
-      <div class="menu_title">
-        <span>数据接入</span>
+      <div class="menu_search">
+        <span class="search_span">数据接入</span>
+        <a-icon
+          class="view_icon"
+          type="plus-square"
+          @click="openModal('source-list')"
+        />
       </div>
       <!-- 临时方案, 不写class了 -->
-      <div
+      <!-- <div
         :title="datasourceName"
         style="width: calc(100% - 30px);
         color: #01040f;
@@ -15,14 +20,30 @@
         overflow: hidden;"
       >
         {{ datasourceName }}
-      </div>
-      <!-- <div class="selector"> -->
-      <!-- <a-select default-value="银行账户" style="width: 94%;">
-          <a-select-option value="SQL Server">
-            SQL Server
-          </a-select-option>
-        </a-select> -->
-      <!-- </div> -->
+      </div> -->
+      <a-select
+        v-if="datasourceList.length > 0"
+        :value="datasourceId"
+        option-label-prop="label"
+        class="menu_select"
+        @change="handleSelectDatasource">
+        <a-select-option
+          v-for="item in datasourceList"
+          :key="item.id"
+          :value="item.id"
+          :label="item.name"
+          :type="item.type">
+          <div style="display: flex;justify-content: space-between;align-items: center;">
+            <span>{{ item.name }}</span>
+            <a-icon
+              v-show="item.id !== datasourceId"
+              type="delete"
+              title="删除"
+              :aria-label="item.name"
+              @click.stop="deleteDatasource(item)" />
+          </div>
+        </a-select-option>
+      </a-select>
       <a-divider />
       <div class="menu_search">
         <span class="search_span">数据库</span>
@@ -290,6 +311,7 @@
         @close="close"
         @success="data => componentSuccess(data)"
         @handleSaveFilterSort="handleSaveFilterSort"
+        @sourceSelected="handleAddDatasource"
       />
 
       <div class="submit_btn">
@@ -325,7 +347,8 @@ import CreateView from './setting/create-view'
 import PanelItem from './panel-item'
 import FieldAggregator from './setting/field-handler/field-aggregator'
 import FieldFilterSort from './setting/field-handler/field-filter-sort'
-import { Node, conversionTree } from '../util'
+import SourceList from '../sourceList'
+import { Node, conversionTree } from '../../util'
 import { hasPermission } from '@/utils/permission'
 import groupBy from 'lodash/groupBy'
 import keys from 'lodash/keys'
@@ -354,7 +377,8 @@ export default {
     PanelItem,
     CreateView, // 创建视图
     FieldAggregator, // 数据筛选
-    FieldFilterSort // 数据排序
+    FieldFilterSort, // 数据排序
+    SourceList // 数据源选择
   },
   provide() {
     return {
@@ -383,6 +407,7 @@ export default {
       spinning: false,
       detailInfo: '',
       datasourceName: '',
+      datasourceList: [],
       isDatabase: false, // 是否是SQL数据源, 控制自定义SQL渲染
       isCustomSql: false, // 是否自定义Sql标识
       tableSearch: '', // 表搜索关键字
@@ -470,10 +495,11 @@ export default {
     }
   },
   async mounted() {
-    this.handleGetDatabaseList()
     if (this.model === 'add') {
+      this.handleGetNewModelDataSource()
       await this.handleGetAddModelDatamodel()
     } else if (this.model === 'edit') {
+      await this.handleGetDataSource()
       await this.handleGetData(this.$route.query.modelId)
       this.$store.dispatch('dataModel/setModelId', this.$route.query.modelId)
       this.$store.commit('common/SET_MENUSELECTID', this.$route.query.modelId)
@@ -487,6 +513,33 @@ export default {
     this.$store.commit('common/SET_MENUSELECTID', -1)
   },
   methods: {
+    /**
+     * 编辑时根据modelId获取数据源
+     */
+    async handleGetDataSource() {
+      // 第一个数据库id
+      const res = await this.$server.dataModel.getDataSourceList(
+        this.$route.query.modelId
+      )
+      if (res.code === 200 && res.data) {
+        const data = res.data[0]
+        const datasourceId = data ? data.id : ''
+        this.datasourceList = res.data
+        this.$store.dispatch(
+          'dataModel/setDatasourceId',
+          datasourceId
+        )
+        this.$router.push({
+          name: 'modelEdit',
+          query: {
+            ...this.$route.query,
+            datasourceId
+          }
+        })
+      } else {
+        this.datasourceList = []
+      }
+    },
     /** 组合右键菜单 */
     handleComboContextmenus(type) {
       const arry = [
@@ -645,9 +698,9 @@ export default {
       this.handleFilterSort()
       this.handleGroupField()
     },
-    async handleGetDatabaseList() {
+    async handleGetNewModelDataSource() {
       if (!this.$route.query.datasourceId) return (this.datasourceName = '')
-      const result = await this.$server.dataModel.getDatabaseList(
+      const result = await this.$server.dataModel.getModelDataSourceList(
         this.$route.query.datasourceId
       )
       if (result.code === 200) {
@@ -655,9 +708,51 @@ export default {
         const type = result.data.type
         this.isDatabase = !baseBalck.some(item => item === type)
         this.isCustomSql = type === 13
-        this.datasourceName = result.data.name
+        this.datasourceList = [result.data]
+        this.$store.dispatch(
+          'dataModel/setDatasourceId',
+          result.data.id
+        )
       } else {
         this.$message.error(result.msg)
+      }
+    },
+    // 添加数据源
+    handleAddDatasource(sourceData) {
+      if (sourceData.id === this.datasourceId) return
+      const target = this.datasourceList.find(item => item.id === sourceData.id)
+      if (!target) {
+        this.datasourceList.push(sourceData)
+      }
+      // 对标select change事件的参数
+      this.handleSelectDatasource(sourceData.id, { data: { attrs: { ...sourceData } } })
+    },
+    // 选中数据源
+    handleSelectDatasource(id, option) {
+      const baseBalck = [11, 12] // 黑名单
+      const type = option.data.attrs.type
+      this.isDatabase = !baseBalck.some(item => item === type)
+      this.isCustomSql = type === 13
+      this.$store.dispatch(
+        'dataModel/setDatasourceId',
+        id
+      )
+      const privileges = [].concat(this.privileges)
+      this.$router.push({ path: this.$route.path, query: { ...this.$route.query, datasourceId: id } })
+      // 路由跳转后重新覆盖当前权限
+      this.$store.commit('common/SET_PRIVILEGES', privileges)
+      this.handleGetDatabase('source')
+    },
+    // 删除数据源
+    async deleteDatasource({ id }) {
+      const index = this.datasourceList.findIndex(item => item.id === id)
+      if (index > -1) {
+        const res = await this.$server.dataModel.actionVerifyDelModelToSource(id, this.detailInfo.config)
+        if (res.code === 200) {
+          this.datasourceList.splice(index, 1)
+        } else {
+          this.$message.error(res.msg || '该数据源已被引用, 请先删除拖入的表')
+        }
       }
     },
     /**
@@ -677,7 +772,7 @@ export default {
         this.$store.dispatch('dataModel/setAddModelId', result.data.id)
         this.$store.commit('common/SET_PRIVILEGES', [0]) // 新增赋予所有权限
         this.$nextTick(() => {
-          this.handleGetDatabase()
+          this.handleGetDatabase('source')
         })
       } else {
         this.$message.error(result.msg)
@@ -685,22 +780,26 @@ export default {
     },
     /**
      * 根据数据源获取数据库(暂时只支持显示第一个库)
+     * @param type table | source 根据表或源获取库
      */
-    async handleGetDatabase() {
-      const len = this.detailInfo.config.tables
-        ? this.detailInfo.config.tables.length
-        : 0
-      let tableId = ''
-      if (len > 0) {
-        tableId = this.detailInfo.config.tables[len - 1].tableId
+    async handleGetDatabase(type) {
+      let tableId = 1
+      if (type === 'table') {
+        const len = this.detailInfo.config.tables
+          ? this.detailInfo.config.tables.length
+          : 0
+        if (len > 0) {
+          tableId = this.detailInfo.config.tables[len - 1].tableId
+        }
       }
-      if (!this.$route.query.datasourceId) {
+      if (type === 'source' && !this.$route.query.datasourceId) {
         this.databaseList = []
         this.databaseName = ''
         return
       }
+      const datasourceId = type === 'source' ? this.$route.query.datasourceId : 1
       const result = await this.$server.dataModel.getDataBaseDataInfoList(
-        this.$route.query.datasourceId,
+        datasourceId,
         tableId
       )
 
@@ -712,6 +811,10 @@ export default {
             : ''
         if (this.databaseList.length && this.databaseList.length > 0) {
           this.handleGetDatabaseTable(result.data[0].id)
+          this.$store.dispatch(
+            'dataModel/setDatasourceId',
+            result.data[0].datasourceId
+          )
         }
         // this.handleDimensions()
         // this.handleMeasures()
@@ -1193,7 +1296,6 @@ export default {
         // 校验缺失字段
         this.doWithMissing(this.cacheDimensions, result.data.pivotSchema)
         this.doWithMissing(this.cacheMeasures, result.data.pivotSchema)
-
         this.$store.commit(
           'common/SET_PRIVILEGES',
           result.data.privileges || []
@@ -1204,7 +1306,7 @@ export default {
         this.handleMeasures()
         this.handleGroupField()
         this.$nextTick(() => {
-          this.handleGetDatabase()
+          this.handleGetDatabase('table')
         })
       } else {
         this.$message.error(result.msg)
@@ -1609,6 +1711,7 @@ export default {
      * 模型保存接口 cover: 是否覆盖大屏
      */
     async actionSaveModel(params, cover) {
+      await this.handleSaveModelSourceId()
       let result
       this.spinning = true
       if (cover) {
@@ -1623,9 +1726,6 @@ export default {
         })
       }
       if (result.code === 200) {
-        if (this.model === 'add') {
-          await this.handleSaveModelSourceId()
-        }
         this.$message
           .success({
             content: this.model === 'add' ? '保存成功' : '编辑成功',
@@ -1646,7 +1746,8 @@ export default {
      */
     async handleSaveModelSourceId() {
       this.$server.dataModel.saveDatasource({
-        sourceDatasourceList: new Array(this.datasource),
+        // sourceDatasourceList: new Array(this.datasource),
+        sourceDatasourceList: this.datasourceList,
         dataModelId: this.model === 'add' ? this.addModelId : this.modelId
       })
     },

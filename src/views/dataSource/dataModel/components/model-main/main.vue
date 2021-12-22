@@ -135,7 +135,7 @@
 
 <script>
 import TreeNode from './show-tree-node'
-import CheckTable from '../../model-edit/setting/check-table'
+import CheckTable from '../model-edit/setting/check-table'
 import { Node, conversionTree } from '../../util'
 import { hasPermission } from '@/utils/permission'
 import { mapState } from 'vuex'
@@ -270,23 +270,6 @@ export default {
         this.$message.error(result.msg)
       }
     },
-    /**
-     * 编辑时根据modelId获取数据源
-     */
-    async handleGetDataSource() {
-      // 第一个数据库id
-      const datsource = await this.$server.dataModel.getDataSourceList(
-        this.modelId
-      )
-      console.log('根据modelId获取数据源', datsource)
-      const data = datsource.data[0]
-      const datasourceId = data ? data.datasourceId : ''
-      this.$store.dispatch(
-        'dataModel/setDatasourceId',
-        datasourceId
-      )
-      return datasourceId
-    },
     // 打开模态框
     openModal() {
       this.visible = true
@@ -296,16 +279,16 @@ export default {
      */
     edit() {
       // this.$router.push({ path: `/dataSource/Model-Edit/${this.modelId}` })
-      this.handleGetDataSource().then(id => {
+      // this.handleGetDataSource().then(id => {
         this.$router.push({
           name: 'modelEdit',
           query: {
             type: 'edit',
-            datasourceId: id,
+            // datasourceId: id,
             modelId: this.modelId
           }
         })
-      })
+      // })
     },
     /**
      * 处理树形组件
