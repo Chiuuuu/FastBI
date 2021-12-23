@@ -522,20 +522,12 @@ export default {
         this.$route.query.modelId
       )
       if (res.code === 200 && res.data) {
-        const data = res.data[0]
-        const datasourceId = data ? data.id : ''
         this.datasourceList = res.data
-        this.$store.dispatch(
-          'dataModel/setDatasourceId',
-          datasourceId
-        )
-        this.$router.push({
-          name: 'modelEdit',
-          query: {
-            ...this.$route.query,
-            datasourceId
-          }
-        })
+        const data = res.data[0]
+        if (data) {
+          // 对标select change事件的参数
+          this.handleSelectDatasource(data.id, { data: { attrs: { ...data } } })
+        }
       } else {
         this.datasourceList = []
       }
@@ -811,10 +803,6 @@ export default {
             : ''
         if (this.databaseList.length && this.databaseList.length > 0) {
           this.handleGetDatabaseTable(result.data[0].id)
-          this.$store.dispatch(
-            'dataModel/setDatasourceId',
-            result.data[0].datasourceId
-          )
         }
         // this.handleDimensions()
         // this.handleMeasures()
@@ -1410,8 +1398,11 @@ export default {
     handleSQLDelete(item) {
       this.$server.dataModel
         .deleCustomSql({
-          name: item.name,
-          tableId: item.id
+          view: {
+            name: item.name,
+            tableId: item.id
+          },
+          config: this.detailInfo.config
         })
         .then(res => {
           if (res.code === 200) {

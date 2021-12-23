@@ -155,8 +155,9 @@ export default {
   /**
    * 删除自定义SQL
    * @param {Object} params
-   * @param {String} params.name
-   * @param {Number} params.tableId
+   * @param {String} params.view.name
+   * @param {Number} params.view.tableId
+   * @param {Number} params.config
    * @returns
    */
   deleCustomSql(params) {
