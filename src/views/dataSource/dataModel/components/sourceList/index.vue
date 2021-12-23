@@ -93,6 +93,7 @@ export default {
       sourceSearch: '',
       sourceList: [],
       sourceSearchList: [],
+      select: {},
       selectId: ''
     }
   },
@@ -146,6 +147,7 @@ export default {
     handleFileSelect(file) {
       if (this.selectId === file.id) return
       this.selectId = file.id
+      this.select = file
       this.$store.dispatch('dataModel/setDatasource', file)
     },
     /**
@@ -156,7 +158,7 @@ export default {
         return this.$message.error('请选择数据源')
       }
       this.$emit('close')
-      this.$emit('sourceSelected', this.sourceList.find(item => item.id === this.selectId))
+      this.$emit('sourceSelected', this.select)
     }
   }
 }
