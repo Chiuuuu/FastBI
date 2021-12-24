@@ -5,7 +5,7 @@
         :class="['dragable', { 'table-red': nodeData.props.status === 2, 'table-yellow': nodeData.props.status === 1}]"
         :draggable="isDrag"
         @mouseleave.stop="handleMouseLeave"
-        @mousedown.stop="handleMouseDown"
+        @mousedown.stop="handleMouseDown($event, nodeData)"
         @dragstart.stop="handleDragStart($event, nodeData, dataIndex)"
         @dragenter.stop="handleDragEnter"
         @dragleave.stop="handleDragLeave"
@@ -76,6 +76,7 @@
     <div class="wrap">
       <tree-node
         v-for="(item, subindex) in nodeData.children"
+        v-on="$listeners"
         :key="subindex"
         :node-data="item"
         :data-index="subindex"
@@ -381,8 +382,9 @@ export default {
         mIndex
       }
     },
-    handleMouseDown() {
+    handleMouseDown(event, item) {
       this.isDrag = true
+      this.$emit('tableSelect', item.getProps())
     },
     handleMouseLeave() {
       this.isDrag = false

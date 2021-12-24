@@ -2,7 +2,12 @@
 .Model-Edit {
     .left {
         position: relative;
+        overflow-y: auto;
         z-index: 501;
+
+        .left-spin-container {
+            height: 192px;    
+        }
         .source-select-options {
             display: flex;
             justify-content: space-between;  
@@ -53,11 +58,15 @@
                 }
             }
         }
+        .SQL_View .sheet_list {
+            height: calc(100% - 50px);
+        }
         .table_list {
-            height: calc(50% - 130px);
+            height: calc(50% - 150px);
+            min-height: 200px;
         }
         .table_list.no-sql {
-            height: calc(100% - 250px);
+            height: calc(100% - 260px);
         }
         .view_icon {
             float: right;

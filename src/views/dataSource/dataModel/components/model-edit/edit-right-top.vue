@@ -12,6 +12,7 @@
     <template v-else>
       <tree-node
         v-for="(item, index) in renderTables"
+        v-on="$listeners"
         :key="index"
         :node-data="item"
         :data-index="index"

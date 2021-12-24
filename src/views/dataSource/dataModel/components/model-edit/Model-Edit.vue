@@ -1,69 +1,73 @@
 <template>
   <div class="Model-Edit">
-    <div class="left">
-      <div class="menu_search">
-        <span class="search_span">数据接入</span>
-        <a-icon
-          class="view_icon"
-          type="plus-square"
-          @click="openModal('source-list')"
-        />
-      </div>
-      <!-- 临时方案, 不写class了 -->
-      <!-- <div
-        :title="datasourceName"
-        style="width: calc(100% - 30px);
-        color: #01040f;
-        margin: 0 15px;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;"
-      >
-        {{ datasourceName }}
-      </div> -->
-      <a-select
-        v-if="datasourceList.length > 0"
-        :value="datasourceId"
-        option-label-prop="label"
-        class="menu_select"
-        @change="handleSelectDatasource">
-        <a-select-option
-          v-for="item in datasourceList"
-          :key="item.id"
-          :value="item.id"
-          :label="item.name"
-          :type="item.type">
-          <div style="display: flex;justify-content: space-between;align-items: center;">
-            <span>{{ item.name }}</span>
+    <div class="left scrollbar">
+      <div class="left-spin-container">
+        <a-spin :spinning="databaseSpinning">
+          <div class="menu_search">
+            <span class="search_span">数据接入</span>
             <a-icon
-              v-show="item.id !== datasourceId"
-              type="delete"
-              title="删除"
-              :aria-label="item.name"
-              @click.stop="deleteDatasource(item)" />
+              class="view_icon"
+              type="plus-square"
+              @click="openModal('source-list')"
+            />
           </div>
-        </a-select-option>
-      </a-select>
-      <template v-if="!isCustomSql">
-        <a-divider />
-        <div class="menu_search">
-          <span class="search_span">数据库</span>
-        </div>
-        <a-select
-          v-model="databaseName"
-          class="menu_select"
-          @change="handleChangeDatabase"
-        >
-          <a-select-option
-            v-for="database in databaseList"
-            :key="database.id"
-            :value="database.name"
-            >{{ database.name || datasourceName }}</a-select-option
+          <!-- 临时方案, 不写class了 -->
+          <!-- <div
+            :title="datasourceName"
+            style="width: calc(100% - 30px);
+            color: #01040f;
+            margin: 0 15px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;"
           >
-        </a-select>
-      </template>
+            {{ datasourceName }}
+          </div> -->
+          <a-select
+            v-if="datasourceList.length > 0"
+            :value="datasourceId"
+            option-label-prop="label"
+            class="menu_select"
+            @change="handleSelectDatasource">
+            <a-select-option
+              v-for="item in datasourceList"
+              :key="item.id"
+              :value="item.id"
+              :label="item.name"
+              :type="item.type">
+              <div style="display: flex;justify-content: space-between;align-items: center;">
+                <span>{{ item.name }}</span>
+                <a-icon
+                  v-show="item.id !== datasourceId"
+                  type="delete"
+                  title="删除"
+                  :aria-label="item.name"
+                  @click.stop="deleteDatasource(item)" />
+              </div>
+            </a-select-option>
+          </a-select>
+          <template v-if="!isCustomSql">
+            <a-divider />
+              <div class="menu_search">
+                <span class="search_span">数据库</span>
+              </div>
+              <a-select
+                v-model="databaseName"
+                class="menu_select"
+                @change="handleChangeDatabase"
+              >
+                <a-select-option
+                  v-for="database in databaseList"
+                  :key="database.id"
+                  :value="database.name"
+                  >{{ database.name || datasourceName }}</a-select-option
+                >
+              </a-select>
+          </template>
+        </a-spin>
+      </div>
       <a-divider />
-      <div class="table_list" :class="{ 'no-sql': !isDatabase || isCustomSql }">
+      <a-spin :spinning="tableSpinning" class="table_list" :class="{ 'no-sql': !isDatabase || isCustomSql }">
         <div class="menu_search" v-if="!isCustomSql">
           <span class="search_span">表</span>
           <a-input
@@ -81,9 +85,9 @@
           :list="tableSearchList"
           @on-left-drag-leave="handleLeftDragLeave"
         ></edit-left>
-      </div>
-      <!-- <a-divider /> -->
-      <div v-if="isDatabase && !isCustomSql" class="SQL_View table_list">
+      </a-spin>
+      <a-spin :spinning="tableSpinning"  v-if="isDatabase && !isCustomSql" class="SQL_View table_list">
+        <a-divider />
         <div class="menu_search">
           <span class="search_span">自定义SQL视图</span>
           <a-icon
@@ -120,7 +124,7 @@
             </a-menu>
           </a-dropdown>
         </div> -->
-      </div>
+      </a-spin>
     </div>
     <div class="right" ref="rightBody" :class="{ add_new: model === 'add' }">
       <div class="header" v-if="model === 'edit'">
@@ -185,6 +189,7 @@
       <div class="draw_board scrollbar">
         <edit-right-top
           ref="rightTopRef"
+          @tableSelect="table => handleGetDatabase('table', table)"
           :detailInfo="detailInfo"
         ></edit-right-top>
       </div>
@@ -407,6 +412,8 @@ export default {
       MeasureIcon,
       modelForm: this.$form.createForm(this, { name: 'modelForm' }),
       spinning: false,
+      databaseSpinning: false, // 库loading
+      tableSpinning: false, // 表loading
       detailInfo: '',
       datasourceName: '',
       datasourceList: [],
@@ -457,7 +464,8 @@ export default {
       parentId: state => state.dataModel.parentId, // 选中的文件夹id
       datasource: state => state.dataModel.datasource, // 数据源
       privileges: state => state.common.privileges,
-      datasourceId: state => state.dataModel.datasourceId // 数据源
+      datasourceId: state => state.dataModel.datasourceId, // 数据源
+      databaseId: state => state.dataModel.databaseId // 数据库
     }),
     model() {
       return this.$route.query.type
@@ -721,10 +729,22 @@ export default {
       // 对标select change事件的参数
       this.handleSelectDatasource(sourceData.id, { data: { attrs: { ...sourceData } } })
     },
-    // 选中数据源
-    handleSelectDatasource(id, option) {
+    /**
+     * @description 选中数据源
+     * @param id 数据源id
+     * @param option 选中项(有a-select传入, 也有手动传入, 注意参数一致性)
+     * @param fetch 不请求数据库列表
+     */
+    handleSelectDatasource(id, option, fetch = true) {
       const baseBalck = [11, 12] // 黑名单
-      const type = option.data.attrs.type
+      // type获取方式有2种, 一种是传入的, 一种需要从数据源列表搜索
+      let type = option.data.attrs.type
+      if (!type) {
+        const target = this.datasourceList.find(item => item.id === id)
+        if (target) {
+          type = target.type
+        }
+      }
       this.isDatabase = !baseBalck.some(item => item === type)
       this.isCustomSql = type === 13
       this.$store.dispatch(
@@ -735,7 +755,7 @@ export default {
       this.$router.push({ path: this.$route.path, query: { ...this.$route.query, datasourceId: id } })
       // 路由跳转后重新覆盖当前权限
       this.$store.commit('common/SET_PRIVILEGES', privileges)
-      this.handleGetDatabase('source')
+      fetch && this.handleGetDatabase('source')
     },
     // 删除数据源
     async deleteDatasource({ id }) {
@@ -775,15 +795,23 @@ export default {
     /**
      * 根据数据源获取数据库(暂时只支持显示第一个库)
      * @param type table | source 根据表或源获取库
+     * @param selectTable 选中的表id
      */
-    async handleGetDatabase(type) {
+    async handleGetDatabase(type, selectTable) {
       this.tableSearch = ''
       let tableId = 1
       if (type === 'table') {
         const len = this.detailInfo.config.tables
           ? this.detailInfo.config.tables.length
           : 0
-        if (len > 0) {
+        if (selectTable) {
+          tableId = selectTable.tableId
+          // 如果刚好在当前库下, 可以直接返回
+          const tableList = [].concat(this.leftMenuList, this.rightMenuList)
+          if (selectTable && tableList.some(item => item.id === tableId)) {
+            return
+          }
+        } else if (len > 0) {
           tableId = this.detailInfo.config.tables[len - 1].tableId
         }
       }
@@ -793,10 +821,13 @@ export default {
         return
       }
       const datasourceId = type === 'source' ? this.$route.query.datasourceId : 1
+      this.databaseSpinning = true
       const result = await this.$server.dataModel.getDataBaseDataInfoList(
         datasourceId,
         tableId
-      )
+      ).finally(() => {
+        this.databaseSpinning = false
+      })
 
       if (result.code === 200) {
         this.databaseList = result.data
@@ -807,10 +838,7 @@ export default {
         if (this.databaseList.length && this.databaseList.length > 0) {
           this.handleGetDatabaseTable(result.data[0].id)
           // 选中数据源
-          this.$store.dispatch(
-            'dataModel/setDatasourceId',
-            result.data[0].datasourceId
-          )
+          this.handleSelectDatasource(result.data[0].datasourceId, { data: { attrs: { ...result.data[0] } } }, false)
         }
         // this.handleDimensions()
         // this.handleMeasures()
@@ -820,7 +848,10 @@ export default {
     },
     // 获取当前库下的表
     async handleGetDatabaseTable(id) {
-      const listResult = await this.$server.dataModel.getTableListById(id)
+      this.tableSpinning = true
+      const listResult = await this.$server.dataModel.getTableListById(id).finally(() => {
+        this.tableSpinning = false
+      })
       if (listResult.code === 200) {
         this.leftMenuList = [].concat(
           listResult.data.filter(item => {
