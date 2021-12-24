@@ -44,22 +44,24 @@
           </div>
         </a-select-option>
       </a-select>
-      <a-divider />
-      <div class="menu_search">
-        <span class="search_span">数据库</span>
-      </div>
-      <a-select
-        v-model="databaseName"
-        class="menu_select"
-        @change="handleChangeDatabase"
-      >
-        <a-select-option
-          v-for="database in databaseList"
-          :key="database.id"
-          :value="database.name"
-          >{{ database.name || datasourceName }}</a-select-option
+      <template v-if="!isCustomSql">
+        <a-divider />
+        <div class="menu_search">
+          <span class="search_span">数据库</span>
+        </div>
+        <a-select
+          v-model="databaseName"
+          class="menu_select"
+          @change="handleChangeDatabase"
         >
-      </a-select>
+          <a-select-option
+            v-for="database in databaseList"
+            :key="database.id"
+            :value="database.name"
+            >{{ database.name || datasourceName }}</a-select-option
+          >
+        </a-select>
+      </template>
       <a-divider />
       <div class="table_list" :class="{ 'no-sql': !isDatabase || isCustomSql }">
         <div class="menu_search" v-if="!isCustomSql">
@@ -775,6 +777,7 @@ export default {
      * @param type table | source 根据表或源获取库
      */
     async handleGetDatabase(type) {
+      this.tableSearch = ''
       let tableId = 1
       if (type === 'table') {
         const len = this.detailInfo.config.tables
@@ -803,6 +806,11 @@ export default {
             : ''
         if (this.databaseList.length && this.databaseList.length > 0) {
           this.handleGetDatabaseTable(result.data[0].id)
+          // 选中数据源
+          this.$store.dispatch(
+            'dataModel/setDatasourceId',
+            result.data[0].datasourceId
+          )
         }
         // this.handleDimensions()
         // this.handleMeasures()
@@ -832,13 +840,14 @@ export default {
       const value = event.target.value
       this.tableSearch = value ? value.trim() : value
       this.searchList = this.leftMenuList.filter(
-        item => item.name.toLowerCase().indexOf(value.toLowerCase()) > -1
+        item => item.alias.toLowerCase().indexOf(value.toLowerCase()) > -1
       )
     }, 400),
     /**
      * 切换数据库
      */
     async handleChangeDatabase(value, data) {
+      this.tableSearch = ''
       this.handleGetDatabaseTable(data.key)
       this.$store.dispatch('dataModel/setDatabaseId', data.key)
     },
