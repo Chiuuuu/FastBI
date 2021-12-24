@@ -2,7 +2,11 @@
   <div class="box">
     <div class="item table-item" ref="itemRef">
       <h6
-        :class="['dragable', { 'table-red': nodeData.props.status === 2, 'table-yellow': nodeData.props.status === 1}]"
+        :class="['dragable', {
+          'table-red': nodeData.props.status === 2,
+          'table-yellow': nodeData.props.status === 1,
+          active: nodeData.props.id === selectTableId
+        }]"
         :draggable="isDrag"
         @mouseleave.stop="handleMouseLeave"
         @mousedown.stop="handleMouseDown($event, nodeData)"
@@ -16,8 +20,13 @@
         {{ nodeData.props.alias }}
       </h6>
       <div v-if="nodeData.props.type === 2" class="union"></div>
-      <a-popover v-model="visible" trigger="click" overlayClassName='model-popover-box' @visibleChange="(v)=> handleVisibleChange(v, nodeData)">
-        <div slot="content" class='popover-content'>
+      <a-popover
+        v-model="visible"
+        trigger="click"
+        overlayClassName="model-popover-box"
+        @visibleChange="v => handleVisibleChange(v, nodeData)"
+      >
+        <div slot="content" class="popover-content">
           <div class="popover-header">
             <div class="popover-header-title">
               <div class="mtx">关联</div>
@@ -26,11 +35,16 @@
           </div>
           <div class="popover-type">
             <ul>
-              <li v-for='(item, index) in popoverType' :key="item.type">
+              <li v-for="(item, index) in popoverType" :key="item.type">
                 <div class="wap" @click="handlePopoverType(item, nodeData)">
-                  <div class="inner" :class="item.type === nodeData.props.joinType ? 'active' : ''">
+                  <div
+                    class="inner"
+                    :class="
+                      item.type === nodeData.props.joinType ? 'active' : ''
+                    "
+                  >
                     <div class="img" :class="'img-0' + (index + 1)"></div>
-                    <div class="txt">{{item.alias}}</div>
+                    <div class="txt">{{ item.alias }}</div>
                   </div>
                 </div>
               </li>
@@ -43,7 +57,7 @@
             </div>
             <div class="popover-form">
               <tree-node-poporver-row
-                v-for="(row,index) in popoverForm"
+                v-for="(row, index) in popoverForm"
                 :key="row.id"
                 :index="index"
                 :row="row"
@@ -58,14 +72,20 @@
             <a-button type="link" @click="handleAddCondition">
               <a-icon type="plus" />添加
             </a-button>
-            <a-button type="link" @click="handleClearCondition">全部删除</a-button>
+            <a-button type="link" @click="handleClearCondition"
+              >全部删除</a-button
+            >
           </div>
         </div>
-        <span class="opt" :class="popoverError ? 'err':''">
-          <b class="num">{{handleGetConditionLength(nodeData)}}</b>
+        <span class="opt" :class="popoverError ? 'err' : ''">
+          <b class="num">{{ handleGetConditionLength(nodeData) }}</b>
         </span>
       </a-popover>
-      <a-popover v-model="nodeVisible" trigger="click"  overlayClassName='btn-box'>
+      <a-popover
+        v-model="nodeVisible"
+        trigger="click"
+        overlayClassName="btn-box"
+      >
         <ul slot="content" class="btn-box-ul">
           <li class="btn-box-li" @click="handleBtnDelete(nodeData)">删除</li>
           <li class="btn-box-li" @click="handleBtnUnion(nodeData)">Union</li>
@@ -82,6 +102,7 @@
         :data-index="subindex"
         :detailInfo="detailInfo"
         :errorTables="errorTables"
+        @tableSelect="table => $store.dispatch('dataModel/setSelectTableId', table.id)"
       ></tree-node>
     </div>
   </div>
@@ -92,6 +113,7 @@ import findIndex from 'lodash/findIndex'
 import pullAllBy from 'lodash/pullAllBy'
 import TreeNodePoporverRow from './tree-node-popover-row'
 import { message } from 'ant-design-vue'
+import { mapState } from 'vuex'
 export default {
   name: 'tree-node',
   inject: ['nodeStatus'],
@@ -124,19 +146,24 @@ export default {
       visible: false,
       nodeVisible: false,
       mark: '',
-      popoverType: [{
-        type: 1,
-        name: '内联'
-      }, {
-        type: 2,
-        name: '左侧'
-      }, {
-        type: 3,
-        name: '右侧'
-      }, {
-        type: 4,
-        name: '完全外部'
-      }],
+      popoverType: [
+        {
+          type: 1,
+          name: '内联'
+        },
+        {
+          type: 2,
+          name: '左侧'
+        },
+        {
+          type: 3,
+          name: '右侧'
+        },
+        {
+          type: 4,
+          name: '完全外部'
+        }
+      ],
       popoverLeftTable: '', // 左表名称
       popoverRightTable: '', // 右表名称
       popoverLeftList: [],
@@ -146,8 +173,13 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      selectTableId: state => state.dataModel.selectTableId // 选中的表
+    }),
     joinLength() {
-      return this.nodeData.props.join && this.nodeData.props.join.conditions.length
+      return (
+        this.nodeData.props.join && this.nodeData.props.join.conditions.length
+      )
     },
     modelId() {
       return this.$route.query.modelId || this.$store.state.dataModel.addModelId
@@ -186,7 +218,9 @@ export default {
       }
     },
     handleUpateCondition(index, row, data) {
-      if (this.popoverForm.length > this.nodeData.props.join.conditions.length) {
+      if (
+        this.popoverForm.length > this.nodeData.props.join.conditions.length
+      ) {
         this.nodeData.props.join.conditions.push(row)
         // 这里需要强制更新
         this.$forceUpdate()
@@ -288,15 +322,31 @@ export default {
     },
     // 删除对应的维度度量
     deletePivotSchema(deleteTarget) {
-      const deleteDimensionsByTarget = this.detailInfo.pivotSchema.dimensions.filter(item => item.tableNo === Number(deleteTarget.tableNo))
-      const deleteMeasuresByTarget = this.detailInfo.pivotSchema.measures.filter(item => item.tableNo === Number(deleteTarget.tableNo))
+      const deleteDimensionsByTarget = this.detailInfo.pivotSchema.dimensions.filter(
+        item => item.tableNo === Number(deleteTarget.tableNo)
+      )
+      const deleteMeasuresByTarget = this.detailInfo.pivotSchema.measures.filter(
+        item => item.tableNo === Number(deleteTarget.tableNo)
+      )
 
-      pullAllBy(this.detailInfo.pivotSchema.dimensions, [{
-        tableNo: Number(deleteTarget.tableNo)
-      }], 'tableNo')
-      pullAllBy(this.detailInfo.pivotSchema.measures, [{
-        tableNo: Number(deleteTarget.tableNo)
-      }], 'tableNo')
+      pullAllBy(
+        this.detailInfo.pivotSchema.dimensions,
+        [
+          {
+            tableNo: Number(deleteTarget.tableNo)
+          }
+        ],
+        'tableNo'
+      )
+      pullAllBy(
+        this.detailInfo.pivotSchema.measures,
+        [
+          {
+            tableNo: Number(deleteTarget.tableNo)
+          }
+        ],
+        'tableNo'
+      )
 
       return {
         dimensions: deleteDimensionsByTarget,
@@ -314,8 +364,12 @@ export default {
         if (matchs) {
           matchs.forEach(match => {
             // 获取根据删除的表的维度度量跟表达式里的id进行筛选
-            const filterDimension = deleteTarget.pivotSchema.dimensions.filter(item => item.id === match).pop()
-            const filterMeasure = deleteTarget.pivotSchema.measures.filter(item => item.id === match).pop()
+            const filterDimension = deleteTarget.pivotSchema.dimensions
+              .filter(item => item.id === match)
+              .pop()
+            const filterMeasure = deleteTarget.pivotSchema.measures
+              .filter(item => item.id === match)
+              .pop()
 
             // 如果存在说明状态是缺失
             if (filterDimension || filterMeasure) {
@@ -325,7 +379,10 @@ export default {
               if (filterDimension) {
                 // 非指定聚合
                 if (!filed.groupByFunc) {
-                  filed.raw_expr = this.replaceWithMissing(filed.raw_expr, filterDimension.alias)
+                  filed.raw_expr = this.replaceWithMissing(
+                    filed.raw_expr,
+                    filterDimension.alias
+                  )
                 } else {
                   this.missingGroupByFunc(filed)
                 }
@@ -333,7 +390,10 @@ export default {
               if (filterMeasure) {
                 // 非指定聚合
                 if (!filed.groupByFunc) {
-                  filed.raw_expr = this.replaceWithMissing(filed.raw_expr, filterMeasure.alias)
+                  filed.raw_expr = this.replaceWithMissing(
+                    filed.raw_expr,
+                    filterMeasure.alias
+                  )
                 } else {
                   this.missingGroupByFunc(filed)
                 }
@@ -371,8 +431,12 @@ export default {
     },
     hasExists(match) {
       let isExists = true
-      const dIndex = this.detailInfo.pivotSchema.dimensions.findIndex(item => item.id === match)
-      const mIndex = this.detailInfo.pivotSchema.measures.findIndex(item => item.id === match)
+      const dIndex = this.detailInfo.pivotSchema.dimensions.findIndex(
+        item => item.id === match
+      )
+      const mIndex = this.detailInfo.pivotSchema.measures.findIndex(
+        item => item.id === match
+      )
       if (dIndex === -1 || mIndex === -1) {
         isExists = false
       }
@@ -384,7 +448,9 @@ export default {
     },
     handleMouseDown(event, item) {
       this.isDrag = true
-      this.$emit('tableSelect', item.getProps())
+      const data = item.getProps()
+      this.$store.dispatch('dataModel/setSelectTableId', data.id)
+      this.$emit('tableSelect', data)
     },
     handleMouseLeave() {
       this.isDrag = false
@@ -422,6 +488,7 @@ export default {
         const getNode = await this.root.getJoin(current, dragNode)
         const renderNode = new Node(getNode)
         current.add(renderNode)
+        this.$store.dispatch('dataModel/setSelectTableId', getNode.id)
         await this.root.handleUpdate({
           tables: this.detailInfo.config.tables
         })
@@ -436,7 +503,10 @@ export default {
 
         const dragNodeId = dragNode.props.tableNo
 
-        if (dragNode.parent && dragNode.parent.props.tableNo === current.props.tableNo) {
+        if (
+          dragNode.parent &&
+          dragNode.parent.props.tableNo === current.props.tableNo
+        ) {
           // 相同父节点
           return
         }
@@ -501,7 +571,10 @@ export default {
       this.handleGetLRTableList(leftNodeProps.tableId, rightNodeProps.tableId)
     },
     async handleGetLRTableList(leftTableId, rightTableId) {
-      const result = await this.$server.dataModel.getDataSourceFieldDataInfoList(leftTableId, rightTableId)
+      const result = await this.$server.dataModel.getDataSourceFieldDataInfoList(
+        leftTableId,
+        rightTableId
+      )
       if (result.code === 200) {
         this.popoverLeftList = [].concat(result.data.left)
         this.popoverRightList = [].concat(result.data.right)
@@ -576,6 +649,9 @@ export default {
             &.table-red {
               background-color: #FFC6C6;
               border: 1px solid #FF0000;
+            }
+            &.active {
+              border: 1px solid #617bff;
             }
         }
         .union {
@@ -671,12 +747,12 @@ export default {
 </style>
 <style lang="less">
 @deep: ~'>>>';
-.model-popover-box{
+.model-popover-box {
   .ant-popover-inner-content {
     padding: 0;
   }
-  .popover{
-    &-header{
+  .popover {
+    &-header {
       background: #fff;
       z-index: 10;
       position: relative;
@@ -697,7 +773,7 @@ export default {
         cursor: pointer;
       }
     }
-    &-type{
+    &-type {
       border-top: 1px solid #ededed;
       border-bottom: 1px solid #ededed;
       position: relative;
@@ -715,40 +791,41 @@ export default {
             &.active {
               border-color: #ededed;
             }
-              .img{
-                width: 48px;
-                height: 30px;
-                margin: 10px auto 8px;
-                background: #fff url("../../../../../assets/images/tableRelat.png") no-repeat;
-                &-01{
-                  background-position: 0 0
-                }
-                &-02{
-                  background-position: 0 -38px
-                }
-                &-03{
-                  background-position: 0 -77px
-                }
-                &-04{
-                  background-position: -52px -116px
-                  // background-position: 0 -116px
-                }
-                &-05{
-                  background-position: -52px -116px
-                }
-                &-06{
-                  background-position: -52px -77px
-                }
+            .img {
+              width: 48px;
+              height: 30px;
+              margin: 10px auto 8px;
+              background: #fff
+                url('../../../../../assets/images/tableRelat.png') no-repeat;
+              &-01 {
+                background-position: 0 0;
               }
-              .txt {
-                text-align: center;
-                margin-bottom: 8px;
+              &-02 {
+                background-position: 0 -38px;
               }
+              &-03 {
+                background-position: 0 -77px;
+              }
+              &-04 {
+                background-position: -52px -116px;
+                // background-position: 0 -116px
+              }
+              &-05 {
+                background-position: -52px -116px;
+              }
+              &-06 {
+                background-position: -52px -77px;
+              }
+            }
+            .txt {
+              text-align: center;
+              margin-bottom: 8px;
+            }
           }
         }
       }
     }
-    &-body{
+    &-body {
       .sprt {
         border-bottom: 1px solid #ededed;
         background: #fafafa;
@@ -777,10 +854,10 @@ export default {
         .popover-row {
           margin-bottom: 10px;
           &.z-err {
-            @{deep} .ant-select-selection{
+            @{deep} .ant-select-selection {
               border-color: red;
             }
-            .err-message{
+            .err-message {
               display: block;
             }
           }

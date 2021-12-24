@@ -818,6 +818,7 @@ export default {
       if (type === 'source' && !this.$route.query.datasourceId) {
         this.databaseList = []
         this.databaseName = ''
+        this.$store.dispatch('dataModel/setDatabaseId', '')
         return
       }
       const datasourceId = type === 'source' ? this.$route.query.datasourceId : 1
