@@ -421,9 +421,11 @@ export default {
       if (matchArry) {
         matchArry.forEach(value => {
           const matchStr = value.match(/(\[)(.+)(\])/)
-          const key = matchStr[2] ? matchStr[2] : ''
-          if (key && key === alias) {
-            rawExpr = rawExpr.replace(value, '<此位置字段丢失>')
+          if (matchStr) {
+            const key = matchStr[2] ? matchStr[2] : ''
+            if (key && key === alias) {
+              rawExpr = rawExpr.replace(value, '<此位置字段丢失>')
+            }
           }
         })
       }

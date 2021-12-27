@@ -38,6 +38,7 @@
                   :index="slotProps.index"
                   :isSelect="selectId === slotProps.file.id"
                   :parent="folder"
+                  :disabled="exceptList.includes(slotProps.file.id)"
                   @fileSelect="handleFileSelect"
                 ></MenuFile>
               </template>
@@ -50,6 +51,7 @@
                 :file="folder"
                 :index="index"
                 :isSelect="selectId === folder.id"
+                :disabled="exceptList.includes(folder.id)"
                 @fileSelect="handleFileSelect"
               ></MenuFile>
             </ul>
@@ -71,6 +73,12 @@ export default {
     isShow: {
       type: Boolean,
       default: false
+    },
+    exceptList: {
+      type: Array,
+      default() {
+        return []
+      }
     }
   },
   components: {

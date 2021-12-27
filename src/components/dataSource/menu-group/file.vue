@@ -1,7 +1,7 @@
 <template>
   <li
     class="item dragable"
-    :class="isSelect ? 'file-active':''"
+    :class="[ { 'file-active': isSelect }, { 'file-disabled': disabled }]"
     :title="file[fileName]"
     :index="index"
     ref="file"
@@ -49,6 +49,10 @@ export default {
       default: 'default'
     },
     isSelect: {
+      type: Boolean,
+      default: false
+    },
+    disabled: {
       type: Boolean,
       default: false
     },

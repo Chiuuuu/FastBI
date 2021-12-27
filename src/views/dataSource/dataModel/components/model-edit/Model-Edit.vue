@@ -313,6 +313,7 @@
         :description="detailInfo.description"
         :rename-data="panelData"
         :union-data="unionNode"
+        :except-list="datasourceList.map(item => item.id)"
         @showGroupbyModal="openModal('field-aggregator')"
         @get-fetch-param="handleGetFetchParams"
         @close="close"
