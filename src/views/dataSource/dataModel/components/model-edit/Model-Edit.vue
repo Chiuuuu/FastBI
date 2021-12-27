@@ -11,20 +11,7 @@
               @click="openModal('source-list')"
             />
           </div>
-          <!-- 临时方案, 不写class了 -->
-          <!-- <div
-            :title="datasourceName"
-            style="width: calc(100% - 30px);
-            color: #01040f;
-            margin: 0 15px;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow: hidden;"
-          >
-            {{ datasourceName }}
-          </div> -->
           <a-select
-            v-if="datasourceList.length > 0"
             :value="datasourceId"
             option-label-prop="label"
             class="menu_select"
@@ -38,7 +25,6 @@
               <div style="display: flex;justify-content: space-between;align-items: center;">
                 <span>{{ item.name }}</span>
                 <a-icon
-                  v-show="item.id !== datasourceId"
                   type="delete"
                   title="删除"
                   :aria-label="item.name"
@@ -761,12 +747,32 @@ export default {
     // 删除数据源
     async deleteDatasource({ id }) {
       const index = this.datasourceList.findIndex(item => item.id === id)
-      if (index > -1) {
-        const res = await this.$server.dataModel.actionVerifyDelModelToSource(id, this.detailInfo.config)
-        if (res.code === 200) {
-          this.datasourceList.splice(index, 1)
+      const deleteFunction = () => {
+        this.datasourceList.splice(index, 1)
+        if (this.datasourceList.length) {
+          const data = this.datasourceList[0]
+          this.handleSelectDatasource(data.id, { data: { attrs: { ...data } } })
         } else {
-          this.$message.error(res.msg || '该数据源已被引用, 请先删除拖入的表')
+          // 没有其他选中项, 则清空下面的库表
+          this.$store.dispatch('dataModel/setDatasourceId', '')
+          this.databaseList = []
+          this.databaseName = ''
+          this.$store.dispatch('dataModel/setDatabaseId', '')
+          this.leftMenuList = []
+          this.rightMenuList = []
+        }
+      }
+      if (index > -1) {
+        if (this.detailInfo.config && this.detailInfo.config.tables.length) {
+          const res = await this.$server.dataModel.actionVerifyDelModelToSource(id, this.detailInfo.config)
+          if (res.code === 200) {
+            deleteFunction()
+          } else {
+            this.$message.error(res.msg || '该数据源已被引用, 请先删除拖入的表')
+          }
+        } else {
+          // 当前没有拖入表, 不调校验接口直接删除
+          deleteFunction()
         }
       }
     },
