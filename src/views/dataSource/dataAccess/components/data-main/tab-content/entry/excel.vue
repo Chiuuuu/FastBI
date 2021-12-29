@@ -151,7 +151,6 @@ export default {
       saveTip: '保存中, 请勿进行其他操作',
       saveCallback: num => {
         const loop = n => {
-          console.log(n)
           if (n <= 95) {
             n += 3
             this.saveTip = n.toFixed(1) + '%'

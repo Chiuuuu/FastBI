@@ -129,7 +129,8 @@ export default {
     return $axios({
       method: 'post',
       url: 'model/datamodel/export',
-      responseType: 'blob', // 注意类型
+      timeout: 600000,
+      // responseType: 'blob', // 注意类型
       data
     })
   },
