@@ -94,7 +94,7 @@ export default {
         const rightNode = this.popoverRightList.filter(item => item.id === (type === 'left' ? row.rightFieldId : value)).pop()
 
         if (leftNode && rightNode) {
-            this.error = leftNode.dataType !== rightNode.dataType
+            this.error = leftNode.convertType !== rightNode.convertType
             if (!this.error) {
               this.$emit('update-condition', this.index, row, this.$data)
             }
