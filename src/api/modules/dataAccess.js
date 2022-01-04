@@ -110,12 +110,19 @@ export default {
     },
     /**
      * @description 自定义表抽取
-     * @param {String} url  请求地址
      * @param {Array} [params={}] 请求参数
      * @returns
      */
     actionCustomExtract(params = []) {
         return $axios.post('/source/view/extract', params)
+    },
+    /**
+     * @description 校验excel|csv数据源中的文件是否可删除
+     * @param {String} params.id 文件id
+     * @returns
+     */
+    verifyDatabaseDelete(params) {
+        return $axios.post('/datasource/database/verifyDel', params)
     },
     /**
     * @description 校验替换的excel文件
