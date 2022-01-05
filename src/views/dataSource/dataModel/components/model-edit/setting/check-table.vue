@@ -27,7 +27,7 @@
         key="submit"
         type="primary"
         v-if="hasEditPermission"
-        :loading="confirmLoading"
+        :loading="confirmLoading || loading"
         @click="handleExport"
       >
         导出宽表
