@@ -408,7 +408,7 @@ export default {
           scopedSlots: { customRender: 'extractStatus' }
         },
         {
-          title: '修改时间',
+          title: '最后一次更新时间',
           key: 'gmtModified',
           width: 200,
           dataIndex: 'gmtModified'
