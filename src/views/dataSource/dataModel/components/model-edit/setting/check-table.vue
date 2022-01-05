@@ -13,6 +13,13 @@
     @cancel="handleClose"
   >
     <template #footer>
+      <div class="tips">
+        <a-icon
+          theme="filled"
+          type="exclamation-circle"
+          style="margin-right: 2px;"
+        />最多可导出前50万条数据
+      </div>
       <a-button key="back" @click="handleClose">
         取消
       </a-button>
@@ -281,6 +288,13 @@ export default {
 .widthModal {
   @{deep} .ant-modal-body {
     padding: 0;
+  }
+  .tips {
+    float: left;
+    color: #617bff;
+    i {
+      color: #617bff;
+    }
   }
 }
 .table-area {
