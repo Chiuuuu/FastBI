@@ -363,8 +363,10 @@ export default {
       this.$store.dispatch('dataAccess/setModelId', file.id)
       this.$store.dispatch('dataAccess/setParentId', file.parentId)
       this.$store.dispatch('dataAccess/setFirstFinished', true)
-      this.$emit('on-menuChange-componet', 'Main')
-      this.$EventBus.$emit('set-tab-index', '1')
+      setTimeout(() => {
+        this.$emit('on-menuChange-componet', 'Main')
+        this.$EventBus.$emit('set-tab-index', '1')
+      }, 200)
     },
     /**
     * 删除菜单
