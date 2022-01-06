@@ -227,6 +227,7 @@ export default {
         //   const readerResult = JSON.parse(reader.result) // 此处的msg就是后端返回的msg内容
         //   this.$message.error(readerResult.msg)
         // }
+        this.$message.error(result.msg || '导出失败')
         return
       }
       // let blob = new Blob([result], {
