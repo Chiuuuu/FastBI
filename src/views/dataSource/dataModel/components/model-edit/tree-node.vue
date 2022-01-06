@@ -210,21 +210,6 @@ export default {
     },
     handleGetRowStatus(index, row, error) {
       this.popoverError = error || false
-      const tableNo = row.tableNo
-      if (this.popoverError) {
-        debugger
-        if (!this.errorTables.includes(row.tableNo)) {
-          this.errorTables.push(tableNo)
-        }
-      } else {
-        this.removeErrorItem(tableNo)
-      }
-    },
-    removeErrorItem(tableNo) {
-      const index = this.errorTables.indexOf(tableNo)
-      if (index > -1) {
-        this.errorTables.splice(index, 1)
-      }
     },
     handleUpateCondition(index, row, data) {
       if (
@@ -570,6 +555,22 @@ export default {
       this.detailInfo.config.tables.splice(index, 1, nodeData.getProps())
     },
     handleVisibleChange(v, node) {
+      // 校验错误的表
+      this.nodeData.props.join.conditions.forEach(item => {
+        const leftNode = this.popoverLeftList.filter(x => x.id === item.leftFieldId).pop()
+        const rightNode = this.popoverRightList.filter(x => x.id === item.rightFieldId).pop()
+        const tableNo = item.tableNo
+        if (leftNode && rightNode && leftNode.convertType !== rightNode.convertType) {
+          if (!this.errorTables.includes(tableNo)) {
+            this.errorTables.push(tableNo)
+          }
+        } else {
+          const index = this.errorTables.indexOf(tableNo)
+          if (index > -1) {
+            this.errorTables.splice(index, 1)
+          }
+        }
+      })
       if (!v) return
 
       if (this.handleGetConditionLength(node)) {
