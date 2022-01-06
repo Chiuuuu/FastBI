@@ -61,7 +61,9 @@ export default {
       this.$emit('on-set-table-name', name)
     },
     handleMounted() {
-      this.$refs.entryRef.handleSetFormData()
+      this.$nextTick(() => {
+        this.$refs.entryRef.handleSetFormData()
+      })
     }
   }
 }

@@ -746,6 +746,9 @@ export default {
     },
     // 删除数据源
     async deleteDatasource({ id }) {
+      if (this.datasourceList.length === 1) {
+        return this.$message.error('请至少保留一个数据源')
+      }
       const index = this.datasourceList.findIndex(item => item.id === id)
       const deleteFunction = () => {
         this.datasourceList.splice(index, 1)

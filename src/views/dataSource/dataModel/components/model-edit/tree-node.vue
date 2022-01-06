@@ -200,8 +200,8 @@ export default {
       }
       return nodeData.props.join && nodeData.props.join.conditions.length
     },
-    handleGetRowStatus(index, row, data) {
-      this.popoverError = (data && data['error']) || false
+    handleGetRowStatus(index, row, error) {
+      this.popoverError = error || false
       const tableNo = row.tableNo
       if (this.popoverError) {
         if (!this.errorTables.includes(row.tableNo)) {
@@ -246,6 +246,7 @@ export default {
       if (tableIndex) {
         this.detailInfo.config.tables[tableIndex].join = this.nodeData.props.join
       }
+      console.log(this.detailInfo.config.tables[tableIndex].join)
     },
     handleAddCondition() {
       this.popoverForm.push({

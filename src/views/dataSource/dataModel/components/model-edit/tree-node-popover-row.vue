@@ -80,7 +80,14 @@ export default {
   },
   data() {
     return {
-      error: false
+      // error: false
+    }
+  },
+  computed: {
+    error() {
+      const leftNode = this.popoverLeftList.filter(item => item.id === this.row.leftFieldId).pop()
+      const rightNode = this.popoverRightList.filter(item => item.id === this.row.rightFieldId).pop()
+      return leftNode && rightNode && leftNode.convertType !== rightNode.convertType
     }
   },
   methods: {
@@ -94,11 +101,12 @@ export default {
         const rightNode = this.popoverRightList.filter(item => item.id === (type === 'left' ? row.rightFieldId : value)).pop()
 
         if (leftNode && rightNode) {
-            this.error = leftNode.convertType !== rightNode.convertType
-            if (!this.error) {
+            const error = leftNode.convertType !== rightNode.convertType
+            if (!error) {
+              console.log('update')
               this.$emit('update-condition', this.index, row, this.$data)
             }
-            this.$emit('change-status', this.index, row, this.$data)
+            this.$emit('change-status', this.index, row, error)
         }
     },
     handledeleteCondition(index, row) {
