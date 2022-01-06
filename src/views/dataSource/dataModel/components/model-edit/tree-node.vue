@@ -195,8 +195,16 @@ export default {
   },
   methods: {
     handleGetConditionLength(nodeData) {
-      if (nodeData.props.join && nodeData.props.join.conditions.length === 0) {
-        this.popoverError = true
+      if (nodeData.props.join) {
+        if (nodeData.props.join.conditions.length === 0) {
+          this.popoverError = true
+        } else {
+          this.popoverError = nodeData.props.join.conditions.some(item => {
+            const leftNode = this.popoverLeftList.filter(x => x.id === item.leftFieldId).pop()
+            const rightNode = this.popoverRightList.filter(x => x.id === item.rightFieldId).pop()
+            return leftNode && rightNode && leftNode.convertType !== rightNode.convertType
+          })
+        }
       }
       return nodeData.props.join && nodeData.props.join.conditions.length
     },
@@ -204,6 +212,7 @@ export default {
       this.popoverError = error || false
       const tableNo = row.tableNo
       if (this.popoverError) {
+        debugger
         if (!this.errorTables.includes(row.tableNo)) {
           this.errorTables.push(tableNo)
         }

@@ -102,10 +102,7 @@ export default {
 
         if (leftNode && rightNode) {
             const error = leftNode.convertType !== rightNode.convertType
-            if (!error) {
-              console.log('update')
-              this.$emit('update-condition', this.index, row, this.$data)
-            }
+            this.$emit('update-condition', this.index, row, this.$data)
             this.$emit('change-status', this.index, row, error)
         }
     },
