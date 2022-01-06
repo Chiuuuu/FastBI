@@ -424,7 +424,7 @@ export default {
         title: '确认提示',
         content: '您确定要删除该文件吗',
         onOk: async () => {
-          if (file.id) {
+          if (!isNaN(file.id)) {
             const res = await this.$server.dataAccess.verifyDatabaseDelete({ id: file.id })
             if (res.code !== 200) {
               return this.$message.error(res.msg || '删除失败')
