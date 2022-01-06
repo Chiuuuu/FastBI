@@ -816,16 +816,17 @@ export default {
               setting: this.setting,
               ...values
             }
-            this.renameScreenData({ ...params }).then(res => {
-              if (res) {
-                this.$message.success('重命名成功')
-                this.fileSelectName = values.name
-                this.getList()
-                if (this.isPublish === 1) {
-                  this.$refs.screen.getShareData()
-                }
+            const res = await this.renameScreenData({ ...params })
+            if (res && res.code === 200) {
+              this.$message.success('重命名成功')
+              this.fileSelectName = values.name
+              this.getList()
+              if (this.isPublish === 1) {
+                this.$refs.screen.getShareData()
               }
-            })
+            } else {
+              return
+            }
           }
         }
         this.screenForm.resetFields()
@@ -856,7 +857,7 @@ export default {
       this.folderTitle = '新建文件夹'
     },
     // 创建文件夹
-    creatFolder(values) {
+    async creatFolder(values) {
       if (this.isAdd === 1) {
         // 新增
         let params = {
@@ -865,19 +866,18 @@ export default {
           parentId: 0,
           type: 3 // 0-无类型,1-数据接入，2-数据建模,3-数据大屏
         }
-        this.$server.common
+        const res = await this.$server.common
           .addMenuFolder('/screen/catalog', params)
-          .then(res => {
-            if (res.code === 200) {
-              this.$message.success(res.msg)
-              this.getList()
-              // 新建文件夹后 返回空页面 不显示大屏
-              this.fileSelectId = -1
-              this.fileSelectName = ''
-            } else {
-              this.$message.error(res.msg)
-            }
-          })
+        if (res.code === 200) {
+          this.$message.success(res.msg)
+          this.getList()
+          // 新建文件夹后 返回空页面 不显示大屏
+          this.fileSelectId = -1
+          this.fileSelectName = ''
+        } else {
+          this.$message.error(res.msg)
+          return
+        }
       } else {
         // 修改
         let params = {
@@ -885,16 +885,15 @@ export default {
           id: this.id,
           ...values
         }
-        this.$server.common
+        const res = await this.$server.common
           .putMenuFolderName('/screen/catalog/update', params)
-          .then(res => {
-            if (res.code === 200) {
-              this.$message.success(res.msg)
-              this.getList()
-            } else {
-              this.$message.error(res.msg)
-            }
-          })
+        if (res.code === 200) {
+          this.$message.success(res.msg)
+          this.getList()
+        } else {
+          this.$message.error(res.msg)
+          return
+        }
       }
       this.folderVisible = false
     },
