@@ -274,6 +274,7 @@ export default {
     },
     // 渲染表单
     handleSetFormData() {
+      console.log(this.modelType, 'aaa')
       if (this.modelType !== 'csv') return
       this.handleResetForm()
       if (this.modelId) {

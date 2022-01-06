@@ -81,7 +81,10 @@ const actions = {
   setModelType({
     commit
   }, type) {
-    commit('SET_MODELTYPE', type)
+    return new Promise(resolve => {
+      commit('SET_MODELTYPE', type)
+      resolve()
+    })
   },
   setFirstFinished({
     commit

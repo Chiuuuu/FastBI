@@ -336,20 +336,20 @@ export default {
     handleFileSelect(file) {
       if (this.fileSelectId === file.id) return
       this.fileSelectId = file.id
-      this.getTableInfo(`/datasource/${file.id}`, result => {
+      this.getTableInfo(`/datasource/${file.id}`, async result => {
         if (result.code === 200) {
           if (result.data.type === 1) {
-            this.$store.dispatch('dataAccess/setModelType', 'mysql')
+            await this.$store.dispatch('dataAccess/setModelType', 'mysql')
           } else if (result.data.type === 2) {
-            this.$store.dispatch('dataAccess/setModelType', 'oracle')
+            await this.$store.dispatch('dataAccess/setModelType', 'oracle')
           } else if (result.data.type === 5) {
-            this.$store.dispatch('dataAccess/setModelType', 'hive')
+            await this.$store.dispatch('dataAccess/setModelType', 'hive')
           } else if (result.data.type === 11) {
-            this.$store.dispatch('dataAccess/setModelType', 'excel')
+            await this.$store.dispatch('dataAccess/setModelType', 'excel')
           } else if (result.data.type === 12) {
-            this.$store.dispatch('dataAccess/setModelType', 'csv')
+            await this.$store.dispatch('dataAccess/setModelType', 'csv')
           } else if (result.data.type === 13) {
-            this.$store.dispatch('dataAccess/setModelType', 'customSql')
+            await this.$store.dispatch('dataAccess/setModelType', 'customSql')
           }
           this.$store.dispatch('dataAccess/setModelInfo', result.data.properties)
           this.$store.dispatch('dataAccess/setModelName', result.data.name)
