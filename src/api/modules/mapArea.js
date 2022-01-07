@@ -21,7 +21,7 @@ export default {
    * @param {Object} params.section 片区名称
    * @returns
    */
-  getMarkerList(params = {}) {
+  getGridList(params = {}) {
     return $axios.post(`/zone/allList`, params)
   },
   /**

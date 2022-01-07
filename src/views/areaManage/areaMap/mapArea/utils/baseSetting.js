@@ -1,5 +1,5 @@
 const BaseSetting = {
-  polygon: {
+  area: {
     strokeColor: '#f69f2e',
     strokeOpacity: 1,
     strokeWeight: 2,
@@ -9,7 +9,7 @@ const BaseSetting = {
     fillColor: '#f69f2e',
     fillOpacity: 0.3
   },
-  marker: {
+  grid: {
     fillColor: '#f69f2e',
     cnt: 0
   }
