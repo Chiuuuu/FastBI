@@ -85,7 +85,8 @@
           class="pick-checkbox-box hasborder"
           v-show="currentFile.operation === 'list'"
         >
-          <b-scrollbar style="height:100%;">
+          <!-- <b-scrollbar style="height:100%;"> -->
+          <ScrollPage :rows="currentFile.searchList" :row-height="22" @change="v => pageDataRows = v">
             <a-checkbox
               v-if="currentFile && currentFile.searchList && currentFile.searchList.length > 0"
               :checked="currentFile.checkedList.length === currentFile.searchList.length"
@@ -96,13 +97,23 @@
               @change="onCheckAllChange"
               >全选</a-checkbox
             >
-            <a-checkbox-group
+            <!-- <a-checkbox-group
               class="f-flexcolumn"
               v-model="currentFile.checkedList"
-              :options="currentFile.searchList"
+              :options="pageDataRows"
               @change="onChange"
-            />
-          </b-scrollbar>
+            /> -->
+            <a-checkbox
+              class="block-checkbox"
+              v-for="item in pageDataRows"
+              :key="item"
+              :checked="currentFile.checkedList.includes(item)"
+              @change="onCheckChange($event, item)"
+            >
+              {{ item }}
+            </a-checkbox>
+          </ScrollPage>
+          <!-- </b-scrollbar> -->
         </div>
         <!--手动筛选-->
         <div
@@ -200,6 +211,7 @@ import navigateList from '@/config/navigate' // 导航条菜单
 import _ from 'lodash'
 import { Loading } from 'element-ui'
 import { Icon } from 'ant-design-vue'
+import ScrollPage from '@/components/scroll'
 import handleReturnChartData from '@/utils/handleReturnChartData'
 const IconFont = Icon.createFromIconfontCN({
   scriptUrl: '//at.alicdn.com/t/font_2276651_kjhn0ldks1j.js'
@@ -229,6 +241,7 @@ export default {
       checkAll: false, // 是否全选标识
       currentFile: {}, // 当前选中的维度/度量数据
       current: {},
+      pageDataRows: [], // 当前页的可选数据
       isdrag: false, // 是否拖拽中
       fileList: [], // 维度字段数组
       isVaild: false, //
@@ -237,7 +250,8 @@ export default {
   },
   inject: ['errorFile'],
   components: {
-    IconFont
+    IconFont,
+    ScrollPage
   },
   watch: {
     currSelected: {
@@ -394,6 +408,7 @@ export default {
     },
     // 列表模糊查询
     search() {
+      const checkAll = this.currentFile.checkedList.length === this.currentFile.searchList.length
       if (!this.listValue) {
         this.currentFile.searchList = this.currentFile.originList
         this.isEmpty = true
@@ -405,12 +420,19 @@ export default {
       this.currentFile.searchList = [].concat(this.currentFile.originList.filter(item => {
         let match = false
         list.forEach(k => {
-          if ((item || '').indexOf(k) > -1) {
+          if ((item || '').toLowerCase().indexOf(k) > -1) {
             match = true
           }
         })
         return match
       }))
+      // 如果是全选状态, 选中当前所有筛选项
+      if (checkAll) {
+        this.currentFile.checkedList = [].concat(this.currentFile.searchList)
+      } else {
+        // 不是全选状态, 过滤掉非当前搜索结果
+        this.currentFile.checkedList = this.currentFile.searchList.filter(item => this.currentFile.checkedList.includes(item))
+      }
       // 不强制刷新的话, 不会触发updated()
       this.$forceUpdate()
     },
@@ -455,11 +477,26 @@ export default {
         this.currentFile.checkedList.length ===
         this.currentFile.originList.length // 判断是否全选
     },
+    onCheckChange(e, value) {
+      const checked = e.target.checked
+      if (checked) {
+        this.currentFile.checkedList.push(value)
+      } else {
+        const len = this.currentFile.checkedList.length
+        for (let i = 0; i < len; i++) {
+          const item = this.currentFile.checkedList[i]
+          if (item === value) {
+            this.currentFile.checkedList.splice(i, 1)
+            break
+          }
+        }
+      }
+    },
     // 点击全选
     onCheckAllChange(e) {
       this.checkAll = e.target.checked
       this.currentFile.checkedList = e.target.checked
-        ? this.currentFile.searchList
+        ? [].concat(this.currentFile.searchList)
         : []
     },
     // 手动，添加字段
@@ -1066,4 +1103,9 @@ export default {
 }
 </script>
 
-<style></style>
+<style scoped>
+.block-checkbox {
+  display: block;
+  margin-left: 0 !important;
+}
+</style>

@@ -192,7 +192,7 @@ export default {
             }
           }
         }
-        if (!stop) {
+        if (!stop && !this.moduleListAll[index].includes(permission)) {
           this.moduleListAll[index].push(permission)
         }
       })

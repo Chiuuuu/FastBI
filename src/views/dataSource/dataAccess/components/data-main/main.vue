@@ -74,6 +74,8 @@ export default {
             return 'Excel'
           case 'csv':
             return 'Csv'
+          case 'customSql':
+            return '自定义SQL'
         }
       },
       modelName: state => state.dataAccess.modelName,
@@ -110,6 +112,7 @@ export default {
       // this.$emit('on-change-componet')
       if (activeKey === '2') {
         this.$nextTick(() => {
+          this.$refs.structure.tableType = 0
           this.$refs.structure.tableKeyword = ''
           this.$refs.structure.handleGetData()
           // 切换tab清空所有选中项

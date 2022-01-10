@@ -40,45 +40,47 @@
           @dragover.stop.prevent
           @drop.stop.prevent="handleWrapDrop"
         >
-          <div
-            class="group"
-            :class="handleIsFolder(folder) ? 'is-folder' : ''"
-            v-for="(folder, index) in folderList"
-            :key="folder.id"
-          >
-            <template v-if="handleIsFolder(folder)">
-              <menu-folder
-                :folder="folder"
-                :index="index"
-                :contextmenus="folderContenxtMenu"
-                @fileDrop="handleFileDrop"
-              >
-                <template v-slot:file="slotProps">
+          <a-spin :spinning="spinning">
+            <div
+              class="group"
+              :class="handleIsFolder(folder) ? 'is-folder' : ''"
+              v-for="(folder, index) in folderList"
+              :key="folder.id"
+            >
+              <template v-if="handleIsFolder(folder)">
+                <menu-folder
+                  :folder="folder"
+                  :index="index"
+                  :contextmenus="folderContenxtMenu"
+                  @fileDrop="handleFileDrop"
+                >
+                  <template v-slot:file="slotProps">
+                    <menu-file
+                      :file="slotProps.file"
+                      :index="slotProps.index"
+                      :parent="folder"
+                      :isSelect="fileSelectId === slotProps.file.id"
+                      :contextmenus="fileContenxtMenu"
+                      @fileSelect="handleFileSelect"
+                      @fileDrag="handleFileDrag"
+                    ></menu-file>
+                  </template>
+                </menu-folder>
+              </template>
+              <template v-else>
+                <ul class="items">
                   <menu-file
-                    :file="slotProps.file"
-                    :index="slotProps.index"
-                    :parent="folder"
-                    :isSelect="fileSelectId === slotProps.file.id"
+                    :file="folder"
+                    :index="index"
+                    :isSelect="fileSelectId === folder.id"
                     :contextmenus="fileContenxtMenu"
                     @fileSelect="handleFileSelect"
                     @fileDrag="handleFileDrag"
                   ></menu-file>
-                </template>
-              </menu-folder>
-            </template>
-            <template v-else>
-              <ul class="items">
-                <menu-file
-                  :file="folder"
-                  :index="index"
-                  :isSelect="fileSelectId === folder.id"
-                  :contextmenus="fileContenxtMenu"
-                  @fileSelect="handleFileSelect"
-                  @fileDrag="handleFileDrag"
-                ></menu-file>
-              </ul>
-            </template>
-          </div>
+                </ul>
+              </template>
+            </div>
+          </a-spin>
         </div>
         <a-empty v-else style="margin-top: 50px; color: rgba(0, 0, 0, 0.65)">
           <span slot="description">暂无数据大屏</span>
@@ -218,7 +220,7 @@
           <div class="releace-line">
             <span class="label"
               ><span style="color: #ff0000">*</span>分享链接：</span
-            ><span class="text">{{ releaseObj.url }}</span>
+            ><span class="text">{{ releaseObj.url || '' }}</span>
           </div>
           <div class="indent">
             <span class="indent-text" @click="copyLink(releaseObj.url)"
@@ -260,6 +262,10 @@
               <a-radio :value="0">永久</a-radio>
             </a-radio-group>
             <span v-else>{{ expiredLabel }}</span>
+          </div>
+          <div class="releace-line">
+            <span class="label"><span style="color: #ff0000">*</span>发布：</span>
+            <a-checkbox :disabled="isPublish !== 0" v-model="releaseObj.publishOa">同步发布至OA</a-checkbox>
           </div>
           <div class="code-show" v-show="showCode">
             <!-- <a-icon type="qrcode" :style="{ fontSize: '250px' }" /> -->
@@ -354,6 +360,7 @@ export default {
   },
   data() {
     return {
+      spinning: false,
       current: ['mail'],
       openKeys: ['sub1'],
       folderList: [], // 文件夹列表
@@ -563,6 +570,7 @@ export default {
       let params = {
         type: 3
       }
+      this.spinning = true
       this.$server.screenManage.getFolderList({ params }).then(res => {
         if (res.code === 200) {
           let rows = res.data
@@ -574,6 +582,8 @@ export default {
             this.getFirstScreen(this.folderList, 0)
           }
         }
+      }).finally(() => {
+        this.spinning = false
       })
     },
     // 获取目录的第一个大屏
@@ -672,6 +682,7 @@ export default {
         .then(res => {
           if (res.code === 200) {
             this.getList()
+            this.$store.dispatch('user/getInfo') // 刷新权限
             this.$message.success(res.msg)
           } else {
             this.$message.error(res.msg)
@@ -808,16 +819,17 @@ export default {
               setting: this.setting,
               ...values
             }
-            this.renameScreenData({ ...params }).then(res => {
-              if (res) {
-                this.$message.success('重命名成功')
-                this.fileSelectName = values.name
-                this.getList()
-                if (this.isPublish === 1) {
-                  this.$refs.screen.getShareData()
-                }
+            const res = await this.renameScreenData({ ...params })
+            if (res && res.code === 200) {
+              this.$message.success('重命名成功')
+              this.fileSelectName = values.name
+              this.getList()
+              if (this.isPublish === 1) {
+                this.$refs.screen.getShareData()
               }
-            })
+            } else {
+              return
+            }
           }
         }
         this.screenForm.resetFields()
@@ -848,7 +860,7 @@ export default {
       this.folderTitle = '新建文件夹'
     },
     // 创建文件夹
-    creatFolder(values) {
+    async creatFolder(values) {
       if (this.isAdd === 1) {
         // 新增
         let params = {
@@ -857,19 +869,18 @@ export default {
           parentId: 0,
           type: 3 // 0-无类型,1-数据接入，2-数据建模,3-数据大屏
         }
-        this.$server.common
+        const res = await this.$server.common
           .addMenuFolder('/screen/catalog', params)
-          .then(res => {
-            if (res.code === 200) {
-              this.$message.success(res.msg)
-              this.getList()
-              // 新建文件夹后 返回空页面 不显示大屏
-              this.fileSelectId = -1
-              this.fileSelectName = ''
-            } else {
-              this.$message.error(res.msg)
-            }
-          })
+        if (res.code === 200) {
+          this.$message.success(res.msg)
+          this.getList()
+          // 新建文件夹后 返回空页面 不显示大屏
+          this.fileSelectId = -1
+          this.fileSelectName = ''
+        } else {
+          this.$message.error(res.msg)
+          return
+        }
       } else {
         // 修改
         let params = {
@@ -877,16 +888,15 @@ export default {
           id: this.id,
           ...values
         }
-        this.$server.common
+        const res = await this.$server.common
           .putMenuFolderName('/screen/catalog/update', params)
-          .then(res => {
-            if (res.code === 200) {
-              this.$message.success(res.msg)
-              this.getList()
-            } else {
-              this.$message.error(res.msg)
-            }
-          })
+        if (res.code === 200) {
+          this.$message.success(res.msg)
+          this.getList()
+        } else {
+          this.$message.error(res.msg)
+          return
+        }
       }
       this.folderVisible = false
     },
@@ -937,7 +947,7 @@ export default {
     release() {
       if (this.isPublish === 0) {
         this.$server.screenManage.getScreenLink(this.screenId).then(res => {
-          this.releaseObj = { url: res.data, expired: 7, password: '' }
+          this.releaseObj = { url: res.data, expired: 7, password: '', publishOa: false }
           this.releaseVisible = true
         })
       } else {
@@ -1001,7 +1011,8 @@ export default {
         screenId: this.screenId,
         password: this.releaseObj.password,
         expired: this.releaseObj.expired,
-        valid: true
+        publishOa: this.releaseObj.publishOa,
+        valid: 1
       }
       // 未发布
       if (this.isPublish === 0) {
@@ -1019,7 +1030,7 @@ export default {
         this.$server.screenManage.reShareScreen(params).then(res => {
           if (res.code === 200) {
             this.$message.success('发布成功')
-            this.releaseObj.valid = true
+            this.releaseObj.valid = 1
           }
         })
       }
@@ -1029,9 +1040,10 @@ export default {
         title: '确认撤销',
         content: `是否确认撤销分享?`,
         onOk: async () => {
-          const res = await this.$server.screenManage.delShareScreen(
-            this.screenId
-          )
+          const res = await this.$server.screenManage.delShareScreen({
+            screenId: this.screenId,
+            id: this.releaseObj.id
+          })
           if (res.code === 200) {
             this.$message.success('撤销成功')
             // 状态改为未发布

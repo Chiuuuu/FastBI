@@ -1,5 +1,9 @@
 <template>
-  <a-spin :spinning="saveLoading" :tip="saveTip" class="tab-excel tab-datasource">
+  <a-spin
+    :spinning="saveLoading"
+    :tip="saveTip"
+    class="tab-excel tab-datasource"
+  >
     <div class="tab-datasource-model scrollbar">
       <a-form-model
         ref="fileForm"
@@ -115,7 +119,8 @@
             :currentFieldList="currentFieldList"
             :currentColumns="currentColumns"
             :show-switch="showFieldSwitch"
-            @changeDataType="changeDataType" />
+            @changeDataType="changeDataType"
+          />
         </a-col>
       </a-row>
     </div>
@@ -140,7 +145,6 @@ export default {
   extends: Excel,
   data() {
     return {
-      saveLoading: false,
       spinning: false,
       uploadProgress: '加载中',
       uploadCallback: num => {
@@ -149,6 +153,29 @@ export default {
           this.uploadProgress = num + '%'
         } else {
           this.uploadProgress = '文件解析中'
+        }
+      },
+      saveLoading: false,
+      saveTip: '保存中, 请勿进行其他操作',
+      saveCallback: num => {
+        const loop = num => {
+          if (num <= 95) {
+            num += 3
+            this.saveTip = num.toFixed(1) + '%'
+            let timer = setTimeout(() => {
+              loop(num)
+            }, 10000)
+            this.$once('hook:beforeDestroy', () => {
+              clearTimeout(timer)
+              timer = null
+            })
+          }
+        }
+        if (num < 100) {
+          this.saveTip = (num * 0.5).toFixed(1) + '%'
+        } else {
+          this.saveTip = '50%'
+          loop(50)
         }
       },
       isDragenter: false,
@@ -240,11 +267,14 @@ export default {
       this.fileList = []
       this.fileInfoList = []
       this.databaseList = []
+      this.saveLoading = false
+      this.saveTip = '保存中, 请勿进行其他操作'
       this.handleClearTable()
       this.clearReplaceFile()
     },
     // 渲染表单
     handleSetFormData() {
+      console.log(this.modelType, 'aaa')
       if (this.modelType !== 'csv') return
       this.handleResetForm()
       if (this.modelId) {
@@ -275,11 +305,14 @@ export default {
     handleOperationDelimiter() {
       // 如果不是库里的分隔符, 要录入操作数组operation: 4
       const currentFile = this.fileInfoList[this.currentFileIndex]
-      const index = this.operation.findIndex(item => item.name === currentFile.name)
+      const index = this.operation.findIndex(
+        item => item.name === currentFile.name
+      )
       if (!isNaN(currentFile.id)) {
         if (currentFile.delimiter === this.queryDelimiter) {
           // 恢复了分隔符
-          if (index > -1) { // 如果operation里面有对象则的删除
+          if (index > -1) {
+            // 如果operation里面有对象则的删除
             this.operation.splice(index, 1)
           }
         } else {
@@ -348,16 +381,19 @@ export default {
       }
       const table = this.databaseList[this.currentFileIndex]
       // const rows = table.originRows
-      const head = { [name]: this.currentColumns.slice(1).map(item => ({
-        name: item.title,
-        dataType: item.dataType
-      })) }
+      const head = {
+        [name]: this.currentColumns.slice(1).map(item => ({
+          name: item.title,
+          dataType: item.dataType
+        }))
+      }
       const data = new FormData()
       data.append('sheetsHeaderJson', JSON.stringify(head))
       data.append('sheetName', name)
       data.append('delimiter', this.queryDelimiter)
       data.append('file', file)
-      const res = await this.$server.dataAccess.actionChangeCsvType(data)
+      const res = await this.$server.dataAccess
+        .actionChangeCsvType(data)
         .finally(() => {
           this.spinning = false
         })
@@ -403,15 +439,14 @@ export default {
         const file = this.fileInfoList[index]
         const target = this.operation.find(item => item.name === file.name)
         // 赋值当前表单的分隔符
-        this.form.delimiter = target ? this.formatDelimiter(target.delimiter) : this.formatDelimiter(file.delimiter)
+        this.form.delimiter = target
+          ? this.formatDelimiter(target.delimiter)
+          : this.formatDelimiter(file.delimiter)
         // 首先判断该文件是否进行过操作, 如果有, 则读文件, 没有则读presto数据
         const isPresto = !target
         this.renderCurrentTable(isPresto)
 
-        this.$store.dispatch(
-          'dataAccess/setDatabaseName',
-          file.name
-        )
+        this.$store.dispatch('dataAccess/setDatabaseName', file.name)
       }
     },
     // 校验文件
@@ -427,9 +462,9 @@ export default {
       }
 
       // 校验大小
-      if (isValid && file.size > 50 * 1024 * 1024) {
+      if (isValid && file.size > 200 * 1024 * 1024) {
         isValid = false
-        this.$message.error('文件大于50M, 无法上传')
+        this.$message.error('文件大于200M, 无法上传')
       }
 
       // 校验重名
@@ -641,6 +676,11 @@ export default {
             delimiter: this.queryDelimiter,
             database: database
           })
+        } else {
+          const target = this.operation.find(item => item.name === name)
+          if (target) {
+            target.database = database
+          }
         }
 
         this.$nextTick(() => {
@@ -657,7 +697,13 @@ export default {
       this.$confirm({
         title: '确认提示',
         content: '您确定要删除该文件吗',
-        onOk: () => {
+        onOk: async () => {
+          if (!isNaN(file.id)) {
+            const res = await this.$server.dataAccess.verifyDatabaseDelete({ id: file.id })
+            if (res.code !== 200) {
+              return this.$message.error(res.msg || '删除失败')
+            }
+          }
           let index = this.fileInfoList.indexOf(file)
           this.databaseList.splice(index, 1)
           this.fileInfoList.splice(index, 1)
@@ -729,20 +775,22 @@ export default {
           if (isPresto) {
             // 单纯地读入库文件, 直接查presto
             this.spinning = true
-            res = await this.$server.dataAccess.getCsvPrestoTableInfo(id)
-            .finally(() => {
-              this.spinning = false
-            })
+            res = await this.$server.dataAccess
+              .getCsvPrestoTableInfo(id)
+              .finally(() => {
+                this.spinning = false
+              })
           } else {
             // 否则需要根据id找到文件重新根据分隔符切割数据
             const formData = new FormData()
             formData.append('databaseId', id)
             formData.append('delimiter', this.queryDelimiter)
             this.spinning = true
-            res = await this.$server.dataAccess.getCsvFileTableInfo(formData)
-            .finally(() => {
-              this.spinning = false
-            })
+            res = await this.$server.dataAccess
+              .getCsvFileTableInfo(formData)
+              .finally(() => {
+                this.spinning = false
+              })
           }
         }
         if (res.code === 200) {
@@ -775,12 +823,13 @@ export default {
         }
       }
       const columns = new Array({
-          title: '序号',
-          dataIndex: 'no',
-          scopedSlots: {
-            customRender: 'no'
-          }
-        }).concat(table.headerList.map((col, index) => {
+        title: '序号',
+        dataIndex: 'no',
+        scopedSlots: {
+          customRender: 'no'
+        }
+      }).concat(
+        table.headerList.map((col, index) => {
           return {
             title: col.name,
             dataType: col.dataType,
@@ -858,25 +907,43 @@ export default {
             }
             for (const key in item) {
               if (key !== 'database') {
-                formData.append('csvDatabaseList[' + index + '].' + key, item[key])
+                formData.append(
+                  'csvDatabaseList[' + index + '].' + key,
+                  item[key]
+                )
               } else {
                 const database = item[key] || {}
-                formData.append('csvDatabaseList[' + index + '].sheetsHeaderJson', JSON.stringify({ [item.name]: database.headerList }))
+                formData.append(
+                  'csvDatabaseList[' + index + '].sheetsHeaderJson',
+                  JSON.stringify({ [item.name]: database.headerList })
+                )
               }
             }
           }
 
           this.$server.dataAccess
-            .saveCsvInfo(formData)
+            .saveCsvInfo(formData, this.saveCallback)
             .then(result => {
               if (result.code === 200) {
                 this.$message.success('保存成功')
-                this.$store.dispatch('dataAccess/getMenuList')
+                this.$store.dispatch(
+                  'dataAccess/getMenuList',
+                  this.accessInstance.$refs.menu
+                )
                 this.$store.dispatch('dataAccess/setFirstFinished', true)
                 this.$store.dispatch('dataAccess/setModelName', this.form.name)
-                this.$store.dispatch('dataAccess/setModelId', result.data.datasource.id)
-                this.$store.commit('common/SET_MENUSELECTID', result.data.datasource.id)
-                this.$store.commit('common/SET_PRIVILEGES', result.data.datasource.privileges || [])
+                this.$store.dispatch(
+                  'dataAccess/setModelId',
+                  result.data.datasource.id
+                )
+                this.$store.commit(
+                  'common/SET_MENUSELECTID',
+                  result.data.datasource.id
+                )
+                this.$store.commit(
+                  'common/SET_PRIVILEGES',
+                  result.data.datasource.privileges || []
+                )
                 this.fileInfoList = result.data.sourceDatabases
                 // this.$store.dispatch('dataAccess/setParentId', 0)
                 // 保存后清空列表

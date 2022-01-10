@@ -49,7 +49,8 @@ const actions = {
   async getMenuList({
     commit
   }, vm) {
-    const result = await dataAccessApi.getMenuList('/datasource/catalog/list/1')
+    vm.spinning = true
+    const result = await dataAccessApi.getMenuList('/datasource/catalog/list/1').finally(() => (vm.spinning = false))
     if (result.code === 200) {
       commit('SET_MENULIST', result.rows)
       vm.handleGetSearchList(vm.searchValue)
@@ -80,7 +81,10 @@ const actions = {
   setModelType({
     commit
   }, type) {
-    commit('SET_MODELTYPE', type)
+    return new Promise(resolve => {
+      commit('SET_MODELTYPE', type)
+      resolve()
+    })
   },
   setFirstFinished({
     commit

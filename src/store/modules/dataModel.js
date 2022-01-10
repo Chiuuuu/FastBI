@@ -8,6 +8,7 @@ const state = {
   databaseId: '', // 数据库id
   datasource: null, // 数据源
   datasourceId: '',
+  selectTableId: '', // 表格id
   selectedModelList: [], // 选中的数据模型
   //存储每个屏幕中使用的所有数据模型
 }
@@ -37,6 +38,9 @@ const mutations = {
   SET_DATASOURCEID(state, id) {
     state.datasourceId = id
   },
+  SET_SELECTTABLEID(state, id) {
+    state.selectTableId = id
+  },
   SET_SELECTEDMODELlIST(state, list) {
     state.selectedModelList = list || []
   }
@@ -44,7 +48,8 @@ const mutations = {
 
 const actions = {
   async getMenuList({ commit }, vm) {
-    const result = await dataAccessApi.getMenuList('/model/catalog/list/2')
+    vm.spinning = true
+    const result = await dataAccessApi.getMenuList('/model/catalog/list/2').finally(() => (vm.spinning = false))
     if (result.code === 200) {
       commit('SET_MENULIST', result.data)
       vm.handleGetModelSearchList(vm.modelSearch)
@@ -63,6 +68,9 @@ const actions = {
   },
   setDatabaseId({ commit }, id) {
     commit('SET_DATABASEID', id)
+  },
+  setSelectTableId({ commit }, id) {
+    commit('SET_SELECTTABLEID', id)
   },
   setDatasource({ commit }, datasource) {
     commit('SET_DATASOURCE', datasource)

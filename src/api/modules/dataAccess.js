@@ -9,6 +9,14 @@ export default {
         return $axios.post(`/datasource/connect`, params)
     },
     /**
+     * @description 测试连接数据库(自定义sql)
+     * @param {Object} [params={}] 请求参数
+     * @returns
+     */
+    actionTestConnect(params = {}) {
+        return $axios.post('/datasource/customize/testConnection', params)
+    },
+    /**
      * @description 获取表的具体字段信息
      * @param {string} type 类型
      * @param {Object} [params={}] 请求参数
@@ -102,12 +110,19 @@ export default {
     },
     /**
      * @description 自定义表抽取
-     * @param {String} url  请求地址
      * @param {Array} [params={}] 请求参数
      * @returns
      */
     actionCustomExtract(params = []) {
         return $axios.post('/source/view/extract', params)
+    },
+    /**
+     * @description 校验excel|csv数据源中的文件是否可删除
+     * @param {String} params.id 文件id
+     * @returns
+     */
+    verifyDatabaseDelete(params) {
+        return $axios.post('/datasource/database/verifyDel', params)
     },
     /**
     * @description 校验替换的excel文件
@@ -252,13 +267,19 @@ export default {
      * @param {String} 'parentId' parentId
      * @param {String} 'id' id
      */
-    saveExcelInfo(data) {
+    saveExcelInfo(data, callback = () => {}) {
         return $axios({
             method: 'post',
             headers: { 'Content-Type': 'multipart/form-data' },
             // url: '/datasource/excel/batchsave',
             url: '/datasource/excel/save',
             data,
+            onUploadProgress: progressEvent => {
+              if (progressEvent.lengthComputable) {
+                let num = Math.round((progressEvent.loaded / progressEvent.total) * 100)
+                callback(num)
+              }
+            },
             timeout: 600000
         })
     },
@@ -296,12 +317,18 @@ export default {
      * @param {String} 'id' id
      * @param {String} 'delimiter' 分隔符
      */
-    saveCsvInfo(data) {
+    saveCsvInfo(data, callback = () => {}) {
         return $axios({
             method: 'post',
             headers: { 'Content-Type': 'multipart/form-data' },
             url: '/datasource/csv/save',
             data,
+            onUploadProgress: progressEvent => {
+              if (progressEvent.lengthComputable) {
+                let num = Math.round((progressEvent.loaded / progressEvent.total) * 100)
+                callback(num)
+              }
+            },
             timeout: 600000
         })
     },

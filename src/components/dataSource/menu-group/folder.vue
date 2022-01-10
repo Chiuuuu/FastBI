@@ -66,7 +66,7 @@ export default {
   data() {
     return {
       contenxtmenu: '',
-      folderOpen: true
+      folderOpen: false
     }
   },
   mounted() {

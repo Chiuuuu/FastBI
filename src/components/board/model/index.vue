@@ -267,7 +267,7 @@ import { deepClone } from '@/utils/deepClone'
 import debounce from 'lodash/debounce'
 import { menuSearchLoop } from '@/utils/menuSearch'
 import { Loading } from 'element-ui'
-import ComputeSetting from '@/views/dataSource/dataModel/model-edit/setting/compute-setting'
+import ComputeSetting from '@/views/dataSource/dataModel/components/model-edit/setting/compute-setting'
 import GeoSetting from './components/geo-setting'
 import AddDataList from './components/addDataList'
 export default {

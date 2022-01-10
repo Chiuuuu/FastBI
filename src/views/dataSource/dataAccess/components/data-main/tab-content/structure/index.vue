@@ -6,13 +6,18 @@
         <a-radio-button :value="1">自定义表</a-radio-button>
       </a-radio-group>
       <a-row type="flex" align="middle">
-        <a-col :span="6" style="padding-left:20px">
-          <a-input :value="tableKeyword" @change="handleGetTableKeyword" placeholder="请输入表名">
+        <a-col :span="6" style="padding-left: 20px">
+          <a-input v-if="modelType !== 'customSql'" :value="tableKeyword" @change="handleGetTableKeyword" placeholder="请输入表名">
             <a-icon slot="prefix" type="search" />
           </a-input>
         </a-col>
-        <a-col :span="4" style="padding-left:10px">
-          <a-select v-show="tableType === 0" style="width: 100%;" :value="database" @change="handleChangeDatabase">
+        <a-col :span="4" style="padding-left: 10px">
+          <a-select
+            v-show="tableType === 0 && modelType !== 'customSql'"
+            style="width: 100%"
+            :value="database"
+            @change="handleChangeDatabase"
+          >
             <a-select-option v-for="item in databaseList" :key="item.name" :value="item.name">
               {{ item.name }}
             </a-select-option>
@@ -20,48 +25,70 @@
         </a-col>
         <a-col :span="14">
           <a-row type="flex" justify="end" align="middle">
-            <a-button type="primary" class="select_button" @click="() => handleGetTableList(pagination)" :loading="spinning">刷新数据</a-button>
             <a-button
-              v-if="hasBtnPermissionEdit || hasBtnPermissionSchedule"
-              v-show="showExtractBtn"
               type="primary"
               class="select_button"
-              style="margin-left:10px;"
+              @click="() => handleGetTableList(pagination)"
+              :loading="spinning"
+            >
+              刷新数据
+            </a-button>
+            <a-button
+              v-if="hasBtnPermissionEdit || hasBtnPermissionSchedule"
+              v-show="showExtractBtn || modelType === 'customSql'"
+              type="primary"
+              class="select_button"
+              style="margin-left: 10px"
               @click="handleExtract"
-              :loading="extractSping">立即抽取</a-button>
+              :loading="extractSping"
+            >
+              立即抽取
+            </a-button>
             <a-button
               v-if="tableType === 0 && hasBtnPermissionSchedule"
               v-show="showExtractBtn"
               type="primary"
-              style="margin-left:10px;"
+              style="margin-left: 10px"
               @click="showSetting('batch')"
               class="select_button"
-            >批量定时抽取</a-button>
-            <a-dropdown v-if="['excel', 'csv'].indexOf(modelType) === -1" :trigger="['click']">
-              <a-button type="primary" style="margin-left:10px;">更多<a-icon type="down" /></a-button>
-              <a-menu slot="overlay">
-                <a-menu-item>
-                  <span @click="handleSyncTable">同步库表结构</span>
-                </a-menu-item>
-                <a-menu-item
-                  v-if="tableType === 0 && hasBtnPermissionSchedule"
-                  v-show="showExtractBtn">
-                  <span @click="showExtractLog">定时抽取记录</span>
-                </a-menu-item>
-                <a-menu-item
-                  v-if="tableType === 0 && hasBtnPermissionSchedule"
-                  v-show="showExtractBtn">
-                  <span @click="showSetting('batchList')">批量任务列表</span>
-                </a-menu-item>
-              </a-menu>
-            </a-dropdown>
+            >
+              批量定时抽取
+            </a-button>
+            <a-button
+              v-if="modelType === 'customSql'"
+              type="primary"
+              style="margin-left: 10px"
+              @click="showExtractLog"
+              class="select_button"
+            >
+              定时抽取记录
+            </a-button>
+            <template v-else>
+              <a-dropdown v-if="['excel', 'csv'].indexOf(modelType) === -1" :trigger="['click']">
+                <a-button type="primary" style="margin-left: 10px">
+                  更多
+                  <a-icon type="down" />
+                </a-button>
+                <a-menu slot="overlay">
+                  <a-menu-item>
+                    <span @click="handleSyncTable">同步库表结构</span>
+                  </a-menu-item>
+                  <a-menu-item v-if="tableType === 0 && hasBtnPermissionSchedule" v-show="showExtractBtn">
+                    <span @click="showExtractLog">定时抽取记录</span>
+                  </a-menu-item>
+                  <a-menu-item v-if="tableType === 0 && hasBtnPermissionSchedule" v-show="showExtractBtn">
+                    <span @click="showSetting('batchList')">批量任务列表</span>
+                  </a-menu-item>
+                </a-menu>
+              </a-dropdown>
+            </template>
           </a-row>
         </a-col>
       </a-row>
     </div>
     <div class="tab-scroll scrollbar">
       <a-table
-        rowKey='id'
+        rowKey="id"
         :row-selection="rowSelection"
         :pagination="pagination"
         :columns="columns"
@@ -71,7 +98,9 @@
         @change="handleChangeTable"
       >
         <span slot="alias" slot-scope="text, record">
-          <a @click="handleCheckTable($event, record.id)">{{ text }}</a>
+          <a-tooltip placement="top" :title="text">
+            <a @click="handleCheckTable($event, record.id)">{{ text }}</a>
+          </a-tooltip>
         </span>
         <span slot="set" slot-scope="set">
           {{ set ? '是' : '否' }}
@@ -87,15 +116,14 @@
           <span v-else>未抽取</span>
         </template>
         <span slot="config" slot-scope="row">
-          <a v-on:click="setting(row)">{{row.set ? '字段编辑' : '字段设置' }}</a>
+          <a v-on:click="setting(row)">{{ row.set ? '字段编辑' : '字段设置' }}</a>
         </span>
         <span slot="regular" slot-scope="row">
           <a v-on:click="showSetting('single', row)">定时设置</a>
         </span>
       </a-table>
-      <a-modal width="920px" title="定时抽取记录" :bodyStyle="bodyStyle" :visible="visible1" @cancel="handleCloseExtractLog">
+      <a-modal width="920px" title="定时抽取记录" :bodyStyle="bodyStyle" :visible="visible1" :footer="null" @cancel="handleCloseExtractLog">
         <a-table
-          row-key="id"
           size="small"
           :columns="logColumns"
           :data-source="logData"
@@ -126,7 +154,8 @@
         :database-id="databaseId"
         @close="closeRegularList"
         @setRegular="setRegular"
-        @checkRegular="handleCheckRegularInfo" />
+        @checkRegular="handleCheckRegularInfo"
+      />
       <regular-setting
         ref="regular"
         :show="visible2"
@@ -139,12 +168,9 @@
         :all-table="data"
         @insertData="data => $refs.extract && $refs.extract.regData.push(data)"
         @updateData="data => $refs.extract && $refs.extract.updateRows(data)"
-        @close="closeRegular" />
-      <table-info
-        :table-id="checkTableId"
-        :show="visible3"
-        @close="visible3 = false"
+        @close="closeRegular"
       />
+      <table-info :table-id="checkTableId" :show="visible3" @close="visible3 = false" />
     </div>
   </a-spin>
 </template>
@@ -154,7 +180,7 @@ import RegularSetting from './regular'
 import ExtractSetting from './extract'
 import TableInfo from './table-info'
 import moment from 'moment'
-import { checkActionPermission, hasPermission } from '@/utils/permission'
+import { hasPermission } from '@/utils/permission'
 import debounce from 'lodash/debounce'
 const logColumns = [
   {
@@ -233,7 +259,7 @@ export default {
       tableKeyword: '',
       logColumns,
       logData: [],
-      bodyStyle: { 'maxHeight': 'calc(100vh - 240px)', 'overflow-y': 'auto' },
+      bodyStyle: { maxHeight: 'calc(100vh - 240px)', 'overflow-y': 'auto' },
       tableType: 0,
       visible: false, // 批量设置定时弹窗
       visible1: false, // 抽取记录弹窗
@@ -258,7 +284,7 @@ export default {
       modelName: state => state.dataAccess.modelName,
       modelType: state => state.dataAccess.modelType,
       privileges: state => state.common.privileges,
-      showExtractBtn: state => [ 'mysql', 'oracle', 'hive' ].indexOf(state.dataAccess.modelType) > -1
+      showExtractBtn: state => ['mysql', 'oracle', 'hive'].indexOf(state.dataAccess.modelType) > -1
     }),
     rowSelection() {
       return {
@@ -270,7 +296,7 @@ export default {
           // eslint-disable-next-line vue/no-side-effects-in-computed-properties
           this.selectedRowKeys = selectedRows.map(item => item.id)
         },
-        onSelectAll: (selected, selectedRows, changeRows) => {
+        onSelectAll: (selected, selectedRows) => {
           // eslint-disable-next-line vue/no-side-effects-in-computed-properties
           this.selectedRows = selectedRows
           // eslint-disable-next-line vue/no-side-effects-in-computed-properties
@@ -307,16 +333,15 @@ export default {
         return `${h}h${this.formatCost(v % 3600, true)}`
       }
     },
-    handleTableTypeChange(event) {
+    handleTableTypeChange() {
       this.handleGetTableList()
     },
     // 同步库库表结构
     async handleSyncTable() {
       this.spinning = true
-      const result = await this.$server.dataAccess.actionSyncTable(this.modelId, this.databaseId)
-        .finally(() => {
-          this.spinning = false
-        })
+      const result = await this.$server.dataAccess.actionSyncTable(this.modelId, this.databaseId).finally(() => {
+        this.spinning = false
+      })
 
       if (result.code === 200) {
         this.$message.success('同步库表成功')
@@ -325,7 +350,7 @@ export default {
         this.$message.error(result.msg)
       }
     },
-    handleGetTableKeyword: debounce(function(e) {
+    handleGetTableKeyword: debounce(function (e) {
       this.tableKeyword = e.target.value.trim()
       this.selectedRowKeys = []
       this.selectedRows = []
@@ -415,7 +440,7 @@ export default {
       this.selectedRows = []
       this.handleGetTableList(pagination)
     },
-    async handleGetData(pagination) {
+    async handleGetData() {
       if (!this.modelType) return
       await this.handleGetDatabaseList()
       this.handleGetTableList()
@@ -433,8 +458,9 @@ export default {
       if (['excel', 'csv'].indexOf(this.modelType) > -1) {
         databaseName = this.databaseName
       }
-      // 当前库组列表没有默认数据库(即没有权限)则不掉接口
-      if (!databaseName) {
+      // 当前库组列表没有默认数据库(即没有权限)则不调接口
+      // 自定义sql没有默认数据库名
+      if (!databaseName && this.modelType !== 'customSql') {
         this.spinning = false
         this.data = []
         this.$store.dispatch('dataAccess/setReadRows', this.data)
@@ -444,8 +470,13 @@ export default {
       }
 
       // 获取数据库id
-      const database = this.databaseList.find(item => item.name === databaseName)
-      this.databaseId = database ? database.id : ''
+      // 自定义sql直接取databaseList第一个id
+      if (this.modelType === 'customSql') {
+        this.databaseId = this.databaseList[0].id
+      } else {
+        const database = this.databaseList.find(item => item.name === databaseName)
+        this.databaseId = database ? database.id : ''
+      }
       const params = {
         databaseName,
         databaseId: this.databaseId,
@@ -455,10 +486,9 @@ export default {
         pageSize: this.pagination.pageSize,
         current: pagination ? pagination.current : this.$options.data().pagination.current
       }
-      const dabaseInfoResult = await this.$server.dataAccess.getTableList(params)
-        .finally(() => {
-          this.spinning = false
-        })
+      const dabaseInfoResult = await this.$server.dataAccess.getTableList(params).finally(() => {
+        this.spinning = false
+      })
       if (dabaseInfoResult.code === 200) {
         this.data = [].concat(dabaseInfoResult.rows)
         this.$store.dispatch('dataAccess/setReadRows', this.data)
@@ -506,33 +536,44 @@ export default {
           normalCnt++
         }
       })
-      if (changeList.length > 0) { // 表字段发生变化
+      if (changeList.length > 0) {
+        // 表字段发生变化
         this.hasChangeData = true
         return 'hasChange'
-      } else if (deleteList.length > 0) { // 有表被删除, 直接拦截操作
-        this.$message.error(h => h('span', { style: { textAlign: 'left' } }, deleteList.map(item => {
-          return h('span', {}, [
-            '表',
-            h('span', {}, item.tableName),
-            ':' + Object.values(item.codeMsgMap).join('、'),
-            h('br')
-          ])
-        })), 5)
+      } else if (deleteList.length > 0) {
+        // 有表被删除, 直接拦截操作
+        this.$message.error(
+          h =>
+            h(
+              'span',
+              { style: { textAlign: 'left' } },
+              deleteList.map(item => {
+                return h('span', {}, [
+                  '表',
+                  h('span', {}, item.tableName),
+                  ':' + Object.values(item.codeMsgMap).join('、'),
+                  h('br')
+                ])
+              })
+            ),
+          5
+        )
         return 'hasDelete'
-      } else if (largeList.length > 0) { // 有大数据表, 则定时任务需至少间隔2小时
+      } else if (largeList.length > 0) {
+        // 有大数据表, 则定时任务需至少间隔2小时
         this.largeDataList = largeList
         return 'hasLarge'
-      } else if (infoList.length === normalCnt) { // 正常情况
+      } else if (infoList.length === normalCnt) {
+        // 正常情况
         return 'normal'
       }
     },
     // 校验当前表数据变动
     async handleVerifyTable(ids) {
       this.verifying = true
-      const result = await this.$server.dataAccess.actionVerifyTable(ids)
-        .finally(() => {
-          this.verifying = false
-        })
+      const result = await this.$server.dataAccess.actionVerifyTable(ids).finally(() => {
+        this.verifying = false
+      })
       if (result.code === 200) {
         return this.handleTableInfo(result.data)
       } else {
@@ -547,7 +588,8 @@ export default {
       }
       this.visible1 = true
       this.modalSpin = true
-      this.$server.dataAccess.getExtractLogList(this.data[0].id)
+      this.$server.dataAccess
+        .getExtractLogList(this.data[0].id)
         .then(res => {
           if (res.code === 200) {
             this.logData = res.rows
@@ -565,8 +607,11 @@ export default {
       } else if (this.selectedRows.length > 10) {
         return this.$message.error('一次抽取最多只能选择10个')
       }
-      const code = await this.handleVerifyTable(this.selectedRows.map(item => item.id))
-      if (code === 'hasDelete' || code === 'error') return
+      // 自定义sql不做表结构校验
+      if (this.modelType !== 'customSql') {
+        const code = await this.handleVerifyTable(this.selectedRows.map(item => item.id))
+        if (code === 'hasDelete' || code === 'error') return
+      }
       // 源表抽取
       let result
       if (this.tableType === 0) {
@@ -581,19 +626,24 @@ export default {
           return _item
         })
         this.extractSping = true
-        result = await this.$server.dataAccess.actionExtract('/datasource/extract', {
-          rows: rows,
-          tableList: this.data
-        }).finally(() => {
-          this.extractSping = false
-          this.handleGetTableList(this.pagination)
-        })
-      } else if (this.tableType === 1) { // 自定义表抽取
+        result = await this.$server.dataAccess
+          .actionExtract('/datasource/extract', {
+            rows: rows,
+            tableList: this.data
+          })
+          .finally(() => {
+            this.extractSping = false
+            this.handleGetTableList(this.pagination)
+          })
+      } else if (this.tableType === 1) {
+        // 自定义表抽取
         this.extractSping = true
-        result = await this.$server.dataAccess.actionCustomExtract(this.selectedRows.map(item => item.id)).finally(() => {
-          this.extractSping = false
-          this.handleGetTableList(this.pagination)
-        })
+        result = await this.$server.dataAccess
+          .actionCustomExtract(this.selectedRows.map(item => item.id))
+          .finally(() => {
+            this.extractSping = false
+            this.handleGetTableList(this.pagination)
+          })
       }
       if (result.code === 200) {
         // if (result.data) {
@@ -608,23 +658,32 @@ export default {
         const errorList = result.msg.split('\\n')
         if (this.largeDataList.length > 0) {
           this.$message.info({
-            content: h => h('div', [
-              h('div', {}, '当前抽取的表数据量较多，耗时会更长，请您耐心等待'),
-              errorList.map(item => h('div', {}, item))
-            ]),
+            content: h =>
+              h('div', [
+                h('div', {}, '当前抽取的表数据量较多，耗时会更长，请您耐心等待'),
+                errorList.map(item => h('div', {}, item))
+              ]),
             icon: '抽取提示'
           })
           this.largeDataList = []
         } else {
           this.$message.info({
-            content: h => h('div', errorList.map(item => h('div', {}, item))),
+            content: h =>
+              h(
+                'div',
+                errorList.map(item => h('div', {}, item))
+              ),
             icon: '抽取提示'
           })
         }
       } else {
         const errorList = result.msg.split('\\n')
         this.$message.error({
-          content: h => h('div', errorList.map(item => h('div', {}, item))),
+          content: h =>
+            h(
+              'div',
+              errorList.map(item => h('div', {}, item))
+            ),
           icon: '抽取提示'
         })
       }
@@ -639,17 +698,22 @@ export default {
       if (type === 'single') {
         this.clickRows = new Array(row)
         this.visible = true
-      } else if (type === 'batch') { // 点击批量抽取按钮
+      } else if (type === 'batch') {
+        // 点击批量抽取按钮
         if (this.selectedRows.length < 2) {
           return this.$message.error('请选择至少2项')
         } else if (this.selectedRows.length > 10) {
           return this.$message.error('最多只能选择10项')
         }
-        const code = await this.handleVerifyTable(this.selectedRows.map(item => item.id))
-        if (code === 'hasDelete' || code === 'error') return
+        // 自定义sql不做表结构校验
+        if (this.modelType !== 'customSql') {
+          const code = await this.handleVerifyTable(this.selectedRows.map(item => item.id))
+          if (code === 'hasDelete' || code === 'error') return
+        }
         this.clickRows = this.selectedRows
         this.visible2 = true
-      } else if (type === 'batchList') { // 查看批量抽取记录
+      } else if (type === 'batchList') {
+        // 查看批量抽取记录
         if (this.data.length < 1) {
           return this.$message.error('当前数据库暂无数据')
         }
@@ -675,10 +739,9 @@ export default {
     // 获取定时任务详情(查看用)
     async handleCheckRegularInfo(data) {
       if (this.$refs.extract.modalSpin) this.$refs.extract.modalSpin = true
-      const res = await this.$server.dataAccess.getRegularInfo(data.id, data.groupId)
-        .catch(() => {
-          if (this.$refs.extract.modalSpin) this.$refs.extract.modalSpin = false
-        })
+      const res = await this.$server.dataAccess.getRegularInfo(data.id, data.groupId).catch(() => {
+        if (this.$refs.extract.modalSpin) this.$refs.extract.modalSpin = false
+      })
       if (res.code === 200) {
         this.visible2 = true
         this.isCheckRegular = true
@@ -690,21 +753,20 @@ export default {
     // 获取定时任务详情(编辑用)
     async handleGetRegularInfo(data) {
       if (this.$refs.extract.modalSpin) this.$refs.extract.modalSpin = true
-      const res = await this.$server.dataAccess.getRegularInfo(data.id, data.groupId)
-        .catch(() => {
-          if (this.$refs.extract.modalSpin) this.$refs.extract.modalSpin = false
-        })
+      const res = await this.$server.dataAccess.getRegularInfo(data.id, data.groupId).catch(() => {
+        if (this.$refs.extract.modalSpin) this.$refs.extract.modalSpin = false
+      })
       if (res.code === 200) {
-        // 校验当前表
-        const code = await this.handleVerifyTable(res.data.map(item => item.target))
-          .finally(() => {
+        // 校验当前表 自定义sql不做表结构校验
+        if (this.modelType !== 'customSql') {
+          const code = await this.handleVerifyTable(res.data.map(item => item.target)).finally(() => {
             if (this.$refs.extract.modalSpin) this.$refs.extract.modalSpin = false
           })
-        if (code === 'hasDelete' || code === 'error') {
-          return code
-        } else {
-          this.regData = res.data
+          if (code === 'hasDelete' || code === 'error') {
+            return code
+          }
         }
+        this.regData = res.data
       } else {
         this.$message.error(res.msg)
         if (this.$refs.extract.modalSpin) this.$refs.extract.modalSpin = false
@@ -717,9 +779,13 @@ export default {
         code = await this.handleGetRegularInfo(data)
       } else {
         this.regData = []
-        code = await this.handleVerifyTable(this.clickRows.map(item => item.id))
-        if (this.$refs.extract) this.$refs.extract.modalSpin = false
+        // 自定义sql不做表结构校验
+        if (this.modelType !== 'customSql') {
+          code = await this.handleVerifyTable(this.clickRows.map(item => item.id))
+          if (this.$refs.extract) this.$refs.extract.modalSpin = false
+        }
       }
+      this.$refs.extract.modalSpin = false
       if (code === 'hasDelete' || code === 'error') return
       this.visible2 = true
     }

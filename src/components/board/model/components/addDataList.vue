@@ -24,7 +24,7 @@
               <a-collapse-panel
                 :showArrow="false"
                 :key="item2.id"
-                :header="item2.name"
+                :header="item2.name || item.name"
                 :style="customStyle"
                 :class="disableList.includes(item2.id) ? 'disable' : ''"
                 @click.native="fileHandle(item2)"

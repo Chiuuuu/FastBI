@@ -1,7 +1,7 @@
 <template>
   <li
     class="item dragable"
-    :class="isSelect ? 'file-active':''"
+    :class="[ { 'file-active': isSelect }, { 'file-disabled': disabled }]"
     :title="file[fileName]"
     :index="index"
     ref="file"
@@ -49,6 +49,10 @@ export default {
       default: 'default'
     },
     isSelect: {
+      type: Boolean,
+      default: false
+    },
+    disabled: {
       type: Boolean,
       default: false
     },
@@ -133,7 +137,7 @@ export default {
 <style lang="less" scoped>
   .icon-bg {
     background: url("../../../assets/images/common/types.png") no-repeat;
-    background-size: 110px 16px;
+    background-size: 130px 16px;
   }
   .icon-2 { // oracle
     background-position: 0 0;
@@ -149,6 +153,9 @@ export default {
   }
   .icon-12 { // csv
     background-position: -72px 0;
+  }
+  .icon-13 { // customSql
+    background-position: -113px 0;
   }
   .icon-model { // 数据模型
     background-position: -94px 0;

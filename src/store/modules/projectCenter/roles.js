@@ -25,7 +25,8 @@ const actions = {
   async getMenuList({
     commit
   }, vm) {
-    const result = await dataAccessApi.getMenuList('/business/role/listTree')
+    vm.spinning = true
+    const result = await dataAccessApi.getMenuList('/business/role/listTree').finally(() => (vm.spinning = false))
     if (result.code === 200) {
       commit('SET_MENULIST', result.data)
       vm.handleGetSearchList(vm.searchValue)

@@ -1,5 +1,5 @@
 <template>
-  <a-modal title="修改密码" :visible="modalShow" :maskClosable="false" @cancel="handleModalCancel">
+  <a-modal title="修改密码" :visible="modalShow" destroyOnClose :maskClosable="false" @cancel="handleModalCancel">
     <a-form-model ref="form" :model="form" :rules="rules" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
       <a-form-model-item label="旧密码" prop="oldPassword">
         <a-input-password v-model="form.oldPassword" style="width: 100%" placeholder="请输入密码"></a-input-password>
@@ -111,9 +111,7 @@ export default {
       })
       if (res.code === 200) {
         this.$message.success('修改成功，请重新登录')
-        setTimeout(() => {
-          this.$emit('updateOk')
-        }, 2000)
+        this.$emit('updateOk')
       } else {
         this.$message.error(res.msg)
       }

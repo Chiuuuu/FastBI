@@ -75,10 +75,10 @@
               class="js-table-tr"
             >
               <td
-                :style="customRow(index)"
                 class="data data-body"
-                v-for="(value, index) in row"
-                :key="index"
+                :style="customRow(index)"
+                v-for="(value, i) in row"
+                :key="i"
               >
                 {{ value }}
               </td>
@@ -396,7 +396,7 @@ export default {
     // },
     // 设置表体样式
     customRow(index) {
-      if (index % 2 === 1) {
+      if (index % 2 === 0) {
         // 奇行
         return {
           //   style: {

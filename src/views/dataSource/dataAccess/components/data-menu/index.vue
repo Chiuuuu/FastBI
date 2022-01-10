@@ -34,11 +34,11 @@
               >
                 <img
                   slot="cover"
-                  :alt="item.name"
+                  :alt="item.text"
                   class="card-img"
                   :src="item.imgurl"
                 />
-                <div class="card-title">{{ item.name }}</div>
+                <div class="card-title">{{ item.text }}</div>
               </a-card>
             </a-col>
           </template>
@@ -57,47 +57,49 @@
     <template v-else>
       <!-- <p class="menu_tips">右键文件夹或选项有添加，重命名等操作</p> -->
       <div class="menu-wrap scrollbar" @dragover.stop="handleDragOver" @drop="handleWrapDrop">
-        <div
-          class="group"
-          :class="handleIsFolder(folder, 'items') ? 'is-folder' : ''"
-          v-for="(folder, index) in menuList"
-          :key="folder.id"
-        >
-          <template v-if="handleIsFolder(folder, 'items')">
-            <menu-folder
-              :folder="folder"
-              :index="index"
-              :contextmenus="folderContenxtMenu"
-              @fileDrop="handleFileDrop"
-            >
-              <template v-slot:file="slotProps">
+        <a-spin :spinning="spinning">
+          <div
+            class="group"
+            :class="handleIsFolder(folder, 'items') ? 'is-folder' : ''"
+            v-for="(folder, index) in menuList"
+            :key="folder.id"
+          >
+            <template v-if="handleIsFolder(folder, 'items')">
+              <menu-folder
+                :folder="folder"
+                :index="index"
+                :contextmenus="folderContenxtMenu"
+                @fileDrop="handleFileDrop"
+              >
+                <template v-slot:file="slotProps">
+                  <menu-file
+                    icon="dataSource"
+                    :file="slotProps.file"
+                    :index="slotProps.index"
+                    :parent="folder"
+                    :isSelect='fileSelectId === slotProps.file.id'
+                    :contextmenus="fileContenxtMenu"
+                    @fileSelect="handleFileSelect"
+                    @fileDrag="handleFileDrag"
+                  ></menu-file>
+                </template>
+              </menu-folder>
+            </template>
+            <template v-else>
+              <ul class="items">
                 <menu-file
                   icon="dataSource"
-                  :file="slotProps.file"
-                  :index="slotProps.index"
-                  :parent="folder"
-                  :isSelect='fileSelectId === slotProps.file.id'
+                  :file="folder"
+                  :index="index"
+                  :isSelect='fileSelectId === folder.id'
                   :contextmenus="fileContenxtMenu"
                   @fileSelect="handleFileSelect"
                   @fileDrag="handleFileDrag"
                 ></menu-file>
-              </template>
-            </menu-folder>
-          </template>
-          <template v-else>
-            <ul class="items">
-              <menu-file
-                icon="dataSource"
-                :file="folder"
-                :index="index"
-                :isSelect='fileSelectId === folder.id'
-                :contextmenus="fileContenxtMenu"
-                @fileSelect="handleFileSelect"
-                @fileDrag="handleFileDrag"
-              ></menu-file>
-            </ul>
-          </template>
-        </div>
+              </ul>
+            </template>
+          </div>
+        </a-spin>
       </div>
     </template>
     <reset-name-modal
@@ -130,11 +132,12 @@ import MenuFolder from '@/components/dataSource/menu-group/folder'
 import debounce from 'lodash/debounce'
 
 const modelList = [
-  { name: 'mysql', type: '1' },
-  { name: 'oracle', type: '2' },
-  { name: 'hive', type: '5' },
-  { name: 'excel', type: '11' },
-  { name: 'csv', type: '12' }
+  { name: 'mysql', text: 'mysql', type: '1' },
+  { name: 'oracle', text: 'oracle', type: '2' },
+  { name: 'hive', text: 'hive', type: '5' },
+  { name: 'excel', text: 'excel', type: '11' },
+  { name: 'csv', text: 'csv', type: '12' },
+  { name: 'customSql', text: '自定义SQL', type: '13' }
 ]
 export default {
   name: 'dataMenu',
@@ -152,6 +155,7 @@ export default {
   },
   data() {
     return {
+      spinning: false,
       searchValue: '', // 关键词搜索
       searchList: [], // 搜索结果
       // fileSelectId: '', // 选中左侧菜单
@@ -325,7 +329,6 @@ export default {
         if (newItem) result.push(newItem)
       })
       this.searchList = result
-      console.log('搜索结果', this.searchList)
     },
     /**
     * 选择左侧菜单
@@ -333,18 +336,20 @@ export default {
     handleFileSelect(file) {
       if (this.fileSelectId === file.id) return
       this.fileSelectId = file.id
-      this.getTableInfo(`/datasource/${file.id}`, result => {
+      this.getTableInfo(`/datasource/${file.id}`, async result => {
         if (result.code === 200) {
           if (result.data.type === 1) {
-            this.$store.dispatch('dataAccess/setModelType', 'mysql')
+            await this.$store.dispatch('dataAccess/setModelType', 'mysql')
           } else if (result.data.type === 2) {
-            this.$store.dispatch('dataAccess/setModelType', 'oracle')
+            await this.$store.dispatch('dataAccess/setModelType', 'oracle')
           } else if (result.data.type === 5) {
-            this.$store.dispatch('dataAccess/setModelType', 'hive')
+            await this.$store.dispatch('dataAccess/setModelType', 'hive')
           } else if (result.data.type === 11) {
-            this.$store.dispatch('dataAccess/setModelType', 'excel')
+            await this.$store.dispatch('dataAccess/setModelType', 'excel')
           } else if (result.data.type === 12) {
-            this.$store.dispatch('dataAccess/setModelType', 'csv')
+            await this.$store.dispatch('dataAccess/setModelType', 'csv')
+          } else if (result.data.type === 13) {
+            await this.$store.dispatch('dataAccess/setModelType', 'customSql')
           }
           this.$store.dispatch('dataAccess/setModelInfo', result.data.properties)
           this.$store.dispatch('dataAccess/setModelName', result.data.name)
@@ -358,8 +363,10 @@ export default {
       this.$store.dispatch('dataAccess/setModelId', file.id)
       this.$store.dispatch('dataAccess/setParentId', file.parentId)
       this.$store.dispatch('dataAccess/setFirstFinished', true)
-      this.$emit('on-menuChange-componet', 'Main')
-      this.$EventBus.$emit('set-tab-index', '1')
+      setTimeout(() => {
+        this.$emit('on-menuChange-componet', 'Main')
+        this.$EventBus.$emit('set-tab-index', '1')
+      }, 200)
     },
     /**
     * 删除菜单
@@ -633,7 +640,6 @@ export default {
       const isHas = list.filter(item => {
         return item.name === values.name
       })
-      console.log(isHas)
       return !!(isHas && isHas.length > 0)
     },
     mouseenter(icon) {
