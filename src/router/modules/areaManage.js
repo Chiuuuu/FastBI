@@ -11,7 +11,7 @@ export default {
   redirect: '/areaManage/areaMap',
   component: RouteView,
   meta: {
-    title: '片区地图管理',
+    title: '片区管理',
     icon: 'environment',
     permissions: [PERMISSION_CODE.PAGE.areaManage]
   },
