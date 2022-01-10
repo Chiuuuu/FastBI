@@ -98,7 +98,9 @@
         @change="handleChangeTable"
       >
         <span slot="alias" slot-scope="text, record">
-          <a @click="handleCheckTable($event, record.id)">{{ text }}</a>
+          <a-tooltip placement="top" :title="text">
+            <a @click="handleCheckTable($event, record.id)">{{ text }}</a>
+          </a-tooltip>
         </span>
         <span slot="set" slot-scope="set">
           {{ set ? '是' : '否' }}

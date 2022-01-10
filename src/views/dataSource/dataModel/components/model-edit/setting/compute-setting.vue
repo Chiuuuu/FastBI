@@ -115,6 +115,15 @@ import findIndex from 'lodash/findIndex'
 import debounce from 'lodash/debounce'
 const expression = [
   {
+    id: 'GROUPBY',
+    name: '指定聚合',
+    expression: '指定聚合',
+    description: '对数据进行分组后聚合计算，或者不分组直接用所有值进行计算。指定聚合方式包括：求和、平均、最大、最小、计数和去重计数。',
+    example: '双击新建指定聚合字段',
+    syntax: '',
+    groups: ['calculation']
+  },
+  {
     id: 'SUM',
     name: '求和聚合',
     expression: 'SUM(表达式)',
@@ -237,15 +246,6 @@ const expression = [
     description: 'REPLACE1（原字符串,替换开始数,替换数量,替换串）:原字符串为需要被替换部分字符串的字符串，替换开始数为从原字符串替换字符的开始数，替换数量为替换字符的数量，替换串为用来替换的字符串。',
     example: 'REPLACE1("abcde",2,3,"***")="a***de"',
     syntax: 'REPLACE1(表达式, 1, 2, "")',
-    groups: ['calculation']
-  },
-  {
-    id: 'GROUPBY',
-    name: '指定聚合',
-    expression: '指定聚合',
-    description: '对数据进行分组后聚合计算，或者不分组直接用所有值进行计算。指定聚合方式包括：求和、平均、最大、最小、计数和去重计数。',
-    example: '双击新建指定聚合字段',
-    syntax: '',
     groups: ['calculation']
   }
 ]
