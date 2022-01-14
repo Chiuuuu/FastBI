@@ -333,11 +333,13 @@ export default {
     /**
     * 选择左侧菜单
     */
-    handleFileSelect(file) {
+    async handleFileSelect(file) {
       if (this.fileSelectId === file.id) return
       this.fileSelectId = file.id
-      this.getTableInfo(`/datasource/${file.id}`, async result => {
+      await this.getTableInfo(`/datasource/${file.id}`, async result => {
         if (result.code === 200) {
+          this.$store.dispatch('dataAccess/setModelInfo', result.data.properties)
+          this.$store.dispatch('dataAccess/setModelName', result.data.name)
           if (result.data.type === 1) {
             await this.$store.dispatch('dataAccess/setModelType', 'mysql')
           } else if (result.data.type === 2) {
@@ -351,8 +353,6 @@ export default {
           } else if (result.data.type === 13) {
             await this.$store.dispatch('dataAccess/setModelType', 'customSql')
           }
-          this.$store.dispatch('dataAccess/setModelInfo', result.data.properties)
-          this.$store.dispatch('dataAccess/setModelName', result.data.name)
         } else {
           this.$store.dispatch('dataAccess/setModelInfo', {})
           this.$store.dispatch('dataAccess/setModelName', '')
@@ -363,10 +363,8 @@ export default {
       this.$store.dispatch('dataAccess/setModelId', file.id)
       this.$store.dispatch('dataAccess/setParentId', file.parentId)
       this.$store.dispatch('dataAccess/setFirstFinished', true)
-      setTimeout(() => {
-        this.$emit('on-menuChange-componet', 'Main')
-        this.$EventBus.$emit('set-tab-index', '1')
-      }, 200)
+      this.$emit('on-menuChange-componet', 'Main')
+      this.$EventBus.$emit('set-tab-index', '1')
     },
     /**
     * 删除菜单
