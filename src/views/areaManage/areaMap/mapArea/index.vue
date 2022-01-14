@@ -54,18 +54,18 @@
             <a-select-option
               v-for="(item, index) in areaList"
               :key="index"
-              :value="item"
-              :disabled="validDrawn(item)"
-              >{{ item }}</a-select-option
+              :value="item.section"
+              :disabled="validDrawn(item.section)"
+              >{{ item.section }}</a-select-option
             >
           </template>
           <!-- 网格选项 -->
           <template v-else-if="searchType === 'grid'">
             <a-select-option
-              v-for="(item, index) in areaList"
+              v-for="(item, index) in gridList"
               :key="index"
-              :value="item"
-              >{{ item }}</a-select-option
+              :value="item.grid"
+              >{{ item.grid }}</a-select-option
             >
           </template>
         </a-select>
@@ -271,7 +271,7 @@ export default {
       showSearch: false, // 搜索下拉框
       showEdit: false, // 操作栏
       showSetting: false, // 弹窗配置片区样式
-      showInfo: false, // 弹窗配置片区样式
+      showInfo: true, // 弹窗配置片区样式
       showCancelDraw: false, // 取消绘制 按钮
       disabledToolbar: false, // 禁用操作栏
 
@@ -284,6 +284,7 @@ export default {
       infoType: 'area', // | grid 查看数据类型
       infoData: {}, // 查看信息的对象
 
+      focusTarget: {}, // 下钻对象(用于init事件初始化后继续下钻)
       floor: 0, // 当前显示层级(控制'返回上一层'按钮) 0: company | 1: area | 2: grid | 3: building
       floorZoomAndCenter: [{
         zoom: MapSetting.zoom,
@@ -294,7 +295,7 @@ export default {
   computed: {
     undrawList() {
       return this.areaList.filter(
-        item => !this.drawnList.some(n => n.name === item)
+        item => !this.drawnList.some(n => n.name === item.section)
       )
     }
   },
@@ -330,9 +331,23 @@ export default {
       })
       if (res && res.code === 200) {
         this.companyList = res.data
+        // 平铺树结构, 形成下拉框筛选项
+        let gridList = []
         this.areaList = res.data.reduce((prev, next) => {
-          return prev.concat(next.sections)
+          const headOfficeName = next.headOfficeName
+          const sectionList = next.section || []
+          const res = sectionList.reduce((p, n) => p.concat(n.grid.map(g => ({
+            grid: g,
+            section: n.sectionName,
+            headOfficeName
+          }))), [])
+          gridList = gridList.concat(res)
+          return prev.concat(sectionList.map(item => ({
+            headOfficeName,
+            section: item.sectionName
+          })))
         }, [])
+        this.gridList = gridList
       } else {
         this.$message.error(res.msg || '请求错误')
       }
@@ -347,7 +362,10 @@ export default {
           this.selectLoading = false
         })
       if (res && res.code === 200) {
-        this.areaList = res.data
+        this.areaList = res.data.map(item => ({
+          section: item,
+          headOfficeName: name
+        }))
       } else {
         this.$message.error(res.msg || '请求错误')
       }
@@ -382,6 +400,25 @@ export default {
       this.spinning = true
       const res = await this.$server.mapArea
         .getGridList(params)
+        .finally(() => {
+          this.spinning = false
+        })
+      if (res && res.code === 200) {
+        return res.data
+      } else {
+        this.$message.error(res.msg || '请求错误')
+      }
+    },
+    // 获取网格楼盘
+    async getBuildingList(params) {
+      if (!params) {
+        params = {
+          grid: this.currentArea.name
+        }
+      }
+      this.spinning = true
+      const res = await this.$server.mapArea
+        .getBuildingList(params)
         .finally(() => {
           this.spinning = false
         })
@@ -484,8 +521,8 @@ export default {
               if (type === 'company') {
                 const data = target.getExtData()
                 // 增城从化特殊处理(需调接口获取网格数量)
-                if (
-                  (data.name === '从化' || data.name === '增城') &&
+                const noSectionList = ['从化', '增城', '花都']
+                if (noSectionList.includes(data.name) &&
                   !data.areaCnt
                 ) {
                   self.gridList =
@@ -578,8 +615,8 @@ export default {
               if (type === 'company') {
                 const data = target.getExtData()
                 // 增城从化特殊处理(需调接口获取网格数量)
-                if (
-                  (data.name === '从化' || data.name === '增城') &&
+                const noSectionList = ['从化', '增城', '花都']
+                if (noSectionList.includes(data.name) &&
                   !data.areaCnt
                 ) {
                   self.gridList =
@@ -718,14 +755,25 @@ export default {
         // 网格->楼盘
         if (type === 'grid') {
           const name = target.getExtData().grid
-          // this.gridList =
-          //   (await this.getBuildingList({
-          //     section: name
-          //   })) || []
-          // if (this.buildingList.length) {
+          this.buildingList =
+            (await this.getBuildingList({
+              grid: name,
+              headOffice: this.getParentName(name, 'grid', 'company').headOfficeName
+            })) || []
+          if (this.buildingList.length) {
             this.mapInstance.map.setZoomAndCenter(...fit)
             this.mapInstance.initBuilding(this.buildingList, this.currentArea)
-          // }
+          }
+        }
+      })
+
+      // 初始化完成
+      this.mapInstance.subscribe.on('init', ({ type }) => {
+        // if (type === 'area' && this.focusTarget.type === 'grid') {
+        if (type === this.focusTarget.type) {
+          const name = this.focusTarget.name
+          this.focusTarget = {}
+          this.handleSearch(name)
         }
       })
 
@@ -788,7 +836,7 @@ export default {
       )
     },
     // 返回上一层
-    backFloor() {
+    async backFloor() {
       let index = --this.floor
       // 针对没有片区的分公司, 直接回到首层
       if (!this.areaList.length && this.floor === 1) {
@@ -824,6 +872,12 @@ export default {
           this.floorZoomAndCenter[1].center
         )
         this.currentArea = {}
+        if (this.drawnList.length) {
+          const name = this.drawnList[0].name
+          this.gridList = await this.getGridList({
+            headOffice: this.getParentName(name, 'area', 'company').headOfficeName
+          }) || []
+        }
       } else if (index === 2) {
         // 网格层
         this.selected = undefined
@@ -848,7 +902,8 @@ export default {
       }
       const data = target.getExtData()
       // 增城从化特殊处理(需调接口获取网格数量)
-      if (data.name === '从化' || data.name === '增城') {
+      const noSectionList = ['从化', '增城', '花都']
+      if (noSectionList.includes(data.name)) {
         this.gridList =
           (await this.getGridList({ headOffice: data.name })) || []
         data.areaCnt = this.gridList.length
@@ -884,7 +939,9 @@ export default {
     handleOk() {
       this.$refs.form.validate(async ok => {
         if (ok) {
-          const name = this.areaList.find(item => item === this.form.selectId)
+          const target = this.areaList.find(item => item.section === this.form.selectId)
+          if (!target) return
+          const name = target.name
           this.currentArea = this.drawnList.find(item => item.name === name)
           // 绘制片区确认
           if (this.visibleType === 'draw') {
@@ -983,29 +1040,29 @@ export default {
       )
       if (!company) return
       await this.handleGetAreaList(company.headOfficeName)
+      this.gridList =
+        (await this.getGridList({
+          headOffice: company.headOfficeName
+        })) || []
       // 如果该公司下有片区, 则渲染片区
       if (this.areaList.length) {
         const res = await this.getAreaSettingList(company.headOfficeName)
+        this.floor = 1
         if (res !== 'error') {
           this.mapInstance.focusCompany(target, this.drawnList)
         }
-        this.floor = 1
       } else {
         // 没有片区, 直接渲染网格点
         this.drawnList = []
         this.mapInstance.focusCompany(target, this.drawnList)
-        this.gridList =
-          (await this.getGridList({
-            headOffice: company.headOfficeName
-          })) || []
+        this.floor = 2
         if (this.gridList.length) {
           this.mapInstance.initGrid(this.gridList, this.currentArea)
         }
-        this.floor = 2
       }
     },
     // 聚焦片区
-    handleFocusArea(name) {
+    async handleFocusArea(name) {
       this.floor = 2
       this.currentArea = this.drawnList.find(item => item.name === name)
       this.mapInstance.focusArea(name)
@@ -1015,6 +1072,7 @@ export default {
       this.floor = 3
       this.mapInstance.focusGrid(name)
     },
+    // 搜索相应层级下钻
     async handleSearch(name) {
       if (this.showEdit) {
         return this.$message.error('请先结束当前片区编辑')
@@ -1038,11 +1096,11 @@ export default {
         if (!name) return
         // 聚焦片区
         if (this.floor === 1) {
-          this.handleFocusArea(name)
+          await this.handleFocusArea(name)
           return
         }
         // 找到片区归属分公司的id
-        const company = this.getCompanyByAreaName(name)
+        const company = this.getParentName(name, 'area')
         if (!company) return
         let companyName = company.headOfficeName
         let target = null
@@ -1052,8 +1110,11 @@ export default {
           }
         })
         if (!target) return
+        this.focusTarget = {
+          type: 'area',
+          name
+        }
         await this.handleFocusCompany(target)
-        this.handleSearch(name)
       } else if (this.searchType === 'grid') {
         // 搜索片区, 下钻到网格
         if (!name) return
@@ -1062,12 +1123,21 @@ export default {
           this.handleFocusGrid(name)
           return
         } else if (this.floor === 1) {
-          this.handleFocusArea(name)
-          this.handleSearch(name)
+          // 向上找到片区
+          const area = this.getParentName(name, 'grid', 'area')
+          if (!area) return
+          this.focusTarget = {
+            type: 'grid',
+            name
+          }
+          await this.handleFocusArea(area.section)
           return
         }
+        // 向上找到片区
+        const area = this.getParentName(name, 'grid', 'area')
+        if (!area) return
         // 找到片区归属分公司的id
-        const company = this.getCompanyByAreaName(name)
+        const company = this.getParentName(area.section, 'area')
         if (!company) return
         let companyName = company.headOfficeName
         let target = null
@@ -1077,15 +1147,36 @@ export default {
           }
         })
         if (!target) return
+        this.focusTarget = {
+          type: 'area',
+          name
+        }
         await this.handleFocusCompany(target)
-        this.handleSearch(name)
       }
     },
-    // 根据片区id获取分公司id
-    getCompanyByAreaName(name) {
-      for (const company of this.companyList) {
-        if (company.sections.some(item => item === name)) {
-          return company
+    /**
+     * @description 根据名称向上查找父节点名称
+     * @param name 名称
+     * @param node 当前节点
+     * @param parent 需要查找的父节点
+     */
+    getParentName(name, node, parent) {
+      // 网格层向上查找(片区or公司)
+      if (node === 'grid') {
+        const grid = this.gridList.find(item => item.grid === name)
+        if (!grid) return
+        const area = this.areaList.find(item => item.section === grid.section)
+        if (parent === 'area') {
+          return area
+        } else if (parent === 'company') {
+          return area ? this.getParentName(area.section, 'area') : null
+        }
+      } else if (node === 'area') {
+        // 片区层向上查找, 只有公司层
+        for (const company of this.companyList) {
+          if (company.section.some(item => item.sectionName === name)) {
+            return company
+          }
         }
       }
     }

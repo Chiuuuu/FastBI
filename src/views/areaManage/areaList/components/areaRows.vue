@@ -3,49 +3,49 @@
     <div class="area-searchbar">
       <a-form-model :model="form" layout="inline">
         <a-form-model-item label="标准地址编号" prop="addressCode">
-          <a-input :maxLength="20" placeholder="请输入标准地址编号" v-model="form.addressCode" />
+          <a-input class="area-input" :maxLength="20" placeholder="请输入标准地址编号" v-model="form.addressCode" />
         </a-form-model-item>
         <a-form-model-item label="标准地址名称" prop="address">
-          <a-input :maxLength="100" placeholder="请输入标准地址名称" v-model="form.address" />
+          <a-input class="area-input" :maxLength="100" placeholder="请输入标准地址名称" v-model="form.address" />
         </a-form-model-item>
         <a-form-model-item label="楼盘编号" prop="householdNumber">
-          <a-input :maxLength="20" placeholder="请输入楼盘编号" v-model="form.householdNumber" />
+          <a-input class="area-input" :maxLength="20" placeholder="请输入楼盘编号" v-model="form.householdNumber" />
         </a-form-model-item>
         <a-form-model-item label="楼盘名称" prop="communityName">
-          <a-input :maxLength="50" placeholder="请输入楼盘名称" v-model="form.communityName" />
+          <a-input class="area-input" :maxLength="50" placeholder="请输入楼盘名称" v-model="form.communityName" />
         </a-form-model-item>
         <a-form-model-item label="楼盘信息提供方" prop="provider">
-          <a-input :maxLength="50" placeholder="请输入楼盘信息提供方" v-model="form.provider" />
+          <a-input class="area-input" :maxLength="50" placeholder="请输入楼盘信息提供方" v-model="form.provider" />
         </a-form-model-item>
         <a-form-model-item label="楼盘信息与标准地址关系是否有效" prop="match">
-          <a-input :maxLength="20" placeholder="请输入有效信息" v-model="form.match" />
+          <a-input class="area-input" :maxLength="20" placeholder="请输入有效信息" v-model="form.match" />
         </a-form-model-item>
         <a-form-model-item label="标准地址归属分公司" prop="headOffice">
-          <a-input :maxLength="50" placeholder="请输入归属分公司" v-model="form.headOffice" />
+          <a-input class="area-input" :maxLength="50" placeholder="请输入归属分公司" v-model="form.headOffice" />
         </a-form-model-item>
         <a-form-model-item label="片区" prop="section">
-          <a-input :maxLength="50" placeholder="请输入片区" v-model="form.section" />
+          <a-input class="area-input" :maxLength="50" placeholder="请输入片区" v-model="form.section" />
         </a-form-model-item>
         <a-form-model-item label="网格" prop="grid">
-          <a-input :maxLength="50" placeholder="请输入网格" v-model="form.grid" />
+          <a-input class="area-input" :maxLength="50" placeholder="请输入网格" v-model="form.grid" />
         </a-form-model-item>
         <a-form-model-item label="运维片区" prop="serviceSection">
-          <a-input :maxLength="50" placeholder="请输入运维片区" v-model="form.serviceSection" />
+          <a-input class="area-input" :maxLength="50" placeholder="请输入运维片区" v-model="form.serviceSection" />
         </a-form-model-item>
         <a-form-model-item label="地市" prop="city">
-          <a-input :maxLength="50" placeholder="请输入地市" v-model="form.city" />
+          <a-input class="area-input" :maxLength="50" placeholder="请输入地市" v-model="form.city" />
         </a-form-model-item>
         <a-form-model-item label="区县" prop="district">
-          <a-input :maxLength="10" placeholder="请输入区县" v-model="form.district" />
+          <a-input class="area-input" :maxLength="10" placeholder="请输入区县" v-model="form.district" />
         </a-form-model-item>
         <a-form-model-item label="街道" prop="street">
-          <a-input :maxLength="10" placeholder="请输入街道" v-model="form.street" />
+          <a-input class="area-input" :maxLength="10" placeholder="请输入街道" v-model="form.street" />
         </a-form-model-item>
         <a-form-model-item label="详细地址" prop="detailAddress">
-          <a-input :maxLength="100" placeholder="请输入详细地址" v-model="form.detailAddress" />
+          <a-input class="area-input" :maxLength="100" placeholder="请输入详细地址" v-model="form.detailAddress" />
         </a-form-model-item>
         <a-form-model-item label="是否人工修改" prop="hasEdit">
-          <a-select style="width: 120px" placeholder="是否修改" v-model="form.hasEdit" allowClear>
+          <a-select class="area-input" placeholder="是否修改" v-model="form.hasEdit" allowClear>
             <a-select-option :value="1">是</a-select-option>
             <a-select-option :value="0">否</a-select-option>
           </a-select>
@@ -69,7 +69,7 @@
       :data-source="dataList"
       :columns="dataColumns.concat(configColumns)"
       :pagination="false"
-      :scroll="{ x: 3500, y: 'calc(100vh - 450px)' }"
+      :scroll="{ x: 3500, y: 'calc(100vh - 480px)' }"
     >
       <!-- 除了操作之外的数据展示列 -->
       <template
@@ -77,7 +77,7 @@
         :slot="'custom_' + i"
         slot-scope="text, record, index"
       >
-        <a-input :maxLength="handleMaxLength(col.dataIndex)" v-model="editRow[col.dataIndex]" v-if="activeIndex === index" :key="i"></a-input>
+        <a-input class="area-input" :maxLength="handleMaxLength(col.dataIndex)" v-model="editRow[col.dataIndex]" v-if="activeIndex === index" :key="i"></a-input>
         <span v-else :key="i" :title="text">{{ text }}</span>
       </template>
 

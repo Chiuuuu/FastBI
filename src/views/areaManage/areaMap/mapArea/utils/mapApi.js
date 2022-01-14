@@ -9,11 +9,11 @@ import { deepClone } from '@/utils/deepClone'
 import guangzhou from '@/utils/guangdong.json'
 
 function getGridIcon(color) {
-  return `<svg t="1635838135487" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2693" width="48" height="48" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><style type="text/css"></style></defs><path d="M512 64c-172.3 0-312 139.7-312 312 0 139.8 205.3 437 282.8 544.3 7.2 9.9 18.2 14.9 29.2 14.9s22-5 29.2-14.9C618.7 813 824 515.8 824 376c0-172.3-139.7-312-312-312z m0 424c-64.1 0-116-51.9-116-116s51.9-116 116-116 116 51.9 116 116-51.9 116-116 116z" p-id="2694" data-spm-anchor-id="a313x.7781069.0.i6" class="selected" fill="${color}"></path></svg>`
+  return `<svg t="1635838135487" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2693" width="48" height="48" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><style type="text/css"></style></defs><path d="M512 64c-172.3 0-312 139.7-312 312 0 139.8 205.3 437 282.8 544.3 7.2 9.9 18.2 14.9 29.2 14.9s22-5 29.2-14.9C618.7 813 824 515.8 824 376c0-172.3-139.7-312-312-312z m0 424c-64.1 0-116-51.9-116-116s51.9-116 116-116 116 51.9 116 116-51.9 116-116 116z" p-id="2694" data-spm-anchor-id="a313x.7781069.0.i6" fill="${color}"></path></svg>`
 }
 
 function getBuildingIcon(color) {
-  return `<svg t="1641536928335" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2109" width="48" height="48"><path d="M994.742857 1024H29.257143V0h497.371428v321.536h468.114286z" fill="#7dc5eb" p-id="2110"></path><path d="M819.551086 936.228571v-87.478857h87.771428V936.228571h-87.771428z m0-234.349714h87.771428v88.298057h-87.771428V701.878857z m0-146.051657h87.771428v87.4496h-87.771428v-87.4496z m0-146.080914h87.771428V497.371429h-87.771428v-87.625143z m-146.285715 439.003428h87.771429V936.228571h-87.771429v-87.478857z m0-146.900114h87.771429v88.298057h-87.771429v-88.298057z m0-146.051657h87.771429v87.4496h-87.771429V555.797943z m0-146.080914h87.771429V497.371429h-87.771429v-87.6544zM526.628571 321.828571h58.514286v702.171429h-58.514286V321.828571zM146.110171 877.714286h263.665372v58.953143H146.110171V877.714286z m0-146.285715h263.665372v58.953143H146.110171v-59.128685V731.428571z m0-146.285714h263.665372v58.953143H146.110171v-59.1872V585.142857z m0-146.285714h263.665372v58.953143H146.110171v-59.216457V438.857143z m0-146.285714h263.665372v58.514285H146.110171V292.2496 292.571429z m0-146.285715h263.665372v58.514286H146.110171V145.905371 146.285714z" fill="${color}" p-id="2111"></path></svg>`
+  return `<svg t="1641867878757" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5819" width="48" height="48"><path d="M823 128H487a40 40 0 0 0-40 40v152H201a40 40 0 0 0-40 40v496a40 40 0 0 0 40 40h278l4-0.2 4 0.2h336a40 40 0 0 0 40-40V168a40 40 0 0 0-40-40zM391.5 732.7a3.3 3.3 0 0 1-3.3 3.3H284.8a3.3 3.3 0 0 1-3.3-3.3v-57.4a3.3 3.3 0 0 1 3.3-3.3h103.4a3.3 3.3 0 0 1 3.3 3.3z m0-136a3.3 3.3 0 0 1-3.3 3.3H284.8a3.3 3.3 0 0 1-3.3-3.3v-57.4a3.3 3.3 0 0 1 3.3-3.3h103.4a3.3 3.3 0 0 1 3.3 3.3z m360 136a3.3 3.3 0 0 1-3.3 3.3H626.8a3.3 3.3 0 0 1-3.3-3.3v-57.4a3.3 3.3 0 0 1 3.3-3.3h121.4a3.3 3.3 0 0 1 3.3 3.3z m0-136a3.3 3.3 0 0 1-3.3 3.3H626.8a3.3 3.3 0 0 1-3.3-3.3v-57.4a3.3 3.3 0 0 1 3.3-3.3h121.4a3.3 3.3 0 0 1 3.3 3.3z m0-136a3.3 3.3 0 0 1-3.3 3.3H626.8a3.3 3.3 0 0 1-3.3-3.3v-57.4a3.3 3.3 0 0 1 3.3-3.3h121.4a3.3 3.3 0 0 1 3.3 3.3z" p-id="5820" fill="${color}"></path></svg>`
 }
 export default class MapEditor {
   /**
@@ -97,7 +97,7 @@ export default class MapEditor {
         return companyName.indexOf(district.slice(0, -1)) > -1
       })
       if (sections) {
-        areaCnt = sections.sections.length
+        areaCnt = sections.section.length
         // 中心文字(越荔分公司只显示一个)
         if (district !== '荔湾区') {
           companyTextList.push(new AMap.Text({
@@ -136,6 +136,10 @@ export default class MapEditor {
     this.companyGroup = new AMap.OverlayGroup(companyList)
     this.companyTextGroup = new AMap.OverlayGroup(companyTextList)
     this.map.add([this.companyGroup, this.companyTextGroup])
+    this.subscribe.execute('init', {
+      type: 'company',
+      target: this.companyGroup
+    })
 
     /* ---------------------------------------注册事件--------------------------------------- */
     // 双击放大当前分公司
@@ -250,6 +254,10 @@ export default class MapEditor {
     this.areaGroup = new AMap.OverlayGroup(areas)
     this.areaTextGroup = new AMap.OverlayGroup(areaTextGroup)
     this.map.add([this.areaGroup, this.areaTextGroup])
+    this.subscribe.execute('init', {
+      type: 'area',
+      target: this.areaGroup
+    })
   }
 
   /**
@@ -304,6 +312,10 @@ export default class MapEditor {
         type: 'grid',
         target: e.target
       })
+    })
+    this.subscribe.execute('init', {
+      type: 'grid',
+      target: this.gridGroup
     })
     this.map.add(this.gridGroup)
 
@@ -367,6 +379,10 @@ export default class MapEditor {
       })
     })
     this.map.add(this.buildingGroup)
+    this.subscribe.execute('init', {
+      type: 'building',
+      target: this.buildingGroup
+    })
 
     // 如果点位过于密集, 用海量点做渲染
     // const data = buildings.map(item => {
@@ -548,6 +564,8 @@ export default class MapEditor {
         this.gridGroup.hide()
         // 先获取到多边形轮廓
         const fit = this.map.getFitZoomAndCenterByOverlays([item])
+        // 缩放比特殊处理
+        fit[0] = fit[0] * 0.55
         this.subscribe.execute('focus', {
           type: 'grid',
           target: item,

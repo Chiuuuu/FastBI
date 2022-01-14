@@ -43,6 +43,30 @@
           <div class="setting-value">{{ data.communityName || '' }}</div>
         </div>
       </template>
+
+      <!-- 楼盘信息载体 -->
+      <template v-else-if="type === 'building'">
+        <div class="setting-row">
+          <div class="setting-label">楼盘名称</div>
+          <div class="setting-value">{{ data.grid || '' }}</div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">区县</div>
+          <div class="setting-value">{{ data.district || '' }}</div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">街道</div>
+          <div class="setting-value">{{ data.street || '' }}</div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">三级地址</div>
+          <div class="setting-value">{{ data.detailAddress || '' }}</div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">用户数</div>
+          <div class="setting-value">0</div>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -128,8 +152,8 @@ export default {
     justify-content: center;
     align-items: center;
   }
-  .setting-value {
-    border-left: 1px solid #efefef;
+  .setting-label {
+    border-right: 1px solid #efefef;
   }
 }
 </style>
