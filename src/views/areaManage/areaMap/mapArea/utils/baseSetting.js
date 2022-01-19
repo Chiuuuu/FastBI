@@ -1,13 +1,13 @@
 const BaseSetting = {
   area: {
-    strokeColor: '#f69f2e',
+    strokeColor: '#617BFF',
     strokeOpacity: 1,
     strokeWeight: 2,
     strokeStyle: 'solid',
     titleFontSize: 20,
     titleColor: '#000000',
-    fillColor: '#f69f2e',
-    fillOpacity: 0.3
+    fillColor: '#617BFF',
+    fillOpacity: 0.2
   },
   grid: {
     fillColor: '#f69f2e',

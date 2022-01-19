@@ -12,6 +12,7 @@
     <!-- 片区搜索下拉框 -->
     <div class="map-area-searchbar">
       <a-button
+        type="primary"
         class="searchbar-btn"
         icon="search"
         @click="showSearch = !showSearch"
@@ -271,7 +272,7 @@ export default {
       showSearch: false, // 搜索下拉框
       showEdit: false, // 操作栏
       showSetting: false, // 弹窗配置片区样式
-      showInfo: true, // 弹窗配置片区样式
+      showInfo: false, // 弹窗配置片区样式
       showCancelDraw: false, // 取消绘制 按钮
       disabledToolbar: false, // 禁用操作栏
 
@@ -286,10 +287,12 @@ export default {
 
       focusTarget: {}, // 下钻对象(用于init事件初始化后继续下钻)
       floor: 0, // 当前显示层级(控制'返回上一层'按钮) 0: company | 1: area | 2: grid | 3: building
-      floorZoomAndCenter: [{
-        zoom: MapSetting.zoom,
-        center: MapSetting.center
-      }]
+      floorZoomAndCenter: [
+        {
+          zoom: MapSetting.zoom,
+          center: MapSetting.center
+        }
+      ]
     }
   },
   computed: {
@@ -336,16 +339,24 @@ export default {
         this.areaList = res.data.reduce((prev, next) => {
           const headOfficeName = next.headOfficeName
           const sectionList = next.section || []
-          const res = sectionList.reduce((p, n) => p.concat(n.grid.map(g => ({
-            grid: g,
-            section: n.sectionName,
-            headOfficeName
-          }))), [])
+          const res = sectionList.reduce(
+            (p, n) =>
+              p.concat(
+                n.grid.map(g => ({
+                  grid: g,
+                  section: n.sectionName,
+                  headOfficeName
+                }))
+              ),
+            []
+          )
           gridList = gridList.concat(res)
-          return prev.concat(sectionList.map(item => ({
-            headOfficeName,
-            section: item.sectionName
-          })))
+          return prev.concat(
+            sectionList.map(item => ({
+              headOfficeName,
+              section: item.sectionName
+            }))
+          )
         }, [])
         this.gridList = gridList
       } else {
@@ -398,11 +409,9 @@ export default {
         }
       }
       this.spinning = true
-      const res = await this.$server.mapArea
-        .getGridList(params)
-        .finally(() => {
-          this.spinning = false
-        })
+      const res = await this.$server.mapArea.getGridList(params).finally(() => {
+        this.spinning = false
+      })
       if (res && res.code === 200) {
         return res.data
       } else {
@@ -522,9 +531,7 @@ export default {
                 const data = target.getExtData()
                 // 增城从化特殊处理(需调接口获取网格数量)
                 const noSectionList = ['从化', '增城', '花都']
-                if (noSectionList.includes(data.name) &&
-                  !data.areaCnt
-                ) {
+                if (noSectionList.includes(data.name) && !data.areaCnt) {
                   self.gridList =
                     (await self.getGridList({
                       headOffice: data.name
@@ -616,9 +623,7 @@ export default {
                 const data = target.getExtData()
                 // 增城从化特殊处理(需调接口获取网格数量)
                 const noSectionList = ['从化', '增城', '花都']
-                if (noSectionList.includes(data.name) &&
-                  !data.areaCnt
-                ) {
+                if (noSectionList.includes(data.name) && !data.areaCnt) {
                   self.gridList =
                     (await self.getGridList({
                       headOffice: data.name
@@ -758,7 +763,8 @@ export default {
           this.buildingList =
             (await this.getBuildingList({
               grid: name,
-              headOffice: this.getParentName(name, 'grid', 'company').headOfficeName
+              headOffice: this.getParentName(name, 'grid', 'company')
+                .headOfficeName
             })) || []
           if (this.buildingList.length) {
             this.mapInstance.map.setZoomAndCenter(...fit)
@@ -874,9 +880,11 @@ export default {
         this.currentArea = {}
         if (this.drawnList.length) {
           const name = this.drawnList[0].name
-          this.gridList = await this.getGridList({
-            headOffice: this.getParentName(name, 'area', 'company').headOfficeName
-          }) || []
+          this.gridList =
+            (await this.getGridList({
+              headOffice: this.getParentName(name, 'area', 'company')
+                .headOfficeName
+            })) || []
         }
       } else if (index === 2) {
         // 网格层
@@ -939,7 +947,9 @@ export default {
     handleOk() {
       this.$refs.form.validate(async ok => {
         if (ok) {
-          const target = this.areaList.find(item => item.section === this.form.selectId)
+          const target = this.areaList.find(
+            item => item.section === this.form.selectId
+          )
           if (!target) return
           const name = target.name
           this.currentArea = this.drawnList.find(item => item.name === name)

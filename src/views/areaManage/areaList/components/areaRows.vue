@@ -41,8 +41,11 @@
         <a-form-model-item label="街道" prop="street">
           <a-input class="area-input" :maxLength="10" placeholder="请输入街道" v-model="form.street" />
         </a-form-model-item>
-        <a-form-model-item label="详细地址" prop="detailAddress">
-          <a-input class="area-input" :maxLength="100" placeholder="请输入详细地址" v-model="form.detailAddress" />
+        <a-form-model-item label="三级地址" prop="detailAddress">
+          <a-input class="area-input" :maxLength="100" placeholder="请输入三级地址" v-model="form.detailAddress" />
+        </a-form-model-item>
+        <a-form-model-item label="地图标准地址" prop="mapStandardAddress">
+          <a-input class="area-input" :maxLength="100" placeholder="请输入地图标准地址" v-model="form.mapStandardAddress" />
         </a-form-model-item>
         <a-form-model-item label="是否人工修改" prop="hasEdit">
           <a-select class="area-input" placeholder="是否修改" v-model="form.hasEdit" allowClear>
@@ -69,7 +72,7 @@
       :data-source="dataList"
       :columns="dataColumns.concat(configColumns)"
       :pagination="false"
-      :scroll="{ x: 3500, y: 'calc(100vh - 480px)' }"
+      :scroll="{ x: 3800, y: 'calc(100vh - 480px)' }"
     >
       <!-- 除了操作之外的数据展示列 -->
       <template
@@ -134,6 +137,7 @@ export default {
         district: '',
         street: '',
         detailAddress: '',
+        mapStandardAddress: '',
         longitude: '',
         latitude: '',
         hasEdit: undefined,
@@ -235,25 +239,32 @@ export default {
           scopedSlots: { customRender: 'custom_12' }
         },
         {
-          title: '详细地址',
+          title: '三级地址',
           dataIndex: 'detailAddress',
           ellipsis: true,
           width: 300,
           scopedSlots: { customRender: 'custom_13' }
         },
         {
+          title: '地图标准地址',
+          dataIndex: 'mapStandardAddress',
+          ellipsis: true,
+          width: 300,
+          scopedSlots: { customRender: 'custom_14' }
+        },
+        {
           title: '经度',
           dataIndex: 'longitude',
           ellipsis: true,
           width: 150
-          // scopedSlots: { customRender: 'custom_14' }
+          // scopedSlots: { customRender: 'custom_15' }
         },
         {
           title: '纬度',
           dataIndex: 'latitude',
           ellipsis: true,
           width: 150
-          // scopedSlots: { customRender: 'custom_15' }
+          // scopedSlots: { customRender: 'custom_16' }
         }
       ],
       configColumns: [
@@ -332,7 +343,8 @@ export default {
         match: 20,
         district: 10,
         street: 10,
-        detailAddress: 100
+        detailAddress: 100,
+        mapStandardAddress: 100
       }
       return enumField[key]
     },
@@ -344,7 +356,8 @@ export default {
         match: '楼盘信息与标准地址关系是否有效',
         district: '区县',
         street: '街道',
-        detailAddress: '详细地址'
+        detailAddress: '三级地址',
+        mapStandardAddress: '地图标准地址'
       }
       const result = []
       for (const key in this.editRow) {

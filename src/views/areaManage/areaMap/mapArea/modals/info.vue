@@ -1,7 +1,7 @@
 <template>
   <div :class="['map-area-info', { show }]">
     <div class="map-area-info-title">
-      <a-icon class="map-btn-close" type="left" @click="handleCloseSetting"></a-icon>
+      <a-icon class="map-btn-close" type="menu-fold" @click="handleCloseSetting"></a-icon>
     </div>
     <div class="map-area-info-content scrollbar">
       <!-- 分公司信息载体 -->

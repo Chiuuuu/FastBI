@@ -9,11 +9,25 @@ import { deepClone } from '@/utils/deepClone'
 import guangzhou from '@/utils/guangdong.json'
 
 function getGridIcon(color) {
-  return `<svg t="1635838135487" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2693" width="48" height="48" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><style type="text/css"></style></defs><path d="M512 64c-172.3 0-312 139.7-312 312 0 139.8 205.3 437 282.8 544.3 7.2 9.9 18.2 14.9 29.2 14.9s22-5 29.2-14.9C618.7 813 824 515.8 824 376c0-172.3-139.7-312-312-312z m0 424c-64.1 0-116-51.9-116-116s51.9-116 116-116 116 51.9 116 116-51.9 116-116 116z" p-id="2694" data-spm-anchor-id="a313x.7781069.0.i6" fill="${color}"></path></svg>`
+  return `<svg t="1642390585358" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="13561" width="16" height="16"><path d="M511.573333 0C283.648 0 98.901333 185.173333 98.901333 413.525333c0 5.12 0.128 10.24 0.298667 15.274667 4.224 117.76 56.96 231.936 138.581333 313.429333l0.725334 0.725334L511.317333 1024l264.96-272.981333 18.688-18.645334c76.032-80.554667 124.8-190.165333 129.066667-303.061333 0.213333-5.290667 0.298667-10.581333 0.298667-15.872C924.245333 185.173333 739.498667 0 511.616 0z m150.613334 543.232a212.949333 212.949333 0 0 1-151.594667 62.72 212.949333 212.949333 0 0 1-151.552-62.72 212.992 212.992 0 0 1-62.72-151.594667c0-57.216 22.272-111.104 62.72-151.552a212.949333 212.949333 0 0 1 151.594667-62.72c57.216 0 111.104 22.272 151.552 62.72a212.949333 212.949333 0 0 1 62.72 151.552 212.992 212.992 0 0 1-62.72 151.594667z" p-id="13562" fill="${color}"></path></svg>`
 }
 
 function getBuildingIcon(color) {
   return `<svg t="1641867878757" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5819" width="48" height="48"><path d="M823 128H487a40 40 0 0 0-40 40v152H201a40 40 0 0 0-40 40v496a40 40 0 0 0 40 40h278l4-0.2 4 0.2h336a40 40 0 0 0 40-40V168a40 40 0 0 0-40-40zM391.5 732.7a3.3 3.3 0 0 1-3.3 3.3H284.8a3.3 3.3 0 0 1-3.3-3.3v-57.4a3.3 3.3 0 0 1 3.3-3.3h103.4a3.3 3.3 0 0 1 3.3 3.3z m0-136a3.3 3.3 0 0 1-3.3 3.3H284.8a3.3 3.3 0 0 1-3.3-3.3v-57.4a3.3 3.3 0 0 1 3.3-3.3h103.4a3.3 3.3 0 0 1 3.3 3.3z m360 136a3.3 3.3 0 0 1-3.3 3.3H626.8a3.3 3.3 0 0 1-3.3-3.3v-57.4a3.3 3.3 0 0 1 3.3-3.3h121.4a3.3 3.3 0 0 1 3.3 3.3z m0-136a3.3 3.3 0 0 1-3.3 3.3H626.8a3.3 3.3 0 0 1-3.3-3.3v-57.4a3.3 3.3 0 0 1 3.3-3.3h121.4a3.3 3.3 0 0 1 3.3 3.3z m0-136a3.3 3.3 0 0 1-3.3 3.3H626.8a3.3 3.3 0 0 1-3.3-3.3v-57.4a3.3 3.3 0 0 1 3.3-3.3h121.4a3.3 3.3 0 0 1 3.3 3.3z" p-id="5820" fill="${color}"></path></svg>`
+}
+
+const MAP_DISTRICT_COLOR = {
+  '天河区': '#A45CE8',
+  '越秀区': '#7060E0',
+  '海珠区': '#1FB613',
+  '荔湾区': '#7060E0',
+  '番禺区': '#3338E2',
+  '白云区': '#61C8AA',
+  '黄埔区': '#617BFF',
+  '花都区': '#EC8121',
+  '南沙区': '#ECBA21',
+  '增城区': '#E85CAE',
+  '从化区': '#5CB8E8'
 }
 export default class MapEditor {
   /**
@@ -116,7 +130,9 @@ export default class MapEditor {
         // 区域轮廓
         companyList.push(new AMap.Polygon({
           path: item.geometry.coordinates[0],
-          fillColor: 'rgba(97, 123, 255, .1)',
+          strokeColor: MAP_DISTRICT_COLOR[district],
+          fillColor: MAP_DISTRICT_COLOR[district],
+          fillOpacity: 0.2,
           zIndex: 1,
           extData: {
             origin: item.properties.centroid,
@@ -352,7 +368,8 @@ export default class MapEditor {
       grid.setting.grid.cnt = buildings.length
     }
     const buildingGroup = buildings.map(item => {
-      const icon = getBuildingIcon(`rgb(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255})`)
+      // const icon = getBuildingIcon(`rgb(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255})`)
+      const icon = getBuildingIcon('#617bff')
       const marker = new AMap.Marker({
         position: [item.longitude, item.latitude],
         offset: [-8, -16],
