@@ -167,8 +167,8 @@
             <a-select-option
               v-for="(item, index) in undrawList"
               :key="index"
-              :value="item"
-              >{{ item }}</a-select-option
+              :value="item.section"
+              >{{ item.section }}</a-select-option
             >
           </a-select>
 
