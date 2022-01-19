@@ -10,12 +10,12 @@
     </template>
 
     <!-- 片区配置 -->
-    <template v-if="setting.polygon">
+    <template v-if="setting.area">
       <div class="setting-row">
         <div class="setting-label">颜色</div>
         <div class="setting-value">
           <el-color-picker
-            v-model="setting.polygon.fillColor"
+            v-model="setting.area.fillColor"
           />
         </div>
       </div>
@@ -23,7 +23,7 @@
         <div class="setting-label">透明度</div>
         <div class="setting-value">
           <a-input-number
-            v-model="setting.polygon.fillOpacity"
+            v-model="setting.area.fillOpacity"
             :max="1"
             :min="0"
             :step="0.01"
@@ -33,7 +33,7 @@
       <div class="setting-row">
         <div class="setting-label">边框线型</div>
         <div class="setting-value">
-          <a-select v-model="setting.polygon.strokeStyle">
+          <a-select v-model="setting.area.strokeStyle">
             <a-select-option value="solid">实线</a-select-option>
             <a-select-option value="dashed">虚线</a-select-option>
           </a-select>
@@ -43,7 +43,7 @@
         <div class="setting-label">边框颜色</div>
         <div class="setting-value">
           <el-color-picker
-            v-model="setting.polygon.strokeColor"
+            v-model="setting.area.strokeColor"
           />
         </div>
       </div>
@@ -51,7 +51,7 @@
         <div class="setting-label">边框宽度</div>
         <div class="setting-value">
           <a-input-number
-            v-model="setting.polygon.strokeWeight"
+            v-model="setting.area.strokeWeight"
             :max="20"
             :min="0"
           ></a-input-number>
@@ -61,10 +61,10 @@
         <div class="setting-label">标题字体</div>
         <div class="setting-value">
           <el-color-picker
-            v-model="setting.polygon.titleColor"
+            v-model="setting.area.titleColor"
           />
           <a-input-number
-            v-model="setting.polygon.titleFontSize"
+            v-model="setting.area.titleFontSize"
             :max="100"
             :min="0"
           ></a-input-number>
@@ -73,14 +73,14 @@
     </template>
 
     <!-- 标记点配置 -->
-    <div v-if="setting.marker" class="setting-row">
+    <!-- <div v-if="setting.grid" class="setting-row">
       <div class="setting-label">片区标记点</div>
       <div class="setting-value">
         <el-color-picker
-          v-model="setting.marker.fillColor"
+          v-model="setting.grid.fillColor"
         />
       </div>
-    </div>
+    </div> -->
   </a-modal>
 </template>
 

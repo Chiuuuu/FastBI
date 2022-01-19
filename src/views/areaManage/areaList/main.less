@@ -33,6 +33,19 @@
   .area-searchbar {
     padding: 0 16px;
     margin-bottom: 16px;
+
+    @{deep} label {
+      display: flex;
+      align-items: center;
+      width: 140px;
+      height: 40px;
+      line-height: normal;
+      white-space: normal;
+      text-align: left;
+    }
+    @{deep} .area-input {
+      width: 240px;
+    }
   }
 
   .area-table {

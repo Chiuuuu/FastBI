@@ -4,13 +4,13 @@ export default class Stack {
   /**
    * 多边形专用的操作栈
    * @param {*} editor // 多边形编辑器实例
-   * @param {*} polygon // 多边形实例
+   * @param {*} area // 多边形实例
    */
-  constructor(editor, polygon) {
+  constructor(editor, area) {
     this.editor = editor
-    this.polygon = polygon
-    const setting = deepClone(polygon.getExtData().setting)
-    setting.polygon.path = deepClone(polygon.getOptions().path)
+    this.area = area
+    const setting = deepClone(area.getExtData().setting)
+    setting.area.path = deepClone(area.getOptions().path)
     this.defaultSetting = setting // 记录初始配置对象
     this.currentSetting = setting // 当前配置对象
     this.stack = [] // 历史操作栈
@@ -26,8 +26,8 @@ export default class Stack {
     // 入栈
     this.stack.push(deepClone(this.currentSetting))
 
-    const setting = Lodash.merge(deepClone(this.polygon.getExtData().setting), stack)
-    setting.polygon.path = this.polygon.getOptions().path
+    const setting = Lodash.merge(deepClone(this.area.getExtData().setting), stack)
+    setting.area.path = this.area.getOptions().path
     this.currentSetting = setting
 
     // 新操作入栈, 清空可恢复的撤销记录

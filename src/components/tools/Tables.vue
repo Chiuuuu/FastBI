@@ -343,7 +343,6 @@ export default {
         }
         this.bodyHeight =
           this.showTableSize.tableY - this.$refs.tableheader.clientHeight
-        console.log(this.bodyHeight)
       })
     },
     // 计算单元格宽度

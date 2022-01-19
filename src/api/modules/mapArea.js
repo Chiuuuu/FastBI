@@ -21,8 +21,17 @@ export default {
    * @param {Object} params.section 片区名称
    * @returns
    */
-  getMarkerList(params = {}) {
+  getGridList(params = {}) {
     return $axios.post(`/zone/allList`, params)
+  },
+  /**
+   * @description 获取楼盘列表
+   * @param {Object} [params={}] 请求参数
+   * @param {Object} params.grid 网格名称
+   * @returns
+   */
+  getBuildingList(params = {}) {
+    return $axios.post('/zone/allCommunityList', params)
   },
   /**
    * @description 获取片区配置列表

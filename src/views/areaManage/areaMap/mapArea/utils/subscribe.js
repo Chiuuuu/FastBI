@@ -30,7 +30,7 @@ export default class Subscribe {
    * 发布执行当前事件函数
    * @param {*} eventType 事件类型
    * @param {*} obj 触发对象
-   * @param {*} obj.type 对象类型 map(地图) | district(行政区) | polygon(多边形) | marker(网格) | editor(片区编辑器) | contextMenu(右键对象)
+   * @param {*} obj.type 对象类型 map(地图) | district(行政区) | area(多边形) | grid(网格) | buiding(楼盘) | editor(片区编辑器) | contextMenu(右键对象)
    * @param {*} obj.target 对象实例
    */
   execute(eventType, obj) {
