@@ -56,7 +56,7 @@
       </template>
     </a-table>
 
-    <a-modal v-model="showFieldModal" :title="modalType === 'tree' ? '选择字段' : '添加条件'" destroyOnClose>
+    <a-modal width="600px" v-model="showFieldModal" :title="modalType === 'tree' ? '选择字段' : '添加条件'" destroyOnClose>
       <template #footer>
         <template v-if="modalType === 'condition'">
           <a-button @click="showFieldModal = false">取消</a-button>
@@ -141,6 +141,30 @@ export default {
     }
   },
   methods: {
+    conditionOptionsNotNum(record) {
+      const type = record.convertType || record.dataType
+      if (type === 'DATE' || type === 'TIMESTAMP') {
+        return [
+          { label: '范围', op: 'range' },
+          { label: '大于', op: 'more' },
+          { label: '大于等于', op: 'moreAndEquals' },
+          { label: '小于', op: 'less' },
+          { label: '小于等于', op: 'lessAndEquals' },
+          { label: '等于', op: 'equals' },
+          { label: '不等于', op: 'notEquals' },
+          { label: '为空', op: 'isNull' },
+          { label: '不为空', op: 'isNotNull' }
+        ]
+      } else {
+        return [
+          { label: '包含', op: 'like' },
+          { label: '不包含', op: 'notLike' },
+          { label: '等于', op: 'equals' },
+          { label: '为空', op: 'isNull' },
+          { label: '不为空', op: 'isNotNull' }
+        ]
+      }
+    },
     // 判断字段是否为数值类型
     isNumber(data) {
       if (!data) return false
@@ -159,13 +183,14 @@ export default {
         isInclude = '只显示'
       }
       // 校验的是当前最新的类型而不是之前存的类型
-      if (this.isNumber(record)) {
+      if (this.isNumber(record) || record.modeType === 3) {
         // 数值类型
         if (len === 0) {
           return '无'
         } else {
+          const options = this.isNumber(record) ? this.conditionOptions : this.conditionOptionsNotNum(record)
           const list = record.rule.ruleFilterList.map(item => {
-            const option = this.conditionOptions.find(o => item.condition === o.op)
+            const option = options.find(o => item.condition === o.op)
             if (!option) return ''
             // 仅当选项是范围时才有2个值
             if (option.op === 'range') {

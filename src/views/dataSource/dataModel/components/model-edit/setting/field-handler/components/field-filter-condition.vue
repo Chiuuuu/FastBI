@@ -1,15 +1,20 @@
 <template>
   <div>
     <div v-if="!isNumber">
-      <a-radio-group v-model="conditionData.modeType" @change="checkedData = []">
+      <a-radio-group
+        v-model="conditionData.modeType"
+        @change="checkedData = []"
+      >
         <a-radio :value="1">列表</a-radio>
         <!-- <a-radio :value="2">手动</a-radio> -->
+        <a-radio :value="3">条件</a-radio>
       </a-radio-group>
+      <!-- 列表筛选 -->
       <template v-if="+conditionData.modeType === 1">
         <a-input
           v-model="searchWord"
           class="input-area"
-          placeholder="请输入搜索的关键词(如: A,B,C)"
+          placeholder="请输入搜索的关键词"
           @keyup.enter.stop="onSearch"
         >
           <a-button
@@ -21,32 +26,28 @@
           >
         </a-input>
         <a-spin :spinning="spinning" class="condition-list hasBorder">
-          <ScrollPage :rows="dataRowsResult" :row-height="22" @change="v => pageDataRows = v">
+          <ScrollPage
+            :rows="dataRowsResult"
+            :row-height="22"
+            :pagination="pagination"
+            :fetch="getPageData"
+            :limit="0"
+            @change="handleCheckedList"
+          >
             <a-checkbox
-              v-if="dataRowsResult.length > 0"
-              :indeterminate="
-                checkedData.length > 0 &&
-                  checkedData.length < dataRowsResult.length
-              "
-              :checked="checkedData.length === dataRowsResult.length"
+              :indeterminate="checkedData.length > 0 && !checkAll"
+              :checked="checkAll"
               @change="onCheckAllChange"
-              >全选</a-checkbox
-            >
+            >全选</a-checkbox>
             <br />
-            <!-- <a-checkbox-group
-              class="block-checkbox"
-              v-model="checkedData"
-              :options="pageDataRows"
-            /> -->
+            <!-- <a-checkbox-group class="block-checkbox" v-model="checkedData" :options="dataRowsResult" /> -->
             <a-checkbox
               class="block-checkbox"
               v-for="item in pageDataRows"
               :key="item"
               :checked="checkedData.includes(item)"
               @change="onCheckChange($event, item)"
-            >
-              {{ item }}
-            </a-checkbox>
+            >{{ item }}</a-checkbox>
           </ScrollPage>
         </a-spin>
       </template>
@@ -79,6 +80,71 @@
               theme="filled"
               @click="deleteManualProperty(index)"
             />
+          </div>
+        </div>
+      </template>
+      <!-- 条件筛选 -->
+      <template v-if="+conditionData.modeType === 3">
+        <button class="ant-btn ant-btn-primary" @click="addCondition">
+          添加条件
+        </button>
+        <div class="pick-checkbox-box" style="margin:0;padding:0">
+          <div class="condition-list scrollbar" style="height:100%;">
+            <div
+              :class="['pick-condition-box']"
+              v-for="(item, index) in customData"
+              :key="index"
+            >
+              <a-select
+                :class="['pick-select', 'has-margin']"
+                v-model="item.condition"
+              >
+                <a-select-option
+                  v-for="option in conditionOptionsNotNum"
+                  :key="option.label"
+                  :value="option.op"
+                  >{{ option.label }}</a-select-option
+                >
+              </a-select>
+              <div class="pick-condition">
+                <!-- 为空or不为空选项时不显示 -->
+                <template v-if="!isNullCondition(item)">
+                  <!-- 日期or日期时间类型 -->
+                  <template v-if="isDate || isTimestamp">
+                    <a-range-picker
+                      v-if="item.condition === 'range'"
+                      :showTime="isTimestamp"
+                      :valueFormat="
+                        isDate ? 'YYYY-MM-DD' : 'YYYY-MM-DD HH:mm:ss'
+                      "
+                      :value="[item.startValue, item.endValue]"
+                      @change="v => onRangePickerChange(v, item)"
+                    />
+                    <a-date-picker
+                      v-else
+                      v-model="item.startValue"
+                      :showTime="isTimestamp"
+                      :valueFormat="
+                        isDate ? 'YYYY-MM-DD' : 'YYYY-MM-DD HH:mm:ss'
+                      "
+                    />
+                  </template>
+                  <a-input
+                    v-else
+                    v-model="item.startValue"
+                    size="default"
+                    placeholder="请输入关键字"
+                    style="text-overflow: clip;"
+                  ></a-input>
+                </template>
+                <a-icon
+                  style="margin-left: 10px"
+                  type="close-circle"
+                  theme="filled"
+                  @click="delectCondition(index)"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </template>
@@ -140,7 +206,8 @@
 </template>
 
 <script>
-import ScrollPage from '@/components/scroll'
+// import ScrollPage from '@/components/scroll'
+import ScrollPage from './scroll'
 export default {
   name: '',
   inject: ['rootInstance', 'NUMBER_LIST', 'conditionOptions'],
@@ -179,7 +246,13 @@ export default {
       customData: [], // 手动添加的列表
       dataRows: [], // 该字段查询出来的数据
       dataRowsResult: [], // 搜索筛选的数据
-      pageDataRows: [] // 当前分页展示的数据
+      pageDataRows: [], // 当前分页展示的数据
+      pagination: {
+        // 分页参数
+        pageSize: 50,
+        pageNo: 1,
+        rowsNum: 0
+      }
     }
   },
   created() {
@@ -187,25 +260,65 @@ export default {
       this.getFieldData()
     }
     // 列表赋值
-    if (this.isNumber) {
+    if (this.isNumber || this.conditionData.modeType === 3) {
       this.customData = [].concat(this.conditionData.rule.ruleFilterList || [])
     }
   },
   computed: {
+    checkAll() {
+      // return this.checkedData.length > 0 && this.checkedData.length === this.pageDataRows.length;
+      return (
+        this.checkedData.length > 0 &&
+        !this.pageDataRows.some(item => !this.checkedData.includes(item))
+      )
+    },
     isNumber() {
       const data = this.fieldData || this.conditionData
-      return this.NUMBER_LIST.includes(
-        data.convertType || data.dataType
-      )
+      return this.NUMBER_LIST.includes(data.convertType || data.dataType)
+    },
+    isDate() {
+      const data = this.fieldData || this.conditionData
+      const type = data.convertType || data.dataType
+      return !this.isNumber && type === 'DATE'
+    },
+    isTimestamp() {
+      const data = this.fieldData || this.conditionData
+      const type = data.convertType || data.dataType
+      return !this.isNumber && type === 'TIMESTAMP'
+    },
+    conditionOptionsNotNum() {
+      if (this.isDate || this.isTimestamp) {
+        return [
+          { label: '范围', op: 'range' },
+          { label: '大于', op: 'more' },
+          { label: '大于等于', op: 'moreAndEquals' },
+          { label: '小于', op: 'less' },
+          { label: '小于等于', op: 'lessAndEquals' },
+          { label: '等于', op: 'equals' },
+          { label: '不等于', op: 'notEquals' },
+          { label: '为空', op: 'isNull' },
+          { label: '不为空', op: 'isNotNull' }
+        ]
+      } else {
+        return [
+          { label: '包含', op: 'like' },
+          { label: '不包含', op: 'notLike' },
+          { label: '等于', op: 'equals' },
+          { label: '为空', op: 'isNull' },
+          { label: '不为空', op: 'isNotNull' }
+        ]
+      }
     }
-    // isNumber() {
-    //   const field = this.getPivotSchemaData()
-    //   return this.NUMBER_LIST.includes(
-    //     field.convertType || field.dataType
-    //   )
-    // }
   },
   methods: {
+    isNullCondition(item) {
+      const list = ['isNull', 'isNotNull']
+      return list.includes(item.condition)
+    },
+    onRangePickerChange(value, item) {
+      item.startValue = value[0]
+      item.endValue = value[1]
+    },
     // 从父组件的维度度量中获取当前对象
     // getPivotSchemaData() {
     //   const data = this.fieldData || this.conditionData
@@ -226,31 +339,40 @@ export default {
         }
       }
     },
-    onSearch() {
-      const checkAll = this.checkedData.length === this.dataRowsResult.length
-      const keyword = (this.searchWord || '').toLowerCase()
-      const list = keyword.split(',')
-      this.dataRowsResult = this.dataRows.filter(item => {
-        let match = false
-        list.forEach(k => {
-          if ((item || '').toLowerCase().indexOf(k) > -1) {
-            match = true
-          }
-        })
-        return match
-      })
-      // 如果是全选状态, 选中当前所有筛选项
-      if (checkAll) {
-        this.checkedData = [].concat(this.dataRowsResult)
-      } else {
-        // 不是全选状态, 过滤掉非当前搜索结果
-        this.checkedData = this.dataRowsResult.filter(item => this.checkedData.includes(item))
-      }
+    async onSearch() {
+      // const checkAll = this.checkedData.length === this.dataRowsResult.length
+      // const keyword = (this.searchWord || '').toLowerCase()
+      // const list = keyword.split(',')
+      // this.dataRowsResult = this.dataRows.filter(item => {
+      //   let match = false
+      //   list.forEach(k => {
+      //     if ((item || '').toLowerCase().indexOf(k) > -1) {
+      //       match = true
+      //     }
+      //   })
+      //   return match
+      // })
+      // // 如果是全选状态, 选中当前所有筛选项
+      // if (checkAll) {
+      //   this.checkedData = [].concat(this.dataRowsResult)
+      // } else {
+      //   // 不是全选状态, 过滤掉非当前搜索结果
+      //   this.checkedData = this.dataRowsResult.filter(item =>
+      //     this.checkedData.includes(item)
+      //   )
+      // }
+      // 重置数据
+      this.fetchType = 'search'
+      this.pagination = this.$options.data().pagination
+      await this.getFieldData()
     },
     onCheckAllChange(e) {
       const value = e.target.checked
       if (value) {
-        this.checkedData = [].concat(this.dataRowsResult)
+        // this.checkedData = [].concat(this.dataRowsResult)
+        this.checkedData = this.checkedData
+          .concat(this.pageDataRows)
+          .filter((item, index, arr) => arr.indexOf(item) === index)
       } else {
         this.checkedData = []
       }
@@ -263,6 +385,17 @@ export default {
         }
         this.checkedData.push(this.conditionName)
         this.conditionName = ''
+      } else if (!this.isNumber && +this.conditionData.modeType === 3) {
+        // 字符和日期时间型添加条件
+        if (this.customData.length < 5) {
+          this.customData.push({
+            condition: !this.isDate && !this.isTimestamp ? 'like' : 'range', // 条件选择，显示
+            startValue: '',
+            endValue: ''
+          })
+        } else {
+          this.$message.error('限制只能添加5个')
+        }
       } else {
         // 数值类型添加条件
         if (this.customData.length < 5) {
@@ -285,20 +418,35 @@ export default {
     // 遍历条件列表, 检验input框是否有空值
     valitateCustomData() {
       for (const item of this.customData) {
-        if (item.condition === 'range') {
+        if (this.isNullCondition(item)) {
+          return true
+        } else if (item.condition === 'range') {
           const { startValue, endValue } = item
           if (startValue === '' || endValue === '') {
             this.$message.error('请完善添加的条件')
             return false
-          } else if (isNaN(startValue) || isNaN(endValue)) {
-            this.$message.error('请完善添加的条件')
-            return false
-          } else if (startValue > endValue) {
-            this.$message.error('范围起始值大于末尾值')
-            return false
+          }
+          // 数值类型
+          if (this.isNumber) {
+            if (isNaN(startValue) || isNaN(endValue)) {
+              this.$message.error('请完善添加的条件')
+              return false
+            } else if (startValue > endValue) {
+              this.$message.error('范围起始值大于末尾值')
+              return false
+            }
+          } else if (this.isDate || this.isTimestamp) {
+            // 日期or日期时间类型
+            if (+new Date(startValue) > +new Date(endValue)) {
+              this.$message.error('范围起始值大于末尾值')
+              return false
+            }
           }
         } else {
-          if (item.startValue === '' || isNaN(item.startValue)) {
+          if (
+            item.startValue === '' ||
+            (this.isNumber && isNaN(item.startValue))
+          ) {
             this.$message.error('请完善添加的条件')
             return false
           }
@@ -308,9 +456,23 @@ export default {
     },
     // 点击确认时, 赋值给rule
     resultConditionData() {
-      if (!this.isNumber) {
+      if (!this.isNumber && +this.conditionData.modeType !== 3) {
+        // 选择列表or手动
         if (this.checkedData.length < 1) {
           this.$message.error('请添加条件')
+          return false
+        } else if (this.checkedData.length > 50) {
+          this.$message.error('最多只能添加50个条件')
+          return false
+        } else if (
+          +this.conditionData.modeType === 0 &&
+          this.checkAll &&
+          this.pagination.rowsNum > 50
+        ) {
+          this.$message.error('最多只能添加50个条件')
+          return false
+        } else if (this.checkedData.reduce((p, n) => (p += String(n).length), 0) > 4000) {
+          this.$message.error('所选文本总长度不能大于4000')
           return false
         }
         this.spinning = true
@@ -336,6 +498,34 @@ export default {
       }
       this.spinning = false
       return true
+    },
+    async getPageData(pageNo) {
+      this.pagination.pageNo = pageNo
+      this.fetchType = 'scroll'
+      await this.getFieldData()
+    },
+    // 更新列表数据后, 处理选中项
+    handleCheckedList(list) {
+      // 之前保存的选中项
+      // const allList = this.conditionData.rule.ruleFilterList;
+      // 重新赋值前如果是全选状态, 选中当前所有筛选项
+      const checkAll =
+        this.checkedData.length > 0 &&
+        this.checkedData.length === this.pageDataRows.length
+      this.pageDataRows = list
+      if (checkAll) {
+        // this.checkedData = [].concat(this.pageDataRows);
+        this.checkedData = this.checkedData
+          .concat(this.pageDataRows)
+          .filter((item, index, arr) => arr.indexOf(item) === index)
+      } else {
+        // 不是全选状态, 对新的数据进行勾选过滤
+        // if (this.fetchType === 'search') {
+        //   this.checkedData = [].concat(list.filter(item => allList.includes(item)));
+        // } else if (this.fetchType === 'scroll') {
+        //   this.checkedData.push(...list.filter(item => allList.includes(item)));
+        // }
+      }
     },
     async getFieldData() {
       // 获取维度对应字段列表
@@ -364,12 +554,14 @@ export default {
       this.spinning = true
       const res = await this.$server.dataModel
         .getModelData({
+          ...this.pagination,
           ...this.rootInstance.detailInfo,
           pivotSchema: {
             ...this.rootInstance.handleConcat() // 处理维度度量
           },
           modelTableId: data.modelTableId,
-          resourceJson: params
+          resourceJson: params,
+          keyword: this.searchWord
         })
         .finally(() => {
           this.spinning = false
@@ -398,11 +590,17 @@ export default {
         if (hasNull) list.unshift('')
         this.dataRows = list
         // 从最新数据中过滤掉被删除的行数据
-        const checkedData = this.conditionData.rule.ruleFilterList.filter(item => this.dataRows.includes(item)) || []
-        this.checkedData = checkedData
-        this.conditionData.rule.ruleFilterList = checkedData
+        const conditions = this.conditionData.rule.ruleFilterList
+        if (conditions && conditions[0] && typeof conditions[0] !== 'object') {
+          this.checkedData = this.conditionData.rule.ruleFilterList
+        } else {
+          this.checkedData = []
+        }
+        this.pagination.rowsNum = res.rowsNum
+        this.dataRowsResult = this.dataRows
+      } else {
+        this.dataRowsResult = []
       }
-      this.dataRowsResult = this.dataRows
     }
   }
 }
