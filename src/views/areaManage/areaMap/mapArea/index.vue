@@ -740,6 +740,12 @@ export default {
             zoom: fit[0],
             center: fit[1]
           }
+          if (this.floor === 2) {
+            this.floorZoomAndCenter[2] = {
+              zoom: fit[0],
+              center: fit[1]
+            }
+          }
         }
         // 片区->网格
         if (type === 'area') {
@@ -1070,8 +1076,8 @@ export default {
       } else {
         // 没有片区, 直接渲染网格点
         this.drawnList = []
-        this.mapInstance.focusCompany(target, this.drawnList)
         this.floor = 2
+        this.mapInstance.focusCompany(target, this.drawnList)
         if (this.gridList.length) {
           this.mapInstance.initGrid(this.gridList, this.currentArea)
         }
