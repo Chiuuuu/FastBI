@@ -48,7 +48,7 @@
       <template v-else-if="type === 'building'">
         <div class="setting-row">
           <div class="setting-label">楼盘名称</div>
-          <div class="setting-value">{{ data.grid || '' }}</div>
+          <div class="setting-value">{{ data.communityName || '' }}</div>
         </div>
         <div class="setting-row">
           <div class="setting-label">区县</div>

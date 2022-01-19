@@ -760,11 +760,11 @@ export default {
         // 网格->楼盘
         if (type === 'grid') {
           const name = target.getExtData().grid
+          const headOffice = this.getParentName(name, 'grid', 'company')
           this.buildingList =
             (await this.getBuildingList({
               grid: name,
-              headOffice: this.getParentName(name, 'grid', 'company')
-                .headOfficeName
+              headOffice: headOffice ? headOffice.headOfficeName : ''
             })) || []
           if (this.buildingList.length) {
             this.mapInstance.map.setZoomAndCenter(...fit)
@@ -880,10 +880,10 @@ export default {
         this.currentArea = {}
         if (this.drawnList.length) {
           const name = this.drawnList[0].name
+          const headOffice = this.getParentName(name, 'area', 'company')
           this.gridList =
             (await this.getGridList({
-              headOffice: this.getParentName(name, 'area', 'company')
-                .headOfficeName
+              headOffice: headOffice ? headOffice.headOfficeName : ''
             })) || []
         }
       } else if (index === 2) {
@@ -1185,6 +1185,10 @@ export default {
         if (parent === 'area') {
           return area
         } else if (parent === 'company') {
+          if (grid.headOffice) {
+            grid.headOfficeName = grid.headOffice
+            return grid
+          }
           return area ? this.getParentName(area.section, 'area') : null
         }
       } else if (node === 'area') {
