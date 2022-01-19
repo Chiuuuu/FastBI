@@ -892,10 +892,14 @@ export default {
         // 重新绘制片区层
         this.mapInstance.gridGroup && this.mapInstance.gridGroup.show()
         this.mapInstance.clearBuilding()
-        this.mapInstance.map.setZoomAndCenter(
-          this.floorZoomAndCenter[2].zoom,
-          this.floorZoomAndCenter[2].center
-        )
+        if (this.floorZoomAndCenter[2]) {
+          this.mapInstance.map.setZoomAndCenter(
+            this.floorZoomAndCenter[2].zoom,
+            this.floorZoomAndCenter[2].center
+          )
+        } else {
+          this.backFloor()
+        }
       }
     },
     // 右键查看信息
@@ -946,12 +950,14 @@ export default {
     // 弹窗确认
     handleOk() {
       this.$refs.form.validate(async ok => {
+        console.log(this.areaList, this.form)
+        debugger
         if (ok) {
           const target = this.areaList.find(
             item => item.section === this.form.selectId
           )
           if (!target) return
-          const name = target.name
+          const name = target.section
           this.currentArea = this.drawnList.find(item => item.name === name)
           // 绘制片区确认
           if (this.visibleType === 'draw') {

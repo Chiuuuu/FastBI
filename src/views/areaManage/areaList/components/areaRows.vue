@@ -17,9 +17,9 @@
         <a-form-model-item label="楼盘信息提供方" prop="provider">
           <a-input class="area-input" :maxLength="50" placeholder="请输入楼盘信息提供方" v-model="form.provider" />
         </a-form-model-item>
-        <a-form-model-item label="楼盘信息与标准地址关系是否有效" prop="match">
+        <!-- <a-form-model-item label="楼盘信息与标准地址关系是否有效" prop="match">
           <a-input class="area-input" :maxLength="20" placeholder="请输入有效信息" v-model="form.match" />
-        </a-form-model-item>
+        </a-form-model-item> -->
         <a-form-model-item label="标准地址归属分公司" prop="headOffice">
           <a-input class="area-input" :maxLength="50" placeholder="请输入归属分公司" v-model="form.headOffice" />
         </a-form-model-item>
@@ -56,10 +56,10 @@
         <a-form-model-item label="最后一次修改时间" prop="gmtModified">
           <a-range-picker style="width:320px" valueFormat="YYYY-MM-DD HH:mm:ss" show-time :placeholder="['开始时间', '结束时间']" v-model="form.gmtModified" />
         </a-form-model-item>
-        <a-form-model-item>
+        <a-form-model-item style="margin-right: auto">
           <a-button type="primary" @click="handleSearch">查询</a-button>
         </a-form-model-item>
-        <a-form-model-item>
+        <a-form-model-item style="margin-right: auto">
           <a-button @click="handleReset">重置</a-button>
         </a-form-model-item>
       </a-form-model>
@@ -182,13 +182,13 @@ export default {
           width: 200
           // scopedSlots: { customRender: 'custom_4' }
         },
-        {
-          title: '楼盘信息与标准地址关系是否有效',
-          dataIndex: 'match',
-          ellipsis: true,
-          width: 250,
-          scopedSlots: { customRender: 'custom_5' }
-        },
+        // {
+        //   title: '楼盘信息与标准地址关系是否有效',
+        //   dataIndex: 'match',
+        //   ellipsis: true,
+        //   width: 250,
+        //   scopedSlots: { customRender: 'custom_5' }
+        // },
         {
           title: '标准地址归属分公司',
           dataIndex: 'headOffice',
@@ -353,7 +353,7 @@ export default {
       const enumField = {
         address: '标准地址名称',
         communityName: '楼盘名称',
-        match: '楼盘信息与标准地址关系是否有效',
+        // match: '楼盘信息与标准地址关系是否有效',
         district: '区县',
         street: '街道',
         detailAddress: '三级地址',
