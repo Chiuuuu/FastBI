@@ -8,6 +8,9 @@
         <a-form-model-item label="标准地址名称" prop="address">
           <a-input class="area-input" :maxLength="100" placeholder="请输入标准地址名称" v-model="form.address" />
         </a-form-model-item>
+        <a-form-model-item label="地图标准地址" prop="mapStandardAddress">
+          <a-input class="area-input" :maxLength="100" placeholder="请输入地图标准地址" v-model="form.mapStandardAddress" />
+        </a-form-model-item>
         <a-form-model-item label="楼盘编号" prop="householdNumber">
           <a-input class="area-input" :maxLength="20" placeholder="请输入楼盘编号" v-model="form.householdNumber" />
         </a-form-model-item>
@@ -43,9 +46,6 @@
         </a-form-model-item>
         <a-form-model-item label="三级地址" prop="detailAddress">
           <a-input class="area-input" :maxLength="100" placeholder="请输入三级地址" v-model="form.detailAddress" />
-        </a-form-model-item>
-        <a-form-model-item label="地图标准地址" prop="mapStandardAddress">
-          <a-input class="area-input" :maxLength="100" placeholder="请输入地图标准地址" v-model="form.mapStandardAddress" />
         </a-form-model-item>
         <a-form-model-item label="是否人工修改" prop="hasEdit">
           <a-select class="area-input" placeholder="是否修改" v-model="form.hasEdit" allowClear>
@@ -162,6 +162,13 @@ export default {
           scopedSlots: { customRender: 'custom_1' }
         },
         {
+          title: '地图标准地址',
+          dataIndex: 'mapStandardAddress',
+          ellipsis: true,
+          width: 300,
+          scopedSlots: { customRender: 'custom_14' }
+        },
+        {
           title: '楼盘编号',
           dataIndex: 'householdNumber',
           ellipsis: true,
@@ -244,13 +251,6 @@ export default {
           ellipsis: true,
           width: 300,
           scopedSlots: { customRender: 'custom_13' }
-        },
-        {
-          title: '地图标准地址',
-          dataIndex: 'mapStandardAddress',
-          ellipsis: true,
-          width: 300,
-          scopedSlots: { customRender: 'custom_14' }
         },
         {
           title: '经度',

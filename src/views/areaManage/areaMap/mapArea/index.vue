@@ -1074,6 +1074,9 @@ export default {
           this.mapInstance.focusCompany(target, this.drawnList)
         }
       } else {
+        if (this.gridList.length === 0) {
+          this.$message.error('该分公司无片区、网格与楼盘信息')
+        }
         // 没有片区, 直接渲染网格点
         this.drawnList = []
         this.floor = 2
