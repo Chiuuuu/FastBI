@@ -16,6 +16,28 @@ function getBuildingIcon(color) {
   return `<svg t="1641867878757" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5819" width="48" height="48"><path d="M823 128H487a40 40 0 0 0-40 40v152H201a40 40 0 0 0-40 40v496a40 40 0 0 0 40 40h278l4-0.2 4 0.2h336a40 40 0 0 0 40-40V168a40 40 0 0 0-40-40zM391.5 732.7a3.3 3.3 0 0 1-3.3 3.3H284.8a3.3 3.3 0 0 1-3.3-3.3v-57.4a3.3 3.3 0 0 1 3.3-3.3h103.4a3.3 3.3 0 0 1 3.3 3.3z m0-136a3.3 3.3 0 0 1-3.3 3.3H284.8a3.3 3.3 0 0 1-3.3-3.3v-57.4a3.3 3.3 0 0 1 3.3-3.3h103.4a3.3 3.3 0 0 1 3.3 3.3z m360 136a3.3 3.3 0 0 1-3.3 3.3H626.8a3.3 3.3 0 0 1-3.3-3.3v-57.4a3.3 3.3 0 0 1 3.3-3.3h121.4a3.3 3.3 0 0 1 3.3 3.3z m0-136a3.3 3.3 0 0 1-3.3 3.3H626.8a3.3 3.3 0 0 1-3.3-3.3v-57.4a3.3 3.3 0 0 1 3.3-3.3h121.4a3.3 3.3 0 0 1 3.3 3.3z m0-136a3.3 3.3 0 0 1-3.3 3.3H626.8a3.3 3.3 0 0 1-3.3-3.3v-57.4a3.3 3.3 0 0 1 3.3-3.3h121.4a3.3 3.3 0 0 1 3.3 3.3z" p-id="5820" fill="${color}"></path></svg>`
 }
 
+// 百度坐标转高德（传入经度、纬度）
+function bgpsGps([bdLng, bdLat]) {
+  let X_PI = Math.PI * 3000.0 / 180.0
+  let x = bdLng - 0.0065
+  let y = bdLat - 0.006
+  let z = Math.sqrt(x * x + y * y) - 0.00002 * Math.sin(y * X_PI)
+  let theta = Math.atan2(y, x) - 0.000003 * Math.cos(x * X_PI)
+  let ggLng = z * Math.cos(theta)
+  let ggLat = z * Math.sin(theta)
+  return [ggLng, ggLat]
+}
+// 高德坐标转百度（传入经度、纬度）
+function gpsBgps([ggLng, ggLat]) {
+  let X_PI = Math.PI * 3000.0 / 180.0
+  let x = ggLng; let y = ggLat
+  let z = Math.sqrt(x * x + y * y) + 0.00002 * Math.sin(y * X_PI)
+  let theta = Math.atan2(y, x) + 0.000003 * Math.cos(x * X_PI)
+  let bdLng = z * Math.cos(theta) + 0.0065
+  let bdLat = z * Math.sin(theta) + 0.006
+  return [bdLat, bdLng]
+}
+
 const MAP_DISTRICT_COLOR = {
   '天河区': '#A45CE8',
   '越秀区': '#7060E0',
@@ -293,7 +315,7 @@ export default class MapEditor {
     const gridGroup = grids.map(item => {
       const icon = getGridIcon(`rgb(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255})`)
       const marker = new AMap.Marker({
-        position: [item.longitude, item.latitude],
+        position: bgpsGps([item.longitude, item.latitude]),
         offset: [-8, -16],
         content: icon,
         extData: {
@@ -371,7 +393,7 @@ export default class MapEditor {
       // const icon = getBuildingIcon(`rgb(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255})`)
       const icon = getBuildingIcon('#617bff')
       const marker = new AMap.Marker({
-        position: [item.longitude, item.latitude],
+        position: bgpsGps([item.longitude, item.latitude]),
         offset: [-8, -16],
         content: icon,
         extData: {
@@ -597,6 +619,8 @@ export default class MapEditor {
    * @param {*} name 片区名称
    */
   focusArea(name) {
+    // 先清除楼盘
+    this.clearBuilding()
     this.areaGroup.eachOverlay(item => {
       const target = item.getExtData()
       if (target.name === name) {
@@ -625,6 +649,7 @@ export default class MapEditor {
   focusCompany(target, areaList) {
     // 显示当前行政区的片区
     this.updateArea(areaList)
+    this.clearBuilding()
     // 隐藏所有行政区轮廓
     this.companyGroup.hide()
     this.companyTextGroup.hide()
@@ -728,9 +753,9 @@ export default class MapEditor {
   /**
    * @description 更新右键选项
    */
-   updateContextMenu(contextMenu) {
-     this.initContextMenu(contextMenu)
-   }
+  updateContextMenu(contextMenu) {
+    this.initContextMenu(contextMenu)
+  }
 
   // 撤回操作
   undoStack() {

@@ -240,7 +240,7 @@ export default {
         expr: data.expr,
         field: data.name,
         alias: data.alias,
-        locked: 0,
+        locked: 0, // 0无锁定 1不可删除 2不可编辑不可删除
         rule: { ruleFilterList: [] },
         ruleType: 1,
         modeType: this.isNumber(data) ? 0 : 1,

@@ -289,7 +289,7 @@ export default {
     conditionOptionsNotNum() {
       if (this.isDate || this.isTimestamp) {
         return [
-          { label: '范围', op: 'range' },
+          { label: '区间', op: 'range' },
           { label: '大于', op: 'more' },
           { label: '大于等于', op: 'moreAndEquals' },
           { label: '小于', op: 'less' },
