@@ -306,7 +306,7 @@ export default {
    * @param {String} params.pivotschemaId // 字段id
    * @param {String} params.field // 字段名称
    * @param {String} params.ruleType // 0all 1筛选 2排序
-   * @param {String} params.modeType // 0all 1列表 2手动
+   * @param {String} params.modeType // 0all 1列表 2手动 3字符串查询
    * @param {String} params.isInclude // 0默认 1排除 2包含
    * @param {String} params.displayOrder // 排序序号
    */
