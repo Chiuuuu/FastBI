@@ -89,7 +89,7 @@
 
       <!-- 操作列 -->
       <template #config="text, record, index">
-        <div v-if="activeIndex === index">
+        <div style="line-height: 33px" v-if="activeIndex === index">
           <a @click="handleSaveRow">保存</a>
           <a-divider type="vertical"></a-divider>
           <a @click="handleCancelEdit">取消</a>

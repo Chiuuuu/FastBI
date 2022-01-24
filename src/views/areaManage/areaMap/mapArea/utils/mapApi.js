@@ -592,6 +592,95 @@ export default class MapEditor {
   }
 
   /**
+   * @description 删除当前片区
+   * @param {*} name 片区name
+   */
+  removeArea(name) {
+    // 删除文字标题
+    this.areaTextGroup.eachOverlay(item => {
+      if (item && item.getText() === name) {
+        this.areaTextGroup.removeOverlay(item)
+      }
+    })
+    // 删除多边形
+    this.areaGroup.eachOverlay(item => {
+      if (item && item.getExtData().name === name) {
+        this.areaGroup.removeOverlay(item)
+        // this.subscribe.execute('remove', {
+        //   type: 'area',
+        //   target: item,
+        // })
+
+        if (this.editor && this.editor.getTarget().getExtData().name === name) {
+          this.closeEditor()
+        }
+      }
+    })
+  }
+
+  /**
+   * @description 更新地区信息(重新绘制当前公司的片区列表)
+   * @param {*} areaList
+   */
+  updateArea(areaList) {
+    this.areaList = areaList
+    // 先清空之前的网格点和标题
+    if (this.gridGroup) {
+      this.map.remove(this.gridGroup)
+      this.gridGroup.clear && this.gridGroup.clear()
+    }
+    this.gridGroup = null
+
+    // 先清空之前的片区
+    if (this.areaGroup) {
+      this.map.remove(this.areaGroup)
+    }
+    if (this.areaTextGroup) {
+      this.map.remove(this.areaTextGroup)
+    }
+    // 片区实例化及事件监听
+    this.initArea()
+  }
+
+  // 片区中心标题
+  handleAreaTitle() {
+    if (!this.currentArea || !(this.currentArea instanceof AMap.Polygon)) return
+    const data = this.currentArea.getExtData()
+    const bounds = this.currentArea.getBounds()
+    const position = bounds ? this.findOrigin(bounds) : []
+    const style = {
+      'background-color': 'transparent',
+      'border': 0,
+      'font-weight': 700,
+      'padding': 0,
+      'font-size': data.setting.area.titleFontSize + 'px',
+      'color': data.setting.area.titleColor
+    }
+
+    // 寻找
+    let target = null
+    this.areaTextGroup.eachOverlay(item => {
+      if (item && item.getText() === data.name) {
+        target = item
+      }
+    })
+    if (target) {
+      target.setPosition(position)
+      target.setStyle(style)
+    } else {
+      const title = new AMap.Text({
+        position,
+        style,
+        anchor: 'center',
+        text: data.name,
+        zIndex: 9,
+        clickable: false
+      })
+      this.areaTextGroup.addOverlay(title)
+    }
+  }
+
+  /**
    * @description 聚焦当前网格
    * @param {*} name 网格名称
    */
@@ -659,57 +748,6 @@ export default class MapEditor {
       fit,
       target
     })
-  }
-
-  /**
-   * @description 删除当前片区
-   * @param {*} name 片区name
-   */
-  removeArea(name) {
-    // 删除文字标题
-    this.areaTextGroup.eachOverlay(item => {
-      if (item && item.getText() === name) {
-        this.areaTextGroup.removeOverlay(item)
-      }
-    })
-    // 删除多边形
-    this.areaGroup.eachOverlay(item => {
-      if (item && item.getExtData().name === name) {
-        this.areaGroup.removeOverlay(item)
-        // this.subscribe.execute('remove', {
-        //   type: 'area',
-        //   target: item,
-        // })
-
-        if (this.editor && this.editor.getTarget().getExtData().name === name) {
-          this.closeEditor()
-        }
-      }
-    })
-  }
-
-  /**
-   * @description 更新地区信息(重新绘制当前公司的片区列表)
-   * @param {*} areaList
-   */
-  updateArea(areaList) {
-    this.areaList = areaList
-    // 先清空之前的网格点和标题
-    if (this.gridGroup) {
-      this.map.remove(this.gridGroup)
-      this.gridGroup.clear && this.gridGroup.clear()
-    }
-    this.gridGroup = null
-
-    // 先清空之前的片区
-    if (this.areaGroup) {
-      this.map.remove(this.areaGroup)
-    }
-    if (this.areaTextGroup) {
-      this.map.remove(this.areaTextGroup)
-    }
-    // 片区实例化及事件监听
-    this.initArea()
   }
 
   /**
@@ -815,44 +853,6 @@ export default class MapEditor {
       if (this.currentArea.contains([lng, lat])) return [lng, lat]
     }
     return bounds.getCenter()
-  }
-
-  // 片区中心标题
-  handleAreaTitle() {
-    if (!this.currentArea || !(this.currentArea instanceof AMap.Polygon)) return
-    const data = this.currentArea.getExtData()
-    const bounds = this.currentArea.getBounds()
-    const position = bounds ? this.findOrigin(bounds) : []
-    const style = {
-      'background-color': 'transparent',
-      'border': 0,
-      'font-weight': 700,
-      'padding': 0,
-      'font-size': data.setting.area.titleFontSize + 'px',
-      'color': data.setting.area.titleColor
-    }
-
-    // 寻找
-    let target = null
-    this.areaTextGroup.eachOverlay(item => {
-      if (item && item.getText() === data.name) {
-        target = item
-      }
-    })
-    if (target) {
-      target.setPosition(position)
-      target.setStyle(style)
-    } else {
-      const title = new AMap.Text({
-        position,
-        style,
-        anchor: 'center',
-        text: data.name,
-        zIndex: 9,
-        clickable: false
-      })
-      this.areaTextGroup.addOverlay(title)
-    }
   }
 
   // 保存片区
