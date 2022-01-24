@@ -1799,8 +1799,7 @@ export default {
         this.$refs.componentRef.pushFetchParam({
           sourceId: this.$route.query.datasourceId,
           databaseName: this.databaseName,
-          databaseId:
-            this.databaseList.length > 0 ? this.databaseList[0].id : '',
+          databaseId: this.databaseId || '',
           dataModelId: this.model === 'add' ? this.addModelId : this.modelId
         })
       }
