@@ -2,19 +2,31 @@ import $axios from '@/axios'
 export default {
     /**
      * @description 连接数据库
-     * @param {Object} [params={}] 请求参数
+     * @param {Object} [data={}] 请求参数
      * @returns
      */
-    actionConnect(params = {}) {
-        return $axios.post(`/datasource/connect`, params)
+    actionConnect(data = {}) {
+    //     return $axios.post(`/datasource/connect`, params)
+        return $axios({
+            method: 'post',
+            url: '/datasource/connect',
+            data,
+            timeout: 600000
+        })
     },
     /**
      * @description 测试连接数据库(自定义sql)
-     * @param {Object} [params={}] 请求参数
+     * @param {Object} [data={}] 请求参数
      * @returns
      */
-    actionTestConnect(params = {}) {
-        return $axios.post('/datasource/customize/testConnection', params)
+    actionTestConnect(data = {}) {
+        // return $axios.post('/datasource/customize/testConnection', params)
+        return $axios({
+            method: 'post',
+            url: '/datasource/customize/testConnection',
+            data,
+            timeout: 600000
+        })
     },
     /**
      * @description 获取表的具体字段信息
