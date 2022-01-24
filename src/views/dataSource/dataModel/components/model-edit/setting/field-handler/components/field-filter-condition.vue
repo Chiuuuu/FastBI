@@ -385,6 +385,9 @@ export default {
       }
     },
     addCondition() {
+      if (this.checkedData.length >= 50) {
+        return this.$message.error('最多只能添加50个条件')
+      }
       // 字符类型手动添加
       if (!this.isNumber && +this.conditionData.modeType === 2) {
         if (this.checkedData.indexOf(this.conditionName) > -1) {
