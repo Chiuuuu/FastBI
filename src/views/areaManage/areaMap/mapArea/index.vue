@@ -906,14 +906,20 @@ export default {
     },
     // 右键查看信息
     async handleCheckInfo(type, target) {
-      const data = target.getExtData()
+      let data = target.getExtData()
       // 增城从化特殊处理(需调接口获取网格数量)
       // const noSectionList = ['从化', '增城', '花都']
       // if (noSectionList.includes(data.name)) {
       if (data.areaCnt === 0) {
         this.gridList =
           (await this.getGridList({ headOffice: data.name })) || []
-        data.areaCnt = this.gridList.length
+        data = Object.assign({}, data, {
+          setting: {
+            grid: {
+              cnt: this.gridList.length
+            }
+          }
+        })
         type = 'companyArea'
       }
       this.infoType = type
