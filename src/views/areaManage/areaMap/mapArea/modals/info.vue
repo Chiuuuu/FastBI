@@ -11,8 +11,24 @@
           <div class="setting-value">{{ data.name }}</div>
         </div>
         <div class="setting-row">
-          <div class="setting-label">{{ data.name === '从化' || data.name === '增城' ? '网格数量' : '片区数量' }}</div>
+          <div class="setting-label">片区数量</div>
           <div class="setting-value">{{ data.areaCnt || 0 }}</div>
+        </div>
+      </template>
+
+      <!-- 无片区分公司信息载体 -->
+      <template v-else-if="type === 'companyArea'">
+        <div class="setting-row">
+          <div class="setting-label">片区名称</div>
+          <div class="setting-value">{{ data.name }}</div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">片区数量</div>
+          <div class="setting-value">0</div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">网格数量</div>
+          <div class="setting-value">{{ data.setting ? (data.setting.grid.cnt || 0) : 0 }}</div>
         </div>
       </template>
 
