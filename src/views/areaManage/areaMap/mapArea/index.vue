@@ -568,7 +568,7 @@ export default {
               self.currentArea = self.drawnList.find(item => item.name === name)
               self.handleOpenEditor(target)
               self.disabledToolbar = true
-              self.gridList = await self.getGridList()
+              self.gridList = await self.getGridList() || []
               if (self.gridList.length) {
                 self.mapInstance.initGrid(self.gridList, self.currentArea)
               }
@@ -686,11 +686,7 @@ export default {
             type = 'building'
           }
           if (!group) return
-          group.eachOverlay(item => {
-            if (text === item.getExtData().name) {
-              target = item
-            }
-          })
+          target = this.mapInstance.getOverLayByName(type, text)
           if (!target) return
         }
         this.handleCheckInfo(type, target)
@@ -781,7 +777,7 @@ export default {
 
       // 初始化完成
       this.mapInstance.subscribe.on('init', ({ type }) => {
-        // if (type === 'area' && this.focusTarget.type === 'grid') {
+        // 判断是否需要再次下钻
         if (type === this.focusTarget.type) {
           const name = this.focusTarget.name
           this.focusTarget = {}
@@ -910,21 +906,15 @@ export default {
     },
     // 右键查看信息
     async handleCheckInfo(type, target) {
-      if (type === 'company') {
-      } else if (type === 'area') {
-        // 右键查看片区信息
-      } else if (type === 'grid') {
-        // 右键查看网格信息
-      } else if (type === 'building') {
-        // 右键查看楼盘信息
-      }
       const data = target.getExtData()
       // 增城从化特殊处理(需调接口获取网格数量)
-      const noSectionList = ['从化', '增城', '花都']
-      if (noSectionList.includes(data.name)) {
+      // const noSectionList = ['从化', '增城', '花都']
+      // if (noSectionList.includes(data.name)) {
+      if (data.areaCnt === 0) {
         this.gridList =
           (await this.getGridList({ headOffice: data.name })) || []
         data.areaCnt = this.gridList.length
+        type = 'companyArea'
       }
       this.infoType = type
       this.infoData = data
@@ -956,8 +946,6 @@ export default {
     // 弹窗确认
     handleOk() {
       this.$refs.form.validate(async ok => {
-        console.log(this.areaList, this.form)
-        debugger
         if (ok) {
           const target = this.areaList.find(
             item => item.section === this.form.selectId
@@ -967,6 +955,13 @@ export default {
           this.currentArea = this.drawnList.find(item => item.name === name)
           // 绘制片区确认
           if (this.visibleType === 'draw') {
+            this.gridList =
+              (await this.getGridList({
+                section: name
+              })) || []
+            if (this.gridList.length) {
+              this.mapInstance.initGrid(this.gridList, this.currentArea)
+            }
             this.currentArea = {
               name,
               setting: deepClone(BaseSetting)
@@ -975,6 +970,7 @@ export default {
             this.showCancelDraw = true
             this.disabledToolbar = true
             const setting = deepClone(BaseSetting)
+            setting.grid.cnt = this.gridList.length || 0
             const data = {
               name,
               setting
@@ -996,13 +992,6 @@ export default {
               }
             })
             this.handleCancelModal()
-            this.gridList =
-              (await this.getGridList({
-                section: name
-              })) || []
-            if (this.gridList.length) {
-              this.mapInstance.initGrid(this.gridList, this.currentArea)
-            }
           } else if (this.visibleType === 'edit') {
             // 编辑片区
             this.disabledToolbar = true
@@ -1107,12 +1096,7 @@ export default {
       if (this.searchType === 'company') {
         if (!name) return
         // 聚焦分公司
-        let target = null
-        this.mapInstance.companyGroup.eachOverlay(item => {
-          if (name === item.getExtData().name) {
-            target = item
-          }
-        })
+        const target = this.mapInstance.getOverLayByName('company', name)
         if (target) {
           this.handleFocusCompany(target)
         }
@@ -1128,12 +1112,7 @@ export default {
         const company = this.getParentName(name, 'area')
         if (!company) return
         let companyName = company.headOfficeName
-        let target = null
-        this.mapInstance.companyGroup.eachOverlay(item => {
-          if (companyName === item.getExtData().name) {
-            target = item
-          }
-        })
+        const target = this.mapInstance.getOverLayByName('company', companyName)
         if (!target) return
         this.focusTarget = {
           type: 'area',
@@ -1165,12 +1144,7 @@ export default {
         const company = this.getParentName(area.section, 'area')
         if (!company) return
         let companyName = company.headOfficeName
-        let target = null
-        this.mapInstance.companyGroup.eachOverlay(item => {
-          if (companyName === item.getExtData().name) {
-            target = item
-          }
-        })
+        const target = this.mapInstance.getOverLayByName('company', companyName)
         if (!target) return
         this.focusTarget = {
           type: 'area',

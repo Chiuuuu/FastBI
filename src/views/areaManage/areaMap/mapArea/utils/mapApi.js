@@ -529,12 +529,7 @@ export default class MapEditor {
       this.currentArea = area
     } else {
       // 根据name找到当前多边形
-      let target = null
-      this.areaGroup.eachOverlay(item => {
-        if (item.getExtData().name === area.name) {
-          target = item
-        }
-      })
+      const target = this.getOverLayByName('area', area.name)
       this.currentArea = target
       if (!target) return
     }
@@ -597,25 +592,18 @@ export default class MapEditor {
    */
   removeArea(name) {
     // 删除文字标题
-    this.areaTextGroup.eachOverlay(item => {
-      if (item && item.getText() === name) {
-        this.areaTextGroup.removeOverlay(item)
-      }
-    })
+    const text = this.getOverLayByName('areaText', name)
+    if (text) {
+      this.areaTextGroup.removeOverlay(text)
+    }
     // 删除多边形
-    this.areaGroup.eachOverlay(item => {
-      if (item && item.getExtData().name === name) {
-        this.areaGroup.removeOverlay(item)
-        // this.subscribe.execute('remove', {
-        //   type: 'area',
-        //   target: item,
-        // })
-
-        if (this.editor && this.editor.getTarget().getExtData().name === name) {
-          this.closeEditor()
-        }
+    const target = this.getOverLayByName('area', name)
+    if (target) {
+      this.areaGroup.removeOverlay(target)
+      if (this.editor && this.editor.getTarget().getExtData().name === name) {
+        this.closeEditor()
       }
-    })
+    }
   }
 
   /**
@@ -658,12 +646,7 @@ export default class MapEditor {
     }
 
     // 寻找
-    let target = null
-    this.areaTextGroup.eachOverlay(item => {
-      if (item && item.getText() === data.name) {
-        target = item
-      }
-    })
+    const target = this.getOverLayByName('areaText', data.name)
     if (target) {
       target.setPosition(position)
       target.setStyle(style)
@@ -685,22 +668,20 @@ export default class MapEditor {
    * @param {*} name 网格名称
    */
   focusGrid(name) {
-    this.gridGroup.eachOverlay(item => {
-      const target = item.getExtData()
-      if (target.grid === name) {
-        // 隐藏所有网格轮廓
-        this.gridGroup.hide()
-        // 先获取到多边形轮廓
-        const fit = this.map.getFitZoomAndCenterByOverlays([item])
-        // 缩放比特殊处理
-        fit[0] = fit[0] * 0.55
-        this.subscribe.execute('focus', {
-          type: 'grid',
-          target: item,
-          fit
-        })
-      }
-    })
+    const target = this.getOverLayByName('grid', name)
+    if (target && target.getExtData().grid === name) {
+      // 隐藏所有网格轮廓
+      this.gridGroup.hide()
+      // 先获取到多边形轮廓
+      const fit = this.map.getFitZoomAndCenterByOverlays([target])
+      // 缩放比特殊处理
+      fit[0] = fit[0] * 0.55
+      this.subscribe.execute('focus', {
+        type: 'grid',
+        target: target,
+        fit
+      })
+    }
   }
 
   /**
@@ -710,24 +691,22 @@ export default class MapEditor {
   focusArea(name) {
     // 先清除楼盘
     this.clearBuilding()
-    this.areaGroup.eachOverlay(item => {
-      const target = item.getExtData()
-      if (target.name === name) {
-        // 隐藏所有片区轮廓
-        this.areaGroup.hide()
-        this.areaTextGroup.hide()
-        // 先获取到多边形轮廓
-        const path = item.getBounds()
-        if (path) {
-          const fit = this.map.getFitZoomAndCenterByOverlays([item])
-          this.subscribe.execute('focus', {
-            type: 'area',
-            target: item,
-            fit
-          })
-        }
+    const target = this.getOverLayByName('area', name)
+    if (target && target.getExtData().name === name) {
+      // 隐藏所有片区轮廓
+      this.areaGroup.hide()
+      this.areaTextGroup.hide()
+      // 先获取到多边形轮廓
+      const path = target.getBounds()
+      if (path) {
+        const fit = this.map.getFitZoomAndCenterByOverlays([target])
+        this.subscribe.execute('focus', {
+          type: 'area',
+          target: target,
+          fit
+        })
       }
-    })
+    }
   }
 
   /**
@@ -845,6 +824,44 @@ export default class MapEditor {
     })
   }
 
+  // 根据名称获取当前图层
+  getOverLayByName(type, name) {
+    // 默认查公司
+    let target = null
+    if (type === 'company') {
+      this.companyGroup.eachOverlay(item => {
+        if (item.getExtData().name === name) {
+          target = item
+        }
+      })
+    } else if (type === 'area') {
+      this.areaGroup.eachOverlay(item => {
+        if (item.getExtData().name === name) {
+          target = item
+        }
+      })
+    } else if (type === 'areaText') {
+      this.areaTextGroup.eachOverlay(item => {
+        if (item && item.getText() === name) {
+          target = item
+        }
+      })
+    } else if (type === 'grid') {
+      this.gridGroup.eachOverlay(item => {
+        if (item.getExtData().grid === name) {
+          target = item
+        }
+      })
+    } else if (type === 'grid') {
+      this.buildingGroup.eachOverlay(item => {
+        if (item.getExtData().name === name) {
+          target = item
+        }
+      })
+    }
+    return target
+  }
+
   // 循环查找多边形的中心
   findOrigin(bounds) {
     const positionList = ['getCenter', 'getNorthEast', 'getSouthEast', 'getSouthWest', 'getNorthWest']
@@ -893,11 +910,8 @@ export default class MapEditor {
       // 没有形成图形, 将文字删除
       if (defaultSetting.area.path.length === 0) {
         this.currentArea.destroy()
-        this.areaTextGroup.eachOverlay(item => {
-          if (item && item.getText() === extData.name) {
-            this.areaTextGroup.removeOverlay(item)
-          }
-        })
+        const target = this.getOverLayByName('areaText', extData.name)
+        target && this.areaTextGroup.removeOverlay(target)
       } else {
         this.currentArea.setExtData(extData)
         this.currentArea.setOptions(defaultSetting)
