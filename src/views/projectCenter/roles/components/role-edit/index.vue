@@ -19,13 +19,13 @@
                 <a-input v-model="form.description" placeholder="请输入角色描述"></a-input>
               </a-form-model-item>
             </a-form-model>
-            <RoleTabeRole
+            <RolesTabRole
               status="edit"
               @getChangeItem="getChangeItem"
               @getTablePermi="getTablePermi"
               @setBasePrivilege="getBasePrivilege"
               @setSourceType="setSourceType"
-              ></RoleTabeRole>
+              ></RolesTabRole>
             <!-- <RolesTabDataPermission status="edit"></RolesTabDataPermission> -->
           </div>
         </div>
@@ -38,13 +38,13 @@
 import { mapState } from 'vuex'
 import { trimFormData } from '@/utils/form-utils'
 // import RolesTabDataPermission from '../tab-content/rolesTabDataPermission'
-import RoleTabeRole from '../tab-content/rolesTabRole'
+import RolesTabRole from '../tab-content/rolesTabRole'
 
 export default {
   name: 'roleEdit',
   components: {
     // RolesTabDataPermission,
-    RoleTabeRole
+    RolesTabRole
   },
   data() {
     return {

@@ -1,24 +1,24 @@
 <template>
   <a-modal
-      :visible="visible"
-      title="设置可见库组"
-      :bodyStyle="bodyStyle"
-      :maskClosable="false"
-      @ok="handleOkTable"
-      @cancel="handleClearTable"
-    >
-      <a-input-search v-model="tableSearchWord" placeholder="请输入搜索的库组名" enter-button="查询" />
-      <a-tree
-        :checkedKeys="searchTableKey"
-        :tree-data="treeData"
-        :replaceFields="{title: 'dbName', key: 'dbId'}"
-        :expandedKeys="[currentSourceInfo.id || '']"
-        :default-expand-all="true"
-        :auto-expand-parent="true"
-        :checkable="true"
-        @check="onCheckTable"
-      ></a-tree>
-    </a-modal>
+    :visible="visible"
+    title="设置可见库组"
+    :bodyStyle="bodyStyle"
+    :maskClosable="false"
+    @ok="handleOkTable"
+    @cancel="handleClearTable"
+  >
+    <a-input-search v-model="tableSearchWord" placeholder="请输入搜索的库组名" enter-button="查询" />
+    <a-tree
+      :checkedKeys="searchTableKey"
+      :tree-data="treeData"
+      :replaceFields="{title: 'dbName', key: 'dbId'}"
+      :expandedKeys="[currentSourceInfo.id || '']"
+      :default-expand-all="true"
+      :auto-expand-parent="true"
+      :checkable="true"
+      @check="onCheckTable"
+    ></a-tree>
+  </a-modal>
 </template>
 
 <script>

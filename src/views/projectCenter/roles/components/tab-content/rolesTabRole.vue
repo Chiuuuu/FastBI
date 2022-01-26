@@ -44,12 +44,28 @@
           />
         </a-spin>
       </a-tab-pane>
+      <a-tab-pane
+        v-if="$store.state.user.selectProject == 1"
+        forceRender
+        :key="4"
+        tab="片区管理"
+      >
+        <a-spin :spinning="spinning4">
+          <map-permission
+            v-on="$listeners"
+            ref="module4"
+            role-title="片区地图管理"
+            :options="modulePermission[4] || {}"
+          />
+        </a-spin>
+      </a-tab-pane>
     </a-tabs>
   </div>
 </template>
 <script>
 import { mapState } from 'vuex'
 import RoleLimit from '../limitTree/role-limit'
+import MapPermission from '../mapPermission/map-permission'
 export default {
   name: 'rolesTabRole',
   provide() {
@@ -82,29 +98,38 @@ export default {
     }
   },
   components: {
-    RoleLimit
+    RoleLimit,
+    MapPermission
   },
   data() {
     return {
       spinning1: false,
       spinning2: false,
       spinning3: false,
+      spinning4: false,
       currentTab: 1,
-      modulePermission: {}, // 模块权限
+      // 模块权限key: 1.大屏 2.模型 3.接入 4.片区地图
+      modulePermission: {},
       // 模块对应的业务权限
       moduleList: {
         1: [],
         2: [],
-        3: []
+        3: [],
+        4: []
       },
-      // 模块对应的全选业务权限
+      // 模块对应的全选业务权限(不用存后端, 只用于判断按钮状态)
       moduleListAll: {
         1: [],
         2: [],
-        3: []
+        3: [],
+        4: []
       },
-      treeList: {}, // 模块对应的树节点
-      folderHeader: [], // 文件夹权限
+      // 模块对应的树节点key: 1.大屏 2.模型 3.接入
+      treeList: {},
+      // 文件夹权限(各模块统一, { name: string, permission: string }[])
+      folderHeader: [],
+      // 黑名单机制, 为空时要传'all'
+      // 根据选中的取反得出列表, [1,2,3]选中[1]则要传[2,3]
       sourceTypeList: 'all'
     }
   },
@@ -232,15 +257,6 @@ export default {
                     const list = []
                     const addItem = item => {
                       if (item.permissions.length > 0) {
-                        // const params = {
-                        //   id: item.id,
-                        //   permissions: item.permissions,
-                        //   name: item.title
-                        // }
-                        // if (i === 3 && item.fileType === 1) {
-                        //   params.dataBasePri = item.dataBasePri
-                        // }
-                        // list.push(params)
                         list.push(item)
                       }
                     }

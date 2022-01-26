@@ -1,24 +1,24 @@
 <template>
   <a-modal
-      :visible="visible"
-      title="选择可用的添加连接类型"
-      :bodyStyle="bodyStyle"
-      :maskClosable="false"
-      @ok="handleOk"
-      @cancel="handleClear"
-    >
-      <a-input-search v-model="searchWord" placeholder="请输入搜索的库组名" enter-button="查询" />
-      <a-tree
-        :checkedKeys="searchTableKey"
-        :tree-data="treeData"
-        :replaceFields="{title: 'name', key: 'type'}"
-        :expandedKeys="[0]"
-        :default-expand-all="true"
-        :auto-expand-parent="true"
-        :checkable="true"
-        @check="onCheck"
-      ></a-tree>
-    </a-modal>
+    :visible="visible"
+    title="选择可用的添加连接类型"
+    :bodyStyle="bodyStyle"
+    :maskClosable="false"
+    @ok="handleOk"
+    @cancel="handleClear"
+  >
+    <a-input-search v-model="searchWord" placeholder="请输入搜索的库组名" enter-button="查询" />
+    <a-tree
+      :checkedKeys="searchTableKey"
+      :tree-data="treeData"
+      :replaceFields="{title: 'name', key: 'type'}"
+      :expandedKeys="[0]"
+      :default-expand-all="true"
+      :auto-expand-parent="true"
+      :checkable="true"
+      @check="onCheck"
+    ></a-tree>
+  </a-modal>
 </template>
 
 <script>
@@ -98,7 +98,7 @@ export default {
       } else {
         list = []
       }
-      // 取反选中
+      // 由于是黑名单机制, 所以要取反选中
       this.initialTypes = this.typeList.filter(item => list.indexOf(item.type) < 0).map(item => item.type)
       this.checkedTypes = this.initialTypes
     },

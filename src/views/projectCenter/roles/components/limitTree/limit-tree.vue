@@ -1,4 +1,5 @@
 <template>
+<!-- 模块下的树形勾选框 -->
   <a-tree
     class="limitTree"
     :tree-data="injectTreeData"
@@ -8,6 +9,8 @@
   >
     <template slot="custom" slot-scope="item" style="color: #f00;width: 100%">
       <a-row>
+        <!-- 资源名称 -->
+        <!-- injectRoleTab === 3 ? 22 : 24 由于数据接入模块要在最后拼接一个库组权限, 所以要判断这里的占比 -->
         <a-col :span="(injectRoleTab === 3 ? 22 : 24) - injectActionList.length * 2">
           <a-icon style="margin-right:8px" v-if="item.fileType === 0" type="folder" />
           <a-icon style="margin-right:8px" v-else type="file" />
