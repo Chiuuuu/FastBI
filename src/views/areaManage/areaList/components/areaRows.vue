@@ -201,70 +201,70 @@ export default {
           dataIndex: 'headOffice',
           ellipsis: true,
           width: 200
-          // scopedSlots: { customRender: 'custom_7' }
+          // scopedSlots: { customRender: 'custom_6' }
         },
         {
           title: '片区',
           dataIndex: 'section',
           ellipsis: true,
           width: 100
-          // scopedSlots: { customRender: 'custom_8' }
+          // scopedSlots: { customRender: 'custom_7' }
         },
         {
           title: '网格',
           dataIndex: 'grid',
           ellipsis: true,
           width: 300
-          // scopedSlots: { customRender: 'custom_9' }
+          // scopedSlots: { customRender: 'custom_8' }
         },
         {
           title: '运维片区',
           dataIndex: 'serviceSection',
           ellipsis: true,
           width: 150
-          // scopedSlots: { customRender: 'custom_10' }
+          // scopedSlots: { customRender: 'custom_9' }
         },
         {
           title: '地市',
           dataIndex: 'city',
           ellipsis: true,
           width: 150
-          // scopedSlots: { customRender: 'custom_11' }
+          // scopedSlots: { customRender: 'custom_10' }
         },
         {
           title: '区县',
           dataIndex: 'district',
           ellipsis: true,
           width: 150,
-          scopedSlots: { customRender: 'custom_12' }
+          scopedSlots: { customRender: 'custom_11' }
         },
         {
           title: '街道',
           dataIndex: 'street',
           ellipsis: true,
           width: 200,
-          scopedSlots: { customRender: 'custom_13' }
+          scopedSlots: { customRender: 'custom_12' }
         },
         {
           title: '三级地址',
           dataIndex: 'detailAddress',
           ellipsis: true,
           width: 300,
-          scopedSlots: { customRender: 'custom_14' }
+          scopedSlots: { customRender: 'custom_13' }
         },
         {
           title: '经度',
           dataIndex: 'longitude',
           ellipsis: true,
           width: 150
-          // scopedSlots: { customRender: 'custom_15' }
+          // scopedSlots: { customRender: 'custom_14' }
         },
         {
           title: '纬度',
           dataIndex: 'latitude',
           ellipsis: true,
           width: 150
-          // scopedSlots: { customRender: 'custom_16' }
+          // scopedSlots: { customRender: 'custom_15' }
         }
       ],
       configColumns: [
