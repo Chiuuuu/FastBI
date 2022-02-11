@@ -162,17 +162,17 @@ const app = {
       }
       return screenManage
         .renameScreen(params)
-        .then(res => {
-          if (res.code === 200) {
-            // res.msg && message.success(res.msg)
-            return true
-          }
-          res.msg && message.error(res.msg)
-        })
-        .catch(err => {
-          // 需要捕获错误 否则无法传递给commit
-          err && message.error(err)
-        })
+        // .then(res => {
+        //   if (res.code === 200) {
+        //     // res.msg && message.success(res.msg)
+        //     return true
+        //   }
+        //   res.msg && message.error(res.msg)
+        // })
+        // .catch(err => {
+        //   // 需要捕获错误 否则无法传递给commit
+        //   err && message.error(err)
+        // })
     },
     // 保存页面配置
     async saveScreenData({ dispatch, rootGetters, state }) {
@@ -427,7 +427,7 @@ const app = {
       }
       // 超时强行关闭
       setTimeout(() => {
-        loadingInstance.close()
+        loadingInstance && loadingInstance.close()
       }, 10 * 1000)
       return screenManage
         .actionRefreshScreen({ params })

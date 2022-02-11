@@ -264,7 +264,7 @@
             <span v-else>{{ expiredLabel }}</span>
           </div>
           <div class="releace-line">
-            <span class="label"><span style="color: #ff0000">*</span>发布：</span>
+            <span class="label">发布：</span>
             <a-checkbox :disabled="isPublish !== 0" v-model="releaseObj.publishOa">同步发布至OA</a-checkbox>
           </div>
           <div class="code-show" v-show="showCode">
@@ -828,7 +828,7 @@ export default {
                 this.$refs.screen.getShareData()
               }
             } else {
-              return
+              return this.$message.error(res.msg || '请求错误')
             }
           }
         }

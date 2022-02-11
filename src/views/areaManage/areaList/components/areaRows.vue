@@ -165,92 +165,92 @@ export default {
           title: '地图标准地址',
           dataIndex: 'mapStandardAddress',
           ellipsis: true,
-          width: 300,
-          scopedSlots: { customRender: 'custom_14' }
+          width: 300
+          // scopedSlots: { customRender: 'custom_2' }
         },
         {
           title: '楼盘编号',
           dataIndex: 'householdNumber',
           ellipsis: true,
           width: 120
-          // scopedSlots: { customRender: 'custom_2' }
+          // scopedSlots: { customRender: 'custom_3' }
         },
         {
           title: '楼盘名称',
           dataIndex: 'communityName',
           ellipsis: true,
           width: 200,
-          scopedSlots: { customRender: 'custom_3' }
+          scopedSlots: { customRender: 'custom_4' }
         },
         {
           title: '楼盘信息提供方',
           dataIndex: 'provider',
           ellipsis: true,
           width: 200
-          // scopedSlots: { customRender: 'custom_4' }
+          // scopedSlots: { customRender: 'custom_5' }
         },
         // {
         //   title: '楼盘信息与标准地址关系是否有效',
         //   dataIndex: 'match',
         //   ellipsis: true,
         //   width: 250,
-        //   scopedSlots: { customRender: 'custom_5' }
+        //   scopedSlots: { customRender: 'custom_6' }
         // },
         {
           title: '标准地址归属分公司',
           dataIndex: 'headOffice',
           ellipsis: true,
           width: 200
-          // scopedSlots: { customRender: 'custom_6' }
+          // scopedSlots: { customRender: 'custom_7' }
         },
         {
           title: '片区',
           dataIndex: 'section',
           ellipsis: true,
           width: 100
-          // scopedSlots: { customRender: 'custom_7' }
+          // scopedSlots: { customRender: 'custom_8' }
         },
         {
           title: '网格',
           dataIndex: 'grid',
           ellipsis: true,
           width: 300
-          // scopedSlots: { customRender: 'custom_8' }
+          // scopedSlots: { customRender: 'custom_9' }
         },
         {
           title: '运维片区',
           dataIndex: 'serviceSection',
           ellipsis: true,
           width: 150
-          // scopedSlots: { customRender: 'custom_9' }
+          // scopedSlots: { customRender: 'custom_10' }
         },
         {
           title: '地市',
           dataIndex: 'city',
           ellipsis: true,
           width: 150
-          // scopedSlots: { customRender: 'custom_10' }
+          // scopedSlots: { customRender: 'custom_11' }
         },
         {
           title: '区县',
           dataIndex: 'district',
           ellipsis: true,
           width: 150,
-          scopedSlots: { customRender: 'custom_11' }
+          scopedSlots: { customRender: 'custom_12' }
         },
         {
           title: '街道',
           dataIndex: 'street',
           ellipsis: true,
           width: 200,
-          scopedSlots: { customRender: 'custom_12' }
+          scopedSlots: { customRender: 'custom_13' }
         },
         {
           title: '三级地址',
           dataIndex: 'detailAddress',
           ellipsis: true,
           width: 300,
-          scopedSlots: { customRender: 'custom_13' }
+          scopedSlots: { customRender: 'custom_14' }
         },
         {
           title: '经度',
