@@ -6,7 +6,7 @@
     :bodyStyle="bodyStyle"
     :maskClosable="false"
     @ok="handleOk"
-    @cancel="handleClear"
+    @cancel="handleCancel"
   >
     <a-spin :spinning="spinning">
       <div class="map-tree-container">
@@ -110,7 +110,8 @@ export default {
     'getProvideActionList',
     'getProvideTreeData',
     'getCurrentRoleTab',
-    'getFolderHeader'
+    'getFolderHeader',
+    'getAreaMapManagement'
   ],
   props: {
     visible: {
@@ -122,9 +123,9 @@ export default {
     return {
       bodyStyle: { padding: 0, height: '400px', 'overflow-y': 'auto' },
       spinning: false,
-      keyword1: '',
-      keyword2: '',
-      keyword3: '',
+      keyword1: '', // 分公司关键字
+      keyword2: '', // 片区关键字
+      keyword3: '', // 网格关键字
       companyList: [], // 分公司列表
       areaList: [], // 片区列表
       gridList: [], // 网格列表
@@ -132,6 +133,25 @@ export default {
         1: 'companyList',
         2: 'areaList',
         3: 'gridList'
+      },
+      fetchData: [],
+      cacheCheckedList: {
+        companyList: [],
+        areaList: [],
+        gridList: []
+      }, // 缓存勾选项(因为是非实时保存)
+      saveCnt: 0 // 最终确认勾选次数
+    }
+  },
+  computed: {
+    injectAreaMapManagement() {
+      return this.getAreaMapManagement()
+    }
+  },
+  watch: {
+    visible(newValue) {
+      if (newValue) {
+        this.renderTree()
       }
     }
   },
@@ -141,43 +161,83 @@ export default {
   methods: {
     async handleGetData() {
       this.spinning = true
-      const res = await this.$server.mapArea.getCompanyList().finally(() => {
+      const res = await this.$server.mapArea.getRoleAreaTree().finally(() => {
         this.spinning = false
       })
-      // 平铺树结构, 形成下拉框筛选项
+      if (res && res.code === 200) {
+        this.fetchData = res.data
+        this.renderTree()
+      }
+    },
+    // 处理片区下的网格树
+    doWithTreeForArea(area, grid) {
+      // 通过接口获取已勾选的网格
+      let checkedNum = 0
+      const children = area.children
+      const res = children.map(item => {
+        let checked = false
+        // 判断当前网格是否被选中
+        const index = grid.findIndex(n => n === item.name)
+        if (index > -1) {
+          checkedNum++
+          checked = true
+          // 减少下一次循环次数
+          grid.splice(index, 1)
+        }
+        return {
+          name: item.name,
+          parentName: area.name,
+          checked: checkedNum > 0 && checked,
+          indeterminate: false,
+          children: []
+        }
+      })
+      return {
+        name: area.name,
+        checked: checkedNum > 0 && checkedNum === children.length,
+        indeterminate: checkedNum > 0 && checkedNum < children.length,
+        children: res
+      }
+    },
+    // 渲染树结构
+    renderTree() {
+      // 已经异步获取过, 直接加载缓存列表
+      if (this.saveCnt > 0) {
+        this.companyList = [].concat(this.cacheCheckedList.companyList)
+        this.areaList = [].concat(this.cacheCheckedList.areaList)
+        this.gridList = [].concat(this.cacheCheckedList.gridList)
+        return
+      }
+      // 平铺树结构, 形成checkbox筛选项
       let areaList = []
       let gridList = []
-      this.companyList = res.data.map(item => {
-        const headOfficeName = item.headOfficeName
-        const sectionList = item.section || []
+      const data = [].concat(this.fetchData)
+      this.companyList = data.map(company => {
         // 片区列表
-        areaList = areaList.concat(
-          sectionList.map(item => {
-            // 处理网格对象
-            const children = item.grid.map(g => ({
-              name: g,
-              parentName: item.sectionName,
-              checked: false,
-              indeterminate: false,
-              children: []
-            }))
-            // 网格列表拼接
-            gridList = gridList.concat(children)
-            return {
-              children: children,
-              parentName: headOfficeName,
-              name: item.sectionName,
-              checked: false,
-              indeterminate: false
-            }
-          })
-        )
+        const children = company.children
+        let checkedNum = 0
+        const newChildren = children.map(area => {
+          // 处理网格列表
+          // const grid = [].concat(this.saveCnt > 0 ? this.cacheCheckedList.grid : this.injectAreaMapManagement.grid)
+          const grid = [].concat(this.injectAreaMapManagement.grid)
+          const areaItem = this.doWithTreeForArea(area, grid)
+          if (areaItem.checked || areaItem.indeterminate) {
+            checkedNum++
+          }
+          // 网格列表拼接
+          gridList = gridList.concat(areaItem.children)
+          return {
+            parentName: company.name,
+            ...areaItem
+          }
+        })
+        areaList = areaList.concat(newChildren)
         return {
-          name: item.headOfficeName,
+          name: company.name,
           parentName: '',
-          checked: false,
-          indeterminate: false,
-          children: areaList
+          checked: checkedNum > 0 && checkedNum === children.length,
+          indeterminate: checkedNum > 0 && checkedNum < children.length,
+          children: newChildren
         }
       })
       this.areaList = areaList
@@ -195,7 +255,7 @@ export default {
       return checkedLen === this[this.enumList[type]].length
     },
     getIndeterminate(type) {
-      const checkedLen = this[this.enumList[type]].filter(item => item.checked)
+      const checkedLen = this[this.enumList[type]].filter(item => item.checked || item.indeterminate)
         .length
       return checkedLen > 0 && checkedLen < this[this.enumList[type]].length
     },
@@ -213,7 +273,10 @@ export default {
     // 按钮事件, type 1公司 2片区 3网格
     handleCheck(e, type, data) {
       const { checked } = e.target
-      let parentType = type
+      let _type = type
+      if (!checked) {
+        data.indeterminate = false
+      }
       // 向下勾选
       if (type < 3) {
         this[this.enumList[++type]].forEach(item => {
@@ -225,9 +288,9 @@ export default {
         })
       }
       // 向上勾选
-      while (parentType > 1) {
+      while (_type > 1) {
         // 找到父节点
-        const target = this[this.enumList[--parentType]].find(
+        const target = this[this.enumList[--_type]].find(
           item => item.name === data.parentName
         )
         if (target) {
@@ -244,8 +307,24 @@ export default {
         }
       }
     },
-    handleOk() {},
-    handleClear() {
+    getCheckedOrIndeterminateList(list) {
+      return list.filter(item => item.checked || item.indeterminate).map(item => item.name)
+    },
+    handleOk() {
+      this.saveCnt++
+      this.cacheCheckedList = {
+        companyList: this.companyList,
+        areaList: this.areaList,
+        gridList: this.gridList
+      }
+      this.$emit('getAreaMapManagement', {
+        headOffice: this.getCheckedOrIndeterminateList(this.companyList),
+        section: this.getCheckedOrIndeterminateList(this.areaList),
+        grid: this.getCheckedOrIndeterminateList(this.gridList)
+      })
+      this.$emit('update:visible', false)
+    },
+    handleCancel() {
       this.$emit('update:visible', false)
     }
   }

@@ -172,5 +172,13 @@ export default {
      */
     updateRoleSourceType(params) {
         return $axios.post('/user/RoleResourcePrivilege/sourceBlackList', params)
+    },
+    /**
+     * @description 获取片区地图已勾选的数据
+     * @param {String} id 角色id
+     * @returns
+     */
+    getAreaMapChecked(id) {
+        return $axios.get(`/user/dataFilter/showAreaMapFilter/${id}`)
     }
 }

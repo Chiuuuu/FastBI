@@ -10,7 +10,7 @@
           size="small"
           type="primary"
           @click="handleSetMapTree"
-        >配置片区身份</a-button>
+        >{{ status === 'show' ? '查看片区身份' : '配置片区身份' }}</a-button>
       </a-col>
     </a-row>
     <!-- 权限标题(增删改查发布...) -->
@@ -27,7 +27,7 @@
       <a-row>
         <a-col :span="24 - injectActionList.length * 2">
           <span style="margin-right: 8px">全选</span>
-          <a-checkbox :disabled="status === 'show'" :checked="checkAll" @change="handleCheckAll"></a-checkbox>
+          <a-checkbox :disabled="status === 'show'" :indeterminate="indeterminate" :checked="checkAll" @change="handleCheckAll"></a-checkbox>
         </a-col>
         <a-col :span="injectActionList.length * 2">
           <a-checkbox-group :value="injectAllPermission" style="width:100%">
@@ -46,33 +46,11 @@
         </a-col>
       </a-row>
     </div>
-    <!-- 权限名称 -->
-    <a-row v-for="item in list" :key="item.title">
-      <a-col class="map-module-title" :span="24 - injectActionList.length * 2">
-        <span class="">{{item.title}}</span>
-      </a-col>
-      <a-col :span="injectActionList.length * 2">
-        <a-checkbox-group :value="item.permissions" style="width:100%">
-          <a-row>
-            <a-col
-              span="5"
-              v-for="(subitem,subindex) in injectActionList"
-              :key="subitem.permission"
-              :style="{
-              width: `${100 / injectActionList.length}%`
-            }"
-            >
-              <a-checkbox
-                :class="`custom-checkbox-${subindex+1}`"
-                :value="subitem.permission"
-                @change="(e) => onChange(subitem, e, item)"
-                :disabled="isDisabled"
-              ></a-checkbox>
-            </a-col>
-          </a-row>
-        </a-checkbox-group>
-      </a-col>
-    </a-row>
+
+    <!-- 勾选项 -->
+    <div class="content scrollbar">
+      <LimitTree ref="tree" v-on="$listeners" :show-icon="false" />
+    </div>
 
     <!-- 片区地图数据配置模态框 -->
     <MapTree ref="MapTree" :visible.sync="visibleMapTree" v-on="$listeners" />
@@ -81,6 +59,7 @@
 
 <script>
 import MapTree from './map-tree'
+import LimitTree from '../limitTree/limit-tree.vue'
 export default {
   name: 'mapPermission',
   inject: [
@@ -101,14 +80,16 @@ export default {
     }
   },
   components: {
-    MapTree
+    MapTree,
+    LimitTree
   },
   computed: {
     isDisabled() {
       return this.status === 'show'
     },
     checkAll() {
-      return this.injectAllPermission.length === this.injectActionList.length
+      return this.injectAllPermission.length > 0 &&
+      this.injectAllPermission.length === this.injectActionList.length
     },
     indeterminate() {
       return (
@@ -221,8 +202,5 @@ export default {
   margin-top: 10px;
   margin-left:40px;
   padding: 0 5px;
-}
-.map-module-title {
-  margin-left: 44px;
 }
 </style>

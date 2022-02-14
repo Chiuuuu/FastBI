@@ -74,6 +74,7 @@ export default {
       getProvideTreeData: () => this.treeData,
       getCurrentRoleTab: () => this.currentTab,
       getFolderHeader: () => this.folderHeader,
+      getAreaMapManagement: () => this.areaMapManagement,
       getCurrentAllPermission: () => this.moduleListAll[this.currentTab],
       getSourceTypeList: () => this.sourceTypeList,
       status: this.status
@@ -130,7 +131,13 @@ export default {
       folderHeader: [],
       // 黑名单机制, 为空时要传'all'
       // 根据选中的取反得出列表, [1,2,3]选中[1]则要传[2,3]
-      sourceTypeList: 'all'
+      sourceTypeList: 'all',
+      // 片区数据勾选项
+      areaMapManagement: {
+        headOffice: [],
+        section: [],
+        grid: []
+      }
     }
   },
   mounted() {
@@ -168,6 +175,21 @@ export default {
             this.$message.error(res.msg || '请求错误')
           }
         })
+    },
+    handleGetAreaMapChecked() {
+      this.$server.projectCenter.getAreaMapChecked(this.roleId).then(res => {
+        if (res.code === 200) {
+          this.folderHeader = res.data
+          this.areaMapManagement = {
+            headOffice: res.data.headOffice || [],
+            section: res.data.section || [],
+            grid: res.data.grid || []
+          }
+          this.$emit('getAreaMapManagement', this.areaMapManagement)
+        } else {
+          this.$message.error('获取文件夹权限失败')
+        }
+      })
     },
     handleReset() {
       this.data = this.$options.data()
@@ -226,23 +248,32 @@ export default {
       this.handleReset()
       await this.handleGetFolderPermissions()
       await this.handleGetSourceType()
+      if (+this.$store.state.user.selectProject === 1) {
+        await this.handleGetAreaMapChecked()
+      }
       // 顺序加载
       this.spinning1 = true
       this.spinning2 = true
       this.spinning3 = true
-      for (let i = 1; i < 4; i++) {
+      this.spinning4 = true
+      for (let i = 1; i < 5; i++) {
         if (!this.roleId && !this.$route.params.id) {
           this.spinning1 = false
           this.spinning2 = false
           this.spinning3 = false
+          this.spinning4 = false
           return
         }
+        if (i === 4 && +this.$store.state.user.selectProject !== 1) return
         this.$server.projectCenter
           .getRoleTree(this.roleId || this.$route.params.id, i)
           .then(result => {
             if (result.code === 200) {
               if (result.data) {
-                this.$set(this.modulePermission, i, result.data.basePrivilege)
+                this.$set(this.modulePermission, i, result.data.basePrivilege || {
+                  header: [],
+                  permissions: []
+                })
                 this.$set(this.moduleList, i, [].concat(result.data.header))
                 this.$set(this.treeList, i, [].concat(result.data.folder))
                 this.$emit(

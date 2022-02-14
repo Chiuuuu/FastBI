@@ -86,5 +86,12 @@ export default {
    */
   updateFields(params = {}) {
     return $axios.post('/zone/data/edit', params)
+  },
+  /**
+   * @description 角色配置中获取3级树结构
+   * @returns
+   */
+  getRoleAreaTree() {
+    return $axios.get('/zone/areaManagementConfigurationList')
   }
 }

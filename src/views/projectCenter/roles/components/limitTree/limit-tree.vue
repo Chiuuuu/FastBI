@@ -12,8 +12,10 @@
         <!-- 资源名称 -->
         <!-- injectRoleTab === 3 ? 22 : 24 由于数据接入模块要在最后拼接一个库组权限, 所以要判断这里的占比 -->
         <a-col :span="(injectRoleTab === 3 ? 22 : 24) - injectActionList.length * 2">
-          <a-icon style="margin-right:8px" v-if="item.fileType === 0" type="folder" />
-          <a-icon style="margin-right:8px" v-else type="file" />
+          <template v-if="showIcon">
+            <a-icon style="margin-right:8px" v-if="item.fileType === 0" type="folder" />
+            <a-icon style="margin-right:8px" v-else type="file" />
+          </template>
           <span>{{item.title}}</span>
         </a-col>
         <!-- 文件夹 -->
@@ -86,6 +88,12 @@ export default {
     'getCurrentRoleTab',
     'getFolderHeader'
   ],
+  props: {
+    showIcon: {
+      type: Boolean,
+      default: true
+    }
+  },
   data() {
     return {
       replaceFields: {

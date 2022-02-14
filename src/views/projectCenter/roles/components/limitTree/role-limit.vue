@@ -43,7 +43,7 @@
         <!-- injectRoleTab === 3 ? 22 : 24 由于数据接入模块要在最后拼接一个库组权限, 所以要判断这里的占比 -->
         <a-col :span="(injectRoleTab === 3 ? 22 : 24) - injectActionList.length * 2">
           <span style="margin-right: 8px">全选</span>
-          <a-checkbox :disabled="status === 'show'" :checked="checkAll" @change="handleCheckAll"></a-checkbox>
+          <a-checkbox :disabled="status === 'show'" :indeterminate="indeterminate" :checked="checkAll" @change="handleCheckAll"></a-checkbox>
         </a-col>
         <a-col :span="injectActionList.length * 2">
           <a-checkbox-group :value="injectAllPermission" style="width:100%">
@@ -106,7 +106,8 @@ export default {
   },
   computed: {
     checkAll() {
-      return this.injectAllPermission.length === this.injectActionList.length
+      return this.injectAllPermission.length > 0 &&
+      this.injectAllPermission.length === this.injectActionList.length
     },
     indeterminate() {
       return (
