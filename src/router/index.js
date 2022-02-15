@@ -60,6 +60,15 @@ router.beforeEach(async (to, from, next) => {
           resetRouter()
           // 根据路由权限动态设置路由
           const accessRoutes = await store.dispatch('permission/generateRoutes', routesModule)
+
+          // TODO: 特殊判断, 仅默认项目下存在片区地图
+          if (Array.isArray(accessRoutes)) {
+            // 找到布局容器
+            let layoutRoutes = accessRoutes.find(item => item.path === '/')
+            if (layoutRoutes && +routesModule.projectId !== 1) {
+              layoutRoutes.children = layoutRoutes.children.filter(item => item.path !== '/areaManage')
+            }
+          }
           router.addRoutes(accessRoutes)
           next({ ...to, replace: true })
         } catch (error) {
