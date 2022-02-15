@@ -216,21 +216,31 @@ export default {
         // 片区列表
         const children = company.children
         let checkedNum = 0
-        const newChildren = children.map(area => {
-          // 处理网格列表
-          // const grid = [].concat(this.saveCnt > 0 ? this.cacheCheckedList.grid : this.injectAreaMapManagement.grid)
-          const grid = [].concat(this.injectAreaMapManagement.grid)
+        const grid = [].concat(this.injectAreaMapManagement.grid)
+
+        // 处理片区数据
+        const doWithArea = area => {
           const areaItem = this.doWithTreeForArea(area, grid)
-          if (areaItem.checked || areaItem.indeterminate) {
-            checkedNum++
-          }
-          // 网格列表拼接
-          gridList = gridList.concat(areaItem.children)
-          return {
-            parentName: company.name,
-            ...areaItem
-          }
-        })
+            if (areaItem.checked || areaItem.indeterminate) {
+              checkedNum++
+            }
+            // 网格列表拼接
+            gridList = gridList.concat(areaItem.children)
+            return {
+              parentName: company.name,
+              ...areaItem
+            }
+        }
+        // 特殊情况-公司下没有片区只有网格
+        let newChildren = []
+        if (children[0] && children[0].level === 2) {
+          newChildren = [].push(doWithArea({
+            name: company.name,
+            children
+          }))
+        } else {
+          newChildren = children.map(doWithArea)
+        }
         areaList = areaList.concat(newChildren)
         return {
           name: company.name,
