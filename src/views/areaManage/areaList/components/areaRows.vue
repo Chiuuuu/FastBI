@@ -124,7 +124,7 @@ export default {
     concatColumn() {
       const editPermission = checkActionPermission(this.$PERMISSION_CODE.OBJECT.areaMap, this.$PERMISSION_CODE.OPERATOR.edit)
       const configColumns = [].concat(this.configColumns)
-      if (editPermission) {
+      if (!editPermission) {
         configColumns.pop()
       }
       return this.dataColumns.concat(configColumns)

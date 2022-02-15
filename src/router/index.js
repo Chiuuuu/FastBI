@@ -55,7 +55,7 @@ router.beforeEach(async (to, from, next) => {
       } else {
         try {
           // 获取用户的对应的路由权限
-          const { routesModule } = await store.dispatch('user/getInfo')
+          const { routesModule, selectProject } = await store.dispatch('user/getInfo')
           // 先在添加之前先清空之前的路由防止重复添加
           resetRouter()
           // 根据路由权限动态设置路由
@@ -65,7 +65,7 @@ router.beforeEach(async (to, from, next) => {
           if (Array.isArray(accessRoutes)) {
             // 找到布局容器
             let layoutRoutes = accessRoutes.find(item => item.path === '/')
-            if (layoutRoutes && +routesModule.projectId !== 1) {
+            if (layoutRoutes && +selectProject !== 1) {
               layoutRoutes.children = layoutRoutes.children.filter(item => item.path !== '/areaManage')
             }
           }
