@@ -70,7 +70,7 @@
       rowKey="id"
       :loading="loading"
       :data-source="dataList"
-      :columns="dataColumns.concat(configColumns)"
+      :columns="concatColumn"
       :pagination="false"
       :scroll="{ x: 3800, y: 'calc(100vh - 480px)' }"
     >
@@ -113,11 +113,23 @@
 </template>
 
 <script>
+import { checkActionPermission } from '@/utils/permission'
 import paginationMixin from '@/mixins/pagination'
 import { trimFormData } from '@/utils/form-utils'
+
 export default {
   name: 'areaRows',
   mixins: [paginationMixin],
+  computed: {
+    concatColumn() {
+      const editPermission = checkActionPermission(this.$PERMISSION_CODE.OBJECT.areaMap, this.$PERMISSION_CODE.OPERATOR.edit)
+      const configColumns = [].concat(this.configColumns)
+      if (editPermission) {
+        configColumns.pop()
+      }
+      return this.dataColumns.concat(configColumns)
+    }
+  },
   data() {
     return {
       loading: false,
