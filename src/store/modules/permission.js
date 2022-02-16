@@ -54,11 +54,20 @@ const mutations = {
 }
 
 const actions = {
-  generateRoutes({ commit }, roles) {
+  generateRoutes({ commit, rootState }, roles) {
     return new Promise((resolve, reject) => {
       let accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
       const { routes, children } = getRenderRouter(accessedRoutes)
       if (children && children.length > 0) {
+        // TODO: 特殊判断, 仅默认项目下存在片区地图
+        if (+rootState.user.selectProject !== 1) {
+          const index = children.findIndex(item => item.path === '/areaManage')
+          children.splice(index, 1)
+        }
+        if (children.length === 0) {
+          reject(new Error('菜单不存在'))
+          return
+        }
         setRedirect(routes)
         commit('SET_ROUTES', accessedRoutes)
         resolve(accessedRoutes)

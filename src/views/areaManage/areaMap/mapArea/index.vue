@@ -66,6 +66,7 @@
               v-for="(item, index) in gridList"
               :key="index"
               :value="item.grid"
+              :disabled="validDrawn(item.section)"
               >{{ item.grid }}</a-select-option
             >
           </template>
