@@ -122,7 +122,7 @@ export default {
   mixins: [paginationMixin],
   computed: {
     concatColumn() {
-      const editPermission = checkActionPermission(this.$PERMISSION_CODE.OBJECT.areaMap, this.$PERMISSION_CODE.OPERATOR.edit)
+      const editPermission = checkActionPermission(this.$PERMISSION_CODE.OBJECT.areaManage, this.$PERMISSION_CODE.OPERATOR.edit)
       const configColumns = [].concat(this.configColumns)
       if (!editPermission) {
         configColumns.pop()
