@@ -169,32 +169,40 @@ export default {
         this.renderTree()
       }
     },
+    // 从返回的列表中判断当前节点是否被选中
+    validChecked(name, list) {
+      const index = list.findIndex(n => n === name)
+      if (index > -1) {
+        // 减少下一次循环次数
+        list.splice(index, 1)
+        return true
+      }
+      return false
+    },
     // 处理片区下的网格树
-    doWithTreeForArea(area, grid) {
+    doWithTreeForArea(area, grid, section) {
       // 通过接口获取已勾选的网格
       let checkedNum = 0
       const children = area.children
       const res = children.map(item => {
-        let checked = false
         // 判断当前网格是否被选中
-        const index = grid.findIndex(n => n === item.name)
-        if (index > -1) {
+        const checked = this.validChecked(item.name, grid)
+        if (checked) {
           checkedNum++
-          checked = true
-          // 减少下一次循环次数
-          grid.splice(index, 1)
         }
         return {
           name: item.name,
           parentName: area.name,
-          checked: checkedNum > 0 && checked,
+          checked: checked,
           indeterminate: false,
           children: []
         }
       })
+      // 二次判定是否选中
+      const checked = this.validChecked(area.name, section)
       return {
         name: area.name,
-        checked: checkedNum > 0 && checkedNum === children.length,
+        checked: (checkedNum > 0 && checkedNum === children.length) || checked,
         indeterminate: checkedNum > 0 && checkedNum < children.length,
         children: res
       }
@@ -217,10 +225,12 @@ export default {
         const children = company.children
         let checkedNum = 0
         const grid = [].concat(this.injectAreaMapManagement.grid)
+        const section = [].concat(this.injectAreaMapManagement.section)
+        const headOffice = [].concat(this.injectAreaMapManagement.headOffice)
 
         // 处理片区数据
         const doWithArea = area => {
-          const areaItem = this.doWithTreeForArea(area, grid)
+          const areaItem = this.doWithTreeForArea(area, grid, section)
             if (areaItem.checked || areaItem.indeterminate) {
               checkedNum++
             }
@@ -242,10 +252,12 @@ export default {
           newChildren = children.map(doWithArea)
         }
         areaList = areaList.concat(newChildren)
+        // 二次判定是否选中
+        const checked = this.validChecked(company.name, headOffice)
         return {
           name: company.name,
           parentName: '',
-          checked: checkedNum > 0 && checkedNum === children.length,
+          checked: (checkedNum > 0 && checkedNum === children.length) || checked,
           indeterminate: checkedNum > 0 && checkedNum < children.length,
           children: newChildren
         }
