@@ -55,11 +55,12 @@ router.beforeEach(async (to, from, next) => {
       } else {
         try {
           // 获取用户的对应的路由权限
-          const { routesModule } = await store.dispatch('user/getInfo')
+          const { routesModule, selectProject } = await store.dispatch('user/getInfo')
           // 先在添加之前先清空之前的路由防止重复添加
           resetRouter()
           // 根据路由权限动态设置路由
           const accessRoutes = await store.dispatch('permission/generateRoutes', routesModule)
+
           router.addRoutes(accessRoutes)
           next({ ...to, replace: true })
         } catch (error) {

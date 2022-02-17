@@ -36,10 +36,7 @@ import { getRenderRouter } from '@/utils/permission'
 import isEqual from 'lodash/isEqual'
 export default {
   data() {
-    const renderRouter = getRenderRouter(this.$store.state.permission.routes)
-    const menuData = this.getMenuData(renderRouter.children)
     return {
-      menuData: menuData,
       openKeys: [],
       selectedKeys: []
     }
@@ -51,6 +48,12 @@ export default {
   },
   created() {
     this.setSelectKeys()
+  },
+  computed: {
+    menuData() {
+      const renderRouter = getRenderRouter(this.$store.state.permission.routes)
+      return this.getMenuData(renderRouter.children)
+    }
   },
   methods: {
     setSelectKeys() {

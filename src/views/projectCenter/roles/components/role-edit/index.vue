@@ -19,13 +19,14 @@
                 <a-input v-model="form.description" placeholder="请输入角色描述"></a-input>
               </a-form-model-item>
             </a-form-model>
-            <RoleTabeRole
+            <RolesTabRole
               status="edit"
               @getChangeItem="getChangeItem"
               @getTablePermi="getTablePermi"
+              @getAreaMapManagement="getAreaMapManagement"
               @setBasePrivilege="getBasePrivilege"
               @setSourceType="setSourceType"
-              ></RoleTabeRole>
+              ></RolesTabRole>
             <!-- <RolesTabDataPermission status="edit"></RolesTabDataPermission> -->
           </div>
         </div>
@@ -38,13 +39,13 @@
 import { mapState } from 'vuex'
 import { trimFormData } from '@/utils/form-utils'
 // import RolesTabDataPermission from '../tab-content/rolesTabDataPermission'
-import RoleTabeRole from '../tab-content/rolesTabRole'
+import RolesTabRole from '../tab-content/rolesTabRole'
 
 export default {
   name: 'roleEdit',
   components: {
     // RolesTabDataPermission,
-    RoleTabeRole
+    RolesTabRole
   },
   data() {
     return {
@@ -88,7 +89,9 @@ export default {
       basePrivilege: [],
       screen: [],
       dataModel: [],
-      dataSource: []
+      dataSource: [],
+      areaMap: [],
+      areaMapManagement: {}
     }
   },
   computed: {
@@ -133,27 +136,20 @@ export default {
         case 3:
           role = 'dataSource'
           break
+        case 4:
+          role = 'areaMap'
+          break
       }
       // 初始化时, 把有勾选的对象都插入进去(后台约定)
       if (Array.isArray(item)) {
         this[role] = this[role].concat(item)
       } else { // 改变单个对象时, 把对象修改或者插入
         const list = this[role]
-        const target = list.find(t => t.id === item.id)
+        const target = list.find(t => role < 4 ? t.id === item.id : t.title === item.title)
         if (target) {
           target.permissions = item.permissions
         } else {
-          // const params = {
-          //   id: item.id,
-          //   permissions: item.permissions,
-          //   name: item.title,
-          //   dataBasePri: []
-          // }
-          // if (role === 3 && item.fileType === 1) {
-          //   params.dataBasePri = []
-          // }
-          // list.push(params)
-          list.push(item)
+          list.push(item.dataRef || item)
         }
       }
     },
@@ -168,6 +164,9 @@ export default {
           break
         case 3:
           role = 'dataSource'
+          break
+        case 4:
+          role = 'areaMap'
           break
       }
       const list = this[role]
@@ -190,6 +189,10 @@ export default {
         })
       }
     },
+    // 设置片区数据
+    getAreaMapManagement(data) {
+      this.areaMapManagement = data
+    },
     // 设置数据源类型
     setSourceType(data) {
       this.sourceType = data
@@ -201,7 +204,9 @@ export default {
         basePermissions: this.basePrivilege,
         screen: this.screen,
         dataModel: this.dataModel,
-        dataSource: this.dataSource
+        dataSource: this.dataSource,
+        areaMap: this.areaMap,
+        areaMapManagement: this.areaMapManagement
       }, this.form)
 
       const promiseall = [

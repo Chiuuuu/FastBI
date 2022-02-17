@@ -10,9 +10,9 @@
             <a-tab-pane key="permission" tab="权限设置">
               <role-permission ref='permissionManage'></role-permission>
             </a-tab-pane>
-            <a-tab-pane key="user" tab="角色用户">
+            <!-- <a-tab-pane key="user" tab="角色用户">
               <role-user ref="userManage"></role-user>
-            </a-tab-pane>
+            </a-tab-pane> -->
           </a-tabs>
         </div>
       </div>

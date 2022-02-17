@@ -1,47 +1,31 @@
 <template>
-<!-- 对应模块 -->
+<!-- 片区地图权限 -->
   <div class="tab scrollbar">
-    <!-- 模块名称, 模块权限-新建模块and新建文件夹 -->
+    <!-- 模块名称 -->
     <a-row class="line" style="padding-left: 16px">
       <a-col span="2">{{ roleTitle }}</a-col>
       <a-col>
-        <a-checkbox-group
-          :value="options.permissions"
-          :options="options.header"
-          :disabled="status === 'show' ? true : false"
-          @change="onCheck"
-        ></a-checkbox-group>
-        <!-- 数据接入独有-数据源类型控制 -->
         <a-button
-          v-if="roleTitle === '数据接入'"
           style="margin-left:10px"
           size="small"
           type="primary"
-          @click="handleSetVisibleSource"
-        >类型</a-button>
+          @click="handleSetMapTree"
+        >{{ status === 'show' ? '查看片区身份' : '配置片区身份' }}</a-button>
       </a-col>
     </a-row>
     <!-- 权限标题(增删改查发布...) -->
     <a-row class="title">
-      <a-col :span="(injectRoleTab === 3 ? 22 : 24) - injectActionList.length * 2">
-        <span>所有目录</span>
+      <a-col :span="24 - injectActionList.length * 2">
+        <span>所有模块</span>
       </a-col>
       <a-col :span="2" align="left" v-for="item in injectActionList" :key="item.permission">
         <span>{{ item.name }}</span>
-        <a-tooltip v-if="item.permission === 'lock'" placement="top" title="锁定后原模型仅模型添加者、项目管理员和企业域管理员可编辑">
-          <a-icon style="margin-left: 2px" type="question-circle" />
-        </a-tooltip>
-      </a-col>
-      <!-- 数据接入独有-可见库组 -->
-      <a-col :span="2" align="left" v-if="injectRoleTab === 3">
-        <span>可见库组</span>
       </a-col>
     </a-row>
     <!-- 全选栏 -->
     <div class="checkbox-all">
       <a-row>
-        <!-- injectRoleTab === 3 ? 22 : 24 由于数据接入模块要在最后拼接一个库组权限, 所以要判断这里的占比 -->
-        <a-col :span="(injectRoleTab === 3 ? 22 : 24) - injectActionList.length * 2">
+        <a-col :span="24 - injectActionList.length * 2">
           <span style="margin-right: 8px">全选</span>
           <a-checkbox :disabled="status === 'show'" :indeterminate="indeterminate" :checked="checkAll" @change="handleCheckAll"></a-checkbox>
         </a-col>
@@ -63,25 +47,21 @@
       </a-row>
     </div>
 
-    <!-- 树结构 -->
+    <!-- 勾选项 -->
     <div class="content scrollbar">
-      <LimitTree ref="tree" v-on="$listeners" @setTable="handleSetVisibleTable" />
+      <LimitTree ref="tree" v-on="$listeners" :show-icon="false" />
     </div>
 
-    <!-- 可见库组模态框 -->
-    <TableSetting ref="table" :visible.sync="visibleTable" v-on="$listeners" />
-
-    <!-- 数据源类型勾选模态框 -->
-    <SourceTypeSetting ref="source" :visible.sync="visibleSourceType" v-on="$listeners" />
+    <!-- 片区地图数据配置模态框 -->
+    <MapTree ref="MapTree" :visible.sync="visibleMapTree" v-on="$listeners" />
   </div>
 </template>
 
 <script>
-import LimitTree from './limit-tree'
-import TableSetting from './table-setting.vue'
-import SourceTypeSetting from './source-type-setting.vue'
+import MapTree from './map-tree'
+import LimitTree from '../limitTree/limit-tree.vue'
 export default {
-  name: 'roleLimit',
+  name: 'mapPermission',
   inject: [
     'status',
     'getCurrentAllPermission',
@@ -95,16 +75,18 @@ export default {
   },
   data() {
     return {
-      visibleSourceType: false,
-      visibleTable: false
+      visibleMapTree: false,
+      list: [{ title: '片区地图' }, { title: '片区地址' }]
     }
   },
   components: {
-    LimitTree,
-    TableSetting,
-    SourceTypeSetting
+    MapTree,
+    LimitTree
   },
   computed: {
+    isDisabled() {
+      return this.status === 'show'
+    },
     checkAll() {
       return this.injectAllPermission.length > 0 &&
       this.injectAllPermission.length === this.injectActionList.length
@@ -134,27 +116,10 @@ export default {
       this.options.permissions = value
       this.$emit('setBasePrivilege', value, this.injectRoleTab + '')
     },
-    // 点击设置具体的库组权限
-    handleSetVisibleTable(sourceInfo) {
-      this.$refs.table && this.$refs.table.handleSetVisibleTable(sourceInfo)
-    },
-    // 点击设置具体的数据源类型权限
-    handleSetVisibleSource() {
-      this.$refs.source && this.$refs.source.handleSetVisibleSource()
-    },
-    // 根据业务转换成文件权限
-    changePermissionToFolder(permission) {
-      switch (permission) {
-        case 'read':
-          return 'folderRead'
-        case 'edit':
-        case 'lock':
-          return 'folderEdit'
-        case 'remove':
-          return 'folderRemove'
-        default:
-          return 'null'
-      }
+    // 点击配置片区地图数据
+    handleSetMapTree() {
+      this.visibleMapTree = true
+      // this.$refs.MapTree && this.$refs.MapTree.handleSetMapTree()
     },
     // 点击全选
     handleCheckAll(e) {

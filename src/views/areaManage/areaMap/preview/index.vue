@@ -3,7 +3,7 @@
     <div class="map-header">
       <span>片区地图</span>
       <a-button class="map-header-btn" @click="handleFullScreen">全屏</a-button>
-      <a-button class="map-header-btn" type="primary" @click="toEdit"
+      <a-button v-if="hasEditPermission" class="map-header-btn" type="primary" @click="toEdit"
         >编辑</a-button
       >
     </div>
@@ -12,11 +12,17 @@
 </template>
 
 <script>
+import { checkActionPermission } from '@/utils/permission'
 import MapArea from '../mapArea'
 export default {
   name: 'areaPreview',
   components: {
     MapArea
+  },
+  computed: {
+    hasEditPermission() {
+      return checkActionPermission(this.$PERMISSION_CODE.OBJECT.areaMap, this.$PERMISSION_CODE.OPERATOR.edit)
+    }
   },
   data() {
     return {}

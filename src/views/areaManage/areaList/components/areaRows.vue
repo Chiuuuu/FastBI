@@ -70,7 +70,7 @@
       rowKey="id"
       :loading="loading"
       :data-source="dataList"
-      :columns="dataColumns.concat(configColumns)"
+      :columns="concatColumn"
       :pagination="false"
       :scroll="{ x: 3800, y: 'calc(100vh - 480px)' }"
     >
@@ -113,11 +113,23 @@
 </template>
 
 <script>
+import { checkActionPermission } from '@/utils/permission'
 import paginationMixin from '@/mixins/pagination'
 import { trimFormData } from '@/utils/form-utils'
+
 export default {
   name: 'areaRows',
   mixins: [paginationMixin],
+  computed: {
+    concatColumn() {
+      const editPermission = checkActionPermission(this.$PERMISSION_CODE.OBJECT.areaMap, this.$PERMISSION_CODE.OPERATOR.edit)
+      const configColumns = [].concat(this.configColumns)
+      if (!editPermission) {
+        configColumns.pop()
+      }
+      return this.dataColumns.concat(configColumns)
+    }
+  },
   data() {
     return {
       loading: false,
@@ -165,36 +177,36 @@ export default {
           title: '地图标准地址',
           dataIndex: 'mapStandardAddress',
           ellipsis: true,
-          width: 300,
-          scopedSlots: { customRender: 'custom_14' }
+          width: 300
+          // scopedSlots: { customRender: 'custom_2' }
         },
         {
           title: '楼盘编号',
           dataIndex: 'householdNumber',
           ellipsis: true,
           width: 120
-          // scopedSlots: { customRender: 'custom_2' }
+          // scopedSlots: { customRender: 'custom_3' }
         },
         {
           title: '楼盘名称',
           dataIndex: 'communityName',
           ellipsis: true,
           width: 200,
-          scopedSlots: { customRender: 'custom_3' }
+          scopedSlots: { customRender: 'custom_4' }
         },
         {
           title: '楼盘信息提供方',
           dataIndex: 'provider',
           ellipsis: true,
           width: 200
-          // scopedSlots: { customRender: 'custom_4' }
+          // scopedSlots: { customRender: 'custom_5' }
         },
         // {
         //   title: '楼盘信息与标准地址关系是否有效',
         //   dataIndex: 'match',
         //   ellipsis: true,
         //   width: 250,
-        //   scopedSlots: { customRender: 'custom_5' }
+        //   scopedSlots: { customRender: 'custom_6' }
         // },
         {
           title: '标准地址归属分公司',
@@ -257,14 +269,14 @@ export default {
           dataIndex: 'longitude',
           ellipsis: true,
           width: 150
-          // scopedSlots: { customRender: 'custom_15' }
+          // scopedSlots: { customRender: 'custom_14' }
         },
         {
           title: '纬度',
           dataIndex: 'latitude',
           ellipsis: true,
           width: 150
-          // scopedSlots: { customRender: 'custom_16' }
+          // scopedSlots: { customRender: 'custom_15' }
         }
       ],
       configColumns: [

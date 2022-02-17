@@ -66,6 +66,7 @@
               v-for="(item, index) in gridList"
               :key="index"
               :value="item.grid"
+              :disabled="validDrawn(item.section)"
               >{{ item.grid }}</a-select-option
             >
           </template>
@@ -908,9 +909,7 @@ export default {
     async handleCheckInfo(type, target) {
       let data = target.getExtData()
       // 增城从化特殊处理(需调接口获取网格数量)
-      // const noSectionList = ['从化', '增城', '花都']
-      // if (noSectionList.includes(data.name)) {
-      if (data.areaCnt === 0) {
+      if (data.hasOwnProperty('areaCnt') && data.areaCnt === 0) {
         this.gridList =
           (await this.getGridList({ headOffice: data.name })) || []
         data = Object.assign({}, data, {
@@ -921,6 +920,11 @@ export default {
           }
         })
         type = 'companyArea'
+      } else if (type === 'area') {
+        // 获取普通的片区下网格数量
+        this.gridList =
+          (await this.getGridList({ section: data.name })) || []
+        data.setting.grid.cnt = this.gridList.length
       }
       this.infoType = type
       this.infoData = data

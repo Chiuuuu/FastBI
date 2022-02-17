@@ -80,7 +80,7 @@ export default {
   },
   computed: {
     categoryList() {
-      return this.getCategoryList().filter(n => (n.id * 1) === '1')
+      return this.getCategoryList().filter(n => (n.id * 1) !== 1)
     },
     imageUrl() {
       return process.env.VUE_APP_SERVICE_URL + this.data.filePath
